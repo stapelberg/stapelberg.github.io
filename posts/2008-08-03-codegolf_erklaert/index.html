@@ -380,7 +380,7 @@ main.
 </p>
 
 <p><h2>C, Obfuscated (216 Zeichen)</h2>
-<pre>N(I a,C**b){C*H[]={&ldquo;Sonntag&rdquo;,&ldquo;Montag&rdquo;,&ldquo;Dienstag&rdquo;,&ldquo;Mittwoch&rdquo;,&ldquo;Donnerstag&rdquo;,&ldquo;Freitag&rdquo;,&ldquo;Samstag&rdquo;},*s=&rdquo; $c-VX\`]fdZ_&ldquo;,
+<pre>N(I a,C**b){C*H[]={&quot;Sonntag&quot;,&quot;Montag&quot;,&quot;Dienstag&quot;,&quot;Mittwoch&quot;,&quot;Donnerstag&quot;,&quot;Freitag&quot;,&quot;Samstag&quot;},*s=&quot; $c-VX\`]fdZ_&quot;,
 <em>d=b[2];X(F,H[(31</em>(a=Y(s,(*d^d[3]^d[2]&amp;127)+9)-s)/12+E(b[1])+(a=E(b[3])-(a&gt;10))+a/4-a/100+a/400)%7]);}</pre></p>
 
 <p>
@@ -393,7 +393,7 @@ der Code dann aussieht ;-).
 </p>
 
 <p><h2>C, Nicht den Regeln entsprechend (155 Zeichen)</h2>
-<pre>main(int a,char**b){char*s=&rdquo; $c-VX\`]fdZ_&ldquo;,<em>d=b[2];
+<pre>main(int a,char**b){char*s=&quot; $c-VX\`]fdZ_&quot;,<em>d=b[2];
 return(31</em>(a=strchr(s,(*d^d[3]^d[2]&amp;127)+9)-s)/12+atoi(b[1])+(a=atoi(b[3])-(a&gt;10))+a/4-a/100+a/400)%7;}</pre></p>
 
 <p>
@@ -404,7 +404,7 @@ Returncode. Das spart die Definition der Tagesnahmen.
 </p>
 
 <p><h2>C, Nicht den Regeln entsprechend, obfuscated (128 Zeichen)</h2>
-<pre>N(I a,C**b){C*s=&rdquo; $c-VX\`]fdZ_&ldquo;,<em>d=b[2];R(31</em>(a=Y(s,(*d^d[3]^d[2]&amp;127)+9)-s)/12+E(b[1])+(a=E(b[3])-(a&gt;10))+a/4-a/100+a/400)%7;}</pre></p>
+<pre>N(I a,C**b){C*s=&quot; $c-VX\`]fdZ_&quot;,<em>d=b[2];R(31</em>(a=Y(s,(*d^d[3]^d[2]&amp;127)+9)-s)/12+E(b[1])+(a=E(b[3])-(a&gt;10))+a/4-a/100+a/400)%7;}</pre></p>
 
 <p>
 Wenn man jetzt die eben genannte Variante nochmal obfuscated, sieht das ganze
@@ -419,7 +419,7 @@ t=(J F z A Ma ni li g S O N D)
 w=(SonnX MonX DiensX Mittwoch DonnersX FreiX SamsX)
 for((i=0;i&lt;12;i++));do echo $2|grep -q ${t[i]}&amp;&amp;m=$[i+2];done
 y=$3
-echo ${w[$[m&lt;4&amp;&amp;(m+=12,y&ndash;),(${1/.}+13*m/5+y+y/4-y/100+y/400+6)%7]]/X/tag}
+echo ${w[$[m&lt;4&amp;&amp;(m+=12,y--),(${1/.}+13*m/5+y+y/4-y/100+y/400+6)%7]]/X/tag}
 </pre></p>
 
 <p>

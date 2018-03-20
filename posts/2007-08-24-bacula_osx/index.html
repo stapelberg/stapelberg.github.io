@@ -214,7 +214,7 @@ target="_blank" title="explanatorygap.net">explanatorygap.net</a> gefunden. Es
 muss auf dem USB-Stick (oder -Festplatte) gespeichert werden.
 </p>
 <p class="filenameHeader">rd.sh</p>
-<pre>echo &ldquo;Creating RAM Disk for $1&rdquo;
+<pre>echo &quot;Creating RAM Disk for $1&quot;
 dev=<code>hdik -drivekey system-image=yes -nomount ram://2048</code>
 if [ $? -eq 0 ] ; then
     newfs $dev

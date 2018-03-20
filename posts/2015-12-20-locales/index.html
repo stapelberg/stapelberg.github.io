@@ -306,7 +306,7 @@ codeset is UTF-8.
 A good end-to-end test could be to run the following <code>perl</code> command:
 </p>
 <pre>
-$ perl -MPOSIX -Mlocale -e &lsquo;print strftime(&ldquo;%c&rdquo;, localtime) . &ldquo;\n&rdquo;&rsquo;
+$ perl -MPOSIX -Mlocale -e 'print strftime(&quot;%c&quot;, localtime) . &quot;\n&quot;'
 2015-12-20T16:22:09 CET
 </pre></p>
 
@@ -314,16 +314,16 @@ $ perl -MPOSIX -Mlocale -e &lsquo;print strftime(&ldquo;%c&rdquo;, localtime) . 
 In case your locales are misconfigured, <code>perl</code> will complain loudly:
 </p>
 <pre>
-$ LC_TIME=en_AU.UTF-8 perl -MPOSIX -Mlocale -e &lsquo;print strftime(&ldquo;%c&rdquo;, localtime) . &ldquo;\n&rdquo;&rsquo;
+$ LC_TIME=en_AU.UTF-8 perl -MPOSIX -Mlocale -e 'print strftime(&quot;%c&quot;, localtime) . &quot;\n&quot;'
 perl: warning: Setting locale failed.
 perl: warning: Please check that your locale settings:
     LANGUAGE = (unset),
     LC_ALL = (unset),
-    LC_TIME = &ldquo;en_AU.UTF-8&rdquo;,
-    LC_MESSAGES = &ldquo;C&rdquo;,
-    LANG = &ldquo;de_CH.UTF-8&rdquo;
+    LC_TIME = &quot;en_AU.UTF-8&quot;,
+    LC_MESSAGES = &quot;C&quot;,
+    LANG = &quot;de_CH.UTF-8&quot;
     are supported and installed on your system.
-perl: warning: Falling back to a fallback locale (&ldquo;de_CH.UTF-8&rdquo;).
+perl: warning: Falling back to a fallback locale (&quot;de_CH.UTF-8&quot;).
 Son 20 Dez 2015 16:22:58 CET
 </pre></p>
 

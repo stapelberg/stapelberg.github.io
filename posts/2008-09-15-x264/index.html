@@ -381,7 +381,7 @@ herunterladen">direkt herunterladen</a>.
 <pre>
 #!/bin/sh</p>
 
-<h1 id="c-2007-michael-stapelberg">&copy; 2007 Michael Stapelberg</h1>
+<h1 id="c-2007-michael-stapelberg">(c) 2007 Michael Stapelberg</h1>
 
 <h1 id="http-michael-stapelberg-de-artikel-x264"><a href="http://michael.stapelberg.de/Artikel/x264">http://michael.stapelberg.de/Artikel/x264</a></h1>
 
@@ -401,11 +401,11 @@ herunterladen">direkt herunterladen</a>.
 
 <h1 id="encodemkv-sh-lt-source-file-gt-lt-title-gt-output-file">encodeMKV.sh &lt;source-file&gt; &lt;title&gt; [output-file]</h1>
 
-<h1 id="toc_8">&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;</h1>
+<h1 id="toc_8">------------------------------------------------------------------------</h1>
 
 <h1 id="configuration">Configuration</h1>
 
-<h1 id="toc_10">&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;</h1>
+<h1 id="toc_10">------------------------------------------------------------------------</h1>
 
 <h1 id="ogg-quality-from-0-to-10">Ogg-Quality (from 0 to 10)</h1>
 
@@ -417,40 +417,40 @@ herunterladen">direkt herunterladen</a>.
 
 <h1 id="if-you-do-not-want-to-install-the-programs-in-path-you-can">If you do not want to install the programs in $PATH, you can</h1>
 
-<h1 id="specify-their-path-here-hard-coded">specify their path here hard-coded&hellip;</h1>
+<h1 id="specify-their-path-here-hard-coded">specify their path here hard-coded...</h1>
 
 <p>MENCODER=<code>which mencoder</code>
 MPLAYER=<code>which mplayer</code>
 OGGENC=<code>which oggenc</code>
 MKVMERGE=<code>which mkvmerge</code></p>
 
-<h1 id="toc_15">&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;</h1>
+<h1 id="toc_15">------------------------------------------------------------------------</h1>
 
-<h1 id="don-t-touch-the-script-below-if-you-do-not-know-what-you-re-doing">Don&rsquo;t touch the script below if you do not know what you&rsquo;re doing :)</h1>
+<h1 id="don-t-touch-the-script-below-if-you-do-not-know-what-you-re-doing">Don't touch the script below if you do not know what you're doing :)</h1>
 
-<h1 id="toc_17">&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;</h1>
+<h1 id="toc_17">------------------------------------------------------------------------</h1>
 
 <h1 id="check-if-all-programs-are-here-before-starting-the-work">Check if all programs are here before starting the work</h1>
 
-<p>if [ -z &ldquo;${MENCODER}&rdquo; -o -z &ldquo;${MPLAYER}&rdquo; ]; then
-    echo &ldquo;Error: mencoder or mplayer was not found. Please install it&rdquo;
+<p>if [ -z &quot;${MENCODER}&quot; -o -z &quot;${MPLAYER}&quot; ]; then
+    echo &quot;Error: mencoder or mplayer was not found. Please install it&quot;
     exit 1
 fi</p>
 
-<p>if [ -z &ldquo;${OGGENC}&rdquo; ]; then
-    echo &ldquo;Error: oggenc was not found. Please install it&rdquo;
+<p>if [ -z &quot;${OGGENC}&quot; ]; then
+    echo &quot;Error: oggenc was not found. Please install it&quot;
     exit 1
 fi</p>
 
-<p>if [ -z &ldquo;${MKVMERGE}&rdquo; ]; then
-    echo &ldquo;Error: mkvmerge was not found. Please install it&rdquo;
+<p>if [ -z &quot;${MKVMERGE}&quot; ]; then
+    echo &quot;Error: mkvmerge was not found. Please install it&quot;
     exit 1
 fi</p>
 
 <h1 id="check-if-the-necessary-parameters-were-given">Check if the necessary parameters were given</h1>
 
-<p>if [ -z &ldquo;${2}&rdquo; ]; then
-    echo &ldquo;Syntax: ${0} &lt;source-file&gt; &lt;title&gt; [output-file]&rdquo;
+<p>if [ -z &quot;${2}&quot; ]; then
+    echo &quot;Syntax: ${0} &lt;source-file&gt; &lt;title&gt; [output-file]&quot;
     exit 1
 fi</p>
 
@@ -461,72 +461,72 @@ TMP_VID=${1}.tmpv
 TMP_AUD=${1}.tmpa</p>
 
 <p>TITLE=${2}
-if [ -z &ldquo;${3}&rdquo; ]; then
+if [ -z &quot;${3}&quot; ]; then
     MKV=${1}.mkv
 else
     MKV=${3}
 fi</p>
 
-<p>if [ ! -f &ldquo;${SRC_VID}&rdquo; ]; then
-    echo &ldquo;Error: Sourcefile does not exist&rdquo;
+<p>if [ ! -f &quot;${SRC_VID}&quot; ]; then
+    echo &quot;Error: Sourcefile does not exist&quot;
     exit 2
 fi</p>
 
-<p>echo -e &ldquo;\nx264/matroska-encode-script\n&rdquo;
-echo &ldquo;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&rdquo;
-echo &ldquo;Encoding \&ldquo;${SRC_VID}\&rdquo; to \&ldquo;${MKV}\&ldquo;&hellip;&rdquo;
-echo -e &ldquo;\tTitle: ${TITLE}&rdquo;
-echo -e &ldquo;\t(Temporary video file: ${TMP_VID})&rdquo;
-echo -e &ldquo;\t(Temporary audio file: ${TMP_AUD})&rdquo;
-echo -e &ldquo;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;\n&rdquo;</p>
+<p>echo -e &quot;\nx264/matroska-encode-script\n&quot;
+echo &quot;------------------------------------------------------------------------&quot;
+echo &quot;Encoding \&quot;${SRC_VID}\&quot; to \&quot;${MKV}\&quot;...&quot;
+echo -e &quot;\tTitle: ${TITLE}&quot;
+echo -e &quot;\t(Temporary video file: ${TMP_VID})&quot;
+echo -e &quot;\t(Temporary audio file: ${TMP_AUD})&quot;
+echo -e &quot;------------------------------------------------------------------------\n&quot;</p>
 
 <h1 id="delete-the-tempfiles">Delete the tempfiles</h1>
 
-<p>rm -f &ldquo;${TMP_VID}&rdquo; &ldquo;${TMP_AUD}&rdquo; &ldquo;${TMP_AUD}.ogg&rdquo;</p>
+<p>rm -f &quot;${TMP_VID}&quot; &quot;${TMP_AUD}&quot; &quot;${TMP_AUD}.ogg&quot;</p>
 
 <h1 id="encode-video">Encode video</h1>
 
 <p>${MENCODER} -really-quiet -ovc x264 -x264encopts <br />
 bitrate=${X264_BITRATE}:subq=6:partitions=all:8x8dct:me=umh:frameref=5:bframes=3:b_pyramid:weight_b:pass=1 <br />
--oac copy -of rawvideo -o &ldquo;${TMP_VID}&rdquo; &ldquo;${SRC_VID}&rdquo; 1&gt;&amp;- || {
-    echo -e &ldquo;\nError: mencoder could not encode the file. Check the printed errors&rdquo;
+-oac copy -of rawvideo -o &quot;${TMP_VID}&quot; &quot;${SRC_VID}&quot; 1&gt;&amp;- || {
+    echo -e &quot;\nError: mencoder could not encode the file. Check the printed errors&quot;
     exit 2
 }
 ${MENCODER} -really-quiet -ovc x264 -x264encopts <br />
 bitrate=${X264_BITRATE}:subq=6:partitions=all:8x8dct:me=umh:frameref=5:bframes=3:b_pyramid:weight_b:pass=2 <br />
--oac copy -of rawvideo -o &ldquo;${TMP_VID}&rdquo; &ldquo;${SRC_VID}&rdquo; 1&gt;&amp;- || {
-    echo -e &ldquo;\nError: mencoder could not encode the file. Check the printed errors&rdquo;
+-oac copy -of rawvideo -o &quot;${TMP_VID}&quot; &quot;${SRC_VID}&quot; 1&gt;&amp;- || {
+    echo -e &quot;\nError: mencoder could not encode the file. Check the printed errors&quot;
     exit 2
 }</p>
 
 <h1 id="extract-audio">Extract audio</h1>
 
-<p>${MPLAYER} -really-quiet -vo null -ao pcm:fast:file=&ldquo;${TMP_AUD}&rdquo; &ldquo;${SRC_VID}&rdquo; || {
-    echo -e &ldquo;\nError: Audio-track could not be extracted via mplayer. Check the printed errors&rdquo;
+<p>${MPLAYER} -really-quiet -vo null -ao pcm:fast:file=&quot;${TMP_AUD}&quot; &quot;${SRC_VID}&quot; || {
+    echo -e &quot;\nError: Audio-track could not be extracted via mplayer. Check the printed errors&quot;
     exit 2
 }</p>
 
 <h1 id="encode-audio">Encode audio</h1>
 
-<p>${OGGENC} -Q -q${OGG_QUALITY} &ldquo;${TMP_AUD}&rdquo; -o &ldquo;${TMP_AUD}.ogg&rdquo; || {
-    echo -e &ldquo;\nError: Audio-track could not be converted to ogg. Check the printed errors&rdquo;
+<p>${OGGENC} -Q -q${OGG_QUALITY} &quot;${TMP_AUD}&quot; -o &quot;${TMP_AUD}.ogg&quot; || {
+    echo -e &quot;\nError: Audio-track could not be converted to ogg. Check the printed errors&quot;
     exit 2
 }</p>
 
 <h1 id="mux-files-to-mkv">Mux files to MKV</h1>
 
-<p>${MKVMERGE} -q -o &ldquo;${MKV}&rdquo; &ndash;title &ldquo;${TITLE}&rdquo; &ndash;default-language ger &ldquo;${TMP_VID}&rdquo; &ldquo;${TMP_AUD}.ogg&rdquo; || {
-    echo -e &ldquo;\nError: Files could not be muxed to mkv. Check the printed erorrs&rdquo;
+<p>${MKVMERGE} -q -o &quot;${MKV}&quot; --title &quot;${TITLE}&quot; --default-language ger &quot;${TMP_VID}&quot; &quot;${TMP_AUD}.ogg&quot; || {
+    echo -e &quot;\nError: Files could not be muxed to mkv. Check the printed erorrs&quot;
     exit 2
 }</p>
 
 <h1 id="delete-tempfiles">Delete tempfiles</h1>
 
-<p>rm &ldquo;${TMP_VID}&rdquo; &ldquo;${TMP_AUD}&rdquo; &ldquo;${TMP_AUD}.ogg&rdquo;</p>
+<p>rm &quot;${TMP_VID}&quot; &quot;${TMP_AUD}&quot; &quot;${TMP_AUD}.ogg&quot;</p>
 
-<p>echo -e &ldquo;\n&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&rdquo;
-echo &ldquo;Created videofile \&ldquo;${MKV}\&ldquo;!&rdquo;
-echo &ldquo;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&rdquo;
+<p>echo -e &quot;\n------------------------------------------------------------------------&quot;
+echo &quot;Created videofile \&quot;${MKV}\&quot;!&quot;
+echo &quot;------------------------------------------------------------------------&quot;
 </pre></p>
 
 </div></div></div></div></div></div></body>

@@ -144,11 +144,11 @@ beliebig. Ich habe als Variable zum Beispiel <code>%name</code> verwendet. Mit
 </pre></p>
 
 <p><h3>Einbindung in bacula-dir.conf</h3>
-<pre>@&quot;|sed &rsquo;s/%name/codebox/g;s/%ret/2 weeks/g&rsquo; /etc/bacula/default-pool.inc&quot;</pre>
+<pre>@&quot;|sed 's/%name/codebox/g;s/%ret/2 weeks/g' /etc/bacula/default-pool.inc&quot;</pre>
 <p>Hier wurde also <code>%name</code> durch „codebox” ersetzt und die Volume Retention-Variable <code>%ret</code> durch „2 weeks”. Nach diesem Schema kann man nun mehrere Rechner sehr einfach einbinden:</p>
-<pre>@&quot;|sed &rsquo;s/%name/codebox/g;s/%ret/2 weeks/g&rsquo; /etc/bacula/default-pool.inc&quot;
-@&quot;|sed &rsquo;s/%name/ibook/g;s/%ret/4 weeks/g&rsquo; /etc/bacula/default-pool.inc&quot;
-@&quot;|sed &rsquo;s/%name/macbook/g;s/%ret/4 weeks/g&rsquo; /etc/bacula/default-pool.inc&quot;</pre>
+<pre>@&quot;|sed 's/%name/codebox/g;s/%ret/2 weeks/g' /etc/bacula/default-pool.inc&quot;
+@&quot;|sed 's/%name/ibook/g;s/%ret/4 weeks/g' /etc/bacula/default-pool.inc&quot;
+@&quot;|sed 's/%name/macbook/g;s/%ret/4 weeks/g' /etc/bacula/default-pool.inc&quot;</pre>
 <p>Das macht dann 3 Zeilen im Vergleich zu 24 Zeilen Konfigurationsaufwand…</p></p>
 
 <p><h3>Template-Datei default-client.inc</h3>
@@ -157,7 +157,7 @@ beliebig. Ich habe als Variable zum Beispiel <code>%name</code> verwendet. Mit
     Address = %address
     FDPort = 9102
     Catalog = MyCatalog
-    Password = &ldquo;%pass&rdquo;
+    Password = &quot;%pass&quot;
     File Retention = %ret
     Job Retention = %ret
     AutoPrune = yes
@@ -167,7 +167,7 @@ Hierbei ist darauf zu achten, dass man – da <code>sed</code> manche Zeichen
 anders interpretiert – manche Zeichen escapen muss. Da der Parser von Bacula
 jedoch auch escaped, muss man sogar doppeltes Escaping vornehmen:
 </p>
-<pre>@&quot;|sed &rsquo;s/%name/codebox/g;s/%address/codebox/g;s/%ret/2 weeks/g;s/%pass/password mit \/ slash/g&rsquo; /etc/bacula/default-client.inc&quot;</pre>
+<pre>@&quot;|sed 's/%name/codebox/g;s/%address/codebox/g;s/%ret/2 weeks/g;s/%pass/password mit \/ slash/g' /etc/bacula/default-client.inc&quot;</pre>
 <p>Dieser Aufruf entspricht dem Passwort „password mit / slash”.</p></p>
 
 <p><h3>Template-Datei default-device.inc</h3>
@@ -212,15 +212,15 @@ File = /.vol</pre></p>
 
 <p><h3>Template-Datei default-job.inc</h3>
 <pre>Job {
-    Name = &ldquo;%name&rdquo;
+    Name = &quot;%name&quot;
     Type = Backup
     Client = %name-fd
-    FileSet = &ldquo;%name-set&rdquo;
-    Schedule = &ldquo;%name-sched&rdquo;
+    FileSet = &quot;%name-set&quot;
+    Schedule = &quot;%name-sched&quot;
     Storage = %name-storage
     Messages = Standard
     Priority = 10
-    Write Bootstrap = &ldquo;/raid/%name/bootstrap&rdquo;
+    Write Bootstrap = &quot;/raid/%name/bootstrap&quot;
     Pool = %name
 }</pre>
 <p>
@@ -234,7 +234,7 @@ Ausbeute, was Zeilen und Ersetzungen angeht.
     # Use VPN address here to enable clients connecting via VPN to back up
     Address = fs.vpn
     SDPort = 9103
-    Password = &ldquo;secret&rdquo;
+    Password = &quot;secret&quot;
     Device = %name-files
     Media Type = File
 }</pre></p>
@@ -247,14 +247,14 @@ Ausbeute, was Zeilen und Ersetzungen angeht.
 
 <h1 id="name-name-of-the-machine-to-be-backed-up">%name - name of the machine to be backed up</h1>
 
-<h1 id="compression-leave-blank-or-set-to-compression-gzip">%compression - leave blank or set to &lsquo;compression = gzip&rsquo;</h1>
+<h1 id="compression-leave-blank-or-set-to-compression-gzip">%compression - leave blank or set to 'compression = gzip'</h1>
 
-<h1 id="mac-leave-blank-or-set-to-hfsplussupport-yes">%mac - leave blank or set to &lsquo;hfsplussupport = yes&rsquo;</h1>
+<h1 id="mac-leave-blank-or-set-to-hfsplussupport-yes">%mac - leave blank or set to 'hfsplussupport = yes'</h1>
 
 <h1 id="os-set-mac-or-linux-or-windows">%os - set mac or linux or windows</h1>
 
 <p>FileSet {
-    Name = &ldquo;%name-set&rdquo;
+    Name = &quot;%name-set&quot;
     Include {
         Options {
             signature = MD5

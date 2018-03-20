@@ -510,7 +510,7 @@ CMD ["/usr/sbin/smbd", "-FS"]
 <pre>
 #cloud-config</p>
 
-<p>hostname: &ldquo;storage&rdquo;</p>
+<p>hostname: &quot;storage&quot;</p>
 
 <p>ssh_authorized_keys:
   - ssh-rsa AAAAB… michael@midna</p>
@@ -518,9 +518,9 @@ CMD ["/usr/sbin/smbd", "-FS"]
 <p>write_files:
   - path: /etc/ssl/certs/r.zekjur.net.crt
     content: |
-      &mdash;&ndash;BEGIN CERTIFICATE&mdash;&ndash;
+      -----BEGIN CERTIFICATE-----
       MIIDYjCCAko…
-      &mdash;&ndash;END CERTIFICATE&mdash;&ndash;
+      -----END CERTIFICATE-----
   - path: /var/lib/ip6tables/rules-save
     permissions: 0644
     owner: root:root
@@ -530,24 +530,24 @@ CMD ["/usr/sbin/smbd", "-FS"]
       :INPUT DROP [0:0]
       :FORWARD ACCEPT [0:0]
       :OUTPUT ACCEPT [0:0]
-      -A INPUT -p ipv6-icmp -m comment &ndash;comment &ldquo;IPv6 needs ICMPv6 to work&rdquo; -j ACCEPT
-      -A INPUT -m state &ndash;state RELATED,ESTABLISHED -m comment &ndash;comment &ldquo;Allow packets for outgoing connections&rdquo; -j ACCEPT
-      -A INPUT -s fe80::/10 -d fe80::/10 -m comment &ndash;comment &ldquo;Allow link-local traffic&rdquo; -j ACCEPT
-      -A INPUT -s 2001:db8::/32 -m comment &ndash;comment &ldquo;local traffic&rdquo; -j ACCEPT
-      -A INPUT -p tcp -m tcp &ndash;dport 22 -m comment &ndash;comment &ldquo;SSH&rdquo; -j ACCEPT
+      -A INPUT -p ipv6-icmp -m comment --comment &quot;IPv6 needs ICMPv6 to work&quot; -j ACCEPT
+      -A INPUT -m state --state RELATED,ESTABLISHED -m comment --comment &quot;Allow packets for outgoing connections&quot; -j ACCEPT
+      -A INPUT -s fe80::/10 -d fe80::/10 -m comment --comment &quot;Allow link-local traffic&quot; -j ACCEPT
+      -A INPUT -s 2001:db8::/32 -m comment --comment &quot;local traffic&quot; -j ACCEPT
+      -A INPUT -p tcp -m tcp --dport 22 -m comment --comment &quot;SSH&quot; -j ACCEPT
       COMMIT
       # Completed on Fri Aug 26 19:57:51 2016
   - path: /root/.ssh/authorized_keys
     permissions: 0600
     owner: root:root
     content: |
-      command=&ldquo;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/midna:/srv/backup/midna stapelberg/rsync /srv/backup/midna&rdquo; ssh-rsa AAAAB… root@midna
-      command=&ldquo;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/scan2drive:/srv/backup/scan2drive stapelberg/rsync /srv/backup/scan2drive&rdquo; ssh-rsa AAAAB… root@scan2drive
-      command=&ldquo;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/alp.zekjur.net:/srv/backup/alp.zekjur.net stapelberg/rsync /srv/backup/alp.zekjur.net&rdquo; ssh-rsa AAAAB… root@alp</p>
+      command=&quot;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/midna:/srv/backup/midna stapelberg/rsync /srv/backup/midna&quot; ssh-rsa AAAAB… root@midna
+      command=&quot;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/scan2drive:/srv/backup/scan2drive stapelberg/rsync /srv/backup/scan2drive&quot; ssh-rsa AAAAB… root@scan2drive
+      command=&quot;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/alp.zekjur.net:/srv/backup/alp.zekjur.net stapelberg/rsync /srv/backup/alp.zekjur.net&quot; ssh-rsa AAAAB… root@alp</p>
 
 <p>coreos:
   update:
-    reboot-strategy: &ldquo;reboot&rdquo;
+    reboot-strategy: &quot;reboot&quot;
   locksmith:
     window_start: 01:00 # UTC, i.e. 02:00 CET or 03:00 CEST
     window_length: 2h  # i.e. until 03:00 CET or 04:00 CEST

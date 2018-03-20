@@ -248,7 +248,7 @@ weiter – außer man definiert den Dialplan für die Extension <code>h</code> (
 exten =&gt; 23,1,System(/home/michael/.pbx/cmus-incoming.sh)
 exten =&gt; 23,2,Dial(SIP/23,30,gj)
 exten =&gt; 23,3,System(/home/michael/.pbx/cmus-hangup.sh)
-exten =&gt; 23,4,GotoIf($[ ${DIALSTATUS} = &ldquo;NOANSWER&rdquo; ]?103)
+exten =&gt; 23,4,GotoIf($[ ${DIALSTATUS} = &quot;NOANSWER&quot; ]?103)
 exten =&gt; 23,5,Hangup()</p>
 
 <p>exten =&gt; 23,103,System(/home/michael/.pbx/cmus-hangup.sh)

@@ -478,7 +478,7 @@ edge# ip6tables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o fou1v
 
 <h4 id="shaping-upstream">Shaping upstream</h4>
 
-<p>With asymmetric internet connections, such as the <sup>400</sup>&frasl;<sub>20</sub> cable connection we’re
+<p>With asymmetric internet connections, such as the 400/20 cable connection we’re
 using, it’s necessary to shape traffic such that the upstream is never entirely
 saturated, otherwise the TCP ACK packets won’t reach their destination in time
 to saturate the downstream.</p>

@@ -490,7 +490,7 @@ some people use the same term to mean “anything more than 96 dpi”.</p>
 display with 3840x2160 pixels, i.e. 137 dpi, with 100% scaling), whereas I
 desire crisp/sharp text (i.e. 200% scaling).</p>
 
-<p>Hence, in 2014, I bought the Dell UP2414Q with 3840x2160 on 24&rdquo; (185 dpi), which
+<p>Hence, in 2014, I bought the Dell UP2414Q with 3840x2160 on 24&quot; (185 dpi), which
 was one of the first non-Apple devices to offer a dpi that Apple would market as
 “Retina”.</p>
 
@@ -524,7 +524,7 @@ regular Single-Stream Transport (SST), but two cables.</p>
 <p>As of November 2017, only latest-generation graphics cards support DisplayPort
 1.4 at all, with e.g. the <a href="https://www.nvidia.com/en-us/geforce/products/10series/geforce-gtx-1060/">nVidia GTX
 1060</a>
-being marketed as “DisplayPort 1.2 Certified, DisplayPort 1.<sup>3</sup>&frasl;<sub>1</sub>.4 Ready”.</p>
+being marketed as “DisplayPort 1.2 Certified, DisplayPort 1.3/1.4 Ready”.</p>
 
 <h4 id="amd-radeon-pro-wx7100">AMD Radeon Pro WX7100</h4>
 
@@ -1165,7 +1165,7 @@ edge# ip6tables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o fou1v
 
 <h4 id="shaping-upstream">Shaping upstream</h4>
 
-<p>With asymmetric internet connections, such as the <sup>400</sup>&frasl;<sub>20</sub> cable connection we’re
+<p>With asymmetric internet connections, such as the 400/20 cable connection we’re
 using, it’s necessary to shape traffic such that the upstream is never entirely
 saturated, otherwise the TCP ACK packets won’t reach their destination in time
 to saturate the downstream.</p>
@@ -2305,93 +2305,93 @@ The following flow chart illustrates how to react to different situations:
 <p><strong>Example fonts stylesheet:</strong> (base64 data removed for readability)
 <pre>
 @font-face {
-  font-family: &lsquo;Inconsolata&rsquo;;
-  src: local(&lsquo;Inconsolata&rsquo;),
-       url(&ldquo;data:application/x-font-woff;charset=utf-8;base64,[…]&ldquo;) format(&ldquo;woff&rdquo;);
+  font-family: 'Inconsolata';
+  src: local('Inconsolata'),
+       url(&quot;data:application/x-font-woff;charset=utf-8;base64,[…]&quot;) format(&quot;woff&quot;);
 }</p>
 
 <p>@font-face {
-  font-family: &lsquo;Roboto&rsquo;;
+  font-family: 'Roboto';
   font-style: normal;
   font-weight: 400;
-  src: local(&lsquo;Roboto&rsquo;),
-       local(&lsquo;Roboto Regular&rsquo;),
-       local(&lsquo;Roboto-Regular&rsquo;),
-       url(&ldquo;data:application/x-font-woff;charset=utf-8;base64,[…]&ldquo;) format(&ldquo;woff&rdquo;);
+  src: local('Roboto'),
+       local('Roboto Regular'),
+       local('Roboto-Regular'),
+       url(&quot;data:application/x-font-woff;charset=utf-8;base64,[…]&quot;) format(&quot;woff&quot;);
 }</p>
 
 <p>body {
-  font-family: &lsquo;Roboto&rsquo;, sans-serif;
+  font-family: 'Roboto', sans-serif;
 }</p>
 
 <p>pre, code {
-  font-family: &lsquo;Inconsolata&rsquo;, monospace;
+  font-family: 'Inconsolata', monospace;
 }
 </pre></p>
 
 <p><strong>Example document:</strong>
 <pre>
 &lt;head&gt;
-&lt;style type=&ldquo;text/css&rdquo;&gt;
+&lt;style type=&quot;text/css&quot;&gt;
 /* Defined, but not referenced */</p>
 
 <p>@font-face {
-  font-family: &lsquo;Inconsolata&rsquo;;
-  src: local(&lsquo;Inconsolata&rsquo;),
-       url(/Inconsolata.woff2) format(&lsquo;woff2&rsquo;),
-       url(/Inconsolata.woff) format(&lsquo;woff&rsquo;);
+  font-family: 'Inconsolata';
+  src: local('Inconsolata'),
+       url(/Inconsolata.woff2) format('woff2'),
+       url(/Inconsolata.woff) format('woff');
 }</p>
 
 <p>@font-face {
-  font-family: &lsquo;Roboto&rsquo;;
+  font-family: 'Roboto';
   font-style: normal;
   font-weight: 400;
-  src: local(&lsquo;Roboto&rsquo;),
-       local(&lsquo;Roboto Regular&rsquo;),
-       local(&lsquo;Roboto-Regular&rsquo;),
-       url(/Roboto-Regular.woff2) format(&lsquo;woff2&rsquo;),
-       url(/Roboto-Regular.woff) format(&lsquo;woff&rsquo;);
+  src: local('Roboto'),
+       local('Roboto Regular'),
+       local('Roboto-Regular'),
+       url(/Roboto-Regular.woff2) format('woff2'),
+       url(/Roboto-Regular.woff) format('woff');
 }<br />
 &lt;/style&gt;
-&lt;script type=&ldquo;text/javascript&rdquo;&gt;
-if (!!document[&lsquo;fonts&rsquo;]) {
+&lt;script type=&quot;text/javascript&quot;&gt;
+if (!!document['fonts']) {
         /* font loading API supported <em>/
-        var r = &ldquo;body { font-family: &lsquo;Roboto&rsquo;, sans-serif; }&ldquo;;
-        var i = &ldquo;pre, code { font-family: &lsquo;Inconsolata&rsquo;, monospace; }&ldquo;;
+        var r = &quot;body { font-family: 'Roboto', sans-serif; }&quot;;
+        var i = &quot;pre, code { font-family: 'Inconsolata', monospace; }&quot;;
         var l = function(m) {
                 if (!document.body) {
                         /</em> cached, before DOM is built <em>/
-                        document.write(&rdquo;&lt;style&gt;&rdquo;+m+&rdquo;&lt;/style&gt;&rdquo;);
+                        document.write(&quot;&lt;style&gt;&quot;+m+&quot;&lt;/style&gt;&quot;);
                 } else {
                         /</em> uncached, after DOM is built */
-                        document.body.innerHTML+=&rdquo;&lt;style&gt;&rdquo;+m+&rdquo;&lt;/style&gt;&rdquo;;
+                        document.body.innerHTML+=&quot;&lt;style&gt;&quot;+m+&quot;&lt;/style&gt;&quot;;
                 }
         };
-        new FontFace(&lsquo;Roboto&rsquo;,
-                     &ldquo;local(&lsquo;Roboto&rsquo;), &rdquo; +
-                     &ldquo;local(&lsquo;Roboto Regular&rsquo;), &rdquo; +
-                     &ldquo;local(&lsquo;Roboto-Regular&rsquo;), &rdquo; +
-                     &ldquo;url(/Roboto-Regular.woff2) format(&lsquo;woff2&rsquo;), &rdquo; +
-                     &ldquo;url(/Roboto-Regular.woff) format(&lsquo;woff&rsquo;)&rdquo;)
-                .load().then(function() { l&reg;; });
-        new FontFace(&lsquo;Inconsolata&rsquo;,
-                     &ldquo;local(&lsquo;Inconsolata&rsquo;), &rdquo; +
-                     &ldquo;url(/Inconsolata.woff2) format(&lsquo;woff2&rsquo;), &rdquo; +
-                     &ldquo;url(/Inconsolata.woff) format(&lsquo;woff&rsquo;)&rdquo;)
+        new FontFace('Roboto',
+                     &quot;local('Roboto'), &quot; +
+                     &quot;local('Roboto Regular'), &quot; +
+                     &quot;local('Roboto-Regular'), &quot; +
+                     &quot;url(/Roboto-Regular.woff2) format('woff2'), &quot; +
+                     &quot;url(/Roboto-Regular.woff) format('woff')&quot;)
+                .load().then(function() { l(r); });
+        new FontFace('Inconsolata',
+                     &quot;local('Inconsolata'), &quot; +
+                     &quot;url(/Inconsolata.woff2) format('woff2'), &quot; +
+                     &quot;url(/Inconsolata.woff) format('woff')&quot;)
                 .load().then(function() { l(i); });
 } else {
-        var l = document.createElement(&lsquo;link&rsquo;);
-        l.rel = &lsquo;preload&rsquo;;
-        l.href = &lsquo;/fonts-woff.css&rsquo;;
-        l.as = &lsquo;style&rsquo;;
-        l.onload = function() { this.rel = &lsquo;stylesheet&rsquo;; };
+        var l = document.createElement('link');
+        l.rel = 'preload';
+        l.href = '/fonts-woff.css';
+        l.as = 'style';
+        l.onload = function() { this.rel = 'stylesheet'; };
         document.head.appendChild(l);
 }
 &lt;/script&gt;
 &lt;noscript&gt;
-  &lt;style type=&ldquo;text/css&rdquo;&gt;
-    body { font-family: &lsquo;Roboto&rsquo;, sans-serif; }
-    pre, code { font-family: &lsquo;Inconsolata&rsquo;, monospace; }
+  &lt;style type=&quot;text/css&quot;&gt;
+    body { font-family: 'Roboto', sans-serif; }
+    pre, code { font-family: 'Inconsolata', monospace; }
   &lt;/style&gt;
 &lt;/noscript&gt;
 &lt;/head&gt;
@@ -2399,11 +2399,11 @@ if (!!document[&lsquo;fonts&rsquo;]) {
 
 <p>[…content…]</p>
 
-<p>&lt;script type=&ldquo;text/javascript&rdquo;&gt;
+<p>&lt;script type=&quot;text/javascript&quot;&gt;
 /* inlined loadCSS.js and cssrelpreload.js from
    <a href="https://github.com/filamentgroup/loadCSS/tree/master/src">https://github.com/filamentgroup/loadCSS/tree/master/src</a> */
-(function(a){&ldquo;use strict&rdquo;;var b=function(b,c,d){var e=a.document;var f=e.createElement(&ldquo;link&rdquo;);var g;if&copy;g=c;else{var h=(e.body||e.getElementsByTagName(&ldquo;head&rdquo;)[0]).childNodes;g=h[h.length-1];}var i=e.styleSheets;f.rel=&ldquo;stylesheet&rdquo;;f.href=b;f.media=&ldquo;only x&rdquo;;function j(a){if(e.body)return a();setTimeout(function(){j(a);});}j(function(){g.parentNode.insertBefore(f,(c?g:g.nextSibling));});var k=function(a){var b=f.href;var c=i.length;while(c&ndash;)if(i[c].href===b)return a();setTimeout(function(){k(a);});};function l(){if(f.addEventListener)f.removeEventListener(&ldquo;load&rdquo;,l);f.media=d||&ldquo;all&rdquo;;}if(f.addEventListener)f.addEventListener(&ldquo;load&rdquo;,l);f.onloadcssdefined=k;k(l);return f;};if(typeof exports!==&ldquo;undefined&rdquo;)exports.loadCSS=b;else a.loadCSS=b;}(typeof global!==&ldquo;undefined&rdquo;?global:this));
-(function(a){if(!a.loadCSS)return;var b=loadCSS.relpreload={};b.support=function(){try{return a.document.createElement(&ldquo;link&rdquo;).relList.supports(&ldquo;preload&rdquo;);}catch(b){return false;}};b.poly=function(){var b=a.document.getElementsByTagName(&ldquo;link&rdquo;);for(var c=0;c&lt;b.length;c++){var d=b[c];if(d.rel===&ldquo;preload&rdquo;&amp;&amp;d.getAttribute(&ldquo;as&rdquo;)===&ldquo;style&rdquo;){a.loadCSS(d.href,d);d.rel=null;}}};if(!b.support()){b.poly();var c=a.setInterval(b.poly,300);if(a.addEventListener)a.addEventListener(&ldquo;load&rdquo;,function(){a.clearInterval&copy;;});if(a.attachEvent)a.attachEvent(&ldquo;onload&rdquo;,function(){a.clearInterval&copy;;});}}(this));
+(function(a){&quot;use strict&quot;;var b=function(b,c,d){var e=a.document;var f=e.createElement(&quot;link&quot;);var g;if(c)g=c;else{var h=(e.body||e.getElementsByTagName(&quot;head&quot;)[0]).childNodes;g=h[h.length-1];}var i=e.styleSheets;f.rel=&quot;stylesheet&quot;;f.href=b;f.media=&quot;only x&quot;;function j(a){if(e.body)return a();setTimeout(function(){j(a);});}j(function(){g.parentNode.insertBefore(f,(c?g:g.nextSibling));});var k=function(a){var b=f.href;var c=i.length;while(c--)if(i[c].href===b)return a();setTimeout(function(){k(a);});};function l(){if(f.addEventListener)f.removeEventListener(&quot;load&quot;,l);f.media=d||&quot;all&quot;;}if(f.addEventListener)f.addEventListener(&quot;load&quot;,l);f.onloadcssdefined=k;k(l);return f;};if(typeof exports!==&quot;undefined&quot;)exports.loadCSS=b;else a.loadCSS=b;}(typeof global!==&quot;undefined&quot;?global:this));
+(function(a){if(!a.loadCSS)return;var b=loadCSS.relpreload={};b.support=function(){try{return a.document.createElement(&quot;link&quot;).relList.supports(&quot;preload&quot;);}catch(b){return false;}};b.poly=function(){var b=a.document.getElementsByTagName(&quot;link&quot;);for(var c=0;c&lt;b.length;c++){var d=b[c];if(d.rel===&quot;preload&quot;&amp;&amp;d.getAttribute(&quot;as&quot;)===&quot;style&quot;){a.loadCSS(d.href,d);d.rel=null;}}};if(!b.support()){b.poly();var c=a.setInterval(b.poly,300);if(a.addEventListener)a.addEventListener(&quot;load&quot;,function(){a.clearInterval(c);});if(a.attachEvent)a.attachEvent(&quot;onload&quot;,function(){a.clearInterval(c);});}}(this));
 &lt;/script&gt;
 &lt;/body&gt;</p>
 
@@ -2848,7 +2848,7 @@ CMD ["/usr/sbin/smbd", "-FS"]
 <pre>
 #cloud-config</p>
 
-<p>hostname: &ldquo;storage&rdquo;</p>
+<p>hostname: &quot;storage&quot;</p>
 
 <p>ssh_authorized_keys:
   - ssh-rsa AAAAB… michael@midna</p>
@@ -2856,9 +2856,9 @@ CMD ["/usr/sbin/smbd", "-FS"]
 <p>write_files:
   - path: /etc/ssl/certs/r.zekjur.net.crt
     content: |
-      &mdash;&ndash;BEGIN CERTIFICATE&mdash;&ndash;
+      -----BEGIN CERTIFICATE-----
       MIIDYjCCAko…
-      &mdash;&ndash;END CERTIFICATE&mdash;&ndash;
+      -----END CERTIFICATE-----
   - path: /var/lib/ip6tables/rules-save
     permissions: 0644
     owner: root:root
@@ -2868,24 +2868,24 @@ CMD ["/usr/sbin/smbd", "-FS"]
       :INPUT DROP [0:0]
       :FORWARD ACCEPT [0:0]
       :OUTPUT ACCEPT [0:0]
-      -A INPUT -p ipv6-icmp -m comment &ndash;comment &ldquo;IPv6 needs ICMPv6 to work&rdquo; -j ACCEPT
-      -A INPUT -m state &ndash;state RELATED,ESTABLISHED -m comment &ndash;comment &ldquo;Allow packets for outgoing connections&rdquo; -j ACCEPT
-      -A INPUT -s fe80::/10 -d fe80::/10 -m comment &ndash;comment &ldquo;Allow link-local traffic&rdquo; -j ACCEPT
-      -A INPUT -s 2001:db8::/32 -m comment &ndash;comment &ldquo;local traffic&rdquo; -j ACCEPT
-      -A INPUT -p tcp -m tcp &ndash;dport 22 -m comment &ndash;comment &ldquo;SSH&rdquo; -j ACCEPT
+      -A INPUT -p ipv6-icmp -m comment --comment &quot;IPv6 needs ICMPv6 to work&quot; -j ACCEPT
+      -A INPUT -m state --state RELATED,ESTABLISHED -m comment --comment &quot;Allow packets for outgoing connections&quot; -j ACCEPT
+      -A INPUT -s fe80::/10 -d fe80::/10 -m comment --comment &quot;Allow link-local traffic&quot; -j ACCEPT
+      -A INPUT -s 2001:db8::/32 -m comment --comment &quot;local traffic&quot; -j ACCEPT
+      -A INPUT -p tcp -m tcp --dport 22 -m comment --comment &quot;SSH&quot; -j ACCEPT
       COMMIT
       # Completed on Fri Aug 26 19:57:51 2016
   - path: /root/.ssh/authorized_keys
     permissions: 0600
     owner: root:root
     content: |
-      command=&ldquo;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/midna:/srv/backup/midna stapelberg/rsync /srv/backup/midna&rdquo; ssh-rsa AAAAB… root@midna
-      command=&ldquo;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/scan2drive:/srv/backup/scan2drive stapelberg/rsync /srv/backup/scan2drive&rdquo; ssh-rsa AAAAB… root@scan2drive
-      command=&ldquo;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/alp.zekjur.net:/srv/backup/alp.zekjur.net stapelberg/rsync /srv/backup/alp.zekjur.net&rdquo; ssh-rsa AAAAB… root@alp</p>
+      command=&quot;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/midna:/srv/backup/midna stapelberg/rsync /srv/backup/midna&quot; ssh-rsa AAAAB… root@midna
+      command=&quot;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/scan2drive:/srv/backup/scan2drive stapelberg/rsync /srv/backup/scan2drive&quot; ssh-rsa AAAAB… root@scan2drive
+      command=&quot;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/alp.zekjur.net:/srv/backup/alp.zekjur.net stapelberg/rsync /srv/backup/alp.zekjur.net&quot; ssh-rsa AAAAB… root@alp</p>
 
 <p>coreos:
   update:
-    reboot-strategy: &ldquo;reboot&rdquo;
+    reboot-strategy: &quot;reboot&quot;
   locksmith:
     window_start: 01:00 # UTC, i.e. 02:00 CET or 03:00 CEST
     window_length: 2h  # i.e. until 03:00 CET or 04:00 CEST

@@ -165,23 +165,23 @@ benutze ich folgendes Script:
 <h1 id="on-startup-use-amp-gt-dev-null-to-hide-output">on startup (use &amp;&gt;/dev/null to hide output)</h1>
 
 <p>REALDEV=$(readlink /dev/disk/by-id/scsi-1AMCC_W51517585EC0DB000531 | tr -d ./)
-if [ &ldquo;${REALDEV}&rdquo; != &ldquo;&rdquo; ]
+if [ &quot;${REALDEV}&quot; != &quot;&quot; ]
 then
-    ebegin &ldquo;Tuning 3WARE-Controller (/dev/${REALDEV})&rdquo;
+    ebegin &quot;Tuning 3WARE-Controller (/dev/${REALDEV})&quot;
         echo 64 &gt; /sys/block/${REALDEV}/queue/max_sectors_kb &amp;&amp; <br />
         echo 512 &gt; /sys/block/${REALDEV}/queue/nr_requests &amp;&amp; <br />
         echo deadline &gt; /sys/block/${REALDEV}/queue/scheduler &amp;&amp; <br />
-        blockdev &ndash;setra 16384 /dev/disk/by-id/scsi-1AMCC_W51517585EC0DB000531
+        blockdev --setra 16384 /dev/disk/by-id/scsi-1AMCC_W51517585EC0DB000531
     eend $?
 else
-    echo &ldquo;ERROR: 3WARE-Controller could not be found!&rdquo;
+    echo &quot;ERROR: 3WARE-Controller could not be found!&quot;
 fi</pre>
 <p>Testen kann man das mit <code>/etc/init.d/local restart</code>, was dann so aussehen sollte:
 <pre>
- * Caching service dependencies &hellip;         [ ok ]
- * Stopping local &hellip;                       [ ok ]
- * Starting local &hellip;
- * Tuning 3WARE-Controller (/dev/sdb) &hellip;   [ ok ]</pre></p>
+ * Caching service dependencies ...         [ ok ]
+ * Stopping local ...                       [ ok ]
+ * Starting local ...
+ * Tuning 3WARE-Controller (/dev/sdb) ...   [ ok ]</pre></p>
 
 <p><h2>Cache aktivieren</h2>
 <p>

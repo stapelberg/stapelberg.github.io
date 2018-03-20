@@ -190,93 +190,93 @@ The following flow chart illustrates how to react to different situations:
 <p><strong>Example fonts stylesheet:</strong> (base64 data removed for readability)
 <pre>
 @font-face {
-  font-family: &lsquo;Inconsolata&rsquo;;
-  src: local(&lsquo;Inconsolata&rsquo;),
-       url(&ldquo;data:application/x-font-woff;charset=utf-8;base64,[…]&ldquo;) format(&ldquo;woff&rdquo;);
+  font-family: 'Inconsolata';
+  src: local('Inconsolata'),
+       url(&quot;data:application/x-font-woff;charset=utf-8;base64,[…]&quot;) format(&quot;woff&quot;);
 }</p>
 
 <p>@font-face {
-  font-family: &lsquo;Roboto&rsquo;;
+  font-family: 'Roboto';
   font-style: normal;
   font-weight: 400;
-  src: local(&lsquo;Roboto&rsquo;),
-       local(&lsquo;Roboto Regular&rsquo;),
-       local(&lsquo;Roboto-Regular&rsquo;),
-       url(&ldquo;data:application/x-font-woff;charset=utf-8;base64,[…]&ldquo;) format(&ldquo;woff&rdquo;);
+  src: local('Roboto'),
+       local('Roboto Regular'),
+       local('Roboto-Regular'),
+       url(&quot;data:application/x-font-woff;charset=utf-8;base64,[…]&quot;) format(&quot;woff&quot;);
 }</p>
 
 <p>body {
-  font-family: &lsquo;Roboto&rsquo;, sans-serif;
+  font-family: 'Roboto', sans-serif;
 }</p>
 
 <p>pre, code {
-  font-family: &lsquo;Inconsolata&rsquo;, monospace;
+  font-family: 'Inconsolata', monospace;
 }
 </pre></p>
 
 <p><strong>Example document:</strong>
 <pre>
 &lt;head&gt;
-&lt;style type=&ldquo;text/css&rdquo;&gt;
+&lt;style type=&quot;text/css&quot;&gt;
 /* Defined, but not referenced */</p>
 
 <p>@font-face {
-  font-family: &lsquo;Inconsolata&rsquo;;
-  src: local(&lsquo;Inconsolata&rsquo;),
-       url(/Inconsolata.woff2) format(&lsquo;woff2&rsquo;),
-       url(/Inconsolata.woff) format(&lsquo;woff&rsquo;);
+  font-family: 'Inconsolata';
+  src: local('Inconsolata'),
+       url(/Inconsolata.woff2) format('woff2'),
+       url(/Inconsolata.woff) format('woff');
 }</p>
 
 <p>@font-face {
-  font-family: &lsquo;Roboto&rsquo;;
+  font-family: 'Roboto';
   font-style: normal;
   font-weight: 400;
-  src: local(&lsquo;Roboto&rsquo;),
-       local(&lsquo;Roboto Regular&rsquo;),
-       local(&lsquo;Roboto-Regular&rsquo;),
-       url(/Roboto-Regular.woff2) format(&lsquo;woff2&rsquo;),
-       url(/Roboto-Regular.woff) format(&lsquo;woff&rsquo;);
+  src: local('Roboto'),
+       local('Roboto Regular'),
+       local('Roboto-Regular'),
+       url(/Roboto-Regular.woff2) format('woff2'),
+       url(/Roboto-Regular.woff) format('woff');
 }<br />
 &lt;/style&gt;
-&lt;script type=&ldquo;text/javascript&rdquo;&gt;
-if (!!document[&lsquo;fonts&rsquo;]) {
+&lt;script type=&quot;text/javascript&quot;&gt;
+if (!!document['fonts']) {
         /* font loading API supported <em>/
-        var r = &ldquo;body { font-family: &lsquo;Roboto&rsquo;, sans-serif; }&ldquo;;
-        var i = &ldquo;pre, code { font-family: &lsquo;Inconsolata&rsquo;, monospace; }&ldquo;;
+        var r = &quot;body { font-family: 'Roboto', sans-serif; }&quot;;
+        var i = &quot;pre, code { font-family: 'Inconsolata', monospace; }&quot;;
         var l = function(m) {
                 if (!document.body) {
                         /</em> cached, before DOM is built <em>/
-                        document.write(&rdquo;&lt;style&gt;&rdquo;+m+&rdquo;&lt;/style&gt;&rdquo;);
+                        document.write(&quot;&lt;style&gt;&quot;+m+&quot;&lt;/style&gt;&quot;);
                 } else {
                         /</em> uncached, after DOM is built */
-                        document.body.innerHTML+=&rdquo;&lt;style&gt;&rdquo;+m+&rdquo;&lt;/style&gt;&rdquo;;
+                        document.body.innerHTML+=&quot;&lt;style&gt;&quot;+m+&quot;&lt;/style&gt;&quot;;
                 }
         };
-        new FontFace(&lsquo;Roboto&rsquo;,
-                     &ldquo;local(&lsquo;Roboto&rsquo;), &rdquo; +
-                     &ldquo;local(&lsquo;Roboto Regular&rsquo;), &rdquo; +
-                     &ldquo;local(&lsquo;Roboto-Regular&rsquo;), &rdquo; +
-                     &ldquo;url(/Roboto-Regular.woff2) format(&lsquo;woff2&rsquo;), &rdquo; +
-                     &ldquo;url(/Roboto-Regular.woff) format(&lsquo;woff&rsquo;)&rdquo;)
-                .load().then(function() { l&reg;; });
-        new FontFace(&lsquo;Inconsolata&rsquo;,
-                     &ldquo;local(&lsquo;Inconsolata&rsquo;), &rdquo; +
-                     &ldquo;url(/Inconsolata.woff2) format(&lsquo;woff2&rsquo;), &rdquo; +
-                     &ldquo;url(/Inconsolata.woff) format(&lsquo;woff&rsquo;)&rdquo;)
+        new FontFace('Roboto',
+                     &quot;local('Roboto'), &quot; +
+                     &quot;local('Roboto Regular'), &quot; +
+                     &quot;local('Roboto-Regular'), &quot; +
+                     &quot;url(/Roboto-Regular.woff2) format('woff2'), &quot; +
+                     &quot;url(/Roboto-Regular.woff) format('woff')&quot;)
+                .load().then(function() { l(r); });
+        new FontFace('Inconsolata',
+                     &quot;local('Inconsolata'), &quot; +
+                     &quot;url(/Inconsolata.woff2) format('woff2'), &quot; +
+                     &quot;url(/Inconsolata.woff) format('woff')&quot;)
                 .load().then(function() { l(i); });
 } else {
-        var l = document.createElement(&lsquo;link&rsquo;);
-        l.rel = &lsquo;preload&rsquo;;
-        l.href = &lsquo;/fonts-woff.css&rsquo;;
-        l.as = &lsquo;style&rsquo;;
-        l.onload = function() { this.rel = &lsquo;stylesheet&rsquo;; };
+        var l = document.createElement('link');
+        l.rel = 'preload';
+        l.href = '/fonts-woff.css';
+        l.as = 'style';
+        l.onload = function() { this.rel = 'stylesheet'; };
         document.head.appendChild(l);
 }
 &lt;/script&gt;
 &lt;noscript&gt;
-  &lt;style type=&ldquo;text/css&rdquo;&gt;
-    body { font-family: &lsquo;Roboto&rsquo;, sans-serif; }
-    pre, code { font-family: &lsquo;Inconsolata&rsquo;, monospace; }
+  &lt;style type=&quot;text/css&quot;&gt;
+    body { font-family: 'Roboto', sans-serif; }
+    pre, code { font-family: 'Inconsolata', monospace; }
   &lt;/style&gt;
 &lt;/noscript&gt;
 &lt;/head&gt;
@@ -284,11 +284,11 @@ if (!!document[&lsquo;fonts&rsquo;]) {
 
 <p>[…content…]</p>
 
-<p>&lt;script type=&ldquo;text/javascript&rdquo;&gt;
+<p>&lt;script type=&quot;text/javascript&quot;&gt;
 /* inlined loadCSS.js and cssrelpreload.js from
    <a href="https://github.com/filamentgroup/loadCSS/tree/master/src">https://github.com/filamentgroup/loadCSS/tree/master/src</a> */
-(function(a){&ldquo;use strict&rdquo;;var b=function(b,c,d){var e=a.document;var f=e.createElement(&ldquo;link&rdquo;);var g;if&copy;g=c;else{var h=(e.body||e.getElementsByTagName(&ldquo;head&rdquo;)[0]).childNodes;g=h[h.length-1];}var i=e.styleSheets;f.rel=&ldquo;stylesheet&rdquo;;f.href=b;f.media=&ldquo;only x&rdquo;;function j(a){if(e.body)return a();setTimeout(function(){j(a);});}j(function(){g.parentNode.insertBefore(f,(c?g:g.nextSibling));});var k=function(a){var b=f.href;var c=i.length;while(c&ndash;)if(i[c].href===b)return a();setTimeout(function(){k(a);});};function l(){if(f.addEventListener)f.removeEventListener(&ldquo;load&rdquo;,l);f.media=d||&ldquo;all&rdquo;;}if(f.addEventListener)f.addEventListener(&ldquo;load&rdquo;,l);f.onloadcssdefined=k;k(l);return f;};if(typeof exports!==&ldquo;undefined&rdquo;)exports.loadCSS=b;else a.loadCSS=b;}(typeof global!==&ldquo;undefined&rdquo;?global:this));
-(function(a){if(!a.loadCSS)return;var b=loadCSS.relpreload={};b.support=function(){try{return a.document.createElement(&ldquo;link&rdquo;).relList.supports(&ldquo;preload&rdquo;);}catch(b){return false;}};b.poly=function(){var b=a.document.getElementsByTagName(&ldquo;link&rdquo;);for(var c=0;c&lt;b.length;c++){var d=b[c];if(d.rel===&ldquo;preload&rdquo;&amp;&amp;d.getAttribute(&ldquo;as&rdquo;)===&ldquo;style&rdquo;){a.loadCSS(d.href,d);d.rel=null;}}};if(!b.support()){b.poly();var c=a.setInterval(b.poly,300);if(a.addEventListener)a.addEventListener(&ldquo;load&rdquo;,function(){a.clearInterval&copy;;});if(a.attachEvent)a.attachEvent(&ldquo;onload&rdquo;,function(){a.clearInterval&copy;;});}}(this));
+(function(a){&quot;use strict&quot;;var b=function(b,c,d){var e=a.document;var f=e.createElement(&quot;link&quot;);var g;if(c)g=c;else{var h=(e.body||e.getElementsByTagName(&quot;head&quot;)[0]).childNodes;g=h[h.length-1];}var i=e.styleSheets;f.rel=&quot;stylesheet&quot;;f.href=b;f.media=&quot;only x&quot;;function j(a){if(e.body)return a();setTimeout(function(){j(a);});}j(function(){g.parentNode.insertBefore(f,(c?g:g.nextSibling));});var k=function(a){var b=f.href;var c=i.length;while(c--)if(i[c].href===b)return a();setTimeout(function(){k(a);});};function l(){if(f.addEventListener)f.removeEventListener(&quot;load&quot;,l);f.media=d||&quot;all&quot;;}if(f.addEventListener)f.addEventListener(&quot;load&quot;,l);f.onloadcssdefined=k;k(l);return f;};if(typeof exports!==&quot;undefined&quot;)exports.loadCSS=b;else a.loadCSS=b;}(typeof global!==&quot;undefined&quot;?global:this));
+(function(a){if(!a.loadCSS)return;var b=loadCSS.relpreload={};b.support=function(){try{return a.document.createElement(&quot;link&quot;).relList.supports(&quot;preload&quot;);}catch(b){return false;}};b.poly=function(){var b=a.document.getElementsByTagName(&quot;link&quot;);for(var c=0;c&lt;b.length;c++){var d=b[c];if(d.rel===&quot;preload&quot;&amp;&amp;d.getAttribute(&quot;as&quot;)===&quot;style&quot;){a.loadCSS(d.href,d);d.rel=null;}}};if(!b.support()){b.poly();var c=a.setInterval(b.poly,300);if(a.addEventListener)a.addEventListener(&quot;load&quot;,function(){a.clearInterval(c);});if(a.attachEvent)a.attachEvent(&quot;onload&quot;,function(){a.clearInterval(c);});}}(this));
 &lt;/script&gt;
 &lt;/body&gt;</p>
 

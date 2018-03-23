@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title> Android ist IPv6-enabled stan…</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.de/posts/2010-10-20-android-ist-ipv6-enabled-stan/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    <link rel="stylesheet" href="/1.css" type="text/css">
+    <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM Feed">
+</head>
+
+
+<body><div class="container-fluid"><div class="row"><div id="menu" class="col-md-2"><h1>Michael Stapelberg</h1><ul class="menu_open">
+<li><a class="menu_item" href="/"><span class="menu_title">Startseite</span></a></li>
+<li><a class="menu_item" href="/posts/"><span class="menu_title">Artikel</span></a></li>
+<li><a class="menu_item" href="/dokumente/"><span class="menu_title">Dokumente</span></a></li>
+<li><a class="menu_item" href="/programme/"><span class="menu_title">Programme</span></a>
+<div class="subitem">
+<ul class="menu_open">
+  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+<li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+<li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+<li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+</ul>
+</div>
+</li>
+
+<li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+<div class="subitem">
+<ul class="menu_open">
+  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+</ul>
+</div>
+</li>
+
+<li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+
+<li><a class="menu_item" href="/tipps"><span class="menu_title">Tipps</span></a></li>
+
+<li><a class="menu_item" href="/meinepcs"><span class="menu_title">Hardware</span></a></li>
+<li><a class="menu_item" href="/impressum"><span class="menu_title">Impressum</span></a></li></ul>
+
+</div><div id="contentBox" class="col-md-10"><h2 class="title"> Android ist IPv6-enabled stan…</h2> (<span id="date">2010-10-20</span>) <div class="Artikel" id="content">
+<p>
+Android ist IPv6-enabled standardmäßig. Was man braucht, um das zu verifizieren
+und eventuell die Einstellungen zu ändern, ist Busybox:
+<a href="http://zedomax.com/android/busybox.zip">http://zedomax.com/android/busybox.zip</a>
+(von <a href="http://zedomax.com/blog/2010/07/07/android-hack-how-to-install-busybox-on-your-android/">diesem Blogpost</a>)
+</p>
+
+<p>
+Die Installation ging bei mir einfacher als im mitgelieferten Script:
+</p>
+
+<pre>
+x200 $ unzip busybox.zip
+x200 $ adb push busybox /sdcard/busybox
+x200 $ adb shell
+$ su
+# mount -o remount,rw /dev/block/mtdblock6 /system
+# mv /sdcard/busybox /system/xbin/busybox
+# cd /system/xbin
+# chmod 755 busybox
+# ./busybox --install -s /system/xbin
+# mount -o remount,ro /dev/block/mtdblock6 /system
+</pre>
+
+<p>
+Vermutlich arbeitet das Script vergleichsweise umständlich, weil ältere
+Android-Versionen kein <code>cp</code> hatten. Zu beachten ist, dass die Nummer
+des MTD-devices je nach Firmware unterschiedlich sein kann.
+</p>
+
+<p>
+Nun kann man verifizieren, dass man eine IPv6-Adresse hat:
+</p>
+
+<pre>
+# ip -6 a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 16436 
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+15: tiwlan0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qlen 100
+    inet6 2001:xxxx:yyyy:zzzz:a6ed:4eff:fef8:eedd/64 scope global dynamic 
+       valid_lft 86399sec preferred_lft 14399sec
+    inet6 fe80::a6ed:4eff:fef8:f2dd/64 scope link 
+       valid_lft forever preferred_lft forever
+</pre>
+
+
+</div></div></div></div></div></div></body>
+</html>

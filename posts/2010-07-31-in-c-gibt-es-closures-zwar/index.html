@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title> In C&#43;&#43; gibt es Closures! Zwar…</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.de/posts/2010-07-31-in-c-gibt-es-closures-zwar/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    <link rel="stylesheet" href="/1.css" type="text/css">
+    <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM Feed">
+</head>
+
+
+<body><div class="container-fluid"><div class="row"><div id="menu" class="col-md-2"><h1>Michael Stapelberg</h1><ul class="menu_open">
+<li><a class="menu_item" href="/"><span class="menu_title">Startseite</span></a></li>
+<li><a class="menu_item" href="/posts/"><span class="menu_title">Artikel</span></a></li>
+<li><a class="menu_item" href="/dokumente/"><span class="menu_title">Dokumente</span></a></li>
+<li><a class="menu_item" href="/programme/"><span class="menu_title">Programme</span></a>
+<div class="subitem">
+<ul class="menu_open">
+  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+<li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+<li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+<li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+</ul>
+</div>
+</li>
+
+<li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+<div class="subitem">
+<ul class="menu_open">
+  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+</ul>
+</div>
+</li>
+
+<li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+
+<li><a class="menu_item" href="/tipps"><span class="menu_title">Tipps</span></a></li>
+
+<li><a class="menu_item" href="/meinepcs"><span class="menu_title">Hardware</span></a></li>
+<li><a class="menu_item" href="/impressum"><span class="menu_title">Impressum</span></a></li></ul>
+
+</div><div id="contentBox" class="col-md-10"><h2 class="title"> In C&#43;&#43; gibt es Closures! Zwar…</h2> (<span id="date">2010-07-31</span>) <div class="Artikel" id="content">
+<p>
+In C++ gibt es Closures! Zwar erst mit <a
+href="http://en.wikipedia.org/wiki/C%2B%2B0x">C++0x</a> (wofür man g++ 4.5
+braucht), aber immerhin. Damit wird das Erstellen asynchroner APIs endlich
+annehmbar (in diesem Fall der CouchDB-Teil einer Qt-Anwendung, wegen Qt muss
+ich überhaupt erst C++ nutzen).
+</p>
+
+<p>
+Zum Vergleich mal die API vorher:
+</p>
+
+<pre>
+void MainWindow::clickedTask() {
+    TodoButton *btn = (TodoButton*)sender();
+
+    /* Get the document from CouchDB */
+    QNetworkReply *nreply = db->get_document(btn->ID());
+    connect(nreply, SIGNAL(finished()), this, SLOT(recv_entry_edit()));
+}
+
+void MainWindow::recv_entry_edit() {
+    QNetworkReply *reply = (QNetworkReply*)sender();
+    QByteArray answer = reply->readAll();
+    QJson::Parser p;
+    bool ok;
+    QVariant var = p.parse(answer, &ok);
+
+    CouchDoc doc = var.toMap();
+
+    QDialog dialog(this, Qt::Dialog);
+    ui_dialog->setupUi(&dialog);
+    ui_dialog->textLineEdit->setText(doc["text"].toString());
+    dialog.exec();
+}
+</pre>
+
+<p>
+Was fällt dabei auf? Da <a
+href="http://doc.trolltech.com/4.6/qnetworkaccessmanager.html">QNetworkAccessManager</a>
+(die Klasse in Qt, die HTTP spricht) asynchron arbeitet (was ja prinzipiell
+wünschenswert ist, aber bei dieser Anwendung wäre eine synchrone API einfacher
+und ausreichend), muss man das finished-Signal mit dem
+recv_entry_edit-Slot verbinden. Hier müssen wir also einen slot definieren (mit
+Name, Eintrag im Headerfile, Unterbrechung des Leseflusses beim Verstehen des
+Codes). Weiterhin habe ich mich entschieden, das JSON-Parsing nicht
+wegzuabstrahieren, da ich dafür letztendlich einen Wrapper um QNetworkReply
+hätte schreiben müssen, der dann genauso umständlich zu benutzen ist.
+</p>
+
+<p>
+Hier also die viel bessere Variante mit Closures:
+</p>
+
+<pre>
+void MainWindow::clickedTask() {
+    TodoButton *btn = (TodoButton*)sender();
+
+    db->get_document(btn->ID(),
+        [](CouchDoc &doc) {
+            QDialog dialog(this, Qt::Dialog);
+            ui_dialog->setupUi(&dialog);
+            ui_dialog->textLineEdit->setText(doc["text"].toString());
+            dialog.exec();
+        },
+        [](QString &err) {
+            cerr << "Could not receive doc: " << err.toStdString() << endl;
+        });
+}
+</pre>
+
+<p>
+Was hier passiert, ist, dass die Code-Blöcke abgespeichert werden (sozusagen,
+für Details verlinke ich unten auf ein Paper) und später mit den jeweiligen
+Parametern aufgerufen werden. Wir müssen also keine Funktion definieren,
+Signale verbinden und können auf Seite der API das JSON-Parsing hübsch
+abstrahieren.  Wohlgemerkt haben wir hier auch Error Handling und der Code ist
+trotzdem kürzer.
+</p>
+
+<p>
+Hier noch zwei Links, die beim Einarbeiten helfen:
+</p>
+
+<ul>
+<li>
+<a href="http://www2.in.tum.de/hp/file?fid=452">Lambdafunktionen
+(Seminarausarbeitung)</a>
+</li>
+<li>
+<a
+href="http://en.wikipedia.org/wiki/C%2B%2B0x#Lambda_functions_and_expressions">Wikipedia:
+C++0x (Lambda functions and exrpessions)</a>
+</li>
+</ul>
+
+
+</div></div></div></div></div></div></body>
+</html>

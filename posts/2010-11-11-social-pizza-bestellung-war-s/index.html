@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title> Social Pizza-Bestellung war s…</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.de/posts/2010-11-11-social-pizza-bestellung-war-s/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    <link rel="stylesheet" href="/1.css" type="text/css">
+    <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM Feed">
+</head>
+
+
+<body><div class="container-fluid"><div class="row"><div id="menu" class="col-md-2"><h1>Michael Stapelberg</h1><ul class="menu_open">
+<li><a class="menu_item" href="/"><span class="menu_title">Startseite</span></a></li>
+<li><a class="menu_item" href="/posts/"><span class="menu_title">Artikel</span></a></li>
+<li><a class="menu_item" href="/dokumente/"><span class="menu_title">Dokumente</span></a></li>
+<li><a class="menu_item" href="/programme/"><span class="menu_title">Programme</span></a>
+<div class="subitem">
+<ul class="menu_open">
+  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+<li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+<li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+<li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+</ul>
+</div>
+</li>
+
+<li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+<div class="subitem">
+<ul class="menu_open">
+  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+</ul>
+</div>
+</li>
+
+<li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+
+<li><a class="menu_item" href="/tipps"><span class="menu_title">Tipps</span></a></li>
+
+<li><a class="menu_item" href="/meinepcs"><span class="menu_title">Hardware</span></a></li>
+<li><a class="menu_item" href="/impressum"><span class="menu_title">Impressum</span></a></li></ul>
+
+</div><div id="contentBox" class="col-md-10"><h2 class="title"> Social Pizza-Bestellung war s…</h2> (<span id="date">2010-11-11</span>) <div class="Artikel" id="content">
+<p>
+Social Pizza-Bestellung war schon lange eine Funktionalität, die wir auf dem
+Chaostreff haben wollten. Das bedeutet, dass jeder am eigenen Rechner sich
+seine Wunschpizza klicken kann und wir dann genau eine Bestellung abschicken.
+Aufgrund mangelnder Computerfähigkeiten der Jungs bei (bzw. hinter) Hallo
+Pizza (Bestellungen gehen per Fax ein und werden dann abgetippt!), kommt dieses
+Feature natürlich nicht.
+</p>
+
+<p>
+Daher sind wir das mal selbst angegangen. Unsere Lösung besteht aus einem
+Proxy-Server auf unserem Router, der Requests an hallopizza.de weiterleitet und
+dabei das Cookie ersetzt. Wir haben dazu zwei vhosts: Einer mit hübschem
+DNS-Namen, der dann auf den anderen mit korrekter URL weiterleitet (damit man
+nicht auf der Eingangsseite landet).
+</p>
+
+<pre>
+&lt;VirtualHost 172.22.37.2:80&gt;
+        DocumentRoot /var/www
+        &lt;Directory /&gt;
+                Options FollowSymLinks
+                AllowOverride None
+        &lt;/Directory&gt;
+
+        RewriteEngine on
+        RewriteRule / http://172.22.37.1/bestellen/ [L]
+&lt;/VirtualHost&gt;
+</pre>
+
+<p>
+Der andere vhost ist dann Proxy-Server für hallopizza.de. Dabei gilt es zu
+beachten, dass Antworten von hallopizza.de üblicherweise komprimiert sind
+(gzip), d.h. via SetOutputFilter ausgepackt werden müssen. Anschließend
+ersetzen wir die URL http://hallopizza.de/ durch http://172.22.37.1/ und fügen
+ein Cookie hinzu (das holt man sich vorher von hallopizza.de, z.B. via wget):
+</p>
+
+<pre>
+&lt;VirtualHost 172.22.37.1:80&gt;
+        DocumentRoot /var/www
+        &lt;Directory /&gt;
+                Options FollowSymLinks
+                AllowOverride None
+        &lt;/Directory&gt;
+
+        ProxyPass / http://hallopizza.de/
+        ProxyPassReverse / http://hallopizza.de/
+
+        AddOutputFilterByType SUBSTITUTE text/html
+        Substitute "s|http://hallopizza.de|http://172.22.37.1/|in"
+
+        SetOutputFilter INFLATE;substitute;DEFLATE
+        RequestHeader set Cookie "hallopizza=blargh"
+&lt;/VirtualHost&gt;
+</pre>
+
+<p>
+Man sollte darauf achten, dass man nicht gleichzeitig im Warenkorb rumklickt,
+hallopizza.de verträgt das nicht so gut. Wenn man das aber nacheinander macht,
+funktioniert es einwandfrei.
+</p>
+
+
+</div></div></div></div></div></div></body>
+</html>

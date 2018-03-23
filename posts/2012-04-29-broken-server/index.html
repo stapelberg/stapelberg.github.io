@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Kaputter Server: Verschiedene Tipps</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.de/posts/2012-04-29-broken-server/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    <link rel="stylesheet" href="/1.css" type="text/css">
+    <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM Feed">
+</head>
+
+
+<body><div class="container-fluid"><div class="row"><div id="menu" class="col-md-2"><h1>Michael Stapelberg</h1><ul class="menu_open">
+<li><a class="menu_item" href="/"><span class="menu_title">Startseite</span></a></li>
+<li><a class="menu_item" href="/posts/"><span class="menu_title">Artikel</span></a></li>
+<li><a class="menu_item" href="/dokumente/"><span class="menu_title">Dokumente</span></a></li>
+<li><a class="menu_item" href="/programme/"><span class="menu_title">Programme</span></a>
+<div class="subitem">
+<ul class="menu_open">
+  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+<li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+<li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+<li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+</ul>
+</div>
+</li>
+
+<li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+<div class="subitem">
+<ul class="menu_open">
+  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+</ul>
+</div>
+</li>
+
+<li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+
+<li><a class="menu_item" href="/tipps"><span class="menu_title">Tipps</span></a></li>
+
+<li><a class="menu_item" href="/meinepcs"><span class="menu_title">Hardware</span></a></li>
+<li><a class="menu_item" href="/impressum"><span class="menu_title">Impressum</span></a></li></ul>
+
+</div><div id="contentBox" class="col-md-10"><h2 class="title">Kaputter Server: Verschiedene Tipps</h2> (<span id="date">2012-04-29</span>) <div class="Artikel" id="content">
+<p>
+Gestern kriegte ich bescheid gesagt, dass ein Server, den ich mitbetreue,
+kaputt gegangen sei. Die Hardware wurde vom Hoster getauscht, allerdings wurden
+auch neue Platten eingebaut. Der Hoster bot an, zusätzlich die alte Platte
+anzuschließen, um die Daten zu kopieren. Warum er die Daten nicht einfach
+selbst kopierte, verstehe ich nicht ganz.
+</p>
+
+<p>
+Im Rescue-System (ein grml) konnten wir dann die alte Platte (7 Jahre
+Betriebsstunden, uff) und die neuen Platten sehen. Nach einem kurzen
+<code>dd</code> waren die Daten dann kopiert, danach ging das Anpassen und
+Debuggen los. Hier eine Checkliste, was man beachten sollte:
+</p>
+
+<ol>
+	<li>In <code>/etc/udev/rules.d/70-persistent-net.rules</code> muss man
+	einen entsprechenden Eintrag für die neue Netzwerkkarte hinzufügen und
+	die alten entfernen, damit die neue Netzwerkkarte nicht als eth1
+	erkannt wird und plötzlich keine Konfiguration mehr hat.
+	Praktischerweise kann man den nötigen Inhalt direkt aus der
+	<code>/etc/udev/rules.d/70-persistent-net.rules</code> des
+	Rescue-systems kopieren.</li>
+
+	<li>Die <code>/etc/mtab</code> sollte, sofern sie existiert und noch
+	eine reguläre Datei ist, durch einen Symlink auf
+	<code>/proc/mounts</code> ersetzt werden.</li>
+
+	<li>Die initramdisk sollte via <code>update-initramfs -k all -u</code>
+	aktualisiert werden.</li>
+
+	<li>Der Bootloader sollte via <code>grub-install --recheck
+	/dev/sda</code> mit aktueller device map installiert werden.</li>
+
+	<li>Die <code>/etc/fstab</code> sollte angepasst werden.</li>
+</ol>
+
+<p>
+Alle diese Punkte hatten wir befolgt, aber nach einem Neustart kam der Server
+trotzdem nicht hoch. Eine serielle Schnittstelle, KVM, Remote-Hands o.ä. hatten
+wir nicht zur Verfügung.
+</p>
+
+<p>
+Als nächstes habe ich dann netconsole probiert, um auf einem anderen Rechner
+die Bootmeldungen zu lesen. Das kriegt man unter Debian folgendermaßen hin:
+</p>
+<pre>
+echo 'forcedeth' &gt;&gt; /etc/initramfs-tools/modules
+echo 'netconsole netconsole=6655@111.222.333.444/eth0,6644@555.666.777.888/00:0c:db:4e:e8:00' &gt;&gt; /etc/initramfs-tools/modules
+update-initramfs -k all -u
+</pre>
+<p>
+Wobei hier 111.222.333.444 die IP des Servers ist und 555.666.777.888 die IP
+ist, an welche die Nachrichten geschickt werden. Wichtig ist hier noch, dass
+die MAC-Adresse diejenige des Gateways ist, damit die Pakete ins Internet
+gelangen. Die kann man mit <code>ip -4 neighbor show</code> herausfinden.
+</p>
+
+<p>
+Des Rätsels Lösung war dann, dass im BIOS des Rechners die alte Festplatte
+zuerst gelistet war, sodass er wieder ins alte System startete. Gelöst haben
+wir das dann mit <code>dd if=/dev/zero of=/dev/sdc bs=5M count=10</code>, womit
+man den MBR und die Partition Table (und Daten!) der alten Platte überschreibt,
+sodass das BIOS diese beim Starten überspringt.
+</p>
+
+</div></div></div></div></div></div></body>
+</html>

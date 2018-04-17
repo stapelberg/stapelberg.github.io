@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>kinX: USB Hub</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.de/posts/2018-04-17-kinx-usb-hub/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    <link rel="stylesheet" href="/1.css" type="text/css">
+    <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM Feed">
+</head>
+
+
+<body><div class="container-fluid"><div class="row"><div id="menu" class="col-md-2"><h1>Michael Stapelberg</h1><ul class="menu_open">
+<li><a class="menu_item" href="/"><span class="menu_title">Startseite</span></a></li>
+<li><a class="menu_item" href="/posts/"><span class="menu_title">Artikel</span></a></li>
+<li><a class="menu_item" href="/dokumente/"><span class="menu_title">Dokumente</span></a></li>
+<li><a class="menu_item" href="/programme/"><span class="menu_title">Programme</span></a>
+<div class="subitem">
+<ul class="menu_open">
+  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+<li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+<li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+<li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+</ul>
+</div>
+</li>
+
+<li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+<div class="subitem">
+<ul class="menu_open">
+  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+</ul>
+</div>
+</li>
+
+<li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+
+<li><a class="menu_item" href="/tipps"><span class="menu_title">Tipps</span></a></li>
+
+<li><a class="menu_item" href="/meinepcs"><span class="menu_title">Hardware</span></a></li>
+<li><a class="menu_item" href="/impressum"><span class="menu_title">Impressum</span></a></li></ul>
+
+</div><div id="contentBox" class="col-md-10"><h2 class="title">kinX: USB Hub</h2> (<span id="date">2018-04-17</span>) <div class="Artikel" id="content">
+
+
+<p>This post is part of a <a href="/posts/2018-04-17-kinx">series of posts about the kinX project</a>.</p>
+
+<h3 id="motivation">Motivation</h3>
+
+<p>The Kinesis Advantage comes with a built-in 2-port USB hub. That hub uses a
+proprietary connector to interface with a
+<a href="https://en.wikipedia.org/wiki/PS/2_port">PS/2</a> keyboard controller, so it
+cannot be used with a USB keyboard controller. As the built-in hub is the
+natural place to connect the Logitech unified receiver dongle, not being able to
+use the hub is mildly annoying.</p>
+
+<p>The kinX MK66F keyboard controller presently needs two USB cables: one connected
+to the USBFS port to supply the PCB with power and receive firmware updates (via
+the Teensy bootloader chip), and one connected to the USBHS port for the actual
+keyboard device.</p>
+
+<p>Lastly, even if the original built-in USB hub had internal ports (instead of a
+PS/2 converter), it only supports USB 1.1, nullifying any latency improvements.</p>
+
+<p>Hence, I decided to build a drop-in replacement USB 2.0 hub with 2 external USB
+ports and 2 internal USB ports, using the same proprietary connector as the
+original, so that the original keyboard USB cable could be re-used.</p>
+
+<h3 id="design-phase">Design phase</h3>
+
+<p>Unfortunately, I could not find an open hardware USB 2.0 hub design on the
+internet, so I started researching various USB hub chips. I quickly discarded
+the idea of using USB 3 due to its much stricter requirements.</p>
+
+<p>In the end, I decided to go with the Cypress HX2VL series because of their
+superior documentation: I found a detailed data sheet, an evaluation board, the
+associated schematics, design checklist/guidelines, and even the evaluation
+board’s bill of materials.</p>
+
+<p>This is what the finished build of my design looks like:</p>
+
+<p><img src="/Bilder/kinx-hub.jpg" width="100%"></p>
+
+<h3 id="power">Power</h3>
+
+<p>After completing my first build, I tested a few USB devices with my hub. The
+Logitech unified receiver dongle and the
+<a href="https://www.yubico.com/start/">YubiKey</a> worked fine. However, my external hard
+drive and my USB memory stick did not work. In the syslog, I would see:</p>
+
+<pre><code>kernel: usb 1-14.4.4: rejected 1 configuration due to insufficient available bus power
+</code></pre>
+
+<p>This is because the USB specification limits bus-powered hubs to 100mA per
+port. While high power usage does not come as a surprise for the external hard
+disk, it turns out that even my USB memory stick requires 200mA. This was a
+surprise, because that stick works on other, commercial bus-powered USB hubs.</p>
+
+<p>A closer look reveals that all 3 commercial USB hubs I have tested claim to be
+self-powered (i.e. using an external power supply), even though they are
+not. This way, the kernel’s power limitation is circumvented, and up to 500mA
+can be used per port. In practice, the host port only supplies 500mA, so the
+user must be careful not to plug in devices which require more than 500mA in
+aggregate.</p>
+
+<p>I changed the SELFPWR configuration pin to have my hub claim it was
+self-powered, too, and that made all USB devices I tested work fine.</p>
+
+<h3 id="eeprom-programming">EEPROM programming</h3>
+
+<p>When debugging the power issue, I originally thought the Maximum Power setting
+in the hub’s USB device descriptor needed to be raised. This turned out to not
+be correct: the Maximum Power refers to the power which the hub uses for its own
+circuitry, not the power it passes through to connected devices.</p>
+
+<p>Nevertheless, it’s a nice touch to modify the device descriptor to put in a
+custom vendor name, product name and serial number: that way, the device shows
+up with a recognizable name in your syslog or
+<a href="https://manpages.debian.org/stretch/usbutils/lsusb.8"><code>lsusb(8)</code></a> output, and
+udev rules can be used to apply settings based on the serial number.</p>
+
+<p>To modify the device descriptor, an <a href="https://en.wikipedia.org/wiki/EEPROM">EEPROM (electrically erasable programmable
+read-only memory)</a> needs to be added to
+the design, from which the HX2VL will read configuration.</p>
+
+<p>The HX2VL allows field-programming of the connected EEPROM, i.e. writing to it
+via the USB hub chip. I found the Windows-only tool hard to set up on a modern
+Windows installation, so I wondered whether I could build a simpler to use tool.</p>
+
+<p>Under the covers, the tool merely sends commands with the vendor-specific
+request code 14 via USB, specifying an index of the two-byte word to
+read/write. This can be replicated in a few lines of Go:</p>
+
+<pre><code>dev, _ := usb.OpenDeviceWithVIDPID(0x04b4, 0x6570)
+eepromRequest := 14
+wIndex := 0 // [0, 63] for 128 bytes of EEPROM
+dev.Control(gousb.RequestTypeVendor|0x80, 
+  eepromRequest, 0, wIndex, make([]byte, 2))
+</code></pre>
+
+<p>The EEPROM contents are well-described in the <a href="http://www.cypress.com/file/114101/download">HX2VL data
+sheet</a>, so the rest is easy.</p>
+
+<p>See <a href="https://github.com/kinx-project/mk66f-blaster">https://github.com/kinx-project/mk66f-blaster</a> for the tool.</p>
+
+<h3 id="lessons-learnt">Lessons learnt</h3>
+
+<ul>
+<li><p>If possible, design the PCB in such a way that components you think you don’t
+need (e.g. the EEPROM) can optionally be soldered on. This would have saved me
+a PCB design/fabrication cycle.</p></li>
+
+<li><p>Get the evaluation board to figure out the configuration you need
+(e.g. self-powered vs. bus-powered).</p></li>
+</ul>
+
+<h3 id="next-up">Next up</h3>
+
+<p>The <a href="/posts/2018-04-17-kinx-latency-measurement/">last post introduces the processing latency measurement firmware for the
+FRDM-K66F development board</a> and
+draws a conclusion.</p>
+
+</div></div></div></div></div></div></body>
+</html>

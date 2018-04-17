@@ -6,6 +6,553 @@
   <id>https://michael.stapelberg.de/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[kinX: USB Hub]]></title>
+    <link href="https://michael.stapelberg.de/posts/2018-04-17-kinx-usb-hub/"/>
+    <id>https://michael.stapelberg.de/posts/2018-04-17-kinx-usb-hub/</id>
+    <published>2018-04-17T17:49:00+02:00</published>
+    <updated>2018-04-17T17:49:00+02:00</updated>
+    <content type="html"><![CDATA[
+
+<p>This post is part of a <a href="/posts/2018-04-17-kinx">series of posts about the kinX project</a>.</p>
+
+<h3 id="motivation">Motivation</h3>
+
+<p>The Kinesis Advantage comes with a built-in 2-port USB hub. That hub uses a
+proprietary connector to interface with a
+<a href="https://en.wikipedia.org/wiki/PS/2_port">PS/2</a> keyboard controller, so it
+cannot be used with a USB keyboard controller. As the built-in hub is the
+natural place to connect the Logitech unified receiver dongle, not being able to
+use the hub is mildly annoying.</p>
+
+<p>The kinX MK66F keyboard controller presently needs two USB cables: one connected
+to the USBFS port to supply the PCB with power and receive firmware updates (via
+the Teensy bootloader chip), and one connected to the USBHS port for the actual
+keyboard device.</p>
+
+<p>Lastly, even if the original built-in USB hub had internal ports (instead of a
+PS/2 converter), it only supports USB 1.1, nullifying any latency improvements.</p>
+
+<p>Hence, I decided to build a drop-in replacement USB 2.0 hub with 2 external USB
+ports and 2 internal USB ports, using the same proprietary connector as the
+original, so that the original keyboard USB cable could be re-used.</p>
+
+<h3 id="design-phase">Design phase</h3>
+
+<p>Unfortunately, I could not find an open hardware USB 2.0 hub design on the
+internet, so I started researching various USB hub chips. I quickly discarded
+the idea of using USB 3 due to its much stricter requirements.</p>
+
+<p>In the end, I decided to go with the Cypress HX2VL series because of their
+superior documentation: I found a detailed data sheet, an evaluation board, the
+associated schematics, design checklist/guidelines, and even the evaluation
+board’s bill of materials.</p>
+
+<p>This is what the finished build of my design looks like:</p>
+
+<p><img src="/Bilder/kinx-hub.jpg" width="100%"></p>
+
+<h3 id="power">Power</h3>
+
+<p>After completing my first build, I tested a few USB devices with my hub. The
+Logitech unified receiver dongle and the
+<a href="https://www.yubico.com/start/">YubiKey</a> worked fine. However, my external hard
+drive and my USB memory stick did not work. In the syslog, I would see:</p>
+
+<pre><code>kernel: usb 1-14.4.4: rejected 1 configuration due to insufficient available bus power
+</code></pre>
+
+<p>This is because the USB specification limits bus-powered hubs to 100mA per
+port. While high power usage does not come as a surprise for the external hard
+disk, it turns out that even my USB memory stick requires 200mA. This was a
+surprise, because that stick works on other, commercial bus-powered USB hubs.</p>
+
+<p>A closer look reveals that all 3 commercial USB hubs I have tested claim to be
+self-powered (i.e. using an external power supply), even though they are
+not. This way, the kernel’s power limitation is circumvented, and up to 500mA
+can be used per port. In practice, the host port only supplies 500mA, so the
+user must be careful not to plug in devices which require more than 500mA in
+aggregate.</p>
+
+<p>I changed the SELFPWR configuration pin to have my hub claim it was
+self-powered, too, and that made all USB devices I tested work fine.</p>
+
+<h3 id="eeprom-programming">EEPROM programming</h3>
+
+<p>When debugging the power issue, I originally thought the Maximum Power setting
+in the hub’s USB device descriptor needed to be raised. This turned out to not
+be correct: the Maximum Power refers to the power which the hub uses for its own
+circuitry, not the power it passes through to connected devices.</p>
+
+<p>Nevertheless, it’s a nice touch to modify the device descriptor to put in a
+custom vendor name, product name and serial number: that way, the device shows
+up with a recognizable name in your syslog or
+<a href="https://manpages.debian.org/stretch/usbutils/lsusb.8"><code>lsusb(8)</code></a> output, and
+udev rules can be used to apply settings based on the serial number.</p>
+
+<p>To modify the device descriptor, an <a href="https://en.wikipedia.org/wiki/EEPROM">EEPROM (electrically erasable programmable
+read-only memory)</a> needs to be added to
+the design, from which the HX2VL will read configuration.</p>
+
+<p>The HX2VL allows field-programming of the connected EEPROM, i.e. writing to it
+via the USB hub chip. I found the Windows-only tool hard to set up on a modern
+Windows installation, so I wondered whether I could build a simpler to use tool.</p>
+
+<p>Under the covers, the tool merely sends commands with the vendor-specific
+request code 14 via USB, specifying an index of the two-byte word to
+read/write. This can be replicated in a few lines of Go:</p>
+
+<pre><code>dev, _ := usb.OpenDeviceWithVIDPID(0x04b4, 0x6570)
+eepromRequest := 14
+wIndex := 0 // [0, 63] for 128 bytes of EEPROM
+dev.Control(gousb.RequestTypeVendor|0x80, 
+  eepromRequest, 0, wIndex, make([]byte, 2))
+</code></pre>
+
+<p>The EEPROM contents are well-described in the <a href="http://www.cypress.com/file/114101/download">HX2VL data
+sheet</a>, so the rest is easy.</p>
+
+<p>See <a href="https://github.com/kinx-project/mk66f-blaster">https://github.com/kinx-project/mk66f-blaster</a> for the tool.</p>
+
+<h3 id="lessons-learnt">Lessons learnt</h3>
+
+<ul>
+<li><p>If possible, design the PCB in such a way that components you think you don’t
+need (e.g. the EEPROM) can optionally be soldered on. This would have saved me
+a PCB design/fabrication cycle.</p></li>
+
+<li><p>Get the evaluation board to figure out the configuration you need
+(e.g. self-powered vs. bus-powered).</p></li>
+</ul>
+
+<h3 id="next-up">Next up</h3>
+
+<p>The <a href="/posts/2018-04-17-kinx-latency-measurement/">last post introduces the processing latency measurement firmware for the
+FRDM-K66F development board</a> and
+draws a conclusion.</p>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[kinX: keyboard controller with &lt;0.225ms input latency]]></title>
+    <link href="https://michael.stapelberg.de/posts/2018-04-17-kinx-keyboard-controller/"/>
+    <id>https://michael.stapelberg.de/posts/2018-04-17-kinx-keyboard-controller/</id>
+    <published>2018-04-17T17:49:00+02:00</published>
+    <updated>2018-04-17T17:49:00+02:00</updated>
+    <content type="html"><![CDATA[
+
+<p>This post is part of a <a href="/posts/2018-04-17-kinx">series of posts about the kinX project</a>.</p>
+
+<h3 id="background">Background</h3>
+
+<p>10 years ago I got a Kinesis Advantage keyboard. I wrote about the experience of
+learning to touch-type using the ergonomic <a href="https://neo-layout.org/">NEO layout</a>
+in my (German) post <a href="/posts/2009-01-01-neo_kinesis/">“Neo-Layout auf einer
+Kinesis-Tastatur”</a>.</p>
+
+<p>The Kinesis Advantage is still the best keyboard I’ve ever used, and I use one
+every day, both at the office and at home.</p>
+
+<p>I had two reasons to start modifying the keyboard:</p>
+
+<ol>
+<li><p>I prefer Cherry MX blue key switches over the Cherry MX brown key switches
+the Kinesis comes with. Nowadays, you can get a Kinesis with Cherry MX red
+key switches, which felt okay in a quick test.</p></li>
+
+<li><p>The original keyboard controller has (had?) a bug where modifier keys such as
+Shift would get stuck at least once a week: you would press Shift, press A,
+release A, release Shift, press A and see AA instead of Aa.</p></li>
+</ol>
+
+<p>I solved issue ① with the help of the excellent Kinesis technical support, who
+sold me unpopulated PCBs so that I could solder on my own key switches.</p>
+
+<p>Issue ② was what lead to my first own keyboard controller build, which I
+documented in <a href="/posts/2013-03-21-kinesis_custom_controller/">“Hacking your own Kinesis keyboard
+controller”</a> (2013).</p>
+
+<p>Then, the topic of input latency popped into my filter bubble, with excellent
+ posts such as <a href="https://pavelfatin.com/typing-with-pleasure/">Pavel Fatin’s “Typing with
+pleasure”</a>. I started wondering
+what input latency I was facing, and whether/how I could reduce it.</p>
+
+<p>Given that I was using a custom keyboard controller, it was up to me to answer
+that question. After trying to understand and modify the firmware I had been
+using for the last 4 years, I realized that I first needed to learn much more
+about how keyboards work.</p>
+
+<p>I firmly believe that creating a good environment is vital for development,
+especially for intrinsically-motivated side projects like this one. Hence, I set
+the project aside until a colleague gifted me his old Kinesis which had
+intermittent issues. I removed the electronics and started using that keyboard
+as my development keyboard.</p>
+
+<h3 id="sources-of-input-latency">Sources of input latency</h3>
+
+<p>A keyboard controller has 3 major tasks:</p>
+
+<ul>
+<li><p><strong>matrix scan</strong>: to avoid physically connecting every single key switch
+directly to a microcontroller (requiring a large number of GPIO pins), most
+keyboards use a matrix. See <a href="http://blog.komar.be/how-to-make-a-keyboard-the-matrix/">“How to make a keyboard — the
+matrix”</a> for a good
+explanation.</p></li>
+
+<li><p><strong>debouncing</strong>: when pressing a key switch, it doesn’t cleanly change from a
+low voltage level to a high voltage level (or vice-versa). Instead, it
+bounces: the voltage level rapidly oscillates until it eventually reaches a
+stable steady state. Because one key press shouldn’t result in a whole bunch
+of characters, keyboard controllers need to debounce the key press.</p></li>
+
+<li><p><strong>USB</strong>: nowadays, keyboards use USB (for example to be compatible with
+laptops, which generally don’t have PS/2 ports), so the keyboard’s state needs
+to be communicated to the computer via USB.</p></li>
+</ul>
+
+<p>Here’s an illustration of the timing of a key press being handled by a naive
+keyboard controller implementation:</p>
+
+<p><img src="/Bilder/kinx-input-latency-sources.svg"></p>
+
+<p>In the worst case, a key press happens just after a keyboard matrix scan. The
+first source of latency is the time it takes until the next keyboard matrix scan
+happens.</p>
+
+<p>Depending on the implementation, the key press now sits in a data structure,
+waiting for the debounce time to pass.</p>
+
+<p>Finally, once the key press was successfully debounced, the device must wait
+until the USB host polls it before it can send the HID report.</p>
+
+<p>Unless the matrix scan interval is coupled to the USB poll interval, the delays
+are additive, and the debounce time is usually constant: in the best case, a key
+press happens just before a matrix scan (0ms) and gets debounced (say, 5ms) just
+before a USB poll (0ms).</p>
+
+<h3 id="teensy-3-6-controller-for-learning">Teensy 3.6 controller (for learning)</h3>
+
+<p>My old keyboard controller used the
+<a href="https://www.pjrc.com/teensy/index.html">Teensy++</a>, which is fairly dated at
+this point. I decided a good start of the project would be to upgrade to the
+current Teensy 3.6, cleaning up the schematics on the way.</p>
+
+<p><img src="/Bilder/kinx-teensy36.jpg" width="100%"></p>
+
+<p>To ensure I understand all involved parts, I implemented a bare-metal firmware
+almost from scratch: I cobbled together the required startup code, USB stack
+and, most importantly, key matrix scanning code.</p>
+
+<p>In my firmware, the Teensy 3.6 runs at 180 MHz (compared to the Teensy++’s 16
+MHz) and scans the keyboard matrix in a busy loop (as opposed to on USB
+poll). Measurements confirmed a matrix scan time of only 100μs (0.1ms).</p>
+
+<p>I implemented debouncing the way it is described in <a href="https://summivox.wordpress.com/2016/06/03/keyboard-matrix-scanning-and-debouncing/">Yin Zhong’s “Keyboard
+Matrix Scanning and
+Debouncing”</a>:
+by registering a key press/release on the rising/falling edge and applying the
+debounce time afterwards, effectively eliminating debounce latency.</p>
+
+<p>Note that while the Cherry MX datasheet specifies a debounce time of 5ms, I
+found it necessary to increase the time to 10ms to prevent bouncing in some of
+my key switches, which are already a few years old.</p>
+
+<p>I set the USB device descriptor’s poll interval to 1, meaning poll every 1 USB
+micro frame, which is 1ms long with USB 1.x (Full Speed).</p>
+
+<p>This leaves us at an input latency within [0ms, 1.1ms]:</p>
+
+<ul>
+<li>≤ 0.1ms scan latency</li>
+<li>0ms debounce latency</li>
+<li>≤ 1ms USB poll latency</li>
+</ul>
+
+<p>Can we reduce the input latency even further? The biggest factor is the USB poll
+interval.</p>
+
+<h3 id="usb-high-speed">USB High Speed</h3>
+
+<p>With USB 2.0 High Speed, the micro frame duration is reduced to 125μs
+(0.125ms). The NXP MK66F micro controller in the Teensy 3.6 has two USB ports:</p>
+
+<ol>
+<li>the Full Speed-only USBFS port, which is used by the Teensy 3.6</li>
+<li>the High Speed-capable USBHS port, which the Teensy optionally uses for host
+mode, with experimental software support (at the time of writing)</li>
+</ol>
+
+<p><img src="/Bilder/kinx-usbhs-breakout.jpg" width="100%"></p>
+
+<p>While the software support was a road block which could conceivably be solved, I
+also faced a mechanical problem: the available space in the Kinesis keyboard and
+the position of the USB High Speed port pins on the Teensy 3.6 unfortunately
+prevented installing any sort of breakout board to actually use the port.</p>
+
+<p>I decided to move from the Teensy 3.6 to my own design with the same
+microcontroller.</p>
+
+<h3 id="mk66f-keyboard-controller">MK66F keyboard controller</h3>
+
+<p><img src="/Bilder/kinx-mk66f.jpg" width="100%"></p>
+
+<p>To make development pleasant, I connected a USB-to-serial adapter (to UART0) and
+a “rebootor” (to PROGHEAD): another Teensy with a special firmware to trigger
+programming mode. This way, I could set my editor’s <code>compile-command</code> to <code>make
+&amp;&amp; teensy_loader_cli -r …</code>, compiling the code, uploading and booting into the
+resulting firmware with a single keyboard shortcut.</p>
+
+<p>I based the firmware for this controller on NXP’s SDK examples, to ensure I get
+a well-tested and maintained USB stack for the USBHS port. I did some
+measurements to confirm the stack does not add measurable extra latency, so I
+did not see any value in me maintaining a custom USB stack.</p>
+
+<p>The firmware can be found at <a href="https://github.com/kinx-project/mk66f-fw">https://github.com/kinx-project/mk66f-fw</a></p>
+
+<p>The hardware can be found at <a href="https://github.com/kinx-project/mk66f-hw">https://github.com/kinx-project/mk66f-hw</a></p>
+
+<p>Using USB 2.0 High Speed leaves us at an input latency within [0ms, 0.225ms]:</p>
+
+<ul>
+<li>≤ 0.1ms scan latency</li>
+<li>0ms debounce latency</li>
+<li>≤ 0.125ms USB poll latency</li>
+</ul>
+
+<h3 id="lessons-learnt">Lessons learnt</h3>
+
+<ul>
+<li><p>In the future, I will base custom designs on the vendor’s development board
+(instead of on the Teensy). This way, the vendor-provided code could be used
+without any modifications.</p></li>
+
+<li><p>While the Teensy bootloader means getting started with the microcontroller
+just requires a USB port, using a JTAG connector for development would be more
+powerful: not only does it replace the combination of Teensy bootloader,
+serial and rebootor, but it also supports debugging with gdb.</p></li>
+</ul>
+
+<h3 id="next-up">Next up</h3>
+
+<p>The <a href="/posts/2018-04-17-kinx-usb-hub/">second post motivates and describes building a drop-in replacement USB
+hub</a> for the Kinesis Advantage keyboard.</p>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[kinX: latency measurement]]></title>
+    <link href="https://michael.stapelberg.de/posts/2018-04-17-kinx-latency-measurement/"/>
+    <id>https://michael.stapelberg.de/posts/2018-04-17-kinx-latency-measurement/</id>
+    <published>2018-04-17T17:49:00+02:00</published>
+    <updated>2018-04-17T17:49:00+02:00</updated>
+    <content type="html"><![CDATA[
+
+<p>This post is part of a <a href="/posts/2018-04-17-kinx">series of posts about the kinX project</a>.</p>
+
+<h3 id="latency-measurement">Latency measurement</h3>
+
+<p>End-to-end latency consists of 3 parts:</p>
+
+<ol>
+<li>input latency (keyboard)</li>
+<li>processing latency (computer)</li>
+<li>output latency (monitor)</li>
+</ol>
+
+<p>During the development of the kinX keyboard controller, I realized that
+measuring processing latency was quite simple with my hardware: I could start a
+timer when sending a key press HID report to the computer and measure the
+elapsed time when I would receive a reply from the computer.</p>
+
+<p>The key to send is the Caps Lock key, because unlike other keys it results in a
+reply: a HID report telling the keyboard to turn the Caps Lock LED on.</p>
+
+<p><img src="/Bilder/kinx-latency-measurement-device.svg"></p>
+
+<h3 id="measurement-device">Measurement device</h3>
+
+<p>To make this measurement technique accessible to as many people as possible, I
+decided to pull it out of my kinX keyboard controller and instead build it using
+the FRDM-K66F evaluation board, which uses the same microcontroller.</p>
+
+<p>The FRDM-K66F can be bought for about 60 USD at big electronics shops, e.g. Digi-Key.</p>
+
+<p>Find the firmware at <a href="https://github.com/kinx-project/measure-fw">https://github.com/kinx-project/measure-fw</a></p>
+
+<h3 id="baseline">Baseline</h3>
+
+<p>To determine the lowest processing latency one can possibly get for userspace
+applications on a Linux system, I wrote a small program which uses Linux’s evdev
+API to receive key presses and react to a Caps Lock keypress as quickly as it
+can by turning the Caps Lock LED on.</p>
+
+<p>Find the program at <a href="https://github.com/kinx-project/measure-evdev">https://github.com/kinx-project/measure-evdev</a></p>
+
+<p>The following layers are exercised when measuring this program:</p>
+
+<ul>
+<li>USB host controller</li>
+<li>Linux kernel (USB and input subsystems)</li>
+<li>input event API (evdev)</li>
+</ul>
+
+<p>Notably, graphical interfaces such as X11 or Wayland are excluded.</p>
+
+<p>The measurements can be verified using Wireshark’s usbmon capturing, which
+provides a view of the USB bus from the computer’s perspective, excluding USB
+poll latency and USB transaction time.</p>
+
+<p>Using Ubuntu 17.10, I measured a processing latency of 152 μs on average.</p>
+
+<h3 id="emacs">Emacs</h3>
+
+<p>Now let’s see whether my current editor of choice adds significant latency.</p>
+
+<p>Using a few lines of Emacs Lisp, I instructed Emacs to turn on the Caps Lock LED
+whenever a key is inserted into the current buffer. In combination with
+remapping the Caps Lock key to any other key (e.g. “a”), this allows us to
+measure Emacs’s processing latency.</p>
+
+<p>On the same Ubuntu 17.10 installation used above, Emacs 25.2.2 adds on average
+278 μs to the baseline processing latency.</p>
+
+<p>Find the code at <a href="https://github.com/kinx-project/measure-emacs">https://github.com/kinx-project/measure-emacs</a></p>
+
+<h3 id="end-to-end-latency">End-to-end latency</h3>
+
+<p>With the kinX keyboard controller, we can achieve the following end-to-end latency:</p>
+
+<table>
+<thead>
+<tr>
+<th>contributor</th>
+<th>latency</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Matrix scan</td>
+<td>≈ 100 μs</td>
+</tr>
+
+<tr>
+<td>USB poll</td>
+<td>≈ 125 μs</td>
+</tr>
+
+<tr>
+<td>Linux</td>
+<td>≈ 152 μs</td>
+</tr>
+
+<tr>
+<td>Emacs</td>
+<td>≈ 278 μs</td>
+</tr>
+</tbody>
+</table>
+
+<p><br>This sums up to ≈ 655 μs on average. On top of that, we have output latency
+within [0, 16ms] due to the 60 Hz refresh rate of our monitors.</p>
+
+<p>Note that using a compositor adds one frame of output latency.</p>
+
+<h3 id="input-latency-perception">Input latency perception</h3>
+
+<p>A natural question to ask is how well humans can perceive input latency. After
+all, keyboards have been manufactured for many years, and if input latency was
+really that important, surely manufacturers would have picked up on this fact by
+now?</p>
+
+<p>I ran a little unscientific experiment in the hope to further my understanding
+of this question at the most recent Chaos Communication Congress in Leipzig.</p>
+
+<p>In the experiment, I let 17 people play a game on a specially prepared
+keyboard. In each round, the game reconfigures the keyboard to either have
+additional input latency or not, decided at random. The player can then type a
+few keys and make a decision. If the player can correctly indicate whether
+additional input latency was present in more than 50% of the cases, the player
+is said to be able to distinguish latency at that level. On each level, the game
+decreases the additional input latency: it starts with 100ms, then 75ms, then
+50ms, etc.</p>
+
+<p>The most sensitive player reliably recognized an additional 15ms of input
+latency.</p>
+
+<p>Some players could not distinguish 75ms of additional input latency.</p>
+
+<p>Every player could distinguish 100ms of additional input latency.</p>
+
+<p>My take-away is that many people cannot perceive slight differences in input
+latency at all, explaining why keyboard manufacturers don’t optimize for low
+latency.</p>
+
+<p>Reducing input latency still seems worthwhile to me: even if the reduction
+happens under the threshold at which you can perceive differences in input
+latency, it buys you more leeway in the entire stack. In other words, you might
+now be able to turn on an expensive editor feature which previously slowed down
+typing too much.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>When I started looking into input latency, my keyboard had dozens of
+milliseconds of latency. I found an easy win in the old firmware, then hit a
+wall, started the kinX project and eventually ended up with a keyboard with just
+0.225ms input latency.</p>
+
+<p>Even if I had not reduced the input latency of my keyboard at all, I feel that
+this project was a valuable learning experience: I now know a lot more about PCB
+design, ARM microcontrollers, USB, HID, etc.</p>
+
+<p>Typing on a self-built keyboard feels good: be it because of the warm fuzzy
+feeling of enjoying the fruits of your labor, or whether the input latency
+indeed is lower, I’m happy with the result either way.</p>
+
+<p>Lastly, I can now decidedly claim that the processing latency of modern
+computers is perfectly fine (remember our 152 μs + 278 μs measurement for
+Linux + Emacs), and as long as you pick decent peripherals, your end-to-end
+latency will be fine, too.</p>
+
+<h3 id="what-s-next">What’s next?</h3>
+
+<p>By far the biggest factor in the end-to-end latency is the monitor’s refresh
+rate, so getting a monitor with a high refresh rate and no additional processing
+latency would be the next step in reducing the end-to-end latency.</p>
+
+<p>As far as the keyboard goes, the matrix scan could be eliminated by wiring up
+each individual key to a microcontroller with enough GPIO pins. The USB poll
+delay could be eliminated by switching to USB 3, but I don’t know of any
+microcontrollers which have USB 3 built-in yet. Both of these improvements are
+likely not worth the effort.</p>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[kinX: overview]]></title>
+    <link href="https://michael.stapelberg.de/posts/2018-04-17-kinx/"/>
+    <id>https://michael.stapelberg.de/posts/2018-04-17-kinx/</id>
+    <published>2018-04-17T17:49:00+02:00</published>
+    <updated>2018-04-17T17:49:00+02:00</updated>
+    <content type="html"><![CDATA[<p>The kinX project is described in a series of blog posts:</p>
+
+<ul>
+<li><p>While not strictly a part of this series, <a href="/posts/2013-03-21-kinesis_custom_controller/">“Hacking your own Kinesis keyboard
+controller”</a> describes the first
+controller I built in 2013 (maybe interesting for context).</p></li>
+
+<li><p>The <a href="/posts/2018-04-17-kinx-keyboard-controller/">first post introduces the kinX, a keyboard
+controller</a> with merely 0.2ms of
+input latency (including USB).</p></li>
+
+<li><p>The <a href="/posts/2018-04-17-kinx-usb-hub/">second post motivates and describes building a drop-in replacement USB
+hub</a> for the Kinesis Advantage keyboard.</p></li>
+
+<li><p>The <a href="/posts/2018-04-17-kinx-latency-measurement/">last post introduces the processing latency measurement firmware for the
+FRDM-K66F development board</a> and
+draws a conclusion.</p></li>
+</ul>
+
+<p>You can find the project’s artifacts at <a href="https://github.com/kinx-project">https://github.com/kinx-project</a>.</p>
+]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[cpu(1) with Linux]]></title>
     <link href="https://michael.stapelberg.de/posts/2018-03-13-cpu/"/>
     <id>https://michael.stapelberg.de/posts/2018-03-13-cpu/</id>
@@ -2408,1037 +2955,6 @@ if (!!document['fonts']) {
 &lt;/body&gt;</p>
 
 <p></pre></p>
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[Gigabit NAS (running CoreOS)]]></title>
-    <link href="https://michael.stapelberg.de/posts/2016-11-21-gigabit-nas-coreos/"/>
-    <id>https://michael.stapelberg.de/posts/2016-11-21-gigabit-nas-coreos/</id>
-    <published>2016-11-21T16:12:00+00:00</published>
-    <updated>2016-11-21T16:12:00+00:00</updated>
-    <content type="html"><![CDATA[<p>
-tl;dr: I upgraded from a qnap TS-119P to a custom HTPC-like network storage
-solution. This article outlines what my original reasoning was for the qnap
-TS-119P, what I learnt, and with what solution precisely I replaced the qnap.
-</p>
-
-<p>
-A little over two years ago, I gave a (German) presentation about my network
-storage setup (see <a
-href="https://media.ccc.de/v/gpn14_-_5801_-_de_-_studio_-_201406202130_-_linux-based_home_nas_-_secure">video</a>
-or <a
-href="https://entropia.de/images/6/6b/Gpn14_linux_based_home_nas.pdf">slides</a>).
-Given that video isn’t a great consumption format when you’re pressed on time,
-and given that a number of my readers might not speak German, I’ll recap the
-most important points:
-</p>
-<ul>
-
-<li>
-<strong>I reduced the scope of the setup to storing daily backups and providing
-media files via CIFS</strong>.<br>
-I have come to prefer numerous smaller setups over one gigantic setup which
-offers everything (think a <a href="https://omnia.turris.cz/en/">Turris
-Omnia</a> acting as a router, mail server, network storage, etc.). Smaller
-setups can be debugged, upgraded or rebuilt in less time. Time-boxing
-activities has become very important to me as I work full time: if I can’t
-imagine finishing the activity within 1 or 2 hours, I usually don’t get started
-on it at all unless I’m on vacation.
-</li>
-
-<li>
-<strong>Requirements: FOSS, relatively cheap, relatively low power usage,
-relatively high redundancy level</strong>.<br>
-I’m looking not to spend a large amount of money on hardware. Whenever I do
-spend a lot, I feel pressured to get the most out of my purchase and use the
-hardware for many years. However, I find it more satisfying to be able to
-upgrade more frequently — just like the update this article is describing
-:).<br>
-
-With regards to redundancy, I’m not content with being able to rebuild the
-system within a couple of days after a failure occurs. Instead, I want to be
-able to trivially switch to a replacement system within minutes. This
-requirement results in the decision to run 2 separate qnap NAS appliances with
-1 hard disk each (instead of e.g. a RAID-1 setup).<br>
-
-The decision to go with qnap as a vendor came from the fact that their devices
-are pretty well supported in the Debian ecosystem: there is a network installer
-for it, the custom hardware is supported by the <a
-href="https://www.hellion.org.uk/qcontrol/">qcontrol</a> tool and one can build
-a serial console connector.
-</li>
-
-<li>
-The remainder of the points is largely related to software, and hence not
-relevant for this article, as I’m keeping the software largely the same (aside
-from the surrounding operating system).
-</li>
-
-</ul>
-
-<h2>What did not work well</h2>
-
-<p>
-Even a well-supported embedded device like the qnap TS-119P requires too much
-effort to be set up:
-</p>
-<ol>
-<li>
-Setting up the network installer is cumbersome.
-</li>
-<li>
-I contributed patches to qcontrol for setting the <a
-href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=703888">wake on LAN
-configuration on the qnap TS-119P’s controller board</a> and for <a
-href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=703894">systemd
-support in qcontrol</a>.
-</li>
-<li>
-I contributed my first ever patch to the Linux kernel for <a
-href="https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/drivers/net/ethernet/marvell/mv643xx_eth.c?id=3871c3876f8084a2f40ba3c3fc20a6bb5754d88d">wake
-on LAN support for the Marvell MV643xx series chips</a>.
-</li>
-<li>
-I ended up <a
-href="http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=723177">lobbying Debian
-to enable the <code>CONFIG_MARVELL_PHY</code> kernel option</a>, while
-personally running a custom kernel.
-</li>
-</ol>
-
-<p>
-On the hardware side, to get any insight into what the device is doing, your
-only input/output option is a serial console. To get easy access to that serial
-console, you need to <a
-href="https://www.cyrius.com/debian/kirkwood/qnap/ts-119/serial/">solder an
-adapter cable for the somewhat non-standard header which they use</a>.
-</p>
-
-<p>
-All of this contributed to my impression that upgrading the device would be
-equally involved. Logically speaking, I know that this is unlikely since my patches
-are upstream in the Linux kernel and in Debian. Nevertheless, I couldn’t help
-but feel like it would be hard. As a result, I have not upgraded my device ever
-since I got it working, i.e. more than two years ago.
-</p>
-
-<p>
-The take-away is that I now try hard to:
-</p>
-<ol>
-<li>
-use <strong>standard hardware which fits well into my landscape</strong>
-</li>
-<li>
-use a software setup which has as <strong>few non-standard
-modifications</strong> as possible and which <strong>automatically updates
-itself</strong>.
-</li>
-</ol>
-
-<h2>What I would like to improve</h2>
-
-<p>
-One continuous pain point was how slow the qnap TS-119P was with regards to
-writing data to disk. The slowness was largely caused by full-disk encryption.
-The device’s hardware accelerator turned out to be useless with
-cryptsetup-luks’s comparatively small hard-coded 4K block size, resulting in
-about 6 to 10 MB/s of throughput.
-</p>
-
-<p>
-This resulted in me downloading files onto the SSD in my workstation and then
-transferring them to the network storage. Doing these downloads in a faster
-environment circumvents my somewhat irrational fears about the files becoming
-unavailable while you are downloading them, and allows me to take pleasure in
-how fast I’m able to download things :).
-</p>
-
-<p>
-The take-away is that any new solution should be as quick as my workstation and
-network, i.e. it should be able to <strong>write files to disk with gigabit
-speed</strong>.
-</p>
-
-<h2>What I can get rid of</h2>
-
-<p>
-While <a
-href="https://github.com/stapelberg/zkj-nas-tools/tree/master/dramaqueen">dramaqueen</a>
-and <a
-href="https://github.com/stapelberg/zkj-nas-tools/tree/master/autowake">autowake</a>
-worked well in principle, they turned out to no longer be very useful in my
-environment: I switched from a dedicated OpenELEC-based media center box to
-using <a href="https://emby.media/">emby</a> and a Chromecast. emby is also
-nice to access remotely, e.g. when watching series at a friend’s place, or
-watching movies while on vacation or business trips somewhere. Hence, my
-storage solution needs to be running 24/7 — no more automated shutdowns and
-wake-up procedures.
-</p>
-
-<h2>What worked well</h2>
-
-<p>
-Reducing the scope drastically in terms of software setup complexity paid off.
-If it weren’t for that, I probably would not have been able to complete this
-upgrade within a few mornings/evenings and would likely have pushed this
-project out for a long time.
-</p>
-
-<h2>The new hardware</h2>
-
-<p>
-I researched the following components back in March, but then put the project
-on hold due to time constraints and to allow myself some more time to think
-about it. I finally ordered the components in August, and they still ranked
-best with regards to cost / performance ratio and fulfilling my requirements.
-</p>
-
-<table width="100%" style="margin-top: 1.5em; margin-bottom: 1.5em; margin-left: 2em">
-<tr>
-<th>Price</th>
-<th>Type</th>
-<th>Article</th>
-</tr>
-
-<tr>
-<td>43.49 CHF</td>
-<td>Case</td>
-<td><a href="http://www.silverstonetek.com/product.php?pid=413">SILVERSTONE Sugo SST-SG05BB-LITE</a></td>
-</tr>
-
-<tr>
-<td>60.40 CHF</td>
-<td>Mainboard</td>
-<td><a href="http://www.asrock.com/mb/AMD/AM1H-ITX/">ASROCK AM1H-ITX</a></td>
-</tr>
-
-<tr>
-<td>38.99 CHF</td>
-<td>CPU</td>
-<td>AMD Athlon 5350 (supports <a
-href="https://en.wikipedia.org/wiki/AES_instruction_set">AES-NI</a>)</td>
-</tr>
-
-<tr>
-<td>20.99 CHF</td>
-<td>Cooler</td>
-<td><a href="https://www.arctic.ac/ch_en/alpine-m1-passive.html">Alpine M1-Passive</a></td>
-</tr>
-
-<tr>
-<td>32.80 CHF</td>
-<td>RAM</td>
-<td>KINGSTON ValueRAM, 8.0GB (KVR16N11/8)</td>
-</tr>
-
-<tr>
-<td valign="top">28.70 CHF</td>
-<td valign="top">PSU</td>
-<td><a href="https://www.accuswiss.ch/product_info.php?info=p18088_Netzteil-fuer-Toshiba-PA3822U-1ACA--PA3822E-1AC3--19V-2-37A.html">Toshiba PA3822U-1ACA, PA3822E-1AC3, 19V 2,37A</a><br>
-(<code>To19V_2.37A_5.5x2.5</code>)</td>
-</tr>
-
-<tr>
-<td valign="top">0 CHF</td>
-<td valign="top">System disk</td>
-<td>(OCZ-AGILITY3 60G)<br>
-You’ll need to do your own research.<br>
-Currently, my system uses 5GB of space,<br>
-so chose the smallest SSD you can find.</td>
-</tr>
-
-<tr>
-<td>225.37 CHF</td>
-<td colspan="2"><strong>total sum</strong></td>
-</tr>
-</table>
-
-<p>
-For the qnap TS-119P, I paid 226 CHF, so my new solution is a tad more
-expensive. However, I had the OCZ-AGILITY3 lying around from a warranty
-exchange, so bottomline, I paid less than what I had paid for the previous
-solution.
-</p>
-
-<p>
-I haven’t measured this myself, but according to the internet, the setups have
-the following power consumption (without disks):
-<ul>
-<li>
-The qnap TS-119P uses ≈7W, i.e. ≈60 CHF/year for electricity.
-</li>
-<li>
-The AM1H-ITX / Athlon 5350 setup uses ≈20W, i.e. ≈77 CHF/year for electricity.
-</li>
-</ul>
-
-<p>
-In terms of fitting well into my hardware landscape, this system does a much
-better job than the qnap. Instead of having to solder a custom serial port
-adapter, I can simply connect a USB keyboard and an HDMI or DisplayPort monitor
-and I’m done.
-</p>
-
-<p>
-Further, any linux distribution can easily be installed from a bootable USB
-drive, without the need for any custom tools or ports.
-</p>
-
-<h3>Full-disk encryption performance</h3>
-
-<pre>
-# cryptsetup benchmark
-# Tests are approximate using memory only (no storage IO).
-PBKDF2-sha1       338687 iterations per second
-PBKDF2-sha256     228348 iterations per second
-PBKDF2-sha512     138847 iterations per second
-PBKDF2-ripemd160  246375 iterations per second
-PBKDF2-whirlpool   84891 iterations per second
-#  Algorithm | Key |  Encryption |  Decryption
-     aes-cbc   128b   468.8 MiB/s  1040.9 MiB/s
-     aes-cbc   256b   366.4 MiB/s   885.8 MiB/s
-     aes-xts   256b   850.8 MiB/s   843.9 MiB/s
-     aes-xts   512b   725.0 MiB/s   740.6 MiB/s
-</pre>
-
-<h3>Network performance</h3>
-
-<p>
-As the old qnap TS-119P would only sustain gigabit performance using IPv4 (with
-TCP checksum offloading), I was naturally relieved to see that the new solution
-can send packets at gigabit line rate using both protocols, IPv4 and IPv6. I
-ran the following tests inside a docker container (<code>docker run --net=host
--t -i debian:latest</code>):
-</p>
-
-<pre>
-# nc 10.0.0.76 3000 | dd of=/dev/null bs=5M
-0+55391 records in
-0+55391 records out
-416109464 bytes (416 MB) copied, 3.55637 s, 117 MB/s
-</pre>
-
-<pre>
-# nc 2001:db8::225:8aff:fe5d:53a9 3000 | dd of=/dev/null bs=5M
-0+275127 records in
-0+275127 records out
-629802884 bytes (630 MB) copied, 5.45907 s, 115 MB/s
-</pre>
-
-<p>
-The CPU was >90% idle using <code>netcat-traditional</code>.<br>
-The CPU was >70% idle using <code>netcat-openbsd</code>.
-</p>
-
-<h3>End-to-end throughput</h3>
-
-<p>
-Reading/writing to a disk which uses cryptsetup-luks full-disk encryption with
-the <code>aes-cbc-essiv:sha256</code> cipher, these are the resulting speeds:
-</p>
-
-<p>
-Reading a file from a CIFS mount works at gigabit throughput, without any
-tuning:
-</p>
-<pre>
-311+1 records in
-311+1 records out
-1632440260 bytes (1,6 GB) copied, 13,9396 s, 117 MB/s
-</pre>
-
-<p>
-Writing works at almost gigabit throughput:
-</p>
-<pre>
-1160+1 records in
-1160+1 records out
-6082701588 bytes (6,1 GB) copied, 58,0304 s, 105 MB/s
-</pre>
-
-<p>
-During rsync+ssh backups, the CPU is never 100% maxed out, and data is sent to
-the NAS at 65 MB/s.
-</p>
-
-<h2>The new software setup</h2>
-
-<p>
-Given that I wanted to use a software setup which has as few non-standard
-modifications as possible and automatically updates itself, I was curious to
-see if I could carry this to the extreme by using <a
-href="https://coreos.com/">CoreOS</a>.
-</p>
-
-<p>
-If you’re unfamiliar with it, CoreOS is a Linux distribution which is intended
-to be used in clusters on individual nodes. It updates itself automatically
-(using <a href="https://github.com/google/omaha">omaha, Google’s updater behind
-ChromeOS</a>) and comes as a largely read-only system without a package
-manager. You deploy software using <a href="https://www.docker.com/">Docker</a>
-and configure the setup using <a
-href="https://coreos.com/os/docs/latest/cloud-config.html">cloud-config</a>.
-</p>
-
-<p>
-I have been successfully using CoreOS for a few years in virtual machine setups
-such as the one for <a href="https://robustirc.net/">the RobustIRC network</a>.
-</p>
-
-<p>
-The cloud-config file I came up with can be found in Appendix A. You can pass
-it to the <a
-href="https://coreos.com/os/docs/latest/installing-to-disk.html">CoreOS
-installer’s <code>-c</code> flag</a>. Personally, I installed CoreOS by booting
-from a <a href="https://grml.org/">grml live linux USB key</a>, then <a
-href="https://coreos.com/os/docs/latest/installing-to-disk.html">running the
-CoreOS installer</a>.
-</p>
-
-<p>
-In order to update the cloud-config file after installing CoreOS, you can use
-the following commands:
-</p>
-<pre>
-midna $ scp cloud-config.storage.yaml core@10.252:/tmp/
-storage $ sudo cp /tmp/cloud-config.storage.yaml /var/lib/coreos-install/user_data
-storage $ sudo coreos-cloudinit --from-file=/var/lib/coreos-install/user_data
-</pre>
-
-<h3>Dockerfiles: rrsync and samba</h3>
-
-<p>
-Since neither rsync nor samba directly provide Docker containers, I had to whip
-up the following small Dockerfiles which install the latest versions from
-Debian jessie.
-</p>
-
-<p>
-Of course, this means that I need to rebuild these two containers regularly,
-but I also can easily roll them back in case an update broke, and the rest of
-the operating system updates independently of these mission-critical pieces.
-</p>
-
-<p>
-Eventually, I’m looking to enable auto-build for these Docker containers so
-that the Docker hub rebuilds the images when necessary, and the updates are
-picked up either manually when time-critical, or automatically by virtue of
-CoreOS rebooting to update itself.
-</p>
-
-<pre>
-FROM debian:jessie
-RUN apt-get update \
-  && apt-get install -y rsync \
-  && gunzip -c /usr/share/doc/rsync/scripts/rrsync.gz > /usr/bin/rrsync \
-  && chmod +x /usr/bin/rrsync
-ENTRYPOINT ["/usr/bin/rrsync"]
-</pre>
-
-<pre>
-FROM debian:jessie
-RUN apt-get update && apt-get install -y samba
-ADD smb.conf /etc/samba/smb.conf
-EXPOSE 137 138 139 445
-CMD ["/usr/sbin/smbd", "-FS"]
-</pre>
-
-<p><h3>Appendix A: cloud-config</h3>
-<pre>
-#cloud-config</p>
-
-<p>hostname: &quot;storage&quot;</p>
-
-<p>ssh_authorized_keys:
-  - ssh-rsa AAAAB… michael@midna</p>
-
-<p>write_files:
-  - path: /etc/ssl/certs/r.zekjur.net.crt
-    content: |
-      -----BEGIN CERTIFICATE-----
-      MIIDYjCCAko…
-      -----END CERTIFICATE-----
-  - path: /var/lib/ip6tables/rules-save
-    permissions: 0644
-    owner: root:root
-    content: |
-      # Generated by ip6tables-save v1.4.14 on Fri Aug 26 19:57:51 2016
-      *filter
-      :INPUT DROP [0:0]
-      :FORWARD ACCEPT [0:0]
-      :OUTPUT ACCEPT [0:0]
-      -A INPUT -p ipv6-icmp -m comment --comment &quot;IPv6 needs ICMPv6 to work&quot; -j ACCEPT
-      -A INPUT -m state --state RELATED,ESTABLISHED -m comment --comment &quot;Allow packets for outgoing connections&quot; -j ACCEPT
-      -A INPUT -s fe80::/10 -d fe80::/10 -m comment --comment &quot;Allow link-local traffic&quot; -j ACCEPT
-      -A INPUT -s 2001:db8::/32 -m comment --comment &quot;local traffic&quot; -j ACCEPT
-      -A INPUT -p tcp -m tcp --dport 22 -m comment --comment &quot;SSH&quot; -j ACCEPT
-      COMMIT
-      # Completed on Fri Aug 26 19:57:51 2016
-  - path: /root/.ssh/authorized_keys
-    permissions: 0600
-    owner: root:root
-    content: |
-      command=&quot;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/midna:/srv/backup/midna stapelberg/rsync /srv/backup/midna&quot; ssh-rsa AAAAB… root@midna
-      command=&quot;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/scan2drive:/srv/backup/scan2drive stapelberg/rsync /srv/backup/scan2drive&quot; ssh-rsa AAAAB… root@scan2drive
-      command=&quot;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/alp.zekjur.net:/srv/backup/alp.zekjur.net stapelberg/rsync /srv/backup/alp.zekjur.net&quot; ssh-rsa AAAAB… root@alp</p>
-
-<p>coreos:
-  update:
-    reboot-strategy: &quot;reboot&quot;
-  locksmith:
-    window_start: 01:00 # UTC, i.e. 02:00 CET or 03:00 CEST
-    window_length: 2h  # i.e. until 03:00 CET or 04:00 CEST
-  units:
-    - name: ip6tables-restore.service
-      enable: true</p>
-
-<pre><code>- name: 00-enp2s0.network
-  runtime: true
-  content: |
-    [Match]
-    Name=enp2s0
-
-    [Network]
-    DNS=10.0.0.1
-    Address=10.0.0.252/24
-    Gateway=10.0.0.1
-    IPv6Token=0:0:0:0:10::252
-
-- name: systemd-networkd-wait-online.service
-  command: start
-  drop-ins:
-    - name: &quot;10-interface.conf&quot;
-      content: |
-        [Service]
-        ExecStart=
-        ExecStart=/usr/lib/systemd/systemd-networkd-wait-online \
-      --interface=enp2s0
-
-- name: unlock.service
-  command: start
-  content: |
-    [Unit]
-    Description=unlock hard drive
-    Wants=network.target
-    After=systemd-networkd-wait-online.service
-    Before=samba.service
-
-    [Service]
-    Type=oneshot
-    RemainAfterExit=yes
-    # Wait until the host is actually reachable.
-    ExecStart=/bin/sh -c &quot;c=0; while [ $c -lt 5 ]; do \
-    /bin/ping6 -n -c 1 r.zekjur.net &amp;&amp; break; \
-    c=$((c+1)); \
-    sleep 1; \
-  done&quot;
-    ExecStart=/bin/sh -c &quot;(echo -n my_local_secret &amp;&amp; \
-  wget \
-    --retry-connrefused \
-    --ca-directory=/dev/null \
-    --ca-certificate=/etc/ssl/certs/r.zekjur.net.crt \
-    -qO- https://r.zekjur.net/sdb2_crypt) \
-  | /sbin/cryptsetup --key-file=- luksOpen /dev/sdb2 sdb2_crypt&quot;
-    ExecStart=/bin/mount /dev/mapper/sdb2_crypt /srv
-
-- name: samba.service
-  command: start
-  content: |
-    [Unit]
-    Description=samba server
-    After=docker.service srv.mount
-    Requires=docker.service srv.mount
-
-    [Service]
-    Restart=always
-    StartLimitInterval=0
-
-    # Always pull the latest version (bleeding edge).
-    ExecStartPre=-/usr/bin/docker pull stapelberg/samba:latest
-
-    # Set up samba users (cannot be done in the (public) Dockerfile
-    # because users/passwords are sensitive information).
-    ExecStartPre=-/usr/bin/docker kill smb
-    ExecStartPre=-/usr/bin/docker rm smb
-    ExecStartPre=-/usr/bin/docker rm smb-prep
-    ExecStartPre=/usr/bin/docker run --name smb-prep stapelberg/samba \
-  adduser --quiet --disabled-password --gecos &quot;&quot; --uid 29901 michael
-    ExecStartPre=/usr/bin/docker commit smb-prep smb-prepared
-    ExecStartPre=/usr/bin/docker rm smb-prep
-    ExecStartPre=/usr/bin/docker run --name smb-prep smb-prepared \
-  /bin/sh -c &quot;echo my_password | tee - | smbpasswd -a -s michael&quot;
-    ExecStartPre=/usr/bin/docker commit smb-prep smb-prepared
-
-    ExecStart=/usr/bin/docker run \
-      -p 137:137 \
-      -p 138:138 \
-      -p 139:139 \
-      -p 445:445 \
-      --tmpfs=/run \
-      -v /srv/data:/srv/data \
-      --name smb \
-      -t \
-      smb-prepared \
-        /usr/sbin/smbd -FS
-
-- name: emby.service
-  command: start
-  content: |
-    [Unit]
-    Description=emby
-    After=docker.service srv.mount
-    Requires=docker.service srv.mount
-
-    [Service]
-    Restart=always
-    StartLimitInterval=0
-
-    # Always pull the latest version (bleeding edge).
-    ExecStartPre=-/usr/bin/docker pull emby/embyserver
-
-    ExecStart=/usr/bin/docker run \
-      --rm \
-      --net=host \
-      -v /srv/data/movies:/srv/data/movies:ro \
-      -v /srv/data/series:/srv/data/series:ro \
-      -v /srv/emby:/config \
-      emby/embyserver
-</code></pre>
-
-<p></pre></p>
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[Conditionally tunneling SSH connections]]></title>
-    <link href="https://michael.stapelberg.de/posts/2016-06-16-ssh-conditional-tunneling/"/>
-    <id>https://michael.stapelberg.de/posts/2016-06-16-ssh-conditional-tunneling/</id>
-    <published>2016-06-16T17:20:00+00:00</published>
-    <updated>2016-06-16T17:20:00+00:00</updated>
-    <content type="html"><![CDATA[<p>
-Whereas most of the networks I regularly use (home, work, hackerspace, events,
-…) provide native IPv6 connectivity, sometimes I’m in a legacy-only network,
-e.g. when tethering via my phone on some mobile providers.
-</p>
-
-<p>
-By far the most common IPv6-only service I use these days is SSH to my
-computer(s) at home. On philosophical grounds, I refuse to set up a dynamic DNS
-record and port-forwardings, so the alternative I use is either <a
-href="https://en.wikipedia.org/wiki/Miredo">Miredo</a> or tunneling through a
-dual-stacked machine. For the latter, I used to use the following SSH config:
-</p>
-
-<pre>
-Host home
-        Hostname home.zekjur.net
-        ProxyCommand ssh -4 dualstack -W %h:%p
-</pre>
-
-<p>
-The issue with that setup is that it’s inefficient when I’m in a network which
-does support IPv6, and it requires me to authenticate to both machines. These
-are not huge issues of course, but they bother me enough that I’ve gotten into
-the habit of commenting out/in the <code>ProxyCommand</code> directive
-regularly.
-</p>
-
-<p>
-I’ve discovered that SSH can be told to use a <code>ProxyCommand</code> only
-when you don’t have a route to the public IPv6 internet, though:
-</p>
-
-<pre>
-Match host home exec "ip -6 route get 2001:7fd::1 2>&1 | grep -q unreachable"
-        ProxyCommand ssh -4 dualstack -W %h:%p
-
-Host home
-        Hostname home.zekjur.net
-</pre>
-
-<p>
-The IPv6 address used is from <code>k.root-servers.net</code>, but no packets
-are being sent — we merely ask the kernel for a route. When you don’t have an
-IPv6 address or default route, the <code>ip</code> command will print
-<code>unreachable</code>, which enables the <code>ProxyCommand</code>.
-</p>
-
-<p>
-For debugging/verifying the setup works as expected, use <code>ssh -vvv</code>
-and look for lines prefixed with “Debug3”.
-</p>
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[Supermicro X11SSZ-QF workstation mainboard]]></title>
-    <link href="https://michael.stapelberg.de/posts/2016-05-10-supermicro_x11ssz-qf_workstation_mainboard/"/>
-    <id>https://michael.stapelberg.de/posts/2016-05-10-supermicro_x11ssz-qf_workstation_mainboard/</id>
-    <published>2016-05-10T18:46:00+00:00</published>
-    <updated>2016-05-10T18:46:00+00:00</updated>
-    <content type="html"><![CDATA[<h3>Context</h3>
-
-<p>
-For the last 3 years I’ve used <a
-href="/Artikel/buying_linux_computer_2012/">the hardware described in my 2012
-article</a>. In order to drive a hi-dpi display, I needed to install an nVidia
-graphics card, since only the nVidia hardware/software supported multi-tile
-displays requiring MST (Multiple Stream Transport) such as the Dell UP2414Q.
-While I’ve switched to <a href="/Artikel/viewsonic_vx2475smhl_4k_linux/">a
-Viewsonic VX2475Smhl-4K</a> in the meantime, I still needed a recent-enough
-DisplayPort output that could deliver 3840x2160@60Hz. This is not the case for
-the Intel Core i7-2600K’s integrated GPU, so I needed to stick with the nVidia
-card.
-</p>
-
-<p>
-I then stumbled over a video file which, when played back using the nouveau
-driver’s <a href="https://en.wikipedia.org/wiki/VDPAU">VDPAU</a> functionality,
-would lock up my graphics card entirely, so that only a cold reboot helped.
-This got me annoyed enough to upgrade my hardware.
-</p>
-
-<h3>Why the Supermicro X11SSZ-QF?</h3>
-
-<p>
-Intel, my standard pick for mainboards with good Linux support, unfortunately
-<a
-href="http://gizmodo.com/5978232/intel-to-stop-making-desktop-motherboards">stopped
-producing desktop mainboards</a>. I looked around a bit for <a
-href="https://en.wikipedia.org/wiki/Skylake_(microarchitecture)">Skylake</a>
-mainboards and realized that the Intel Q170 Express chipset actually supports 2
-DisplayPort outputs that each support 3840x2160@60Hz, enabling a multi-monitor
-hi-dpi display setup. While I don’t currently have multiple monitors and don’t
-intend to get another monitor in the near future, I thought it’d be nice to
-have that as a possibility.
-</p>
-
-<p>
-Turns out that there are only two mainboards out there which use the Q170
-Express chipset and actually expose two DisplayPort outputs: the <a
-href="http://www.fujitsu.com/global/products/computing/peripheral/mainboards/extended-lifecycle-main/pmod-177971.html">Fujitsu
-D3402-B</a>, and the <a
-href="http://www.supermicro.com/products/motherboard/core/q170/x11ssz-qf.cfm">Supermicro
-X11SSZ-QF</a>. The Fujitsu one doesn’t have an integrated S/PDIF output, which
-I need to play audio on my <a
-href="http://usa.denon.com/us/product/hometheater/avreceiversht/avrx1100w">Denon
-AVR-X1100W</a> without a constant noise level. Also, I wasn’t able to find
-software downloads or even a manual for the board on the Fujitsu website. For
-Supermicro, you can find the manual and software very easily on their website,
-and because I bought Supermicro hardware in the past and was rather happy with
-it, I decided to go with the Supermicro option.
-</p>
-
-<p>
-I’ve been using the board for half a year now, without any stability issues.
-</p>
-
-<h3>Mechanics and accessories</h3>
-
-<p>
-The X11SSZ-QF ships with a printed quick reference sheet, an I/O shield and 4
-SATA cables. Unfortunately, Supermicro apparently went for the cheapest SATA
-cables they could find, as they do not have a clip to ensure they don’t slide
-off of the hard disk connector. This is rather disappointing for a mainboard
-that costs more than 300 CHF. Further, an S/PDIF bracket is not included, so I
-needed to <a
-href="http://www.amazon.com/SPDIF-Optical-Plate-Cable-Bracket/dp/B003AV944Y">order
-one from the USA</a>.
-</p>
-
-<p>
-The I/O shield comes with covers over each port, which I assume is because the
-X11SSZ mainboard family has different ports (one model has more ethernet ports,
-for example). When removing the covers, push them through from the rear side of
-the case (if you had installed it already). If you do it from the other side, a
-bit of metal will remain in each port.
-</p>
-
-<p>
-Due to the positioning of the CPU socket, with my Fractal Design Define R3
-case, one cannot reach the back of the CPU fan bracket when the mainboard is
-installed in the case. Hence, you need to first install the CPU fan, then
-install the mainboard. This is doable, you just need to realize it early enough
-and think about it, otherwise you’ll install the mainboard twice.
-</p>
-
-<h3>Integrated GPU not initialized</h3>
-
-<p>
-The integrated GPU is not initialized by default. You need to either install an
-external graphics card or use IPMI to enter the BIOS and change <code>Advanced
-→ Chipset Configuration → Graphics Configuration → Primary Display</code> to
-“IGFX”.
-</p>
-
-<p>
-For using IPMI, you need to connect the ethernet port <code>IPMI_LAN</code>
-(top right on the back panel, see <a
-href="http://www.supermicro.com/QuickRefs/motherboard/Q170/QRG-1744.pdf">the
-X11SSZ-QF quick reference guide</a>) to a network which has a DHCP server, then
-connect to the IPMI’s IP address in a browser.
-</p>
-
-<h3>Overeager Fan Control</h3>
-
-<p>
-When I first powered up the mainboard, I was rather confused by the behavior: I got no picture (see above), but <code>LED2</code> was blinking, meaning “PWR Fail or Fan Fail”. In addition, the computer seemed to turn itself off and on in a loop. After a while, I realized that it’s just the fan control which thinks my slow-spinning Scythe Mugen 3 Rev. B CPU fan is broken because of its low RPM value. The fan control subsequently spins up the fan to maximum speed, realizes the CPU is cool enough, spins down the fan, realizes the fan speed is too low, spins up the fan, etc.
-</p>
-
-<p>
-Neither in the BIOS nor in the IPMI web interface did I find any options for the fan thresholds. Luckily, you can actually introspect and configure them using IPMI:
-</p>
-
-<pre>
-# apt-get install freeipmi-tools
-# ipmi-sensors-config --filename=ipmi-sensors.config --checkout
-</pre>
-
-<p>
-In the human-readable text file <code>ipmi-sensors.config</code> you can now introspect the current configuration. You can see that <code>FAN1</code> and <code>FAN2</code> have sections in that file:
-</p>
-<pre>
-Section 607_FAN1
- Enable_All_Event_Messages Yes
- Enable_Scanning_On_This_Sensor Yes
- Enable_Assertion_Event_Lower_Critical_Going_Low Yes
- Enable_Assertion_Event_Lower_Non_Recoverable_Going_Low Yes
- Enable_Assertion_Event_Upper_Critical_Going_High Yes
- Enable_Assertion_Event_Upper_Non_Recoverable_Going_High Yes
- Enable_Deassertion_Event_Lower_Critical_Going_Low Yes
- Enable_Deassertion_Event_Lower_Non_Recoverable_Going_Low Yes
- Enable_Deassertion_Event_Upper_Critical_Going_High Yes
- Enable_Deassertion_Event_Upper_Non_Recoverable_Going_High Yes
- Lower_Non_Critical_Threshold 700.000000
- Lower_Critical_Threshold 500.000000
- Lower_Non_Recoverable_Threshold 300.000000
- Upper_Non_Critical_Threshold 25300.000000
- Upper_Critical_Threshold 25400.000000
- Upper_Non_Recoverable_Threshold 25500.000000
- Positive_Going_Threshold_Hysteresis 100.000000
- Negative_Going_Threshold_Hysteresis 100.000000
-EndSection
-</pre>
-
-<p>
-When running <code>ipmi-sensors</code>, you can see the current temperatures,
-voltages and fan readings. In my case, the fan spins with 700 RPM during normal
-operation, which was exactly the <code>Lower_Non_Critical_Threshold</code> in
-the default IPMI config. Hence, I modified my config file as illustrated by the
-following diff:
-</p>
-
-<pre>
---- ipmi-sensors.config 2015-11-13 11:53:00.940595043 +0100
-+++ ipmi-sensors-fixed.config   2015-11-13 11:54:49.955641295 +0100
-@@ -206,11 +206,11 @@
- Enable_Deassertion_Event_Upper_Non_Recoverable_Going_High Yes
-- Lower_Non_Critical_Threshold 700.000000
-+ Lower_Non_Critical_Threshold 400.000000
-- Lower_Critical_Threshold 500.000000
-+ Lower_Critical_Threshold 200.000000
-- Lower_Non_Recoverable_Threshold 300.000000
-+ Lower_Non_Recoverable_Threshold 0.000000
- Upper_Non_Critical_Threshold 25300.000000
-</pre>
-
-<p>
-You can install the new configuration using the <code>--commit</code> flag:
-</p>
-
-<pre>
-# ipmi-sensors-config --filename=ipmi-sensors-fixed.config --commit
-</pre>
-
-<p>
-You might need to shut down your computer and disconnect power for this change to take effect, since the BMC is running even when the mainboard is powered off.
-</p>
-
-<h3>S/PDIF output</h3>
-
-<p>
-The S/PDIF pin header on the mainboard just doesn’t work at all. It does not work
-in Windows 7 (for which the board was made), and it doesn’t work in Linux.
-Neither the digital nor the analog part of an S/PDIF port works. When
-introspecting the Intel HDA setup of the board, the S/PDIF output is not even
-hooked up correctly. Even after fixing that, it doesn’t work.
-</p>
-
-<p>
-Of course, I’ve contacted the Supermicro support. After making clear to them
-what my use-case is, they ordered (!) an S/PDIF header and tested the analog
-part of it. Their technical support claims that their port is working, but they
-never replied to my question with which operating system they tested that,
-despite me asking multiple times.
-</p>
-
-<p>
-It’s pretty disappointing to see that the support is unable to help here or at
-least confirm that it’s broken.
-</p>
-
-<p>
-To address the issue, I’ve bought an <a
-href="https://www.asus.com/us/Sound-Cards/Xonar_DX/specifications/">ASUS Xonar
-DX</a> sound card. It works out of the box on Linux, and its S/PDIF port works.
-The S/PDIF port is shared with the Line-in/Mic-in jack, but a suitable adapter
-is shipped with the card.
-</p>
-
-<h3>Wake-on-LAN</h3>
-
-<p>
-I haven’t gotten around to using Wake-on-LAN or Suspend-to-RAM yet. I will
-amend this section when I get around to it.
-</p>
-
-<h3>Conclusion</h3>
-
-<p>
-It’s clear that this mainboard is not for consumers. This begins with the
-awkward graphics and fan control setup and culminates in the apparently
-entirely untested S/PDIF output.
-</p>
-
-<p>
-That said, once you get it working, it works reliably, and it seems like the
-only reasonable option with two onboard DisplayPort outputs.
-</p>
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[Docker on Travis for new tools and fast runs]]></title>
-    <link href="https://michael.stapelberg.de/posts/2016-03-06-docker-on-travis-for-new-tools-and-fast-runs/"/>
-    <id>https://michael.stapelberg.de/posts/2016-03-06-docker-on-travis-for-new-tools-and-fast-runs/</id>
-    <published>2016-03-06T19:00:00+00:00</published>
-    <updated>2016-03-06T19:00:00+00:00</updated>
-    <content type="html"><![CDATA[<p>
-Like many other open source projects, the <a href="https://i3wm.org/">i3 window
-manager</a> is using <a href="https://travis-ci.org/">Travis CI</a> for <a
-href="https://en.wikipedia.org/wiki/Continuous_integration">continuous
-integration (CI)</a>. In our specific case, we not only verify that every pull
-request compiles and the test suite still passes, but we also ensure the code
-is auto-formatted using <a
-href="http://clang.llvm.org/docs/ClangFormat.html">clang-format</a>, does not
-contain detectable spelling errors and does not accidentally use C functions
-like <code>sprintf()</code> without error checking.
-</p>
-
-<p>
-By offering their CI service for free, Travis provides a great service to the
-open source community, and I’m very thankful for that. Automatically running
-the test suite for contributions and displaying the results alongside the pull
-request is a feature that I’ve long wanted, but would have never gotten around
-to implementing in the home-grown code review system we used before moving to
-GitHub.
-</p>
-
-<h3>Motivation (more recent build environment)</h3>
-
-<p>
-Nothing is perfect, though, and some aspects of Travis can make it hard to work
-with. In particular, the build environment they provide is rather old: at the
-time of writing, the latest you can get is <a
-href="https://en.wikipedia.org/wiki/Ubuntu_(operating_system)#Releases">Ubuntu
-Trusty</a>, which was released almost two years ago. I realize that Ubuntu
-Trusty is the current Ubuntu Long-Term Support release, but we want to move a
-bit quicker than being able to depend on new packages roughly once every two
-years.
-</p>
-
-<p>
-For quite a while, we had to make do with that old environment. As a
-mitigation, in <a
-href="https://github.com/i3/i3/blob/065ce6b8fcd3510033d81f5f3731a765e1324b91/.travis.yml">our
-<code>.travis.yml</code></a> file, we added the <a
-href="https://github.com/travis-ci/apt-source-whitelist">whitelisted
-ubuntu-toolchain-r-test source</a> for newer versions of clang (notably also
-clang-format) and GCC. For integrating lintian’s spell checking into our CI
-infrastructure, we needed a newer lintian version, as the version in Ubuntu
-Trusty doesn’t have an interface for external scripts to use. Trying to make
-our <code>.travis.yml</code> file install a newer version of lintian (and only
-lintian!) was really challenging. To get a rough idea, take a look at <a
-href="https://github.com/i3/i3/blob/dd33cd36dd0d28f0b60fbc0366bb468c645e9e55/.travis.yml">our
-<code>.travis.yml</code></a> before we upgraded to Ubuntu Trusty and were stuck
-with Ubuntu Precise. Cherry-picking a newer lintian version into Trusty would
-have been even more complicated.
-</p>
-
-<p>
-With Travis <a
-href="https://blog.travis-ci.com/2015-08-19-using-docker-on-travis-ci/">starting
-to offer Docker in their build environment</a>, and by looking at Docker’s <a
-href="https://docs.docker.com/opensource/project/set-up-dev-env/">contribution
-process, which also makes heavy use of containers</a>, we were able to put
-together a better solution:
-</p>
-
-<h3>Implementation</h3>
-
-<p>
-The basic idea is to build a Docker container based on Debian testing and then
-run all build/test commands inside that container. Our <a
-href="https://github.com/i3/i3/blob/fbfbdb8e124480bc90bbd6a8b59c1692c4ebd531/travis-build.Dockerfile">Dockerfile</a>
-installs compilers, formatters and other development tools first, then installs
-all build dependencies for i3 based on the <code>debian/control</code> file, so
-that we don’t need to duplicate build dependencies for Travis and for Debian.
-</p>
-
-<p>
-This solves the immediate issue nicely, but comes at a significant cost:
-building a Docker container adds quite a bit of wall clock time to a Travis
-run, and we want to give our contributors quick feedback. The solution to long
-build times is caching: we can simply upload the Docker container to the <a
-href="https://hub.docker.com/">Docker Hub</a> and make subsequent builds use
-the cached version.
-</p>
-
-<p>
-We decided to cache the container for a month, or until inputs to the build
-environment (currently the <code>Dockerfile</code> and
-<code>debian/control</code>) change. Technically, this is implemented by a
-little shell script called <a
-href="https://github.com/i3/i3/blob/fbfbdb8e124480bc90bbd6a8b59c1692c4ebd531/travis/ha.sh">ha.sh</a>
-(get it? hash!) which prints the SHA-256 hash of the input files. This hash,
-appended to the current month, is what we use as tag for the Docker container,
-e.g. <code>2016-03-3d453fe1</code>.
-</p>
-
-<p>
-See our <a
-href="https://github.com/i3/i3/blob/42f5a6ce479968a8f95dd5a827524865094d6a5c/.travis.yml">.travis.yml</a>
-for how to plug it all together.
-</p>
-
-<h3>Conclusion</h3>
-
-<p>
-We’ve been successfully using this setup for a bit over a month now. The
-advantages over pure Travis are:
-</p>
-
-<ol>
-<li>
-Our build environment is more recent, so we do not depend on Travis when we
-want to adopt tools that are only present in more recent versions of
-Linux.
-</li>
-<li>
-CI runs are faster: what used to take about 5 minutes now takes only 1-2
-minutes.
-</li>
-<li>
-As a nice side effect, contributors can now easily run the tests in the same
-environment that we use on Travis.
-</li>
-</ol>
-
-<p>
-There is some potential for even quicker CI runs: currently, all the different
-steps are run in sequence, but some of them could run in parallel.
-Unfortunately, Travis currently doesn’t provide a nice way to specify the
-dependency graph or to expose the different parts of a CI run in the pull
-request itself.
-</p>
 ]]></content>
   </entry>
 </feed>

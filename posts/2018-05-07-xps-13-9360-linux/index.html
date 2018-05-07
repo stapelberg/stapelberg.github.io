@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Installing Dell’s Ubuntu image on an XPS 9360</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.de/posts/2018-05-07-xps-13-9360-linux/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    <link rel="stylesheet" href="/1.css" type="text/css">
+    <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM Feed">
+</head>
+
+
+<body><div class="container-fluid"><div class="row"><div id="menu" class="col-md-2"><h1>Michael Stapelberg</h1><ul class="menu_open">
+<li><a class="menu_item" href="/"><span class="menu_title">Startseite</span></a></li>
+<li><a class="menu_item" href="/posts/"><span class="menu_title">Artikel</span></a></li>
+<li><a class="menu_item" href="/dokumente/"><span class="menu_title">Dokumente</span></a></li>
+<li><a class="menu_item" href="/programme/"><span class="menu_title">Programme</span></a>
+<div class="subitem">
+<ul class="menu_open">
+  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+<li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+<li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+<li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+</ul>
+</div>
+</li>
+
+<li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+<div class="subitem">
+<ul class="menu_open">
+  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+</ul>
+</div>
+</li>
+
+<li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+
+<li><a class="menu_item" href="/tipps"><span class="menu_title">Tipps</span></a></li>
+
+<li><a class="menu_item" href="/meinepcs"><span class="menu_title">Hardware</span></a></li>
+<li><a class="menu_item" href="/impressum"><span class="menu_title">Impressum</span></a></li></ul>
+
+</div><div id="contentBox" class="col-md-10"><h2 class="title">Installing Dell’s Ubuntu image on an XPS 9360</h2> (<span id="date">2018-05-07</span>) <div class="Artikel" id="content">
+
+
+<p>Warning: if you don’t understand one of the steps, don’t blindly follow them,
+but ask a friend for help instead! Be sure to have a known-working backup
+before messing with your system.</p>
+
+<h3 id="motivation">Motivation</h3>
+
+<p>I recently got a Dell XPS 13 9360 (2017), which of course I would like to use
+with Linux. I figured I’d give Dell’s Ubuntu version a try, as it is the closest
+I can get to a supported Linux offering on a modern laptop.</p>
+
+<p>Unfortunately, Dell doesn’t sell the XPS 9360 in its shop anymore (and I don’t
+like its successor due to the lack of USB A ports), so I had to resort to buying
+a version that comes with Windows.</p>
+
+<p>You can obtain the recovery image
+<code>dell-bto-xenial-dino2-mlk-A00-iso-20161021-0.iso</code> from
+<a href="http://www.dell.com/support/home/us/en/19/Drivers/OSISO/W764">http://www.dell.com/support/home/us/en/19/Drivers/OSISO/W764</a>, provided you have
+the system tag of an XPS 9360 that came with Linux — ask a friend if you
+accidentally purchased the Windows version. Tip: the service tag is the BIOS
+serial number, which is included in the output of
+<a href="https://manpages.debian.org/stretch/lshw/lshw.1.en"><code>lshw(1)</code></a> and similar
+tools.</p>
+
+<h3 id="making-the-image-bootable">Making the image bootable</h3>
+
+<p>I don’t understand why this image is not bootable by default. The device it was
+generated for never had a CD/DVD drive, so what good is using an ISO 9660 image?</p>
+
+<p>Anyway, to make the image bootable, I formatted a USB thumb drive with a FAT
+file system and installed GRUB in such a way that it will loopback-boot into the
+ISO image (this is option 2 from <a href="https://askubuntu.com/a/395880">https://askubuntu.com/a/395880</a>):</p>
+
+<pre><code>grub-mkimage -o bootx64.efi -p /efi/boot -O x86_64-efi \
+ fat iso9660 part_gpt part_msdos \
+ normal boot linux configfile loopback chain \
+ efifwsetup efi_gop efi_uga \
+ ls search search_label search_fs_uuid search_fs_file \
+ gfxterm gfxterm_background gfxterm_menu test all_video loadenv \
+ exfat ext2 ntfs btrfs hfsplus udf
+cat &gt;grub.cfg &lt;&lt;'EOT'
+set timeout=3
+set color_highlight=black/light-magenta
+
+menuentry 'Ubuntu ISO' {
+        set isofile=&quot;/efi/boot/dell-bto-xenial-dino2-mlk-A00-iso-20161021-0.iso&quot;
+        loopback loop $isofile
+        linux (loop)/casper/vmlinuz.efi boot=casper iso-scan/filename=$isofile noprompt noeject quiet splash persistent --
+        initrd (loop)/casper/initrd.lz
+}
+EOT
+
+sudo mkfs.vfat /dev/sdc
+pmount /dev/sdc
+mkdir -p /media/sdc/efi/boot
+cp bootx64.efi *.iso grub.cfg /media/sdc/efi/boot
+pumount sdc
+</code></pre>
+
+<h3 id="making-the-installer-work">Making the installer work</h3>
+
+<p>To get the installer to work, I had to comment out the <code>self.genuine</code> checks in
+<code>/usr/lib/ubiquity/plugins/dell-{bootstrap,recovery}.py</code>, then start <code>ubiquity</code>
+from the terminal.</p>
+
+<h3 id="switch-to-luks-full-disk-encryption">Switch to LUKS full-disk encryption</h3>
+
+<p>Unfortunately, the recovery installation only offers you to encrypt your
+homedir, whereas I would like to encrypt my entire disk. Here are the steps I
+took to enable LUKS full-disk encryption.</p>
+
+<p>First, I copied the root file system’s data to my backup storage. Pay attention
+to copying the files as root, otherwise setuid and setgid bits might get lost.</p>
+
+<pre><code># mount /dev/mapper/nvme0n1p3 /mnt/root
+# rsync -aXx --relative --numeric-ids /mnt/root/ root@storage:xps/
+# umount /mnt/root
+</code></pre>
+
+<p>Then, I created a new boot partition, encrypted the root partition and re-created the file system:</p>
+
+<pre><code># cat &lt;&lt;'EOT' | sfdisk /dev/nvme0n1
+label: gpt
+label-id: C64A87D1-CA61-4BF2-81E6-0216EE6BC4C0
+device: /dev/nvme0n1
+unit: sectors
+first-lba: 34
+last-lba: 2000409230
+
+/dev/nvme0n1p1 : start=          34, size=      488248, type=C12A7328-F81F-11D2-BA4B-00A0C93EC93B, name=&quot;EFI System Partition&quot;
+/dev/nvme0n1p2 : start=      488282, size=     5380681, type=EBD0A0A2-B9E5-4433-87C0-68B6B72699C7, name=&quot;fat32&quot;
+/dev/nvme0n1p3 : start=     5869568, size=     2097152, type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
+/dev/nvme0n1p4 : start=     7966720, size=  1992442511, type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
+EOT
+# mkfs.ext2 /dev/nvme0n1p3
+# cryptsetup luksFormat /dev/nvme0n1p4
+# cryptsetup luksOpen /dev/nvme0n1p4 nvme0n1p3_crypt
+# mkfs.ext4 /dev/mapper/nvme0n1p4_crypt
+</code></pre>
+
+<p>Next, I restored the data:</p>
+
+<pre><code># mount /dev/mapper/nvme0n1p4_crypt /mnt/root
+# mount /dev/nvme0n1p3 /mnt/root/boot
+# mkdir /mnt/root/boot/efi
+# mount /dev/nvme0n1p1 /mnt/root/boot/efi
+# rsync -aXx --numeric-ids storage:xps/ /mnt/root
+</code></pre>
+
+<p>And finally, I fixed the boot partition:</p>
+
+<pre><code># mount -o bind /dev /mnt/root/dev
+# mount -t sysfs sysfs /mnt/root/sys
+# mount -t proc proc /mnt/root/proc
+# chroot /mnt/root /bin/bash
+
+# apt install cryptsetup
+# echo nvme0n1p4_crypt UUID=$(blkid -o value -s UUID /dev/nvme0n1p4) none luks,discard &gt; /etc/crypttab
+# cat &gt;/etc/fstab &lt;&lt;EOT
+UUID=$(blkid -o value -s UUID /dev/mapper/nvme0n1p4_crypt) / ext4 errors=remount-ro 0 1
+UUID=$(blkid -o value -s UUID /dev/nvme0n1p3) /boot ext2 defaults 0 0
+UUID=$(blkid -o value -s UUID /dev/nvme0n1p1) /boot/efi vfat umask=0077 0 1
+EOT
+# update-initramfs -u
+# update-grub
+# grub-install
+
+# umount /mnt/root/{proc,sys,dev,boot/efi,boot,}
+</code></pre>
+
+</div></div></div></div></div></div></body>
+</html>

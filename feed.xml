@@ -793,10 +793,13 @@ point to <code>/home/michael/go/bin/porterbox-aarch64</code>, followed by <code>
       $@
 </code></pre>
 
-<p>Because it’s subtle:
-* <code>\$PWD</code> refers to the directory in which the reverse sshfs was mounted by <code>cpu</code>.
-* <code>$PWD</code> refers to the working directory in which <code>porterbox-aarch64</code> was called.
-* <code>$@</code> refers to the original command with which <code>porterbox-aarch64</code> was called.</p>
+<p>Because it’s subtle:</p>
+
+<ul>
+<li><code>\$PWD</code> refers to the directory in which the reverse sshfs was mounted by <code>cpu</code>.</li>
+<li><code>$PWD</code> refers to the working directory in which <code>porterbox-aarch64</code> was called.</li>
+<li><code>$@</code> refers to the original command with which <code>porterbox-aarch64</code> was called.</li>
+</ul>
 
 <h3 id="bindmount">bindmount</h3>
 

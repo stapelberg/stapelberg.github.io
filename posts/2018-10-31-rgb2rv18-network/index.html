@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Network setup for our retro computing event RGB2Rv18</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.de/posts/2018-10-31-rgb2rv18-network/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    <link rel="stylesheet" href="/1.css" type="text/css">
+    <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM Feed">
+</head>
+
+
+<body><div class="container-fluid"><div class="row"><div id="menu" class="col-md-2"><h1>Michael Stapelberg</h1><ul class="menu_open">
+<li><a class="menu_item" href="/"><span class="menu_title">Startseite</span></a></li>
+<li><a class="menu_item" href="/posts/"><span class="menu_title">Artikel</span></a></li>
+<li><a class="menu_item" href="/dokumente/"><span class="menu_title">Dokumente</span></a></li>
+<li><a class="menu_item" href="/programme/"><span class="menu_title">Programme</span></a>
+<div class="subitem">
+<ul class="menu_open">
+  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
+<li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+<li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+</ul>
+</div>
+</li>
+
+<li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+<div class="subitem">
+<ul class="menu_open">
+  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+</ul>
+</div>
+</li>
+
+<li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+
+<li><a class="menu_item" href="/tipps"><span class="menu_title">Tipps</span></a></li>
+
+<li><a class="menu_item" href="/meinepcs"><span class="menu_title">Hardware</span></a></li>
+<li><a class="menu_item" href="/impressum"><span class="menu_title">Impressum</span></a></li></ul>
+
+</div><div id="contentBox" class="col-md-10"><h2 class="title">Network setup for our retro computing event RGB2Rv18</h2> (<span id="date">2018-10-30</span>) <div class="Artikel" id="content">
+
+
+<p>Our computer association <a href="https://www.noname-ev.de/">NoName e.V.</a> organizes a
+retro computing event called <a href="https://www.rgb2r.de/">RGB2R</a> every year,
+located in Heidelberg, Germany. This year’s version is called RGB2Rv18.</p>
+
+<p>This article describes the network setup I created for this year’s event. If you
+haven’t read it, the article about <a href="/posts/2017-11-13-rgb2r-network/">last year’s RGB2Rv17
+network</a> is also available.</p>
+
+<h3 id="connectivity">Connectivity</h3>
+
+<p>As a reminder, the venue’s DSL connection tops out at a megabit or two, so we
+used my parent’s 400 Mbit/s cable internet line, like last year.</p>
+
+<p>A difference to last year is that we switched from the tp-link CPE510 devices to
+a pair of <a href="https://www.ubnt.com/airfiber/airfiber24/">Ubiquiti airFiber24</a>. The
+airFibers are specified to reach 1.4 Gbit/s. In practice, we reached
+approximately 700 Mbps displayed capacity (at a signal strength of ≈-60 dBm) and
+422 Mbit/s end-to-end download speed, limited by the cable uplink.</p>
+
+<p>Notably, using a single pair of radios removes a bunch of complexity from the
+network setup as we no longer need to load-balance over two separate uplinks.</p>
+
+<p>Like last year, the edge router for the event venue was a <a href="https://pcengines.ch/apu2c4.htm">PC Engines
+apu2c4</a>. For the Local Area Network (LAN)
+within the venue, we provided a few switches and WiFi using <a href="https://www.ubnt.com/">Ubiquiti
+Networks</a> access points.</p>
+
+<h3 id="wifi-setup">WiFi setup</h3>
+
+<p>It turns out that the 24 GHz-based airFiber radios are much harder to align than
+the 5 GHz-based tp-links we used last year. With the tp-link devices, we were
+able to easily obtain a link, and do maybe 45 minutes of fine tuning to achieve
+maximum bandwidth.</p>
+
+<p>With the airFiber radios mounted in the same location, we were unable to
+establish a link even once in about 1.5 hours of trying. We think this was due
+to trees/branches being in the way, so we decided to scout the property for a
+better radio location with as much of a direct line of sight as possible.</p>
+
+<p>We eventually found a better location on the other side of the house and managed
+to establish a link. It still took us an hour or so of fine tuning to move the
+link from weak (≈-80 dBm) to okay (≈-60 dBm).</p>
+
+<p>After the first night, in which it rained for a while, the radios had lost their
+link. We think that this might be due to the humidity, and managed to restore
+the link after another 30 minutes of re-adjustment.</p>
+
+<p>It also rained the second night, but this time, the link stayed up. During rain,
+signal strength dropped from ≈-60 dBm to ≈-72 dBm, but that still resulted in
+≈500 Mbit/s of WiFi capacity, sufficient to max out our uplink.</p>
+
+<p>For next year, it would be great to use an antenna alignment tool of sorts to
+cut down on setup time. Alternatively, we could switch to more forgiving radios
+which also handle 500 Mbps+. Let me know if you have any suggestions!</p>
+
+<h3 id="software">Software</h3>
+
+<p>In May this year, I wrote <a href="https://github.com/rtr7/router7">router7</a>, a pure-Go
+small home internet router. Mostly out of curiosity, we gave it a shot, and I’m
+happy to announce that router7 ran the event without any trouble.</p>
+
+<p>In preparation, I <a href="https://github.com/rtr7/router7/commit/2e8e0daa0ac8a6a123893b27fb1de566768383d0">implemented TCP MSS
+clamping</a>
+and <a href="https://github.com/rtr7/kernel/commit/c7afbc1fd2efdb9e1149d271c4d2be59cc5c98f4">included the WireGuard kernel
+module</a>.</p>
+
+<p>I largely followed the <a href="https://github.com/rtr7/router7#installation">router7 installation
+instructions</a>. To be specific,
+here is the <code>Makefile</code> I used for creating the router7 image:</p>
+
+<pre><code># github.com/rtr7/router7/cmd/... without dhcp6,
+# as the cable uplink does not provide IPv6:
+PKGS := github.com/rtr7/router7/cmd/backupd \
+	github.com/rtr7/router7/cmd/captured \
+	github.com/rtr7/router7/cmd/dhcp4 \
+	github.com/rtr7/router7/cmd/dhcp4d \
+	github.com/rtr7/router7/cmd/diagd \
+	github.com/rtr7/router7/cmd/dnsd \
+	github.com/rtr7/router7/cmd/netconfigd \
+	github.com/rtr7/router7/cmd/radvd \
+	github.com/gokrazy/breakglass \
+	github.com/gokrazy/timestamps \
+	github.com/stapelberg/rgb2r/cmd/grafana \
+	github.com/stapelberg/rgb2r/cmd/prometheus \
+	github.com/stapelberg/rgb2r/cmd/node_exporter \
+	github.com/stapelberg/rgb2r/cmd/blackbox_exporter \
+	github.com/stapelberg/rgb2r/cmd/ratelimit \
+	github.com/stapelberg/rgb2r/cmd/tc \
+	github.com/stapelberg/rgb2r/cmd/wg
+
+image:
+ifndef DIR
+	@echo variable DIR unset
+	false
+endif
+	GOARCH=amd64 gokr-packer \
+		-gokrazy_pkgs=github.com/gokrazy/gokrazy/cmd/ntp,github.com/gokrazy/gokrazy/cmd/randomd \
+		-kernel_package=github.com/rtr7/kernel \
+		-firmware_package=github.com/rtr7/kernel \
+		-overwrite_boot=${DIR}/boot.img \
+		-overwrite_root=${DIR}/root.img \
+		-overwrite_mbr=${DIR}/mbr.img \
+		-serial_console=ttyS0,115200n8 \
+		-hostname=rgb2router \
+		${PKGS}
+</code></pre>
+
+<p>After preparing an <code>interfaces.json</code> configuration file and a
+<a href="https://github.com/gokrazy/breakglass">breakglass</a> SSH hostkey, I used
+<code>rtr7-recover</code> to net-install the image onto the apu2c4. For subsequent updates,
+I used <code>rtr7-safe-update</code>.</p>
+
+<p>The Go packages under <code>github.com/stapelberg/rgb2r</code> are wrappers which run
+software I installed to the permanent partition mounted at <code>/perm</code>. See
+<a href="https://gokrazy.org/prototyping.html">gokrazy: Prototyping</a> for more details.</p>
+
+<h3 id="tunnel-setup">Tunnel setup</h3>
+
+<p>Last year, we used a Foo-over-UDP tunnel after noticing that we didn’t get
+enough bandwidth with OpenVPN. This year, after hearing much about it, we
+successfully used <a href="https://www.wireguard.com/">WireGuard</a>.</p>
+
+<p>I found WireGuard to be more performant than OpenVPN, and easier to set up than
+either OpenVPN or Foo-over-UDP.</p>
+
+<p>The one wrinkle is that its wire protocol is not yet frozen, and its kernel
+module is not yet included in Linux.</p>
+
+<h3 id="traffic-shaping">Traffic shaping</h3>
+
+<p>With asymmetric internet connections, such as the 400/20 cable connection we’re
+using, it’s necessary to shape traffic such that the upstream is never entirely
+saturated, otherwise the TCP ACK packets won’t reach their destination in time
+to saturate the downstream.</p>
+
+<p>While the FritzBox might already provide traffic shaping, we wanted to
+voluntarily restrict our upstream usage to leave some headroom for my parents.</p>
+
+<pre><code>rgb2router# tc qdisc replace dev uplink0 root tbf \
+  rate 16mbit \
+  latency 50ms \
+  burst 4000
+</code></pre>
+
+<p>The specified <code>latency</code> value is a best guess, and the <code>burst</code> value is derived
+from the kernel internal timer frequency (<code>CONFIG_HZ</code>) (!), packet size and rate
+as per
+<a href="https://unix.stackexchange.com/questions/100785/bucket-size-in-tbf">https://unix.stackexchange.com/questions/100785/bucket-size-in-tbf</a>.</p>
+
+<p>Tip: keep in mind to disable shaping temporarily when you’re doing bandwidth
+tests ;-).</p>
+
+<h3 id="statistics">Statistics</h3>
+
+<ul>
+<li><p>We peaked at 59 active DHCP leases, which is very similar to the “about 60”
+last year.</p></li>
+
+<li><p>DNS traffic peaked at about 25 queries/second, while mostly remaining at less
+than 5 queries/second.</p></li>
+
+<li><p>We were able to obtain peaks of nearly 200 Mbit/s of download traffic and
+transferred over 200 GB of data, twice as much as last year.</p></li>
+</ul>
+
+</div></div></div></div></div></div></body>
+</html>

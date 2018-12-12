@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Docker and IPv6</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.de/posts/2018-12-12-docker-ipv6/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    <link rel="stylesheet" href="/1.css" type="text/css">
+    <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM Feed">
+</head>
+
+
+<body><div class="container-fluid"><div class="row"><div id="menu" class="col-md-2"><h1>Michael Stapelberg</h1><ul class="menu_open">
+<li><a class="menu_item" href="/"><span class="menu_title">Startseite</span></a></li>
+<li><a class="menu_item" href="/posts/"><span class="menu_title">Artikel</span></a></li>
+<li><a class="menu_item" href="/dokumente/"><span class="menu_title">Dokumente</span></a></li>
+<li><a class="menu_item" href="/programme/"><span class="menu_title">Programme</span></a>
+<div class="subitem">
+<ul class="menu_open">
+  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
+<li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+<li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+</ul>
+</div>
+</li>
+
+<li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+<div class="subitem">
+<ul class="menu_open">
+  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+</ul>
+</div>
+</li>
+
+<li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+
+<li><a class="menu_item" href="/tipps"><span class="menu_title">Tipps</span></a></li>
+
+<li><a class="menu_item" href="/meinepcs"><span class="menu_title">Hardware</span></a></li>
+<li><a class="menu_item" href="/impressum"><span class="menu_title">Impressum</span></a></li></ul>
+
+</div><div id="contentBox" class="col-md-10"><h2 class="title">Docker and IPv6</h2> (<span id="date">2018-12-12</span>) <div class="Artikel" id="content">
+
+
+<p>My use-case is seemingly very simple: I want to run a webserver in a Docker
+container, and it should be reachable via IPv4 and IPv6. The webserver has
+multiple virtual hosts, some of which just serve static files, while others
+proxy to, say, a <a href="https://grafana.com">Grafana</a> instance, which is also running
+in a Docker container.</p>
+
+<p>This article walks through the required steps, which are a bit cumbersome to
+puzzle together from Docker’s official documentation.</p>
+
+<p>I’m using documentation-only IPs (<a href="https://tools.ietf.org/html/rfc3849">RFC3849</a>
+and <a href="https://tools.ietf.org/html/rfc5737">RFC5737</a>) throughout the
+article. Let’s say that my provider gives me a routed IPv6 subnet
+<code>2001:db8:13b:330::/64</code> and the IPv4 address <code>203.0.113.1</code>.</p>
+
+<h3 id="enabling-ipv6-in-docker">Enabling IPv6 in Docker</h3>
+
+<p>The Docker daemon defaults to IPv4-only. To enable IPv6, create the
+configuration file <code>/etc/docker/daemon.json</code> with the following content:</p>
+
+<pre><code>{
+  &quot;ipv6&quot;: true,
+  &quot;fixed-cidr-v6&quot;: &quot;2001:db8:13b:330:ffff::/80&quot;
+}
+</code></pre>
+
+<p>After restarting the Docker daemon, containers will now get IPv6 addresses based
+on their MAC address, which is picked sequentially from the range
+<code>02:42:ac:11:00:00</code> to <code>02:42:ac:11:ff:ff</code>. That is, the first container you
+start will use the IPv6 address <code>2001:db8:13b:330:ffff:0242:ac11:0002</code>.</p>
+
+<h3 id="publishing-ports-and-remote-addresses">Publishing ports and remote addresses</h3>
+
+<p>When publishing port 80 of a webserver, notice the remote address when accessing
+the port via IPv4 and IPv6:</p>
+
+<pre><code>% docker run -p 80:80 nginx
+198.51.100.7 - - [12/Dec/2018:07:38:19 +0000] &quot;GET / HTTP/1.1&quot; 200 612
+172.17.0.1 - - [12/Dec/2018:07:38:40 +0000] &quot;GET / HTTP/1.1&quot; 200 612
+</code></pre>
+
+<p>The first request (IPv4) has the correct remote address, but not the second one
+(IPv6). This is because Docker publishes ports with
+<a href="https://en.wikipedia.org/wiki/Network_address_translation">NAT</a> for IPv4, and a
+TCP proxy for IPv6.</p>
+
+<p>Of course, not having access to the actual remote address breaks rate limiting,
+abuse blocking, address-based geo location, etc.</p>
+
+<p>Some people resort to using Docker’s <code>host</code> network option, but that’s not a
+good solution: your container will not be able to talk to other containers by
+name anymore, so you will need lots of static, host-specific configuration.</p>
+
+<p>A better solution is to only publish the port via IPv4 and connect to the
+container’s IPv6 address directly:</p>
+
+<pre><code>% docker run --publish 203.0.113.1:80:80 --name nginx nginx
+</code></pre>
+
+<p>You can obtain the container’s IPv6 address using:</p>
+
+<pre><code>% docker inspect -f '{{.NetworkSettings.GlobalIPv6Address}}' nginx
+</code></pre>
+
+<h3 id="static-ipv6-addresses">Static IPv6 addresses</h3>
+
+<p>Above, I explained that we need to use the container’s IPv6 address directly,
+and that the address is derived from the MAC address, which is chosen
+sequentially at container start time.</p>
+
+<p>Having addresses depend on the order in which containers come up isn’t a robust
+solution for my simple setup, where I want to statically configure a DNS record.</p>
+
+<p>Docker allows specifying an IPv6 address, but only when you’re using a <a href="https://docs.docker.com/network/network-tutorial-standalone/#use-user-defined-bridge-networks">user-defined bridge network</a> with an IPv6 subnet carved out for the network, like so:</p>
+
+<pre><code>% docker network create --subnet 2001:db8:13b:330:dd::/80 --ipv6 nginx
+
+% docker run \
+  --network nginx \
+  --ip6 2001:db8:13b:330:dd:ff::1 \
+  --publish 203.0.113.1:80:80 \
+  nginx
+</code></pre>
+
+<p>Note that I’m using an IPv6 address from the far end of the address space
+(<code>ff::1</code>), so as to not conflict with the addresses that Docker sequentially
+allocates from the network we created.</p>
+
+<p>Now, create a DNS record with the container’s addresses and you’ll be able to
+access it via IPv4 and IPv6 with correct remote addresses, while still being
+able to reach other containers:</p>
+
+<pre><code>www.example.net A    203.0.113.1
+www.example.net AAAA 2001:db8:13b:330:dd:ff::1
+</code></pre>
+
+<p>Note that all other Docker containers that you want to reach from the nginx
+container must also use the nginx network. This is the recommended solution over
+the old <code>--link</code> flag anyway.</p>
+
+<p>One disadvantage of this solution is that you cannot offer services from
+multiple Docker containers on the same IPv6 address (e.g. www and git).</p>
+
+</div></div></div></div></div></div></body>
+</html>

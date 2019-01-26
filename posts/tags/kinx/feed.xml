@@ -1,0 +1,555 @@
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Michael Stapelbergs Website: posts tagged kinx</title>
+  <link href="https://michael.stapelberg.de/posts/tags/kinx/feed.xml" rel="self"/>
+  <link href="https://michael.stapelberg.de/posts/tags/kinx/"/>
+  <updated>2018-04-17T17:49:00+02:00</updated>
+  <id>https://michael.stapelberg.de/posts/tags/kinx/</id>
+  <generator>Hugo -- gohugo.io</generator>
+  <entry>
+    <title type="html"><![CDATA[kinX: USB Hub]]></title>
+    <link href="https://michael.stapelberg.de/posts/2018-04-17-kinx-usb-hub/"/>
+    <id>https://michael.stapelberg.de/posts/2018-04-17-kinx-usb-hub/</id>
+    <published>2018-04-17T17:49:00+02:00</published>
+    <updated>2018-04-17T17:49:00+02:00</updated>
+    <content type="html"><![CDATA[
+
+<p>This post is part of a <a href="/posts/2018-04-17-kinx">series of posts about the kinX project</a>.</p>
+
+<h3 id="motivation">Motivation</h3>
+
+<p>The Kinesis Advantage comes with a built-in 2-port USB hub. That hub uses a
+proprietary connector to interface with a
+<a href="https://en.wikipedia.org/wiki/PS/2_port">PS/2</a> keyboard controller, so it
+cannot be used with a USB keyboard controller. As the built-in hub is the
+natural place to connect the Logitech unified receiver dongle, not being able to
+use the hub is mildly annoying.</p>
+
+<p>The kinX MK66F keyboard controller presently needs two USB cables: one connected
+to the USBFS port to supply the PCB with power and receive firmware updates (via
+the Teensy bootloader chip), and one connected to the USBHS port for the actual
+keyboard device.</p>
+
+<p>Lastly, even if the original built-in USB hub had internal ports (instead of a
+PS/2 converter), it only supports USB 1.1, nullifying any latency improvements.</p>
+
+<p>Hence, I decided to build a drop-in replacement USB 2.0 hub with 2 external USB
+ports and 2 internal USB ports, using the same proprietary connector as the
+original, so that the original keyboard USB cable could be re-used.</p>
+
+<h3 id="design-phase">Design phase</h3>
+
+<p>Unfortunately, I could not find an open hardware USB 2.0 hub design on the
+internet, so I started researching various USB hub chips. I quickly discarded
+the idea of using USB 3 due to its much stricter requirements.</p>
+
+<p>In the end, I decided to go with the Cypress HX2VL series because of their
+superior documentation: I found a detailed data sheet, an evaluation board, the
+associated schematics, design checklist/guidelines, and even the evaluation
+board’s bill of materials.</p>
+
+<p>This is what the finished build of my design looks like:</p>
+
+<p><img src="/Bilder/kinx-hub.jpg" width="100%"></p>
+
+<h3 id="power">Power</h3>
+
+<p>After completing my first build, I tested a few USB devices with my hub. The
+Logitech unified receiver dongle and the
+<a href="https://www.yubico.com/start/">YubiKey</a> worked fine. However, my external hard
+drive and my USB memory stick did not work. In the syslog, I would see:</p>
+
+<pre><code>kernel: usb 1-14.4.4: rejected 1 configuration due to insufficient available bus power
+</code></pre>
+
+<p>This is because the USB specification limits bus-powered hubs to 100mA per
+port. While high power usage does not come as a surprise for the external hard
+disk, it turns out that even my USB memory stick requires 200mA. This was a
+surprise, because that stick works on other, commercial bus-powered USB hubs.</p>
+
+<p>A closer look reveals that all 3 commercial USB hubs I have tested claim to be
+self-powered (i.e. using an external power supply), even though they are
+not. This way, the kernel’s power limitation is circumvented, and up to 500mA
+can be used per port. In practice, the host port only supplies 500mA, so the
+user must be careful not to plug in devices which require more than 500mA in
+aggregate.</p>
+
+<p>I changed the SELFPWR configuration pin to have my hub claim it was
+self-powered, too, and that made all USB devices I tested work fine.</p>
+
+<h3 id="eeprom-programming">EEPROM programming</h3>
+
+<p>When debugging the power issue, I originally thought the Maximum Power setting
+in the hub’s USB device descriptor needed to be raised. This turned out to not
+be correct: the Maximum Power refers to the power which the hub uses for its own
+circuitry, not the power it passes through to connected devices.</p>
+
+<p>Nevertheless, it’s a nice touch to modify the device descriptor to put in a
+custom vendor name, product name and serial number: that way, the device shows
+up with a recognizable name in your syslog or
+<a href="https://manpages.debian.org/stretch/usbutils/lsusb.8"><code>lsusb(8)</code></a> output, and
+udev rules can be used to apply settings based on the serial number.</p>
+
+<p>To modify the device descriptor, an <a href="https://en.wikipedia.org/wiki/EEPROM">EEPROM (electrically erasable programmable
+read-only memory)</a> needs to be added to
+the design, from which the HX2VL will read configuration.</p>
+
+<p>The HX2VL allows field-programming of the connected EEPROM, i.e. writing to it
+via the USB hub chip. I found the Windows-only tool hard to set up on a modern
+Windows installation, so I wondered whether I could build a simpler to use tool.</p>
+
+<p>Under the covers, the tool merely sends commands with the vendor-specific
+request code 14 via USB, specifying an index of the two-byte word to
+read/write. This can be replicated in a few lines of Go:</p>
+
+<pre><code>dev, _ := usb.OpenDeviceWithVIDPID(0x04b4, 0x6570)
+eepromRequest := 14
+wIndex := 0 // [0, 63] for 128 bytes of EEPROM
+dev.Control(gousb.RequestTypeVendor|0x80, 
+  eepromRequest, 0, wIndex, make([]byte, 2))
+</code></pre>
+
+<p>The EEPROM contents are well-described in the <a href="http://www.cypress.com/file/114101/download">HX2VL data
+sheet</a>, so the rest is easy.</p>
+
+<p>See <a href="https://github.com/kinx-project/mk66f-blaster">https://github.com/kinx-project/mk66f-blaster</a> for the tool.</p>
+
+<h3 id="lessons-learnt">Lessons learnt</h3>
+
+<ul>
+<li><p>If possible, design the PCB in such a way that components you think you don’t
+need (e.g. the EEPROM) can optionally be soldered on. This would have saved me
+a PCB design/fabrication cycle.</p></li>
+
+<li><p>Get the evaluation board to figure out the configuration you need
+(e.g. self-powered vs. bus-powered).</p></li>
+</ul>
+
+<h3 id="next-up">Next up</h3>
+
+<p>The <a href="/posts/2018-04-17-kinx-latency-measurement/">last post introduces the processing latency measurement firmware for the
+FRDM-K66F development board</a> and
+draws a conclusion.</p>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[kinX: keyboard controller with &lt;0.225ms input latency]]></title>
+    <link href="https://michael.stapelberg.de/posts/2018-04-17-kinx-keyboard-controller/"/>
+    <id>https://michael.stapelberg.de/posts/2018-04-17-kinx-keyboard-controller/</id>
+    <published>2018-04-17T17:49:00+02:00</published>
+    <updated>2018-04-17T17:49:00+02:00</updated>
+    <content type="html"><![CDATA[
+
+<p>This post is part of a <a href="/posts/2018-04-17-kinx">series of posts about the kinX project</a>.</p>
+
+<h3 id="background">Background</h3>
+
+<p>10 years ago I got a Kinesis Advantage keyboard. I wrote about the experience of
+learning to touch-type using the ergonomic <a href="https://neo-layout.org/">NEO layout</a>
+in my (German) post <a href="/posts/2009-01-01-neo_kinesis/">“Neo-Layout auf einer
+Kinesis-Tastatur”</a>.</p>
+
+<p>The Kinesis Advantage is still the best keyboard I’ve ever used, and I use one
+every day, both at the office and at home.</p>
+
+<p>I had two reasons to start modifying the keyboard:</p>
+
+<ol>
+<li><p>I prefer Cherry MX blue key switches over the Cherry MX brown key switches
+the Kinesis comes with. Nowadays, you can get a Kinesis with Cherry MX red
+key switches, which felt okay in a quick test.</p></li>
+
+<li><p>The original keyboard controller has (had?) a bug where modifier keys such as
+Shift would get stuck at least once a week: you would press Shift, press A,
+release A, release Shift, press A and see AA instead of Aa.</p></li>
+</ol>
+
+<p>I solved issue ① with the help of the excellent Kinesis technical support, who
+sold me unpopulated PCBs so that I could solder on my own key switches.</p>
+
+<p>Issue ② was what lead to my first own keyboard controller build, which I
+documented in <a href="/posts/2013-03-21-kinesis_custom_controller/">“Hacking your own Kinesis keyboard
+controller”</a> (2013).</p>
+
+<p>Then, the topic of input latency popped into my filter bubble, with excellent
+ posts such as <a href="https://pavelfatin.com/typing-with-pleasure/">Pavel Fatin’s “Typing with
+pleasure”</a>. I started wondering
+what input latency I was facing, and whether/how I could reduce it.</p>
+
+<p>Given that I was using a custom keyboard controller, it was up to me to answer
+that question. After trying to understand and modify the firmware I had been
+using for the last 4 years, I realized that I first needed to learn much more
+about how keyboards work.</p>
+
+<p>I firmly believe that creating a good environment is vital for development,
+especially for intrinsically-motivated side projects like this one. Hence, I set
+the project aside until a colleague gifted me his old Kinesis which had
+intermittent issues. I removed the electronics and started using that keyboard
+as my development keyboard.</p>
+
+<h3 id="sources-of-input-latency">Sources of input latency</h3>
+
+<p>A keyboard controller has 3 major tasks:</p>
+
+<ul>
+<li><p><strong>matrix scan</strong>: to avoid physically connecting every single key switch
+directly to a microcontroller (requiring a large number of GPIO pins), most
+keyboards use a matrix. See <a href="http://blog.komar.be/how-to-make-a-keyboard-the-matrix/">“How to make a keyboard — the
+matrix”</a> for a good
+explanation.</p></li>
+
+<li><p><strong>debouncing</strong>: when pressing a key switch, it doesn’t cleanly change from a
+low voltage level to a high voltage level (or vice-versa). Instead, it
+bounces: the voltage level rapidly oscillates until it eventually reaches a
+stable steady state. Because one key press shouldn’t result in a whole bunch
+of characters, keyboard controllers need to debounce the key press.</p></li>
+
+<li><p><strong>USB</strong>: nowadays, keyboards use USB (for example to be compatible with
+laptops, which generally don’t have PS/2 ports), so the keyboard’s state needs
+to be communicated to the computer via USB.</p></li>
+</ul>
+
+<p>Here’s an illustration of the timing of a key press being handled by a naive
+keyboard controller implementation:</p>
+
+<p><img src="/Bilder/kinx-input-latency-sources.svg"></p>
+
+<p>In the worst case, a key press happens just after a keyboard matrix scan. The
+first source of latency is the time it takes until the next keyboard matrix scan
+happens.</p>
+
+<p>Depending on the implementation, the key press now sits in a data structure,
+waiting for the debounce time to pass.</p>
+
+<p>Finally, once the key press was successfully debounced, the device must wait
+until the USB host polls it before it can send the HID report.</p>
+
+<p>Unless the matrix scan interval is coupled to the USB poll interval, the delays
+are additive, and the debounce time is usually constant: in the best case, a key
+press happens just before a matrix scan (0ms) and gets debounced (say, 5ms) just
+before a USB poll (0ms).</p>
+
+<h3 id="teensy-3-6-controller-for-learning">Teensy 3.6 controller (for learning)</h3>
+
+<p>My old keyboard controller used the
+<a href="https://www.pjrc.com/teensy/index.html">Teensy++</a>, which is fairly dated at
+this point. I decided a good start of the project would be to upgrade to the
+current Teensy 3.6, cleaning up the schematics on the way.</p>
+
+<p><img src="/Bilder/kinx-teensy36.jpg" width="100%"></p>
+
+<p>To ensure I understand all involved parts, I implemented a bare-metal firmware
+almost from scratch: I cobbled together the required startup code, USB stack
+and, most importantly, key matrix scanning code.</p>
+
+<p>In my firmware, the Teensy 3.6 runs at 180 MHz (compared to the Teensy++’s 16
+MHz) and scans the keyboard matrix in a busy loop (as opposed to on USB
+poll). Measurements confirmed a matrix scan time of only 100μs (0.1ms).</p>
+
+<p>I implemented debouncing the way it is described in <a href="https://summivox.wordpress.com/2016/06/03/keyboard-matrix-scanning-and-debouncing/">Yin Zhong’s “Keyboard
+Matrix Scanning and
+Debouncing”</a>:
+by registering a key press/release on the rising/falling edge and applying the
+debounce time afterwards, effectively eliminating debounce latency.</p>
+
+<p>Note that while the Cherry MX datasheet specifies a debounce time of 5ms, I
+found it necessary to increase the time to 10ms to prevent bouncing in some of
+my key switches, which are already a few years old.</p>
+
+<p>I set the USB device descriptor’s poll interval to 1, meaning poll every 1 USB
+micro frame, which is 1ms long with USB 1.x (Full Speed).</p>
+
+<p>This leaves us at an input latency within [0ms, 1.1ms]:</p>
+
+<ul>
+<li>≤ 0.1ms scan latency</li>
+<li>0ms debounce latency</li>
+<li>≤ 1ms USB poll latency</li>
+</ul>
+
+<p>Can we reduce the input latency even further? The biggest factor is the USB poll
+interval.</p>
+
+<h3 id="usb-high-speed">USB High Speed</h3>
+
+<p>With USB 2.0 High Speed, the micro frame duration is reduced to 125μs
+(0.125ms). The NXP MK66F micro controller in the Teensy 3.6 has two USB ports:</p>
+
+<ol>
+<li>the Full Speed-only USBFS port, which is used by the Teensy 3.6</li>
+<li>the High Speed-capable USBHS port, which the Teensy optionally uses for host
+mode, with experimental software support (at the time of writing)</li>
+</ol>
+
+<p><img src="/Bilder/kinx-usbhs-breakout.jpg" width="100%"></p>
+
+<p>While the software support was a road block which could conceivably be solved, I
+also faced a mechanical problem: the available space in the Kinesis keyboard and
+the position of the USB High Speed port pins on the Teensy 3.6 unfortunately
+prevented installing any sort of breakout board to actually use the port.</p>
+
+<p>I decided to move from the Teensy 3.6 to my own design with the same
+microcontroller.</p>
+
+<h3 id="mk66f-keyboard-controller">MK66F keyboard controller</h3>
+
+<p><img src="/Bilder/kinx-mk66f.jpg" width="100%"></p>
+
+<p>To make development pleasant, I connected a USB-to-serial adapter (to UART0) and
+a “rebootor” (to PROGHEAD): another Teensy with a special firmware to trigger
+programming mode. This way, I could set my editor’s <code>compile-command</code> to <code>make
+&amp;&amp; teensy_loader_cli -r …</code>, compiling the code, uploading and booting into the
+resulting firmware with a single keyboard shortcut.</p>
+
+<p>I based the firmware for this controller on NXP’s SDK examples, to ensure I get
+a well-tested and maintained USB stack for the USBHS port. I did some
+measurements to confirm the stack does not add measurable extra latency, so I
+did not see any value in me maintaining a custom USB stack.</p>
+
+<p>The firmware can be found at <a href="https://github.com/kinx-project/mk66f-fw">https://github.com/kinx-project/mk66f-fw</a></p>
+
+<p>The hardware can be found at <a href="https://github.com/kinx-project/mk66f-hw">https://github.com/kinx-project/mk66f-hw</a></p>
+
+<p>Using USB 2.0 High Speed leaves us at an input latency within [0ms, 0.225ms]:</p>
+
+<ul>
+<li>≤ 0.1ms scan latency</li>
+<li>0ms debounce latency</li>
+<li>≤ 0.125ms USB poll latency</li>
+</ul>
+
+<h3 id="lessons-learnt">Lessons learnt</h3>
+
+<ul>
+<li><p>In the future, I will base custom designs on the vendor’s development board
+(instead of on the Teensy). This way, the vendor-provided code could be used
+without any modifications.</p></li>
+
+<li><p>While the Teensy bootloader means getting started with the microcontroller
+just requires a USB port, using a JTAG connector for development would be more
+powerful: not only does it replace the combination of Teensy bootloader,
+serial and rebootor, but it also supports debugging with gdb.</p></li>
+</ul>
+
+<h3 id="next-up">Next up</h3>
+
+<p>The <a href="/posts/2018-04-17-kinx-usb-hub/">second post motivates and describes building a drop-in replacement USB
+hub</a> for the Kinesis Advantage keyboard.</p>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[kinX: latency measurement]]></title>
+    <link href="https://michael.stapelberg.de/posts/2018-04-17-kinx-latency-measurement/"/>
+    <id>https://michael.stapelberg.de/posts/2018-04-17-kinx-latency-measurement/</id>
+    <published>2018-04-17T17:49:00+02:00</published>
+    <updated>2018-04-17T17:49:00+02:00</updated>
+    <content type="html"><![CDATA[
+
+<p>This post is part of a <a href="/posts/2018-04-17-kinx">series of posts about the kinX project</a>.</p>
+
+<h3 id="latency-measurement">Latency measurement</h3>
+
+<p>End-to-end latency consists of 3 parts:</p>
+
+<ol>
+<li>input latency (keyboard)</li>
+<li>processing latency (computer)</li>
+<li>output latency (monitor)</li>
+</ol>
+
+<p>During the development of the kinX keyboard controller, I realized that
+measuring processing latency was quite simple with my hardware: I could start a
+timer when sending a key press HID report to the computer and measure the
+elapsed time when I would receive a reply from the computer.</p>
+
+<p>The key to send is the Caps Lock key, because unlike other keys it results in a
+reply: a HID report telling the keyboard to turn the Caps Lock LED on.</p>
+
+<p><img src="/Bilder/kinx-latency-measurement-device.svg"></p>
+
+<h3 id="measurement-device">Measurement device</h3>
+
+<p>To make this measurement technique accessible to as many people as possible, I
+decided to pull it out of my kinX keyboard controller and instead build it using
+the FRDM-K66F evaluation board, which uses the same microcontroller.</p>
+
+<p>The FRDM-K66F can be bought for about 60 USD at big electronics shops, e.g. Digi-Key.</p>
+
+<p>Find the firmware at <a href="https://github.com/kinx-project/measure-fw">https://github.com/kinx-project/measure-fw</a></p>
+
+<h3 id="baseline">Baseline</h3>
+
+<p>To determine the lowest processing latency one can possibly get for userspace
+applications on a Linux system, I wrote a small program which uses Linux’s evdev
+API to receive key presses and react to a Caps Lock keypress as quickly as it
+can by turning the Caps Lock LED on.</p>
+
+<p>Find the program at <a href="https://github.com/kinx-project/measure-evdev">https://github.com/kinx-project/measure-evdev</a></p>
+
+<p>The following layers are exercised when measuring this program:</p>
+
+<ul>
+<li>USB host controller</li>
+<li>Linux kernel (USB and input subsystems)</li>
+<li>input event API (evdev)</li>
+</ul>
+
+<p>Notably, graphical interfaces such as X11 or Wayland are excluded.</p>
+
+<p>The measurements can be verified using Wireshark’s usbmon capturing, which
+provides a view of the USB bus from the computer’s perspective, excluding USB
+poll latency and USB transaction time.</p>
+
+<p>Using Ubuntu 17.10, I measured a processing latency of 152 μs on average.</p>
+
+<h3 id="emacs">Emacs</h3>
+
+<p>Now let’s see whether my current editor of choice adds significant latency.</p>
+
+<p>Using a few lines of Emacs Lisp, I instructed Emacs to turn on the Caps Lock LED
+whenever a key is inserted into the current buffer. In combination with
+remapping the Caps Lock key to any other key (e.g. “a”), this allows us to
+measure Emacs’s processing latency.</p>
+
+<p>On the same Ubuntu 17.10 installation used above, Emacs 25.2.2 adds on average
+278 μs to the baseline processing latency.</p>
+
+<p>Find the code at <a href="https://github.com/kinx-project/measure-emacs">https://github.com/kinx-project/measure-emacs</a></p>
+
+<h3 id="end-to-end-latency">End-to-end latency</h3>
+
+<p>With the kinX keyboard controller, we can achieve the following end-to-end latency:</p>
+
+<table>
+<thead>
+<tr>
+<th>contributor</th>
+<th>latency</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Matrix scan</td>
+<td>≈ 100 μs</td>
+</tr>
+
+<tr>
+<td>USB poll</td>
+<td>≈ 125 μs</td>
+</tr>
+
+<tr>
+<td>Linux</td>
+<td>≈ 152 μs</td>
+</tr>
+
+<tr>
+<td>Emacs</td>
+<td>≈ 278 μs</td>
+</tr>
+</tbody>
+</table>
+
+<p><br>This sums up to ≈ 655 μs on average. On top of that, we have output latency
+within [0, 16ms] due to the 60 Hz refresh rate of our monitors.</p>
+
+<p>Note that using a compositor adds one frame of output latency.</p>
+
+<h3 id="input-latency-perception">Input latency perception</h3>
+
+<p>A natural question to ask is how well humans can perceive input latency. After
+all, keyboards have been manufactured for many years, and if input latency was
+really that important, surely manufacturers would have picked up on this fact by
+now?</p>
+
+<p>I ran a little unscientific experiment in the hope to further my understanding
+of this question at the most recent Chaos Communication Congress in Leipzig.</p>
+
+<p>In the experiment, I let 17 people play a game on a specially prepared
+keyboard. In each round, the game reconfigures the keyboard to either have
+additional input latency or not, decided at random. The player can then type a
+few keys and make a decision. If the player can correctly indicate whether
+additional input latency was present in more than 50% of the cases, the player
+is said to be able to distinguish latency at that level. On each level, the game
+decreases the additional input latency: it starts with 100ms, then 75ms, then
+50ms, etc.</p>
+
+<p>The most sensitive player reliably recognized an additional 15ms of input
+latency.</p>
+
+<p>Some players could not distinguish 75ms of additional input latency.</p>
+
+<p>Every player could distinguish 100ms of additional input latency.</p>
+
+<p>My take-away is that many people cannot perceive slight differences in input
+latency at all, explaining why keyboard manufacturers don’t optimize for low
+latency.</p>
+
+<p>Reducing input latency still seems worthwhile to me: even if the reduction
+happens under the threshold at which you can perceive differences in input
+latency, it buys you more leeway in the entire stack. In other words, you might
+now be able to turn on an expensive editor feature which previously slowed down
+typing too much.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>When I started looking into input latency, my keyboard had dozens of
+milliseconds of latency. I found an easy win in the old firmware, then hit a
+wall, started the kinX project and eventually ended up with a keyboard with just
+0.225ms input latency.</p>
+
+<p>Even if I had not reduced the input latency of my keyboard at all, I feel that
+this project was a valuable learning experience: I now know a lot more about PCB
+design, ARM microcontrollers, USB, HID, etc.</p>
+
+<p>Typing on a self-built keyboard feels good: be it because of the warm fuzzy
+feeling of enjoying the fruits of your labor, or whether the input latency
+indeed is lower, I’m happy with the result either way.</p>
+
+<p>Lastly, I can now decidedly claim that the processing latency of modern
+computers is perfectly fine (remember our 152 μs + 278 μs measurement for
+Linux + Emacs), and as long as you pick decent peripherals, your end-to-end
+latency will be fine, too.</p>
+
+<h3 id="what-s-next">What’s next?</h3>
+
+<p>By far the biggest factor in the end-to-end latency is the monitor’s refresh
+rate, so getting a monitor with a high refresh rate and no additional processing
+latency would be the next step in reducing the end-to-end latency.</p>
+
+<p>As far as the keyboard goes, the matrix scan could be eliminated by wiring up
+each individual key to a microcontroller with enough GPIO pins. The USB poll
+delay could be eliminated by switching to USB 3, but I don’t know of any
+microcontrollers which have USB 3 built-in yet. Both of these improvements are
+likely not worth the effort.</p>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[kinX: overview]]></title>
+    <link href="https://michael.stapelberg.de/posts/2018-04-17-kinx/"/>
+    <id>https://michael.stapelberg.de/posts/2018-04-17-kinx/</id>
+    <published>2018-04-17T17:49:00+02:00</published>
+    <updated>2018-04-17T17:49:00+02:00</updated>
+    <content type="html"><![CDATA[<p>The kinX project is described in a series of blog posts:</p>
+
+<ul>
+<li><p>While not strictly a part of this series, <a href="/posts/2013-03-21-kinesis_custom_controller/">“Hacking your own Kinesis keyboard
+controller”</a> describes the first
+controller I built in 2013 (maybe interesting for context).</p></li>
+
+<li><p>The <a href="/posts/2018-04-17-kinx-keyboard-controller/">first post introduces the kinX, a keyboard
+controller</a> with merely 0.2ms of
+input latency (including USB).</p></li>
+
+<li><p>The <a href="/posts/2018-04-17-kinx-usb-hub/">second post motivates and describes building a drop-in replacement USB
+hub</a> for the Kinesis Advantage keyboard.</p></li>
+
+<li><p>The <a href="/posts/2018-04-17-kinx-latency-measurement/">last post introduces the processing latency measurement firmware for the
+FRDM-K66F development board</a> and
+draws a conclusion.</p></li>
+</ul>
+
+<p>You can find the project’s artifacts at <a href="https://github.com/kinx-project">https://github.com/kinx-project</a>.</p>
+]]></content>
+  </entry>
+</feed>

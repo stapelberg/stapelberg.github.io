@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Debian Code Search: improving client-side latency</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.de/posts/2016-08-08-debian-codesearch-latency/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    <link rel="stylesheet" href="/1.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+
+
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+	<div id="menu" class="col-md-2">
+  <div style="display: flex; align-items: center">
+    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
+    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+  </div>
+
+  <ul class="menu_open">
+    <li><a class="menu_item" href="/"><span class="menu_title">Startseite</span></a></li>
+    <li><a class="menu_item" href="/posts/"><span class="menu_title">Artikel</span></a></li>
+    <li><a class="menu_item" href="/dokumente/"><span class="menu_title">Dokumente</span></a></li>
+    <li><a class="menu_item" href="/programme/"><span class="menu_title">Programme</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
+	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+
+    <li><a class="menu_item" href="/tipps"><span class="menu_title">Tipps</span></a></li>
+    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
+
+    <li><a class="menu_item" href="/meinepcs"><span class="menu_title">Hardware</span></a></li>
+    <li><a class="menu_item" href="/impressum"><span class="menu_title">Impressum</span></a></li>
+  </ul>
+</div>
+
+	<div id="contentBox" class="col-md-10">
+	  <h2 class="title">Debian Code Search: improving client-side latency</h2>
+	  <div style="margin-bottom: 2em">
+	    
+	    
+	    
+	    <span id="date">published 2016-08-08, last modified 2019-02-04</span>
+	    
+	  
+	  
+	  in tag
+	  
+	  
+	  <span class="tag"><a href="/posts/tags/debian/">debian</a></span>
+	  
+	  
+	  <span style="background-color: black; border-radius: 25%; padding-left: 0.1em; padding-right: 0.1em">
+	    <a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2016-08-08-debian-codesearch-latency.html">✎</a>
+	  </span>
+	  </div>
+	  <div class="Artikel" id="content">
+	    <p>
+A while ago, it occurred to me that querying Debian Code Search seemed slow, which surprised me because I previously spent quite some effort on making it faster, see <a href="https://people.debian.org/~stapelberg/2014/12/03/debian-code-search-instant.html">Debian Code Search Instant</a> and <a href="https://people.debian.org/~stapelberg/2014/12/23/code-search-taming-the-latency-tail.html">Taming the latency tail</a> for the most recent substantial architecture overhaul and related optimizations.
+</p>
+
+<p>
+Upon taking a closer look, I realized that while performing the search query on the server side was pretty fast, the perceived slowness was due to the client side being slow. By “being slow”, I mean that it took a long time until something was drawn on the screen (high latency) and that what was happening on the screen was janky (stuttering, not smooth).
+</p>
+
+<p>
+Part of that slowness was due to historical reasons: the client-side architecture was optimized for the use-case where users open Debian Code Search’s index page and then submit a search query, but I was using Chrome’s address bar to send a search query (type “codesearch”, then hit the TAB key). Further, we only added a non-JavaScript version after we launched the JavaScript version. Hence, the redirects and progressive enhancements we implemented are more of a kludge than a well thought out design.
+</p>
+
+<p>
+After this bit of original investigation, I opened <a href="https://github.com/Debian/dcs/issues/69">GitHub issue #69</a> to track the work on making Debian Code Search faster. In that issue, I captured how Chrome’s network inspector visualizes the work necessary to render the page: <img src="https://people.debian.org/~stapelberg/screenshots/2016-08-08-dcs-before.png" width="626" height="278" alt="Chrome network inspector: before">
+</p>
+
+<h3>A couple of quick wins</h3>
+
+<p>
+There are a couple of little fixes and improvements on which I’m not going to spend too much time on, but which I list for completeness anyway just in case they come in handy for a similar project of yours:
+</p>
+<ul>
+<li>
+<a href="https://github.com/Debian/dcs/commit/6d614adb1b9a547ead93aead8830d71f9ce7354e">Remove css @import, unnecessary because we minify the two stylesheets together already.</a>
+</li>
+<li>
+<a href="https://github.com/Debian/dcs/commit/084d9d337e2f65be4aeb3e1518b310a3de667a60">Compress assets using the gzip-compatible Zöpfli algorithm (saves 3KB).</a>
+</li>
+<li>
+<a href="https://github.com/Debian/dcs/commit/d18d4c03dfb7522412bb1c80f063ceefdd2b5977">Run SVG files through the <code>svgo</code> optimizer (saves 8KB).</a>
+</li>
+<li>
+<a href="https://github.com/Debian/dcs/commit/80d6dd3f86dc746efc21c653fe212ecb729e500b">Use highly compressed/post-processed woff/woff2 webfont versions (gains such as 57KB→14KB for Roboto-Bold).</a>
+</li>
+<li>
+<a href="https://github.com/Debian/dcs/commit/e65763a6bc5c53882244b070e69322804da9d63e">Enabled HTTP/2 in nginx — not a win by itself, but avoids further round trips in combination with the EventSource API (see below).</a>
+</li>
+</ul>
+
+<h3>Bigger changes</h3>
+
+<p>
+The URL pattern has changed. Previously, we had 2 areas of the website, one for JavaScript-compatible clients and one for the rest. When you hit the wrong one, you were redirected. In some areas, we couldn’t tell which area is the correct one for you, so you would always incur a redirect: one example for this is the search bar. With the new URL pattern, we deliver both versions under the same URL: the elements only used by the JavaScript code are hidden using CSS by default, then made visible by JavaScript code. The elements only used by the non-JavaScript code are wrapped in a &lt;noscript&gt; tag.
+</p>
+
+<p>
+All CSS which is required for the initial page rendering is now inlined in the responses, allowing the browser to immediately render a response without requiring any additional round trips.
+</p>
+
+<p>
+All non-essential CSS has been moved into a separate CSS file which is loaded asynchronously. This is done using a pattern like <code>&lt;link rel="preload" href="foo.css" as="style" onload="this.rel='stylesheet'"&gt;</code>, see also <a href="https://github.com/filamentgroup/loadCSS">filamentgroup/loadCSS</a>.
+</p>
+
+<p>
+We switched from WebSockets to the <a href="https://developer.mozilla.org/en-US/docs/Web/API/EventSource">EventSource API</a> because the former is not compatible with HTTP/2, whereas the latter is. This removes a round trip and some custom code for WebSocket reconnecting, because EventSource does that for you.
+</p>
+
+<p>
+The progress bar animation used to animate the <code>background-position</code> property. <a href="http://www.html5rocks.com/en/tutorials/speed/high-performance-animations/">It turns out</a> that browsers can only animate the <code>position</code>, <code>scale</code>, <code>rotation</code> and <code>opacity</code> properties smoothly, because such animations can be off-loaded to the GPU. Hence, we have re-implemented the progress bar animation using the <code>position</code> property.
+</p>
+
+<p>
+The biggest win for improving client-side latency from the Chrome address bar was introducing <a href="http://www.html5rocks.com/en/tutorials/service-worker/introduction/">Service Workers</a> (see commit <a href="https://github.com/Debian/dcs/commit/7f31aef402cb782056e290a797f224171f4af270">7f31aef402cb782056e290a797f224171f4af270</a>). Our Service Worker caches static assets and a placeholder results page. The placeholder page is presented immediately when you start a search (e.g. from the address bar), making the first response immediate, i.e. rendered within 100ms. Having assets and the result page out of the way, the first round trip is used for actually doing the search, removing all unnecessary overhead.
+</p>
+
+<p>
+With all of these improvements in place, rendering latency goes down from half a second to well under 100 ms, and this is what the Chrome network inspector looks like:
+<img src="https://people.debian.org/~stapelberg/screenshots/2016-08-08-dcs-after.png" width="471" height="333" alt="Chrome network inspector: after">
+</p>
+
+	  </div>
+	</div>
+      </div>
+    </div>
+  </body>
+</html>

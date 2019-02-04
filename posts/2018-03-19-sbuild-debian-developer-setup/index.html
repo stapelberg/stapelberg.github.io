@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>sbuild-debian-developer-setup(1)</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.de/posts/2018-03-19-sbuild-debian-developer-setup/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    <link rel="stylesheet" href="/1.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+
+
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+	<div id="menu" class="col-md-2">
+  <div style="display: flex; align-items: center">
+    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
+    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+  </div>
+
+  <ul class="menu_open">
+    <li><a class="menu_item" href="/"><span class="menu_title">Startseite</span></a></li>
+    <li><a class="menu_item" href="/posts/"><span class="menu_title">Artikel</span></a></li>
+    <li><a class="menu_item" href="/dokumente/"><span class="menu_title">Dokumente</span></a></li>
+    <li><a class="menu_item" href="/programme/"><span class="menu_title">Programme</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
+	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+
+    <li><a class="menu_item" href="/tipps"><span class="menu_title">Tipps</span></a></li>
+    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
+
+    <li><a class="menu_item" href="/meinepcs"><span class="menu_title">Hardware</span></a></li>
+    <li><a class="menu_item" href="/impressum"><span class="menu_title">Impressum</span></a></li>
+  </ul>
+</div>
+
+	<div id="contentBox" class="col-md-10">
+	  <h2 class="title">sbuild-debian-developer-setup(1)</h2>
+	  <div style="margin-bottom: 2em">
+	    
+	    
+	    
+	    <span id="date">published 2018-03-19, last modified 2019-02-04</span>
+	    
+	  
+	  
+	  in tag
+	  
+	  
+	  <span class="tag"><a href="/posts/tags/debian/">debian</a></span>
+	  
+	  
+	  <span style="background-color: black; border-radius: 25%; padding-left: 0.1em; padding-right: 0.1em">
+	    <a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2018-03-19-sbuild-debian-developer-setup.html">✎</a>
+	  </span>
+	  </div>
+	  <div class="Artikel" id="content">
+	    <p>
+  I have heard a number of times that sbuild is too hard to get started with,
+  and hence people don’t use it.
+</p>
+
+<p>
+  To reduce hurdles from using/contributing to Debian, I wanted to make sbuild
+  easier to set up.
+</p>
+
+<p>
+  sbuild ≥ 0.74.0 provides a Debian package
+  called <a href="https://packages.debian.org/sid/sbuild-debian-developer-setup">sbuild-debian-developer-setup</a>. Once
+  installed, run
+  the <a href="https://manpages.debian.org/unstable/sbuild/sbuild-debian-developer-setup.1">sbuild-debian-developer-setup(1)</a>
+  command to create a chroot suitable for building packages for Debian unstable.
+</p>
+
+<p>
+  On a system without any sbuild/schroot bits installed, a transcript of the
+  full setup looks like this:
+</p>
+
+<pre>
+% sudo apt install -t unstable sbuild-debian-developer-setup
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+The following additional packages will be installed:
+  libsbuild-perl sbuild schroot
+Suggested packages:
+  deborphan btrfs-tools aufs-tools | unionfs-fuse qemu-user-static
+Recommended packages:
+  exim4 | mail-transport-agent autopkgtest
+The following NEW packages will be installed:
+  libsbuild-perl sbuild sbuild-debian-developer-setup schroot
+0 upgraded, 4 newly installed, 0 to remove and 1454 not upgraded.
+Need to get 1.106 kB of archives.
+After this operation, 3.556 kB of additional disk space will be used.
+Do you want to continue? [Y/n]
+Get:1 http://localhost:3142/deb.debian.org/debian unstable/main amd64 libsbuild-perl all 0.74.0-1 [129 kB]
+Get:2 http://localhost:3142/deb.debian.org/debian unstable/main amd64 sbuild all 0.74.0-1 [142 kB]
+Get:3 http://localhost:3142/deb.debian.org/debian testing/main amd64 schroot amd64 1.6.10-4 [772 kB]
+Get:4 http://localhost:3142/deb.debian.org/debian unstable/main amd64 sbuild-debian-developer-setup all 0.74.0-1 [62,6 kB]
+Fetched 1.106 kB in 0s (5.036 kB/s)
+Selecting previously unselected package libsbuild-perl.
+(Reading database ... 276684 files and directories currently installed.)
+Preparing to unpack .../libsbuild-perl_0.74.0-1_all.deb ...
+Unpacking libsbuild-perl (0.74.0-1) ...
+Selecting previously unselected package sbuild.
+Preparing to unpack .../sbuild_0.74.0-1_all.deb ...
+Unpacking sbuild (0.74.0-1) ...
+Selecting previously unselected package schroot.
+Preparing to unpack .../schroot_1.6.10-4_amd64.deb ...
+Unpacking schroot (1.6.10-4) ...
+Selecting previously unselected package sbuild-debian-developer-setup.
+Preparing to unpack .../sbuild-debian-developer-setup_0.74.0-1_all.deb ...
+Unpacking sbuild-debian-developer-setup (0.74.0-1) ...
+Processing triggers for systemd (236-1) ...
+Setting up schroot (1.6.10-4) ...
+Created symlink /etc/systemd/system/multi-user.target.wants/schroot.service → /lib/systemd/system/schroot.service.
+Setting up libsbuild-perl (0.74.0-1) ...
+Processing triggers for man-db (2.7.6.1-2) ...
+Setting up sbuild (0.74.0-1) ...
+Setting up sbuild-debian-developer-setup (0.74.0-1) ...
+Processing triggers for systemd (236-1) ...
+
+% sudo sbuild-debian-developer-setup
+The user `michael' is already a member of `sbuild'.
+I: SUITE: unstable
+I: TARGET: /srv/chroot/unstable-amd64-sbuild
+I: MIRROR: http://localhost:3142/deb.debian.org/debian
+I: Running debootstrap --arch=amd64 --variant=buildd --verbose --include=fakeroot,build-essential,eatmydata --components=main --resolve-deps unstable /srv/chroot/unstable-amd64-sbuild http://localhost:3142/deb.debian.org/debian
+I: Retrieving InRelease 
+I: Checking Release signature
+I: Valid Release signature (key id 126C0D24BD8A2942CC7DF8AC7638D0442B90D010)
+I: Retrieving Packages 
+I: Validating Packages 
+I: Found packages in base already in required: apt 
+I: Resolving dependencies of required packages...
+[…]
+I: Successfully set up unstable chroot.
+I: Run "sbuild-adduser" to add new sbuild users.
+ln -s /usr/share/doc/sbuild/examples/sbuild-update-all /etc/cron.daily/sbuild-debian-developer-setup-update-all
+Now run `newgrp sbuild', or log out and log in again.
+
+% newgrp sbuild
+
+% sbuild -d unstable hello
+sbuild (Debian sbuild) 0.74.0 (14 Mar 2018) on x1
+
++==============================================================================+
+| hello (amd64)                                Mon, 19 Mar 2018 07:46:14 +0000 |
++==============================================================================+
+
+Package: hello
+Distribution: unstable
+Machine Architecture: amd64
+Host Architecture: amd64
+Build Architecture: amd64
+Build Type: binary
+[…]
+</pre>
+
+<p>
+  I hope you’ll find this useful.
+</p>
+
+	  </div>
+	</div>
+      </div>
+    </div>
+  </body>
+</html>

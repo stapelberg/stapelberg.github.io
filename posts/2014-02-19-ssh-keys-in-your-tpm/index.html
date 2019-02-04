@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Using your TPM for SSH authentication</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.de/posts/2014-02-19-ssh-keys-in-your-tpm/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    <link rel="stylesheet" href="/1.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+
+
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+	<div id="menu" class="col-md-2">
+  <div style="display: flex; align-items: center">
+    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
+    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+  </div>
+
+  <ul class="menu_open">
+    <li><a class="menu_item" href="/"><span class="menu_title">Startseite</span></a></li>
+    <li><a class="menu_item" href="/posts/"><span class="menu_title">Artikel</span></a></li>
+    <li><a class="menu_item" href="/dokumente/"><span class="menu_title">Dokumente</span></a></li>
+    <li><a class="menu_item" href="/programme/"><span class="menu_title">Programme</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
+	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+
+    <li><a class="menu_item" href="/tipps"><span class="menu_title">Tipps</span></a></li>
+    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
+
+    <li><a class="menu_item" href="/meinepcs"><span class="menu_title">Hardware</span></a></li>
+    <li><a class="menu_item" href="/impressum"><span class="menu_title">Impressum</span></a></li>
+  </ul>
+</div>
+
+	<div id="contentBox" class="col-md-10">
+	  <h2 class="title">Using your TPM for SSH authentication</h2>
+	  <div style="margin-bottom: 2em">
+	    
+	    
+	    
+	    <span id="date">published 2014-02-19, last modified 2019-02-04</span>
+	    
+	  
+	  
+	  in tag
+	  
+	  
+	  <span class="tag"><a href="/posts/tags/debian/">debian</a></span>
+	  
+	  
+	  <span style="background-color: black; border-radius: 25%; padding-left: 0.1em; padding-right: 0.1em">
+	    <a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2014-02-19-SSH-keys-in-your-TPM.html">✎</a>
+	  </span>
+	  </div>
+	  <div class="Artikel" id="content">
+	    <p>
+Thomas Habets has <a
+href="http://blog.habets.se/2013/11/TPM-chip-protecting-SSH-keys---properly">blogged
+about using your TPM (Trusted Platform Module) for SSH authentication</a> a few
+weeks ago. We worked together to get his package <a
+href="https://packages.debian.org/sid/simple-tpm-pk11">simple-tpm-pk11</a> into
+Debian, and it has just arrived in unstable :-).
+</p>
+
+<p>
+Using simple-tpm-pk11, you can let your TPM generate a key, which you then can
+use for SSH authentication. This key will never leave the TPM, so it is safer
+than having your key on the filesystem (e.g. <code>~/.ssh/id_rsa</code>), since
+file system access is not enough to steal your key anymore. Instead, you’ll
+need remote code execution.
+</p>
+
+<p>
+To use this software, first make sure your TPM is enabled in the BIOS. In my
+ThinkPad X200 from 2008, the TPM is called “Security Chip”.
+</p>
+
+<p>
+Afterwards, claim ownership of your TPM using <code>tpm_takeownership -z</code>
+(from the <code>tpm-tools</code> package) and enter a password. You will
+<strong>not</strong> need to enter this password for every SSH authentication
+later (but you may choose to set a separate password for that).
+</p>
+
+<p>
+Then, install <code>simple-tpm-pk11</code>, create a key, set it as your
+PKCS11Provider and install the public key on the host(s) where you want to use
+it:
+</p>
+
+<pre>
+mkdir ~/.simple-tpm-pk11
+stpm-keygen -o ~/.simple-tpm-pk11/my.key
+echo key my.key &gt; ~/.simple-tpm-pk11/config
+echo -e "\nHost *\n    PKCS11Provider libsimple-tpm-pk11.so" &gt;&gt; ~/.ssh/config
+ssh-keygen -D libsimple-tpm-pk11.so | ssh shell.example.com tee -a .ssh/authorized_keys
+</pre>
+
+<p>
+You’ll now be able to ssh into shell.example.com without having the key for
+that on your file system :-).
+</p>
+
+<p>
+In case you have any feedback about/troubles with the software, please feel
+free to contact Thomas directly.
+</p>
+
+	  </div>
+	</div>
+      </div>
+    </div>
+  </body>
+</html>

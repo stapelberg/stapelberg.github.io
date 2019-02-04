@@ -1,0 +1,1126 @@
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Michael Stapelbergs Website: posts tagged debian</title>
+  <link href="https://michael.stapelberg.de/posts/tags/debian/feed.xml" rel="self"/>
+  <link href="https://michael.stapelberg.de/posts/tags/debian/"/>
+  <updated>2018-06-03T08:43:00+02:00</updated>
+  <id>https://michael.stapelberg.de/posts/tags/debian/</id>
+  <generator>Hugo -- gohugo.io</generator>
+  <entry>
+    <title type="html"><![CDATA[Looking for a new Raspberry Pi image maintainer]]></title>
+    <link href="https://michael.stapelberg.de/posts/2018-06-03-raspi3-looking-for-maintainer/"/>
+    <id>https://michael.stapelberg.de/posts/2018-06-03-raspi3-looking-for-maintainer/</id>
+    <published>2018-06-03T08:43:00+02:00</published>
+    <updated>2019-02-04T19:08:45+01:00</updated>
+    <content type="html"><![CDATA[<p>
+  (Cross-posting this message I sent to pkg-raspi-maintainers for broader visibility.)
+</p>
+
+<p>
+  I started building Raspberry Pi images because I thought there should be an easy, official way to install Debian on the Raspberry Pi.
+</p>
+
+<p>
+  I still believe that, but I’m not actually using Debian on any of my Raspberry Pis anymore¹, so my personal motivation to do any work on the images is gone.
+</p>
+
+<p>
+  On top of that, I realize that my commitments exceed my spare time capacity, so I need to get rid of responsibilities.
+</p>
+
+<p>
+  Therefore, <strong>I’m looking for someone to take up maintainership of the Raspberry Pi images</strong>. Numerous people have reached out to me with thank you notes and questions, so I think the user interest is there. Also, I’ll be happy to answer any questions that you might have and that I can easily answer. Please reply here (or in private) if you’re interested.
+</p>
+
+<p>
+  If I can’t find someone within the next 7 days, I’ll put up an announcement message in the raspi3-image-spec README, wiki page, and my blog posts, stating that the image is unmaintained and looking for a new maintainer.
+</p>
+
+<p>
+  Thanks for your understanding,
+</p>
+
+<p>
+  ① just in case you’re curious, I’m now running cross-compiled Go programs directly under a Linux kernel and minimal userland, see <a href="https://gokrazy.org/">https://gokrazy.org/</a>
+</p>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[sbuild-debian-developer-setup(1)]]></title>
+    <link href="https://michael.stapelberg.de/posts/2018-03-19-sbuild-debian-developer-setup/"/>
+    <id>https://michael.stapelberg.de/posts/2018-03-19-sbuild-debian-developer-setup/</id>
+    <published>2018-03-19T08:00:00+01:00</published>
+    <updated>2019-02-04T19:08:45+01:00</updated>
+    <content type="html"><![CDATA[<p>
+  I have heard a number of times that sbuild is too hard to get started with,
+  and hence people don’t use it.
+</p>
+
+<p>
+  To reduce hurdles from using/contributing to Debian, I wanted to make sbuild
+  easier to set up.
+</p>
+
+<p>
+  sbuild ≥ 0.74.0 provides a Debian package
+  called <a href="https://packages.debian.org/sid/sbuild-debian-developer-setup">sbuild-debian-developer-setup</a>. Once
+  installed, run
+  the <a href="https://manpages.debian.org/unstable/sbuild/sbuild-debian-developer-setup.1">sbuild-debian-developer-setup(1)</a>
+  command to create a chroot suitable for building packages for Debian unstable.
+</p>
+
+<p>
+  On a system without any sbuild/schroot bits installed, a transcript of the
+  full setup looks like this:
+</p>
+
+<pre>
+% sudo apt install -t unstable sbuild-debian-developer-setup
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+The following additional packages will be installed:
+  libsbuild-perl sbuild schroot
+Suggested packages:
+  deborphan btrfs-tools aufs-tools | unionfs-fuse qemu-user-static
+Recommended packages:
+  exim4 | mail-transport-agent autopkgtest
+The following NEW packages will be installed:
+  libsbuild-perl sbuild sbuild-debian-developer-setup schroot
+0 upgraded, 4 newly installed, 0 to remove and 1454 not upgraded.
+Need to get 1.106 kB of archives.
+After this operation, 3.556 kB of additional disk space will be used.
+Do you want to continue? [Y/n]
+Get:1 http://localhost:3142/deb.debian.org/debian unstable/main amd64 libsbuild-perl all 0.74.0-1 [129 kB]
+Get:2 http://localhost:3142/deb.debian.org/debian unstable/main amd64 sbuild all 0.74.0-1 [142 kB]
+Get:3 http://localhost:3142/deb.debian.org/debian testing/main amd64 schroot amd64 1.6.10-4 [772 kB]
+Get:4 http://localhost:3142/deb.debian.org/debian unstable/main amd64 sbuild-debian-developer-setup all 0.74.0-1 [62,6 kB]
+Fetched 1.106 kB in 0s (5.036 kB/s)
+Selecting previously unselected package libsbuild-perl.
+(Reading database ... 276684 files and directories currently installed.)
+Preparing to unpack .../libsbuild-perl_0.74.0-1_all.deb ...
+Unpacking libsbuild-perl (0.74.0-1) ...
+Selecting previously unselected package sbuild.
+Preparing to unpack .../sbuild_0.74.0-1_all.deb ...
+Unpacking sbuild (0.74.0-1) ...
+Selecting previously unselected package schroot.
+Preparing to unpack .../schroot_1.6.10-4_amd64.deb ...
+Unpacking schroot (1.6.10-4) ...
+Selecting previously unselected package sbuild-debian-developer-setup.
+Preparing to unpack .../sbuild-debian-developer-setup_0.74.0-1_all.deb ...
+Unpacking sbuild-debian-developer-setup (0.74.0-1) ...
+Processing triggers for systemd (236-1) ...
+Setting up schroot (1.6.10-4) ...
+Created symlink /etc/systemd/system/multi-user.target.wants/schroot.service → /lib/systemd/system/schroot.service.
+Setting up libsbuild-perl (0.74.0-1) ...
+Processing triggers for man-db (2.7.6.1-2) ...
+Setting up sbuild (0.74.0-1) ...
+Setting up sbuild-debian-developer-setup (0.74.0-1) ...
+Processing triggers for systemd (236-1) ...
+
+% sudo sbuild-debian-developer-setup
+The user `michael' is already a member of `sbuild'.
+I: SUITE: unstable
+I: TARGET: /srv/chroot/unstable-amd64-sbuild
+I: MIRROR: http://localhost:3142/deb.debian.org/debian
+I: Running debootstrap --arch=amd64 --variant=buildd --verbose --include=fakeroot,build-essential,eatmydata --components=main --resolve-deps unstable /srv/chroot/unstable-amd64-sbuild http://localhost:3142/deb.debian.org/debian
+I: Retrieving InRelease 
+I: Checking Release signature
+I: Valid Release signature (key id 126C0D24BD8A2942CC7DF8AC7638D0442B90D010)
+I: Retrieving Packages 
+I: Validating Packages 
+I: Found packages in base already in required: apt 
+I: Resolving dependencies of required packages...
+[…]
+I: Successfully set up unstable chroot.
+I: Run "sbuild-adduser" to add new sbuild users.
+ln -s /usr/share/doc/sbuild/examples/sbuild-update-all /etc/cron.daily/sbuild-debian-developer-setup-update-all
+Now run `newgrp sbuild', or log out and log in again.
+
+% newgrp sbuild
+
+% sbuild -d unstable hello
+sbuild (Debian sbuild) 0.74.0 (14 Mar 2018) on x1
+
++==============================================================================+
+| hello (amd64)                                Mon, 19 Mar 2018 07:46:14 +0000 |
++==============================================================================+
+
+Package: hello
+Distribution: unstable
+Machine Architecture: amd64
+Host Architecture: amd64
+Build Architecture: amd64
+Build Type: binary
+[…]
+</pre>
+
+<p>
+  I hope you’ll find this useful.
+</p>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[dput usability changes]]></title>
+    <link href="https://michael.stapelberg.de/posts/2018-03-10-dput-usability/"/>
+    <id>https://michael.stapelberg.de/posts/2018-03-10-dput-usability/</id>
+    <published>2018-03-10T10:00:00+01:00</published>
+    <updated>2019-02-04T19:08:45+01:00</updated>
+    <content type="html"><![CDATA[<p>
+  dput-ng ≥ 1.16 contains two usability changes which make uploading easier:
+</p>
+
+<ol>
+  <li>
+    When no arguments are specified, dput-ng auto-selects the most recent .changes file (with confirmation).
+  </li>
+  <li>
+    Instead of erroring out when detecting an unsigned .changes file, <a href="https://manpages.debian.org/stretch/devscripts/debsign.1">debsign(1)</a> is invoked to sign the .changes file before proceeding.
+  </li>
+</ol>
+
+<p>
+  With these changes, after building a package, you just need to
+  type <code>dput</code> (in the correct directory of course) to sign and upload
+  it.
+</p>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[pristine-tar considered harmful]]></title>
+    <link href="https://michael.stapelberg.de/posts/2018-01-28-pristine-tar/"/>
+    <id>https://michael.stapelberg.de/posts/2018-01-28-pristine-tar/</id>
+    <published>2018-01-28T21:20:00+01:00</published>
+    <updated>2019-02-04T19:08:45+01:00</updated>
+    <content type="html"><![CDATA[<p>
+  If you want to follow along at home, clone this repository:
+</p>
+
+<pre>
+% GBP_CONF_FILES=:debian/gbp.conf gbp clone https://anonscm.debian.org/git/pkg-go/packages/golang-github-go-macaron-inject.git
+</pre>
+
+<p>
+  Now, in the <code>golang-github-go-macaron-inject</code> directory, I’m aware
+  of three ways to obtain an orig tarball (please correct me if there are more):
+</p>
+
+<ol>
+  <li>
+    Run <code><a href="https://manpages.debian.org/stretch/git-buildpackage/gbp-buildpackage.1.en.html">gbp
+    buildpackage</a></code>, creating an orig tarball from git
+    (<code>upstream/0.0_git20160627.0.d8a0b86</code>)<br>
+    The resulting sha1sum is <code>d085a04b7b35856be24f8cc4a9a6d9799cdb59b4</code>.
+  </li>
+  <li>
+    Run <code><a href="https://manpages.debian.org/stretch/pristine-tar/pristine-tar.1.en.html">pristine-tar</a>
+    checkout</code><br>
+    The resulting sha1sum is <code>d51575c0b00db5fe2bbf8eea65bc7c4f767ee954</code>.
+  </li>
+  <li>
+    Run <code><a href="https://manpages.debian.org/stretch/devscripts/origtargz.1.en.html">origtargz</a></code><br>
+    The resulting sha1sum is <code>d51575c0b00db5fe2bbf8eea65bc7c4f767ee954</code>.
+  </li>
+</ol>
+
+<p>
+  Have a look at the
+  archive’s <a href="https://deb.debian.org/debian/pool/main/g/golang-github-go-macaron-inject/golang-github-go-macaron-inject_0.0~git20160627.0.d8a0b86-2.dsc">golang-github-go-macaron-inject_0.0~git20160627.0.d8a0b86-2.dsc</a>,
+  however: the file entry orig tarball reads:
+</p>
+
+<pre>
+f5d5941c7b77e8941498910b64542f3db6daa3c2 7688 golang-github-go-macaron-inject_0.0~git20160627.0.d8a0b86.orig.tar.xz
+</pre>
+
+<p>
+  So, why did we get a different tarball? Let’s go through the methods:
+</p>
+
+<ol>
+  <li>
+    The uploader must not have used <code>gbp buildpackage</code> to create
+    their tarball. Perhaps they imported from a tarball created by
+    dh-make-golang, or created manually, and then left that tarball in place
+    (which is a perfectly fine, normal workflow).
+  </li>
+
+  <li>
+    I’m not entirely sure why <code>pristine-tar</code> resulted in a different
+    tarball than what’s in the archive. I think the most likely theory is that
+    the uploader had to go back and modify the tarball, but forgot to update (or
+    made a mistake while updating) the pristine-tar branch.
+  </li>
+  
+  <li>
+    <code>origtargz</code>, when it detects pristine-tar data, uses
+    pristine-tar, hence the same tarball as ②.
+  </li>
+</ol>
+
+<p>
+  Had we not used pristine-tar for this repository at
+  all, <code>origtargz</code> would have pulled the correct tarball from the
+  archive.
+</p>
+
+<p>
+  The above anecdote illustrates the fragility of the pristine-tar approach. In
+  my experience from the pkg-go team, when the pristine-tar branch doesn’t
+  contain outright incorrect data, it is often outdated. Even when everything is
+  working correctly, a number of packagers are disgruntled about the extra
+  work/mental complexity.
+</p>
+
+<p>
+  In the pkg-go team, we have (independently of this specific anecdote)
+  collectively decided to have the upstream branch track the upstream remote’s
+  master (or similar) branch directly, and get rid of pristine-tar in our
+  repositories. This should result in method ① and ③ working correctly.
+</p>
+
+<p>
+  In conclusion, my recommendation for any repository is: don’t bother with
+  pristine-tar. Instead, configure <code>origtargz</code> as a git-buildpackage
+  postclone hook in your <code>~/.gbp.conf</code> to always work with archive
+  orig tarballs:
+</p>
+
+<pre>
+[clone]
+# Ensure the correct orig tarball is present.
+postclone=origtargz
+
+[buildpackage]
+# Pick up the orig tarballs created by the origtargz postclone hook.
+tarball-dir = ..
+</pre>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[Debian buster on the Raspberry Pi 3 (update)]]></title>
+    <link href="https://michael.stapelberg.de/posts/2018-01-08-raspberry-pi-3/"/>
+    <id>https://michael.stapelberg.de/posts/2018-01-08-raspberry-pi-3/</id>
+    <published>2018-01-08T22:55:00+01:00</published>
+    <updated>2019-02-04T19:08:45+01:00</updated>
+    <content type="html"><![CDATA[<p>
+I previously wrote about <a
+href="https://people.debian.org/~stapelberg/2017/10/08/raspberry-pi-3.html">my
+Debian buster preview image for the Raspberry Pi 3</a>.
+</p>
+
+<p>
+Now, I’m publishing an updated version, containing the following changes:
+</p>
+<ul>
+<li>
+WiFi works out of the box. Use e.g. <code>ip link set dev wlan0 up</code>, and <code>iwlist wlan0 scan</code>.
+</li>
+<li>
+Kernel boot messages are now displayed on an attached monitor (if any), not just on the serial console.
+</li>
+<li>
+Root file system resizing will now not touch the partition table if the user modified it.
+</li>
+<li>
+The image is now compressed using xz, reducing its size to 170M.
+</li>
+</ul>
+
+<p>
+As before, the image is built
+with <a href="https://github.com/larswirzenius/vmdb2">vmdb2</a>, the successor
+to vmdebootstrap. The input files are available
+at <a href="https://github.com/Debian/raspi3-image-spec">https://github.com/Debian/raspi3-image-spec</a>.
+</p>
+
+<p>
+Note that Bluetooth is still untested
+(see <a href="https://wiki.debian.org/RaspberryPi3">wiki:RaspberryPi3</a> for
+details).
+</p>
+
+<p>
+Given that Bluetooth is the only known issue, I’d like to work towards getting
+this image built and provided on official Debian infrastructure. If you know how
+to make this happen, please send me an email. Thanks!
+</p>
+
+<p>
+As a <strong>preview version</strong> (i.e. unofficial, unsupported, etc.)
+until that’s done, I built and uploaded the resulting image. Find it at <a
+href="https://people.debian.org/~stapelberg/raspberrypi3/2018-01-08/">https://people.debian.org/~stapelberg/raspberrypi3/2018-01-08/</a>.
+To install the image, insert the SD card into your computer (I’m assuming it’s
+available as <code>/dev/sdb</code>) and copy the image onto it:
+</p>
+
+<pre>
+$ wget https://people.debian.org/~stapelberg/raspberrypi3/2018-01-08/2018-01-08-raspberry-pi-3-buster-PREVIEW.img.xz
+$ xzcat 2018-01-08-raspberry-pi-3-buster-PREVIEW.img.xz | dd of=/dev/sdb bs=64k oflag=dsync status=progress
+</pre>
+
+<p>
+If resolving client-supplied DHCP hostnames works in your network, you should
+be able to log into the Raspberry Pi 3 using SSH after booting it:
+</p>
+
+<pre>
+$ ssh root@rpi3
+# Password is “raspberry”
+</pre>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[Which VCS do Debian’s Go package upstreams use?]]></title>
+    <link href="https://michael.stapelberg.de/posts/2017-10-22-pkg-go-upstreams/"/>
+    <id>https://michael.stapelberg.de/posts/2017-10-22-pkg-go-upstreams/</id>
+    <published>2017-10-22T13:20:00+02:00</published>
+    <updated>2019-02-04T19:08:45+01:00</updated>
+    <content type="html"><![CDATA[<p>
+  In the pkg-go team, we are currently discussing which workflows we should
+  standardize on.
+</p>
+
+<p>
+  One of the considerations is what goes into the “upstream” Git branch of our
+  repositories: should it track the upstream Git repository, or should it
+  contain orig tarball imports?
+</p>
+
+<p>
+  Now, tracking the upstream Git repository only works if upstream actually uses
+  Git. The go tool, which is widely used within the Go community for managing Go
+  packages, supports Git, Mercurial, Bazaar and Subversion. But which of these
+  are actually used in practice?
+</p>
+
+<p>
+  Let’s find out!
+</p>
+
+<h3>Option 1: If you have the sources lists of all suites locally anyway</h3>
+
+<pre>
+/usr/lib/apt/apt-helper cat-file \
+  $(apt-get indextargets --format '$(FILENAME)' 'ShortDesc: Sources' 'Origin: Debian') \
+  | sed -n 's,Go-Import-Path: ,,gp' \
+  | sort -u
+</pre>
+
+<h3>Option 2: If you prefer to use a relational database over textfiles</h3>
+
+<p>
+  This is the harder option, but also the more complete one.
+</p>
+
+<p>
+  First, we’ll need the Go package import paths of all Go packages which are in
+  Debian. We can get them from
+  the <a href="https://wiki.debian.org/ProjectB">ProjectB</a> database, Debian’s
+  main PostgreSQL database containing all of the state about the Debian archive.
+</p>
+
+<p>
+  Unfortunately, only Debian Developers have SSH access to a mirror of ProjectB
+  at the moment. I contacted DSA to ask about providing public ProjectB access.
+</p>
+
+<pre>
+  ssh mirror.ftp-master.debian.org "echo \"SELECT value FROM source_metadata \
+  LEFT JOIN metadata_keys ON (source_metadata.key_id = metadata_keys.key_id) \
+  WHERE metadata_keys.key = 'Go-Import-Path' GROUP BY value\" | \
+    psql -A -t service=projectb" > go_import_path.txt
+</pre>
+
+<p>
+  I
+  uploaded <a href="https://people.debian.org/~stapelberg/2017-10-22-go_import_path.txt">a
+  copy of resulting <code>go_import_path.txt</code></a>, if you’re curious.
+</p>
+
+<p>
+  Now, let’s come up with a little bit of Go to print the VCS responsible for
+  each specified Go import path:
+</p>
+
+<pre>
+go get -u golang.org/x/tools/go/vcs
+cat >vcs4.go <<'EOT'
+package main
+
+import (
+	"fmt"
+	"log"
+	"os"
+	"sync"
+
+	"golang.org/x/tools/go/vcs"
+)
+
+func main() {
+	var wg sync.WaitGroup
+	for _, arg := range os.Args[1:] {
+		wg.Add(1)
+		go func(arg string) {
+			defer wg.Done()
+			rr, err := vcs.RepoRootForImportPath(arg, false)
+			if err != nil {
+				log.Println(err)
+				return
+			}
+			fmt.Println(rr.VCS.Name)
+		}(arg)
+	}
+	wg.Wait()
+}
+EOT
+</pre>
+
+<p>
+  Lastly, run it in combination
+  with <a href="https://manpages.debian.org/stretch/coreutils/uniq.1"><code>uniq(1)</code></a>
+  to discover…
+</p>
+
+<pre>
+go run vcs4.go $(tr '\n' ' ' < go_import_path.txt) | sort | uniq -c
+    760 Git
+      1 Mercurial
+</pre>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[pk4: a new tool to avail the Debian source package producing the specified package]]></title>
+    <link href="https://michael.stapelberg.de/posts/2017-10-21-pk4/"/>
+    <id>https://michael.stapelberg.de/posts/2017-10-21-pk4/</id>
+    <published>2017-10-21T10:05:00+02:00</published>
+    <updated>2019-02-04T19:08:45+01:00</updated>
+    <content type="html"><![CDATA[<p>
+  UNIX distributions used to come with the system source code
+  in <code>/usr/src</code>. This is a concept which fascinates me: if you want
+  to change something in any part of your system, just make your change in the
+  corresponding directory, recomile, reinstall, and you can immediately see your
+  changes in action.
+</p>
+
+<p>
+  So, I decided I wanted to build a tool which can give you the impression of
+  that, without the downsides of additional disk space usage and slower update
+  times because of <code>/usr/src</code> maintenance.
+</p>
+
+<p>
+  The result of this effort is a tool called <code>pk4</code> (mnemonic: get me
+  the package for…) which I just uploaded to Debian.
+</p>
+
+<p>
+  What distinguishes this tool from an <code>apt source</code> call is the
+  combination of a number of features:
+</p>
+
+<ul>
+  <li>
+    pk4 defaults to the version of the package which is installed on your
+    system. This means when installing the resulting packages, you won’t be
+    forced to upgrade your system in case you’re not running the latest
+    available version.
+    <br>
+    In case the package is not installed on your system, the candidate
+    (see <code>apt policy</code>) will be used.
+  </li>
+  <li>
+    pk4 tries hard to resolve the provided argument(s): you can specify Debian
+    binary package names, Debian source package names, or file paths on your
+    system (in which case the owning package will be used).
+  </li>
+  <li>
+    pk4 comes with tab completion for bash and zsh.
+  </li>
+  <li>
+    pk4 caps the disk usage of the checked out packages by deleting the oldest ones
+    after crossing a limit (default: 2GiB).
+  </li>
+  <li>
+    pk4 allows users to enable supplied or shipped-with-pk4 hooks, e.g. git-init.
+    <br>
+    The git-init hook in particular results in an experience that reminds of
+    <a href="https://manpages.debian.org/stretch/dgit/dgit.1.en.html">dgit</a>,
+    and in fact it might be useful to combine the two tools in some way.
+  </li>
+  <li>
+    pk4 optimizes for low latency of each operation.
+  </li>
+  <li>
+    pk4 respects your APT configuration, i.e. should work in company intranets.
+  </li>
+  <li>
+    tries hard to download source packages, with fallback to snapshot.debian.org.
+  </li>
+</ul>
+
+<p>
+  If you don’t want to wait for the package to clear the NEW queue, you can get
+  it from here in the meantime:
+</p>
+<pre>
+wget https://people.debian.org/~stapelberg/pk4/pk4_1_amd64.deb
+sudo apt install ./pk4_1_amd64.deb
+</pre>
+
+<p>
+  You can find the sources and issue tracker
+  at <a href="https://github.com/Debian/pk4">https://github.com/Debian/pk4</a>.
+</p>
+
+<p>
+  Here is a terminal screencast of the tool in action, availing the sources of
+  i3, applying a patch, rebuilding the package and replacing the installed
+  binary packages:
+</p>
+
+<script type="text/javascript" src="https://asciinema.org/a/TgYn2wkABiob14WKb2UefNl9f.js" id="asciicast-TgYn2wkABiob14WKb2UefNl9f" async></script>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[Debian stretch on the Raspberry Pi 3 (update)]]></title>
+    <link href="https://michael.stapelberg.de/posts/2017-10-08-raspberry-pi-3/"/>
+    <id>https://michael.stapelberg.de/posts/2017-10-08-raspberry-pi-3/</id>
+    <published>2017-10-08T22:45:00+02:00</published>
+    <updated>2019-02-04T19:08:45+01:00</updated>
+    <content type="html"><![CDATA[<p>
+I previously wrote about <a
+href="https://people.debian.org/~stapelberg/2017/03/22/raspberry-pi-3.html">my
+Debian stretch preview image for the Raspberry Pi 3</a>.
+</p>
+
+<p>
+Now, I’m publishing an updated version, containing the following changes:
+</p>
+<ul>
+<li>
+SSH host keys are generated on first boot.
+</li>
+<li>
+Old kernel versions are now removed from /boot/firmware when purged.
+</li>
+<li>
+The image is built
+with <a href="https://github.com/larswirzenius/vmdb2">vmdb2</a>, the successor
+to vmdebootstrap. The input files are available
+at <a href="https://github.com/Debian/raspi3-image-spec">https://github.com/Debian/raspi3-image-spec</a>.
+</li>
+<li>
+The image uses the linux-image-arm64 4.13.4-3 kernel, which provides HDMI output.
+</li>
+<li>
+The image is now compressed using bzip2, reducing its size to 220M.
+</li>
+</ul>
+
+<p>
+A couple of issues remain, notably the lack of WiFi and bluetooth support
+(see <a
+href="https://wiki.debian.org/RaspberryPi3">wiki:RaspberryPi3</a> for details.
+Any help with fixing these issues is very welcome!
+</p>
+
+<p>
+As a <strong>preview version</strong> (i.e. unofficial, unsupported, etc.)
+until all the necessary bits and pieces are in place to build images in a
+proper place in Debian, I built and uploaded the resulting image. Find it at <a
+href="https://people.debian.org/~stapelberg/raspberrypi3/2017-10-08/">https://people.debian.org/~stapelberg/raspberrypi3/2017-10-08/</a>.
+To install the image, insert the SD card into your computer (I’m assuming it’s
+available as <code>/dev/sdb</code>) and copy the image onto it:
+</p>
+
+<pre>
+$ wget https://people.debian.org/~stapelberg/raspberrypi3/2017-10-08/2017-10-08-raspberry-pi-3-buster-PREVIEW.img.bz2
+$ bunzip2 2017-10-08-raspberry-pi-3-buster-PREVIEW.img.bz2
+$ sudo dd if=2017-10-08-raspberry-pi-3-buster-PREVIEW.img of=/dev/sdb bs=5M
+</pre>
+
+<p>
+If resolving client-supplied DHCP hostnames works in your network, you should
+be able to log into the Raspberry Pi 3 using SSH after booting it:
+</p>
+
+<pre>
+$ ssh root@rpi3
+# Password is “raspberry”
+</pre>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[manpages.debian.org: what’s new since the launch?]]></title>
+    <link href="https://michael.stapelberg.de/posts/2017-04-09-manpages-debian-org-news/"/>
+    <id>https://michael.stapelberg.de/posts/2017-04-09-manpages-debian-org-news/</id>
+    <published>2017-04-09T13:23:00+02:00</published>
+    <updated>2019-02-04T19:08:45+01:00</updated>
+    <content type="html"><![CDATA[<p>
+On 2017-01-18, I announced that <a
+href="https://manpages.debian.org">https://manpages.debian.org</a> had been
+modernized. Let me catch you up on a few things which happened in the meantime:
+</p>
+
+<ul>
+<li>
+Debian experimental was added to manpages.debian.org. I was <a
+href="https://github.com/Debian/debiman/issues/23">surprised to learn</a> that
+adding experimental only required 52MB of disk usage. Further, Debian contrib
+was added after <a href="https://github.com/Debian/debiman/issues/34">realizing
+that contrib licenses are compatible with the DFSG</a>.
+</li>
+<li>
+Indentation in some code examples was <a
+href="https://github.com/Debian/debiman/issues/21">fixed upstream</a> in
+<a href="http://mdocml.bsd.lv">mandoc</a>.
+</li>
+<li>
+Address-bar search should now also work in Firefox, which <a
+href="https://github.com/Debian/debiman/issues/41">apparently requires a title
+attribute</a> on the opensearch XML file reference.
+</li>
+<li>
+manpages now <a href="https://github.com/Debian/debiman/issues/42">specify
+their language</a> in the HTML tag so that search engines can offer users the
+most appropriate version of the manpage.
+</li>
+<li>
+I contributed <code>mandocd(8)</code> to the mandoc project, which <a
+href="https://github.com/Debian/debiman/commit/3715b1eaf9c1793b9a8c7b1787e2d6511ca2b004">debiman
+now uses</a> for significantly faster manpage conversion (useful for disaster
+recovery/development). An entire run previously took 2 hours on my workstation.
+With this change, it takes merely 22 minutes. The effects are even more
+pronounced on manziarly, the VM behind manpages.debian.org.
+</li>
+<li>
+Thanks to Peter Palfrader (weasel) from the Debian System Administrators (DSA)
+team, manpages.debian.org is now serving its manpages (and most of its
+redirects) from Debian’s static mirroring infrastructure. That way, planned
+maintenance won’t result in service downtime. I contributed <a
+href="https://anonscm.debian.org/git/mirror/dsa-puppet.git/tree/modules/roles/README.static-mirroring.txt">README.static-mirroring.txt</a>,
+which describes the infrastructure in more detail.
+</li>
+</ul>
+
+<p>
+The list above is not complete, but rather a selection of things I found worth
+pointing out to the larger public.
+</p>
+
+<p>
+There are still a few things I plan to work on soon, so stay tuned :).
+</p>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[Debian stretch on the Raspberry Pi 3 (update)]]></title>
+    <link href="https://michael.stapelberg.de/posts/2017-03-22-raspberry-pi-3/"/>
+    <id>https://michael.stapelberg.de/posts/2017-03-22-raspberry-pi-3/</id>
+    <published>2017-03-22T18:36:00+02:00</published>
+    <updated>2019-02-04T19:08:45+01:00</updated>
+    <content type="html"><![CDATA[<p>
+I previously wrote about <a
+href="https://people.debian.org/~stapelberg/2016/11/24/raspberry-pi-3.html">my
+Debian stretch preview image for the Raspberry Pi 3</a>.
+</p>
+
+<p>
+Now, I’m publishing an updated version, containing the following changes:
+</p>
+<ul>
+<li>
+A new version of the upstream firmware makes the Ethernet MAC address persist
+across reboots.
+</li>
+<li>
+Updated initramfs files (without updating the kernel) are now correctly copied
+to the VFAT boot partition.
+</li>
+<li>
+The initramfs’s file system check now works as the required fsck binaries are
+now available.
+</li>
+<li>
+The root file system is now resized to fill the available space of the SD card
+on first boot.
+</li>
+<li>
+SSH access is now enabled, restricted via iptables to local network source
+addresses only.
+</li>
+<li>
+The image uses the linux-image-4.9.0-2-arm64 4.9.13-1 kernel.
+</li>
+</ul>
+
+<p>
+A couple of issues remain, notably the lack of HDMI, WiFi and bluetooth support
+(see <a
+href="https://wiki.debian.org/RaspberryPi3">wiki:RaspberryPi3</a> for details.
+Any help with fixing these issues is very welcome!
+</p>
+
+<p>
+As a <strong>preview version</strong> (i.e. unofficial, unsupported, etc.)
+until all the necessary bits and pieces are in place to build images in a
+proper place in Debian, I built and uploaded the resulting image. Find it at <a
+href="https://people.debian.org/~stapelberg/raspberrypi3/2017-03-22/">https://people.debian.org/~stapelberg/raspberrypi3/2017-03-22/</a>.
+To install the image, insert the SD card into your computer (I’m assuming it’s
+available as <code>/dev/sdb</code>) and copy the image onto it:
+</p>
+
+<pre>
+$ wget https://people.debian.org/~stapelberg/raspberrypi3/2017-03-22/2017-03-22-raspberry-pi-3-stretch-PREVIEW.img
+$ sudo dd if=2017-03-22-raspberry-pi-3-stretch-PREVIEW.img of=/dev/sdb bs=5M
+</pre>
+
+<p>
+If resolving client-supplied DHCP hostnames works in your network, you should
+be able to log into the Raspberry Pi 3 using SSH after booting it:
+</p>
+
+<pre>
+$ ssh root@rpi3
+# Password is “raspberry”
+</pre>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[manpages.debian.org has been modernized]]></title>
+    <link href="https://michael.stapelberg.de/posts/2017-01-18-manpages-debian-org/"/>
+    <id>https://michael.stapelberg.de/posts/2017-01-18-manpages-debian-org/</id>
+    <published>2017-01-18T18:20:00+01:00</published>
+    <updated>2019-02-04T19:08:45+01:00</updated>
+    <content type="html"><![CDATA[<p>
+<a href="https://manpages.debian.org">https://manpages.debian.org</a> has been
+modernized! We have just launched a major update to our manpage repository.
+What used to be served via a CGI script is now a statically generated website,
+and therefore blazingly fast.
+</p>
+
+<p>
+While we were at it, we have restructured the paths so that we can serve all
+manpages, even those whose name conflicts with other binary packages (e.g.
+crontab(5) from cron, bcron or systemd-cron). Don’t worry: the old URLs are
+redirected correctly.
+</p>
+
+<p>
+Furthermore, the design of the site has been updated and now includes
+navigation panels that allow quick access to the manpage in other Debian
+versions, other binary packages, other sections and other languages. Speaking
+of languages, the site serves manpages in all their available languages and
+respects your browser’s language when redirecting or following a
+cross-reference.
+</p>
+
+<p>
+Much like the Debian package tracker, manpages.debian.org includes packages
+from Debian oldstable, oldstable-backports, stable, stable-backports, testing
+and unstable. New manpages should make their way onto manpages.debian.org
+within a few hours.
+</p>
+
+<p>
+The generator program (“debiman”) is open source and can be found at <a
+href="https://github.com/Debian/debiman">https://github.com/Debian/debiman</a>.
+In case you would like to use it to run a similar manpage repository (or
+convert your existing manpage repository to it), we’d love to help you out;
+just send an email to stapelberg AT debian DOT org.
+</p>
+
+<p>
+This effort is standing on the shoulders of giants: check out <a
+href="https://manpages.debian.org/about.html">https://manpages.debian.org/about.html</a>
+for a list of people we thank.
+</p>
+
+<p>
+We’d love to hear your feedback and thoughts. Either contact us via an
+issue on <a
+href="https://github.com/Debian/debiman/issues/">https://github.com/Debian/debiman/issues/</a>,
+or send an email to the debian-doc mailing list (see <a
+href="https://lists.debian.org/debian-doc/">https://lists.debian.org/debian-doc/</a>).
+</p>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[Debian package build tools]]></title>
+    <link href="https://michael.stapelberg.de/posts/2016-11-25-build-tools/"/>
+    <id>https://michael.stapelberg.de/posts/2016-11-25-build-tools/</id>
+    <published>2016-11-25T13:30:00+02:00</published>
+    <updated>2019-02-04T19:08:45+01:00</updated>
+    <content type="html"><![CDATA[<p>
+Personally, I find the packaging tools which are available in Debian
+<strong>far too complex</strong>. To better understand the options we have, I
+created a diagram of tools which are frequently used, only covering the build
+step (i.e. no post-build quality assurance checks or packaging-time helpers):
+</p>
+
+<a href="https://people.debian.org/~stapelberg/build-tools/2016-11-25-debian-build-tools.png"><img src="https://people.debian.org/~stapelberg/build-tools/2016-11-25-debian-build-tools.png" width="600" alt="debian package build tools"></a>
+
+<p>
+When I was first introduced to Debian packaging, people recommended I use
+<code>pbuilder</code>. Given how complex the toolchain is in the pbuilder case,
+I don’t understand why that is (was?) a common recommendation.
+</p>
+
+<p>
+Back in August 2015, so well over a year ago, I switched to
+<code>sbuild</code>, motivated by how much simpler it was to implement <a
+href="https://people.debian.org/~stapelberg//2015/10/12/ratt.html">ratt
+(rebuilds reverse build dependencies)</a> using sbuild, and I have not looked
+back.
+</p>
+
+<p>
+Are there people who do not use sbuild for reasons other than familiarity? If
+so, please let me know, I’d like to understand.
+</p>
+
+<p>
+I also made a version of the diagram above, colored by the programming
+languages in which the tools are implemented. The chosen colors are heavily
+biased :-).
+</p>
+
+<a href="https://people.debian.org/~stapelberg/build-tools/2016-11-25-debian-build-tools-lang.png"><img src="https://people.debian.org/~stapelberg/build-tools/2016-11-25-debian-build-tools-lang.png" width="600" alt="debian package build tools, by language"></a>
+
+<p>
+To me, the diagram above means: if you want to make substantial changes to the
+Debian build tool infrastructure, you need to become an expert in all of
+Python, Perl, Bash, C and Make. I know that this is not true for every change,
+but it still irks me that there might be changes for which it is required.
+</p>
+
+<p>
+I propose to eliminate complexity in Debian by deprecating the pbuilder
+toolchain in favor of sbuild.
+</p>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[Debian stretch on the Raspberry Pi 3]]></title>
+    <link href="https://michael.stapelberg.de/posts/2016-11-24-raspberry-pi-3/"/>
+    <id>https://michael.stapelberg.de/posts/2016-11-24-raspberry-pi-3/</id>
+    <published>2016-11-24T09:45:00+02:00</published>
+    <updated>2019-02-04T19:08:45+01:00</updated>
+    <content type="html"><![CDATA[<p>
+The last couple of days, I worked on getting Debian to run on the Raspberry Pi
+3.
+</p>
+
+<p>
+Thanks to the work of many talented people, the Linux kernel in version 4.8 is
+_almost_ ready to run on the Raspberry Pi 3. The only missing thing is the
+bcm2835 MMC driver, which is required to read the root file system from the SD
+card. I’ve asked our maintainers to <a
+href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=845422">include the
+patch</a> for the time being.
+</p>
+
+<p>
+Aside from the kernel, one also needs a working bootloader, hence I used
+Ubuntu’s linux-firmware-raspi2 package and uploaded the <a
+href="https://anonscm.debian.org/cgit/pkg-raspi/linux-firmware-raspi3.git/">linux-firmware-raspi3
+package</a> to Debian. The package is currently in the NEW queue and needs to
+be accepted by ftp-master before entering Debian.
+</p>
+
+<p>
+The most popular method of providing a Linux distribution for the Raspberry Pi
+is to provide an image that can be written to an SD card. I made two little
+changes to vmdebootstrap (<a
+href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=845439">#845439</a>, <a
+href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=845526">#845526</a>)
+which make it easier to create such an image.
+</p>
+
+<p>
+The Debian wiki page <a
+href="https://wiki.debian.org/RaspberryPi3">https://wiki.debian.org/RaspberryPi3</a>
+describes the current state of affairs and should be updated, as this blog post
+will not be updated.
+</p>
+
+<p>
+As a <strong>preview version</strong> (i.e. unofficial, unsupported, etc.)
+until all the necessary bits and pieces are in place to build images in a
+proper place in Debian, I built and uploaded the resulting image. Find it at <a
+href="https://people.debian.org/~stapelberg/raspberrypi3/">https://people.debian.org/~stapelberg/raspberrypi3/</a>.
+To install the image, insert the SD card into your computer (I’m assuming it’s
+available as <code>/dev/sdb</code>) and copy the image onto it:
+</p>
+
+<pre>
+$ wget https://people.debian.org/~stapelberg/raspberrypi3/2016-11-24-raspberry-pi-3-stretch-PREVIEW.img
+$ sudo dd if=2016-11-24-raspberry-pi-3-stretch-PREVIEW.img of=/dev/sdb bs=5M
+</pre>
+
+<p>
+I hope this initial work on getting Debian booted will motivate other people to
+contribute little improvements here and there. A list of current limitations
+and potential improvements can be found on the <a
+href="https://wiki.debian.org/RaspberryPi3">RaspberryPi3 Debian wiki page</a>.
+</p>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[Debian Code Search: improving client-side latency]]></title>
+    <link href="https://michael.stapelberg.de/posts/2016-08-08-debian-codesearch-latency/"/>
+    <id>https://michael.stapelberg.de/posts/2016-08-08-debian-codesearch-latency/</id>
+    <published>2016-08-08T09:45:00+02:00</published>
+    <updated>2019-02-04T19:08:45+01:00</updated>
+    <content type="html"><![CDATA[<p>
+A while ago, it occurred to me that querying Debian Code Search seemed slow, which surprised me because I previously spent quite some effort on making it faster, see <a href="https://people.debian.org/~stapelberg/2014/12/03/debian-code-search-instant.html">Debian Code Search Instant</a> and <a href="https://people.debian.org/~stapelberg/2014/12/23/code-search-taming-the-latency-tail.html">Taming the latency tail</a> for the most recent substantial architecture overhaul and related optimizations.
+</p>
+
+<p>
+Upon taking a closer look, I realized that while performing the search query on the server side was pretty fast, the perceived slowness was due to the client side being slow. By “being slow”, I mean that it took a long time until something was drawn on the screen (high latency) and that what was happening on the screen was janky (stuttering, not smooth).
+</p>
+
+<p>
+Part of that slowness was due to historical reasons: the client-side architecture was optimized for the use-case where users open Debian Code Search’s index page and then submit a search query, but I was using Chrome’s address bar to send a search query (type “codesearch”, then hit the TAB key). Further, we only added a non-JavaScript version after we launched the JavaScript version. Hence, the redirects and progressive enhancements we implemented are more of a kludge than a well thought out design.
+</p>
+
+<p>
+After this bit of original investigation, I opened <a href="https://github.com/Debian/dcs/issues/69">GitHub issue #69</a> to track the work on making Debian Code Search faster. In that issue, I captured how Chrome’s network inspector visualizes the work necessary to render the page: <img src="https://people.debian.org/~stapelberg/screenshots/2016-08-08-dcs-before.png" width="626" height="278" alt="Chrome network inspector: before">
+</p>
+
+<h3>A couple of quick wins</h3>
+
+<p>
+There are a couple of little fixes and improvements on which I’m not going to spend too much time on, but which I list for completeness anyway just in case they come in handy for a similar project of yours:
+</p>
+<ul>
+<li>
+<a href="https://github.com/Debian/dcs/commit/6d614adb1b9a547ead93aead8830d71f9ce7354e">Remove css @import, unnecessary because we minify the two stylesheets together already.</a>
+</li>
+<li>
+<a href="https://github.com/Debian/dcs/commit/084d9d337e2f65be4aeb3e1518b310a3de667a60">Compress assets using the gzip-compatible Zöpfli algorithm (saves 3KB).</a>
+</li>
+<li>
+<a href="https://github.com/Debian/dcs/commit/d18d4c03dfb7522412bb1c80f063ceefdd2b5977">Run SVG files through the <code>svgo</code> optimizer (saves 8KB).</a>
+</li>
+<li>
+<a href="https://github.com/Debian/dcs/commit/80d6dd3f86dc746efc21c653fe212ecb729e500b">Use highly compressed/post-processed woff/woff2 webfont versions (gains such as 57KB→14KB for Roboto-Bold).</a>
+</li>
+<li>
+<a href="https://github.com/Debian/dcs/commit/e65763a6bc5c53882244b070e69322804da9d63e">Enabled HTTP/2 in nginx — not a win by itself, but avoids further round trips in combination with the EventSource API (see below).</a>
+</li>
+</ul>
+
+<h3>Bigger changes</h3>
+
+<p>
+The URL pattern has changed. Previously, we had 2 areas of the website, one for JavaScript-compatible clients and one for the rest. When you hit the wrong one, you were redirected. In some areas, we couldn’t tell which area is the correct one for you, so you would always incur a redirect: one example for this is the search bar. With the new URL pattern, we deliver both versions under the same URL: the elements only used by the JavaScript code are hidden using CSS by default, then made visible by JavaScript code. The elements only used by the non-JavaScript code are wrapped in a &lt;noscript&gt; tag.
+</p>
+
+<p>
+All CSS which is required for the initial page rendering is now inlined in the responses, allowing the browser to immediately render a response without requiring any additional round trips.
+</p>
+
+<p>
+All non-essential CSS has been moved into a separate CSS file which is loaded asynchronously. This is done using a pattern like <code>&lt;link rel="preload" href="foo.css" as="style" onload="this.rel='stylesheet'"&gt;</code>, see also <a href="https://github.com/filamentgroup/loadCSS">filamentgroup/loadCSS</a>.
+</p>
+
+<p>
+We switched from WebSockets to the <a href="https://developer.mozilla.org/en-US/docs/Web/API/EventSource">EventSource API</a> because the former is not compatible with HTTP/2, whereas the latter is. This removes a round trip and some custom code for WebSocket reconnecting, because EventSource does that for you.
+</p>
+
+<p>
+The progress bar animation used to animate the <code>background-position</code> property. <a href="http://www.html5rocks.com/en/tutorials/speed/high-performance-animations/">It turns out</a> that browsers can only animate the <code>position</code>, <code>scale</code>, <code>rotation</code> and <code>opacity</code> properties smoothly, because such animations can be off-loaded to the GPU. Hence, we have re-implemented the progress bar animation using the <code>position</code> property.
+</p>
+
+<p>
+The biggest win for improving client-side latency from the Chrome address bar was introducing <a href="http://www.html5rocks.com/en/tutorials/service-worker/introduction/">Service Workers</a> (see commit <a href="https://github.com/Debian/dcs/commit/7f31aef402cb782056e290a797f224171f4af270">7f31aef402cb782056e290a797f224171f4af270</a>). Our Service Worker caches static assets and a placeholder results page. The placeholder page is presented immediately when you start a search (e.g. from the address bar), making the first response immediate, i.e. rendered within 100ms. Having assets and the result page out of the way, the first round trip is used for actually doing the search, removing all unnecessary overhead.
+</p>
+
+<p>
+With all of these improvements in place, rendering latency goes down from half a second to well under 100 ms, and this is what the Chrome network inspector looks like:
+<img src="https://people.debian.org/~stapelberg/screenshots/2016-08-08-dcs-after.png" width="471" height="333" alt="Chrome network inspector: after">
+</p>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[mergebot: easily merging contributions]]></title>
+    <link href="https://michael.stapelberg.de/posts/2016-07-17-mergebot/"/>
+    <id>https://michael.stapelberg.de/posts/2016-07-17-mergebot/</id>
+    <published>2016-07-17T14:00:00+02:00</published>
+    <updated>2019-02-04T19:08:45+01:00</updated>
+    <content type="html"><![CDATA[<p>
+Recently, I was wondering why I was pushing off accepting contributions in Debian for longer than in other projects. It occurred to me that the effort to accept a contribution in Debian is way higher than in other FOSS projects. My remaining FOSS projects are on GitHub, where I can just click the “Merge” button after deciding a contribution looks good. In Debian, merging is actually a lot of work: I need to clone the repository, configure it, merge the patch, update the changelog, build and upload.
+</p>
+
+<p>
+I wondered how close we can bring Debian to a model where accepting a contribution is just a single click as well. In principle, I think it can be done.
+</p>
+
+<p>
+To demonstrate the feasibility and collect some feedback, I wrote a program called <code>mergebot</code>. The first stage is done: <code>mergebot</code> can be used on your local machine as a command-line tool. You provide it with the source package and bug number which contains the patch in question, and it will do the rest:
+</p>
+
+<pre style="background-color: black; color: white; padding: 0.1em; overflow-x: auto">
+<span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">~</span> $ mergebot -source_package=wit -bug=#831331
+2016/07/17 12:06:06 will work on package "wit", bug "831331"
+2016/07/17 12:06:07 Skipping MIME part with invalid Content-Disposition header (mime: no media type)
+2016/07/17 12:06:07 gbp clone --pristine-tar git+ssh://git.debian.org/git/collab-maint/wit.git /tmp/mergebot-743062986/repo
+2016/07/17 12:06:09 git config push.default matching
+2016/07/17 12:06:09 git config --add remote.origin.push +refs/heads/*:refs/heads/*
+2016/07/17 12:06:09 git config --add remote.origin.push +refs/tags/*:refs/tags/*
+2016/07/17 12:06:09 git config user.email stapelberg AT debian DOT org
+2016/07/17 12:06:09 patch -p1 -i ../latest.patch
+2016/07/17 12:06:09 git add .
+2016/07/17 12:06:09 git commit -a --author Chris Lamb &lt;lamby AT debian DOT org&gt; --message Fix for “wit: please make the build reproducible” (Closes: #831331)
+2016/07/17 12:06:09 gbp dch --release --git-author --commit
+2016/07/17 12:06:09 gbp buildpackage --git-tag --git-export-dir=../export --git-builder=sbuild -v -As --dist=unstable
+2016/07/17 12:07:16 Merge and build successful!
+2016/07/17 12:07:16 Please introspect the resulting Debian package and git repository, then push and upload:
+2016/07/17 12:07:16 cd "/tmp/mergebot-743062986"
+2016/07/17 12:07:16 (cd repo &amp;&amp; git push)
+2016/07/17 12:07:16 (cd export &amp;&amp; debsign *.changes &amp;&amp; dput *.changes)
+
+<span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">~</span> $ cd /tmp/mergebot-743062986/repo
+<span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">/tmp/mergebot-743062986/repo</span> $ git log HEAD~2..
+commit d983d242ee546b2249a866afe664bac002a06859
+Author: Michael Stapelberg &lt;stapelberg AT debian DOT org&gt;
+Date:   Sun Jul 17 13:32:41 2016 +0200
+
+    Update changelog for 2.31a-3 release
+
+commit 5a327f5d66e924afc656ad71d3bfb242a9bd6ddc
+Author: Chris Lamb &lt;lamby AT debian DOT org&gt;
+Date:   Sun Jul 17 13:32:41 2016 +0200
+
+    Fix for “wit: please make the build reproducible” (Closes: #831331)
+<span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">/tmp/mergebot-743062986/repo</span> $ git push
+Counting objects: 11, done.
+Delta compression using up to 8 threads.
+Compressing objects: 100% (11/11), done.
+Writing objects: 100% (11/11), 1.59 KiB | 0 bytes/s, done.
+Total 11 (delta 6), reused 0 (delta 0)
+remote: Sending notification emails to: dispatch+wit_vcs@tracker.debian.org
+remote: Sending notification emails to: dispatch+wit_vcs@tracker.debian.org
+To git+ssh://git.debian.org/git/collab-maint/wit.git
+   650ee05..d983d24  master -&gt; master
+ * [new tag]         debian/2.31a-3 -&gt; debian/2.31a-3
+<span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">/tmp/mergebot-743062986/repo</span> $ cd ../export
+<span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">/tmp/mergebot-743062986/export</span> $ debsign *.changes &amp;&amp; dput *.changes
+[…]
+Uploading wit_2.31a-3.dsc
+Uploading wit_2.31a-3.debian.tar.xz
+Uploading wit_2.31a-3_amd64.deb
+Uploading wit_2.31a-3_amd64.changes
+</pre>
+
+<p>
+Of course, this is not quite as convenient as clicking a “Merge” button yet. I have <a href="https://github.com/Debian/mergebot#future-ideas">some ideas</a> on how to make that happen, but I need to know whether people are interested before I spend more time on this.
+</p>
+
+<p>
+Please see <a href="https://github.com/Debian/mergebot">github.com/Debian/mergebot</a> for more details, and please get in touch if you think this is worthwhile or would even like to help. Feedback is accepted in the GitHub issue tracker for mergebot or <a href="https://lists.alioth.debian.org/cgi-bin/mailman/listinfo/mergebot-discuss">the project mailing list mergebot-discuss</a>. Thanks!
+</p>
+]]></content>
+  </entry>
+</feed>

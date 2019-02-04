@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>mergebot: easily merging contributions</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.de/posts/2016-07-17-mergebot/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    <link rel="stylesheet" href="/1.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+
+
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+	<div id="menu" class="col-md-2">
+  <div style="display: flex; align-items: center">
+    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
+    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+  </div>
+
+  <ul class="menu_open">
+    <li><a class="menu_item" href="/"><span class="menu_title">Startseite</span></a></li>
+    <li><a class="menu_item" href="/posts/"><span class="menu_title">Artikel</span></a></li>
+    <li><a class="menu_item" href="/dokumente/"><span class="menu_title">Dokumente</span></a></li>
+    <li><a class="menu_item" href="/programme/"><span class="menu_title">Programme</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
+	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+
+    <li><a class="menu_item" href="/tipps"><span class="menu_title">Tipps</span></a></li>
+    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
+
+    <li><a class="menu_item" href="/meinepcs"><span class="menu_title">Hardware</span></a></li>
+    <li><a class="menu_item" href="/impressum"><span class="menu_title">Impressum</span></a></li>
+  </ul>
+</div>
+
+	<div id="contentBox" class="col-md-10">
+	  <h2 class="title">mergebot: easily merging contributions</h2>
+	  <div style="margin-bottom: 2em">
+	    
+	    
+	    
+	    <span id="date">published 2016-07-17, last modified 2019-02-04</span>
+	    
+	  
+	  
+	  in tag
+	  
+	  
+	  <span class="tag"><a href="/posts/tags/debian/">debian</a></span>
+	  
+	  
+	  <span style="background-color: black; border-radius: 25%; padding-left: 0.1em; padding-right: 0.1em">
+	    <a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2016-07-17-mergebot.html">✎</a>
+	  </span>
+	  </div>
+	  <div class="Artikel" id="content">
+	    <p>
+Recently, I was wondering why I was pushing off accepting contributions in Debian for longer than in other projects. It occurred to me that the effort to accept a contribution in Debian is way higher than in other FOSS projects. My remaining FOSS projects are on GitHub, where I can just click the “Merge” button after deciding a contribution looks good. In Debian, merging is actually a lot of work: I need to clone the repository, configure it, merge the patch, update the changelog, build and upload.
+</p>
+
+<p>
+I wondered how close we can bring Debian to a model where accepting a contribution is just a single click as well. In principle, I think it can be done.
+</p>
+
+<p>
+To demonstrate the feasibility and collect some feedback, I wrote a program called <code>mergebot</code>. The first stage is done: <code>mergebot</code> can be used on your local machine as a command-line tool. You provide it with the source package and bug number which contains the patch in question, and it will do the rest:
+</p>
+
+<pre style="background-color: black; color: white; padding: 0.1em; overflow-x: auto">
+<span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">~</span> $ mergebot -source_package=wit -bug=#831331
+2016/07/17 12:06:06 will work on package "wit", bug "831331"
+2016/07/17 12:06:07 Skipping MIME part with invalid Content-Disposition header (mime: no media type)
+2016/07/17 12:06:07 gbp clone --pristine-tar git+ssh://git.debian.org/git/collab-maint/wit.git /tmp/mergebot-743062986/repo
+2016/07/17 12:06:09 git config push.default matching
+2016/07/17 12:06:09 git config --add remote.origin.push +refs/heads/*:refs/heads/*
+2016/07/17 12:06:09 git config --add remote.origin.push +refs/tags/*:refs/tags/*
+2016/07/17 12:06:09 git config user.email stapelberg AT debian DOT org
+2016/07/17 12:06:09 patch -p1 -i ../latest.patch
+2016/07/17 12:06:09 git add .
+2016/07/17 12:06:09 git commit -a --author Chris Lamb &lt;lamby AT debian DOT org&gt; --message Fix for “wit: please make the build reproducible” (Closes: #831331)
+2016/07/17 12:06:09 gbp dch --release --git-author --commit
+2016/07/17 12:06:09 gbp buildpackage --git-tag --git-export-dir=../export --git-builder=sbuild -v -As --dist=unstable
+2016/07/17 12:07:16 Merge and build successful!
+2016/07/17 12:07:16 Please introspect the resulting Debian package and git repository, then push and upload:
+2016/07/17 12:07:16 cd "/tmp/mergebot-743062986"
+2016/07/17 12:07:16 (cd repo &amp;&amp; git push)
+2016/07/17 12:07:16 (cd export &amp;&amp; debsign *.changes &amp;&amp; dput *.changes)
+
+<span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">~</span> $ cd /tmp/mergebot-743062986/repo
+<span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">/tmp/mergebot-743062986/repo</span> $ git log HEAD~2..
+commit d983d242ee546b2249a866afe664bac002a06859
+Author: Michael Stapelberg &lt;stapelberg AT debian DOT org&gt;
+Date:   Sun Jul 17 13:32:41 2016 +0200
+
+    Update changelog for 2.31a-3 release
+
+commit 5a327f5d66e924afc656ad71d3bfb242a9bd6ddc
+Author: Chris Lamb &lt;lamby AT debian DOT org&gt;
+Date:   Sun Jul 17 13:32:41 2016 +0200
+
+    Fix for “wit: please make the build reproducible” (Closes: #831331)
+<span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">/tmp/mergebot-743062986/repo</span> $ git push
+Counting objects: 11, done.
+Delta compression using up to 8 threads.
+Compressing objects: 100% (11/11), done.
+Writing objects: 100% (11/11), 1.59 KiB | 0 bytes/s, done.
+Total 11 (delta 6), reused 0 (delta 0)
+remote: Sending notification emails to: dispatch+wit_vcs@tracker.debian.org
+remote: Sending notification emails to: dispatch+wit_vcs@tracker.debian.org
+To git+ssh://git.debian.org/git/collab-maint/wit.git
+   650ee05..d983d24  master -&gt; master
+ * [new tag]         debian/2.31a-3 -&gt; debian/2.31a-3
+<span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">/tmp/mergebot-743062986/repo</span> $ cd ../export
+<span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">/tmp/mergebot-743062986/export</span> $ debsign *.changes &amp;&amp; dput *.changes
+[…]
+Uploading wit_2.31a-3.dsc
+Uploading wit_2.31a-3.debian.tar.xz
+Uploading wit_2.31a-3_amd64.deb
+Uploading wit_2.31a-3_amd64.changes
+</pre>
+
+<p>
+Of course, this is not quite as convenient as clicking a “Merge” button yet. I have <a href="https://github.com/Debian/mergebot#future-ideas">some ideas</a> on how to make that happen, but I need to know whether people are interested before I spend more time on this.
+</p>
+
+<p>
+Please see <a href="https://github.com/Debian/mergebot">github.com/Debian/mergebot</a> for more details, and please get in touch if you think this is worthwhile or would even like to help. Feedback is accepted in the GitHub issue tracker for mergebot or <a href="https://lists.alioth.debian.org/cgi-bin/mailman/listinfo/mergebot-discuss">the project mailing list mergebot-discuss</a>. Thanks!
+</p>
+
+	  </div>
+	</div>
+      </div>
+    </div>
+  </body>
+</html>

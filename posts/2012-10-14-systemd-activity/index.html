@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>My recent systemd activity</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.de/posts/2012-10-14-systemd-activity/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    <link rel="stylesheet" href="/1.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+
+
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+	<div id="menu" class="col-md-2">
+  <div style="display: flex; align-items: center">
+    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
+    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+  </div>
+
+  <ul class="menu_open">
+    <li><a class="menu_item" href="/"><span class="menu_title">Startseite</span></a></li>
+    <li><a class="menu_item" href="/posts/"><span class="menu_title">Artikel</span></a></li>
+    <li><a class="menu_item" href="/dokumente/"><span class="menu_title">Dokumente</span></a></li>
+    <li><a class="menu_item" href="/programme/"><span class="menu_title">Programme</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
+	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+
+    <li><a class="menu_item" href="/tipps"><span class="menu_title">Tipps</span></a></li>
+    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
+
+    <li><a class="menu_item" href="/meinepcs"><span class="menu_title">Hardware</span></a></li>
+    <li><a class="menu_item" href="/impressum"><span class="menu_title">Impressum</span></a></li>
+  </ul>
+</div>
+
+	<div id="contentBox" class="col-md-10">
+	  <h2 class="title">My recent systemd activity</h2>
+	  <div style="margin-bottom: 2em">
+	    
+	    
+	    
+	    <span id="date">published 2012-10-14, last modified 2019-02-04</span>
+	    
+	  
+	  
+	  in tag
+	  
+	  
+	  <span class="tag"><a href="/posts/tags/debian/">debian</a></span>
+	  
+	  
+	  <span style="background-color: black; border-radius: 25%; padding-left: 0.1em; padding-right: 0.1em">
+	    <a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2012-10-14-systemd-activity.html">✎</a>
+	  </span>
+	  </div>
+	  <div class="Artikel" id="content">
+	    <p>
+I recently worked on the following systemd-related issues:
+</p>
+
+<ul>
+
+<li>
+<a href="http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=686115">#686115 - CanReload is set to yes unconditionally for legacy SysV services</a><br>
+I wrote a patch which uses a heuristic to figure out whether a SysV init script
+supports the reload option or not. Not perfect, but a whole lot better than
+defaulting to "yes" :-). This should also fix <a
+href="http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=650382">#650382 -
+force-reload translated to reload for SysV services</a>.
+</li>
+
+<li>
+<a href="http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=688635">#688635 - Don’t kill libvirt VMs when restarting libvirt</a><br>
+I ported a patch from the Fedora systemd packaging which avoids killing all
+processes of a cgroup when restarting a service. This is necessary for
+libvirtd, otherwise all virtual machines get killed when you restart
+libvirt-bin.service. libvirt-bin 0.10.2-4 (experimental) ships systemd service
+files.
+</li>
+
+<li>
+<a href="http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=635777">#635777 - 90-seconds delay on reboot/shutdown when postfix is installed</a><br>
+I tracked down the cause of several 90-second delay on shutdown causes and
+provided a patch (which is a workaround…).
+</li>
+
+<li>
+<a href="http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=624599">#624599 - systemd: DHCP hook scripts calling invoke-rc.d causes boot hang</a><br>
+I tracked down the cause of a deadlock at boot time when dhcp hooks call
+invoke-rc.d (as does samba). Several workarounds are known but we have not yet
+taken any action.
+</li>
+
+</ul>
+
+	  </div>
+	</div>
+      </div>
+    </div>
+  </body>
+</html>

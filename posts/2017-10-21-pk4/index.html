@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>pk4: a new tool to avail the Debian source package producing the specified package</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.de/posts/2017-10-21-pk4/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    <link rel="stylesheet" href="/1.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+
+
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+	<div id="menu" class="col-md-2">
+  <div style="display: flex; align-items: center">
+    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
+    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+  </div>
+
+  <ul class="menu_open">
+    <li><a class="menu_item" href="/"><span class="menu_title">Startseite</span></a></li>
+    <li><a class="menu_item" href="/posts/"><span class="menu_title">Artikel</span></a></li>
+    <li><a class="menu_item" href="/dokumente/"><span class="menu_title">Dokumente</span></a></li>
+    <li><a class="menu_item" href="/programme/"><span class="menu_title">Programme</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
+	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+
+    <li><a class="menu_item" href="/tipps"><span class="menu_title">Tipps</span></a></li>
+    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
+
+    <li><a class="menu_item" href="/meinepcs"><span class="menu_title">Hardware</span></a></li>
+    <li><a class="menu_item" href="/impressum"><span class="menu_title">Impressum</span></a></li>
+  </ul>
+</div>
+
+	<div id="contentBox" class="col-md-10">
+	  <h2 class="title">pk4: a new tool to avail the Debian source package producing the specified package</h2>
+	  <div style="margin-bottom: 2em">
+	    
+	    
+	    
+	    <span id="date">published 2017-10-21, last modified 2019-02-04</span>
+	    
+	  
+	  
+	  in tag
+	  
+	  
+	  <span class="tag"><a href="/posts/tags/debian/">debian</a></span>
+	  
+	  
+	  <span style="background-color: black; border-radius: 25%; padding-left: 0.1em; padding-right: 0.1em">
+	    <a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2017-10-21-pk4.html">✎</a>
+	  </span>
+	  </div>
+	  <div class="Artikel" id="content">
+	    <p>
+  UNIX distributions used to come with the system source code
+  in <code>/usr/src</code>. This is a concept which fascinates me: if you want
+  to change something in any part of your system, just make your change in the
+  corresponding directory, recomile, reinstall, and you can immediately see your
+  changes in action.
+</p>
+
+<p>
+  So, I decided I wanted to build a tool which can give you the impression of
+  that, without the downsides of additional disk space usage and slower update
+  times because of <code>/usr/src</code> maintenance.
+</p>
+
+<p>
+  The result of this effort is a tool called <code>pk4</code> (mnemonic: get me
+  the package for…) which I just uploaded to Debian.
+</p>
+
+<p>
+  What distinguishes this tool from an <code>apt source</code> call is the
+  combination of a number of features:
+</p>
+
+<ul>
+  <li>
+    pk4 defaults to the version of the package which is installed on your
+    system. This means when installing the resulting packages, you won’t be
+    forced to upgrade your system in case you’re not running the latest
+    available version.
+    <br>
+    In case the package is not installed on your system, the candidate
+    (see <code>apt policy</code>) will be used.
+  </li>
+  <li>
+    pk4 tries hard to resolve the provided argument(s): you can specify Debian
+    binary package names, Debian source package names, or file paths on your
+    system (in which case the owning package will be used).
+  </li>
+  <li>
+    pk4 comes with tab completion for bash and zsh.
+  </li>
+  <li>
+    pk4 caps the disk usage of the checked out packages by deleting the oldest ones
+    after crossing a limit (default: 2GiB).
+  </li>
+  <li>
+    pk4 allows users to enable supplied or shipped-with-pk4 hooks, e.g. git-init.
+    <br>
+    The git-init hook in particular results in an experience that reminds of
+    <a href="https://manpages.debian.org/stretch/dgit/dgit.1.en.html">dgit</a>,
+    and in fact it might be useful to combine the two tools in some way.
+  </li>
+  <li>
+    pk4 optimizes for low latency of each operation.
+  </li>
+  <li>
+    pk4 respects your APT configuration, i.e. should work in company intranets.
+  </li>
+  <li>
+    tries hard to download source packages, with fallback to snapshot.debian.org.
+  </li>
+</ul>
+
+<p>
+  If you don’t want to wait for the package to clear the NEW queue, you can get
+  it from here in the meantime:
+</p>
+<pre>
+wget https://people.debian.org/~stapelberg/pk4/pk4_1_amd64.deb
+sudo apt install ./pk4_1_amd64.deb
+</pre>
+
+<p>
+  You can find the sources and issue tracker
+  at <a href="https://github.com/Debian/pk4">https://github.com/Debian/pk4</a>.
+</p>
+
+<p>
+  Here is a terminal screencast of the tool in action, availing the sources of
+  i3, applying a patch, rebuilding the package and replacing the installed
+  binary packages:
+</p>
+
+<script type="text/javascript" src="https://asciinema.org/a/TgYn2wkABiob14WKb2UefNl9f.js" id="asciicast-TgYn2wkABiob14WKb2UefNl9f" async></script>
+
+	  </div>
+	</div>
+      </div>
+    </div>
+  </body>
+</html>

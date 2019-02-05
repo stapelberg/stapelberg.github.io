@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>TurboPFor: an analysis</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.de/posts/2019-02-05-turbopfor-analysis/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    <link rel="stylesheet" href="/1.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+
+
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+	<div id="menu" class="col-md-2">
+  <div style="display: flex; align-items: center">
+    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
+    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+  </div>
+
+  <ul class="menu_open">
+    <li><a class="menu_item" href="/"><span class="menu_title">Startseite</span></a></li>
+    <li><a class="menu_item" href="/posts/"><span class="menu_title">Artikel</span></a></li>
+    <li><a class="menu_item" href="/dokumente/"><span class="menu_title">Dokumente</span></a></li>
+    <li><a class="menu_item" href="/programme/"><span class="menu_title">Programme</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
+	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+
+    <li><a class="menu_item" href="/tipps"><span class="menu_title">Tipps</span></a></li>
+    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
+
+    <li><a class="menu_item" href="/meinepcs"><span class="menu_title">Hardware</span></a></li>
+    <li><a class="menu_item" href="/impressum"><span class="menu_title">Impressum</span></a></li>
+  </ul>
+</div>
+
+	<div id="contentBox" class="col-md-10">
+	  <h2 class="title">TurboPFor: an analysis</h2>
+	  <div style="margin-bottom: 2em">
+	    
+	    
+	    
+	    <span id="date">published 2019-02-05, last modified 2019-02-01</span>
+	    
+	  
+	  
+	  in tag
+	  
+	  
+	  <span class="tag"><a href="/posts/tags/debian/">debian</a></span>
+	  
+	  
+	  <span style="background-color: black; border-radius: 25%; padding-left: 0.1em; padding-right: 0.1em">
+	    <a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2019-02-05-TurboPFor-analysis.markdown">✎</a>
+	  </span>
+	  </div>
+	  <div class="Artikel" id="content">
+	    
+
+<h3 id="motivation">Motivation</h3>
+
+<p>I have recently been looking into speeding up Debian Code Search. As a quick
+reminder, search engines answer queries by consulting an inverted index: a map
+from term to documents containing that term (called a “posting list”). See <a href="https://codesearch.debian.net/research/bsc-thesis.pdf">the
+Debian Code Search Bachelor
+Thesis</a> (PDF) for a lot
+more details.</p>
+
+<p>Currently, Debian Code Search does not store positional information in its
+index, i.e. the index can only reveal <em>that</em> a certain trigram is present in a
+document, not <em>where</em> or <em>how often</em>.</p>
+
+<p>From analyzing Debian Code Search queries, I knew that identifier queries (70%)
+massively outnumber regular expression queries (30%). When processing identifier
+queries, storing positional information in the index enables a significant
+optimization: instead of identifying the possibly-matching documents and having
+to read them all, we can determine matches from querying the index alone, no
+document reads required.</p>
+
+<p>This moves the bottleneck: having to read all possibly-matching documents
+requires a lot of expensive random I/O, whereas having to decode long posting
+lists requires a lot of cheap sequential I/O.</p>
+
+<p>Of course, storing positions comes with a downside: the index is larger, and a
+larger index takes more time to decode when querying.</p>
+
+<p>Hence, I have been looking at various posting list compression/decoding
+techniques, to figure out whether we could switch to a technique which would
+retain (or improve upon!) current performance despite much longer posting lists
+and produce a small enough index to fit on our current hardware.</p>
+
+<h3 id="literature">Literature</h3>
+
+<p>I started looking into this space because of Daniel Lemire’s <a href="https://lemire.me/blog/2017/09/27/stream-vbyte-breaking-new-speed-records-for-integer-compression/">Stream
+VByte</a>
+post. As usual, Daniel’s work is well presented, easily digestible and
+accompanied by not just one, but multiple implementations.</p>
+
+<p>I also looked for scientific papers to learn about the state of the art and
+classes of different approaches in general. The best I could find is
+<a href="https://dl.acm.org/citation.cfm?doid=2682862.2682870">Compression, SIMD, and Postings
+Lists</a>. If you don’t have
+access to the paper, I hear that
+<a href="https://en.wikipedia.org/wiki/Sci-Hub">Sci-Hub</a> is helpful.</p>
+
+<p>The paper is from 2014, and doesn’t include all algorithms. If you know of a
+better paper, please let me know and I’ll include it here.</p>
+
+<p>Eventually, I stumbled upon an algorithm/implementation called TurboPFor, which
+the rest of the article tries to shine some light on.</p>
+
+<h3 id="turbopfor">TurboPFor</h3>
+
+<p>If you’re wondering: PFor stands for Patched Frame Of Reference and describes a
+family of algorithms. The principle is explained e.g. in <a href="https://arxiv.org/pdf/1401.6399.pdf">SIMD Compression and
+the Intersection of Sorted Integers (PDF)</a>.</p>
+
+<p>The <a href="https://github.com/powturbo/TurboPFor">TurboPFor project’s README file</a>
+claims that TurboPFor256 compresses with a rate of 5.04 bits per integer, and
+can decode with 9400 MB/s on a single thread of an Intel i7-6700 CPU.</p>
+
+<p>For Debian Code Search, we use unsigned integers of 32 bit (uint32), which
+TurboPFor will compress into as few bits as required.</p>
+
+<p>Dividing Debian Code Search’s file sizes by the total number of integers, I get
+similar values, at least for the docid index section:</p>
+
+<ul>
+<li>5.49 bits per integer for the docid index section</li>
+<li>11.09 bits per integer for the positions index section</li>
+</ul>
+
+<p>I can confirm the order of magnitude of the decoding speed, too. My benchmark
+calls TurboPFor from Go via cgo, which introduces some overhead. To exclude disk
+speed as a factor, data comes from the page cache. The benchmark sequentially
+decodes all posting lists in the specified index, using as many threads as the
+machine has cores¹:</p>
+
+<ul>
+<li>≈1400 MB/s on a  1.1 GiB docid index section</li>
+<li>≈4126 MB/s on a 15.0 GiB position index section</li>
+</ul>
+
+<p>I think the numbers differ because the position index section contains larger
+integers (requiring more bits). I repeated both benchmarks, capped to 1 GiB, and
+decoding speeds still differed, so it is not just the size of the index.</p>
+
+<p>Compared to Streaming VByte, a TurboPFor256 index comes in at just over half the
+size, while still reaching 83% of Streaming VByte’s decoding speed. This seems
+like a good trade-off for my use-case, so I decided to have a closer look at how
+TurboPFor works.</p>
+
+<p>① See <a href="https://github.com/stapelberg/goturbopfor/blob/d7954fb81e66080941891dccc27407d8496f65d9/cmd/gp4-verify/verify.go">cmd/gp4-verify/verify.go</a> run on an Intel i9-9900K.</p>
+
+<h3 id="methodology">Methodology</h3>
+
+<p>To confirm my understanding of the details of the format, I implemented a
+pure-Go TurboPFor256 decoder. Note that it is intentionally <em>not optimized</em> as
+its main goal is to use simple code to teach the TurboPFor256 on-disk format.</p>
+
+<p>If you’re looking to use TurboPFor from Go, I recommend using cgo. cgo’s
+function call overhead is about 51ns <a href="https://go-review.googlesource.com/c/go/+/30080">as of Go
+1.8</a>, which will easily be
+offset by TurboPFor’s carefully optimized, vectorized (SSE/AVX) code.</p>
+
+<p>With that caveat out of the way, you can find my teaching implementation at
+<a href="https://github.com/stapelberg/goturbopfor">https://github.com/stapelberg/goturbopfor</a></p>
+
+<p>I verified that it produces the same results as TurboPFor’s <code>p4ndec256v32</code>
+function for all posting lists in the Debian Code Search index.</p>
+
+<h3 id="on-disk-format">On-disk format</h3>
+
+<p>Note that TurboPFor does not fully define an on-disk format on its own. When
+encoding, it turns a list of integers into a byte stream:</p>
+
+<pre><code>size_t p4nenc256v32(uint32_t *in, size_t n, unsigned char *out);
+</code></pre>
+
+<p>When decoding, it decodes the byte stream into an array of integers, but needs
+to know the number of integers in advance:</p>
+
+<pre><code>size_t p4ndec256v32(unsigned char *in, size_t n, uint32_t *out);
+</code></pre>
+
+<p>Hence, you’ll need to keep track of the number of integers and length of the
+generated byte streams separately. When I talk about on-disk format, I’m
+referring to the byte stream which TurboPFor returns.</p>
+
+<p>The TurboPFor256 format uses blocks of 256 integers each, followed by a trailing
+block — if required — which can contain fewer than 256 integers:</p>
+
+<p><img src="/turbopfor/ondisk.svgo.svg"></p>
+
+<p>SIMD bitpacking is used for all blocks but the trailing block (which uses
+regular bitpacking). This is not merely an implementation detail for decoding:
+the on-disk structure is different for blocks which can be SIMD-decoded.</p>
+
+<p>Each block starts with a 2 bit header, specifying the type of the block:</p>
+
+<ul>
+<li>11: <a href="#block-constant">constant</a></li>
+<li>00: <a href="#block-bitpack">bitpacking</a></li>
+<li>10: <a href="#block-bitpackex">bitpacking with exceptions (bitmap)</a></li>
+<li>01: <a href="#block-bitpackvb">bitpacking with exceptions (variable byte)</a></li>
+</ul>
+
+<p>Each block type is explained in more detail in the following sections.</p>
+
+<p>Note that none of the block types store the number of elements: you will always
+need to know how many integers you need to decode. Also, you need to know in
+advance how many bytes you need to feed to TurboPFor, so you will need some sort
+of container format.</p>
+
+<p>Further, TurboPFor automatically choses the best block type for each block.</p>
+
+<h4 id="block-constant">Constant block</h4>
+
+<p>A constant block (all integers of the block have the same value) consists of a
+single value of a specified bit width ≤ 32. This value will be stored in each
+output element for the block. E.g., after calling <code>decode(input, 3, output)</code>
+with <code>input</code> being the constant block depicted below, output is <code>{0xB8912636,
+0xB8912636, 0xB8912636}</code>.</p>
+
+<p><img src="/turbopfor/block-constant.svgo.svg"></p>
+
+<p>The example shows the maximum number of bytes (5). Smaller integers will use
+fewer bytes: e.g. an integer which can be represented in 3 bits will only use 2
+bytes.</p>
+
+<h4 id="block-bitpack">Bitpacking block</h4>
+
+<p>A bitpacking block specifies a bit width ≤ 32, followed by a stream of
+bits. Each value starts at the Least Significant Bit (LSB), i.e. the 3-bit
+values 0 (<code>000b</code>) and 5 (<code>101b</code>) are encoded as <code>101000b</code>.</p>
+
+<p><img src="/turbopfor/block-bitpack.svgo.svg"></p>
+
+<h4 id="block-bitpackex">Bitpacking with exceptions (bitmap) block</h4>
+
+<p>The constant and bitpacking block types work well for integers which don’t
+exceed a certain width, e.g. for a series of integers of width ≤ 5 bits.</p>
+
+<p>For a series of integers where only a few values exceed an otherwise common
+width (say, two values require 7 bits, the rest requires 5 bits), it makes sense
+to cut the integers into two parts: value and exception.</p>
+
+<p>In the example below, decoding the third integer <code>out2</code> (<code>000b</code>) requires
+combination with exception <code>ex0</code> (<code>10110b</code>), resulting in <code>10110000b</code>.</p>
+
+<p>The number of exceptions can be determined by summing the 1 bits in the bitmap
+using the <a href="https://en.wikipedia.org/wiki/Hamming_weight">popcount instruction</a>.</p>
+
+<p><img src="/turbopfor/block-bitpackex.svgo.svg"></p>
+
+<h4 id="block-bitpackvb">Bitpacking with exceptions (variable byte)</h4>
+
+<p>When the exceptions are not uniform enough, it makes sense to switch from
+bitpacking to a variable byte encoding:</p>
+
+<p><img src="/turbopfor/block-bitpackvb.svgo.svg"></p>
+
+<h3 id="decoding-variable-byte">Decoding: variable byte</h3>
+
+<p>The variable byte encoding used by the TurboPFor format is similar to the one
+<a href="https://sqlite.org/src4/doc/trunk/www/varint.wiki">used by SQLite</a>, which is
+described, alongside other common variable byte encodings, at
+<a href="https://github.com/stoklund/varint">github.com/stoklund/varint</a>.</p>
+
+<p>Instead of using individual bits for dispatching, this format classifies the
+first byte (<code>b[0]</code>) into ranges:</p>
+
+<ul>
+<li>[0—176]: the value is <code>b[0]</code></li>
+<li>[177—240]: a 14 bit value is in <code>b[0]</code> (6 high bits) and <code>b[1]</code> (8 low bits)</li>
+<li>[241—248]: a 19 bit value is in <code>b[0]</code> (3 high bits), <code>b[1]</code> and <code>b[2]</code> (16 low bits)</li>
+<li>[249—255]: a 32 bit value is in <code>b[1]</code>, <code>b[2]</code>, <code>b[3]</code> and possibly <code>b[4]</code></li>
+</ul>
+
+<p>Here is the space usage of different values:</p>
+
+<ul>
+<li>[0—176] are stored in 1 byte (as-is)</li>
+<li>[177—16560] are stored in 2 bytes, with the highest 6 bits added to 177</li>
+<li>[16561—540848] are stored in 3 bytes, with the highest 3 bits added to 241</li>
+<li>[540849—16777215] are stored in 4 bytes, with 0 added to 249</li>
+<li>[16777216—4294967295] are stored in 5 bytes, with 1 added to 249</li>
+</ul>
+
+<p>An overflow marker will be used to signal that encoding the
+values would be less space-efficient than simply copying them
+(e.g. if all values require 5 bytes).</p>
+
+<p>This format is very space-efficient: it packs 0-176 into a single byte, as
+opposed to 0-128 (most others). At the same time, it can be decoded very
+quickly, as only the first byte needs to be compared to decode a value (similar
+to PrefixVarint).</p>
+
+<h3 id="decoding-bitpacking">Decoding: bitpacking</h3>
+
+<h4 id="regular-bitpacking">Regular bitpacking</h4>
+
+<p>In regular (non-SIMD) bitpacking, integers are stored on disk one after the
+other, padded to a full byte, as a byte is the smallest addressable unit when
+reading data from disk. For example, if you bitpack only one 3 bit int, you will
+end up with 5 bits of padding.</p>
+
+<p><img src="/turbopfor/bitpacking.svgo.svg"></p>
+
+<h4 id="simd-bitpacking-256v32">SIMD bitpacking (256v32)</h4>
+
+<p>SIMD bitpacking works like regular bitpacking, but processes 8 uint32
+little-endian values at the same time, leveraging the <a href="https://en.wikipedia.org/wiki/Advanced_Vector_Extensions">AVX instruction
+set</a>. The following
+illustration shows the order in which 3-bit integers are decoded from disk:</p>
+
+<p><img src="/turbopfor/bitpacking256v32.svgo.svg"></p>
+
+<h3 id="in-practice">In Practice</h3>
+
+<p>For a Debian Code Search index, 85% of posting lists are short enough to only
+consist of a trailing block, i.e. no SIMD instructions can be used for decoding.</p>
+
+<p>The distribution of block types looks as follows:</p>
+
+<ul>
+<li>72% bitpacking with exceptions (bitmap)</li>
+<li>19% bitpacking with exceptions (variable byte)</li>
+<li>5% constant</li>
+<li>4% bitpacking</li>
+</ul>
+
+<p>Constant blocks are mostly used for posting lists with just one entry.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>The TurboPFor on-disk format is very flexible: with its 4 different kinds of
+blocks, chances are high that a very efficient encoding will be used for most
+integer series.</p>
+
+<p>Of course, the flip side of covering so many cases is complexity: the format and
+implementation take quite a bit of time to understand — hopefully this article
+helps a little! For environments where the C TurboPFor implementation cannot be
+used, smaller algorithms might be simpler to implement.</p>
+
+<p>That said, if you can use the TurboPFor implementation, you will benefit from a
+highly optimized SIMD code base, which will most likely be an improvement over
+what you’re currently using.</p>
+
+	  </div>
+	</div>
+      </div>
+    </div>
+  </body>
+</html>

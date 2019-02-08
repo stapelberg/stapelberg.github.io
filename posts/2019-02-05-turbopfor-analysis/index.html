@@ -109,6 +109,45 @@ body, td, th {
 	  </span>
 	  </div>
 	  <div class="Artikel" id="content">
+	    <style type="text/css">
+	      #TableOfContents > ul, #TableOfContents > ul > li > ul {
+		  list-style: none;
+		  margin: 0;
+		  padding: 0;
+	      }
+	    </style>
+	    <details style="margin-bottom: 2em">
+	      <summary>Table of contents</summary>
+	      <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#literature">Literature</a></li>
+<li><a href="#turbopfor">TurboPFor</a></li>
+<li><a href="#methodology">Methodology</a></li>
+<li><a href="#on-disk-format">On-disk format</a>
+<ul>
+<li><a href="#block-constant">Constant block</a></li>
+<li><a href="#block-bitpack">Bitpacking block</a></li>
+<li><a href="#block-bitpackex">Bitpacking with exceptions (bitmap) block</a></li>
+<li><a href="#block-bitpackvb">Bitpacking with exceptions (variable byte)</a></li>
+</ul></li>
+<li><a href="#decoding-variable-byte">Decoding: variable byte</a></li>
+<li><a href="#decoding-bitpacking">Decoding: bitpacking</a>
+<ul>
+<li><a href="#regular-bitpacking">Regular bitpacking</a></li>
+<li><a href="#simd-bitpacking-256v32">SIMD bitpacking (256v32)</a></li>
+</ul></li>
+<li><a href="#in-practice">In Practice</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+	    </details>
 	    
 
 <h3 id="motivation">Motivation</h3>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Debugging experience in Debian</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.ch/posts/2019-02-15-debian-debugging-devex/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    <link rel="stylesheet" href="/1.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+
+
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+	<div id="menu" class="col-md-2">
+  <div style="display: flex; align-items: center">
+    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
+    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+  </div>
+
+  <ul class="menu_open">
+    <li><a class="menu_item" href="/"><span class="menu_title">About</span></a></li>
+    <li><a class="menu_item" href="/posts/"><span class="menu_title">Blog</span></a></li>
+    <li><span class="menu_title">Programs</span>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
+	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
+    <li><a class="menu_item" href="/impressum"><span class="menu_title">Impressum</span></a></li>
+  </ul>
+</div>
+
+	<div id="contentBox" class="col-md-10">
+	  <h2 class="title">Debugging experience in Debian</h2>
+	  <div style="margin-bottom: 2em">
+	    
+	    
+	    
+	    <span id="date">published 2019-02-15, last modified 2019-02-12</span>
+	    
+	  
+	  
+	  in tag
+	  
+	  
+	  <span class="tag"><a href="/posts/tags/debian/">debian</a></span>
+	  
+	  
+	  <span style="background-color: black; border-radius: 25%; padding-left: 0.1em; padding-right: 0.1em">
+	    <a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2019-02-15-debian-debugging-devex.markdown">✎</a>
+	  </span>
+	  </div>
+	  <div class="Artikel" id="content">
+	    
+
+<p>Recently, a user reported that <a href="https://bugs.debian.org/918925">they don’t see window titles in i3 when running
+i3 on a Raspberry Pi with Debian</a>.</p>
+
+<p>I copied the latest <a href="https://wiki.debian.org/RaspberryPi3">Raspberry Pi Debian
+image</a> onto an SD card, booted it, and was
+able to reproduce the issue.</p>
+
+<p>Conceptually, at this point, I should be able to install and start <code>gdb</code>, set a
+break point and step through the code.</p>
+
+<h3 id="enabling-debug-symbols-in-debian">Enabling debug symbols in Debian</h3>
+
+<p>Debian, by default, strips debug symbols when building packages to conserve disk
+space and network bandwidth. The motivation is very reasonable: most users will
+never need the debug symbols.</p>
+
+<p>Unfortunately, obtaining debug symbols when you do need them is unreasonably hard.</p>
+
+<p>We begin by configuring an additional apt repository which contains
+automatically generated debug packages:</p>
+
+<pre><code>raspi# cat &gt;&gt;/etc/apt/sources.list.d/debug.list &lt;&lt;'EOT'
+deb http://deb.debian.org/debian-debug buster-debug main contrib non-free
+EOT
+raspi# apt update
+</code></pre>
+
+<p>Notably, not all Debian packages have debug packages. As <a href="https://wiki.debian.org/DebugPackage">the DebugPackage
+Debian Wiki page</a> explains,
+<code>debhelper/9.20151219</code> started generating debug packages (ending in <code>-dbgsym</code>)
+automatically. Packages which have not been updated might come with their own
+debug packages (ending in <code>-dbg</code>) or might not preserve debug symbols at all!</p>
+
+<p>Now that we <strong>can</strong> install debug packages, how do we know <strong>which ones</strong> we need?</p>
+
+<h3 id="finding-debug-symbol-packages-in-debian">Finding debug symbol packages in Debian</h3>
+
+<p>For debugging i3, we obviously need at least the <code>i3-dbgsym</code> package, but i3
+uses a number of other libraries through whose code we may need to step.</p>
+
+<p>The <code>debian-goodies</code> package ships a tool called
+<a href="https://manpages.debian.org/testing/debian-goodies/find-dbgsym-packages.1.en.html">find-dbgsym-packages</a>
+which prints the required packages to debug an executable, core dump or running
+process:</p>
+
+<pre><code>raspi# apt install debian-goodies
+raspi# apt install $(find-dbgsym-packages $(which i3))
+</code></pre>
+
+<p>Now we should have symbol names and line number information available in
+<code>gdb</code>. But for effectively stepping through the program, access to the source
+code is required.</p>
+
+<h3 id="obtaining-source-code-in-debian">Obtaining source code in Debian</h3>
+
+<p>Naively, one would assume that <code>apt source</code> should be sufficient for obtaining
+the source code of any Debian package. However, <code>apt source</code> defaults to the
+package candidate version, not the version you have installed on your
+system.</p>
+
+<p>I have addressed this issue with the
+<a href="https://manpages.debian.org/testing/pk4/pk4.1.en.html"><code>pk4</code></a> tool, which
+defaults to the installed version.</p>
+
+<p>Before we can extract any sources, we need to configure yet another apt
+repository:</p>
+
+<pre><code>raspi# cat &gt;&gt;/etc/apt/sources.list.d/source.list &lt;&lt;'EOT'
+deb-src http://deb.debian.org/debian buster main contrib non-free
+EOT
+raspi# apt update
+</code></pre>
+
+<p>Regardless of whether you use <code>apt source</code> or <code>pk4</code>, one remaining problem is
+the directory mismatch: the debug symbols contain a certain path, and that path
+is typically not where you extracted your sources to. While debugging, you will
+need to tell <code>gdb</code> about the location of the sources. This is tricky when you
+debug a call across different source packages:</p>
+
+<pre><code>(gdb) pwd
+Working directory /usr/src/i3.
+(gdb) list main
+229     * the main loop. */
+230     ev_unref(main_loop);
+231   }
+232 }
+233
+234 int main(int argc, char *argv[]) {
+235  /* Keep a symbol pointing to the I3_VERSION string constant so that
+236   * we have it in gdb backtraces. */
+237  static const char *_i3_version __attribute__((used)) = I3_VERSION;
+238  char *override_configpath = NULL;
+(gdb) list xcb_connect
+484	../../src/xcb_util.c: No such file or directory.
+</code></pre>
+
+<p>See <a href="https://sourceware.org/gdb/onlinedocs/gdb/Source-Path.html">Specifying Source
+Directories</a> in the
+gdb manual for the <code>dir</code> command which allows you to add multiple directories to
+the source path. This is pretty tedious, though, and does not work for all
+programs.</p>
+
+<h3 id="positive-example-fedora">Positive example: Fedora</h3>
+
+<p>While Fedora conceptually shares all the same steps, the experience on Fedora is
+so much better: when you run <code>gdb /usr/bin/i3</code>, it will tell you what the next
+step is:</p>
+
+<pre><code># gdb /usr/bin/i3
+[…]
+Reading symbols from /usr/bin/i3...(no debugging symbols found)...done.
+Missing separate debuginfos, use: dnf debuginfo-install i3-4.16-1.fc28.x86_64
+</code></pre>
+
+<p>Watch what happens when we run the suggested command:</p>
+
+<pre><code># dnf debuginfo-install i3-4.16-1.fc28.x86_64
+enabling updates-debuginfo repository
+enabling fedora-debuginfo repository
+[…]
+Installed:
+  i3-debuginfo.x86_64 4.16-1.fc28
+  i3-debugsource.x86_64 4.16-1.fc28
+Complete!
+</code></pre>
+
+<p>A single command understood our intent, enabled the required repositories and
+installed the required packages, both for debug symbols and source code (stored
+in e.g. <code>/usr/src/debug/i3-4.16-1.fc28.x86_64</code>). Unfortunately, <code>gdb</code> doesn’t
+seem to locate the sources, which seems like a bug to me.</p>
+
+<p>One downside of Fedora’s approach is that <code>gdb</code> will only print all required
+dependencies once you actually run the program, so you may need to run multiple
+<code>dnf</code> commands.</p>
+
+<h3 id="in-an-ideal-world">In an ideal world</h3>
+
+<p>Ideally, none of the manual steps described above would be necessary. It seems
+absurd to me that so much knowledge is required to efficiently debug programs in
+Debian. Case in point: I only learnt about <code>find-dbgsym-packages</code> a few days ago
+when talking to one of its contributors.</p>
+
+<p>Installing <code>gdb</code> should be all that a user needs to do. Debug symbols and
+sources can be transparently provided through a lazy-loading FUSE file
+system. If our build/packaging infrastructure assured predictable paths and
+automated debug symbol extraction, we could have transparent, quick and reliable
+debugging of all programs within Debian.</p>
+
+<p>NixOS’s dwarffs is an implementation of this idea:
+<a href="https://github.com/edolstra/dwarffs">https://github.com/edolstra/dwarffs</a></p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>While I agree with the removal of debug symbols as a general optimization, I
+think every Linux distribution should strive to provide an entirely transparent
+debugging experience: you should not even have to know that debug symbols are
+not present by default. Debian really falls short in this regard.</p>
+
+<p>Getting Debian to a fully transparent debugging experience requires a lot of
+technical work and a lot of social convincing. In my experience,
+programmatically working with the Debian archive and packages is tricky, and
+ensuring that <em>all</em> packages in a Debian release have debug packages (let alone
+predictable paths) seems entirely unachievable due to the fragmentation of
+packaging infrastructure and holdouts blocking any progress.</p>
+
+<p>My go-to example is <a href="https://sources.debian.org/src/rsync/3.1.3-5/debian/rules/">rsync’s
+debian/rules</a>, which
+intentionally (!) still has not adopted debhelper. It is not a surprise that
+there are no debug symbols for <code>rsync</code> in Debian.</p>
+
+	  </div>
+	</div>
+      </div>
+    </div>
+  </body>
+</html>

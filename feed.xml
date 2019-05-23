@@ -6,6 +6,111 @@
   <id>https://michael.stapelberg.ch/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[Optional dependencies don’t work]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2019-05-23-optional-dependencies/"/>
+    <id>https://michael.stapelberg.ch/posts/2019-05-23-optional-dependencies/</id>
+    <published>2019-05-23T00:00:00+00:00</published>
+    <updated>2019-05-05T01:19:31+02:00</updated>
+    <content type="html"><![CDATA[
+
+<p>In the i3 projects, we have always tried hard to avoid optional
+dependencies. There are a number of reasons behind it, and as I have recently
+encountered some of the downsides of optional dependencies firsthand, I
+summarized my thoughts in this article.</p>
+
+<h3 id="what-is-a-compile-time-optional-dependency">What is a (compile-time) optional dependency?</h3>
+
+<p>When building software from source, most programming languages and build systems
+support conditional compilation: different parts of the source code are compiled
+based on certain conditions.</p>
+
+<p>An optional dependency is conditional compilation hooked up directly to a knob
+(e.g. command line flag, configuration file, …), with the effect that the
+software can now be built without an otherwise required dependency.</p>
+
+<p>Let’s walk through a few issues with optional dependencies.</p>
+
+<h3 id="inconsistent-experience-in-different-environments">Inconsistent experience in different environments</h3>
+
+<p>Software is usually not built by end users, but by packagers, at least when we
+are talking about Open Source.</p>
+
+<p>Hence, end users don’t see the knob for the optional dependency, they are just
+presented with the fait accompli: their version of the software behaves
+differently than other versions of the same software.</p>
+
+<p>Depending on the kind of software, this situation can be made obvious to the
+user: for example, if the optional dependency is needed to print documents, the
+program can produce an appropriate error message when the user tries to print a
+document.</p>
+
+<p>Sometimes, this isn’t possible: when i3 introduced an optional dependency on
+cairo and pangocairo, the behavior itself (rendering window titles) worked in
+all configurations, but non-ASCII characters might break depending on whether i3
+was compiled with cairo.</p>
+
+<p>For users, it is frustrating to only discover in conversation that a program has
+a feature that the user is interested in, but it’s not available on their
+computer. For support, this situation can be hard to detect, and even harder to
+resolve to the user’s satisfaction.</p>
+
+<h3 id="packaging-is-more-complicated">Packaging is more complicated</h3>
+
+<p>Unfortunately, many build systems don’t stop the build when optional
+dependencies are not present. Instead, you sometimes end up with a broken build,
+or, even worse: with a successful build that does not work correctly at runtime.</p>
+
+<p>This means that packagers need to closely examine the build output to know which
+dependencies to make available. In the best case, there is a summary of
+available and enabled options, clearly outlining what this build will
+contain. In the worst case, you need to infer the features from the checks that
+are done, or work your way through the <code>--help</code> output.</p>
+
+<p>The better alternative is to configure your build system such that it stops when
+<em>any</em> dependency was not found, and thereby have packagers acknowledge each
+optional dependency by explicitly disabling the option.</p>
+
+<h3 id="untested-code-paths-bit-rot">Untested code paths bit rot</h3>
+
+<p>Code paths which are not used will inevitably bit rot. If you have optional
+dependencies, you need to test both the code path without the dependency and the
+code path with the dependency. It doesn’t matter whether the tests are automated
+or manual, the test matrix must cover both paths.</p>
+
+<p>Interestingly enough, this principle seems to apply to all kinds of software
+projects (but it slows down as change slows down): one might think that
+important Open Source building blocks should have enough users to cover all
+sorts of configurations.</p>
+
+<p>However, consider this example: building cairo without libxrender results in all
+GTK application windows, menus, etc. being displayed as empty grey
+surfaces. Cairo does not fail to build without libxrender, but the code path
+clearly is broken without libxrender.</p>
+
+<h3 id="can-we-do-without-them">Can we do without them?</h3>
+
+<p>I’m not saying optional dependencies should <em>never</em> be used. In fact, for
+bootstrapping, disabling dependencies can save a lot of work and can sometimes
+allow breaking circular dependencies. For example, in an early bootstrapping
+stage, binutils can be compiled with <code>--disable-nls</code> to disable
+internationalization.</p>
+
+<p>However, optional dependencies are broken so often that I conclude they are
+overused. Read on and see for yourself whether you would rather commit to best
+practices or not introduce an optional dependency.</p>
+
+<h3 id="best-practices">Best practices</h3>
+
+<p>If you do decide to make dependencies optional, please:</p>
+
+<ol>
+<li>Set up automated testing for <strong>all</strong> code path combinations.</li>
+<li>Fail the build until packagers explicitly pass a <code>--disable</code> flag.</li>
+<li>Tell users their version is missing a dependency at runtime, e.g. in <code>--version</code>.</li>
+</ol>
+]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[Winding down my Debian involvement]]></title>
     <link href="https://michael.stapelberg.ch/posts/2019-03-10-debian-winding-down/"/>
     <id>https://michael.stapelberg.ch/posts/2019-03-10-debian-winding-down/</id>
@@ -2134,117 +2239,6 @@ tools.</p>
   type <code>dput</code> (in the correct directory of course) to sign and upload
   it.
 </p>
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[pristine-tar considered harmful]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2018-01-28-pristine-tar/"/>
-    <id>https://michael.stapelberg.ch/posts/2018-01-28-pristine-tar/</id>
-    <published>2018-01-28T21:20:00+01:00</published>
-    <updated>2019-02-04T19:08:45+01:00</updated>
-    <content type="html"><![CDATA[<p>
-  If you want to follow along at home, clone this repository:
-</p>
-
-<pre>
-% GBP_CONF_FILES=:debian/gbp.conf gbp clone https://anonscm.debian.org/git/pkg-go/packages/golang-github-go-macaron-inject.git
-</pre>
-
-<p>
-  Now, in the <code>golang-github-go-macaron-inject</code> directory, I’m aware
-  of three ways to obtain an orig tarball (please correct me if there are more):
-</p>
-
-<ol>
-  <li>
-    Run <code><a href="https://manpages.debian.org/stretch/git-buildpackage/gbp-buildpackage.1.en.html">gbp
-    buildpackage</a></code>, creating an orig tarball from git
-    (<code>upstream/0.0_git20160627.0.d8a0b86</code>)<br>
-    The resulting sha1sum is <code>d085a04b7b35856be24f8cc4a9a6d9799cdb59b4</code>.
-  </li>
-  <li>
-    Run <code><a href="https://manpages.debian.org/stretch/pristine-tar/pristine-tar.1.en.html">pristine-tar</a>
-    checkout</code><br>
-    The resulting sha1sum is <code>d51575c0b00db5fe2bbf8eea65bc7c4f767ee954</code>.
-  </li>
-  <li>
-    Run <code><a href="https://manpages.debian.org/stretch/devscripts/origtargz.1.en.html">origtargz</a></code><br>
-    The resulting sha1sum is <code>d51575c0b00db5fe2bbf8eea65bc7c4f767ee954</code>.
-  </li>
-</ol>
-
-<p>
-  Have a look at the
-  archive’s <a href="https://deb.debian.org/debian/pool/main/g/golang-github-go-macaron-inject/golang-github-go-macaron-inject_0.0~git20160627.0.d8a0b86-2.dsc">golang-github-go-macaron-inject_0.0~git20160627.0.d8a0b86-2.dsc</a>,
-  however: the file entry orig tarball reads:
-</p>
-
-<pre>
-f5d5941c7b77e8941498910b64542f3db6daa3c2 7688 golang-github-go-macaron-inject_0.0~git20160627.0.d8a0b86.orig.tar.xz
-</pre>
-
-<p>
-  So, why did we get a different tarball? Let’s go through the methods:
-</p>
-
-<ol>
-  <li>
-    The uploader must not have used <code>gbp buildpackage</code> to create
-    their tarball. Perhaps they imported from a tarball created by
-    dh-make-golang, or created manually, and then left that tarball in place
-    (which is a perfectly fine, normal workflow).
-  </li>
-
-  <li>
-    I’m not entirely sure why <code>pristine-tar</code> resulted in a different
-    tarball than what’s in the archive. I think the most likely theory is that
-    the uploader had to go back and modify the tarball, but forgot to update (or
-    made a mistake while updating) the pristine-tar branch.
-  </li>
-  
-  <li>
-    <code>origtargz</code>, when it detects pristine-tar data, uses
-    pristine-tar, hence the same tarball as ②.
-  </li>
-</ol>
-
-<p>
-  Had we not used pristine-tar for this repository at
-  all, <code>origtargz</code> would have pulled the correct tarball from the
-  archive.
-</p>
-
-<p>
-  The above anecdote illustrates the fragility of the pristine-tar approach. In
-  my experience from the pkg-go team, when the pristine-tar branch doesn’t
-  contain outright incorrect data, it is often outdated. Even when everything is
-  working correctly, a number of packagers are disgruntled about the extra
-  work/mental complexity.
-</p>
-
-<p>
-  In the pkg-go team, we have (independently of this specific anecdote)
-  collectively decided to have the upstream branch track the upstream remote’s
-  master (or similar) branch directly, and get rid of pristine-tar in our
-  repositories. This should result in method ① and ③ working correctly.
-</p>
-
-<p>
-  In conclusion, my recommendation for any repository is: don’t bother with
-  pristine-tar. Instead, configure <code>origtargz</code> as a git-buildpackage
-  postclone hook in your <code>~/.gbp.conf</code> to always work with archive
-  orig tarballs:
-</p>
-
-<pre>
-[clone]
-# Ensure the correct orig tarball is present.
-postclone=origtargz
-
-[buildpackage]
-# Pick up the orig tarballs created by the origtargz postclone hook.
-tarball-dir = ..
-</pre>
 ]]></content>
   </entry>
 </feed>

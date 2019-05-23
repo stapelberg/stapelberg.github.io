@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Optional dependencies don’t work</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.ch/posts/2019-05-23-optional-dependencies/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    <link rel="stylesheet" href="/1.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+
+
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+	<div id="menu" class="col-md-2">
+  <div style="display: flex; align-items: center">
+    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
+    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+  </div>
+
+  <ul class="menu_open">
+    <li><a class="menu_item" href="/"><span class="menu_title">About</span></a></li>
+    <li><a class="menu_item" href="/posts/"><span class="menu_title">Blog</span></a></li>
+    <li><span class="menu_title">Programs</span>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
+	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
+  </ul>
+</div>
+
+	<div id="contentBox" class="col-md-10">
+	  <h2 class="title">Optional dependencies don’t work</h2>
+	  <div style="margin-bottom: 2em">
+	    
+	    
+	    
+	    <span id="date">published 2019-05-23, last modified 2019-05-05</span>
+	    
+	  
+	  
+	  in tag
+	  
+	  
+	  <span class="tag"><a href="/posts/tags/debian/">debian</a></span>
+	  
+	  
+	  <span style="background-color: black; border-radius: 25%; padding-left: 0.1em; padding-right: 0.1em">
+	    <a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2019-05-23-optional-dependencies.markdown">✎</a>
+	  </span>
+	  </div>
+	  <div class="Artikel" id="content">
+	    
+
+<p>In the i3 projects, we have always tried hard to avoid optional
+dependencies. There are a number of reasons behind it, and as I have recently
+encountered some of the downsides of optional dependencies firsthand, I
+summarized my thoughts in this article.</p>
+
+<h3 id="what-is-a-compile-time-optional-dependency">What is a (compile-time) optional dependency?</h3>
+
+<p>When building software from source, most programming languages and build systems
+support conditional compilation: different parts of the source code are compiled
+based on certain conditions.</p>
+
+<p>An optional dependency is conditional compilation hooked up directly to a knob
+(e.g. command line flag, configuration file, …), with the effect that the
+software can now be built without an otherwise required dependency.</p>
+
+<p>Let’s walk through a few issues with optional dependencies.</p>
+
+<h3 id="inconsistent-experience-in-different-environments">Inconsistent experience in different environments</h3>
+
+<p>Software is usually not built by end users, but by packagers, at least when we
+are talking about Open Source.</p>
+
+<p>Hence, end users don’t see the knob for the optional dependency, they are just
+presented with the fait accompli: their version of the software behaves
+differently than other versions of the same software.</p>
+
+<p>Depending on the kind of software, this situation can be made obvious to the
+user: for example, if the optional dependency is needed to print documents, the
+program can produce an appropriate error message when the user tries to print a
+document.</p>
+
+<p>Sometimes, this isn’t possible: when i3 introduced an optional dependency on
+cairo and pangocairo, the behavior itself (rendering window titles) worked in
+all configurations, but non-ASCII characters might break depending on whether i3
+was compiled with cairo.</p>
+
+<p>For users, it is frustrating to only discover in conversation that a program has
+a feature that the user is interested in, but it’s not available on their
+computer. For support, this situation can be hard to detect, and even harder to
+resolve to the user’s satisfaction.</p>
+
+<h3 id="packaging-is-more-complicated">Packaging is more complicated</h3>
+
+<p>Unfortunately, many build systems don’t stop the build when optional
+dependencies are not present. Instead, you sometimes end up with a broken build,
+or, even worse: with a successful build that does not work correctly at runtime.</p>
+
+<p>This means that packagers need to closely examine the build output to know which
+dependencies to make available. In the best case, there is a summary of
+available and enabled options, clearly outlining what this build will
+contain. In the worst case, you need to infer the features from the checks that
+are done, or work your way through the <code>--help</code> output.</p>
+
+<p>The better alternative is to configure your build system such that it stops when
+<em>any</em> dependency was not found, and thereby have packagers acknowledge each
+optional dependency by explicitly disabling the option.</p>
+
+<h3 id="untested-code-paths-bit-rot">Untested code paths bit rot</h3>
+
+<p>Code paths which are not used will inevitably bit rot. If you have optional
+dependencies, you need to test both the code path without the dependency and the
+code path with the dependency. It doesn’t matter whether the tests are automated
+or manual, the test matrix must cover both paths.</p>
+
+<p>Interestingly enough, this principle seems to apply to all kinds of software
+projects (but it slows down as change slows down): one might think that
+important Open Source building blocks should have enough users to cover all
+sorts of configurations.</p>
+
+<p>However, consider this example: building cairo without libxrender results in all
+GTK application windows, menus, etc. being displayed as empty grey
+surfaces. Cairo does not fail to build without libxrender, but the code path
+clearly is broken without libxrender.</p>
+
+<h3 id="can-we-do-without-them">Can we do without them?</h3>
+
+<p>I’m not saying optional dependencies should <em>never</em> be used. In fact, for
+bootstrapping, disabling dependencies can save a lot of work and can sometimes
+allow breaking circular dependencies. For example, in an early bootstrapping
+stage, binutils can be compiled with <code>--disable-nls</code> to disable
+internationalization.</p>
+
+<p>However, optional dependencies are broken so often that I conclude they are
+overused. Read on and see for yourself whether you would rather commit to best
+practices or not introduce an optional dependency.</p>
+
+<h3 id="best-practices">Best practices</h3>
+
+<p>If you do decide to make dependencies optional, please:</p>
+
+<ol>
+<li>Set up automated testing for <strong>all</strong> code path combinations.</li>
+<li>Fail the build until packagers explicitly pass a <code>--disable</code> flag.</li>
+<li>Tell users their version is missing a dependency at runtime, e.g. in <code>--version</code>.</li>
+</ol>
+
+	  </div>
+	</div>
+      </div>
+    </div>
+  </body>
+</html>

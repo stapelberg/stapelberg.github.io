@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Can we do without hooks and triggers?</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.ch/posts/2019-07-06-hooks-and-triggers/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    <link rel="stylesheet" href="/1.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+
+
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+	<div id="menu" class="col-md-2">
+  <div style="display: flex; align-items: center">
+    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
+    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+  </div>
+
+  <ul class="menu_open">
+    <li><a class="menu_item" href="/"><span class="menu_title">About</span></a></li>
+    <li><a class="menu_item" href="/posts/"><span class="menu_title">Blog</span></a></li>
+    <li><span class="menu_title">Programs</span>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
+	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
+  </ul>
+</div>
+
+	<div id="contentBox" class="col-md-10">
+	  <h2 class="title">Can we do without hooks and triggers?</h2>
+	  <div style="margin-bottom: 2em">
+	    <span id="date">published 2019-07-06, last modified 2019-07-13</span>
+	    
+	  
+	  
+	  in tag
+	  
+	  
+	  <span class="tag"><a href="/posts/tags/debian/">debian</a></span>
+	  
+	  
+	  <span style="background-color: black; border-radius: 25%; padding-left: 0.1em; padding-right: 0.1em">
+	    <a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2019-07-06-hooks-and-triggers.markdown">✎</a>
+	  </span>
+	  </div>
+	  <div class="Artikel" id="content">
+	    <style type="text/css">
+	      #TableOfContents > ul, #TableOfContents > ul > li > ul {
+		  list-style: none;
+		  margin: 0;
+		  padding: 0;
+	      }
+	    </style>
+	    <details style="margin-bottom: 2em">
+	      <summary>Table of contents</summary>
+	      <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#hooks-preclude-concurrent-package-installation">Hooks preclude concurrent package installation</a></li>
+<li><a href="#triggers-slow-down-installing-updating-other-packages">Triggers slow down installing/updating other packages</a></li>
+<li><a href="#unnecessary-work-if-programs-are-not-used-between-updates">Unnecessary work if programs are not used between updates</a></li>
+<li><a href="#implemented-in-an-interpreted-language">Implemented in an interpreted language</a></li>
+<li><a href="#incentivizing-more-upstream-standardization">Incentivizing more upstream standardization</a></li>
+<li><a href="#can-we-do-without-them">Can we do without them?</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+	    </details>
+	    
+
+<p>Hooks are an extension feature provided by all package managers that are used in
+larger Linux distributions. For example, Debian uses apt, which has various
+<a href="https://www.debian.org/doc/debian-policy/ap-flowcharts.html">maintainer
+scripts</a>. Fedora
+uses rpm, which has
+<a href="https://fedoraproject.org/wiki/Packaging:Scriptlets">scriptlets</a>. Different
+package managers use different names for the concept, but all of them offer
+package maintainers the ability to run arbitrary code during package
+installation and upgrades. Example hook use cases include adding daemon user
+accounts to your system (e.g. <code>postgres</code>), or generating/updating cache files.</p>
+
+<p>Triggers are a kind of hook which run when <em>other</em> packages are installed. For
+example, on Debian, the <a href="https://manpages.debian.org/man.1"><code>man(1)</code></a> package
+comes with a trigger which regenerates the search database index whenever any
+package installs a manpage. When, for example, the
+<a href="https://manpages.debian.org/nginx.8"><code>nginx(8)</code></a> package is installed, a
+trigger provided by the <a href="https://manpages.debian.org/man.1"><code>man(1)</code></a> package
+runs.</p>
+
+<p>Over the past few decades, Open Source software has become more and more
+uniform: instead of each piece of software defining its own rules, a small
+number of build systems are now widely adopted.</p>
+
+<p>Hence, I think it makes sense to revisit whether offering extension via hooks
+and triggers is a net win or net loss.</p>
+
+<h3 id="hooks-preclude-concurrent-package-installation">Hooks preclude concurrent package installation</h3>
+
+<p>Package managers commonly can make very little assumptions about what hooks do,
+what preconditions they require, and which conflicts might be caused by running
+multiple package’s hooks concurrently.</p>
+
+<p>Hence, package managers cannot concurrently install packages. At least the
+hook/trigger part of the installation needs to happen in sequence.</p>
+
+<p>While it seems technically feasible to retrofit package manager hooks with
+concurrency primitives such as locks for mutual exclusion between different hook
+processes, the required overhaul of all hooks¹ seems like such a daunting task
+that it might be better to just get rid of the hooks instead. Only deleting code
+frees you from the burden of maintenance, automated testing and debugging.</p>
+
+<p>① In Debian, there are 8620 non-generated maintainer scripts, as reported by
+   <code>find shard*/src/*/debian -regex &quot;.*\(pre\|post\)\(inst\|rm\)$&quot;</code> on a Debian
+   Code Search instance.</p>
+
+<h3 id="triggers-slow-down-installing-updating-other-packages">Triggers slow down installing/updating other packages</h3>
+
+<p>Personally, I never use the
+<a href="https://manpages.debian.org/apropos.1"><code>apropos(1)</code></a> command, so I don’t
+appreciate the <a href="https://manpages.debian.org/man.1"><code>man(1)</code></a> package’s trigger
+which updates the database used by
+<a href="https://manpages.debian.org/apropos.1"><code>apropos(1)</code></a>. The process takes a long
+time and, because hooks and triggers must be executed serially (see previous
+section), blocks my installation or update.</p>
+
+<p>When I tell people this, they are often surprised to learn about the existance
+of the <a href="https://manpages.debian.org/apropos.1"><code>apropos(1)</code></a> command. I suggest
+adopting an opt-in model.</p>
+
+<h3 id="unnecessary-work-if-programs-are-not-used-between-updates">Unnecessary work if programs are not used between updates</h3>
+
+<p>Hooks run when packages are installed. If a package’s contents are not used
+between two updates, running the hook in the first update could have been
+skipped. Running the hook lazily when the package contents are used reduces
+unnecessary work.</p>
+
+<p>As a welcome side-effect, lazy hook evaluation automatically makes the hook work
+in operating system images, such as live USB thumb drives or SD card images for
+the Raspberry Pi. Such images must not ship the same crypto keys (e.g. OpenSSH
+host keys) to all machines, but instead generate a different key on each
+machine.</p>
+
+<p>Why do users keep packages installed they don’t use? It’s extra work to remember
+and clean up those packages after use. Plus, users might not realize or value
+that having fewer packages installed has benefits such as faster updates.</p>
+
+<p>I can also imagine that there are people for whom the cost of re-installing
+packages incentivizes them to just keep packages installed—you never know when
+you might need the program again…</p>
+
+<h3 id="implemented-in-an-interpreted-language">Implemented in an interpreted language</h3>
+
+<p>While working on hermetic packages (more on that in another blog post), where
+the contained programs are started with modified environment variables
+(e.g. <code>PATH</code>) via a wrapper bash script, I noticed that the overhead of those
+wrapper bash scripts quickly becomes significant. For example, when using the
+excellent <a href="https://magit.vc/">magit</a> interface for Git in Emacs, I encountered
+second-long delays² when using hermetic packages compared to standard
+packages. Re-implementing wrappers in a compiled language provided a significant
+speed-up.</p>
+
+<p>Similarly, getting rid of an extension point which mandates using shell scripts
+allows us to build an efficient and fast implementation of a predefined set of
+primitives, where you can reason about their effects and interactions.</p>
+
+<p>② magit needs to run git a few times for displaying the full status, so small
+   overhead quickly adds up.</p>
+
+<h3 id="incentivizing-more-upstream-standardization">Incentivizing more upstream standardization</h3>
+
+<p>Hooks are an escape hatch for distribution maintainers to express anything which
+their packaging system cannot express.</p>
+
+<p>Distributions should only rely on well-established interfaces such as autoconf’s
+classic <code>./configure &amp;&amp; make &amp;&amp; make install</code> (including commonly used flags) to
+build a distribution package. Integrating upstream software into a distribution
+should not require custom hooks. For example, instead of requiring a hook which
+updates a cache of schema files, the library used to interact with those files
+should transparently (re-)generate the cache or fall back to a slower code path.</p>
+
+<p>Distribution maintainers are hard to come by, so we should value their time. In
+particular, there is a 1:n relationship of packages to distribution package
+maintainers (software is typically available in multiple Linux distributions),
+so it makes sense to spend the work in the 1 and have the n benefit.</p>
+
+<h3 id="can-we-do-without-them">Can we do without them?</h3>
+
+<p>If we want to get rid of hooks, we need another mechanism to achieve what we
+currently achieve with hooks.</p>
+
+<p>If the hook is not specific to the package, it can be moved to the package
+manager. The desired system state should either be derived from the package
+contents (e.g. required system users can be discovered from systemd service
+files) or declaratively specified in the package build instructions—more on that
+in another blog post. This turns hooks (arbitrary code) into configuration,
+which allows the package manager to collapse and sequence the required state
+changes. E.g., when 5 packages are installed which each need a new system user,
+the package manager could update <code>/etc/passwd</code> just once.</p>
+
+<p>If the hook is specific to the package, it should be moved into the package
+contents. This typically means moving the functionality into the program start
+(or the systemd service file if we are talking about a daemon). If (while?)
+upstream is not convinced, you can either wrap the program or patch it. Note
+that this case is relatively rare: I have worked with hundreds of packages and
+the only package-specific functionality I came across was automatically
+generating host keys before starting OpenSSH’s
+<a href="https://manpages.debian.org/sshd.8"><code>sshd(8)</code></a>.</p>
+
+<p>There is one exception where moving the hook doesn’t work: packages which modify
+state outside of the system, such as bootloaders or kernel images.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>Global state modifications performed as part of package installation today use
+hooks, an overly expressive extension mechanism.</p>
+
+<p>Instead, all modifications should be driven by configuration. This is feasible
+because there are only a few different kinds of desired state
+modifications. This makes it possible for package managers to optimize package
+installation.</p>
+
+	  </div>
+	</div>
+      </div>
+    </div>
+  </body>
+</html>

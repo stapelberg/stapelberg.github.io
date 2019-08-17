@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Linux package managers are slow</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.ch/posts/2019-08-17-linux-package-managers-are-slow/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    
+    <link rel="stylesheet" href="/1.min.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+
+
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+	<div id="menu" class="col-md-2">
+  <div style="display: flex; align-items: center">
+    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
+    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+  </div>
+
+  <ul class="menu_open">
+    <li><a class="menu_item" href="/"><span class="menu_title">About</span></a></li>
+    <li><a class="menu_item" href="/posts/"><span class="menu_title">Blog</span></a></li>
+    <li><span class="menu_title">Programs</span>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
+	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
+  </ul>
+</div>
+
+	<div id="contentBox" class="col-md-10">
+	  <h2 class="title">Linux package managers are slow</h2>
+	  <div style="margin-bottom: 2em">
+	    <span id="date">published 2019-08-17</span>
+	    
+	  
+	  
+	  in tags
+	  
+	  
+	  <span class="tag"><a href="/posts/tags/distri/">distri</a></span>
+	  
+	  <span class="tag"><a href="/posts/tags/debian/">debian</a></span>
+	  
+	  
+	  <span style="background-color: black; border-radius: 25%; padding-left: 0.1em; padding-right: 0.1em">
+	    <a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2019-08-17-linux-package-managers-are-slow.markdown">✎</a>
+	  </span>
+	  </div>
+	  <div class="Artikel" id="content">
+	    <style type="text/css">
+	      #TableOfContents > ul, #TableOfContents > ul > li > ul {
+		  list-style: none;
+		  margin: 0;
+		  padding: 0;
+	      }
+	    </style>
+	    <details style="margin-bottom: 2em">
+	      <summary>Table of contents</summary>
+	      <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#measurements">Measurements</a>
+<ul>
+<li><a href="#ack-small-perl-program">ack (small Perl program)</a></li>
+<li><a href="#qemu-large-c-program">qemu (large C program)</a></li>
+<li><a href="#pain-point-too-much-metadata">Pain point: too much metadata</a></li>
+<li><a href="#pain-point-no-concurrency">Pain point: no concurrency</a></li>
+</ul></li>
+<li><a href="#thought-experiment-further-speed-ups">Thought experiment: further speed-ups</a></li>
+<li><a href="#current-landscape">Current landscape</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
+<li><a href="#appendix-a-related-work">Appendix A: related work</a></li>
+<li><a href="#appendix-b">Appendix B: measurement details</a>
+<ul>
+<li><a href="#ack">ack</a></li>
+<li><a href="#qemu">qemu</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+	    </details>
+	    
+
+<p>I measured how long the most popular Linux distribution’s package manager take
+to install small and large packages (the
+<a href="https://manpages.debian.org/ack.1p"><code>ack(1p)</code></a> source code search Perl script
+and <a href="https://en.wikipedia.org/wiki/QEMU">qemu</a>, respectively).</p>
+
+<p>Where required, my measurements include metadata updates such as transferring an
+up-to-date package list. For me, requiring a metadata update is the more common
+case, particularly on live systems or within Docker containers.</p>
+
+<p>All measurements were taken on an <code>Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz</code>
+running Docker 1.13.1 on Linux 4.19, backed by a Samsung 970 Pro NVMe
+drive boasting many hundreds of MB/s write performance.</p>
+
+<p>See <a href="#appendix-b">Appendix B</a> for details on the measurement method and command
+outputs.</p>
+
+<h3 id="measurements">Measurements</h3>
+
+<p>Keep in mind that these are one-time measurements. They should be indicative of
+actual performance, but your experience may vary.</p>
+
+<h4 id="ack-small-perl-program">ack (small Perl program)</h4>
+
+<table>
+<thead>
+<tr>
+<th>distribution</th>
+<th>package manager</th>
+<th>data</th>
+<th>wall-clock time</th>
+<th>rate</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Fedora</td>
+<td>dnf</td>
+<td>107 MB</td>
+<td>29s</td>
+<td>3.7 MB/s</td>
+</tr>
+
+<tr>
+<td>NixOS</td>
+<td>Nix</td>
+<td>15 MB</td>
+<td>14s</td>
+<td>1.1 MB/s</td>
+</tr>
+
+<tr>
+<td>Debian</td>
+<td>apt</td>
+<td>15 MB</td>
+<td>4s</td>
+<td>3.7 MB/s</td>
+</tr>
+
+<tr>
+<td>Arch Linux</td>
+<td>pacman</td>
+<td>6.5 MB</td>
+<td>3s</td>
+<td>2.1 MB/s</td>
+</tr>
+
+<tr>
+<td>Alpine</td>
+<td>apk</td>
+<td>10 MB</td>
+<td>1s</td>
+<td>10.0 MB/s</td>
+</tr>
+</tbody>
+</table>
+
+<h4 id="qemu-large-c-program">qemu (large C program)</h4>
+
+<table>
+<thead>
+<tr>
+<th>distribution</th>
+<th>package manager</th>
+<th>data</th>
+<th>wall-clock time</th>
+<th>rate</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Fedora</td>
+<td>dnf</td>
+<td>266 MB</td>
+<td>1m8s</td>
+<td>3.9 MB/s</td>
+</tr>
+
+<tr>
+<td>Arch Linux</td>
+<td>pacman</td>
+<td>124 MB</td>
+<td>1m2s</td>
+<td>2.0 MB/s</td>
+</tr>
+
+<tr>
+<td>Debian</td>
+<td>apt</td>
+<td>159 MB</td>
+<td>51s</td>
+<td>3.1 MB/s</td>
+</tr>
+
+<tr>
+<td>NixOS</td>
+<td>Nix</td>
+<td>262 MB</td>
+<td>38s</td>
+<td>6.8 MB/s</td>
+</tr>
+
+<tr>
+<td>Alpine</td>
+<td>apk</td>
+<td>26 MB</td>
+<td>2.4s</td>
+<td>10.8 MB/s</td>
+</tr>
+</tbody>
+</table>
+
+<p><br>
+The difference between the slowest and fastest package managers is 30x!</p>
+
+<p>How can Alpine’s apk and Arch Linux’s pacman be an order of magnitude faster
+than the rest? They are doing a lot less than the others, and more efficiently,
+too.</p>
+
+<h4 id="pain-point-too-much-metadata">Pain point: too much metadata</h4>
+
+<p>For example, Fedora transfers a lot more data than others because its main
+package list is 60 MB (compressed!) alone. Compare that with Alpine’s 734 KB
+<code>APKINDEX.tar.gz</code>.</p>
+
+<p>Of course the extra metadata which Fedora provides helps some use case,
+otherwise they hopefully would have removed it altogether. The amount of
+metadata seems excessive for the use case of installing a single package, which
+I consider the main use-case of an interactive package manager.</p>
+
+<p>I expect any modern Linux distribution to <strong>only transfer absolutely required
+data</strong> to complete my task.</p>
+
+<h4 id="pain-point-no-concurrency">Pain point: no concurrency</h4>
+
+<p>Because they need to sequence executing arbitrary package maintainer-provided
+code (hooks and triggers), all tested package managers need to install packages
+sequentially (one after the other) instead of concurrently (all at the same
+time).</p>
+
+<p>In my blog post <a href="/posts/2019-07-20-hooks-and-triggers/">“Can we do without hooks and
+triggers?”</a>, I outline that hooks and
+triggers are not strictly necessary to build a working Linux distribution.</p>
+
+<h3 id="thought-experiment-further-speed-ups">Thought experiment: further speed-ups</h3>
+
+<p>Strictly speaking, the only required feature of a package manager is to make
+available the package contents so that the package can be used: a program can be
+started, a kernel module can be loaded, etc.</p>
+
+<p>By only implementing what’s needed for this feature, and nothing more, a package
+manager could likely beat <code>apk</code>’s performance. It could, for example:</p>
+
+<ul>
+<li>skip archive extraction by mounting file system images (like AppImage or snappy)</li>
+<li>use compression which is light on CPU, as networks are fast (like <code>apk</code>)</li>
+<li>skip fsync when it is safe to do so, i.e.:
+
+<ul>
+<li>package installations don’t modify system state</li>
+<li>atomic package installation (e.g. an append-only package store)</li>
+<li>automatically clean up the package store after crashes</li>
+</ul></li>
+</ul>
+
+<h3 id="current-landscape">Current landscape</h3>
+
+<p>Here’s a table outlining how the various package managers listed on Wikipedia’s
+<a href="https://en.wikipedia.org/wiki/List_of_software_package_management_systems#Linux">list of software package management
+systems</a>
+fare:</p>
+
+<table>
+<thead>
+<tr>
+<th>name</th>
+<th>scope</th>
+<th>package file format</th>
+<th>hooks/triggers</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>AppImage</td>
+<td>apps</td>
+<td>image: ISO9660, SquashFS</td>
+<td>no</td>
+</tr>
+
+<tr>
+<td><a href="https://snapcraft.io/">snappy</a></td>
+<td>apps</td>
+<td>image: SquashFS</td>
+<td>yes: <a href="https://docs.snapcraft.io/build-snaps/hooks">hooks</a></td>
+</tr>
+
+<tr>
+<td>FlatPak</td>
+<td>apps</td>
+<td>archive: <a href="https://ostree.readthedocs.io/en/latest/">OSTree</a></td>
+<td>no</td>
+</tr>
+
+<tr>
+<td>0install</td>
+<td>apps</td>
+<td>archive: tar.bz2</td>
+<td>no</td>
+</tr>
+
+<tr>
+<td>nix, guix</td>
+<td>distro</td>
+<td>archive: nar.{bz2,xz}</td>
+<td><a href="https://github.com/NixOS/nixos/blob/master/modules/system/activation/activation-script.nix">activation script</a></td>
+</tr>
+
+<tr>
+<td>dpkg</td>
+<td>distro</td>
+<td>archive: tar.{gz,xz,bz2} in ar(1)</td>
+<td>yes</td>
+</tr>
+
+<tr>
+<td>rpm</td>
+<td>distro</td>
+<td>archive: cpio.{bz2,lz,xz}</td>
+<td><a href="https://fedoraproject.org/wiki/Packaging:Scriptlets">scriptlets</a></td>
+</tr>
+
+<tr>
+<td>pacman</td>
+<td>distro</td>
+<td>archive: tar.xz</td>
+<td><a href="https://wiki.archlinux.org/index.php/PKGBUILD#install">install</a></td>
+</tr>
+
+<tr>
+<td>slackware</td>
+<td>distro</td>
+<td>archive: tar.{gz,xz}</td>
+<td>yes: doinst.sh</td>
+</tr>
+
+<tr>
+<td>apk</td>
+<td>distro</td>
+<td>archive: tar.gz</td>
+<td>yes: .post-install</td>
+</tr>
+
+<tr>
+<td>Entropy</td>
+<td>distro</td>
+<td>archive: tar.bz2</td>
+<td>yes</td>
+</tr>
+
+<tr>
+<td>ipkg, opkg</td>
+<td>distro</td>
+<td>archive: tar{,.gz}</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>As per the <a href="#current-landscape">current landscape</a>, there is no
+distribution-scoped package manager which uses images and leaves out hooks and
+triggers, not even in smaller Linux distributions.</p>
+
+<p>I think that space is really interesting, as it uses a minimal design to achieve
+significant real-world speed-ups.</p>
+
+<p>I have explored this idea in much more detail, and am happy to talk more about
+it in my post “Introducing the distri research linux distribution&quot;.</p>
+
+<h3 id="appendix-a-related-work">Appendix A: related work</h3>
+
+<p>There are a couple of recent developments going into the same direction:</p>
+
+<ul>
+<li><a href="http://0pointer.net/blog/revisiting-how-we-put-together-linux-systems.html">“Revisiting How We Put Together Linux Systems”</a> describes mounting app bundles</li>
+<li><a href="https://android.googlesource.com/platform/system/apex/+/refs/heads/master/docs/README.md">Android Q uses ext4 loopback images</a></li>
+<li>The Haiku Operating System’s package manager <a href="https://en.wikipedia.org/wiki/Haiku_Depot">Haiku
+Depot</a> uses images</li>
+</ul>
+
+<h3 id="appendix-b">Appendix B: measurement details</h3>
+
+<h4 id="ack">ack</h4>
+
+<p>You can expand each of these:</p>
+
+<p><details>
+<summary>
+Fedora’s dnf takes almost 30 seconds to fetch and unpack 107 MB.
+</summary></p>
+
+<pre><code>% docker run -t -i fedora /bin/bash
+[root@722e6df10258 /]# time dnf install -y ack
+Fedora Modular 30 - x86_64            4.4 MB/s | 2.7 MB     00:00
+Fedora Modular 30 - x86_64 - Updates  3.7 MB/s | 2.4 MB     00:00
+Fedora 30 - x86_64 - Updates           17 MB/s |  19 MB     00:01
+Fedora 30 - x86_64                     31 MB/s |  70 MB     00:02
+[…]
+Install  44 Packages
+
+Total download size: 13 M
+Installed size: 42 M
+[…]
+real	0m29.498s
+user	0m22.954s
+sys	0m1.085s
+</code></pre>
+
+<p></details></p>
+
+<p><details>
+<summary>
+NixOS’s Nix takes 14s to fetch and unpack 15 MB.
+</summary></p>
+
+<pre><code>% docker run -t -i nixos/nix
+39e9186422ba:/# time sh -c 'nix-channel --update &amp;&amp; nix-env -i perl5.28.2-ack-2.28'
+unpacking channels...
+created 2 symlinks in user environment
+installing 'perl5.28.2-ack-2.28'
+these paths will be fetched (14.91 MiB download, 80.83 MiB unpacked):
+  /nix/store/57iv2vch31v8plcjrk97lcw1zbwb2n9r-perl-5.28.2
+  /nix/store/89gi8cbp8l5sf0m8pgynp2mh1c6pk1gk-attr-2.4.48
+  /nix/store/gkrpl3k6s43fkg71n0269yq3p1f0al88-perl5.28.2-ack-2.28-man
+  /nix/store/iykxb0bmfjmi7s53kfg6pjbfpd8jmza6-glibc-2.27
+  /nix/store/k8lhqzpaaymshchz8ky3z4653h4kln9d-coreutils-8.31
+  /nix/store/svgkibi7105pm151prywndsgvmc4qvzs-acl-2.2.53
+  /nix/store/x4knf14z1p0ci72gl314i7vza93iy7yc-perl5.28.2-File-Next-1.16
+  /nix/store/zfj7ria2kwqzqj9dh91kj9kwsynxdfk0-perl5.28.2-ack-2.28
+copying path '/nix/store/gkrpl3k6s43fkg71n0269yq3p1f0al88-perl5.28.2-ack-2.28-man' from 'https://cache.nixos.org'...
+copying path '/nix/store/iykxb0bmfjmi7s53kfg6pjbfpd8jmza6-glibc-2.27' from 'https://cache.nixos.org'...
+copying path '/nix/store/x4knf14z1p0ci72gl314i7vza93iy7yc-perl5.28.2-File-Next-1.16' from 'https://cache.nixos.org'...
+copying path '/nix/store/89gi8cbp8l5sf0m8pgynp2mh1c6pk1gk-attr-2.4.48' from 'https://cache.nixos.org'...
+copying path '/nix/store/svgkibi7105pm151prywndsgvmc4qvzs-acl-2.2.53' from 'https://cache.nixos.org'...
+copying path '/nix/store/k8lhqzpaaymshchz8ky3z4653h4kln9d-coreutils-8.31' from 'https://cache.nixos.org'...
+copying path '/nix/store/57iv2vch31v8plcjrk97lcw1zbwb2n9r-perl-5.28.2' from 'https://cache.nixos.org'...
+copying path '/nix/store/zfj7ria2kwqzqj9dh91kj9kwsynxdfk0-perl5.28.2-ack-2.28' from 'https://cache.nixos.org'...
+building '/nix/store/q3243sjg91x1m8ipl0sj5gjzpnbgxrqw-user-environment.drv'...
+created 56 symlinks in user environment
+real	0m 14.02s
+user	0m 8.83s
+sys	0m 2.69s
+</code></pre>
+
+<p></details></p>
+
+<p><details>
+<summary>
+Debian’s apt takes almost 10 seconds to fetch and unpack 16 MB.
+</summary></p>
+
+<pre><code>% docker run -t -i debian:sid
+root@b7cc25a927ab:/# time (apt update &amp;&amp; apt install -y ack-grep)
+Get:1 http://cdn-fastly.deb.debian.org/debian sid InRelease [233 kB]
+Get:2 http://cdn-fastly.deb.debian.org/debian sid/main amd64 Packages [8270 kB]
+Fetched 8502 kB in 2s (4764 kB/s)
+[…]
+The following NEW packages will be installed:
+  ack ack-grep libfile-next-perl libgdbm-compat4 libgdbm5 libperl5.26 netbase perl perl-modules-5.26
+The following packages will be upgraded:
+  perl-base
+1 upgraded, 9 newly installed, 0 to remove and 60 not upgraded.
+Need to get 8238 kB of archives.
+After this operation, 42.3 MB of additional disk space will be used.
+[…]
+real	0m9.096s
+user	0m2.616s
+sys	0m0.441s
+</code></pre>
+
+<p></details></p>
+
+<p><details>
+<summary>
+Arch Linux’s pacman takes a little over 3s to fetch and unpack 6.5 MB.
+</summary></p>
+
+<pre><code>% docker run -t -i archlinux/base
+[root@9604e4ae2367 /]# time (pacman -Sy &amp;&amp; pacman -S --noconfirm ack)
+:: Synchronizing package databases...
+ core            132.2 KiB  1033K/s 00:00
+ extra          1629.6 KiB  2.95M/s 00:01
+ community         4.9 MiB  5.75M/s 00:01
+[…]
+Total Download Size:   0.07 MiB
+Total Installed Size:  0.19 MiB
+[…]
+real	0m3.354s
+user	0m0.224s
+sys	0m0.049s
+</code></pre>
+
+<p></details></p>
+
+<p><details>
+<summary>
+Alpine’s apk takes only about 1 second to fetch and unpack 10 MB.
+</summary></p>
+
+<pre><code>% docker run -t -i alpine
+/ # time apk add ack
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/APKINDEX.tar.gz
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.10/community/x86_64/APKINDEX.tar.gz
+(1/4) Installing perl-file-next (1.16-r0)
+(2/4) Installing libbz2 (1.0.6-r7)
+(3/4) Installing perl (5.28.2-r1)
+(4/4) Installing ack (3.0.0-r0)
+Executing busybox-1.30.1-r2.trigger
+OK: 44 MiB in 18 packages
+real	0m 0.96s
+user	0m 0.25s
+sys	0m 0.07s
+</code></pre>
+
+<p></details></p>
+
+<h4 id="qemu">qemu</h4>
+
+<p>You can expand each of these:</p>
+
+<p><details>
+<summary>
+Fedora’s dnf takes over a minute to fetch and unpack 266 MB.
+</summary></p>
+
+<pre><code>% docker run -t -i fedora /bin/bash
+[root@722e6df10258 /]# time dnf install -y qemu
+Fedora Modular 30 - x86_64            3.1 MB/s | 2.7 MB     00:00
+Fedora Modular 30 - x86_64 - Updates  2.7 MB/s | 2.4 MB     00:00
+Fedora 30 - x86_64 - Updates           20 MB/s |  19 MB     00:00
+Fedora 30 - x86_64                     31 MB/s |  70 MB     00:02
+[…]
+Install  262 Packages
+Upgrade    4 Packages
+
+Total download size: 172 M
+[…]
+real	1m7.877s
+user	0m44.237s
+sys	0m3.258s
+</code></pre>
+
+<p></details></p>
+
+<p><details>
+<summary>
+NixOS’s Nix takes 38s to fetch and unpack 262 MB.
+</summary></p>
+
+<pre><code>% docker run -t -i nixos/nix
+39e9186422ba:/# time sh -c 'nix-channel --update &amp;&amp; nix-env -i qemu-4.0.0'
+unpacking channels...
+created 2 symlinks in user environment
+installing 'qemu-4.0.0'
+these paths will be fetched (262.18 MiB download, 1364.54 MiB unpacked):
+[…]
+real	0m 38.49s
+user	0m 26.52s
+sys	0m 4.43s
+</code></pre>
+
+<p></details></p>
+
+<p><details>
+<summary>
+Debian’s apt takes 51 seconds to fetch and unpack 159 MB.
+</summary></p>
+
+<pre><code>% docker run -t -i debian:sid
+root@b7cc25a927ab:/# time (apt update &amp;&amp; apt install -y qemu-system-x86)
+Get:1 http://cdn-fastly.deb.debian.org/debian sid InRelease [149 kB]
+Get:2 http://cdn-fastly.deb.debian.org/debian sid/main amd64 Packages [8426 kB]
+Fetched 8574 kB in 1s (6716 kB/s)
+[…]
+Fetched 151 MB in 2s (64.6 MB/s)
+[…]
+real	0m51.583s
+user	0m15.671s
+sys	0m3.732s
+</code></pre>
+
+<p></details></p>
+
+<p><details>
+<summary>
+Arch Linux’s pacman takes 1m2s to fetch and unpack 124 MB.
+</summary></p>
+
+<pre><code>% docker run -t -i archlinux/base
+[root@9604e4ae2367 /]# time (pacman -Sy &amp;&amp; pacman -S --noconfirm qemu)
+:: Synchronizing package databases...
+ core       132.2 KiB   751K/s 00:00
+ extra     1629.6 KiB  3.04M/s 00:01
+ community    4.9 MiB  6.16M/s 00:01
+[…]
+Total Download Size:   123.20 MiB
+Total Installed Size:  587.84 MiB
+[…]
+real	1m2.475s
+user	0m9.272s
+sys	0m2.458s
+</code></pre>
+
+<p></details></p>
+
+<p><details>
+<summary>
+Alpine’s apk takes only about 2.4 seconds to fetch and unpack 26 MB.
+</summary></p>
+
+<pre><code>% docker run -t -i alpine
+/ # time apk add qemu-system-x86_64
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/APKINDEX.tar.gz
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.10/community/x86_64/APKINDEX.tar.gz
+[…]
+OK: 78 MiB in 95 packages
+real	0m 2.43s
+user	0m 0.46s
+sys	0m 0.09s
+</code></pre>
+
+<p></details></p>
+
+	  </div>
+	</div>
+      </div>
+    </div>
+  </body>
+</html>

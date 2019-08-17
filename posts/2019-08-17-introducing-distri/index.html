@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>distri: a Linux distribution to research fast package management</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.ch/posts/2019-08-17-introducing-distri/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    
+    <link rel="stylesheet" href="/1.min.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+
+
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+	<div id="menu" class="col-md-2">
+  <div style="display: flex; align-items: center">
+    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
+    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+  </div>
+
+  <ul class="menu_open">
+    <li><a class="menu_item" href="/"><span class="menu_title">About</span></a></li>
+    <li><a class="menu_item" href="/posts/"><span class="menu_title">Blog</span></a></li>
+    <li><span class="menu_title">Programs</span>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
+	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
+  </ul>
+</div>
+
+	<div id="contentBox" class="col-md-10">
+	  <h2 class="title">distri: a Linux distribution to research fast package management</h2>
+	  <div style="margin-bottom: 2em">
+	    <span id="date">published 2019-08-17</span>
+	    
+	  
+	  
+	  in tags
+	  
+	  
+	  <span class="tag"><a href="/posts/tags/distri/">distri</a></span>
+	  
+	  <span class="tag"><a href="/posts/tags/debian/">debian</a></span>
+	  
+	  
+	  <span style="background-color: black; border-radius: 25%; padding-left: 0.1em; padding-right: 0.1em">
+	    <a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2019-08-17-introducing-distri.markdown">✎</a>
+	  </span>
+	  </div>
+	  <div class="Artikel" id="content">
+	    <style type="text/css">
+	      #TableOfContents > ul, #TableOfContents > ul > li > ul {
+		  list-style: none;
+		  margin: 0;
+		  padding: 0;
+	      }
+	    </style>
+	    <details style="margin-bottom: 2em">
+	      <summary>Table of contents</summary>
+	      <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#key-idea-packages-are-images-not-archives">Key idea: packages are images, not archives</a></li>
+<li><a href="#key-idea-separate-hierarchies">Key idea: separate hierarchies</a></li>
+<li><a href="#key-idea-exchange-directories">Key idea: exchange directories</a>
+<ul>
+<li><a href="#search-paths-sometimes-need-to-be-fixed">Search paths sometimes need to be fixed</a></li>
+<li><a href="#fhs-compat">FHS compatibility</a></li>
+</ul></li>
+<li><a href="#fast-package-manager">Fast package manager</a></li>
+<li><a href="#fast-package-builder">Fast package builder</a></li>
+<li><a href="#package-stores">Package stores</a></li>
+<li><a href="#distri-s-first-release">distri’s first release</a></li>
+<li><a href="#project-outlook">Project outlook</a></li>
+<li><a href="#more-to-come">There’s more to come: subscribe to the distri feed</a></li>
+<li><a href="#feedback-or-questions">Feedback or questions?</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+	    </details>
+	    
+
+<p>Over the last year or so I have worked on a research linux distribution in my
+spare time. It’s not a distribution for researchers (like <a href="https://en.wikipedia.org/wiki/Scientific_Linux">Scientific
+Linux</a>), but my personal
+playground project to research linux distribution development, i.e. try out
+fresh ideas.</p>
+
+<p>This article focuses on the package format and its advantages, but there is
+more to distri, which I will <a href="#more-to-come">cover in upcoming blog posts</a>.</p>
+
+<h3 id="motivation">Motivation</h3>
+
+<p>I was a Debian Developer for the 7 years from 2012 to 2019, but using the
+distribution often left me frustrated, ultimately <a href="/posts/2019-03-10-debian-winding-down/">resulting in me winding down
+my Debian work</a>.</p>
+
+<p>Frequently, I was noticing a large gap between the actual speed of an operation
+(e.g. doing an update) and the possible speed based on back of the envelope
+calculations. I wrote more about this in my blog post <a href="/posts/2019-08-17-linux-package-managers-are-slow/">“Package managers are
+slow”</a>.</p>
+
+<p>To me, this observation means that either there is potential to optimize the
+package manager itself (e.g. <code>apt</code>), or what the system does is just too
+complex. While I remember seeing some low-hanging fruit¹, through my work on
+distri, I wanted to explore whether all the complexity we currently have in
+Linux distributions such as Debian or Fedora is inherent to the problem space.</p>
+
+<p>I have completed enough of the experiment to conclude that the complexity is not
+inherent: I can build a Linux distribution for general-enough purposes which is
+much less complex than existing ones.</p>
+
+<p>① Those were low-hanging fruit from a user perspective. I’m not saying that
+  fixing them is easy in the technical sense; I know too little about <code>apt</code>’s code
+  base to make such a statement.</p>
+
+<h3 id="key-idea-packages-are-images-not-archives">Key idea: packages are images, not archives</h3>
+
+<p>One key idea is to switch from using archives to using <strong>images</strong> for package
+contents. Common package managers such as <a href="https://manpages.debian.org/dpkg.1"><code>dpkg(1)</code></a>
+
+use <a href="https://manpages.debian.org/tar.1"><code>tar(1)</code></a>
+ archives with various compression
+algorithms.</p>
+
+<p>distri uses <a href="https://en.wikipedia.org/wiki/SquashFS">SquashFS images</a>, a
+comparatively simple file system image format that I happen to be familiar with
+from my work on the <a href="https://gokrazy.org">gokrazy Raspberry Pi 3 Go platform</a>.</p>
+
+<p>This idea is not novel: <a href="https://en.wikipedia.org/wiki/AppImage">AppImage</a> and
+<a href="https://en.wikipedia.org/wiki/Snappy_(package_manager)">snappy</a> also use
+images, but only for individual, self-contained applications. distri however
+uses images for distribution packages with dependencies. In particular, there is
+no duplication of shared libraries in distri.</p>
+
+<p>A nice side effect of using read-only image files is that applications are
+immutable and can hence not be broken by accidental (or malicious!)
+modification.</p>
+
+<h3 id="key-idea-separate-hierarchies">Key idea: separate hierarchies</h3>
+
+<p>Package contents are made available under a fully-qualified path. E.g., all
+files provided by package <code>zsh-amd64-5.6.2-3</code> are available under
+<code>/ro/zsh-amd64-5.6.2-3</code>. The mountpoint <code>/ro</code> stands for read-only, which is
+short yet descriptive.</p>
+
+<p>Perhaps surprisingly, building software with custom <code>prefix</code> values of
+e.g. <code>/ro/zsh-amd64-5.6.2-3</code> is widely supported, thanks to:</p>
+
+<ol>
+<li><p>Linux distributions, which build software with <code>prefix</code> set to <code>/usr</code>,
+whereas FreeBSD (and the autotools default), which build with <code>prefix</code> set to
+<code>/usr/local</code>.</p></li>
+
+<li><p>Enthusiast users in corporate or research environments, who install software
+into their home directories.</p></li>
+</ol>
+
+<p>Because using a custom <code>prefix</code> is a common scenario, upstream awareness for
+<code>prefix</code>-correctness is generally high, and the rarely required patch will be
+quickly accepted.</p>
+
+<h3 id="key-idea-exchange-directories">Key idea: exchange directories</h3>
+
+<p>Software packages often exchange data by placing or locating files in well-known
+directories. Here are just a few examples:</p>
+
+<ul>
+<li><a href="https://manpages.debian.org/gcc.1"><code>gcc(1)</code></a>
+ locates the <a href="https://manpages.debian.org/libusb.3"><code>libusb(3)</code></a>
+ headers via <code>/usr/include</code></li>
+<li><a href="https://manpages.debian.org/man.1"><code>man(1)</code></a>
+ locates the <a href="https://manpages.debian.org/nginx.1"><code>nginx(1)</code></a>
+ manpage via <code>/usr/share/man</code>.</li>
+<li><a href="https://manpages.debian.org/zsh.1"><code>zsh(1)</code></a>
+ locates executable programs via <code>PATH</code> components such as <code>/bin</code></li>
+</ul>
+
+<p>In distri, these locations are called <strong>exchange directories</strong> and are provided
+via FUSE in <code>/ro</code>.</p>
+
+<p>Exchange directories come in two different flavors:</p>
+
+<ol>
+<li><p>global. The exchange directory, e.g. <code>/ro/share</code>, provides the union of the
+<code>share</code> sub directory of all packages in the package store.
+<br />
+Global exchange directories are largely used for compatibility, <a href="#fhs-compat">see
+below</a>.</p></li>
+
+<li><p>per-package. Useful for tight coupling: e.g. <a href="https://manpages.debian.org/irssi.1"><code>irssi(1)</code></a>
+ does not provide any ABI guarantees, so plugins such as <code>irssi-robustirc</code>
+can declare that they want
+e.g. <code>/ro/irssi-amd64-1.1.1-1/out/lib/irssi/modules</code> to be a per-package
+exchange directory and contain files from their <code>lib/irssi/modules</code>.</p></li>
+</ol>
+
+<aside class="admonition note">
+  <div class="note-icon">
+    <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+  </div>
+  <div class="admonition-content">
+    <strong>Note</strong>:
+Only a few exchange directories are also available in the package build
+environment (as opposed to run-time).
+</div>
+</aside>
+
+
+<h4 id="search-paths-sometimes-need-to-be-fixed">Search paths sometimes need to be fixed</h4>
+
+<p>Programs which use exchange directories sometimes use search paths to access
+multiple exchange directories. In fact, the examples above were taken from <a href="https://manpages.debian.org/gcc.1"><code>gcc(1)</code></a>
+’s <code>INCLUDEPATH</code>, <a href="https://manpages.debian.org/man.1"><code>man(1)</code></a>
+’s <code>MANPATH</code> and <a href="https://manpages.debian.org/zsh.1"><code>zsh(1)</code></a>
+’s <code>PATH</code>. These are
+prominent ones, but more examples are easy to find: <a href="https://manpages.debian.org/zsh.1"><code>zsh(1)</code></a>
+ loads completion functions from its <code>FPATH</code>.</p>
+
+<p>Some search path values are derived from <code>--datadir=/ro/share</code> and require no
+further attention, but others might derive from
+e.g. <code>--prefix=/ro/zsh-amd64-5.6.2-3/out</code> and need to be pointed to an exchange
+directory via a specific command line flag.</p>
+
+<aside class="admonition note">
+  <div class="note-icon">
+    <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+  </div>
+  <div class="admonition-content">
+    <strong>Note</strong>:
+
+To create the illusion of a writable search path at package build-time,
+<code>$DESTDIR/ro/share</code> and <code>$DESTDIR/ro/lib</code> are diverted to
+<code>$DESTDIR/$PREFIX/share</code> and <code>$DESTDIR/$PREFIX/lib</code>,
+respectively.
+
+</div>
+</aside>
+
+
+<h4 id="fhs-compat">FHS compatibility</h4>
+
+<p>Global exchange directories are used to make distri provide enough of the
+<a href="https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard">Filesystem Hierarchy Standard
+(FHS)</a> that
+third-party software largely just works. This includes a C development
+environment.</p>
+
+<p>I successfully ran a few programs from their binary packages such as Google
+Chrome, Spotify, or Microsoft’s Visual Studio Code.</p>
+
+<h3 id="fast-package-manager">Fast package manager</h3>
+
+<p>I previously wrote about how <a href="/posts/2019-08-17-linux-package-managers-are-slow/">Linux distribution package managers are too slow</a>.</p>
+
+<p>distri’s package manager is extremely fast. Its main bottleneck is typically the network link, even at high speed links (I tested with a 100 Gbps link).</p>
+
+<p>Its speed comes largely from an architecture which allows the package manager to
+do less work. Specifically:</p>
+
+<ol>
+<li><p>Package images can be added atomically to the package store, so we can safely
+skip <a href="https://manpages.debian.org/fsync.2"><code>fsync(2)</code></a>
+. Corruption will be cleaned up
+automatically, and durability is not important: if an interactive
+installation is interrupted, the user can just repeat it, as it will be fresh
+on their mind.</p></li>
+
+<li><p>Because all packages are co-installable thanks to separate hierarchies, there
+are no conflicts at the package store level, and no dependency resolution (an
+optimization problem requiring <a href="https://research.swtch.com/version-sat">SAT
+solving</a>) is required at all.
+<br />
+In exchange directories, we resolve conflicts by selecting the package with the
+highest monotonically increasing distri revision number.</p></li>
+
+<li><p>distri proves that we can build a useful Linux distribution <a href="/posts/2019-07-20-hooks-and-triggers/">entirely without
+hooks and triggers</a>. Not having to
+serialize hook execution allows us to download packages into the package
+store with maximum concurrency.</p></li>
+
+<li><p>Because we are using images instead of archives, we do not need to unpack
+anything. This means installing a package is really just writing its package
+image and metadata to the package store. Sequential writes are typically the
+fastest kind of storage usage pattern.</p></li>
+</ol>
+
+<p>Fast installation also make other use-cases more bearable, such as creating disk
+images, be it for testing them in <a href="https://manpages.debian.org/qemu.1"><code>qemu(1)</code></a>
+, booting
+them on real hardware from a USB drive, or for cloud providers such as Google
+Cloud.</p>
+
+<aside class="admonition note">
+  <div class="note-icon">
+    <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+  </div>
+  <div class="admonition-content">
+    <strong>Note</strong>:
+To saturate links above 1 Gbps, transfer packages without compression.
+</div>
+</aside>
+
+
+<h3 id="fast-package-builder">Fast package builder</h3>
+
+<p>Contrary to how distribution package builders are usually implemented, the
+distri package builder does not actually install any packages into the build
+environment.</p>
+
+<p>Instead, distri makes available a filtered view of the package store (only
+declared dependencies are available) at <code>/ro</code> in the build environment.</p>
+
+<p>This means that even for large dependency trees, setting up a build environment
+happens in a fraction of a second! Such a low latency really makes a difference
+in how comfortable it is to iterate on distribution packages.</p>
+
+<h3 id="package-stores">Package stores</h3>
+
+<p>In distri, package images are installed from a remote <strong>package store</strong> into the
+local system package store <code>/roimg</code>, which backs the <code>/ro</code> mount.</p>
+
+<p>A package store is implemented as a directory of package images and their
+associated metadata files.</p>
+
+<p>You can easily make available a package store by using <code>distri export</code>.</p>
+
+<p>To provide a mirror for your local network, you can periodically <code>distri update</code>
+from the package store you want to mirror, and then <code>distri export</code> your local
+copy. Special tooling (e.g. <code>debmirror</code> in Debian) is not required because
+<code>distri install</code> is atomic (and <code>update</code> uses <code>install</code>).</p>
+
+<p>Producing derivatives is easy: just add your own packages to a copy of the
+package store.</p>
+
+<p>The package store is intentionally kept simple to manage and distribute. Its
+files could be exchanged via peer-to-peer file systems, or synchronized from an
+offline medium.</p>
+
+<h3 id="distri-s-first-release">distri’s first release</h3>
+
+<p>distri works well enough to demonstrate the ideas explained above. I have
+branched this state into <a href="https://github.com/distr1/distri/tree/jackherer">branch
+<code>jackherer</code></a>, distri’s first
+release code name. This way, I can keep experimenting in the distri repository
+without breaking your installation.</p>
+
+<p>From the branch contents, our autobuilder creates:</p>
+
+<ol>
+<li><p><a href="https://repo.distr1.org/distri/jackherer/img/">disk images</a>, which…</p>
+
+<ul>
+<li>can be <a href="https://github.com/distr1/distri#run-distri-on-real-hardware">tested on real hardware</a></li>
+<li>can be <a href="https://github.com/distr1/distri#run-distri-in-qemu">tested in qemu</a></li>
+<li>can be <a href="https://github.com/distr1/distri#run-distri-in-virtualbox">tested in virtualbox</a></li>
+<li>can be <a href="https://github.com/distr1/distri#run-distri-in-docker">tested in docker</a></li>
+<li>can be <a href="https://github.com/distr1/distri#run-distri-on-google-cloud">tested on Google Cloud</a></li>
+</ul></li>
+
+<li><p>a <a href="https://repo.distr1.org/distri/jackherer/pkg/">package repository</a>. Installations can pick up new packages with
+<code>distri update</code>.</p></li>
+
+<li><p><a href="https://repo.distr1.org/distri/jackherer/docs/">documentation for the release</a>.</p>
+
+<ul>
+<li>Definitely check out the <a href="https://github.com/distr1/distri#cool-things-to-try">“Cool things to
+try”</a> README section.</li>
+</ul></li>
+</ol>
+
+<p>The project website can be found at <a href="https://distr1.org">https://distr1.org</a>. The website is just the
+README for now, but we can improve that later.</p>
+
+<p>The repository can be found at <a href="https://github.com/distr1/distri">https://github.com/distr1/distri</a></p>
+
+<h3 id="project-outlook">Project outlook</h3>
+
+<p>Right now, distri is mainly a vehicle for my spare-time Linux distribution
+research. <strong>I don’t recommend anyone use distri for anything but research,</strong> and
+there are no medium-term plans of that changing. At the very least, please
+contact me before basing anything serious on distri so that we can talk about
+limitations and expectations.</p>
+
+<p>I expect the distri project to live for as long as I have blog posts to publish,
+and we’ll see what happens afterwards. Note that this is a hobby for me: I will
+continue to explore, at my own pace, parts that I find interesting.</p>
+
+<p>My hope is that established distributions might get a useful idea or two from
+distri.</p>
+
+<h3 id="more-to-come">There’s more to come: subscribe to the distri feed</h3>
+
+<p>I don’t want to make this post too long, but there is much more!</p>
+
+<p>Please subscribe to the following URL in your feed reader to get all posts about
+distri:</p>
+
+<p><a href="https://michael.stapelberg.ch/posts/tags/distri/feed.xml">https://michael.stapelberg.ch/posts/tags/distri/feed.xml</a></p>
+
+<p>Next in my queue are articles about hermetic packages and good package
+maintainer experience (including declarative packaging).</p>
+
+<h3 id="feedback-or-questions">Feedback or questions?</h3>
+
+<p>I’d love to discuss these ideas in case you’re interested!</p>
+
+<p>Please send feedback to the <a href="https://www.freelists.org/list/distri">distri mailing
+list</a> so that everyone can participate!</p>
+
+	  </div>
+	</div>
+      </div>
+    </div>
+  </body>
+</html>

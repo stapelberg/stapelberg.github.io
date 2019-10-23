@@ -6,11 +6,125 @@
   <id>https://michael.stapelberg.ch/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[Network Storage PC Hardware (2019)]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2019-10-23-nas/"/>
+    <id>https://michael.stapelberg.ch/posts/2019-10-23-nas/</id>
+    <published>2019-10-23T00:00:00+00:00</published>
+    <updated>2019-10-23T18:34:49+02:00</updated>
+    <content type="html"><![CDATA[
+
+<p>One of my two NAS builds recently died, so I bought a new one until I find some
+time to debug the old one. Since a couple of people have been asking me what I
+would recommend nowadays based on my <a href="/posts/2016-11-21-gigabit-nas-coreos/">November 2016 article “Gigabit NAS
+(running CoreOS)”</a>, I figured I would
+share the new hardware listing:</p>
+
+<table width="100%" style="margin-top: 1.5em; margin-bottom: 1.5em; margin-left: 2em">
+<tr>
+<th>Price</th>
+<th>Type</th>
+<th>Article</th>
+</tr>
+
+<tr>
+<td>54.00 CHF</td>
+<td>Case</td>
+<td><a href="https://www.digitec.ch/en/s1/product/silverstone-sst-sg05bb-lite-cube-pc-cases-3525365">Silverstone SST-SG05BB-Lite (cube)</a></td>
+</tr>
+
+<tr>
+<td valign="top">60.40 CHF</td>
+<td valign="top">Mainboard</td>
+<td><a href="https://www.digitec.ch/en/s1/product/asrock-ab350-gaming-itxac-am4-amd-b350-mini-itx-motherboards-7022839">AsRock AB350 Gaming-ITX/ac (AM4, AMD B350, Mini ITX)</a><br>
+<strong>Be sure to <a href="https://www.asrock.com/MB/AMD/Fatal1ty%20AB350%20Gaming-ITXac/index.asp#BIOS">update the UEFI</a> to the latest version (6.00)!</strong></td>
+</tr>
+
+<tr>
+<td>62.30 CHF</td>
+<td>CPU</td>
+<td><a href="https://www.digitec.ch/en/s1/product/amd-a6-9500e-2-am4-3ghz-processors-6436852">AMD A6-9500E (2, AM4, 3GHz)</a></td>
+</tr>
+
+<tr>
+<td>20.10 CHF</td>
+<td>Cooler</td>
+<td><a href="https://www.digitec.ch/en/s1/product/arctic-alpine-690cm-cpu-coolers-11053306">Arctic Alpine AM4 Passive</a></td>
+</tr>
+
+<tr>
+<td>42.80 CHF</td>
+<td>RAM</td>
+<td><a href="https://www.digitec.ch/en/s1/product/kingston-valueram-1x-8gb-ddr4-2400-dimm-288-memory-6149789">Kingston ValueRAM (1x, 8GB, DDR4-2400, DIMM 288)</a></td>
+</tr>
+
+<tr>
+<td>29.00 CHF</td>
+<td>Fan</td>
+<td><a href="https://www.digitec.ch/en/s1/product/noctua-nf-s12a-uln-120mm-1x-pc-fans-2451401">Noctua Nf-s12a ULN (120mm, 1x)</a></td>
+</tr>
+
+<tr>
+<td valign="top">55.00 CHF</td>
+<td valign="top">PSU</td>
+<td><a href="https://www.digitec.ch/en/s1/product/silverstone-st30sf-300w-sfx-300w-power-supply-computer-5808725">Silverstone ST30SF 300W SFX (300W)</a></td>
+</tr>
+
+<tr>
+<td valign="top">27.50 CHF</td>
+<td valign="top">System disk</td>
+<td><a href="https://www.digitec.ch/en/s1/product/intenso-high-performance-120gb-25-ssd-5984710?tagIds=76-535">Intenso High Performance (120GB, 2.5") SATA</a></td>
+</tr>
+
+<tr>
+<td>351.10 CHF</td>
+<td colspan="2"><strong>total sum</strong></td>
+</tr>
+</table>
+
+<p>In <a href="/posts/2016-11-21-gigabit-nas-coreos/">November 2016 I paid only 225 CHF</a>, i.e. 126 CHF less.</p>
+
+<p>Why is this build so much more expensive? There are two major reasons:</p>
+
+<h3 id="the-am4-platform">The AM4 platform</h3>
+
+<p>The AM4 platform replaced the AM1 APU series as the cheapest broadly available
+AMD platform.</p>
+
+<p>As you might have gathered from the links in the hardware listing above, I
+define “broadly available” as available at digitec, a large electronics shop in
+Zürich.</p>
+
+<p>They offer same-day orders for pick-up in their Zürich location during Weekdays
+and on Saturdays, so it is kind of like being on a hardware support plan :-)</p>
+
+<p>Unfortunately, the cheapest AM4 CPU is a lot more expensive (+ 23.31 CHF).</p>
+
+<p>Also, there are (currently?) no AM4 mainboards with DC barrel power plugs,
+meaning more expensive ATX power supplies (+ 26.30 CHF) become necessary.</p>
+
+<h3 id="additional-components-fan-and-system-disk">Additional components: fan and system disk</h3>
+
+<p>Definitely invest in the Noctua 120mm ULN (Ultra Low Noise) fan (+ 29.00
+CHF). The fan that comes in the Silverstone case is pretty noisy, and that might
+be bothersome if you don’t have the luxury of stashing your NAS away in the
+basement.</p>
+
+<p>In my last build, I had an SSD lying around that I used as system disk, this
+time I had to buy one (+ 27.50 CHF).</p>
+
+<p>Note that I intentionally picked a SATA SSD over an M.2 SSD: the M.2 slot of the
+AB350 is on the back of the mainboard, so an M.2 SSD is harder to reach. The
+performance disadvantage of a SATA SSD compared to an M.2 SSD might be
+measurable, but irrelevant for my day-to-day usage. Quickly accessing the
+physical hardware is more important.</p>
+]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[Debian Code Search: positional index, TurboPFor-compressed]]></title>
     <link href="https://michael.stapelberg.ch/posts/2019-09-29-dcs-positional-turbopfor-index/"/>
     <id>https://michael.stapelberg.ch/posts/2019-09-29-dcs-positional-turbopfor-index/</id>
     <published>2019-09-29T00:00:00+00:00</published>
-    <updated>2019-09-29T13:20:18+02:00</updated>
+    <updated>2019-09-29T13:34:08+02:00</updated>
     <content type="html"><![CDATA[
 
 <style type="text/css">
@@ -3108,194 +3222,6 @@ serial and rebootor, but it also supports debugging with gdb.</p></li>
 
 <p>The <a href="/posts/2018-04-17-kinx-usb-hub/">second post motivates and describes building a drop-in replacement USB
 hub</a> for the Kinesis Advantage keyboard.</p>
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[kinX: latency measurement]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-latency-measurement/"/>
-    <id>https://michael.stapelberg.ch/posts/2018-04-17-kinx-latency-measurement/</id>
-    <published>2018-04-17T17:49:00+02:00</published>
-    <updated>2019-01-26T23:11:13+01:00</updated>
-    <content type="html"><![CDATA[
-
-<p>This post is part of a <a href="/posts/2018-04-17-kinx">series of posts about the kinX project</a>.</p>
-
-<h3 id="latency-measurement">Latency measurement</h3>
-
-<p>End-to-end latency consists of 3 parts:</p>
-
-<ol>
-<li>input latency (keyboard)</li>
-<li>processing latency (computer)</li>
-<li>output latency (monitor)</li>
-</ol>
-
-<p>During the development of the kinX keyboard controller, I realized that
-measuring processing latency was quite simple with my hardware: I could start a
-timer when sending a key press HID report to the computer and measure the
-elapsed time when I would receive a reply from the computer.</p>
-
-<p>The key to send is the Caps Lock key, because unlike other keys it results in a
-reply: a HID report telling the keyboard to turn the Caps Lock LED on.</p>
-
-<p><img src="/Bilder/kinx-latency-measurement-device.svg"></p>
-
-<h3 id="measurement-device">Measurement device</h3>
-
-<p>To make this measurement technique accessible to as many people as possible, I
-decided to pull it out of my kinX keyboard controller and instead build it using
-the FRDM-K66F evaluation board, which uses the same microcontroller.</p>
-
-<p>The FRDM-K66F can be bought for about 60 USD at big electronics shops, e.g. Digi-Key.</p>
-
-<p>Find the firmware at <a href="https://github.com/kinx-project/measure-fw">https://github.com/kinx-project/measure-fw</a></p>
-
-<h3 id="baseline">Baseline</h3>
-
-<p>To determine the lowest processing latency one can possibly get for userspace
-applications on a Linux system, I wrote a small program which uses Linux’s evdev
-API to receive key presses and react to a Caps Lock keypress as quickly as it
-can by turning the Caps Lock LED on.</p>
-
-<p>Find the program at <a href="https://github.com/kinx-project/measure-evdev">https://github.com/kinx-project/measure-evdev</a></p>
-
-<p>The following layers are exercised when measuring this program:</p>
-
-<ul>
-<li>USB host controller</li>
-<li>Linux kernel (USB and input subsystems)</li>
-<li>input event API (evdev)</li>
-</ul>
-
-<p>Notably, graphical interfaces such as X11 or Wayland are excluded.</p>
-
-<p>The measurements can be verified using Wireshark’s usbmon capturing, which
-provides a view of the USB bus from the computer’s perspective, excluding USB
-poll latency and USB transaction time.</p>
-
-<p>Using Ubuntu 17.10, I measured a processing latency of 152 μs on average.</p>
-
-<h3 id="emacs">Emacs</h3>
-
-<p>Now let’s see whether my current editor of choice adds significant latency.</p>
-
-<p>Using a few lines of Emacs Lisp, I instructed Emacs to turn on the Caps Lock LED
-whenever a key is inserted into the current buffer. In combination with
-remapping the Caps Lock key to any other key (e.g. “a”), this allows us to
-measure Emacs’s processing latency.</p>
-
-<p>On the same Ubuntu 17.10 installation used above, Emacs 25.2.2 adds on average
-278 μs to the baseline processing latency.</p>
-
-<p>Find the code at <a href="https://github.com/kinx-project/measure-emacs">https://github.com/kinx-project/measure-emacs</a></p>
-
-<h3 id="end-to-end-latency">End-to-end latency</h3>
-
-<p>With the kinX keyboard controller, we can achieve the following end-to-end latency:</p>
-
-<table>
-<thead>
-<tr>
-<th>contributor</th>
-<th>latency</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td>Matrix scan</td>
-<td>≈ 100 μs</td>
-</tr>
-
-<tr>
-<td>USB poll</td>
-<td>≈ 125 μs</td>
-</tr>
-
-<tr>
-<td>Linux</td>
-<td>≈ 152 μs</td>
-</tr>
-
-<tr>
-<td>Emacs</td>
-<td>≈ 278 μs</td>
-</tr>
-</tbody>
-</table>
-
-<p><br>This sums up to ≈ 655 μs on average. On top of that, we have output latency
-within [0, 16ms] due to the 60 Hz refresh rate of our monitors.</p>
-
-<p>Note that using a compositor adds one frame of output latency.</p>
-
-<h3 id="input-latency-perception">Input latency perception</h3>
-
-<p>A natural question to ask is how well humans can perceive input latency. After
-all, keyboards have been manufactured for many years, and if input latency was
-really that important, surely manufacturers would have picked up on this fact by
-now?</p>
-
-<p>I ran a little unscientific experiment in the hope to further my understanding
-of this question at the most recent Chaos Communication Congress in Leipzig.</p>
-
-<p>In the experiment, I let 17 people play a game on a specially prepared
-keyboard. In each round, the game reconfigures the keyboard to either have
-additional input latency or not, decided at random. The player can then type a
-few keys and make a decision. If the player can correctly indicate whether
-additional input latency was present in more than 50% of the cases, the player
-is said to be able to distinguish latency at that level. On each level, the game
-decreases the additional input latency: it starts with 100ms, then 75ms, then
-50ms, etc.</p>
-
-<p>The most sensitive player reliably recognized an additional 15ms of input
-latency.</p>
-
-<p>Some players could not distinguish 75ms of additional input latency.</p>
-
-<p>Every player could distinguish 100ms of additional input latency.</p>
-
-<p>My take-away is that many people cannot perceive slight differences in input
-latency at all, explaining why keyboard manufacturers don’t optimize for low
-latency.</p>
-
-<p>Reducing input latency still seems worthwhile to me: even if the reduction
-happens under the threshold at which you can perceive differences in input
-latency, it buys you more leeway in the entire stack. In other words, you might
-now be able to turn on an expensive editor feature which previously slowed down
-typing too much.</p>
-
-<h3 id="conclusion">Conclusion</h3>
-
-<p>When I started looking into input latency, my keyboard had dozens of
-milliseconds of latency. I found an easy win in the old firmware, then hit a
-wall, started the kinX project and eventually ended up with a keyboard with just
-0.225ms input latency.</p>
-
-<p>Even if I had not reduced the input latency of my keyboard at all, I feel that
-this project was a valuable learning experience: I now know a lot more about PCB
-design, ARM microcontrollers, USB, HID, etc.</p>
-
-<p>Typing on a self-built keyboard feels good: be it because of the warm fuzzy
-feeling of enjoying the fruits of your labor, or whether the input latency
-indeed is lower, I’m happy with the result either way.</p>
-
-<p>Lastly, I can now decidedly claim that the processing latency of modern
-computers is perfectly fine (remember our 152 μs + 278 μs measurement for
-Linux + Emacs), and as long as you pick decent peripherals, your end-to-end
-latency will be fine, too.</p>
-
-<h3 id="what-s-next">What’s next?</h3>
-
-<p>By far the biggest factor in the end-to-end latency is the monitor’s refresh
-rate, so getting a monitor with a high refresh rate and no additional processing
-latency would be the next step in reducing the end-to-end latency.</p>
-
-<p>As far as the keyboard goes, the matrix scan could be eliminated by wiring up
-each individual key to a microcontroller with enough GPIO pins. The USB poll
-delay could be eliminated by switching to USB 3, but I don’t know of any
-microcontrollers which have USB 3 built-in yet. Both of these improvements are
-likely not worth the effort.</p>
 ]]></content>
   </entry>
 </feed>

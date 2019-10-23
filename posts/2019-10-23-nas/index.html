@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Network Storage PC Hardware (2019)</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.ch/posts/2019-10-23-nas/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    
+    <link rel="stylesheet" href="/1.min.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+
+
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+	<div id="menu" class="col-md-2">
+  <div style="display: flex; align-items: center">
+    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
+    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+  </div>
+
+  <ul class="menu_open">
+    <li><a class="menu_item" href="/"><span class="menu_title">About</span></a></li>
+    <li><a class="menu_item" href="/posts/"><span class="menu_title">Blog</span></a></li>
+    <li><span class="menu_title">Programs</span>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
+	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
+  </ul>
+</div>
+
+	<div id="contentBox" class="col-md-10">
+	  <h2 class="title">Network Storage PC Hardware (2019)</h2>
+	  <div style="margin-bottom: 2em">
+	    <span id="date">published 2019-10-23</span>
+	    
+	  
+	  <span style="background-color: black; border-radius: 25%; padding-left: 0.1em; padding-right: 0.1em">
+	    <a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2019-10-23-nas.markdown">✎</a>
+	  </span>
+	  </div>
+	  <div class="Artikel" id="content">
+	    
+
+<p>One of my two NAS builds recently died, so I bought a new one until I find some
+time to debug the old one. Since a couple of people have been asking me what I
+would recommend nowadays based on my <a href="/posts/2016-11-21-gigabit-nas-coreos/">November 2016 article “Gigabit NAS
+(running CoreOS)”</a>, I figured I would
+share the new hardware listing:</p>
+
+<table width="100%" style="margin-top: 1.5em; margin-bottom: 1.5em; margin-left: 2em">
+<tr>
+<th>Price</th>
+<th>Type</th>
+<th>Article</th>
+</tr>
+
+<tr>
+<td>54.00 CHF</td>
+<td>Case</td>
+<td><a href="https://www.digitec.ch/en/s1/product/silverstone-sst-sg05bb-lite-cube-pc-cases-3525365">Silverstone SST-SG05BB-Lite (cube)</a></td>
+</tr>
+
+<tr>
+<td valign="top">60.40 CHF</td>
+<td valign="top">Mainboard</td>
+<td><a href="https://www.digitec.ch/en/s1/product/asrock-ab350-gaming-itxac-am4-amd-b350-mini-itx-motherboards-7022839">AsRock AB350 Gaming-ITX/ac (AM4, AMD B350, Mini ITX)</a><br>
+<strong>Be sure to <a href="https://www.asrock.com/MB/AMD/Fatal1ty%20AB350%20Gaming-ITXac/index.asp#BIOS">update the UEFI</a> to the latest version (6.00)!</strong></td>
+</tr>
+
+<tr>
+<td>62.30 CHF</td>
+<td>CPU</td>
+<td><a href="https://www.digitec.ch/en/s1/product/amd-a6-9500e-2-am4-3ghz-processors-6436852">AMD A6-9500E (2, AM4, 3GHz)</a></td>
+</tr>
+
+<tr>
+<td>20.10 CHF</td>
+<td>Cooler</td>
+<td><a href="https://www.digitec.ch/en/s1/product/arctic-alpine-690cm-cpu-coolers-11053306">Arctic Alpine AM4 Passive</a></td>
+</tr>
+
+<tr>
+<td>42.80 CHF</td>
+<td>RAM</td>
+<td><a href="https://www.digitec.ch/en/s1/product/kingston-valueram-1x-8gb-ddr4-2400-dimm-288-memory-6149789">Kingston ValueRAM (1x, 8GB, DDR4-2400, DIMM 288)</a></td>
+</tr>
+
+<tr>
+<td>29.00 CHF</td>
+<td>Fan</td>
+<td><a href="https://www.digitec.ch/en/s1/product/noctua-nf-s12a-uln-120mm-1x-pc-fans-2451401">Noctua Nf-s12a ULN (120mm, 1x)</a></td>
+</tr>
+
+<tr>
+<td valign="top">55.00 CHF</td>
+<td valign="top">PSU</td>
+<td><a href="https://www.digitec.ch/en/s1/product/silverstone-st30sf-300w-sfx-300w-power-supply-computer-5808725">Silverstone ST30SF 300W SFX (300W)</a></td>
+</tr>
+
+<tr>
+<td valign="top">27.50 CHF</td>
+<td valign="top">System disk</td>
+<td><a href="https://www.digitec.ch/en/s1/product/intenso-high-performance-120gb-25-ssd-5984710?tagIds=76-535">Intenso High Performance (120GB, 2.5") SATA</a></td>
+</tr>
+
+<tr>
+<td>351.10 CHF</td>
+<td colspan="2"><strong>total sum</strong></td>
+</tr>
+</table>
+
+<p>In <a href="/posts/2016-11-21-gigabit-nas-coreos/">November 2016 I paid only 225 CHF</a>, i.e. 126 CHF less.</p>
+
+<p>Why is this build so much more expensive? There are two major reasons:</p>
+
+<h3 id="the-am4-platform">The AM4 platform</h3>
+
+<p>The AM4 platform replaced the AM1 APU series as the cheapest broadly available
+AMD platform.</p>
+
+<p>As you might have gathered from the links in the hardware listing above, I
+define “broadly available” as available at digitec, a large electronics shop in
+Zürich.</p>
+
+<p>They offer same-day orders for pick-up in their Zürich location during Weekdays
+and on Saturdays, so it is kind of like being on a hardware support plan :-)</p>
+
+<p>Unfortunately, the cheapest AM4 CPU is a lot more expensive (+ 23.31 CHF).</p>
+
+<p>Also, there are (currently?) no AM4 mainboards with DC barrel power plugs,
+meaning more expensive ATX power supplies (+ 26.30 CHF) become necessary.</p>
+
+<h3 id="additional-components-fan-and-system-disk">Additional components: fan and system disk</h3>
+
+<p>Definitely invest in the Noctua 120mm ULN (Ultra Low Noise) fan (+ 29.00
+CHF). The fan that comes in the Silverstone case is pretty noisy, and that might
+be bothersome if you don’t have the luxury of stashing your NAS away in the
+basement.</p>
+
+<p>In my last build, I had an SSD lying around that I used as system disk, this
+time I had to buy one (+ 27.50 CHF).</p>
+
+<p>Note that I intentionally picked a SATA SSD over an M.2 SSD: the M.2 slot of the
+AB350 is on the back of the mainboard, so an M.2 SSD is harder to reach. The
+performance disadvantage of a SATA SSD compared to an M.2 SSD might be
+measurable, but irrelevant for my day-to-day usage. Quickly accessing the
+physical hardware is more important.</p>
+
+	  </div>
+	</div>
+      </div>
+    </div>
+  </body>
+</html>

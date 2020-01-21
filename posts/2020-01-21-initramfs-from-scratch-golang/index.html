@@ -261,10 +261,12 @@ pci:v00001AF4d00001004sv00001AF4sd00000008bc01sc00i00
 <code>modalias</code> files within <code>sysfs</code> and load the responsible modules.</p>
 
 <p>Loading a kernel module can result in new devices appearing. When that happens,
-the kernel sends a uevent, which the uevent consumer in userspace receives via a
-netlink socket. Typically, this consumer is <a href="https://manpages.debian.org/udev.7"><code>udev(7)</code></a>
-,
-but in our case, it’s <code>minitrd</code>.</p>
+the kernel sends a
+<a href="https://stackoverflow.com/questions/22803469/uevent-sent-from-kernel-to-user-space-udev">uevent</a>,
+which the uevent consumer in userspace receives via a netlink socket. Typically,
+this consumer is <a href="https://manpages.debian.org/udev.7"><code>udev(7)</code></a>
+, but in our case, it’s
+<code>minitrd</code>.</p>
 
 <p>For each uevent messages that comes with a <code>MODALIAS</code> variable, <code>minitrd</code> will
 load the relevant kernel module(s).</p>

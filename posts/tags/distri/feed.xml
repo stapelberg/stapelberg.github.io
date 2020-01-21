@@ -10,7 +10,7 @@
     <link href="https://michael.stapelberg.ch/posts/2020-01-21-initramfs-from-scratch-golang/"/>
     <id>https://michael.stapelberg.ch/posts/2020-01-21-initramfs-from-scratch-golang/</id>
     <published>2020-01-21T17:50:00+01:00</published>
-    <updated>2020-01-21T18:05:08+01:00</updated>
+    <updated>2020-01-21T18:19:33+01:00</updated>
     <content type="html"><![CDATA[
 
 <p>In case you are not yet familiar with why an initramfs (or initrd, or initial
@@ -132,10 +132,12 @@ pci:v00001AF4d00001004sv00001AF4sd00000008bc01sc00i00
 <code>modalias</code> files within <code>sysfs</code> and load the responsible modules.</p>
 
 <p>Loading a kernel module can result in new devices appearing. When that happens,
-the kernel sends a uevent, which the uevent consumer in userspace receives via a
-netlink socket. Typically, this consumer is <a href="https://manpages.debian.org/udev.7"><code>udev(7)</code></a>
-,
-but in our case, it’s <code>minitrd</code>.</p>
+the kernel sends a
+<a href="https://stackoverflow.com/questions/22803469/uevent-sent-from-kernel-to-user-space-udev">uevent</a>,
+which the uevent consumer in userspace receives via a netlink socket. Typically,
+this consumer is <a href="https://manpages.debian.org/udev.7"><code>udev(7)</code></a>
+, but in our case, it’s
+<code>minitrd</code>.</p>
 
 <p>For each uevent messages that comes with a <code>MODALIAS</code> variable, <code>minitrd</code> will
 load the relevant kernel module(s).</p>

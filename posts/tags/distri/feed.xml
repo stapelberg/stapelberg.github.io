@@ -2,9 +2,416 @@
   <title>Michael Stapelbergs Website: posts tagged distri</title>
   <link href="https://michael.stapelberg.ch/posts/tags/distri/feed.xml" rel="self"/>
   <link href="https://michael.stapelberg.ch/posts/tags/distri/"/>
-  <updated>2019-08-17T18:36:00+02:00</updated>
+  <updated>2020-01-21T17:50:00+01:00</updated>
   <id>https://michael.stapelberg.ch/posts/tags/distri/</id>
   <generator>Hugo -- gohugo.io</generator>
+  <entry>
+    <title type="html"><![CDATA[distri: 20x faster initramfs (initrd) from scratch]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2020-01-21-initramfs-from-scratch-golang/"/>
+    <id>https://michael.stapelberg.ch/posts/2020-01-21-initramfs-from-scratch-golang/</id>
+    <published>2020-01-21T17:50:00+01:00</published>
+    <updated>2020-01-21T18:05:08+01:00</updated>
+    <content type="html"><![CDATA[
+
+<p>In case you are not yet familiar with why an initramfs (or initrd, or initial
+ramdisk) is typically used when starting Linux, let me quote the <a href="https://en.wikipedia.org/wiki/Initial_ramdisk">wikipedia
+definition</a>:</p>
+
+<p>“[…] initrd is a scheme for loading a temporary root file system into memory,
+which may be used as part of the Linux startup process […] to make preparations
+before the real root file system can be mounted.”</p>
+
+<p>Many Linux distributions do not compile all file system drivers into the kernel,
+but instead load them on-demand from an initramfs, which saves memory.</p>
+
+<p>Another common scenario, in which an initramfs is required, is full-disk
+encryption: the disk must be unlocked from userspace, but since userspace is
+encrypted, an initramfs is used.</p>
+
+<h2 id="motivation">Motivation</h2>
+
+<p>Thus far, building a <a href="https://distr1.org/">distri</a> disk image was quite slow:</p>
+
+<p>This is on an AMD Ryzen 3900X 12-core processor (2019):</p>
+
+<pre><code>distri % time make cryptimage serial=1
+80.29s user 13.56s system 186% cpu 50.419 total # 19s image, 31s initrd
+</code></pre>
+
+<p>Of these 50 seconds,
+<a href="https://en.wikipedia.org/wiki/Dracut_(software)"><code>dracut</code></a>’s initramfs
+generation accounts for 31 seconds (62%)!</p>
+
+<p>Initramfs generation time drops to 8.7 seconds once <code>dracut</code> no longer needs to
+use the single-threaded <a href="https://manpages.debian.org/gzip.1"><code>gzip(1)</code></a>
+, but the
+multi-threaded replacement <a href="https://manpages.debian.org/pigz.1"><code>pigz(1)</code></a>
+:</p>
+
+<p>This brings the total time to build a distri disk image down to:</p>
+
+<pre><code>distri % time make cryptimage serial=1
+76.85s user 13.23s system 327% cpu 27.509 total # 19s image, 8.7s initrd
+</code></pre>
+
+<p>Clearly, when you use <code>dracut</code> on any modern computer, you should make pigz
+available. <code>dracut</code> should fail to compile unless one explicitly opts into the
+known-slower gzip. For more thoughts on optional dependencies, see <a href="/posts/2019-05-23-optional-dependencies/">“Optional
+dependencies don’t work”</a>.</p>
+
+<p>But why does it take 8.7 seconds still? Can we go faster?</p>
+
+<p>The answer is <strong>Yes</strong>! I recently built a distri-specific initramfs I’m calling
+<code>minitrd</code>. I wrote both big parts from scratch:</p>
+
+<ol>
+<li>the initramfs generator program (<a href="https://github.com/distr1/distri/blob/master/cmd/distri/initrd.go"><code>distri initrd</code></a>)</li>
+<li>a custom Go userland (<a href="https://github.com/distr1/distri/blob/master/cmd/minitrd/minitrd.go"><code>cmd/minitrd</code></a>), running as <code>/init</code> in the initramfs.</li>
+</ol>
+
+<p><code>minitrd</code> generates the initramfs image in ≈400ms, bringing the total time down
+to:</p>
+
+<pre><code>distri % time make cryptimage serial=1
+50.09s user 8.80s system 314% cpu 18.739 total # 18s image, 400ms initrd
+</code></pre>
+
+<p>(The remaining time is spent in preparing the file system, then installing and
+configuring the distri system, i.e. preparing a disk image you can <a href="https://distr1.org/#run-distri-on-real-hardware">run on real
+hardware</a>.)</p>
+
+<p>How can <code>minitrd</code> be 20 times faster than <code>dracut</code>?</p>
+
+<p><code>dracut</code> is mainly written in shell, with a C helper program. It drives the
+generation process by spawning lots of external dependencies (e.g. <code>ldd</code> or the
+<code>dracut-install</code> helper program). I assume that the combination of using an
+interpreted language (shell) that spawns lots of processes and precludes a
+concurrent architecture is to blame for the poor performance.</p>
+
+<p><code>minitrd</code> is written in Go, with speed as a goal. It leverages concurrency and
+uses no external dependencies; everything happens within a single process (but
+with enough threads to saturate modern hardware).</p>
+
+<p>Measuring early boot time using qemu, I measured the <code>dracut</code>-generated
+initramfs taking 588ms to display the full disk encryption passphrase prompt,
+whereas <code>minitrd</code> took only 195ms.</p>
+
+<p>The rest of this article dives deeper into how <code>minitrd</code> works.</p>
+
+<h2 id="what-does-an-initramfs-do">What does an initramfs do?</h2>
+
+<p>Ultimately, the job of an initramfs is to make the root file system available
+and continue booting the system from there. Depending on the system setup, this
+involves the following 5 steps:</p>
+
+<h3 id="1-load-kernel-modules-to-access-the-block-devices-with-the-root-file-system">1. Load kernel modules to access the block devices with the root file system</h3>
+
+<p>Depending on the system, the block devices with the root file system might
+already be present when the initramfs runs, or some kernel modules might need to
+be loaded first. On my Dell XPS 9360 laptop, the NVMe system disk is already
+present when the initramfs starts, whereas in qemu, we need to load the
+<code>virtio_pci</code> module, followed by the <code>virtio_scsi</code> module.</p>
+
+<p>How will our userland program know which kernel modules to load? Linux kernel
+modules declare patterns for their supported hardware as an alias, e.g.:</p>
+
+<pre><code>initrd# grep virtio_pci lib/modules/5.4.6/modules.alias
+alias pci:v00001AF4d*sv*sd*bc*sc*i* virtio_pci
+</code></pre>
+
+<p>Devices in <code>sysfs</code> have a <code>modalias</code> file whose content can be matched against
+these declarations to identify the module to load:</p>
+
+<pre><code>initrd# cat /sys/devices/pci0000:00/*/modalias
+pci:v00001AF4d00001005sv00001AF4sd00000004bc00scFFi00
+pci:v00001AF4d00001004sv00001AF4sd00000008bc01sc00i00
+[…]
+</code></pre>
+
+<p>Hence, for the initial round of module loading, it is sufficient to locate all
+<code>modalias</code> files within <code>sysfs</code> and load the responsible modules.</p>
+
+<p>Loading a kernel module can result in new devices appearing. When that happens,
+the kernel sends a uevent, which the uevent consumer in userspace receives via a
+netlink socket. Typically, this consumer is <a href="https://manpages.debian.org/udev.7"><code>udev(7)</code></a>
+,
+but in our case, it’s <code>minitrd</code>.</p>
+
+<p>For each uevent messages that comes with a <code>MODALIAS</code> variable, <code>minitrd</code> will
+load the relevant kernel module(s).</p>
+
+<p>When loading a kernel module, its dependencies need to be loaded
+first. Dependency information is stored in the <code>modules.dep</code> file in a
+<code>Makefile</code>-like syntax:</p>
+
+<pre><code>initrd# grep virtio_pci lib/modules/5.4.6/modules.dep
+kernel/drivers/virtio/virtio_pci.ko: kernel/drivers/virtio/virtio_ring.ko kernel/drivers/virtio/virtio.ko
+</code></pre>
+
+<p>To load a module, we can open its file and then call the Linux-specific <a href="https://manpages.debian.org/finit_module.2"><code>finit_module(2)</code></a>
+ system call. Some modules are expected to
+return an error code, e.g. <code>ENODEV</code> or <code>ENOENT</code> when some hardware device is not
+actually present.</p>
+
+<p>Side note: next to the textual versions, there are also binary versions of the
+<code>modules.alias</code> and <code>modules.dep</code> files. Presumably, those can be queried more
+quickly, but for simplicitly, I have not (yet?) implemented support in
+<code>minitrd</code>.</p>
+
+<h3 id="2-console-settings-font-keyboard-layout">2. Console settings: font, keyboard layout</h3>
+
+<p>Setting a legible font is necessary for hi-dpi displays. On my Dell XPS 9360
+(3200 x 1800 QHD+ display), the following works well:</p>
+
+<pre><code>initrd# setfont latarcyrheb-sun32
+</code></pre>
+
+<p>Setting the user’s keyboard layout is necessary for entering the LUKS full-disk
+encryption passphrase in their preferred keyboard layout. I use the <a href="https://www.neo-layout.org">NEO
+layout</a>:</p>
+
+<pre><code>initrd# loadkeys neo
+</code></pre>
+
+<h3 id="3-block-device-identification">3. Block device identification</h3>
+
+<p>In the Linux kernel, block device enumeration order is not necessarily the same
+on each boot. Even if it was deterministic, device order could still be changed
+when users modify their computer’s device topology (e.g. connect a new disk to a
+formerly unused port).</p>
+
+<p>Hence, it is good style to refer to disks and their partitions with stable
+identifiers. This also applies to boot loader configuration, and so most
+distributions will set a kernel parameter such as
+<code>root=UUID=1fa04de7-30a9-4183-93e9-1b0061567121</code>.</p>
+
+<p>Identifying the block device or partition with the specified <code>UUID</code> is the
+initramfs’s job.</p>
+
+<p>Depending on what the device contains, the UUID comes from a different
+place. For example, <code>ext4</code> file systems have a UUID field in their file system
+superblock, whereas LUKS volumes have a UUID in their LUKS header.</p>
+
+<p>Canonically, probing a device to extract the UUID is done by <code>libblkid</code> from the
+<code>util-linux</code> package, but the logic can easily be <a href="https://github.com/distr1/distri/blob/master/cmd/minitrd/blkid.go">re-implemented in other
+languages</a>
+and changes rarely. <code>minitrd</code> comes with its own implementation to avoid
+<a href="https://golang.org/cmd/cgo/">cgo</a> or running the <a href="https://manpages.debian.org/blkid.8"><code>blkid(8)</code></a>
+ program.</p>
+
+<h3 id="4-luks-full-disk-encryption-unlocking-only-on-encrypted-systems">4. LUKS full-disk encryption unlocking (only on encrypted systems)</h3>
+
+<p>Unlocking a
+<a href="https://en.wikipedia.org/wiki/Linux_Unified_Key_Setup">LUKS</a>-encrypted volume
+is done in userspace. The kernel handles the crypto, but reading the metadata,
+obtaining the passphrase (or e.g. key material from a file) and setting up the
+device mapper table entries are done in user space.</p>
+
+<pre><code>initrd# modprobe algif_skcipher
+initrd# cryptsetup luksOpen /dev/sda4 cryptroot1
+</code></pre>
+
+<p>After the user entered their passphrase, the root file system can be mounted:</p>
+
+<pre><code>initrd# mount /dev/dm-0 /mnt
+</code></pre>
+
+<h3 id="5-continuing-the-boot-process-switch-root">5. Continuing the boot process (switch_root)</h3>
+
+<p>Now that everything is set up, we need to pass execution to the init program on
+the root file system with a careful sequence of <a href="https://manpages.debian.org/chdir.2"><code>chdir(2)</code></a>
+, <a href="https://manpages.debian.org/mount.2"><code>mount(2)</code></a>
+, <a href="https://manpages.debian.org/chroot.2"><code>chroot(2)</code></a>
+, <a href="https://manpages.debian.org/chdir.2"><code>chdir(2)</code></a>
+ and <a href="https://manpages.debian.org/execve.2"><code>execve(2)</code></a>
+ system calls that is explained in <a href="https://github.com/mirror/busybox/blob/9ec836c033fc6e55e80f3309b3e05acdf09bb297/util-linux/switch_root.c#L297">this busybox switch_root
+comment</a>.</p>
+
+<pre><code>initrd# mount -t devtmpfs dev /mnt/dev
+initrd# exec switch_root -c /dev/console /mnt /init
+</code></pre>
+
+<p>To conserve RAM, the files in the temporary file system to which the initramfs
+archive is extracted are typically deleted.</p>
+
+<h2 id="how-is-an-initramfs-generated">How is an initramfs generated?</h2>
+
+<p>An initramfs “image” (more accurately: archive) is a compressed
+<a href="https://en.wikipedia.org/wiki/Cpio">cpio</a> archive. Typically, gzip compression
+is used, but the kernel supports a bunch of different algorithms and
+distributions such as <a href="https://www.phoronix.com/scan.php?page=news_item&amp;px=LZ4-Initramfs-Ubuntu-Go-Ahead">Ubuntu are switching to lz4</a>.</p>
+
+<p>Generators typically prepare a temporary directory and feed it to the <a href="https://manpages.debian.org/cpio.1"><code>cpio(1)</code></a>
+ program. In <code>minitrd</code>, we read the files into memory
+and generate the cpio archive using the
+<a href="https://github.com/cavaliercoder/go-cpio">go-cpio</a> package. We use the
+<a href="https://github.com/klauspost/pgzip">pgzip</a> package for parallel gzip
+compression.</p>
+
+<p>The following files need to go into the cpio archive:</p>
+
+<h3 id="minitrd-go-userland">minitrd Go userland</h3>
+
+<p>The <code>minitrd</code> binary is copied into the cpio archive as <code>/init</code> and will be run
+by the kernel after extracting the archive.</p>
+
+<p>Like the rest of distri, <code>minitrd</code> is built statically without cgo, which means
+it can be copied as-is into the cpio archive.</p>
+
+<h3 id="linux-kernel-modules">Linux kernel modules</h3>
+
+<p>Aside from the <code>modules.alias</code> and <code>modules.dep</code> metadata files, the kernel
+modules themselves reside in e.g. <code>/lib/modules/5.4.6/kernel</code> and need to be
+copied into the cpio archive.</p>
+
+<p>Copying all modules results in a ≈80 MiB archive, so it is common to only copy
+modules that are relevant to the initramfs’s features. This reduces archive size
+to ≈24 MiB.</p>
+
+<p>The filtering relies on hard-coded patterns and module names. For example, disk
+encryption related modules are all kernel modules underneath <code>kernel/crypto</code>,
+plus <code>kernel/drivers/md/dm-crypt.ko</code>.</p>
+
+<p>When generating a host-only initramfs (works on precisely the computer that
+generated it), some initramfs generators look at the currently loaded modules
+and just copy those.</p>
+
+<h3 id="console-fonts-and-keymaps">Console Fonts and Keymaps</h3>
+
+<p>The <code>kbd</code> package’s <a href="https://manpages.debian.org/setfont.8"><code>setfont(8)</code></a>
+ and <a href="https://manpages.debian.org/loadkeys.1"><code>loadkeys(1)</code></a>
+ programs load console fonts and keymaps from
+<code>/usr/share/consolefonts</code> and <code>/usr/share/keymaps</code>, respectively.</p>
+
+<p>Hence, these directories need to be copied into the cpio archive. Depending on
+whether the initramfs should be generic (work on many computers) or host-only
+(works on precisely the computer/settings that generated it), the entire
+directories are copied, or only the required font/keymap.</p>
+
+<h3 id="cryptsetup-setfont-loadkeys">cryptsetup, setfont, loadkeys</h3>
+
+<p>These programs are (currently) required because <code>minitrd</code> does not implement
+their functionality.</p>
+
+<p>As they are dynamically linked, not only the programs themselves need to be
+copied, but also the ELF dynamic linking loader (path stored in the <code>.interp</code>
+ELF section) and any ELF library dependencies.</p>
+
+<p>For example, <code>cryptsetup</code> in distri declares the ELF interpreter
+<code>/ro/glibc-amd64-2.27-3/out/lib/ld-linux-x86-64.so.2</code> and declares dependencies
+on shared libraries <code>libcryptsetup.so.12</code>, <code>libblkid.so.1</code> and others. Luckily,
+in distri, packages contain a <code>lib</code> subdirectory containing symbolic links to
+the resolved shared library paths (hermetic packaging), so it is sufficient to
+mirror the lib directory into the cpio archive, recursing into shared library
+dependencies of shared libraries.</p>
+
+<p><code>cryptsetup</code> also requires the GCC runtime library <code>libgcc_s.so.1</code> to be present
+at runtime, and will abort with an error message about not being able to call
+<a href="https://manpages.debian.org/pthread_cancel.3"><code>pthread_cancel(3)</code></a>
+ if it is unavailable.</p>
+
+<h3 id="time-zone-data">time zone data</h3>
+
+<p>To print log messages in the correct time zone, we copy <code>/etc/localtime</code> from
+the host into the cpio archive.</p>
+
+<h2 id="minitrd-outside-of-distri">minitrd outside of distri?</h2>
+
+<p>I currently have no desire to make <code>minitrd</code> available outside of
+<a href="https://distr1.org/">distri</a>. While the technical challenges (such as extending
+the generator to not rely on distri’s hermetic packages) are surmountable, I
+don’t want to support people’s initramfs remotely.</p>
+
+<p>Also, I think that people’s efforts should in general be spent on rallying
+behind <code>dracut</code> and making it work faster, thereby benefiting all Linux
+distributions that use dracut (increasingly more). With <code>minitrd</code>, I have
+demonstrated that significant speed-ups are achievable.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>It was interesting to dive into how an initramfs really works. I had been
+working with the concept for many years, from small tasks such as “debug why the
+encrypted root file system is not unlocked” to more complicated tasks such as
+“set up a root file system on DRBD for a high-availability setup”. But even with
+that sort of experience, I didn’t know all the details, until I was forced to
+implement every little thing.</p>
+
+<p>As I suspected going into this exercise, <code>dracut</code> is much slower than it needs
+to be. Re-implementing its generation stage in a modern language instead of
+shell helps a lot.</p>
+
+<p>Of course, my <code>minitrd</code> does a bit less than <code>dracut</code>, but not drastically
+so. The overall architecture is the same.</p>
+
+<p>I hope my effort helps with two things:</p>
+
+<ol>
+<li><p>As a teaching implementation: instead of wading through the various
+components that make up a modern initramfs (udev, systemd, various shell
+scripts, …), people can learn about how an initramfs works in a single place.</p></li>
+
+<li><p>I hope the significant time difference motivates people to improve <code>dracut</code>.</p></li>
+</ol>
+
+<h2 id="appendix-qemu-development-environment">Appendix: qemu development environment</h2>
+
+<p>Before writing any Go code, I did some manual prototyping. Learning how other
+people prototype is often immensely useful to me, so I’m sharing my notes here.</p>
+
+<p>First, I copied all kernel modules and a statically built busybox binary:</p>
+
+<pre><code>% mkdir -p lib/modules/5.4.6
+% cp -Lr /ro/lib/modules/5.4.6/* lib/modules/5.4.6/
+% cp ~/busybox-1.22.0-amd64/busybox sh
+</code></pre>
+
+<p>To generate an initramfs from the current directory, I used:</p>
+
+<pre><code>% find . | cpio -o -H newc | pigz &gt; /tmp/initrd
+</code></pre>
+
+<p>In distri’s <code>Makefile</code>, I append these flags to the <code>QEMU</code> invocation:</p>
+
+<pre><code>-kernel /tmp/kernel \
+-initrd /tmp/initrd \
+-append &quot;root=/dev/mapper/cryptroot1 rdinit=/sh ro console=ttyS0,115200 rd.luks=1 rd.luks.uuid=63051f8a-54b9-4996-b94f-3cf105af2900 rd.luks.name=63051f8a-54b9-4996-b94f-3cf105af2900=cryptroot1 rd.vconsole.keymap=neo rd.vconsole.font=latarcyrheb-sun32 init=/init systemd.setenv=PATH=/bin rw vga=836&quot;
+</code></pre>
+
+<p>The <code>vga=</code> mode parameter is required for loading font <code>latarcyrheb-sun32</code>.</p>
+
+<p>Once in the <code>busybox</code> shell, I manually prepared the required mount points and
+kernel modules:</p>
+
+<pre><code>ln -s sh mount
+ln -s sh lsmod
+mkdir /proc /sys /run /mnt
+mount -t proc proc /proc
+mount -t sysfs sys /sys
+mount -t devtmpfs dev /dev
+modprobe virtio_pci
+modprobe virtio_scsi
+</code></pre>
+
+<p>As a next step, I copied <code>cryptsetup</code> and dependencies into the initramfs directory:</p>
+
+<pre><code>% for f in /ro/cryptsetup-amd64-2.0.4-6/lib/*; do full=$(readlink -f $f); rel=$(echo $full | sed 's,^/,,g'); mkdir -p $(dirname $rel); install $full $rel; done
+% ln -s ld-2.27.so ro/glibc-amd64-2.27-3/out/lib/ld-linux-x86-64.so.2
+% cp /ro/glibc-amd64-2.27-3/out/lib/ld-2.27.so ro/glibc-amd64-2.27-3/out/lib/ld-2.27.so
+% cp -r /ro/cryptsetup-amd64-2.0.4-6/lib ro/cryptsetup-amd64-2.0.4-6/
+% mkdir -p ro/gcc-libs-amd64-8.2.0-3/out/lib64/
+% cp /ro/gcc-libs-amd64-8.2.0-3/out/lib64/libgcc_s.so.1 ro/gcc-libs-amd64-8.2.0-3/out/lib64/libgcc_s.so.1
+% ln -s /ro/gcc-libs-amd64-8.2.0-3/out/lib64/libgcc_s.so.1 ro/cryptsetup-amd64-2.0.4-6/lib
+% cp -r /ro/lvm2-amd64-2.03.00-6/lib ro/lvm2-amd64-2.03.00-6/
+</code></pre>
+
+<p>In <code>busybox</code>, I used the following commands to unlock the root file system:</p>
+
+<pre><code>modprobe algif_skcipher
+./cryptsetup luksOpen /dev/sda4 cryptroot1
+mount /dev/dm-0 /mnt
+</code></pre>
+]]></content>
+  </entry>
   <entry>
     <title type="html"><![CDATA[distri: a Linux distribution to research fast package management]]></title>
     <link href="https://michael.stapelberg.ch/posts/2019-08-17-introducing-distri/"/>

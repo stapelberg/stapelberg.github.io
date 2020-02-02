@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Readiness notifications in Go</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.ch/posts/2020-02-02-readiness-notifications-in-golang/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    
+    <link rel="stylesheet" href="/1.min.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+
+
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+	<div id="menu" class="col-md-2">
+  <div style="display: flex; align-items: center">
+    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
+    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+  </div>
+
+  <ul class="menu_open">
+    <li><a class="menu_item" href="/"><span class="menu_title">About</span></a></li>
+    <li><a class="menu_item" href="/posts/"><span class="menu_title">Blog</span></a></li>
+    <li><span class="menu_title">Programs</span>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
+	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
+  </ul>
+</div>
+
+	<div id="contentBox" class="col-md-10">
+	  <h2 class="title">Readiness notifications in Go</h2>
+	  <div style="margin-bottom: 2em">
+	    <span id="date">published 2020-02-02</span>
+	    
+	  
+	  <span style="background-color: black; border-radius: 25%; padding-left: 0.1em; padding-right: 0.1em">
+	    <a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2020-02-02-readiness-notifications-in-golang.markdown">✎</a>
+	  </span>
+	  </div>
+	  <div class="Artikel" id="content">
+	    
+
+<p>When spawning a child program, for example in an integration test, it is often
+helpful to know when the child program is ready to receive requests.</p>
+
+<h3 id="delaying">Delaying</h3>
+
+<p>A brittle strategy is to just add a delay (say, <code>time.Sleep(2 * time.Second)</code>)
+and hope the child program finishes initialization in that time. This is brittle
+because it depends on timing, so when the computer running the test is slow for
+whichever reason, your test starts failing. Many CI/CD systems have less
+capacity (and/or are more heavily utilized) than developer machines, so timeouts
+frequently need to be adjusted.</p>
+
+<p>Also, relying on timing is a race to the bottom: your delay needs to work on the
+slowest machine that runs your code. Ergo, tests waste valuable developer time
+on your high-end workstation, just so that they pass on some under-powered
+machine.</p>
+
+<h3 id="polling">Polling</h3>
+
+<p>A slightly better strategy is polling, i.e. repeatedly checking whether the
+child program is ready. As an example, in the <code>dnsmasq_exporter</code> test, <a href="https://github.com/google/dnsmasq_exporter/blob/646ded9be82e26a4c6450da8d7128d12e0e11e3a/dnsmasq_test.go#L46-L61">I need
+to
+poll</a>
+to find out when <a href="https://manpages.debian.org/dnsmasq.8"><code>dnsmasq(8)</code></a>
+ is ready.</p>
+
+<p>This approach is better because it automatically works well on both high-end and
+under-powered machines, without wasting time on either.</p>
+
+<p>Finding a good frequency with which to poll is a bit of an art, though: the more
+often you poll, the less time you waste, but also the more resources you spend
+on polling instead of letting your program initialize. The overhead may be
+barely noticeable, but when starting lots of programs (e.g. in a microservice
+architecture) or when individual polls are costly, the overhead can add up.</p>
+
+<h3 id="readiness-notifications">Readiness notifications</h3>
+
+<p>The most elegant approach is to use readiness notifications: you don’t waste any
+time or resources.</p>
+
+<p>It only takes a few lines of code to integrate this approach into your
+application. The specifics might vary depending on your environment,
+e.g. whether an environment variable is preferable to a command-line flag; my
+goal with this article is to explain the approach in general, and you can take
+care of the details.</p>
+
+<p>The key idea is: the child program inherits a pipe file descriptor from the
+parent and closes it once ready. The parent program knows the child program is
+ready because an otherwise blocking read from the pipe returns once the pipe is
+closed.</p>
+
+<p>This is similar to using a <code>chan struct{}</code> in Go and closing it. It doesn’t have
+to remain this simple, though: you can also send arbitrary data over the pipe,
+ranging from a simple string being sent in one direction and culminating in
+speaking a framed protocol in a client/server fashion. In <a href="https://codesearch.debian.net/">Debian Code
+Search</a>, I’m <a href="https://github.com/Debian/dcs/blob/3baaecabca2d6c56799012c40c1245fc389cb6e6/internal/addrfd/addrfd.go">writing the chosen network
+address</a>
+before closing the pipe, so that the parent program knows where to connect to.</p>
+
+<h4 id="parent-program">Parent Program</h4>
+
+<p>So, how do we go about readiness notifications in Go? We create a new pipe and
+specify the write end in the <code>ExtraFiles</code> field of <code>(os/exec).Cmd</code>:</p>
+
+<pre><code>r, w, err := os.Pipe()
+if err != nil {
+  return err
+}
+
+child := exec.Command(&quot;child&quot;)
+child.Stderr = os.Stderr
+child.ExtraFiles = []*os.File{w}
+</code></pre>
+
+<p>It is good practice to explicitly specify the file descriptor number that we
+passed via some sort of signaling, so that the child program does not need to be
+modified when we add new file descriptors in the parent, and also because this
+behavior is usually opt-in.</p>
+
+<p>In this case, we’ll do that via an environment variable and start the child
+program:</p>
+
+<pre><code>// Go dup2()’s ExtraFiles to file descriptor 3 and counting.
+// File descriptors 0, 1, 2 are stdin, stdout and stderr.
+child.Env = append(os.Environ(), &quot;CHILD_READY_FD=3&quot;)
+
+// Note child.Start(), not child.Run():
+if err := child.Start(); err != nil {
+  return fmt.Errorf(&quot;%v: %v&quot;, child.Args, err)
+}
+</code></pre>
+
+<p>At this point, both the parent and the child process have a file descriptor
+referencing the write end of the pipe. Since the pipe will only be closed once
+<em>all</em> processes have closed the write end, we need to close the write end in the
+parent program:</p>
+
+<pre><code>// Close the write end of the pipe in the parent:
+w.Close()
+</code></pre>
+
+<p>Now, we can blockingly read from the pipe, and know that once the read call
+returns, the child program is ready to receive requests:</p>
+
+<pre><code>// Avoid hanging forever in case the child program never becomes ready;
+// this is easier to diagnose than an unspecified CI/CD test timeout.
+// This timeout should be much much longer than initialization takes.
+r.SetReadDeadline(time.Now().Add(1 * time.Minute))
+if _, err := ioutil.ReadAll(r); err != nil {
+  return fmt.Errorf(&quot;awaiting readiness: %v&quot;, err)
+}
+
+// …send requests…
+
+// …tear down child program…
+</code></pre>
+
+<h4 id="child-program">Child Program</h4>
+
+<p>In the child program, we need to recognize that the parent program requests a
+readiness notification, and ensure our signaling doesn’t leak to child programs
+of the child program:</p>
+
+<pre><code>var readyFile *os.File
+
+func init() {
+  if fd, err := strconv.Atoi(os.Getenv(&quot;CHILD_READY_FD&quot;)); err == nil {
+    readyFile = os.NewFile(uintptr(fd), &quot;readyfd&quot;)
+    os.Unsetenv(&quot;CHILD_READY_FD&quot;)
+  }
+}
+
+func main() {
+  // …initialize…
+
+  if readyFile != nil {
+    readyFile.Close() // signal readiness
+    readyFile = nil   // just to be prudent
+  }
+}
+</code></pre>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>Depending on what you’re communicating from the child to the parent, and how
+your system is architected, it might be a good idea to use <a href="http://0pointer.de/blog/projects/socket-activation.html">systemd socket
+activation</a> (<a href="https://vincent.bernat.ch/en/blog/2018-systemd-golang-socket-activation">socket
+activation in
+Go</a>). It
+works similarly in concept, but passes a listening socket and readiness is
+determined by the child process answering requests. We introduced this technique
+in the <a href="https://i3wm.org/docs/testsuite.html#_appendix_b_socket_activation">i3
+testsuite</a>
+and reduced the total wallclock time from &gt;100 seconds to a mere 16 seconds back
+then (even faster today).</p>
+
+<p>The technique described in this blog post is a bit more generic than systemd’s
+socket activation. In general, passing file descriptors between processes is a
+powerful idea. For example, in debiman, we’re <a href="https://github.com/Debian/debiman/blob/32eac1bc6182f68c7443a56b85c33522dc3d5d70/internal/convert/mandoc.go#L118">passing individual pipe file
+descriptors</a>
+to a persistent <a href="https://manpages.debian.org/mandocd.8"><code>mandocd(8)</code></a>
+ process to quickly
+convert lots of man pages without encurring process creation overhead.</p>
+
+	  </div>
+	</div>
+      </div>
+    </div>
+  </body>
+</html>

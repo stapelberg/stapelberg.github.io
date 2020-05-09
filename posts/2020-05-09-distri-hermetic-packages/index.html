@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Hermetic packages (in distri)</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.ch/posts/2020-05-09-distri-hermetic-packages/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    
+    <link rel="stylesheet" href="/1.min.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+
+
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+	<div id="menu" class="col-md-2">
+  <div style="display: flex; align-items: center">
+    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
+    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+  </div>
+
+  <ul class="menu_open">
+    <li><a class="menu_item" href="/"><span class="menu_title">About</span></a></li>
+    <li><a class="menu_item" href="/posts/"><span class="menu_title">Blog</span></a></li>
+    <li><span class="menu_title">Programs</span>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
+	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
+  </ul>
+</div>
+
+	<div id="contentBox" class="col-md-10">
+	  <h2 class="title">Hermetic packages (in distri)</h2>
+	  <div style="margin-bottom: 2em">
+	    <span id="date">published 2020-05-09</span>
+	    
+	  
+	  
+	  in tags
+	  
+	  
+	  <span class="tag"><a href="/posts/tags/distri/">distri</a></span>
+	  
+	  <span class="tag"><a href="/posts/tags/debian/">debian</a></span>
+	  
+	  
+	  <span style="background-color: black; border-radius: 25%; padding-left: 0.1em; padding-right: 0.1em">
+	    <a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2020-05-09-distri-hermetic-packages.markdown">✎</a>
+	  </span>
+	  </div>
+	  <div class="Artikel" id="content">
+	    <style type="text/css">
+	      #TableOfContents > ul, #TableOfContents > ul > li > ul {
+		  list-style: none;
+		  margin: 0;
+		  padding: 0;
+	      }
+	    </style>
+	    <details style="margin-bottom: 2em">
+	      <summary>Table of contents</summary>
+	      <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#out-of-scope-plugins-are-not-hermetic-by-design">Out of scope: plugins are not hermetic by design</a></li>
+<li><a href="#implementation-of-hermetic-packages-in-distri">Implementation of hermetic packages in distri</a>
+<ul>
+<li><a href="#elf-interpreter-and-dynamic-libraries">ELF interpreter and dynamic libraries</a></li>
+<li><a href="#environment-variable-setup-wrapper-programs">Environment variable setup wrapper programs</a></li>
+<li><a href="#shebang-interpreter-patching">Shebang interpreter patching</a></li>
+<li><a href="#performance-requirements">Performance requirements</a></li>
+</ul></li>
+<li><a href="#downside-rebuild-of-packages-required-to-pick-up-changes">Downside: rebuild of packages required to pick up changes</a></li>
+<li><a href="#downside-long-env-variables-are-cumbersome-to-deal-with">Downside: long env variables are cumbersome to deal with</a></li>
+<li><a href="#edge-cases">Edge cases</a>
+<ul>
+<li><a href="#issue-accidental-abi-breakage-in-plugin-mechanisms">Issue: accidental ABI breakage in plugin mechanisms</a></li>
+<li><a href="#issue-wrapper-bypass-when-a-program-re-executes-itself">Issue: wrapper bypass when a program re-executes itself</a></li>
+<li><a href="#misc-smaller-issues">Misc smaller issues</a></li>
+</ul></li>
+<li><a href="#appendix-could-other-distributions-adopt-hermetic-packages">Appendix: Could other distributions adopt hermetic packages?</a></li>
+<li><a href="#appendix-demo-in-distri">Appendix: demo (in distri)</a></li>
+</ul></li>
+</ul>
+</nav>
+	    </details>
+	    
+
+<p>In <a href="https://distr1.org/">distri</a>, packages (e.g. <code>emacs</code>) are hermetic. By
+hermetic, I mean that the dependencies a package uses (e.g. <code>libusb</code>) don’t
+change, even when newer versions are installed.</p>
+
+<p>For example, if package <code>libusb-amd64-1.0.22-7</code> is available at build time, the
+package will always use that same version, even after the newer
+<code>libusb-amd64-1.0.23-8</code> will be installed into the package store.</p>
+
+<p>Another way of saying the same thing is: <em>packages in distri are always
+co-installable</em>.</p>
+
+<p>This makes the package store more robust: additions to it will not break the
+system. On a technical level, the package store is implemented as a directory
+containing distri SquashFS images and metadata files, into which packages are
+installed in an atomic way.</p>
+
+<h2 id="out-of-scope-plugins-are-not-hermetic-by-design">Out of scope: plugins are not hermetic by design</h2>
+
+<p>One exception where hermeticity is not desired are plugin mechanisms: optionally
+loading out-of-tree code at runtime obviously is not hermetic.</p>
+
+<p>As an example, consider <a href="https://www.gnu.org/software/libc/manual/html_node/Name-Service-Switch.html">glibc’s Name Service Switch
+(NSS)</a>
+mechanism. Page <a href="https://www.gnu.org/software/libc/manual/html_node/Adding-another-Service-to-NSS.html#Adding-another-Service-to-NSS">29.4.1 Adding another Service to
+NSS</a>
+describes how glibc searches <code>$prefix/lib</code> for shared libraries at runtime.</p>
+
+<p>Debian <a href="https://packages.debian.org/search?suite=buster&amp;arch=amd64&amp;mode=filename&amp;searchon=contents&amp;keywords=libnss_%20.so.2">ships about a dozen NSS
+libraries</a>
+for a variety of purposes, and enterprise setups might add their own into the
+mix.</p>
+
+<p>systemd (as of v245) accounts for 4 NSS libraries,
+e.g. <a href="https://www.freedesktop.org/software/systemd/man/nss-systemd.html">nss-systemd</a>
+for user/group name resolution for users allocated through <a href="https://www.freedesktop.org/software/systemd/man/systemd.exec.html">systemd’s
+<code>DynamicUser=</code></a>
+option.</p>
+
+<p>Having packages be as hermetic as possible remains a worthwhile goal despite any
+exceptions: I will gladly use a 99% hermetic system over a 0% hermetic system
+any day.</p>
+
+<p>Side note: Xorg’s driver model (which can be characterized as a plugin
+mechanism) does not fall under this category because of its tight API/ABI
+coupling! For this case, where drivers are only guaranteed to work with
+precisely the Xorg version for which they were compiled, distri uses per-package
+exchange directories.</p>
+
+<h2 id="implementation-of-hermetic-packages-in-distri">Implementation of hermetic packages in distri</h2>
+
+<p>On a technical level, the requirement is: all paths used by the program must
+always result in the same contents. This is implemented in distri via the
+read-only package store mounted at <code>/ro</code>, e.g. files underneath
+<code>/ro/emacs-amd64-26.3-15</code> never change.</p>
+
+<p>To change all paths used by a program, in practice, three strategies cover most
+paths:</p>
+
+<h3 id="elf-interpreter-and-dynamic-libraries">ELF interpreter and dynamic libraries</h3>
+
+<p>Programs on Linux use the <a href="https://en.wikipedia.org/wiki/Executable_and_Linkable_Format">ELF file
+format</a>, which
+contains two kinds of references:</p>
+
+<p>First, <strong>the ELF interpreter</strong> (<code>PT_INTERP</code> segment), which is used to start the
+program. For dynamically linked programs on 64-bit systems, this is typically
+<a href="https://manpages.debian.org/testing/manpages/ld.so.8.en.html"><code>ld.so(8)</code></a>.</p>
+
+<p>Many distributions use system-global paths such as
+<code>/lib64/ld-linux-x86-64.so.2</code>, but distri compiles programs with
+<code>-Wl,--dynamic-linker=/ro/glibc-amd64-2.31-4/out/lib/ld-linux-x86-64.so.2</code> so
+that the full path ends up in the binary.</p>
+
+<p>The ELF interpreter is shown by <code>file(1)</code>, but you can also use <code>readelf -a
+$BINARY | grep 'program interpreter'</code> to display it.</p>
+
+<p>And secondly, <a href="https://en.wikipedia.org/wiki/Rpath"><strong>the rpath</strong>, a run-time search
+path</a> for dynamic libraries. Instead of
+storing full references to all dynamic libraries, we set the rpath so that
+<code>ld.so(8)</code> will find the correct dynamic libraries.</p>
+
+<p>Originally, we used to just set a long rpath, containing one entry for each
+dynamic library dependency. However, we have since <a href="https://github.com/distr1/distri/commit/19f342071283f4d78353bdbac8d6849809927f93">switched to using a single
+<code>lib</code> subdirectory per
+package</a>
+as its rpath, and placing symlinks with full path references into that <code>lib</code>
+directory, e.g. using <code>-Wl,-rpath=/ro/grep-amd64-3.4-4/lib</code>. This is better for
+performance, as <code>ld.so</code> uses a per-directory cache.</p>
+
+<p>Note that program load times are significantly influenced by how quickly you can
+locate the dynamic libraries. distri uses a FUSE file system to load programs
+from, so <a href="https://github.com/distr1/distri/commit/b6a0e43368d54d5ed0e03af687158dc3e2106e38">getting proper <code>-ENOENT</code> caching into
+place</a>
+drastically sped up program load times.</p>
+
+<p>Instead of compiling software with the <code>-Wl,--dynamic-linker</code> and <code>-Wl,-rpath</code>
+flags, one can also modify these fields after the fact using <code>patchelf(1)</code>. For
+closed-source programs, this is the only possibility.</p>
+
+<p>The rpath can be inspected by using e.g. <code>readelf -a $BINARY | grep RPATH</code>.</p>
+
+<h3 id="environment-variable-setup-wrapper-programs">Environment variable setup wrapper programs</h3>
+
+<p>Many programs are influenced by environment variables: to start another program,
+said program is often found by checking each directory in the <code>PATH</code> environment
+variable.</p>
+
+<p>Such search paths are prevalent in scripting languages, too, to find
+modules. Python has <code>PYTHONPATH</code>, Perl has <code>PERL5LIB</code>, and so on.</p>
+
+<p>To set up these search path environment variables at run time, distri employs an
+indirection. Instead of e.g. <code>teensy-loader-cli</code>, you run a small wrapper
+program that calls precisely one <code>execve</code> system call with the desired
+environment variables.</p>
+
+<p>Initially, I used shell scripts as wrapper programs because they are easily
+inspectable. This turned out to be too slow, so I switched to <a href="https://github.com/distr1/distri/blob/3ee4437f88605174fd82144381cfa726fc683ccb/internal/build/build.go#L1085-L1112">compiled
+programs</a>. I’m
+linking them statically for fast startup, and I’m linking them against <a href="https://musl.libc.org/">musl
+libc</a> for significantly smaller file sizes than glibc
+(per-executable overhead adds up quickly in a distribution!).</p>
+
+<p>Note that the wrapper programs prepend to the <code>PATH</code> environment variable, they
+don’t replace it in its entirely. This is important so that users have a way to
+extend the <code>PATH</code> (and other variables) if they so choose. This doesn’t hurt
+hermeticity because it is only relevant for programs that were not present at
+build time, i.e. plugin mechanisms which, by design, cannot be hermetic.</p>
+
+<h3 id="shebang-interpreter-patching">Shebang interpreter patching</h3>
+
+<p>The <a href="https://en.wikipedia.org/wiki/Shebang_(Unix)">Shebang</a> of scripts contains
+a path, too, and hence needs to be changed.</p>
+
+<p><a href="https://github.com/distr1/distri/issues/67">We don’t do this in distri yet</a>
+(the number of packaged scripts is small), but we should.</p>
+
+<h3 id="performance-requirements">Performance requirements</h3>
+
+<p>The performance improvements in the previous sections are not just good to have,
+but practically required when many processes are involved: without them, you’ll
+encounter second-long delays in <a href="https://magit.vc/">magit</a> which spawns many git
+processes under the covers, or in
+<a href="https://en.wikipedia.org/wiki/Dracut_(software)">dracut</a>, which spawns one
+<code>cp(1)</code> process per file.</p>
+
+<h2 id="downside-rebuild-of-packages-required-to-pick-up-changes">Downside: rebuild of packages required to pick up changes</h2>
+
+<p>Linux distributions such as Debian consider it an advantage to roll out security
+fixes to the entire system by updating a single shared library package
+(e.g. <code>openssl</code>).</p>
+
+<p>The flip side of that coin is that changes to a single critical package can
+break the entire system.</p>
+
+<p>With hermetic packages, all reverse dependencies must be rebuilt when a
+library’s changes should be picked up by the whole system. E.g., when <code>openssl</code>
+changes, <code>curl</code> must be rebuilt to pick up the new version of <code>openssl</code>.</p>
+
+<p>This approach trades off using more bandwidth and more disk space (temporarily)
+against reducing the blast radius of any individual package update.</p>
+
+<h2 id="downside-long-env-variables-are-cumbersome-to-deal-with">Downside: long env variables are cumbersome to deal with</h2>
+
+<p>This can be partially mitigated by <a href="https://github.com/distr1/distri/commit/6ac53cac4a5027622ae8622be2a208778dd54e74">removing empty directories at build
+time</a>,
+which will result in shorter variables.</p>
+
+<p>In general, there is no getting around this. One little trick is to use <code>tr :
+'\n'</code>, e.g.:</p>
+
+<pre><code>distri0# echo $PATH
+/usr/bin:/bin:/usr/sbin:/sbin:/ro/openssh-amd64-8.2p1-11/out/bin
+
+distri0# echo $PATH | tr : '\n'
+/usr/bin
+/bin
+/usr/sbin
+/sbin
+/ro/openssh-amd64-8.2p1-11/out/bin
+</code></pre>
+
+<h2 id="edge-cases">Edge cases</h2>
+
+<p>The implementation outlined above works well in hundreds of packages, and only a
+small handful exhibited problems of any kind. Here are some issues I encountered:</p>
+
+<h3 id="issue-accidental-abi-breakage-in-plugin-mechanisms">Issue: accidental ABI breakage in plugin mechanisms</h3>
+
+<p>NSS libraries built against glibc 2.28 and newer <a href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=928769">cannot be loaded by glibc
+2.27</a>. In all
+likelihood, such changes do not happen too often, but it does illustrate that
+glibc’s <a href="https://www.gnu.org/software/libc/manual/html_node/Adding-another-Service-to-NSS.html#Adding-another-Service-to-NSS">published interface
+spec</a>
+is not sufficient for forwards and backwards compatibility.</p>
+
+<p>In distri, we could likely use a per-package exchange directory for glibc’s NSS
+mechanism to prevent the above problem from happening in the future.</p>
+
+<h3 id="issue-wrapper-bypass-when-a-program-re-executes-itself">Issue: wrapper bypass when a program re-executes itself</h3>
+
+<p>Some programs try to arrange for themselves to be re-executed outside of their
+current process tree. For example, consider building a program with the <code>meson</code>
+build system:</p>
+
+<ol>
+<li><p>When <code>meson</code> first configures the build, it generates <code>ninja</code> files (think
+Makefiles) which contain command lines that run the <code>meson --internal</code>
+helper.</p></li>
+
+<li><p>Once <code>meson</code> returns, <code>ninja</code> is called as a separate process, so it will not
+have the environment which the <code>meson</code> wrapper sets up. <code>ninja</code> then runs the
+previously persisted <code>meson</code> command line. Since the command line uses the
+full path to <code>meson</code> (not to its wrapper), it bypasses the wrapper.</p></li>
+</ol>
+
+<p>Luckily, not many programs try to arrange for other process trees to run
+them. Here is a table summarizing how affected programs might try to arrange for
+re-execution, whether the technique results in a wrapper bypass, and what we do
+about it in distri:</p>
+
+<table>
+<thead>
+<tr>
+<th>technique to execute itself</th>
+<th>uses wrapper</th>
+<th>mitigation</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>run-time: find own basename in <code>PATH</code></td>
+<td>yes</td>
+<td>wrapper program</td>
+</tr>
+
+<tr>
+<td>compile-time: embed expected path</td>
+<td>no; bypass!</td>
+<td>configure or patch</td>
+</tr>
+
+<tr>
+<td>run-time: <code>argv[0]</code> or <code>/proc/self/exe</code></td>
+<td>no; bypass!</td>
+<td><a href="https://github.com/distr1/distri/commit/f45ee9ac1121da284f2943c80e2c30afa24ca80d">patch</a></td>
+</tr>
+</tbody>
+</table>
+
+<p>One might think that setting <code>argv[0]</code> to the wrapper location seems like a way
+to side-step this problem. We tried doing this in distri, but <a href="https://github.com/distr1/distri/commit/b517cb33ed827d358b00737434c7a09dd75583b7">had to
+revert</a>
+and <a href="https://github.com/distr1/distri/commit/9fd34936d4415f9963202bbb9ee454c970874b18">go the other
+way</a>.</p>
+
+<h3 id="misc-smaller-issues">Misc smaller issues</h3>
+
+<ul>
+<li>Login shells are <a href="https://unix.stackexchange.com/a/46856/181634">started by convention with a <code>-</code> character prepended to
+<code>argv[0]</code></a>, so <a href="https://github.com/distr1/distri/commit/3c3a9d6ef4fc76edca6fb8351a716b18b83ff3af">shells like
+bash or zsh cannot use wrapper
+programs</a>.</li>
+<li><a href="https://github.com/distr1/distri/commit/cefded2b2ce39407cc2d75936ec6cb018d533846">LDFLAGS leaked to
+pkgconfig</a>
+(<a href="https://github.com/distr1/distri/commit/434b7298ad7ef8d4ae229df84dd2353badf48fa1">upstream
+reports</a>)</li>
+<li><a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1635036">mozjs tries to run autoconf with the shell directly, but should use
+autoconf’s wrapper</a></li>
+</ul>
+
+<h2 id="appendix-could-other-distributions-adopt-hermetic-packages">Appendix: Could other distributions adopt hermetic packages?</h2>
+
+<p>At a very high level, adopting hermetic packages will require two steps:</p>
+
+<ol>
+<li><p>Using fully qualified paths whose contents don’t change
+(e.g. <code>/ro/emacs-amd64-26.3-15</code>) generally requires rebuilding programs,
+e.g. with <code>--prefix</code> set.</p></li>
+
+<li><p>Once you use fully qualified paths you need to make the packages able to
+exchange data. distri solves this with exchange directories, implemented in the
+<code>/ro</code> file system which is backed by a FUSE daemon.</p></li>
+</ol>
+
+<p>The first step is pretty simple, whereas the second step is where I expect
+controversy around any suggested mechanism.</p>
+
+<h2 id="appendix-demo-in-distri">Appendix: demo (in distri)</h2>
+
+<p>This appendix contains commands and their outputs, run on upcoming distri
+version <code>supersilverhaze</code>, but verified to work on older versions, too.</p>
+
+<p>Large outputs have been collapsed and can be expanded by clicking on the output.</p>
+
+<p>The <code>/bin</code> directory contains symlinks for the union of all package’s <code>bin</code> subdirectories:
+<details class="output" open><summary><code>distri0# readlink -f /bin/teensy_loader_cli</code></summary><pre><code>/ro/teensy-loader-cli-amd64-2.1+g20180927-7/bin/teensy_loader_cli</code></pre></details></p>
+
+<p>The wrapper program in the <code>bin</code> subdirectory is small:
+<details class="output" open><summary><code>distri0# ls -lh $(readlink -f /bin/teensy_loader_cli)</code></summary><pre><code>-rwxr-xr-x 1 root root 46K Apr 21 21:56 /ro/teensy-loader-cli-amd64-2.1+g20180927-7/bin/teensy_loader_cli</code></pre></details></p>
+
+<p>Wrapper programs execute quickly:
+<details class="output"><summary><code>distri0# strace -fvy /bin/teensy_loader_cli |&amp; head | cat -n</code></summary><pre><code>     1  execve(&quot;/bin/teensy_loader_cli&quot;, [&quot;/bin/teensy_loader_cli&quot;], [&quot;USER=root&quot;, &quot;LOGNAME=root&quot;, &quot;HOME=/root&quot;, &quot;PATH=/ro/bash-amd64-5.0-4/bin:/r&quot;..., &quot;SHELL=/bin/zsh&quot;, &quot;TERM=screen.xterm-256color&quot;, &quot;XDG_SESSION_ID=c1&quot;, &quot;XDG_RUNTIME_DIR=/run/user/0&quot;, &quot;DBUS_SESSION_BUS_ADDRESS=unix:pa&quot;..., &quot;XDG_SESSION_TYPE=tty&quot;, &quot;XDG_SESSION_CLASS=user&quot;, &quot;SSH_CLIENT=10.0.2.2 42556 22&quot;, &quot;SSH_CONNECTION=10.0.2.2 42556 10&quot;..., &quot;SSH<em>TTY=/dev/pts/0&quot;, &quot;SHLVL=1&quot;, &quot;PWD=/root&quot;, &quot;OLDPWD=/root&quot;, &quot;</em>=/usr/bin/strace&quot;, &quot;LD_LIBRARY_PATH=/ro/bash-amd64-5&quot;..., &quot;PERL5LIB=/ro/bash-amd64-5.0-4/ou&quot;..., &quot;PYTHONPATH=/ro/bash-amd64-5.b0-4/&quot;...]) = 0
+     2  arch_prctl(ARCH_SET_FS, 0x40c878)       = 0
+     3  set_tid_address(0x40ca9c)               = 715
+     4  brk(NULL)                               = 0x15b9000
+     5  brk(0x15ba000)                          = 0x15ba000
+     6  brk(0x15bb000)                          = 0x15bb000
+     7  brk(0x15bd000)                          = 0x15bd000
+     8  brk(0x15bf000)                          = 0x15bf000
+     9  brk(0x15c1000)                          = 0x15c1000
+    10  execve(&quot;/ro/teensy-loader-cli-amd64-2.1+g20180927-7/out/bin/teensy_loader_cli&quot;, [&quot;/ro/teensy-loader-cli-amd64-2.1+&quot;...], [&quot;USER=root&quot;, &quot;LOGNAME=root&quot;, &quot;HOME=/root&quot;, &quot;PATH=/ro/bash-amd64-5.0-4/bin:/r&quot;..., &quot;SHELL=/bin/zsh&quot;, &quot;TERM=screen.xterm-256color&quot;, &quot;XDG_SESSION_ID=c1&quot;, &quot;XDG_RUNTIME_DIR=/run/user/0&quot;, &quot;DBUS_SESSION_BUS_ADDRESS=unix:pa&quot;..., &quot;XDG_SESSION_TYPE=tty&quot;, &quot;XDG_SESSION_CLASS=user&quot;, &quot;SSH_CLIENT=10.0.2.2 42556 22&quot;, &quot;SSH_CONNECTION=10.0.2.2 42556 10&quot;..., &quot;SSH<em>TTY=/dev/pts/0&quot;, &quot;SHLVL=1&quot;, &quot;PWD=/root&quot;, &quot;OLDPWD=/root&quot;, &quot;</em>=/usr/bin/strace&quot;, &quot;LD_LIBRARY_PATH=/ro/bash-amd64-5&quot;..., &quot;PERL5LIB=/ro/bash-amd64-5.0-4/ou&quot;..., &quot;PYTHONPATH=/ro/bash-amd64-5.0-4/&quot;...]) = 0</code></pre></details></p>
+
+<p>Confirm which ELF interpreter is set for a binary using <code>readelf(1)</code>:
+<details class="output" open><summary><code>distri0# readelf -a /ro/teensy-loader-cli-amd64-2.1+g20180927-7/out/bin/teensy_loader_cli | grep 'program interpreter'</code></summary><pre><code>[Requesting program interpreter: /ro/glibc-amd64-2.31-4/out/lib/ld-linux-x86-64.so.2]</code></pre></details></p>
+
+<p>Confirm the rpath is set to the package’s lib subdirectory using <code>readelf(1)</code>:
+<details class="output" open><summary><code>distri0# readelf -a /ro/teensy-loader-cli-amd64-2.1+g20180927-7/out/bin/teensy_loader_cli | grep RPATH</code></summary><pre><code> 0x000000000000000f (RPATH)              Library rpath: [/ro/teensy-loader-cli-amd64-2.1+g20180927-7/lib]</code></pre></details></p>
+
+<p>…and verify the lib subdirectory has the expected symlinks and target versions:
+<details class="output"><summary><code>distri0# find /ro/teensy-loader-cli-amd64-*/lib -type f -printf '%P -&gt; %l\n'</code><pre>libc.so.6 -&gt; /ro/glibc-amd64-2.31-4/out/lib/libc-2.31.so</pre></summary><pre><code>libpthread.so.0 -&gt; /ro/glibc-amd64-2.31-4/out/lib/libpthread-2.31.so
+librt.so.1 -&gt; /ro/glibc-amd64-2.31-4/out/lib/librt-2.31.so
+libudev.so.1 -&gt; /ro/libudev-amd64-245-11/out/lib/libudev.so.1.6.17
+libusb-0.1.so.4 -&gt; /ro/libusb-compat-amd64-0.1.5-7/out/lib/libusb-0.1.so.4.4.4
+libusb-1.0.so.0 -&gt; /ro/libusb-amd64-1.0.23-8/out/lib/libusb-1.0.so.0.2.0</code></pre></details></p>
+
+<p>To verify the correct libraries are actually loaded, you can set the <code>LD_DEBUG</code>
+environment variable for <code>ld.so(8)</code>:</p>
+
+<p><details class="output"><summary><code>distri0# LD_DEBUG=libs teensy_loader_cli</code></summary><pre><code>[…]
+       678:     find library=libc.so.6 [0]; searching
+       678:      search path=/ro/teensy-loader-cli-amd64-2.1+g20180927-7/lib            (RPATH from file /ro/teensy-loader-cli-amd64-2.1+g20180927-7/out/bin/teensy_loader_cli)
+       678:       trying file=/ro/teensy-loader-cli-amd64-2.1+g20180927-7/lib/libc.so.6
+       678:
+[…]</code></pre></details></p>
+
+<p>NSS libraries that distri ships:
+<details class="output"><summary><code>find /lib/ -name &quot;libnss_*.so.2&quot; -type f -printf '%P -&gt; %l\n'</code><pre>libnss_myhostname.so.2 -&gt; ../systemd-amd64-245-11/out/lib/libnss_myhostname.so.2</pre></summary><pre><code>libnss_mymachines.so.2 -&gt; ../systemd-amd64-245-11/out/lib/libnss_mymachines.so.2
+libnss_resolve.so.2 -&gt; ../systemd-amd64-245-11/out/lib/libnss_resolve.so.2
+libnss_systemd.so.2 -&gt; ../systemd-amd64-245-11/out/lib/libnss_systemd.so.2
+libnss_compat.so.2 -&gt; ../glibc-amd64-2.31-4/out/lib/libnss_compat.so.2
+libnss_db.so.2 -&gt; ../glibc-amd64-2.31-4/out/lib/libnss_db.so.2
+libnss_dns.so.2 -&gt; ../glibc-amd64-2.31-4/out/lib/libnss_dns.so.2
+libnss_files.so.2 -&gt; ../glibc-amd64-2.31-4/out/lib/libnss_files.so.2
+libnss_hesiod.so.2 -&gt; ../glibc-amd64-2.31-4/out/lib/libnss_hesiod.so.2</code></pre></details></p>
+
+	  </div>
+	</div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -11,45 +11,59 @@
     <id>https://michael.stapelberg.ch/posts/2020-02-02-readiness-notifications-in-golang/</id>
     <published>2020-02-02T00:00:00+00:00</published>
     <updated>2020-02-03T08:54:25+01:00</updated>
-    <content type="html"><![CDATA[<p>When spawning a child program, for example in an integration test, it is often
+    <content type="html"><![CDATA[
+
+<p>When spawning a child program, for example in an integration test, it is often
 helpful to know when the child program is ready to receive requests.</p>
+
 <h3 id="delaying">Delaying</h3>
+
 <p>A brittle strategy is to just add a delay (say, <code>time.Sleep(2 * time.Second)</code>)
 and hope the child program finishes initialization in that time. This is brittle
 because it depends on timing, so when the computer running the test is slow for
 whichever reason, your test starts failing. Many CI/CD systems have less
 capacity (and/or are more heavily utilized) than developer machines, so timeouts
 frequently need to be adjusted.</p>
+
 <p>Also, relying on timing is a race to the bottom: your delay needs to work on the
 slowest machine that runs your code. Ergo, tests waste valuable developer time
 on your high-end workstation, just so that they pass on some under-powered
 machine.</p>
+
 <h3 id="polling">Polling</h3>
+
 <p>A slightly better strategy is polling, i.e. repeatedly checking whether the
 child program is ready. As an example, in the <code>dnsmasq_exporter</code> test, <a href="https://github.com/google/dnsmasq_exporter/blob/646ded9be82e26a4c6450da8d7128d12e0e11e3a/dnsmasq_test.go#L46-L61">I need
 to
 poll</a>
 to find out when <a href="https://manpages.debian.org/dnsmasq.8"><code>dnsmasq(8)</code></a>
  is ready.</p>
+
 <p>This approach is better because it automatically works well on both high-end and
 under-powered machines, without wasting time on either.</p>
+
 <p>Finding a good frequency with which to poll is a bit of an art, though: the more
 often you poll, the less time you waste, but also the more resources you spend
 on polling instead of letting your program initialize. The overhead may be
 barely noticeable, but when starting lots of programs (e.g. in a microservice
 architecture) or when individual polls are costly, the overhead can add up.</p>
+
 <h3 id="readiness-notifications">Readiness notifications</h3>
+
 <p>The most elegant approach is to use readiness notifications: you don’t waste any
 time or resources.</p>
+
 <p>It only takes a few lines of code to integrate this approach into your
 application. The specifics might vary depending on your environment,
 e.g. whether an environment variable is preferable to a command-line flag; my
 goal with this article is to explain the approach in general, and you can take
 care of the details.</p>
+
 <p>The key idea is: the child program inherits a pipe file descriptor from the
 parent and closes it once ready. The parent program knows the child program is
 ready because an otherwise blocking read from the pipe returns once the pipe is
 closed.</p>
+
 <p>This is similar to using a <code>chan struct{}</code> in Go and closing it. It doesn’t have
 to remain this simple, though: you can also send arbitrary data over the pipe,
 ranging from a simple string being sent in one direction and culminating in
@@ -57,9 +71,12 @@ speaking a framed protocol in a client/server fashion. In <a href="https://codes
 Search</a>, I’m <a href="https://github.com/Debian/dcs/blob/3baaecabca2d6c56799012c40c1245fc389cb6e6/internal/addrfd/addrfd.go">writing the chosen network
 address</a>
 before closing the pipe, so that the parent program knows where to connect to.</p>
+
 <h4 id="parent-program">Parent Program</h4>
+
 <p>So, how do we go about readiness notifications in Go? We create a new pipe and
 specify the write end in the <code>ExtraFiles</code> field of <code>(os/exec).Cmd</code>:</p>
+
 <pre><code>r, w, err := os.Pipe()
 if err != nil {
   return err
@@ -68,12 +85,16 @@ if err != nil {
 child := exec.Command(&quot;child&quot;)
 child.Stderr = os.Stderr
 child.ExtraFiles = []*os.File{w}
-</code></pre><p>It is good practice to explicitly specify the file descriptor number that we
+</code></pre>
+
+<p>It is good practice to explicitly specify the file descriptor number that we
 passed via some sort of signaling, so that the child program does not need to be
 modified when we add new file descriptors in the parent, and also because this
 behavior is usually opt-in.</p>
+
 <p>In this case, we’ll do that via an environment variable and start the child
 program:</p>
+
 <pre><code>// Go dup2()’s ExtraFiles to file descriptor 3 and counting.
 // File descriptors 0, 1, 2 are stdin, stdout and stderr.
 child.Env = append(os.Environ(), &quot;CHILD_READY_FD=3&quot;)
@@ -82,14 +103,20 @@ child.Env = append(os.Environ(), &quot;CHILD_READY_FD=3&quot;)
 if err := child.Start(); err != nil {
   return fmt.Errorf(&quot;%v: %v&quot;, child.Args, err)
 }
-</code></pre><p>At this point, both the parent and the child process have a file descriptor
+</code></pre>
+
+<p>At this point, both the parent and the child process have a file descriptor
 referencing the write end of the pipe. Since the pipe will only be closed once
 <em>all</em> processes have closed the write end, we need to close the write end in the
 parent program:</p>
+
 <pre><code>// Close the write end of the pipe in the parent:
 w.Close()
-</code></pre><p>Now, we can blockingly read from the pipe, and know that once the read call
+</code></pre>
+
+<p>Now, we can blockingly read from the pipe, and know that once the read call
 returns, the child program is ready to receive requests:</p>
+
 <pre><code>// Avoid hanging forever in case the child program never becomes ready;
 // this is easier to diagnose than an unspecified CI/CD test timeout.
 // This timeout should be much much longer than initialization takes.
@@ -101,10 +128,14 @@ if _, err := ioutil.ReadAll(r); err != nil {
 // …send requests…
 
 // …tear down child program…
-</code></pre><h4 id="child-program">Child Program</h4>
+</code></pre>
+
+<h4 id="child-program">Child Program</h4>
+
 <p>In the child program, we need to recognize that the parent program requests a
 readiness notification, and ensure our signaling doesn’t leak to child programs
 of the child program:</p>
+
 <pre><code>var readyFile *os.File
 
 func init() {
@@ -122,7 +153,10 @@ func main() {
     readyFile = nil   // just to be prudent
   }
 }
-</code></pre><h3 id="conclusion">Conclusion</h3>
+</code></pre>
+
+<h3 id="conclusion">Conclusion</h3>
+
 <p>Depending on what you’re communicating from the child to the parent, and how
 your system is architected, it might be a good idea to use <a href="http://0pointer.de/blog/projects/socket-activation.html">systemd socket
 activation</a> (<a href="https://vincent.bernat.ch/en/blog/2018-systemd-golang-socket-activation">socket
@@ -134,6 +168,7 @@ in the <a href="https://i3wm.org/docs/testsuite.html#_appendix_b_socket_activati
 testsuite</a>
 and reduced the total wallclock time from &gt;100 seconds to a mere 16 seconds back
 then (even faster today).</p>
+
 <p>The technique described in this blog post is a bit more generic than systemd’s
 socket activation. In general, passing file descriptors between processes is a
 powerful idea. For example, in debiman, we’re <a href="https://github.com/Debian/debiman/blob/32eac1bc6182f68c7443a56b85c33522dc3d5d70/internal/convert/mandoc.go#L118">passing individual pipe file
@@ -149,86 +184,126 @@ convert lots of man pages without encurring process creation overhead.</p>
     <id>https://michael.stapelberg.ch/posts/2020-01-21-initramfs-from-scratch-golang/</id>
     <published>2020-01-21T17:50:00+01:00</published>
     <updated>2020-02-03T08:54:25+01:00</updated>
-    <content type="html"><![CDATA[<p>In case you are not yet familiar with why an initramfs (or initrd, or initial
+    <content type="html"><![CDATA[
+
+<p>In case you are not yet familiar with why an initramfs (or initrd, or initial
 ramdisk) is typically used when starting Linux, let me quote the <a href="https://en.wikipedia.org/wiki/Initial_ramdisk">wikipedia
 definition</a>:</p>
+
 <p>“[…] initrd is a scheme for loading a temporary root file system into memory,
 which may be used as part of the Linux startup process […] to make preparations
 before the real root file system can be mounted.”</p>
+
 <p>Many Linux distributions do not compile all file system drivers into the kernel,
 but instead load them on-demand from an initramfs, which saves memory.</p>
+
 <p>Another common scenario, in which an initramfs is required, is full-disk
 encryption: the disk must be unlocked from userspace, but since userspace is
 encrypted, an initramfs is used.</p>
+
 <h2 id="motivation">Motivation</h2>
+
 <p>Thus far, building a <a href="https://distr1.org/">distri</a> disk image was quite slow:</p>
+
 <p>This is on an AMD Ryzen 3900X 12-core processor (2019):</p>
+
 <pre><code>distri % time make cryptimage serial=1
 80.29s user 13.56s system 186% cpu 50.419 total # 19s image, 31s initrd
-</code></pre><p>Of these 50 seconds,
+</code></pre>
+
+<p>Of these 50 seconds,
 <a href="https://en.wikipedia.org/wiki/Dracut_(software)"><code>dracut</code></a>’s initramfs
 generation accounts for 31 seconds (62%)!</p>
+
 <p>Initramfs generation time drops to 8.7 seconds once <code>dracut</code> no longer needs to
 use the single-threaded <a href="https://manpages.debian.org/gzip.1"><code>gzip(1)</code></a>
 , but the
 multi-threaded replacement <a href="https://manpages.debian.org/pigz.1"><code>pigz(1)</code></a>
 :</p>
+
 <p>This brings the total time to build a distri disk image down to:</p>
+
 <pre><code>distri % time make cryptimage serial=1
 76.85s user 13.23s system 327% cpu 27.509 total # 19s image, 8.7s initrd
-</code></pre><p>Clearly, when you use <code>dracut</code> on any modern computer, you should make pigz
+</code></pre>
+
+<p>Clearly, when you use <code>dracut</code> on any modern computer, you should make pigz
 available. <code>dracut</code> should fail to compile unless one explicitly opts into the
 known-slower gzip. For more thoughts on optional dependencies, see <a href="/posts/2019-05-23-optional-dependencies/">“Optional
 dependencies don’t work”</a>.</p>
+
 <p>But why does it take 8.7 seconds still? Can we go faster?</p>
+
 <p>The answer is <strong>Yes</strong>! I recently built a distri-specific initramfs I’m calling
 <code>minitrd</code>. I wrote both big parts from scratch:</p>
+
 <ol>
 <li>the initramfs generator program (<a href="https://github.com/distr1/distri/blob/master/cmd/distri/initrd.go"><code>distri initrd</code></a>)</li>
 <li>a custom Go userland (<a href="https://github.com/distr1/distri/blob/master/cmd/minitrd/minitrd.go"><code>cmd/minitrd</code></a>), running as <code>/init</code> in the initramfs.</li>
 </ol>
+
 <p><code>minitrd</code> generates the initramfs image in ≈400ms, bringing the total time down
 to:</p>
+
 <pre><code>distri % time make cryptimage serial=1
 50.09s user 8.80s system 314% cpu 18.739 total # 18s image, 400ms initrd
-</code></pre><p>(The remaining time is spent in preparing the file system, then installing and
+</code></pre>
+
+<p>(The remaining time is spent in preparing the file system, then installing and
 configuring the distri system, i.e. preparing a disk image you can <a href="https://distr1.org/#run-distri-on-real-hardware">run on real
 hardware</a>.)</p>
+
 <p>How can <code>minitrd</code> be 20 times faster than <code>dracut</code>?</p>
+
 <p><code>dracut</code> is mainly written in shell, with a C helper program. It drives the
 generation process by spawning lots of external dependencies (e.g. <code>ldd</code> or the
 <code>dracut-install</code> helper program). I assume that the combination of using an
 interpreted language (shell) that spawns lots of processes and precludes a
 concurrent architecture is to blame for the poor performance.</p>
+
 <p><code>minitrd</code> is written in Go, with speed as a goal. It leverages concurrency and
 uses no external dependencies; everything happens within a single process (but
 with enough threads to saturate modern hardware).</p>
+
 <p>Measuring early boot time using qemu, I measured the <code>dracut</code>-generated
 initramfs taking 588ms to display the full disk encryption passphrase prompt,
 whereas <code>minitrd</code> took only 195ms.</p>
+
 <p>The rest of this article dives deeper into how <code>minitrd</code> works.</p>
+
 <h2 id="what-does-an-initramfs-do">What does an initramfs do?</h2>
+
 <p>Ultimately, the job of an initramfs is to make the root file system available
 and continue booting the system from there. Depending on the system setup, this
 involves the following 5 steps:</p>
+
 <h3 id="1-load-kernel-modules-to-access-the-block-devices-with-the-root-file-system">1. Load kernel modules to access the block devices with the root file system</h3>
+
 <p>Depending on the system, the block devices with the root file system might
 already be present when the initramfs runs, or some kernel modules might need to
 be loaded first. On my Dell XPS 9360 laptop, the NVMe system disk is already
 present when the initramfs starts, whereas in qemu, we need to load the
 <code>virtio_pci</code> module, followed by the <code>virtio_scsi</code> module.</p>
+
 <p>How will our userland program know which kernel modules to load? Linux kernel
 modules declare patterns for their supported hardware as an alias, e.g.:</p>
+
 <pre><code>initrd# grep virtio_pci lib/modules/5.4.6/modules.alias
 alias pci:v00001AF4d*sv*sd*bc*sc*i* virtio_pci
-</code></pre><p>Devices in <code>sysfs</code> have a <code>modalias</code> file whose content can be matched against
+</code></pre>
+
+<p>Devices in <code>sysfs</code> have a <code>modalias</code> file whose content can be matched against
 these declarations to identify the module to load:</p>
+
 <pre><code>initrd# cat /sys/devices/pci0000:00/*/modalias
 pci:v00001AF4d00001005sv00001AF4sd00000004bc00scFFi00
 pci:v00001AF4d00001004sv00001AF4sd00000008bc01sc00i00
 […]
-</code></pre><p>Hence, for the initial round of module loading, it is sufficient to locate all
+</code></pre>
+
+<p>Hence, for the initial round of module loading, it is sufficient to locate all
 <code>modalias</code> files within <code>sysfs</code> and load the responsible modules.</p>
+
 <p>Loading a kernel module can result in new devices appearing. When that happens,
 the kernel sends a
 <a href="https://stackoverflow.com/questions/22803469/uevent-sent-from-kernel-to-user-space-udev">uevent</a>,
@@ -236,60 +311,88 @@ which the uevent consumer in userspace receives via a netlink socket. Typically,
 this consumer is <a href="https://manpages.debian.org/udev.7"><code>udev(7)</code></a>
 , but in our case, it’s
 <code>minitrd</code>.</p>
+
 <p>For each uevent messages that comes with a <code>MODALIAS</code> variable, <code>minitrd</code> will
 load the relevant kernel module(s).</p>
+
 <p>When loading a kernel module, its dependencies need to be loaded
 first. Dependency information is stored in the <code>modules.dep</code> file in a
 <code>Makefile</code>-like syntax:</p>
+
 <pre><code>initrd# grep virtio_pci lib/modules/5.4.6/modules.dep
 kernel/drivers/virtio/virtio_pci.ko: kernel/drivers/virtio/virtio_ring.ko kernel/drivers/virtio/virtio.ko
-</code></pre><p>To load a module, we can open its file and then call the Linux-specific <a href="https://manpages.debian.org/finit_module.2"><code>finit_module(2)</code></a>
+</code></pre>
+
+<p>To load a module, we can open its file and then call the Linux-specific <a href="https://manpages.debian.org/finit_module.2"><code>finit_module(2)</code></a>
  system call. Some modules are expected to
 return an error code, e.g. <code>ENODEV</code> or <code>ENOENT</code> when some hardware device is not
 actually present.</p>
+
 <p>Side note: next to the textual versions, there are also binary versions of the
 <code>modules.alias</code> and <code>modules.dep</code> files. Presumably, those can be queried more
 quickly, but for simplicitly, I have not (yet?) implemented support in
 <code>minitrd</code>.</p>
+
 <h3 id="2-console-settings-font-keyboard-layout">2. Console settings: font, keyboard layout</h3>
+
 <p>Setting a legible font is necessary for hi-dpi displays. On my Dell XPS 9360
 (3200 x 1800 QHD+ display), the following works well:</p>
+
 <pre><code>initrd# setfont latarcyrheb-sun32
-</code></pre><p>Setting the user’s keyboard layout is necessary for entering the LUKS full-disk
+</code></pre>
+
+<p>Setting the user’s keyboard layout is necessary for entering the LUKS full-disk
 encryption passphrase in their preferred keyboard layout. I use the <a href="https://www.neo-layout.org">NEO
 layout</a>:</p>
+
 <pre><code>initrd# loadkeys neo
-</code></pre><h3 id="3-block-device-identification">3. Block device identification</h3>
+</code></pre>
+
+<h3 id="3-block-device-identification">3. Block device identification</h3>
+
 <p>In the Linux kernel, block device enumeration order is not necessarily the same
 on each boot. Even if it was deterministic, device order could still be changed
 when users modify their computer’s device topology (e.g. connect a new disk to a
 formerly unused port).</p>
+
 <p>Hence, it is good style to refer to disks and their partitions with stable
 identifiers. This also applies to boot loader configuration, and so most
 distributions will set a kernel parameter such as
 <code>root=UUID=1fa04de7-30a9-4183-93e9-1b0061567121</code>.</p>
+
 <p>Identifying the block device or partition with the specified <code>UUID</code> is the
 initramfs’s job.</p>
+
 <p>Depending on what the device contains, the UUID comes from a different
 place. For example, <code>ext4</code> file systems have a UUID field in their file system
 superblock, whereas LUKS volumes have a UUID in their LUKS header.</p>
+
 <p>Canonically, probing a device to extract the UUID is done by <code>libblkid</code> from the
 <code>util-linux</code> package, but the logic can easily be <a href="https://github.com/distr1/distri/blob/master/cmd/minitrd/blkid.go">re-implemented in other
 languages</a>
 and changes rarely. <code>minitrd</code> comes with its own implementation to avoid
 <a href="https://golang.org/cmd/cgo/">cgo</a> or running the <a href="https://manpages.debian.org/blkid.8"><code>blkid(8)</code></a>
  program.</p>
+
 <h3 id="4-luks-full-disk-encryption-unlocking-only-on-encrypted-systems">4. LUKS full-disk encryption unlocking (only on encrypted systems)</h3>
+
 <p>Unlocking a
 <a href="https://en.wikipedia.org/wiki/Linux_Unified_Key_Setup">LUKS</a>-encrypted volume
 is done in userspace. The kernel handles the crypto, but reading the metadata,
 obtaining the passphrase (or e.g. key material from a file) and setting up the
 device mapper table entries are done in user space.</p>
+
 <pre><code>initrd# modprobe algif_skcipher
 initrd# cryptsetup luksOpen /dev/sda4 cryptroot1
-</code></pre><p>After the user entered their passphrase, the root file system can be mounted:</p>
+</code></pre>
+
+<p>After the user entered their passphrase, the root file system can be mounted:</p>
+
 <pre><code>initrd# mount /dev/dm-0 /mnt
-</code></pre><h3 id="5-continuing-the-boot-process-switch_root">5. Continuing the boot process (switch_root)</h3>
+</code></pre>
+
+<h3 id="5-continuing-the-boot-process-switch-root">5. Continuing the boot process (switch_root)</h3>
+
 <p>Now that everything is set up, we need to pass execution to the init program on
 the root file system with a careful sequence of <a href="https://manpages.debian.org/chdir.2"><code>chdir(2)</code></a>
 , <a href="https://manpages.debian.org/mount.2"><code>mount(2)</code></a>
@@ -298,55 +401,77 @@ the root file system with a careful sequence of <a href="https://manpages.debian
  and <a href="https://manpages.debian.org/execve.2"><code>execve(2)</code></a>
  system calls that is explained in <a href="https://github.com/mirror/busybox/blob/9ec836c033fc6e55e80f3309b3e05acdf09bb297/util-linux/switch_root.c#L297">this busybox switch_root
 comment</a>.</p>
+
 <pre><code>initrd# mount -t devtmpfs dev /mnt/dev
 initrd# exec switch_root -c /dev/console /mnt /init
-</code></pre><p>To conserve RAM, the files in the temporary file system to which the initramfs
+</code></pre>
+
+<p>To conserve RAM, the files in the temporary file system to which the initramfs
 archive is extracted are typically deleted.</p>
+
 <h2 id="how-is-an-initramfs-generated">How is an initramfs generated?</h2>
+
 <p>An initramfs “image” (more accurately: archive) is a compressed
 <a href="https://en.wikipedia.org/wiki/Cpio">cpio</a> archive. Typically, gzip compression
 is used, but the kernel supports a bunch of different algorithms and
 distributions such as <a href="https://www.phoronix.com/scan.php?page=news_item&amp;px=LZ4-Initramfs-Ubuntu-Go-Ahead">Ubuntu are switching to lz4</a>.</p>
+
 <p>Generators typically prepare a temporary directory and feed it to the <a href="https://manpages.debian.org/cpio.1"><code>cpio(1)</code></a>
  program. In <code>minitrd</code>, we read the files into memory
 and generate the cpio archive using the
 <a href="https://github.com/cavaliercoder/go-cpio">go-cpio</a> package. We use the
 <a href="https://github.com/klauspost/pgzip">pgzip</a> package for parallel gzip
 compression.</p>
+
 <p>The following files need to go into the cpio archive:</p>
+
 <h3 id="minitrd-go-userland">minitrd Go userland</h3>
+
 <p>The <code>minitrd</code> binary is copied into the cpio archive as <code>/init</code> and will be run
 by the kernel after extracting the archive.</p>
+
 <p>Like the rest of distri, <code>minitrd</code> is built statically without cgo, which means
 it can be copied as-is into the cpio archive.</p>
+
 <h3 id="linux-kernel-modules">Linux kernel modules</h3>
+
 <p>Aside from the <code>modules.alias</code> and <code>modules.dep</code> metadata files, the kernel
 modules themselves reside in e.g. <code>/lib/modules/5.4.6/kernel</code> and need to be
 copied into the cpio archive.</p>
+
 <p>Copying all modules results in a ≈80 MiB archive, so it is common to only copy
 modules that are relevant to the initramfs’s features. This reduces archive size
 to ≈24 MiB.</p>
+
 <p>The filtering relies on hard-coded patterns and module names. For example, disk
 encryption related modules are all kernel modules underneath <code>kernel/crypto</code>,
 plus <code>kernel/drivers/md/dm-crypt.ko</code>.</p>
+
 <p>When generating a host-only initramfs (works on precisely the computer that
 generated it), some initramfs generators look at the currently loaded modules
 and just copy those.</p>
+
 <h3 id="console-fonts-and-keymaps">Console Fonts and Keymaps</h3>
+
 <p>The <code>kbd</code> package’s <a href="https://manpages.debian.org/setfont.8"><code>setfont(8)</code></a>
  and <a href="https://manpages.debian.org/loadkeys.1"><code>loadkeys(1)</code></a>
  programs load console fonts and keymaps from
 <code>/usr/share/consolefonts</code> and <code>/usr/share/keymaps</code>, respectively.</p>
+
 <p>Hence, these directories need to be copied into the cpio archive. Depending on
 whether the initramfs should be generic (work on many computers) or host-only
 (works on precisely the computer/settings that generated it), the entire
 directories are copied, or only the required font/keymap.</p>
+
 <h3 id="cryptsetup-setfont-loadkeys">cryptsetup, setfont, loadkeys</h3>
+
 <p>These programs are (currently) required because <code>minitrd</code> does not implement
 their functionality.</p>
+
 <p>As they are dynamically linked, not only the programs themselves need to be
 copied, but also the ELF dynamic linking loader (path stored in the <code>.interp</code>
 ELF section) and any ELF library dependencies.</p>
+
 <p>For example, <code>cryptsetup</code> in distri declares the ELF interpreter
 <code>/ro/glibc-amd64-2.27-3/out/lib/ld-linux-x86-64.so.2</code> and declares dependencies
 on shared libraries <code>libcryptsetup.so.12</code>, <code>libblkid.so.1</code> and others. Luckily,
@@ -354,61 +479,84 @@ in distri, packages contain a <code>lib</code> subdirectory containing symbolic 
 the resolved shared library paths (hermetic packaging), so it is sufficient to
 mirror the lib directory into the cpio archive, recursing into shared library
 dependencies of shared libraries.</p>
+
 <p><code>cryptsetup</code> also requires the GCC runtime library <code>libgcc_s.so.1</code> to be present
 at runtime, and will abort with an error message about not being able to call
 <a href="https://manpages.debian.org/pthread_cancel.3"><code>pthread_cancel(3)</code></a>
  if it is unavailable.</p>
+
 <h3 id="time-zone-data">time zone data</h3>
+
 <p>To print log messages in the correct time zone, we copy <code>/etc/localtime</code> from
 the host into the cpio archive.</p>
+
 <h2 id="minitrd-outside-of-distri">minitrd outside of distri?</h2>
+
 <p>I currently have no desire to make <code>minitrd</code> available outside of
 <a href="https://distr1.org/">distri</a>. While the technical challenges (such as extending
 the generator to not rely on distri’s hermetic packages) are surmountable, I
 don’t want to support people’s initramfs remotely.</p>
+
 <p>Also, I think that people’s efforts should in general be spent on rallying
 behind <code>dracut</code> and making it work faster, thereby benefiting all Linux
 distributions that use dracut (increasingly more). With <code>minitrd</code>, I have
 demonstrated that significant speed-ups are achievable.</p>
+
 <h2 id="conclusion">Conclusion</h2>
+
 <p>It was interesting to dive into how an initramfs really works. I had been
 working with the concept for many years, from small tasks such as “debug why the
 encrypted root file system is not unlocked” to more complicated tasks such as
 “set up a root file system on DRBD for a high-availability setup”. But even with
 that sort of experience, I didn’t know all the details, until I was forced to
 implement every little thing.</p>
+
 <p>As I suspected going into this exercise, <code>dracut</code> is much slower than it needs
 to be. Re-implementing its generation stage in a modern language instead of
 shell helps a lot.</p>
+
 <p>Of course, my <code>minitrd</code> does a bit less than <code>dracut</code>, but not drastically
 so. The overall architecture is the same.</p>
+
 <p>I hope my effort helps with two things:</p>
+
 <ol>
-<li>
-<p>As a teaching implementation: instead of wading through the various
+<li><p>As a teaching implementation: instead of wading through the various
 components that make up a modern initramfs (udev, systemd, various shell
-scripts, …), people can learn about how an initramfs works in a single place.</p>
-</li>
-<li>
-<p>I hope the significant time difference motivates people to improve <code>dracut</code>.</p>
-</li>
+scripts, …), people can learn about how an initramfs works in a single place.</p></li>
+
+<li><p>I hope the significant time difference motivates people to improve <code>dracut</code>.</p></li>
 </ol>
+
 <h2 id="appendix-qemu-development-environment">Appendix: qemu development environment</h2>
+
 <p>Before writing any Go code, I did some manual prototyping. Learning how other
 people prototype is often immensely useful to me, so I’m sharing my notes here.</p>
+
 <p>First, I copied all kernel modules and a statically built busybox binary:</p>
+
 <pre><code>% mkdir -p lib/modules/5.4.6
 % cp -Lr /ro/lib/modules/5.4.6/* lib/modules/5.4.6/
 % cp ~/busybox-1.22.0-amd64/busybox sh
-</code></pre><p>To generate an initramfs from the current directory, I used:</p>
+</code></pre>
+
+<p>To generate an initramfs from the current directory, I used:</p>
+
 <pre><code>% find . | cpio -o -H newc | pigz &gt; /tmp/initrd
-</code></pre><p>In distri’s <code>Makefile</code>, I append these flags to the <code>QEMU</code> invocation:</p>
+</code></pre>
+
+<p>In distri’s <code>Makefile</code>, I append these flags to the <code>QEMU</code> invocation:</p>
+
 <pre><code>-kernel /tmp/kernel \
 -initrd /tmp/initrd \
 -append &quot;root=/dev/mapper/cryptroot1 rdinit=/sh ro console=ttyS0,115200 rd.luks=1 rd.luks.uuid=63051f8a-54b9-4996-b94f-3cf105af2900 rd.luks.name=63051f8a-54b9-4996-b94f-3cf105af2900=cryptroot1 rd.vconsole.keymap=neo rd.vconsole.font=latarcyrheb-sun32 init=/init systemd.setenv=PATH=/bin rw vga=836&quot;
-</code></pre><p>The <code>vga=</code> mode parameter is required for loading font <code>latarcyrheb-sun32</code>.</p>
+</code></pre>
+
+<p>The <code>vga=</code> mode parameter is required for loading font <code>latarcyrheb-sun32</code>.</p>
+
 <p>Once in the <code>busybox</code> shell, I manually prepared the required mount points and
 kernel modules:</p>
+
 <pre><code>ln -s sh mount
 ln -s sh lsmod
 mkdir /proc /sys /run /mnt
@@ -417,7 +565,10 @@ mount -t sysfs sys /sys
 mount -t devtmpfs dev /dev
 modprobe virtio_pci
 modprobe virtio_scsi
-</code></pre><p>As a next step, I copied <code>cryptsetup</code> and dependencies into the initramfs directory:</p>
+</code></pre>
+
+<p>As a next step, I copied <code>cryptsetup</code> and dependencies into the initramfs directory:</p>
+
 <pre><code>% for f in /ro/cryptsetup-amd64-2.0.4-6/lib/*; do full=$(readlink -f $f); rel=$(echo $full | sed 's,^/,,g'); mkdir -p $(dirname $rel); install $full $rel; done
 % ln -s ld-2.27.so ro/glibc-amd64-2.27-3/out/lib/ld-linux-x86-64.so.2
 % cp /ro/glibc-amd64-2.27-3/out/lib/ld-2.27.so ro/glibc-amd64-2.27-3/out/lib/ld-2.27.so
@@ -426,11 +577,15 @@ modprobe virtio_scsi
 % cp /ro/gcc-libs-amd64-8.2.0-3/out/lib64/libgcc_s.so.1 ro/gcc-libs-amd64-8.2.0-3/out/lib64/libgcc_s.so.1
 % ln -s /ro/gcc-libs-amd64-8.2.0-3/out/lib64/libgcc_s.so.1 ro/cryptsetup-amd64-2.0.4-6/lib
 % cp -r /ro/lvm2-amd64-2.03.00-6/lib ro/lvm2-amd64-2.03.00-6/
-</code></pre><p>In <code>busybox</code>, I used the following commands to unlock the root file system:</p>
+</code></pre>
+
+<p>In <code>busybox</code>, I used the following commands to unlock the root file system:</p>
+
 <pre><code>modprobe algif_skcipher
 ./cryptsetup luksOpen /dev/sda4 cryptroot1
 mount /dev/dm-0 /mnt
-</code></pre>]]></content>
+</code></pre>
+]]></content>
   </entry>
   <entry>
     <title type="html"><![CDATA[Debian Code Search: positional index, TurboPFor-compressed]]></title>
@@ -438,159 +593,341 @@ mount /dev/dm-0 /mnt
     <id>https://michael.stapelberg.ch/posts/2019-09-29-dcs-positional-turbopfor-index/</id>
     <published>2019-09-29T00:00:00+00:00</published>
     <updated>2020-02-03T08:54:25+01:00</updated>
-    <content type="html"><![CDATA[<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+    <content type="html"><![CDATA[
+
+<style type="text/css">
+.bar {
+  display: inline-block;
+  padding: 0.25em;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.barcon {
+  width: 40em;
+  display: flex;
+}
+</style>
+
 <p>See the <a href="#conclusion">Conclusion</a> for a summary if you’re impatient :-)</p>
+
 <h3 id="motivation">Motivation</h3>
+
 <p>Over the last few months, I have been developing a new index format for Debian
 Code Search. This required a lot of careful refactoring, re-implementation,
 debug tool creation and debugging.</p>
+
 <p>Multiple factors motivated my work on a new index format:</p>
+
 <ol>
-<li>
-<p>The existing index format has a 2G size limit, into which we have bumped a
-few times, requiring manual intervention to keep the system running.</p>
-</li>
-<li>
-<p>Debugging the existing system required creating ad-hoc debugging tools, which
-made debugging sessions unnecessarily lengthy and painful.</p>
-</li>
-<li>
-<p>I wanted to check whether <a href="https://github.com/Debian/dcs/issues/85">switching to a different integer compression
+<li><p>The existing index format has a 2G size limit, into which we have bumped a
+few times, requiring manual intervention to keep the system running.</p></li>
+
+<li><p>Debugging the existing system required creating ad-hoc debugging tools, which
+made debugging sessions unnecessarily lengthy and painful.</p></li>
+
+<li><p>I wanted to check whether <a href="https://github.com/Debian/dcs/issues/85">switching to a different integer compression
 format</a> would improve performance
-(it does not).</p>
-</li>
-<li>
-<p>I wanted to check whether storing positions with the posting lists would
+(it does not).</p></li>
+
+<li><p>I wanted to check whether storing positions with the posting lists would
 improve performance of identifier queries (= queries which are not using any
 regular expression features), which make up 78.2% of all Debian Code Search
-queries (it does).</p>
-</li>
+queries (it does).</p></li>
 </ol>
+
 <p>I figured building a new index from scratch was the easiest approach, compared
 to refactoring the existing index to increase the size limit (point ①).</p>
+
 <p>I also figured it would be a good idea to develop the debugging tool in lock
 step with the index format so that I can be sure the tool works and is useful
 (point ②).</p>
+
 <h3 id="integer-compression-turbopfor">Integer compression: TurboPFor</h3>
+
 <p>As a quick refresher, search engines typically store document IDs (representing
 source code files, in our case) in an ordered list (“posting list”). It usually
 makes sense to apply at least a rudimentary level of compression: our existing
 system used variable integer encoding.</p>
+
 <p><a href="https://github.com/powturbo/TurboPFor">TurboPFor</a>, the self-proclaimed “Fastest
 Integer Compression” library, combines an advanced on-disk format with a
 carefully tuned SIMD implementation to reach better speeds (in micro benchmarks)
 at less disk usage than <a href="https://github.com/google/codesearch/blob/4fe90b597ae534f90238f82c7b5b1bb6d6d52dff/index/write.go#L561">Russ Cox’s varint implementation in
 <code>github.com/google/codesearch</code></a>.</p>
+
 <p>If you are curious about its inner workings, check out my “<a href="/posts/2019-02-05-turbopfor-analysis/">TurboPFor: an
 analysis</a>”.</p>
+
 <p>Applied on the Debian Code Search index, TurboPFor indeed compresses integers better:</p>
+
 <h4 id="disk-space">Disk space</h4>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+
+<p><div style="display: inline-block">
+    <div class="barcon">
+        <div class="bar" style="width: 100%; background-color: blue; color: white">
+            &nbsp;
+        </div>
+    </div>
+</div>
+<span style="margin-right: 2em">8.9G</span>
+codesearch varint index</p>
+
+<p><div style="display: inline-block">
+    <div class="barcon">
+        <div class="bar" style="width: 61%; background-color: blue; color: white">
+            &nbsp;
+        </div>
+    </div>
+</div>
+<span style="margin-right: 2em">5.5G</span>
+TurboPFor index</p>
+
 <p>Switching to TurboPFor (via cgo) for storing and reading the index results in a
 slight speed-up of a <code>dcs replay</code> benchmark, which is more pronounced the more
 i/o is required.</p>
+
 <h4 id="query-speed-regexp-cold-page-cache">Query speed (regexp, cold page cache)</h4>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+
+<p><div style="display: inline-block">
+    <div class="barcon">
+        <div class="bar" style="width: 100%; background-color: blue; color: white">
+            &nbsp;
+        </div>
+    </div>
+</div>
+<span style="margin-right: 2em">18s</span>
+codesearch varint index</p>
+
+<p><div style="display: inline-block">
+    <div class="barcon">
+        <div class="bar" style="width: 77.7%; background-color: blue; color: white">
+            &nbsp;
+        </div>
+    </div>
+</div>
+<span style="margin-right: 2em">14s</span>
+TurboPFor index (cgo)</p>
+
 <h4 id="query-speed-regexp-warm-page-cache">Query speed (regexp, warm page cache)</h4>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+
+<p><div style="display: inline-block">
+    <div class="barcon">
+        <div class="bar" style="width: 100%; background-color: blue; color: white">
+            &nbsp;
+        </div>
+    </div>
+</div>
+<span style="margin-right: 2em">15s</span>
+codesearch varint index</p>
+
+<p><div style="display: inline-block">
+    <div class="barcon">
+        <div class="bar" style="width: 93.3%; background-color: blue; color: white">
+            &nbsp;
+        </div>
+    </div>
+</div>
+<span style="margin-right: 2em">14s</span>
+TurboPFor index (cgo)</p>
+
 <p>Overall, TurboPFor is an all-around improvement in efficiency, albeit with a
 high cost in implementation complexity.</p>
+
 <h3 id="positional-index-trade-more-disk-for-faster-queries">Positional index: trade more disk for faster queries</h3>
+
 <p>This section builds on the previous section: all figures come from the TurboPFor
 index, which can optionally support positions.</p>
+
 <p>Conceptually, we’re going from:</p>
+
 <pre><code>type docid uint32
 type index map[trigram][]docid
-</code></pre><p>…to:</p>
+</code></pre>
+
+<p>…to:</p>
+
 <pre><code>type occurrence struct {
     doc docid
     pos uint32 // byte offset in doc
 }
 type index map[trigram][]occurrence
-</code></pre><p>The resulting index consumes more disk space, but can be queried faster:</p>
+</code></pre>
+
+<p>The resulting index consumes more disk space, but can be queried faster:</p>
+
 <ol>
-<li>
-<p>We can do fewer queries: instead of reading all the posting lists for all
+<li><p>We can do fewer queries: instead of reading all the posting lists for all
 the trigrams, we can read the posting lists for the query’s first and last
 trigram only.
-<!-- raw HTML omitted -->
+<br>
 This is one of the tricks described in the paper
-“<!-- raw HTML omitted -->AS-Index: A
-Structure For String Search Using n-grams and Algebraic Signatures<!-- raw HTML omitted -->”
+“<a href="https://cedric.cnam.fr/fichiers/art_3216.pdf">AS-Index: A
+Structure For String Search Using n-grams and Algebraic Signatures</a>”
 (PDF), and goes a long way without incurring the complexity, computational
-cost and additional disk usage of calculating algebraic signatures.</p>
-</li>
-<li>
-<p>Verifying the delta between the last and first position matches the length
+cost and additional disk usage of calculating algebraic signatures.</p></li>
+
+<li><p>Verifying the delta between the last and first position matches the length
 of the query term significantly reduces the number of files to read (lower
-false positive rate).</p>
-</li>
-<li>
-<p>The matching phase is quicker: instead of locating the query term in the
-file, we only need to compare a few bytes at a known offset for equality.</p>
-</li>
-<li>
-<p>More data is read sequentially (from the index), which is faster.</p>
-</li>
+false positive rate).</p></li>
+
+<li><p>The matching phase is quicker: instead of locating the query term in the
+file, we only need to compare a few bytes at a known offset for equality.</p></li>
+
+<li><p>More data is read sequentially (from the index), which is faster.</p></li>
 </ol>
+
 <h4 id="disk-space-1">Disk space</h4>
+
 <p>A positional index consumes significantly more disk space, but not so much as
 to pose a challenge: a Hetzner EX61-NVME dedicated server (≈ 64 €/month)
 provides 1 TB worth of fast NVMe flash storage.</p>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+
+<p><div style="display: inline-block">
+    <div class="barcon">
+        <div class="bar" style="width: 5.2%; background-color: blue; color: white">
+            &nbsp;
+        </div>
+    </div>
+</div>
+<span style="margin-right: 2em">&nbsp;6.5G</span>
+non-positional</p>
+
+<p><div style="display: inline-block">
+    <div class="barcon">
+        <div class="bar" style="width: 100%; background-color: blue; color: white">
+            &nbsp;
+        </div>
+    </div>
+</div>
+<span style="margin-right: 2em">123G</span>
+positional</p>
+
+<p><div style="display: inline-block">
+    <div class="barcon">
+        <div class="bar" style="width: 75.6%; background-color: blue; color: white">
+            &nbsp;
+        </div>
+    </div>
+</div>
+<span style="margin-right: 2em">&nbsp;&nbsp;93G</span>
+positional (posrel)</p>
+
 <p>The idea behind the positional index (posrel) is to not store a <code>(doc,pos)</code>
 tuple on disk, but to store positions, accompanied by a stream of doc/pos
 relationship bits: 1 means this position belongs to the next document, 0 means
 this position belongs to the current document.</p>
+
 <p>This is an easy way of saving some space without modifying the TurboPFor
 on-disk format: the posrel technique reduces the index size to about ¾.</p>
+
 <p>With the increase in size, the Linux page cache hit ratio will be lower for
 the positional index, i.e. more data will need to be fetched from disk for
 querying the index.</p>
+
 <p>As long as the disk can deliver data as fast as you can decompress posting
 lists, this only translates into one disk seek’s worth of additional
 latency. This is the case with modern NVMe disks that deliver thousands of MB/s,
 e.g. the Samsung 960 Pro (used in Hetzner’s aforementioned EX61-NVME server).</p>
+
 <p>The values were measured by running <code>dcs du -h /srv/dcs/shard*/full</code>
 without and with the <code>-pos</code> argument.</p>
+
 <h4 id="bytes-read">Bytes read</h4>
+
 <p>A positional index requires fewer queries: reading only the first and last
 trigram’s posting lists and positions is sufficient to achieve a lower (!) false
 positive rate than evaluating <strong>all</strong> trigram’s posting lists in a
 non-positional index.</p>
+
 <p>As a consequence, fewer files need to be read, resulting in fewer bytes required
 to read from disk overall.</p>
+
 <p>As an additional bonus, in a positional index, more data is read sequentially
 (index), which is faster than random i/o, regardless of the underlying disk.</p>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+
+<p><div style="display: inline-block">
+<div class="barcon">
+<div class="bar" style="width: calc(2 * 1.2em); background-color: blue; color: white">
+  1.2G
+</div>
+<div class="bar" style="width: calc(2 * 19.8em); background-color: green; color: white">
+  19.8G
+</div>
+</div>
+</div>
+<span style="margin-right: 2em">21.0G</span>
+regexp queries</p>
+
+<p><div style="display: inline-block">
+<div class="barcon">
+<div class="bar" style="width: calc(2 * 4.2em); background-color: blue; color: white">
+  4.2G (index)
+</div>
+<div class="bar" style="width: calc(2 * 10.8em); background-color: green; color: white">
+  10.8G (files)
+</div>
+</div>
+</div>
+<span style="margin-right: 2em">15.0G</span>
+identifier queries</p>
+
 <p>The values were measured by running <code>iostat -d 25</code> just before running
 <a href="https://codesearch.debian.net/research/2019-08-03-dcs-new-index/"><code>bench.zsh</code></a>
 on an otherwise idle system.</p>
+
 <h4 id="query-speed">Query speed</h4>
+
 <p>Even though the positional index is larger and requires more data to be read at
 query time (see above), thanks to the C TurboPFor library, the 2 queries on a
 positional index are roughly as fast as the n queries on a non-positional index
 (≈4s instead of ≈3s).</p>
+
 <p>This is more than made up for by the combined i/o matching stage, which shrinks
 from ≈18.5s (7.1s i/o + 11.4s matching) to ≈1.3s.</p>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+
+<p><div style="display: inline-block">
+<div class="barcon">
+<div class="bar" style="width: calc(2 * 3.3em); background-color: blue; color: white">
+  3.3s (index)
+</div>
+<div class="bar" style="width: calc(2 * 7.1em); background-color: green; color: white">
+  7.1s (i/o)
+</div>
+<div class="bar" style="width: calc(2 * 11.4em); background-color: purple; color: white">
+  11.4s (matching)
+</div>
+</div>
+</div>
+<span style="margin-right: 2em">21.8s</span>
+regexp queries</p>
+
+<p><div style="display: inline-block">
+<div class="barcon">
+<div class="bar" style="width: calc(2 * 3.92em); background-color: blue; color: white">
+  3.92s (index)
+</div>
+<div class="bar" style="width: calc(2 * 1.3em); background-color: green; color: white">
+  ≈1.3s
+</div>
+</div>
+</div>
+<span style="margin-right: 2em">5.22s</span>
+identifier queries</p>
+
 <p>Note that identifier query i/o was sped up not just by needing to read fewer
 bytes, but also by only having to verify bytes at a known offset instead of
 needing to locate the identifier within the file.</p>
+
 <h3 id="conclusion">Conclusion</h3>
+
 <p>The new index format is overall slightly more efficient. This disk space
 efficiency allows us to introduce a positional index section for the first
 time.</p>
+
 <p>Most Debian Code Search queries are positional queries (78.2%) and will be
 answered much quicker by leveraging the positions.</p>
+
 <p>Bottomline, it is beneficial to use a positional index on disk over a
 non-positional index in RAM.</p>
 ]]></content>
@@ -601,74 +938,93 @@ non-positional index in RAM.</p>
     <id>https://michael.stapelberg.ch/posts/2019-08-17-introducing-distri/</id>
     <published>2019-08-17T18:36:00+02:00</published>
     <updated>2020-02-03T08:54:25+01:00</updated>
-    <content type="html"><![CDATA[<p>Over the last year or so I have worked on a research linux distribution in my
+    <content type="html"><![CDATA[
+
+<p>Over the last year or so I have worked on a research linux distribution in my
 spare time. It’s not a distribution for researchers (like <a href="https://en.wikipedia.org/wiki/Scientific_Linux">Scientific
 Linux</a>), but my personal
 playground project to research linux distribution development, i.e. try out
 fresh ideas.</p>
+
 <p>This article focuses on the package format and its advantages, but there is
 more to distri, which I will <a href="#more-to-come">cover in upcoming blog posts</a>.</p>
+
 <h3 id="motivation">Motivation</h3>
+
 <p>I was a Debian Developer for the 7 years from 2012 to 2019, but using the
 distribution often left me frustrated, ultimately <a href="/posts/2019-03-10-debian-winding-down/">resulting in me winding down
 my Debian work</a>.</p>
+
 <p>Frequently, I was noticing a large gap between the actual speed of an operation
 (e.g. doing an update) and the possible speed based on back of the envelope
 calculations. I wrote more about this in my blog post <a href="/posts/2019-08-17-linux-package-managers-are-slow/">“Package managers are
 slow”</a>.</p>
+
 <p>To me, this observation means that either there is potential to optimize the
 package manager itself (e.g. <code>apt</code>), or what the system does is just too
 complex. While I remember seeing some low-hanging fruit¹, through my work on
 distri, I wanted to explore whether all the complexity we currently have in
 Linux distributions such as Debian or Fedora is inherent to the problem space.</p>
+
 <p>I have completed enough of the experiment to conclude that the complexity is not
 inherent: I can build a Linux distribution for general-enough purposes which is
 much less complex than existing ones.</p>
+
 <p>① Those were low-hanging fruit from a user perspective. I’m not saying that
-fixing them is easy in the technical sense; I know too little about <code>apt</code>’s code
-base to make such a statement.</p>
+  fixing them is easy in the technical sense; I know too little about <code>apt</code>’s code
+  base to make such a statement.</p>
+
 <h3 id="key-idea-packages-are-images-not-archives">Key idea: packages are images, not archives</h3>
+
 <p>One key idea is to switch from using archives to using <strong>images</strong> for package
 contents. Common package managers such as <a href="https://manpages.debian.org/dpkg.1"><code>dpkg(1)</code></a>
 
 use <a href="https://manpages.debian.org/tar.1"><code>tar(1)</code></a>
  archives with various compression
 algorithms.</p>
+
 <p>distri uses <a href="https://en.wikipedia.org/wiki/SquashFS">SquashFS images</a>, a
 comparatively simple file system image format that I happen to be familiar with
 from my work on the <a href="https://gokrazy.org">gokrazy Raspberry Pi 3 Go platform</a>.</p>
+
 <p>This idea is not novel: <a href="https://en.wikipedia.org/wiki/AppImage">AppImage</a> and
 <a href="https://en.wikipedia.org/wiki/Snappy_(package_manager)">snappy</a> also use
 images, but only for individual, self-contained applications. distri however
 uses images for distribution packages with dependencies. In particular, there is
 no duplication of shared libraries in distri.</p>
+
 <p>A nice side effect of using read-only image files is that applications are
 immutable and can hence not be broken by accidental (or malicious!)
 modification.</p>
+
 <h3 id="key-idea-separate-hierarchies">Key idea: separate hierarchies</h3>
+
 <p>Package contents are made available under a fully-qualified path. E.g., all
 files provided by package <code>zsh-amd64-5.6.2-3</code> are available under
 <code>/ro/zsh-amd64-5.6.2-3</code>. The mountpoint <code>/ro</code> stands for read-only, which is
 short yet descriptive.</p>
+
 <p>Perhaps surprisingly, building software with custom <code>prefix</code> values of
 e.g. <code>/ro/zsh-amd64-5.6.2-3</code> is widely supported, thanks to:</p>
+
 <ol>
-<li>
-<p>Linux distributions, which build software with <code>prefix</code> set to <code>/usr</code>,
+<li><p>Linux distributions, which build software with <code>prefix</code> set to <code>/usr</code>,
 whereas FreeBSD (and the autotools default), which build with <code>prefix</code> set to
-<code>/usr/local</code>.</p>
-</li>
-<li>
-<p>Enthusiast users in corporate or research environments, who install software
-into their home directories.</p>
-</li>
+<code>/usr/local</code>.</p></li>
+
+<li><p>Enthusiast users in corporate or research environments, who install software
+into their home directories.</p></li>
 </ol>
+
 <p>Because using a custom <code>prefix</code> is a common scenario, upstream awareness for
 <code>prefix</code>-correctness is generally high, and the rarely required patch will be
 quickly accepted.</p>
+
 <h3 id="key-idea-exchange-directories">Key idea: exchange directories</h3>
+
 <p>Software packages often exchange data by placing or locating files in well-known
 directories. Here are just a few examples:</p>
+
 <ul>
 <li><a href="https://manpages.debian.org/gcc.1"><code>gcc(1)</code></a>
  locates the <a href="https://manpages.debian.org/libusb.3"><code>libusb(3)</code></a>
@@ -679,25 +1035,26 @@ directories. Here are just a few examples:</p>
 <li><a href="https://manpages.debian.org/zsh.1"><code>zsh(1)</code></a>
  locates executable programs via <code>PATH</code> components such as <code>/bin</code></li>
 </ul>
+
 <p>In distri, these locations are called <strong>exchange directories</strong> and are provided
 via FUSE in <code>/ro</code>.</p>
+
 <p>Exchange directories come in two different flavors:</p>
+
 <ol>
-<li>
-<p>global. The exchange directory, e.g. <code>/ro/share</code>, provides the union of the
+<li><p>global. The exchange directory, e.g. <code>/ro/share</code>, provides the union of the
 <code>share</code> sub directory of all packages in the package store.
-<br>
+<br />
 Global exchange directories are largely used for compatibility, <a href="#fhs-compat">see
-below</a>.</p>
-</li>
-<li>
-<p>per-package. Useful for tight coupling: e.g. <a href="https://manpages.debian.org/irssi.1"><code>irssi(1)</code></a>
+below</a>.</p></li>
+
+<li><p>per-package. Useful for tight coupling: e.g. <a href="https://manpages.debian.org/irssi.1"><code>irssi(1)</code></a>
  does not provide any ABI guarantees, so plugins such as <code>irssi-robustirc</code>
 can declare that they want
 e.g. <code>/ro/irssi-amd64-1.1.1-1/out/lib/irssi/modules</code> to be a per-package
-exchange directory and contain files from their <code>lib/irssi/modules</code>.</p>
-</li>
+exchange directory and contain files from their <code>lib/irssi/modules</code>.</p></li>
 </ol>
+
 <aside class="admonition note">
   <div class="note-icon">
     <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
@@ -715,7 +1072,9 @@ environment (as opposed to run-time).
 </div>
 </aside>
 
+
 <h4 id="search-paths-sometimes-need-to-be-fixed">Search paths sometimes need to be fixed</h4>
+
 <p>Programs which use exchange directories sometimes use search paths to access
 multiple exchange directories. In fact, the examples above were taken from <a href="https://manpages.debian.org/gcc.1"><code>gcc(1)</code></a>
 ’s <code>INCLUDEPATH</code>, <a href="https://manpages.debian.org/man.1"><code>man(1)</code></a>
@@ -723,10 +1082,12 @@ multiple exchange directories. In fact, the examples above were taken from <a hr
 ’s <code>PATH</code>. These are
 prominent ones, but more examples are easy to find: <a href="https://manpages.debian.org/zsh.1"><code>zsh(1)</code></a>
  loads completion functions from its <code>FPATH</code>.</p>
+
 <p>Some search path values are derived from <code>--datadir=/ro/share</code> and require no
 further attention, but others might derive from
 e.g. <code>--prefix=/ro/zsh-amd64-5.6.2-3/out</code> and need to be pointed to an exchange
 directory via a specific command line flag.</p>
+
 <aside class="admonition note">
   <div class="note-icon">
     <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
@@ -748,55 +1109,60 @@ respectively.
 </div>
 </aside>
 
+
 <h4 id="fhs-compat">FHS compatibility</h4>
+
 <p>Global exchange directories are used to make distri provide enough of the
 <a href="https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard">Filesystem Hierarchy Standard
 (FHS)</a> that
 third-party software largely just works. This includes a C development
 environment.</p>
+
 <p>I successfully ran a few programs from their binary packages such as Google
 Chrome, Spotify, or Microsoft’s Visual Studio Code.</p>
+
 <h3 id="fast-package-manager">Fast package manager</h3>
+
 <p>I previously wrote about how <a href="/posts/2019-08-17-linux-package-managers-are-slow/">Linux distribution package managers are too slow</a>.</p>
+
 <p>distri’s package manager is extremely fast. Its main bottleneck is typically the network link, even at high speed links (I tested with a 100 Gbps link).</p>
+
 <p>Its speed comes largely from an architecture which allows the package manager to
 do less work. Specifically:</p>
+
 <ol>
-<li>
-<p>Package images can be added atomically to the package store, so we can safely
+<li><p>Package images can be added atomically to the package store, so we can safely
 skip <a href="https://manpages.debian.org/fsync.2"><code>fsync(2)</code></a>
 . Corruption will be cleaned up
 automatically, and durability is not important: if an interactive
 installation is interrupted, the user can just repeat it, as it will be fresh
-on their mind.</p>
-</li>
-<li>
-<p>Because all packages are co-installable thanks to separate hierarchies, there
+on their mind.</p></li>
+
+<li><p>Because all packages are co-installable thanks to separate hierarchies, there
 are no conflicts at the package store level, and no dependency resolution (an
 optimization problem requiring <a href="https://research.swtch.com/version-sat">SAT
 solving</a>) is required at all.
-<br>
+<br />
 In exchange directories, we resolve conflicts by selecting the package with the
-highest monotonically increasing distri revision number.</p>
-</li>
-<li>
-<p>distri proves that we can build a useful Linux distribution <a href="/posts/2019-07-20-hooks-and-triggers/">entirely without
+highest monotonically increasing distri revision number.</p></li>
+
+<li><p>distri proves that we can build a useful Linux distribution <a href="/posts/2019-07-20-hooks-and-triggers/">entirely without
 hooks and triggers</a>. Not having to
 serialize hook execution allows us to download packages into the package
-store with maximum concurrency.</p>
-</li>
-<li>
-<p>Because we are using images instead of archives, we do not need to unpack
+store with maximum concurrency.</p></li>
+
+<li><p>Because we are using images instead of archives, we do not need to unpack
 anything. This means installing a package is really just writing its package
 image and metadata to the package store. Sequential writes are typically the
-fastest kind of storage usage pattern.</p>
-</li>
+fastest kind of storage usage pattern.</p></li>
 </ol>
+
 <p>Fast installation also make other use-cases more bearable, such as creating disk
 images, be it for testing them in <a href="https://manpages.debian.org/qemu.1"><code>qemu(1)</code></a>
 , booting
 them on real hardware from a USB drive, or for cloud providers such as Google
 Cloud.</p>
+
 <aside class="admonition note">
   <div class="note-icon">
     <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
@@ -813,83 +1179,110 @@ To saturate links above 1 Gbps, transfer packages without compression.
 </div>
 </aside>
 
+
 <h3 id="fast-package-builder">Fast package builder</h3>
+
 <p>Contrary to how distribution package builders are usually implemented, the
 distri package builder does not actually install any packages into the build
 environment.</p>
+
 <p>Instead, distri makes available a filtered view of the package store (only
 declared dependencies are available) at <code>/ro</code> in the build environment.</p>
+
 <p>This means that even for large dependency trees, setting up a build environment
 happens in a fraction of a second! Such a low latency really makes a difference
 in how comfortable it is to iterate on distribution packages.</p>
+
 <h3 id="package-stores">Package stores</h3>
+
 <p>In distri, package images are installed from a remote <strong>package store</strong> into the
 local system package store <code>/roimg</code>, which backs the <code>/ro</code> mount.</p>
+
 <p>A package store is implemented as a directory of package images and their
 associated metadata files.</p>
+
 <p>You can easily make available a package store by using <code>distri export</code>.</p>
+
 <p>To provide a mirror for your local network, you can periodically <code>distri update</code>
 from the package store you want to mirror, and then <code>distri export</code> your local
 copy. Special tooling (e.g. <code>debmirror</code> in Debian) is not required because
 <code>distri install</code> is atomic (and <code>update</code> uses <code>install</code>).</p>
+
 <p>Producing derivatives is easy: just add your own packages to a copy of the
 package store.</p>
+
 <p>The package store is intentionally kept simple to manage and distribute. Its
 files could be exchanged via peer-to-peer file systems, or synchronized from an
 offline medium.</p>
-<h3 id="distris-first-release">distri’s first release</h3>
+
+<h3 id="distri-s-first-release">distri’s first release</h3>
+
 <p>distri works well enough to demonstrate the ideas explained above. I have
 branched this state into <a href="https://github.com/distr1/distri/tree/jackherer">branch
 <code>jackherer</code></a>, distri’s first
 release code name. This way, I can keep experimenting in the distri repository
 without breaking your installation.</p>
+
 <p>From the branch contents, our autobuilder creates:</p>
+
 <ol>
-<li><a href="https://repo.distr1.org/distri/jackherer/img/">disk images</a>, which…</li>
-</ol>
+<li><p><a href="https://repo.distr1.org/distri/jackherer/img/">disk images</a>, which…</p>
+
 <ul>
 <li>can be <a href="https://github.com/distr1/distri#run-distri-on-real-hardware">tested on real hardware</a></li>
 <li>can be <a href="https://github.com/distr1/distri#run-distri-in-qemu">tested in qemu</a></li>
 <li>can be <a href="https://github.com/distr1/distri#run-distri-in-virtualbox">tested in virtualbox</a></li>
 <li>can be <a href="https://github.com/distr1/distri#run-distri-in-docker">tested in docker</a></li>
 <li>can be <a href="https://github.com/distr1/distri#run-distri-on-google-cloud">tested on Google Cloud</a></li>
-</ul>
-<ol>
-<li>
-<p>a <a href="https://repo.distr1.org/distri/jackherer/pkg/">package repository</a>. Installations can pick up new packages with
-<code>distri update</code>.</p>
-</li>
-<li>
-<p><a href="https://repo.distr1.org/distri/jackherer/docs/">documentation for the release</a>.</p>
-</li>
-</ol>
+</ul></li>
+
+<li><p>a <a href="https://repo.distr1.org/distri/jackherer/pkg/">package repository</a>. Installations can pick up new packages with
+<code>distri update</code>.</p></li>
+
+<li><p><a href="https://repo.distr1.org/distri/jackherer/docs/">documentation for the release</a>.</p>
+
 <ul>
 <li>Definitely check out the <a href="https://github.com/distr1/distri#cool-things-to-try">“Cool things to
 try”</a> README section.</li>
-</ul>
+</ul></li>
+</ol>
+
 <p>The project website can be found at <a href="https://distr1.org">https://distr1.org</a>. The website is just the
 README for now, but we can improve that later.</p>
+
 <p>The repository can be found at <a href="https://github.com/distr1/distri">https://github.com/distr1/distri</a></p>
+
 <h3 id="project-outlook">Project outlook</h3>
+
 <p>Right now, distri is mainly a vehicle for my spare-time Linux distribution
 research. <strong>I don’t recommend anyone use distri for anything but research,</strong> and
 there are no medium-term plans of that changing. At the very least, please
 contact me before basing anything serious on distri so that we can talk about
 limitations and expectations.</p>
+
 <p>I expect the distri project to live for as long as I have blog posts to publish,
 and we’ll see what happens afterwards. Note that this is a hobby for me: I will
 continue to explore, at my own pace, parts that I find interesting.</p>
+
 <p>My hope is that established distributions might get a useful idea or two from
 distri.</p>
+
 <h3 id="more-to-come">There’s more to come: subscribe to the distri feed</h3>
+
 <p>I don’t want to make this post too long, but there is much more!</p>
+
 <p>Please subscribe to the following URL in your feed reader to get all posts about
 distri:</p>
+
 <p><a href="https://michael.stapelberg.ch/posts/tags/distri/feed.xml">https://michael.stapelberg.ch/posts/tags/distri/feed.xml</a></p>
+
 <p>Next in my queue are articles about hermetic packages and good package
 maintainer experience (including declarative packaging).</p>
+
 <h3 id="feedback-or-questions">Feedback or questions?</h3>
+
 <p>I’d love to discuss these ideas in case you’re interested!</p>
+
 <p>Please send feedback to the <a href="https://www.freelists.org/list/distri">distri mailing
 list</a> so that everyone can participate!</p>
 ]]></content>
@@ -1019,102 +1412,140 @@ go run vcs4.go $(tr '\n' ' ' < go_import_path.txt) | sort | uniq -c
     <id>https://michael.stapelberg.ch/posts/2017-08-19-golang_favorite/</id>
     <published>2017-08-19T13:00:00+02:00</published>
     <updated>2020-02-03T08:54:25+01:00</updated>
-    <content type="html"><![CDATA[<p>I strive to respect everybody’s personal preferences, so I usually steer clear
+    <content type="html"><![CDATA[
+
+<p>I strive to respect everybody’s personal preferences, so I usually steer clear
 of debates about which is the best programming language, text editor or
 operating system.</p>
-<p>However, recently I was asked a couple of times why I like and use a lot of <!-- raw HTML omitted -->Go<!-- raw HTML omitted -->, so here is a coherent article to fill in the
+
+<p>However, recently I was asked a couple of times why I like and use a lot of <a
+href="https://golang.org">Go</a>, so here is a coherent article to fill in the
 blanks of my ad-hoc in-person ramblings :-).</p>
+
 <h3 id="my-background">My background</h3>
+
 <p>I have used C and Perl for a number of decently sized projects. I have written
 programs in Python, Ruby, C++, CHICKEN Scheme, Emacs Lisp, Rust and Java (for
 Android only). I understand a bit of Lua, PHP, Erlang and Haskell. In a previous
 life, I developed a number of programs using
 <a href="https://en.wikipedia.org/wiki/Delphi_(programming_language)">Delphi</a>.</p>
+
 <p>I had a brief look at Go in 2009, when it was first released. I seriously
 started using the language when Go 1.0 was released in 2012, featuring the <a href="https://golang.org/doc/go1compat">Go 1
 compatibility guarantee</a>. I still have
 <a href="https://github.com/stapelberg/greetbot">code</a> running in production which I
 authored in 2012, largely untouched.</p>
+
 <h3 id="1-clarity">1. Clarity</h3>
+
 <h4 id="formatting">Formatting</h4>
+
 <p>Go code, by convention, is formatted using the
 <a href="https://golang.org/cmd/gofmt/"><code>gofmt</code></a> tool. Programmatically formatting code
 is not a new idea, but contrary to its predecessors, <code>gofmt</code> supports precisely
 one canonical style.</p>
+
 <p>Having all code formatted the same way makes reading code easier; the code feels
 familiar. This helps not only when reading the standard library or Go compiler,
 but also when working with many code bases — think Open Source, or big
 companies.</p>
+
 <p>Further, auto-formatting is a huge time-saver during code reviews, as it
 eliminates an entire dimension in which code could be reviewed before: now, you
 can just let your continuous integration system verify that <code>gofmt</code> produces no
 diffs.</p>
+
 <p>Interestingly enough, having my editor apply <code>gofmt</code> when saving a file has
 changed the way I write code. I used to attempt to match what the formatter
 would enforce, then have it correct my mistakes. Nowadays, I express my thought
 as quickly as possible and trust <code>gofmt</code> to make it pretty
 (<a href="https://play.golang.org/p/I6GJwiT77v">example</a> of what I would type, click
 Format).</p>
+
 <h4 id="high-quality-code">High-quality code</h4>
+
 <p>I use the standard library (<a href="https://golang.org/pkg/">docs</a>,
 <a href="https://github.com/golang/go/tree/master/src">source</a>) quite a bit, see below.</p>
+
 <p>All standard library code which I have read so far was of extremely high quality.</p>
+
 <p>One example is the <a href="https://golang.org/pkg/image/jpeg/"><code>image/jpeg</code></a> package: I
 didn’t know how JPEG worked at the time, but it was easy to pick up by switching
 between the <a href="https://en.wikipedia.org/wiki/JPEG">Wikipedia JPEG article</a> and the
 <code>image/jpeg</code> code. If the package had a few more comments, I would qualify it as
 a teaching implementation.</p>
+
 <h4 id="opinions">Opinions</h4>
+
 <p>I have come to agree with many opinions the Go community holds, such as:</p>
+
 <ul>
 <li><a href="https://github.com/golang/go/wiki/CodeReviewComments#variable-names">Variable names</a> should be short by default, and become more descriptive the further from its declaration a name is used.</li>
 <li>Keep the dependency tree small (to a reasonable degree): <a href="https://www.youtube.com/watch?v=PAAkCSZUG1c&amp;t=9m28s">a little copying is better than a little dependency</a></li>
 <li>There is a cost to introducing an abstraction layer. Go code is usually rather clear, at the cost of being a bit repetitive at times.</li>
 <li>See <a href="https://github.com/golang/go/wiki/CodeReviewComments">CodeReviewComments</a> and <a href="https://go-proverbs.github.io/">Go Proverbs</a> for more.</li>
 </ul>
+
 <h4 id="few-keywords-and-abstraction-layers">Few keywords and abstraction layers</h4>
+
 <p>The Go specification lists only <a href="https://golang.org/ref/spec#Keywords">25
 keywords</a>, which I can easily keep in my
 head.</p>
+
 <p>The same is true for <a href="https://golang.org/pkg/builtin/">builtin functions</a> and
 <a href="https://golang.org/ref/spec#Types">types</a>.</p>
+
 <p>In my experience, the small number of abstraction layers and concepts makes the
 language easy to pick up and quickly feel comfortable in.</p>
+
 <p>While we’re talking about it: I was surprised about how readable the <a href="https://golang.org/ref/spec">Go
 specification</a> is. It really seems to target
 programmers (rather than standards committees?).</p>
+
 <h3 id="2-speed">2. Speed</h3>
-<h4 id="quick-feedback--low-latency">Quick feedback / low latency</h4>
+
+<h4 id="quick-feedback-low-latency">Quick feedback / low latency</h4>
+
 <p>I love quick feedback: I appreciate websites which load quickly, I prefer fluent
 User Interfaces which don’t lag, and I will choose a quick tool over a more
 powerful tool any day. <a href="https://blog.gigaspaces.com/amazon-found-every-100ms-of-latency-cost-them-1-in-sales/">The
 findings</a>
 of large web properties confirm that this behavior is shared by many.</p>
+
 <p>The authors of the Go compiler respect my desire for low latency: compilation
 speed matters to them, and new optimizations are carefully weighed against
 whether they will slow down compilation.</p>
+
 <p>A friend of mine had not used Go before. After installing the
 <a href="https://robustirc.net">RobustIRC</a> bridge using <code>go get</code>, they concluded that Go
 must be an interpreted language and I had to correct them: no, the Go compiler
 just is that fast.</p>
+
 <p>Most Go tools are no exception, e.g. <code>gofmt</code> or <code>goimports</code> are blazingly fast.</p>
+
 <h4 id="maximum-resource-usage">Maximum resource usage</h4>
+
 <p>For batch applications (as opposed to interactive applications), utilizing the
 available resources to their fullest is usually more important than low latency.</p>
+
 <p>It is delightfully easy to profile and change a Go program to utilize all
 available IOPS, network bandwidth or compute. As an example, I wrote about
 <a href="https://people.debian.org/~stapelberg/2014/01/17/debmirror-rackspace.html">filling a 1 Gbps
 link</a>,
 and optimized <a href="https://github.com/Debian/debiman/">debiman</a> to utilize all
 available resources, reducing its runtime by hours.</p>
+
 <h3 id="3-rich-standard-library">3. Rich standard library</h3>
+
 <p>The <a href="https://golang.org/pkg">Go standard library</a> provides means to effectively
 use common communications protocols and data storage formats/mechanisms, such as
 TCP/IP, HTTP, JPEG, SQL, …</p>
+
 <p>Go’s standard library is the best one I have ever seen. I perceive it as
 well-organized, clean, small, yet comprehensive: I often find it possible to
 write reasonably sized programs with just the standard library, plus one or two
 external packages.</p>
+
 <p>Domain-specific data types and algorithms are (in general) not included and live
 outside the standard library,
 e.g. <a href="https://godoc.org/golang.org/x/net/html"><code>golang.org/x/net/html</code></a>. The
@@ -1124,12 +1555,16 @@ breaking changes, even if they are clearly worthwhile. A prominent example is
 <code>golang.org/x/crypto/ssh</code>, which had to break existing code to <a href="https://github.com/golang/crypto/commit/e4e2799dd7aab89f583e1d898300d96367750991">establish a more
 secure
 default</a>.</p>
+
 <h3 id="4-tooling">4. Tooling</h3>
+
 <p>To download, compile, install and update Go packages, I use the <code>go get</code> tool.</p>
+
 <p>All Go code bases I have worked with use the built-in
 <a href="https://golang.org/pkg/testing/"><code>testing</code></a> facilities. This results not only
 in easy and fast testing, but also in <a href="https://blog.golang.org/cover">coverage
 reports</a> being readily available.</p>
+
 <p>Whenever a program uses more resources than expected, I fire up <code>pprof</code>. See
 this <a href="https://blog.golang.org/profiling-go-programs">golang.org blog post about
 <code>pprof</code></a> for an introduction, or
@@ -1138,27 +1573,37 @@ Search</a>. After
 importing the <a href="https://golang.org/pkg/net/http/pprof/"><code>net/http/pprof</code>
 package</a>, you can profile your server
 while it’s running, without recompilation or restarting.</p>
+
 <p>Cross-compilation is as easy as setting the <code>GOARCH</code> environment variable,
 e.g. <code>GOARCH=arm64</code> for targeting the Raspberry Pi 3. Notably, tools just work
 cross-platform, too! For example, I can profile <a href="https://gokrazy.org">gokrazy</a>
-from my amd64 computer: <code>go tool pprof ~/go/bin/linux_arm64/dhcp http://gokrazy:3112/debug/pprof/heap</code>.</p>
+from my amd64 computer: <code>go tool pprof ~/go/bin/linux_arm64/dhcp
+http://gokrazy:3112/debug/pprof/heap</code>.</p>
+
 <p><a href="https://godoc.org/golang.org/x/tools/cmd/godoc">godoc</a> displays documentation
 as plain text or serves it via HTTP. <a href="https://godoc.org">godoc.org</a> is a public
 instance, but I run a local one to use while offline or for not yet published
 packages.</p>
+
 <p>Note that these are standard tools coming with the language. Coming from C, each
 of the above would be a significant feat to accomplish. In Go, we take them for
 granted.</p>
+
 <h3 id="getting-started">Getting started</h3>
+
 <p>Hopefully I was able to convey why I’m happy working with Go.</p>
+
 <p>If you’re interested in getting started with Go, check out <a href="https://github.com/gopheracademy/gopher/blob/1cdbcd9fc3ba58efd628d4a6a552befc8e3912be/bot/bot.go#L516">the beginner’s
 resources</a>
 we point people to when they join the Gophers slack channel. See
 <a href="https://golang.org/help/">https://golang.org/help/</a>.</p>
+
 <h3 id="caveats">Caveats</h3>
+
 <p>Of course, no programming tool is entirely free of problems. Given that this
 article explains why Go is my favorite programming language, it focuses on the
 positives. I will mention a few issues in passing, though:</p>
+
 <ul>
 <li>If you use Go packages which don’t offer a stable API, you might want to use a specific, known-working version. Your best bet is the <a href="https://github.com/golang/dep">dep</a> tool, which is not part of the language at the time of writing.</li>
 <li>Idiomatic Go code does not necessarily translate to the highest performance machine code, and the runtime comes at a (small) cost. In the rare cases where I found performance lacking, I successfully resorted to <a href="https://golang.org/cmd/cgo/">cgo</a> or assembler. If your domain is hard-realtime applications or otherwise extremely performance-critical code, your mileage may vary, though.</li>
@@ -1172,13 +1617,142 @@ positives. I will mention a few issues in passing, though:</p>
     <id>https://michael.stapelberg.ch/posts/2017-01-28-golang_atomically_writing/</id>
     <published>2017-01-28T21:29:00+00:00</published>
     <updated>2020-02-03T08:54:25+01:00</updated>
-    <content type="html"><![CDATA[<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+    <content type="html"><![CDATA[<p>
+<strong>NOTE </strong> that the documented assumptions about fsync skipping are incorrect in the code below. Prefer using <a href="https://github.com/google/renameio">the renameio package</a>.
+</p>
+
+<p>
+Writing files is simple, but correctly writing files atomically in a performant
+way might not be as trivial as one might think. Here’s an extensively commented
+function to atomically write compressed files (taken from <a
+href="https://github.com/Debian/debiman">debiman</a>, the software behind <a
+href="https://manpages.debian.org/">manpages.debian.org</a>):
+<p>
+
+<pre>
+package main
+
+import (
+    "bufio"
+    "compress/gzip"
+    "io"
+    "io/ioutil"
+    "log"
+    "os"
+    "path/filepath"
+)
+
+func tempDir(dest string) string {
+    tempdir := os.Getenv("TMPDIR")
+    if tempdir == "" {
+        // Convenient for development: decreases the chance that we
+        // cannot move files due to TMPDIR being on a different file
+        // system than dest.
+        tempdir = filepath.Dir(dest)
+    }
+    return tempdir
+}
+
+func writeAtomically(dest string, compress bool, write func(w io.Writer) error) (err error) {
+    f, err := ioutil.TempFile(tempDir(dest), "atomic-")
+    if err != nil {
+        return err
+    }
+    defer func() {
+        // Clean up (best effort) in case we are returning with an error:
+        if err != nil {
+            // Prevent file descriptor leaks.
+            f.Close()
+            // Remove the tempfile to avoid filling up the file system.
+            os.Remove(f.Name())
+        }
+    }()
+
+    // Use a buffered writer to minimize write(2) syscalls.
+    bufw := bufio.NewWriter(f)
+
+    w := io.Writer(bufw)
+    var gzipw *gzip.Writer
+    if compress {
+        // NOTE: gzip’s decompression phase takes the same time,
+        // regardless of compression level. Hence, we invest the
+        // maximum CPU time once to achieve the best compression.
+        gzipw, err = gzip.NewWriterLevel(bufw, gzip.BestCompression)
+        if err != nil {
+            return err
+        }
+        defer gzipw.Close()
+        w = gzipw
+    }
+
+    if err := write(w); err != nil {
+        return err
+    }
+
+    if compress {
+        if err := gzipw.Close(); err != nil {
+            return err
+        }
+    }
+
+    if err := bufw.Flush(); err != nil {
+        return err
+    }
+
+    // Chmod the file world-readable (ioutil.TempFile creates files with
+    // mode 0600) before renaming.
+    if err := f.Chmod(0644); err != nil {
+        return err
+    }
+
+    // fsync(2) after fchmod(2) orders writes as per
+    // https://lwn.net/Articles/270891/. Can be skipped for performance
+    // for idempotent applications (which only ever atomically write new
+    // files and tolerate file loss) on an ordered file systems. ext3,
+    // ext4, XFS, Btrfs, ZFS are ordered by default.
+    f.Sync()
+
+    if err := f.Close(); err != nil {
+        return err
+    }
+
+    return os.Rename(f.Name(), dest)
+}
+
+func main() {
+    if err := writeAtomically("demo.txt.gz", true, func(w io.Writer) error {
+        _, err := w.Write([]byte("demo"))
+        return err
+    }); err != nil {
+        log.Fatal(err)
+    }
+}
+</pre>
+
+<p>
+<a href="https://manpages.debian.org/rsync.1">rsync(1)</a> will fail when it
+lacks permission to read files. Hence, if you are synchronizing a repository of
+files while updating it, you’ll need to set <code>TMPDIR</code> to point to a
+directory on the same file system (for <a
+href="https://manpages.debian.org/rename.2">rename(2)</a> to work) which is not
+covered by your <a href="https://manpages.debian.org/rsync.1">rsync(1)</a>
+invocation.
+</p>
+
+<p>
+When calling <code>writeAtomically</code> repeatedly to create lots of small
+files, you’ll notice that creating <code>gzip.Writer</code>s is actually rather
+expensive. Modifying the function to re-use the same <code>gzip.Writer</code>
+<a
+href="https://github.com/Debian/debiman/commit/2f891341daa6c2b24dc9b0bacd3b722b057d8e9b">yielded
+a significant decrease in wall-clock time</a>.
+</p>
+
+<p>
+Of course, if you’re looking for maximum write performance (as opposed to
+minimum resulting file size), you should use a different gzip level than
+<code>gzip.BestCompression</code>.
+</p>
 ]]></content>
   </entry>
   <entry>
@@ -1187,20 +1761,67 @@ positives. I will mention a few issues in passing, though:</p>
     <id>https://michael.stapelberg.ch/posts/2012-11-07-sigill_golang/</id>
     <published>2012-11-07T17:50:00+00:00</published>
     <updated>2020-02-03T08:54:25+01:00</updated>
-    <content type="html"><![CDATA[<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+    <content type="html"><![CDATA[<p>
+After launching <a href="http://codesearch.debian.net/">Debian Code Search</a>,
+sometimes its index-backend processes would crash when presented with some
+class of queries. The queries itself did not show an interesting pattern, and
+in fact, it wasn’t their fault.
+</p>
+
+<p>
+Looking at the system’s journal, I noticed that the processes were crashing
+with SIGILL, the signal when an illegal instruction for the CPU is encountered:
+</p>
+
+<pre>
+Nov 07 00:11:33 codesearch index-backend[10517]: SIGILL: illegal instruction
+Nov 07 00:11:33 codesearch index-backend[10517]: PC=0x42558d
+</pre>
+
+<p>
+Interestingly, on my workstation, I could not reproduce this issue.
+</p>
+
+<p>
+Therefore, I fired up gdb and reproduced the problem. After gdb stopped due to
+SIGILL, I examined the current instruction:
+</p>
+
+<pre>
+gdb $ x/4i $pc
+0x42558d <cPostingOr+509>:  vzeroupper 
+0x425590 <cPostingOr+512>:  retq   
+0x425591 <cPostingOr+513>:  nopl   0x0(%rax)
+0x425598 <cPostingOr+520>:  cmp    %ebx,%r10d
+</pre>
+
+<p>
+Some quick googling revealed that <code>vzeroupper</code> is an instruction
+which is pretty new, but supported by Intel’s i7 and AMD’s Bulldozer CPUs. I am
+using an AMD CPU in the server on which Debian Code Search is hosted, but why
+would the Go compiler add such an instruction to the code in the first place?
+</p>
+
+<p>
+Then it struck me: It’s GCC, invoked because I use cgo for a small part of
+the code! To get the most performance out of my code when benchmarking, I had
+setup the cflags like this:
+</p>
+
+<pre>
+#cgo CFLAGS: -std=gnu99 -O3 -march=native
+</pre>
+
+<p>
+…leading to GCC putting in instructions which are only available on my
+workstation, but not on my server. The fix was to simply remove
+<code>-march=native</code>.
+</p>
+
+<p>
+Therefore: Be careful with optimizations (doh), especially when you are
+compiling code on a different machine than you intend to run it on.
+</p>
 ]]></content>
   </entry>
   <entry>
@@ -1209,25 +1830,135 @@ positives. I will mention a few issues in passing, though:</p>
     <id>https://michael.stapelberg.ch/posts/2012-09-27-cgo_uint32/</id>
     <published>2012-09-27T16:51:00+00:00</published>
     <updated>2020-02-03T08:54:25+01:00</updated>
-    <content type="html"><![CDATA[<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+    <content type="html"><![CDATA[<p>
+There is <a href="http://golang.org/doc/articles/c_go_cgo.html">official
+documentation on the Go C language interface</a> (or <code>cgo</code> in golang
+terminology), but the things it covers are relatively simple. I have used cgo
+recently in a real-world project and I want to share my experiences in this
+short article, that is, how to use types properly (avoiding the
+<code>void*</code> equivalent <code>unsafe.Pointer</code>) and how to deal with
+Go’s data structures such as slices.
+</p>
+
+<h2>A simple example</h2>
+
+<p>
+To make sure we’re on the same page, let’s consider this simple example:
+</p>
+
+<pre>
+package main
+import "fmt"
+func main() {
+    list := []int{23, 42, 17}
+    for idx, val := range list {
+        fmt.Printf("index %d: value %d\n", idx, val)
+    }
+}
+</pre>
+
+<p>
+The output of that program is:
+</p>
+
+<pre>
+index 0: value 23
+index 1: value 42
+index 2: value 17
+</pre>
+
+<h2>Multiplying these numbers</h2>
+
+<p>
+Let’s assume that we want to multiply all these numbers by 2. In Go, that’s
+pretty simple:
+</p>
+
+<pre>
+package main
+import "fmt"
+
+func multiply(input []int) []int {
+    // Create an output list with the same size
+    output := make([]int, len(input))
+    for idx, val := range input {
+        output[idx] = val * 2
+    }
+    return output
+}
+
+func main() {
+    list := []int{23, 42, 17}
+    list = multiply(list)
+    for idx, val := range list {
+        fmt.Printf("index %d: value %d\n", idx, val)
+    }
+}
+</pre>
+
+<p>
+Now let’s see how we would do that in C with cgo. Note that we switch to using
+<code>uint32</code> instead of <code>int</code> because that makes the point
+I’m trying to make easier to convey.
+</p>
+
+<pre>
+package main
+import "fmt"
+
+/*
+// Note the -std=gnu99. Using -std=c99 will not work.
+#cgo CFLAGS: -std=gnu99
+#include &lt;stdint.h&gt;
+
+void cMultiply(int len, uint32_t *input, uint32_t *output) {
+    for (int i = 0; i < len; i++) {
+        output[i] = input[i] * 2;
+    }
+}
+*/
+import "C"
+
+func multiply(input []uint32) []uint32 {
+    output := make([]uint32, len(input))
+    C.cMultiply(C.int(len(input)),
+        (*C.uint32_t)(&input[0]),
+    (*C.uint32_t)(&output[0]))
+    return output
+}
+
+func main() {
+    list := []uint32{23, 42, 17}
+    list = multiply(list)
+    for idx, val := range list {
+        fmt.Printf("index %d: value %d\n", idx, val)
+    }
+}
+</pre>
+
+<p>
+As you can see, we need to convert the Go types into C types, which can be done
+by simply type-casting them. Also, we need to manually implement the array
+calling convention which is normally done by the C compiler: We pass a pointer
+to the first element.
+</p>
+
+<p>
+We have also avoided passing the slice directly to the C code and instead
+passed the length plus a pointer to the contents. This is a simple way to avoid
+having to use the internal Go <code>SliceHeader</code> data type.
+</p>
+
+<p>
+If you are using C code to speed up some critical routines, you might want to
+throw in a <code>-O3</code> in the <code>#cgo CFLAGS</code> pragma.
+</p>
+
+<p>
+It is noteworthy that you should avoid calling a lot of cgo-functions, since
+the function call overhead is much higher than the normal go function call
+overhead.
+</p>
 ]]></content>
   </entry>
 </feed>

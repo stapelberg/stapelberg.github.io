@@ -101,72 +101,98 @@ body, td, th {
 	  </span>
 	  </div>
 	  <div class="Artikel" id="content">
-	    <p>In the i3 projects, we have always tried hard to avoid optional
+	    
+
+<p>In the i3 projects, we have always tried hard to avoid optional
 dependencies. There are a number of reasons behind it, and as I have recently
 encountered some of the downsides of optional dependencies firsthand, I
 summarized my thoughts in this article.</p>
+
 <h3 id="what-is-a-compile-time-optional-dependency">What is a (compile-time) optional dependency?</h3>
+
 <p>When building software from source, most programming languages and build systems
 support conditional compilation: different parts of the source code are compiled
 based on certain conditions.</p>
+
 <p>An optional dependency is conditional compilation hooked up directly to a knob
 (e.g. command line flag, configuration file, …), with the effect that the
 software can now be built without an otherwise required dependency.</p>
+
 <p>Let’s walk through a few issues with optional dependencies.</p>
+
 <h3 id="inconsistent-experience-in-different-environments">Inconsistent experience in different environments</h3>
+
 <p>Software is usually not built by end users, but by packagers, at least when we
 are talking about Open Source.</p>
+
 <p>Hence, end users don’t see the knob for the optional dependency, they are just
 presented with the fait accompli: their version of the software behaves
 differently than other versions of the same software.</p>
+
 <p>Depending on the kind of software, this situation can be made obvious to the
 user: for example, if the optional dependency is needed to print documents, the
 program can produce an appropriate error message when the user tries to print a
 document.</p>
+
 <p>Sometimes, this isn’t possible: when i3 introduced an optional dependency on
 cairo and pangocairo, the behavior itself (rendering window titles) worked in
 all configurations, but non-ASCII characters might break depending on whether i3
 was compiled with cairo.</p>
+
 <p>For users, it is frustrating to only discover in conversation that a program has
 a feature that the user is interested in, but it’s not available on their
 computer. For support, this situation can be hard to detect, and even harder to
 resolve to the user’s satisfaction.</p>
+
 <h3 id="packaging-is-more-complicated">Packaging is more complicated</h3>
+
 <p>Unfortunately, many build systems don’t stop the build when optional
 dependencies are not present. Instead, you sometimes end up with a broken build,
 or, even worse: with a successful build that does not work correctly at runtime.</p>
+
 <p>This means that packagers need to closely examine the build output to know which
 dependencies to make available. In the best case, there is a summary of
 available and enabled options, clearly outlining what this build will
 contain. In the worst case, you need to infer the features from the checks that
 are done, or work your way through the <code>--help</code> output.</p>
+
 <p>The better alternative is to configure your build system such that it stops when
 <em>any</em> dependency was not found, and thereby have packagers acknowledge each
 optional dependency by explicitly disabling the option.</p>
+
 <h3 id="untested-code-paths-bit-rot">Untested code paths bit rot</h3>
+
 <p>Code paths which are not used will inevitably bit rot. If you have optional
 dependencies, you need to test both the code path without the dependency and the
 code path with the dependency. It doesn’t matter whether the tests are automated
 or manual, the test matrix must cover both paths.</p>
+
 <p>Interestingly enough, this principle seems to apply to all kinds of software
 projects (but it slows down as change slows down): one might think that
 important Open Source building blocks should have enough users to cover all
 sorts of configurations.</p>
+
 <p>However, consider this example: building cairo without libxrender results in all
 GTK application windows, menus, etc. being displayed as empty grey
 surfaces. Cairo does not fail to build without libxrender, but the code path
 clearly is broken without libxrender.</p>
+
 <h3 id="can-we-do-without-them">Can we do without them?</h3>
+
 <p>I’m not saying optional dependencies should <em>never</em> be used. In fact, for
 bootstrapping, disabling dependencies can save a lot of work and can sometimes
 allow breaking circular dependencies. For example, in an early bootstrapping
 stage, binutils can be compiled with <code>--disable-nls</code> to disable
 internationalization.</p>
+
 <p>However, optional dependencies are broken so often that I conclude they are
 overused. Read on and see for yourself whether you would rather commit to best
 practices or not introduce an optional dependency.</p>
+
 <h3 id="best-practices">Best practices</h3>
+
 <p>If you do decide to make dependencies optional, please:</p>
+
 <ol>
 <li>Set up automated testing for <strong>all</strong> code path combinations.</li>
 <li>Fail the build until packagers explicitly pass a <code>--disable</code> flag.</li>

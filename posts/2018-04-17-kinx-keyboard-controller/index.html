@@ -111,175 +111,218 @@ body, td, th {
 	    <details style="margin-bottom: 2em">
 	      <summary>Table of contents</summary>
 	      <nav id="TableOfContents">
-  <ul>
-    <li>
-      <ul>
-        <li><a href="#background">Background</a></li>
-        <li><a href="#sources-of-input-latency">Sources of input latency</a></li>
-        <li><a href="#teensy-36-controller-for-learning">Teensy 3.6 controller (for learning)</a></li>
-        <li><a href="#usb-high-speed">USB High Speed</a></li>
-        <li><a href="#mk66f-keyboard-controller">MK66F keyboard controller</a></li>
-        <li><a href="#lessons-learnt">Lessons learnt</a></li>
-        <li><a href="#next-up">Next up</a></li>
-      </ul>
-    </li>
-  </ul>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#background">Background</a></li>
+<li><a href="#sources-of-input-latency">Sources of input latency</a></li>
+<li><a href="#teensy-3-6-controller-for-learning">Teensy 3.6 controller (for learning)</a></li>
+<li><a href="#usb-high-speed">USB High Speed</a></li>
+<li><a href="#mk66f-keyboard-controller">MK66F keyboard controller</a></li>
+<li><a href="#lessons-learnt">Lessons learnt</a></li>
+<li><a href="#next-up">Next up</a></li>
+</ul></li>
+</ul></li>
+</ul>
 </nav>
 	    </details>
-	    <p>This post is part of a <a href="/posts/2018-04-17-kinx">series of posts about the kinX project</a>.</p>
+	    
+
+<p>This post is part of a <a href="/posts/2018-04-17-kinx">series of posts about the kinX project</a>.</p>
+
 <h3 id="background">Background</h3>
+
 <p>10 years ago I got a Kinesis Advantage keyboard. I wrote about the experience of
 learning to touch-type using the ergonomic <a href="https://neo-layout.org/">NEO layout</a>
 in my (German) post <a href="/posts/2009-01-01-neo_kinesis/">“Neo-Layout auf einer
 Kinesis-Tastatur”</a>.</p>
+
 <p>The Kinesis Advantage is still the best keyboard I’ve ever used, and I use one
 every day, both at the office and at home.</p>
+
 <p>I had two reasons to start modifying the keyboard:</p>
+
 <ol>
-<li>
-<p>I prefer Cherry MX blue key switches over the Cherry MX brown key switches
+<li><p>I prefer Cherry MX blue key switches over the Cherry MX brown key switches
 the Kinesis comes with. Nowadays, you can get a Kinesis with Cherry MX red
-key switches, which felt okay in a quick test.</p>
-</li>
-<li>
-<p>The original keyboard controller has (had?) a bug where modifier keys such as
+key switches, which felt okay in a quick test.</p></li>
+
+<li><p>The original keyboard controller has (had?) a bug where modifier keys such as
 Shift would get stuck at least once a week: you would press Shift, press A,
-release A, release Shift, press A and see AA instead of Aa.</p>
-</li>
+release A, release Shift, press A and see AA instead of Aa.</p></li>
 </ol>
+
 <p>I solved issue ① with the help of the excellent Kinesis technical support, who
 sold me unpopulated PCBs so that I could solder on my own key switches.</p>
+
 <p>Issue ② was what lead to my first own keyboard controller build, which I
 documented in <a href="/posts/2013-03-21-kinesis_custom_controller/">“Hacking your own Kinesis keyboard
 controller”</a> (2013).</p>
+
 <p>Then, the topic of input latency popped into my filter bubble, with excellent
-posts such as <a href="https://pavelfatin.com/typing-with-pleasure/">Pavel Fatin’s “Typing with
+ posts such as <a href="https://pavelfatin.com/typing-with-pleasure/">Pavel Fatin’s “Typing with
 pleasure”</a>. I started wondering
 what input latency I was facing, and whether/how I could reduce it.</p>
+
 <p>Given that I was using a custom keyboard controller, it was up to me to answer
 that question. After trying to understand and modify the firmware I had been
 using for the last 4 years, I realized that I first needed to learn much more
 about how keyboards work.</p>
+
 <p>I firmly believe that creating a good environment is vital for development,
 especially for intrinsically-motivated side projects like this one. Hence, I set
 the project aside until a colleague gifted me his old Kinesis which had
 intermittent issues. I removed the electronics and started using that keyboard
 as my development keyboard.</p>
+
 <h3 id="sources-of-input-latency">Sources of input latency</h3>
+
 <p>A keyboard controller has 3 major tasks:</p>
+
 <ul>
-<li>
-<p><strong>matrix scan</strong>: to avoid physically connecting every single key switch
+<li><p><strong>matrix scan</strong>: to avoid physically connecting every single key switch
 directly to a microcontroller (requiring a large number of GPIO pins), most
 keyboards use a matrix. See <a href="http://blog.komar.be/how-to-make-a-keyboard-the-matrix/">“How to make a keyboard — the
 matrix”</a> for a good
-explanation.</p>
-</li>
-<li>
-<p><strong>debouncing</strong>: when pressing a key switch, it doesn’t cleanly change from a
+explanation.</p></li>
+
+<li><p><strong>debouncing</strong>: when pressing a key switch, it doesn’t cleanly change from a
 low voltage level to a high voltage level (or vice-versa). Instead, it
 bounces: the voltage level rapidly oscillates until it eventually reaches a
 stable steady state. Because one key press shouldn’t result in a whole bunch
-of characters, keyboard controllers need to debounce the key press.</p>
-</li>
-<li>
-<p><strong>USB</strong>: nowadays, keyboards use USB (for example to be compatible with
+of characters, keyboard controllers need to debounce the key press.</p></li>
+
+<li><p><strong>USB</strong>: nowadays, keyboards use USB (for example to be compatible with
 laptops, which generally don’t have PS/2 ports), so the keyboard’s state needs
-to be communicated to the computer via USB.</p>
-</li>
+to be communicated to the computer via USB.</p></li>
 </ul>
+
 <p>Here’s an illustration of the timing of a key press being handled by a naive
 keyboard controller implementation:</p>
-<!-- raw HTML omitted -->
+
+<p><img src="/Bilder/kinx-input-latency-sources.svg"></p>
+
 <p>In the worst case, a key press happens just after a keyboard matrix scan. The
 first source of latency is the time it takes until the next keyboard matrix scan
 happens.</p>
+
 <p>Depending on the implementation, the key press now sits in a data structure,
 waiting for the debounce time to pass.</p>
+
 <p>Finally, once the key press was successfully debounced, the device must wait
 until the USB host polls it before it can send the HID report.</p>
+
 <p>Unless the matrix scan interval is coupled to the USB poll interval, the delays
 are additive, and the debounce time is usually constant: in the best case, a key
 press happens just before a matrix scan (0ms) and gets debounced (say, 5ms) just
 before a USB poll (0ms).</p>
-<h3 id="teensy-36-controller-for-learning">Teensy 3.6 controller (for learning)</h3>
+
+<h3 id="teensy-3-6-controller-for-learning">Teensy 3.6 controller (for learning)</h3>
+
 <p>My old keyboard controller used the
 <a href="https://www.pjrc.com/teensy/index.html">Teensy++</a>, which is fairly dated at
 this point. I decided a good start of the project would be to upgrade to the
 current Teensy 3.6, cleaning up the schematics on the way.</p>
-<!-- raw HTML omitted -->
+
+<p><img src="/Bilder/kinx-teensy36.jpg" width="100%"></p>
+
 <p>To ensure I understand all involved parts, I implemented a bare-metal firmware
 almost from scratch: I cobbled together the required startup code, USB stack
 and, most importantly, key matrix scanning code.</p>
+
 <p>In my firmware, the Teensy 3.6 runs at 180 MHz (compared to the Teensy++’s 16
 MHz) and scans the keyboard matrix in a busy loop (as opposed to on USB
 poll). Measurements confirmed a matrix scan time of only 100μs (0.1ms).</p>
+
 <p>I implemented debouncing the way it is described in <a href="https://summivox.wordpress.com/2016/06/03/keyboard-matrix-scanning-and-debouncing/">Yin Zhong’s “Keyboard
 Matrix Scanning and
 Debouncing”</a>:
 by registering a key press/release on the rising/falling edge and applying the
 debounce time afterwards, effectively eliminating debounce latency.</p>
+
 <p>Note that while the Cherry MX datasheet specifies a debounce time of 5ms, I
 found it necessary to increase the time to 10ms to prevent bouncing in some of
 my key switches, which are already a few years old.</p>
+
 <p>I set the USB device descriptor’s poll interval to 1, meaning poll every 1 USB
 micro frame, which is 1ms long with USB 1.x (Full Speed).</p>
+
 <p>This leaves us at an input latency within [0ms, 1.1ms]:</p>
+
 <ul>
 <li>≤ 0.1ms scan latency</li>
 <li>0ms debounce latency</li>
 <li>≤ 1ms USB poll latency</li>
 </ul>
+
 <p>Can we reduce the input latency even further? The biggest factor is the USB poll
 interval.</p>
+
 <h3 id="usb-high-speed">USB High Speed</h3>
+
 <p>With USB 2.0 High Speed, the micro frame duration is reduced to 125μs
 (0.125ms). The NXP MK66F micro controller in the Teensy 3.6 has two USB ports:</p>
+
 <ol>
 <li>the Full Speed-only USBFS port, which is used by the Teensy 3.6</li>
 <li>the High Speed-capable USBHS port, which the Teensy optionally uses for host
 mode, with experimental software support (at the time of writing)</li>
 </ol>
-<!-- raw HTML omitted -->
+
+<p><img src="/Bilder/kinx-usbhs-breakout.jpg" width="100%"></p>
+
 <p>While the software support was a road block which could conceivably be solved, I
 also faced a mechanical problem: the available space in the Kinesis keyboard and
 the position of the USB High Speed port pins on the Teensy 3.6 unfortunately
 prevented installing any sort of breakout board to actually use the port.</p>
+
 <p>I decided to move from the Teensy 3.6 to my own design with the same
 microcontroller.</p>
+
 <h3 id="mk66f-keyboard-controller">MK66F keyboard controller</h3>
-<!-- raw HTML omitted -->
+
+<p><img src="/Bilder/kinx-mk66f.jpg" width="100%"></p>
+
 <p>To make development pleasant, I connected a USB-to-serial adapter (to UART0) and
 a “rebootor” (to PROGHEAD): another Teensy with a special firmware to trigger
-programming mode. This way, I could set my editor’s <code>compile-command</code> to <code>make &amp;&amp; teensy_loader_cli -r …</code>, compiling the code, uploading and booting into the
+programming mode. This way, I could set my editor’s <code>compile-command</code> to <code>make
+&amp;&amp; teensy_loader_cli -r …</code>, compiling the code, uploading and booting into the
 resulting firmware with a single keyboard shortcut.</p>
+
 <p>I based the firmware for this controller on NXP’s SDK examples, to ensure I get
 a well-tested and maintained USB stack for the USBHS port. I did some
 measurements to confirm the stack does not add measurable extra latency, so I
 did not see any value in me maintaining a custom USB stack.</p>
+
 <p>The firmware can be found at <a href="https://github.com/kinx-project/mk66f-fw">https://github.com/kinx-project/mk66f-fw</a></p>
+
 <p>The hardware can be found at <a href="https://github.com/kinx-project/mk66f-hw">https://github.com/kinx-project/mk66f-hw</a></p>
+
 <p>Using USB 2.0 High Speed leaves us at an input latency within [0ms, 0.225ms]:</p>
+
 <ul>
 <li>≤ 0.1ms scan latency</li>
 <li>0ms debounce latency</li>
 <li>≤ 0.125ms USB poll latency</li>
 </ul>
+
 <h3 id="lessons-learnt">Lessons learnt</h3>
+
 <ul>
-<li>
-<p>In the future, I will base custom designs on the vendor’s development board
+<li><p>In the future, I will base custom designs on the vendor’s development board
 (instead of on the Teensy). This way, the vendor-provided code could be used
-without any modifications.</p>
-</li>
-<li>
-<p>While the Teensy bootloader means getting started with the microcontroller
+without any modifications.</p></li>
+
+<li><p>While the Teensy bootloader means getting started with the microcontroller
 just requires a USB port, using a JTAG connector for development would be more
 powerful: not only does it replace the combination of Teensy bootloader,
-serial and rebootor, but it also supports debugging with gdb.</p>
-</li>
+serial and rebootor, but it also supports debugging with gdb.</p></li>
 </ul>
+
 <h3 id="next-up">Next up</h3>
+
 <p>The <a href="/posts/2018-04-17-kinx-usb-hub/">second post motivates and describes building a drop-in replacement USB
 hub</a> for the Kinesis Advantage keyboard.</p>
 

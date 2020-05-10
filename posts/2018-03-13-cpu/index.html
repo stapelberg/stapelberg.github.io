@@ -94,36 +94,53 @@ body, td, th {
 	  </span>
 	  </div>
 	  <div class="Artikel" id="content">
-	    <h3 id="motivation">motivation</h3>
+	    
+
+<h3 id="motivation">motivation</h3>
+
 <p>To run the tests of my i3 Go package, I use the following command:</p>
+
 <pre><code>go test -v go.i3wm.org/...
-</code></pre><p>To run the tests of my i3 Go package on a different architecture, the only thing
+</code></pre>
+
+<p>To run the tests of my i3 Go package on a different architecture, the only thing
 I should need to change is to declare the architecture by setting
 <code>GOARCH=arm64</code>:</p>
+
 <pre><code>GOARCH=arm64 go test -v go.i3wm.org/...
-</code></pre><p>“Easy!”, I hear you exclaim: “Just <code>apt install qemu</code>, and you can transparently
+</code></pre>
+
+<p>“Easy!”, I hear you exclaim: “Just <code>apt install qemu</code>, and you can transparently
 emulate architectures”. But what if I want to run my tests on a native machine,
 such as the various <a href="https://db.debian.org/machines.cgi?sortby=purpose&amp;sortorder=dsc">Debian porter
 boxes</a>? Down
 the rabbit hole we go…</p>
-<h3 id="cpu1">cpu(1)</h3>
+
+<h3 id="cpu-1">cpu(1)</h3>
+
 <p>On Plan 9, the <a href="http://man.cat-v.org/plan_9/1/cpu">cpu(1)</a> command allows
 transparently using the CPU of dedicated compute servers. This has fascinated me
 for a long time, so I tried to replicate the functionality in Linux.</p>
+
 <h3 id="reverse-sshfs">reverse sshfs</h3>
+
 <p>One of the key insights this project is built on is that
 <a href="https://manpages.debian.org/stretch/sshfs/sshfs.1"><code>sshfs(1)</code></a> can be used over
 an already-authenticated channel, so you don’t need to do awkward reverse
 port-forwardings or even allow the remote machine SSH access to your local
 machine.</p>
+
 <p>I learnt this trick from the 2014 <a href="https://blog.dhampir.no/content/reverse-sshfs-mounts-fs-push">boltblog post “Reverse SSHFS mounts (fs
 push)”</a>.</p>
+
 <p>The post uses <a href="https://manpages.debian.org/stretch/vde2/dpipe.1"><code>dpipe(1)</code></a>’s
 bidirectional wiring of stdin/stdout (as opposed to a unidirectional wiring like
 in UNIX pipes).</p>
+
 <p>Instead of clumsily running <code>dpipe</code> in a separate window, I encapsulated the
 necessary steps in a little Go program I call <code>cpu</code>. The reverse sshfs principle
 looks like this in Go:</p>
+
 <pre><code>sftp := exec.Command(&quot;/usr/lib/openssh/sftp-server&quot;)
 stdin, _ := sftp.StdinPipe()
 stdout, _ := sftp.StdoutPipe()
@@ -138,17 +155,27 @@ const (
 )
 session.Start(fmt.Sprintf(&quot;sshfs %s:%s %s -o slave&quot;, host, src, mnt))
 sftp.Start()
-</code></pre><p>Here’s how the tool looks in action:</p>
-<!-- raw HTML omitted -->
-<h3 id="binfmt_misc">binfmt_misc</h3>
+</code></pre>
+
+<p>Here’s how the tool looks in action:</p>
+
+<script src="https://asciinema.org/a/Q1BWLcdtIMOE5SCHOzu1eqcOE.js" id="asciicast-Q1BWLcdtIMOE5SCHOzu1eqcOE" async></script>
+
+<h3 id="binfmt-misc">binfmt_misc</h3>
+
 <p>Now that we have a tool which will make our local file system available on the
 remote machine, let’s integrate it into our <code>go test</code> invocation.</p>
+
 <p>While we don’t want to modify the <code>go</code> tool, we can easily teach our kernel how
 to run aarch64 ELF binaries using
 <a href="https://www.kernel.org/doc/html/v4.14/admin-guide/binfmt-misc.html">binfmt_misc</a>.</p>
+
 <p>I modified the existing <code>/var/lib/binfmts/qemu-aarch64</code>’s interpreter field to
-point to <code>/home/michael/go/bin/porterbox-aarch64</code>, followed by <code>update-binfmts --enable qemu-aarch64</code> to have the kernel pick up the changes.</p>
+point to <code>/home/michael/go/bin/porterbox-aarch64</code>, followed by <code>update-binfmts
+--enable qemu-aarch64</code> to have the kernel pick up the changes.</p>
+
 <p><code>porterbox-aarch64</code> is a wrapper invoking <code>cpu</code> like so:</p>
+
 <pre><code>cpu \
   -host=rpi3 \
   unshare \
@@ -161,14 +188,20 @@ point to <code>/home/michael/go/bin/porterbox-aarch64</code>, followed by <code>
       \$PWD \
       $PWD \
       $@
-</code></pre><p>Because it’s subtle:</p>
+</code></pre>
+
+<p>Because it’s subtle:</p>
+
 <ul>
 <li><code>\$PWD</code> refers to the directory in which the reverse sshfs was mounted by <code>cpu</code>.</li>
 <li><code>$PWD</code> refers to the working directory in which <code>porterbox-aarch64</code> was called.</li>
 <li><code>$@</code> refers to the original command with which <code>porterbox-aarch64</code> was called.</li>
 </ul>
+
 <h3 id="bindmount">bindmount</h3>
+
 <p>bindmount is a small shell script preparing the bind mounts:</p>
+
 <pre><code>#!/bin/sh
 
 set -e
@@ -188,12 +221,19 @@ mount --rbind &quot;$remote/home&quot; /home
 
 cd &quot;$wd&quot;
 &quot;$@&quot;
-</code></pre><h3 id="demo">demo</h3>
+</code></pre>
+
+<h3 id="demo">demo</h3>
+
 <p>This is what all of the above looks like in action:</p>
-<!-- raw HTML omitted -->
+
+<script src="https://asciinema.org/a/Mjb66iHIbBfGuK5lEMnLt0UzS.js" id="asciicast-Mjb66iHIbBfGuK5lEMnLt0UzS" async></script>
+
 <h3 id="layers">layers</h3>
+
 <p>Putting all of the above puzzle pieces together, we end up with the following
 picture:</p>
+
 <pre><code>go test
 ├ compile test program for GOARCH=arm64
 └ exec test program (on host)
@@ -205,25 +245,36 @@ picture:</p>
           └ unshare --user
             ├ bind /home, /tmp
             └ run test program (on target)
-</code></pre><h3 id="requirements">requirements</h3>
+</code></pre>
+
+<h3 id="requirements">requirements</h3>
+
 <p>On the remote host, the following requirements need to be fulfilled:</p>
+
 <ul>
 <li><code>apt install sshfs</code>, which also activates the FUSE kernel module</li>
 <li><code>sysctl -w kernel.unprivileged_userns_clone=1</code></li>
 </ul>
+
 <p>If the tests require any additional dependencies (the tests in question require
 <code>Xvfb</code> and <code>i3</code>), those need to be installed as well.</p>
+
 <p>On Debian porter boxes, you can install the dependencies in an <a href="https://dsa.debian.org/doc/schroot/"><code>schroot</code>
 session</a>. Note that I wasn’t able to test
 this yet, as porter boxes lacked all requirements at the time of writing.</p>
+
 <p>Unfortunately, <a href="https://wiki.debian.org/Multiarch">Debian’s Multi-Arch</a> does not
 yet include binaries. Otherwise, one might use it to help out with the
 dependencies: one could overlay the local <code>/usr/bin/aarch64-linux-gnu/</code> on the
 remote <code>/usr/bin</code>.</p>
+
 <h3 id="conclusion">conclusion</h3>
+
 <p>On first glance, this approach works as expected. Time will tell whether it’s
 useful in practice or just an interesting one-off exploration.</p>
+
 <p>From a design perspective, there are a few open questions:</p>
+
 <ul>
 <li>Making available only <code>/home</code> might not be sufficient. But making available
 <code>/</code> doesn’t work because <code>sshfs</code> does not support device nodes such as
@@ -234,6 +285,7 @@ are disabled by default on Linux)? Essentially, I think I’m asking for <a href
 namespaces</a>.</li>
 <li>In similar spirit, can binfmt_misc be used per-process?</li>
 </ul>
+
 <p>Regardless, if this setup stands the test of time, I’ll polish and publish the
 tools.</p>
 

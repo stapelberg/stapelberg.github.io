@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Using the iPhone camera as a Linux webcam with v4l2loopback</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.ch/posts/2020-06-06-iphone-camera-linux-v4l2loopback/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    
+    <link rel="stylesheet" href="/1.min.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+
+
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+	<div id="menu" class="col-md-2">
+  <div style="display: flex; align-items: center">
+    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
+    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+  </div>
+
+  <ul class="menu_open">
+    <li><a class="menu_item" href="/"><span class="menu_title">About</span></a></li>
+    <li><a class="menu_item" href="/posts/"><span class="menu_title">Blog</span></a></li>
+    <li><span class="menu_title">Programs</span>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://gokrazy.github.io/"><span class="menu_title">gokrazy</span></a></li>
+	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
+	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
+  </ul>
+</div>
+
+	<div id="contentBox" class="col-md-10">
+	  <h2 class="title">Using the iPhone camera as a Linux webcam with v4l2loopback</h2>
+	  <div style="margin-bottom: 2em">
+	    <span id="date">published 2020-06-06</span>
+	    
+	  
+	  <span style="background-color: black; border-radius: 25%; padding-left: 0.1em; padding-right: 0.1em">
+	    <a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2020-06-06-iphone-camera-linux-v4l2loopback.markdown">✎</a>
+	  </span>
+	  </div>
+	  <div class="Artikel" id="content">
+	    
+
+<p><a href="../../Bilder/2020-06-06-iphone-cam.jpg"><img
+src="../../Bilder/2020-06-06-iphone-cam.thumb.jpg"
+srcset="../../Bilder/2020-06-06-iphone-cam.thumb.2x.jpg 2x,../../Bilder/2020-06-06-iphone-cam.thumb.3x.jpg 3x"
+alt="iPhone camera setup"
+width="200" align="right" style="border: 1px solid #ccc; margin-left: 1em"></a></p>
+
+<p>For my <a href="https://www.twitch.tv/stapelberg">programming stream at
+twitch.tv/stapelberg</a>, I wanted to add an
+additional camera to show test devices, electronics projects, etc. I couldn’t
+find my old webcam, and new ones are hard to come by currently, so I figured I
+would try to include a phone camera somehow.</p>
+
+<p>The setup that I ended up with is:</p>
+
+<p>iPhone camera<br>
+→ Instant Webcam<br>
+→ WiFi<br>
+→ gstreamer<br>
+→ v4l2loopback<br>
+→ OBS</p>
+
+<p>Disclaimer: I was only interested in a video stream! I don’t think this setup
+would be helpful for video conferencing, due to lacking audio/video
+synchronization.</p>
+
+<h3 id="iphone-software-instant-webcam-app">iPhone Software: Instant Webcam app</h3>
+
+<p>I’m using the <a href="https://instant-webcam.com/">PhobosLab Instant Webcam</a> (install
+from the <a href="https://apps.apple.com/us/app/instant-webcam/id683949930">Apple App
+Store</a>) app on an old
+iPhone 8 that I bought used.</p>
+
+<p>There are three interesting related blog posts by app author Dominic Szablewski:</p>
+
+<ol>
+<li><a href="https://phoboslab.org/log/2013/05/mpeg1-video-decoder-in-javascript">MPEG1 Video Decoder in JavaScript</a> (2013-May)</li>
+<li><a href="https://phoboslab.org/log/2013/09/html5-live-video-streaming-via-websockets">HTML5 Live Video Streaming via WebSockets</a> (2013-Sep)</li>
+<li><a href="https://phoboslab.org/log/2017/02/decode-it-like-its-1999">Decode it like it’s 1999</a> (2017-Feb)</li>
+</ol>
+
+<p>As hinted at in the blog posts, the way the app works is by streaming MPEG1
+video from the iPhone (presumably via ffmpeg?) to the <a href="https://jsmpeg.com/">jsmpeg JavaScript
+library</a> via WebSockets.</p>
+
+<p>After some git archeology, I figured out that <a href="https://github.com/phoboslab/jsmpeg/commit/7bf420fd0c176d626a50494bfe32135dd911483d">jsmpeg was rewritten in commit
+7bf420fd just after
+v0.2</a>. You
+can <a href="https://github.com/phoboslab/jsmpeg/tree/186666dd9c2d1fd3430d41f15f695d4a78ed1e42">browse the old version on
+GitHub</a>.</p>
+
+<p>Notably, the Instant Webcam app seems to <strong>still use the older v0.2 version</strong>,
+which <a href="https://github.com/phoboslab/jsmpeg/blob/186666dd9c2d1fd3430d41f15f695d4a78ed1e42/stream-server.js">starts WebSocket streams with a custom 8-byte
+header</a>
+that we need to strip.</p>
+
+<h3 id="linux-software">Linux Software</h3>
+
+<p>Install the <a href="https://github.com/umlaeute/v4l2loopback"><code>v4l2loopback</code></a> kernel
+module, e.g.
+<a href="https://www.archlinux.org/packages/community/any/v4l2loopback-dkms/"><code>community/v4l2loopback-dkms</code></a>
+on Arch Linux or
+<a href="https://packages.debian.org/bullseye/v4l2loopback-dkms"><code>v4l2loopback-dkms</code></a> on
+Debian. I used version 0.12.5-1 at the time of writing.</p>
+
+<p>Then, install <a href="https://gstreamer.freedesktop.org/">gstreamer</a> and required
+plugins. I used version 1.16.2 for all of these:</p>
+
+<ul>
+<li><a href="https://www.archlinux.org/packages/extra/x86_64/gstreamer/"><code>gstreamer</code></a></li>
+<li><a href="https://www.archlinux.org/packages/extra/x86_64/gst-plugins-bad/"><code>gst-plugins-bad</code></a> for <code>mpegvideoparse</code></li>
+<li><a href="https://www.archlinux.org/packages/extra/x86_64/gst-libav/"><code>gst-libav</code></a> for <code>avdec_mpeg2video</code></li>
+</ul>
+
+<p>Lastly, install either <a href="https://github.com/vi/websocat"><code>websocat</code></a> or
+<a href="https://github.com/esphen/wsta"><code>wsta</code></a> for accessing WebSockets. I
+successfully tested with <code>websocat</code> 1.5.0 and <code>wsta</code> 0.5.0.</p>
+
+<h3 id="streaming">Streaming</h3>
+
+<p>First, load the <code>v4l2loopback</code> kernel module:</p>
+
+<pre><code>% sudo modprobe v4l2loopback video_nr=10 card_label=v4l2-iphone
+</code></pre>
+
+<p>Then, we’re going to use gstreamer to decode the WebSocket MPEG1 stream (after
+stripping the custom 8-byte header) and send it into the <code>/dev/video10</code> V4L2
+device, to the <code>v4l2loopback</code> kernel module:</p>
+
+<pre><code>% websocat --binary ws://iPhone.lan/ws | \
+  dd bs=8 skip=1 | \
+  gst-launch-1.0 \
+    fdsrc \
+    ! queue \
+    ! mpegvideoparse \
+    ! avdec_mpeg2video \
+    ! videoconvert \
+    ! videorate \
+    ! 'video/x-raw, format=YUY2, framerate=30/1' \
+    ! v4l2sink device=/dev/video10 sync=false
+</code></pre>
+
+<p>Here are a couple of notes about individual parts of this pipeline:</p>
+
+<ul>
+<li><p>You must set <code>websocat</code> (or the alternative
+<a href="https://github.com/esphen/wsta"><code>wsta</code></a>) into binary mode, otherwise they
+will garble the output stream with newline characters, resulting in a
+seemingly kinda working stream that just displays garbage. Ask me how I know.</p></li>
+
+<li><p>The <code>queue</code> element uncouples decoding from reading from the network socket,
+which should help in case the network has intermittent troubles.</p></li>
+
+<li><p>Without enforcing <code>framerate=30/1</code>, you cannot cancel and restart the
+gstreamer pipeline: subsequent invocations will fail with <code>streaming stopped,
+reason not-negotiated (-4)</code></p></li>
+
+<li><p>Setting format <code>YUY2</code> allows <code>ffmpeg</code>-based decoders to play the
+stream. Without this setting, e.g. <code>ffplay</code> will fail with <code>[ffmpeg/demuxer]
+video4linux2,v4l2: Dequeued v4l2 buffer contains 462848 bytes, but 460800 were
+expected. Flags: 0x00000001.</code></p></li>
+
+<li><p>The <code>sync=false</code> property on <code>v4l2sink</code> plays frames as quickly as possible
+without trying to do any synchronization.</p></li>
+</ul>
+
+<p>Now, consumers such as <a href="https://obsproject.com/">OBS (Open Broadcaster
+Software)</a>, <code>ffplay</code> or <code>mpv</code> can capture from
+<code>/dev/video10</code>:</p>
+
+<pre><code>% ffplay /dev/video10
+% mpv av://v4l2:/dev/video10 --profile=low-latency
+</code></pre>
+
+<h3 id="debugging">Debugging</h3>
+
+<p>Hopefully the instructions above just work for you, but in case things go wrong,
+maybe the following notes are helpful.</p>
+
+<p>To debug issues, I used the <code>GST_DEBUG_DUMP_DOT_DIR</code> environment variable as
+described on <a href="https://gstreamer.freedesktop.org/documentation/tutorials/basic/debugging-tools.html?gi-language=c#getting-pipeline-graphs">Debugging tools: Getting pipeline
+graphs</a>. In
+these graphs, you can quickly see which pipeline elements negotiate which caps.</p>
+
+<p>I also used the <a href="https://github.com/phoboslab/pl_mpeg">PL_MPEG</a> example program
+to play the <a href="https://phoboslab.org/files/bjork-all-is-full-of-love.mpg">supplied MPEG test
+file</a>. PL_MPEG is
+written by Dominic Szablewski as well, and you can read more about it in
+Dominic’s blog post <a href="https://phoboslab.org/log/2019/06/pl-mpeg-single-file-library">MPEG1 Single file C
+library</a>. I
+figured the codec and parameters might be similar between the different projects
+of the same author and used this to gain more confidence into the stream
+parameters.</p>
+
+<p>I also used <a href="https://www.wireshark.org/">Wireshark</a> to look at the stream
+traffic to discover that <code>websocat</code> and <code>wsta</code> garble the stream output by
+default unless the <code>--binary</code> flag is used.</p>
+
+	  </div>
+	</div>
+      </div>
+    </div>
+  </body>
+</html>

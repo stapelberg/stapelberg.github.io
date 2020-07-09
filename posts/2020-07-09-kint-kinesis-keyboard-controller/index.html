@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Introducing the kinT kinesis keyboard controller</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.ch/posts/2020-07-09-kint-kinesis-keyboard-controller/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    
+    <link rel="stylesheet" href="/1.min.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+
+
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+	<div id="menu" class="col-md-2">
+  <div style="display: flex; align-items: center">
+    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
+    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+  </div>
+
+  <ul class="menu_open">
+    <li><a class="menu_item" href="/"><span class="menu_title">About</span></a></li>
+    <li><a class="menu_item" href="/posts/"><span class="menu_title">Blog</span></a></li>
+    <li><span class="menu_title">Programs</span>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://gokrazy.org/"><span class="menu_title">gokrazy</span></a></li>
+	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
+	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
+  </ul>
+</div>
+
+	<div id="contentBox" class="col-md-10">
+	  <h2 class="title">Introducing the kinT kinesis keyboard controller</h2>
+	  <div style="margin-bottom: 2em">
+	    <span id="date">published 2020-07-09</span>
+	    
+	  
+	  <span style="background-color: black; border-radius: 25%; padding-left: 0.1em; padding-right: 0.1em">
+	    <a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2020-07-09-kint-kinesis-keyboard-controller.markdown">✎</a>
+	  </span>
+	  </div>
+	  <div class="Artikel" id="content">
+	    
+
+<p><a href="../../Bilder/2020-05-22-desk-setup-kinesis.jpg"><img
+src="../../Bilder/2020-05-22-desk-setup-kinesis.jpg"
+alt="Kinesis Advantage ergonomic keyboard"
+width="200" align="right" style="border: 1px solid #ccc; margin-left: 1em"></a></p>
+
+<p>Back <a href="../2013-03-21-kinesis_custom_controller/">in 2013, I published a replacement
+controller</a> for the Kinesis Advantage
+ergonomic keyboard. In the community, it is often referred to simply as the
+“stapelberg”, and became quite popular.</p>
+
+<p>Many people like to use the feature-rich <a href="https://docs.qmk.fm/">QMK firmware</a>,
+which supports my replacement controller out of the box.</p>
+
+<p><a href="../../Bilder/kinesis-pcb-mounted.jpg"><img
+src="../../Bilder/kinesis-pcb-mounted.jpg"
+alt="kinesis pcb mounted"
+width="200" align="right" style="border: 1px solid #ccc; margin-left: 1em"></a></p>
+
+<p>On eBay, you can frequently find complete stapelberg kits or even
+already-modified Kinesis keyboards including the stapelberg board for sale.</p>
+
+<p>In 2017, Kinesis released the Kinesis Advantage 2, which uses a different
+connector (an FPC connector) for connecting the two thumb pad PCBs to the
+controller PCB, instead of the soldered cable the older Kinesis Advantage
+used. Aside from the change in connector and cable type, the newer keyboard uses
+the same pinout as the old one.</p>
+
+<p>I wanted to at least update my project to support the Kinesis Advantage 2. While
+doing so, I decided to also make a bunch of improvements to make the project
+more approachable and usable for beginners. Among many other improvements, the
+project switched from Eagle to <a href="https://kicad-pcb.org/">KiCad</a>, which is FOSS
+and means no more costly license fees!</p>
+
+<h2 id="kint-t-for-teensy">kinT (T for Teensy!)</h2>
+
+<p>I am hereby announcing the <a href="https://github.com/kinx-project/kint">kinT kinesis keyboard
+controller</a>: a replacement keyboard
+controller for your Kinesis Advantage or Advantage 2 ergonomic keyboards.</p>
+
+<p><a href="../../Bilder/kint-pcb-3d-render-back-v2020-06-30.png"><img
+src="../../Bilder/kint-pcb-3d-render-back-v2020-06-30.png"
+alt="kinT keyboard controller"
+width="600" style="border: 1px solid #ccc; margin-left: 1em"></a></p>
+
+<p>The Teensy footprint looks a bit odd, but it’s a combined footprint so that you
+can use the same board with many different Teensy microcontrollers, giving you
+full flexibility regarding cost and features. See <a href="https://github.com/kinx-project/kint#compatibility-which-teensy-to-use">“Compatibility: which Teensy
+to
+use?”</a>
+for more details.</p>
+
+<hr />
+
+<p>I <a href="../2013-03-21-kinesis_custom_controller/">originally replaced the controller of my Kinesis Advantage to work around a
+bug</a>, but these days I do most of it
+just because I enjoy tinkering with keyboards.</p>
+
+<p>You might consider to replace your keyboard controller for example…</p>
+
+<ul>
+<li>to build or modify your own keyboard</li>
+<li>to <a href="https://michael.stapelberg.ch/posts/2013-03-21-kinesis_custom_controller/">work around bugs in the standard controller</a></li>
+<li>because you prefer to run open source software such as the <a href="https://docs.qmk.fm/">QMK firmware</a>, even on your keyboard</li>
+</ul>
+
+<h2 id="building-your-own-kint-keyboard-controller">Building your own kinT keyboard controller</h2>
+
+<ol>
+<li><p>Follow <a href="https://github.com/kinx-project/kint#buying-the-board-and-components-bill-of-materials">“Buying the board and components (Bill of
+materials)”</a>. When
+ordering from OSH Park (board) and Digi-Key (components), you’ll get the
+minimum quantity of 3 boards for 72 USD (24 USD per board), and one set of
+components for 49 USD.</p>
+
+<ul>
+<li>If you have any special requirements regarding which Teensy microcontroller
+to use, this is the step where you would replace the Teensy 3.6 with your
+choice.</li>
+</ul></li>
+
+<li><p>Wait for the components to arrive. When ordering from big shops like Digi-Key
+or Mouser, this typically takes 2 days to many places in the world.</p></li>
+
+<li><p>Wait for the boards to arrive. This takes 6 days in the best case when
+ordering from OSH Park with their Super Swift Service option. In general, the
+longer you are willing to wait, the cheaper it is going to get.</p></li>
+
+<li><p>Follow <a href="https://github.com/kinx-project/kint#soldering">the soldering
+guide</a>. This will take about
+an hour.</p></li>
+
+<li><p><a href="https://github.com/kinx-project/kint#installing-the-firmware">Install the firmware</a></p></li>
+</ol>
+
+<h2 id="improvements-over-the-older-replacement-board">Improvements over the older replacement board</h2>
+
+<p>In case you’re familiar with the older replacement board and are wondering what
+changed, here is a complete list:</p>
+
+<ul>
+<li><p>The kinT supports both, the older Kinesis Advantage (KB500) <strong>and</strong> the newer
+Kinesis Advantage 2 (KB600) keyboards. They differ in how the thumb pads are
+connected. See the soldering instructions below.</p></li>
+
+<li><p>The kinT is made for the newer Teensy 3.x and 4.x series, which will remain
+widely available for years to come, whereas <a href="https://www.pjrc.com/store/teensypp.html">the future of the Teensy++ 2.0 is
+not as certain</a>.</p></li>
+
+<li><p>The kinT is a smaller PCB (4.25 x 3.39 inches, or 108.0 x 86.1 mm), which makes it:</p>
+
+<ul>
+<li><p>more compact: can be inserted/removed without having to unscrew a key well.</p></li>
+
+<li><p>cheaper: 72 USD for 3 boards at oshpark, instead of 81 USD.</p></li>
+</ul></li>
+
+<li><p>The kinT silkscreen
+(<a href="https://raw.githubusercontent.com/kinx-project/kint/44e6c8be96a0e1e13ada5eafdeba8c51a2d6c9e8/pcb-3d-render-front-v2020-06-23.png">front</a>,
+<a href="https://raw.githubusercontent.com/kinx-project/kint/44e6c8be96a0e1e13ada5eafdeba8c51a2d6c9e8/pcb-3d-render-back-v2020-06-23.png">back</a>)
+and
+<a href="https://github.com/kinx-project/kint/blob/44e6c8be96a0e1e13ada5eafdeba8c51a2d6c9e8/schematic-v2020-06-23.pdf">schematic</a>
+are much much clearer, making assembly a breeze.</p></li>
+
+<li><p>The kinT is a good starting point for your own project:</p>
+
+<ul>
+<li><p>kinT was designed in the open source <a href="https://kicad-pcb.org/">KiCad</a>
+program, meaning you do not need any license subscriptions.</p></li>
+
+<li><p>The clear silkscreen and schematic make development and debugging easier.</p></li>
+</ul></li>
+
+<li><p>On the kinT, the Teensy no longer has to be soldered onto the board upside down.</p></li>
+
+<li><p>On the kinT, the FPC connectors have been moved for less strain on the cables.</p></li>
+
+<li><p>The kinT makes possible lower-cost builds: if you don’t need the scroll lock,
+num lock and keypad LEDs, you can use a Teensy LC for merely 11 USD.</p></li>
+</ul>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>I’m very excited to release this new keyboard controller, and I can’t wait to
+see all the custom builds and modifications!</p>
+
+<p>By the way, there is also a (4-hour!) <a href="https://youtu.be/I0kwQbnhlfk">stream
+recording</a> in case you are interested in some more
+history and context, and want to see me solder a kinT controller live on stream!</p>
+
+	  </div>
+	</div>
+      </div>
+    </div>
+  </body>
+</html>

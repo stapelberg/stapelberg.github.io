@@ -3,16 +3,455 @@
   <link href="https://michael.stapelberg.ch/feed.xml" rel="self"/>
   <link href="https://michael.stapelberg.ch/"/>
 
-    <updated>2020-07-09T09:31:22+02:00</updated>
+    <updated>2020-08-09T15:12:59+02:00</updated>
     
   <id>https://michael.stapelberg.ch/</id>
   <generator>Hugo -- gohugo.io</generator>
+  <entry>
+    <title type="html"><![CDATA[Adding a fiber link to my home network]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/"/>
+    <id>https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/</id>
+    <published>2020-08-09T14:53:53+02:00</published>
+    <updated>2020-08-09T15:12:59+02:00</updated>
+    <content type="html"><![CDATA[
+
+<h2 id="motivation">Motivation</h2>
+
+<p>Despite using a FTTH internet connection since 2014, aside from the one fiber
+uplink, I had always used network gear with 1 Gbit/s links over regular old rj45
+cat5(e) cables.</p>
+
+<hr />
+
+<p>I liked the simplicity and uniformity of that setup, but decided it’s time to
+add at least one fiber connection, to <strong>get rid of a temporary ethernet cable</strong>
+that connected my kitchen with the rest of my network that is largely in the
+living room and office.</p>
+
+<p>The temporary ethernet cable was an experiment to verify that running a server
+or two in my kitchen actually works (it does!). I used a <a href="https://www.digitec.ch/de/s1/product/hama-cat-6-flach-we-1000cm-netzwerkkabel-7465292">flat ethernet
+cable</a>,
+which is great for test setups like that, as you can often tape it onto the
+walls and still close the doors.</p>
+
+<p>So, we will replace one ethernet cable with one fiber cable and converters at
+each end:</p>
+
+<p><a href="../../Bilder/2020-08-04-media-converters.jpg"><img src="../../Bilder/2020-08-04-media-converters.thumb.1x.jpg" srcset="../../Bilder/2020-08-04-media-converters.thumb.2x.jpg 2x,../../Bilder/2020-08-04-media-converters.thumb.3x.jpg 3x" width="600" height="216" alt="0.9mm thin fiber cables" style="border: 1px solid #000"></a></p>
+
+<p>Why is it good to switch from copper ethernet cables to fiber in this case?
+Fiber cables are <strong>smaller and hence easier to fit</strong> into existing cable
+ducts. While regular ethernet cable is way too thick to fit into any of the
+existing ducts in my flat, I was hoping that fiber might fit!</p>
+
+<p>When I actually received the cables, I was surprised <strong>how much thinner</strong> fiber
+cables actually can be: there are 0.9mm cables, which are so thin, they can be
+hidden in plain sight! I had only ever seen 2mm fiber cables before, and the
+0.9mm cables are incredibly light, flexible and thin! Even pasta is typically
+thicker:</p>
+
+<p><a href="../../Bilder/2020-08-04-glasnudeln.jpg"><img src="../../Bilder/2020-08-04-glasnudeln.thumb.jpg" srcset="../../Bilder/2020-08-04-glasnudeln.thumb.2x.jpg 2x,../../Bilder/2020-08-04-glasnudeln.thumb.3x.jpg 3x" width="600" height="450" alt="0.9mm thin fiber cables" style="border: 1px solid #000"></a></p>
+
+<p><small><em>Preparing a delicious pot of glass noodles ;)</em></small></p>
+
+<hr />
+
+<p>The cable shown above comes from <a href="https://www.FS.COM/company/about_us.html">the fiber store
+FS.COM</a>, which different people have
+praised on multiple occasions, so naturally I was curious to give them a shot
+myself.</p>
+
+<p>Also, for the longest time, it was my understanding that fiber connectors can
+only be put onto fiber cables using expensive (≫2000 CHF) machines. A while ago
+I heard about <strong>field assembly connectors</strong> so I wanted to verify that those
+indeed work.</p>
+
+<hr />
+
+<p>Aside from practical reasons, playing around with fiber networking also makes
+for a good hobby during a pandemic :)</p>
+
+<h2 id="hardware-selection">Hardware Selection</h2>
+
+<p>I ordered all my fiber equipment at <a href="https://www.FS.COM">FS.COM</a>: everything
+they have is very affordable, and products in stock at their German warehouse
+arrive in Switzerland (and presumably other European countries) within the same
+week.</p>
+
+<p>If you are in the luxurious position to have enough physical space and agility
+to pull through an entire fiber cable, <strong>without having to remove any
+connectors</strong>, you can make a new network connection with just a few parts:</p>
+
+<table>
+<thead>
+<tr>
+<th>amt</th>
+<th>price</th>
+<th>total</th>
+<th>article</th>
+<th>note</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>2x</td>
+<td>36 CHF</td>
+<td>72 CHF</td>
+<td><a href="https://www.FS.COM/de-en/products/17237.html">#17237</a></td>
+<td><a href="https://www.FS.COM/de-en/products/17237.html">1 Gbit/s media converter RJ45/SFP</a></td>
+</tr>
+
+<tr>
+<td>1x</td>
+<td>8.5 CHF</td>
+<td>8.5 CHF</td>
+<td><a href="https://www.FS.COM/de-en/products/75339.html">#39135</a></td>
+<td><a href="https://www.FS.COM/de-en/products/75339.html">1 Gbit/s BiDi SFP 1310nm-TX/1550nm-RX</a></td>
+</tr>
+
+<tr>
+<td>1x</td>
+<td>11 CHF</td>
+<td>11 CHF</td>
+<td><a href="https://www.FS.COM/de-en/products/75340.html">#39138</a></td>
+<td><a href="https://www.FS.COM/de-en/products/75340.html">1 Gbit/s BiDi SFP 1550nm-TX/1310nm-RX</a></td>
+</tr>
+
+<tr>
+<td>1x</td>
+<td>2.3 CHF</td>
+<td>2.3 CHF</td>
+<td><a href="https://www.FS.COM/de-en/products/12285.html">#12285</a></td>
+<td><a href="https://www.FS.COM/de-en/products/12285.html">fiber cable, 0.9mm LC UPC/LC UPC simplex</a></td>
+</tr>
+</tbody>
+</table>
+
+<p>I recommend buying an extra fiber cable or two so that you can accidentally
+damage a cable and still have enough spares.</p>
+
+<p>Total cost thus far: just under 100 CHF. If you have existing switches with a
+free SFP slot, you can use those instead of the media converters and save most
+of the cost.</p>
+
+<hr />
+
+<p>If you need to <strong>temporarily remove</strong> one or both of the fiber cable connector(s),
+you also need field assembly connectors and a few tools in addition:</p>
+
+<table>
+<thead>
+<tr>
+<th>amt</th>
+<th>price</th>
+<th>total</th>
+<th>article</th>
+<th>note</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>2x</td>
+<td>4 CHF</td>
+<td>8 CHF</td>
+<td><a href="https://www.FS.COM/de-en/products/35165.html">#35165</a></td>
+<td><a href="https://www.FS.COM/de-en/products/35165.html">LC/UPC 0.9mm pre-polished field assembly connector</a></td>
+</tr>
+
+<tr>
+<td>1x</td>
+<td>110 CHF</td>
+<td>110 CHF</td>
+<td><a href="https://www.FS.COM/de-en/products/14341.html">#14341</a></td>
+<td><a href="https://www.FS.COM/de-en/products/14341.html">High Precision Fibre Optic Cleaver FS-08C</a></td>
+</tr>
+
+<tr>
+<td>1x</td>
+<td>26 CHF</td>
+<td>26 CHF</td>
+<td><a href="https://www.FS.COM/de-en/products/14346.html">#14346</a></td>
+<td><a href="https://www.FS.COM/de-en/products/14346.html">Fibre Optic Kevlar Cutter</a></td>
+</tr>
+
+<tr>
+<td>1x</td>
+<td>14 CHF</td>
+<td>14 CHF</td>
+<td><a href="https://www.FS.COM/de-en/products/72812.html">#72812</a></td>
+<td><a href="https://www.FS.COM/de-en/products/72812.html">Fibre Optical Stripper</a></td>
+</tr>
+</tbody>
+</table>
+
+<p>I recommend buying twice the number of field assembly connectors, for practicing.</p>
+
+<p>Personally, I screwed up two connectors before figuring out <a href="#field-assembly-connectors">how the process
+goes</a>.</p>
+
+<p>Total cost: about 160 CHF for the field assembly equipment, so 260 CHF in total.</p>
+
+<hr />
+
+<p>To boost your confidence in the resulting fiber, the following items are nice to
+have, but you can get by without, if you’re on a budget.</p>
+
+<table>
+<thead>
+<tr>
+<th>price</th>
+<th>article</th>
+<th>note</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>18 CHF</td>
+<td><a href="https://www.FS.COM/de-en/products/35388.html">#35388</a></td>
+<td><a href="https://www.FS.COM/de-en/products/35388.html">FVFL-204 Visual Fault Locator</a></td>
+</tr>
+
+<tr>
+<td>9.40 CHF</td>
+<td><a href="https://www.FS.COM/de-en/products/82730.html">#82730</a></td>
+<td><a href="https://www.FS.COM/de-en/products/82730.html">2.5mm to 1.25mm adapter for Visual Fault Locator</a></td>
+</tr>
+
+<tr>
+<td>4.10 CHF</td>
+<td><a href="https://www.FS.COM/de-en/products/14010.html">#14010</a></td>
+<td><a href="https://www.FS.COM/de-en/products/14010.html">1.25mm fiber clean swabs (100pcs)</a></td>
+</tr>
+</tbody>
+</table>
+
+<p>With the visual fault locator, you can shine a light through your fiber. You can
+verify correct connector assembly by looking at how the light comes out of the
+connector.</p>
+
+<p>The fiber cleaning swabs are good to have in general, but for the field assembly
+connector, you need to use alcohol-soaked wipes anyway (which FS.COM does not
+stock).</p>
+
+<p>The total cost for everything is just under 300 CHF.</p>
+
+<h3 id="hardware-selection-process">Hardware Selection Process</h3>
+
+<p>The large selection at FS.COM can be overwhelming to navigate at first. My
+selection process went something like this:</p>
+
+<p>My first constraint is using bi-directional (BiDi) fiber optics modules so that
+I only need to lay a single fiber cable, as opposed to two fiber cables.</p>
+
+<p>The second constraint is to use field assembly connectors.</p>
+
+<p>If possible, I wanted to use <a href="https://community.FS.COM/blog/why-not-use-bend-insensitive-fiber-optic-cable-to-reduce-bend-radius.html">bend-insensitive
+fiber</a>
+so that I wouldn’t need to pay so much attention to the bend radius and have
+more flexibility in where and how I can lay fiber.</p>
+
+<p>With these constraints, there aren’t too many products left to combine. An
+obvious and good choice are 0.9mm fiber cable using LC/UPC connectors.</p>
+
+<h3 id="fs-com-details">FS.COM details</h3>
+
+<p>As of 2020-08-05, FS.COM states they have 5 warehouses in 4 locations:</p>
+
+<ul>
+<li>Delaware (US)</li>
+<li>Munich (Germany)</li>
+<li>Melbourne (Australia)</li>
+<li>Shenzhen (China)</li>
+</ul>
+
+<p>They recently built another, bigger (7 km²) warehouse in Shenzhen, and now
+produce inventory for the whole year.</p>
+
+<p>By 2019, FS.COM had over 300,000 registered corporate customers, reaching nearly
+200 million USD yearly sales.</p>
+
+<h2 id="delivery-times">Delivery times</h2>
+
+<p>As mentioned before, delivery times are quick when the products are in stock at
+FS.COM’s German warehouse.</p>
+
+<p>In my case, I put in my order on 2020-Jun-26.</p>
+
+<p>The items that shipped from the German warehouse arrived on 2020-Jul-01.</p>
+
+<p>Some items had to be manufactured and/or shipped from Asia. Those items arrived
+after 3 more weeks, on 2020-Jul-24.</p>
+
+<p>Unfortunately, FS.COM doesn’t stock any 0.9mm fiber cables in their German
+warehouse right now, so be prepared for a few weeks of waiting time.</p>
+
+<h2 id="laying-the-fiber">Laying The Fiber</h2>
+
+<p>Use a cable puller to pull the fiber through existing cable ducts where
+possible.</p>
+
+<ul>
+<li><p>In general, buy the thinnest one you can find. I have <a href="https://www.distrelec.ch/en/cable-pull-strap-10m-tools-495005/p/18092626">this 4mm diameter cable
+puller</a>,
+but a 3mm or even 2mm one would work in more situations.</p></li>
+
+<li><p>I found it worthwhile to buy a brand one. It is distinctly better to handle
+(less stiff, i.e. more flexible) than the cheap one I got, and thinner, too,
+which is always good.</p></li>
+</ul>
+
+<p>In my experience, it generally did not work well to <strong>push</strong> the fiber into an
+existing duct or alongside an existing cable. I really needed a cable
+<strong>puller</strong>.</p>
+
+<p>If you’re lucky and have enough space in your duct(s), you can leave the
+existing connectors on the fiber. I have successfully just used a piece of tape
+to fix the fiber connector on the cable puller, pushing down the nose
+temporarily:</p>
+
+<p><a href="../../Bilder/2020-08-04-cable-puller.jpg"><img src="../../Bilder/2020-08-04-cable-puller.thumb.jpg" srcset="../../Bilder/2020-08-04-cable-puller.thumb.2x.jpg 2x,../../Bilder/2020-08-04-cable-puller.thumb.3x.jpg 3x" width="600" height="450" alt="fiber cable taped to cable puller" style="border: 1px solid #000"></a></p>
+
+<p>Where there are no existing ducts, you may need to lay the fiber on top of the
+wall. Obviously, this is tricky as soon as you need to make a connection going
+through a wall: whereas copper ethernet cables can be bent and squeezed into
+door frames, you quickly risk breaking fiber cables.</p>
+
+<p>Luckily, the fiber is very light, so it’s very easy to fix to the wall with a
+piece of tape:</p>
+
+<p><a href="../../Bilder/2020-08-04-wand-kabel.jpg"><img src="../../Bilder/2020-08-04-wand-kabel.thumb.1x.jpg" srcset="../../Bilder/2020-08-04-wand-kabel.thumb.2x.jpg 2x,../../Bilder/2020-08-04-wand-kabel.thumb.3x.jpg 3x" width="600" height="450" alt="fiber cables on the wall" style="border: 1px solid #000"></a></p>
+
+<p>You can see the upstream internet fiber in the top right corner, which is rather
+thick in comparison to my 0.9mm yellow fiber that’s barely visible in the middle
+of the picture.</p>
+
+<p>Note how the fiber entirely disappears behind the existing duct atop the
+door!</p>
+
+<p>Above, you can see the flat ethernet cable I have been using as a temporary
+experiment.</p>
+
+<hr />
+
+<p>Where there is an existing cable that you can temporarily remove, it might be
+possible to remove it, put the fiber in, and put the old cable back in,
+too. This is possible because the 0.9mm fiber cable is so thin!</p>
+
+<p>I’m using this technique to cross another wall where the existing cable duct is
+too full, but there is a cable that can be removed and put back after pulling
+the fiber through:</p>
+
+<p><a href="../../Bilder/2020-08-04-loch.jpg"><img src="../../Bilder/2020-08-04-loch.thumb.1x.jpg" srcset="../../Bilder/2020-08-04-loch.thumb.2x.jpg 2x,../../Bilder/2020-08-04-loch.thumb.3x.jpg 3x" width="600" height="450" alt="fiber cable next to existing cable" style="border: 1px solid #000"></a></p>
+
+<p>…and on the other side of the wall:</p>
+
+<p><a href="../../Bilder/2020-08-04-dose.jpg"><img src="../../Bilder/2020-08-04-dose.thumb.1x.jpg" srcset="../../Bilder/2020-08-04-dose.thumb.2x.jpg 2x,../../Bilder/2020-08-04-dose.thumb.3x.jpg 3x" width="600" height="450" alt="fiber cable next to existing socket" style="border: 1px solid #000"></a></p>
+
+<p>Note how the fiber is thin enough to fit between the socket and duct!</p>
+
+<hr />
+
+<p><strong>Note:</strong> despite measuring how long a fiber cable I would need, my cable turned
+out too short! While the cable was just as long as I had measured, with
+distances exceeding 10m, it is a good idea to <strong>add a few meters spare</strong> on each
+side of the connection.</p>
+
+<h2 id="field-assembly-connectors">Field assembly connectors</h2>
+
+<p>To give you an overview, these are the required steps at a high level:</p>
+
+<ol>
+<li>Cut the fiber with the <a href="https://www.FS.COM/de-en/products/14346.html">Fibre Optic Kevlar Cutter</a></li>
+<li>Strip the fiber with the <a href="https://www.FS.COM/de-en/products/72812.html">Fibre Optical Stripper</a></li>
+<li>Put the field assembly <em>jacket</em> onto the fiber</li>
+<li>Cut the stripped fiber cleanly with the <a href="https://www.FS.COM/de-en/products/14341.html">High Precision Fibre Optic Cleaver FS-08C</a></li>
+<li>Put the field assembly <em>connector</em> onto the fiber</li>
+</ol>
+
+<hr />
+
+<p>I thought the following resources were useful:</p>
+
+<ol>
+<li>Pictograms: <a href="https://img-en.fs.com/file/user_manual/lc-field-assembly-connector-quick-start-guide-v1.0.pdf">PDF: FS.COM LC UPC field assembley connectors quick start
+guide</a></li>
+<li>Pictures: <a href="https://www.fs.com/de-en/products/35165.html">Installation Procedure on
+FS.COM</a></li>
+<li>Video: <a href="https://www.youtube.com/watch?v=epTzemeJjAw">YouTube: Terminate Fiber in 5
+Minutes</a>: this video shows a
+different product, but I found it helpful to see any field assembly connector
+on video, and this is one of the better videos I could find.</li>
+</ol>
+
+<!-- TODO: include a link to my own video once published -->
+
+<hr />
+
+<p><strong>Beware:</strong> the little paper booklet that comes with the field assembly
+connector contains measurements which are <strong>not to scale</strong>. I have suggested to
+FS.COM that they fix this, but until then, you’ll need to use e.g. a tape
+measure.</p>
+
+<hr />
+
+<p>For establishing an intuition of their different sizes, here are the different connectors:</p>
+
+<p><a href="../../Bilder/2020-08-07-fiber-cable-connector-size.jpg"><img src="../../Bilder/2020-08-07-fiber-cable-connector-size.thumb.1x.jpg" srcset="../../Bilder/2020-08-07-fiber-cable-connector-size.thumb.2x.jpg 2x,../../Bilder/2020-08-07-fiber-cable-connector-size.thumb.3x.jpg 3x" width="600" height="450" alt="fiber cable next to existing socket" style="border: 1px solid #000"></a></p>
+
+<p>From left to right:</p>
+
+<ul>
+<li>2.0mm fiber cable</li>
+<li>cat6 ethernet cable</li>
+<li>0.9mm fiber cable (LC/UPC factory)</li>
+<li>0.9mm fiber cable (LC/UPC field assembly connector)</li>
+</ul>
+
+<p>The 0.9mm fiber cables come with smaller connectors than the 2.0mm fiber cables,
+and that alone might be a reason to prefer them in some situations.</p>
+
+<p>The field assembly connectors are pretty bulky in comparison, but since you can
+attach them yourself after pulling only the cable through the walls and/or
+ducts, you usually don’t care too much about their size.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Modern fiber cables available at FS.COM are:</p>
+
+<ul>
+<li>thinner than I expected</li>
+<li>more robust than I expected</li>
+<li>cheaper than I expected</li>
+<li>survive tighter bend radiuses than I expected</li>
+</ul>
+
+<p>Replacing this particular connection with a fiber connection was a smooth
+process overall, and I would recommend it in other situations as well.</p>
+
+<hr />
+
+<p>I would claim that it is <strong>totally feasible</strong> for anyone with an hour of
+patience to learn how to put a field assembly connector onto a fiber cable.</p>
+
+<p>If labor cost is expensive in your country or you just like doing things
+yourself, I can definitely recommend this approach. In case you mess the
+connector up and don’t want to fix it yourself, you can always call an
+electrician!</p>
+
+<hr />
+
+<p>Stay tuned for the next part, where I upgrade the 1G link to a 10G link!</p>
+]]></content>
+  </entry>
   <entry>
     <title type="html"><![CDATA[Introducing the kinT kinesis keyboard controller]]></title>
     <link href="https://michael.stapelberg.ch/posts/2020-07-09-kint-kinesis-keyboard-controller/"/>
     <id>https://michael.stapelberg.ch/posts/2020-07-09-kint-kinesis-keyboard-controller/</id>
     <published>2020-07-09T09:25:00+02:00</published>
-    <updated>2020-07-09T09:31:22+02:00</updated>
+    <updated>2020-07-09T09:34:57+02:00</updated>
     <content type="html"><![CDATA[
 
 <p><a href="../../Bilder/2020-05-22-desk-setup-kinesis.jpg"><img
@@ -3757,185 +4196,6 @@ operating systems here. Stay tuned.</p>
 
 <p>Lastly, I hope this post inspires someone, ideally a group of people, to improve
 the developer experience within Debian.</p>
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[Debugging experience in Debian]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2019-02-15-debian-debugging-devex/"/>
-    <id>https://michael.stapelberg.ch/posts/2019-02-15-debian-debugging-devex/</id>
-    <published>2019-02-15T00:00:00+00:00</published>
-    <updated>2019-02-15T13:11:24+01:00</updated>
-    <content type="html"><![CDATA[
-
-<p>Recently, a user reported that <a href="https://bugs.debian.org/918925">they don’t see window titles in i3 when running
-i3 on a Raspberry Pi with Debian</a>.</p>
-
-<p>I copied the latest <a href="https://wiki.debian.org/RaspberryPi3">Raspberry Pi Debian
-image</a> onto an SD card, booted it, and was
-able to reproduce the issue.</p>
-
-<p>Conceptually, at this point, I should be able to install and start <code>gdb</code>, set a
-break point and step through the code.</p>
-
-<h3 id="enabling-debug-symbols-in-debian">Enabling debug symbols in Debian</h3>
-
-<p>Debian, by default, strips debug symbols when building packages to conserve disk
-space and network bandwidth. The motivation is very reasonable: most users will
-never need the debug symbols.</p>
-
-<p>Unfortunately, obtaining debug symbols when you do need them is unreasonably hard.</p>
-
-<p>We begin by configuring an additional apt repository which contains
-automatically generated debug packages:</p>
-
-<pre><code>raspi# cat &gt;&gt;/etc/apt/sources.list.d/debug.list &lt;&lt;'EOT'
-deb http://deb.debian.org/debian-debug buster-debug main contrib non-free
-EOT
-raspi# apt update
-</code></pre>
-
-<p>Notably, not all Debian packages have debug packages. As <a href="https://wiki.debian.org/DebugPackage">the DebugPackage
-Debian Wiki page</a> explains,
-<code>debhelper/9.20151219</code> started generating debug packages (ending in <code>-dbgsym</code>)
-automatically. Packages which have not been updated might come with their own
-debug packages (ending in <code>-dbg</code>) or might not preserve debug symbols at all!</p>
-
-<p>Now that we <strong>can</strong> install debug packages, how do we know <strong>which ones</strong> we need?</p>
-
-<h3 id="finding-debug-symbol-packages-in-debian">Finding debug symbol packages in Debian</h3>
-
-<p>For debugging i3, we obviously need at least the <code>i3-dbgsym</code> package, but i3
-uses a number of other libraries through whose code we may need to step.</p>
-
-<p>The <code>debian-goodies</code> package ships a tool called
-<a href="https://manpages.debian.org/testing/debian-goodies/find-dbgsym-packages.1.en.html">find-dbgsym-packages</a>
-which prints the required packages to debug an executable, core dump or running
-process:</p>
-
-<pre><code>raspi# apt install debian-goodies
-raspi# apt install $(find-dbgsym-packages $(which i3))
-</code></pre>
-
-<p>Now we should have symbol names and line number information available in
-<code>gdb</code>. But for effectively stepping through the program, access to the source
-code is required.</p>
-
-<h3 id="obtaining-source-code-in-debian">Obtaining source code in Debian</h3>
-
-<p>Naively, one would assume that <code>apt source</code> should be sufficient for obtaining
-the source code of any Debian package. However, <code>apt source</code> defaults to the
-package candidate version, not the version you have installed on your
-system.</p>
-
-<p>I have addressed this issue with the
-<a href="https://manpages.debian.org/testing/pk4/pk4.1.en.html"><code>pk4</code></a> tool, which
-defaults to the installed version.</p>
-
-<p>Before we can extract any sources, we need to configure yet another apt
-repository:</p>
-
-<pre><code>raspi# cat &gt;&gt;/etc/apt/sources.list.d/source.list &lt;&lt;'EOT'
-deb-src http://deb.debian.org/debian buster main contrib non-free
-EOT
-raspi# apt update
-</code></pre>
-
-<p>Regardless of whether you use <code>apt source</code> or <code>pk4</code>, one remaining problem is
-the directory mismatch: the debug symbols contain a certain path, and that path
-is typically not where you extracted your sources to. While debugging, you will
-need to tell <code>gdb</code> about the location of the sources. This is tricky when you
-debug a call across different source packages:</p>
-
-<pre><code>(gdb) pwd
-Working directory /usr/src/i3.
-(gdb) list main
-229     * the main loop. */
-230     ev_unref(main_loop);
-231   }
-232 }
-233
-234 int main(int argc, char *argv[]) {
-235  /* Keep a symbol pointing to the I3_VERSION string constant so that
-236   * we have it in gdb backtraces. */
-237  static const char *_i3_version __attribute__((used)) = I3_VERSION;
-238  char *override_configpath = NULL;
-(gdb) list xcb_connect
-484	../../src/xcb_util.c: No such file or directory.
-</code></pre>
-
-<p>See <a href="https://sourceware.org/gdb/onlinedocs/gdb/Source-Path.html">Specifying Source
-Directories</a> in the
-gdb manual for the <code>dir</code> command which allows you to add multiple directories to
-the source path. This is pretty tedious, though, and does not work for all
-programs.</p>
-
-<h3 id="positive-example-fedora">Positive example: Fedora</h3>
-
-<p>While Fedora conceptually shares all the same steps, the experience on Fedora is
-so much better: when you run <code>gdb /usr/bin/i3</code>, it will tell you what the next
-step is:</p>
-
-<pre><code># gdb /usr/bin/i3
-[…]
-Reading symbols from /usr/bin/i3...(no debugging symbols found)...done.
-Missing separate debuginfos, use: dnf debuginfo-install i3-4.16-1.fc28.x86_64
-</code></pre>
-
-<p>Watch what happens when we run the suggested command:</p>
-
-<pre><code># dnf debuginfo-install i3-4.16-1.fc28.x86_64
-enabling updates-debuginfo repository
-enabling fedora-debuginfo repository
-[…]
-Installed:
-  i3-debuginfo.x86_64 4.16-1.fc28
-  i3-debugsource.x86_64 4.16-1.fc28
-Complete!
-</code></pre>
-
-<p>A single command understood our intent, enabled the required repositories and
-installed the required packages, both for debug symbols and source code (stored
-in e.g. <code>/usr/src/debug/i3-4.16-1.fc28.x86_64</code>). Unfortunately, <code>gdb</code> doesn’t
-seem to locate the sources, which seems like a bug to me.</p>
-
-<p>One downside of Fedora’s approach is that <code>gdb</code> will only print all required
-dependencies once you actually run the program, so you may need to run multiple
-<code>dnf</code> commands.</p>
-
-<h3 id="in-an-ideal-world">In an ideal world</h3>
-
-<p>Ideally, none of the manual steps described above would be necessary. It seems
-absurd to me that so much knowledge is required to efficiently debug programs in
-Debian. Case in point: I only learnt about <code>find-dbgsym-packages</code> a few days ago
-when talking to one of its contributors.</p>
-
-<p>Installing <code>gdb</code> should be all that a user needs to do. Debug symbols and
-sources can be transparently provided through a lazy-loading FUSE file
-system. If our build/packaging infrastructure assured predictable paths and
-automated debug symbol extraction, we could have transparent, quick and reliable
-debugging of all programs within Debian.</p>
-
-<p>NixOS’s dwarffs is an implementation of this idea:
-<a href="https://github.com/edolstra/dwarffs">https://github.com/edolstra/dwarffs</a></p>
-
-<h3 id="conclusion">Conclusion</h3>
-
-<p>While I agree with the removal of debug symbols as a general optimization, I
-think every Linux distribution should strive to provide an entirely transparent
-debugging experience: you should not even have to know that debug symbols are
-not present by default. Debian really falls short in this regard.</p>
-
-<p>Getting Debian to a fully transparent debugging experience requires a lot of
-technical work and a lot of social convincing. In my experience,
-programmatically working with the Debian archive and packages is tricky, and
-ensuring that <em>all</em> packages in a Debian release have debug packages (let alone
-predictable paths) seems entirely unachievable due to the fragmentation of
-packaging infrastructure and holdouts blocking any progress.</p>
-
-<p>My go-to example is <a href="https://sources.debian.org/src/rsync/3.1.3-5/debian/rules/">rsync’s
-debian/rules</a>, which
-intentionally (!) still has not adopted debhelper. It is not a surprise that
-there are no debug symbols for <code>rsync</code> in Debian.</p>
 ]]></content>
   </entry>
 </feed>

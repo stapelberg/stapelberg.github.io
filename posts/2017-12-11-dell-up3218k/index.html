@@ -86,10 +86,14 @@ body, td, th {
 	<div id="contentBox" class="col-md-10">
 	  <h2 class="title">Dell 8K4K monitor (Dell UP3218K)</h2>
 	  <div style="margin-bottom: 2em">
-	    <span id="date">published 2017-12-11, last modified 2018-03-18</span>
+	    <span id="date">published 2017-12-11, last modified 2020-08-25</span>
 	    
 	  
 	  <span style="padding-left: 0.1em; padding-right: 0.1em; margin-left: .5em; margin-right: .5em"><a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2017-12-11-dell-up3218k.markdown"><img src="../../Bilder/pen-square-solid.svg" style="height: 1.25em"></a></span>
+	  
+	  <span style="padding-left: 0.1em; padding-right: 0.1em">
+	    <a style="text-decoration: none; color: white" href="https://twitter.com/zekjur/status/940146614655750144"><img src="../../Bilder/twitter-brands.svg" style="height: 1.25em"></a>
+	  </span>
 	  
 	  </div>
 	  <div class="Artikel" id="content">
@@ -384,6 +388,10 @@ business day, they were very forthcoming and offered to replace the monitor.</p>
 <p>The replacement monitor still emits some noise, but much less pronounced. I
 think I can easily ignore the noise.</p>
 
+<p><strong>Update after 2+ years</strong>: I had honestly forgotten that the replacement monitor
+also made noise. Maybe it went away, or my ears have gotten worse, or I just
+didn’t notice for long enough.</p>
+
 <h3 id="wakeup-issues">Wakeup issues</h3>
 
 <p>Rarely (less than once a week), when waking up the monitor from DPMS standby
@@ -397,6 +405,39 @@ video card, but I don’t know for sure.</p>
 <p>Interestingly enough, I also encountered this issue with the Dell UP2414Q I
 bought in 2014. My workaround is to power down that display using its power
 button in the evenings, and power it up in the mornings.</p>
+
+<p><strong>Update after 2+ years</strong>: I have now figured out that the monitor wakes up
+reliably after:</p>
+
+<ol>
+<li><p>Swapping the cables around at my Graphics Card, i.e. using output <code>DP-4</code> for
+the left monitor half and output <code>DP-0</code> for the right monitor half, not the
+other way around:</p>
+
+<pre><code>xrandr \
+--output DP-4 --mode 3840x4320 --panning 0x0+0+0 \
+--output DP-0 --mode 3840x4320 --panning 0x0+3840+0 --right-of DP-4
+</code></pre></li>
+
+<li><p>When powering on the monitor, waiting until it shows the dialog box “No
+signal on DP1”, and only then waking up my machine to generate a signal.</p></li>
+</ol>
+
+<p>When disconnecting and re-connecting the monitor to another machine,
+I found these steps the most reliable:</p>
+
+<ol>
+<li>Power off the monitor, then unplug the two DisplayPort cables.</li>
+<li>Plug in both cables, then power the monitor on again.
+<br />
+An easy mistake to make is to not push the DisplayPort connector in all the
+way. This issue usually manifests itself as the monitor still showing a picture
+(because the second cable likely is plugged in correctly), but the full
+resolution not being available.</li>
+</ol>
+
+<p>I have used these two steps twice a workday for weeks on end, and the monitor
+came up reliably every single time.</p>
 
 <h3 id="conclusion">Conclusion</h3>
 

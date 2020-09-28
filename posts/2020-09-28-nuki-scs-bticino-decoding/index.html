@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Nuki Opener with an SCS bus intercom (bTicino 344212)</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+    <link rel="canonical" href="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/">
+    <meta name="author" content="Michael Stapelberg">
+    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
+    <style type="text/css">
+@font-face {
+  font-family: 'Yanone Kaffeesatz Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
+}
+
+body, td, th {
+  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #000;
+} 
+    </style>
+    <link rel="stylesheet" href="/2.css" type="text/css">
+    
+    <link rel="stylesheet" href="/1.min.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+
+
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+	<div id="menu" class="col-md-2">
+  <div style="display: flex; align-items: center">
+    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
+    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+  </div>
+
+  <ul class="menu_open">
+    <li><a class="menu_item" href="/"><span class="menu_title">About</span></a></li>
+    <li><a class="menu_item" href="/posts/"><span class="menu_title">Blog</span></a></li>
+    <li><span class="menu_title">Programs</span>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://gokrazy.org/"><span class="menu_title">gokrazy</span></a></li>
+	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
+	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
+	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
+	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
+	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
+      <div class="subitem">
+	<ul class="menu_open">
+	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
+	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
+	</ul>
+      </div>
+    </li>
+
+    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
+    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
+  </ul>
+</div>
+
+	<div id="contentBox" class="col-md-10">
+	  <h2 class="title">Nuki Opener with an SCS bus intercom (bTicino 344212)</h2>
+	  <div style="margin-bottom: 2em">
+	    <span id="date">published 2020-09-28</span>
+	    
+	  
+	  <span style="padding-left: 0.1em; padding-right: 0.1em; margin-left: .5em; margin-right: .5em"><a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2020-09-28-nuki-scs-bticino-decoding.markdown"><img src="../../Bilder/pen-square-solid.svg" style="height: 1.25em"></a></span>
+	  
+	  </div>
+	  <div class="Artikel" id="content">
+	    
+
+<p>I have long been looking for a way to make my intercom a little more pleasant.</p>
+
+<p>Recently, a friend made me aware of the <a href="https://nuki.io/opener">Nuki Opener</a>,
+which promises to make existing intercom systems smart, and claims to be
+compatible with the specific intercom I have!</p>
+
+<p>So I got one and tried setting it up, but could not get it to work.</p>
+
+<p>This post documents how I have analyzed what goes over the intercom’s <a href="https://en.wikipedia.org/wiki/Bus_SCS">SCS
+bus</a>. Perhaps the technique is
+interesting, or perhaps you want to learn more about SCS :)</p>
+
+<p>Note that I have <strong>not yet used</strong> the Nuki Opener, so I can’t say anything about
+it yet. What I have seen so far makes a good impression, but it just does not
+seem to work at all with my intercom. I will update this article after working
+with the Nuki support to fix this.</p>
+
+<h2 id="connecting-the-nuki-opener-to-the-bticino-344212">Connecting the Nuki Opener to the bTicino 344212</h2>
+
+<p>First, I identified which wires are used for the bus: between BUS- and BUS+, the
+internet tells me that I would expect to measure ≈27V, and indeed a multimeter
+shows:</p>
+
+<p><a href="../../Bilder/2020-09-27-bticino-multimeter.jpg"><img src="../../Bilder/2020-09-27-bticino-multimeter.thumb.1x.jpg" srcset="../../Bilder/2020-09-27-bticino-multimeter.thumb.2x.jpg 2x,../../Bilder/2020-09-27-bticino-multimeter.thumb.3x.jpg 3x" width="200" height="264" alt="bTicino wiring" style="border: 1px solid #000" loading="lazy"></a></p>
+
+<p>I then connected the Nuki Opener as described in <a href="https://developer.nuki.io/uploads/short-url/3naDfQDFbzh3Je7ytrNzRDscvFz.pdf">“Connect the Nuki Opener to an
+unknown
+intercom”</a>,
+Page 8, Bus intercoms → Basic setup without doorbell suppression:</p>
+
+<table>
+<thead>
+<tr>
+<th>Nuki wire</th>
+<th>Intercom</th>
+<th>Signal</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>black</td>
+<td>BUS-</td>
+<td>GND</td>
+</tr>
+
+<tr>
+<td>red</td>
+<td>BUS+</td>
+<td>SCS (+27V)</td>
+</tr>
+
+<tr>
+<td>orange</td>
+<td>BUS+</td>
+<td>SCS (+27V)</td>
+</tr>
+</tbody>
+</table>
+
+<p><a href="../../Bilder/2020-09-27-bticino-wiring.jpg"><img src="../../Bilder/2020-09-27-bticino-wiring.thumb.1x.jpg" srcset="../../Bilder/2020-09-27-bticino-wiring.thumb.2x.jpg 2x,../../Bilder/2020-09-27-bticino-wiring.thumb.3x.jpg 3x" width="200" height="264" alt="bTicino wiring" style="border: 1px solid #000" loading="lazy"></a></p>
+
+<p>I had previously tried the enhanced setup with doorbell suppression, as the Nuki
+app recommends, but switched to the <strong>simplest setup possible</strong> when capturing
+the signal.</p>
+
+<h2 id="configuring-the-nuki-opener">Configuring the Nuki Opener</h2>
+
+<p>With the Nuki app, I configured the Opener either as:</p>
+
+<ul>
+<li>bTicino → 344212</li>
+<li>Generic → Bus (SCS)</li>
+<li>Unknown intercom</li>
+</ul>
+
+<p>Unfortunately, with all configurations:</p>
+
+<ol>
+<li>The app says it learned the door open signal successfully.</li>
+<li>The device/app does react to door rings.</li>
+<li>The device <strong>never successfully opens the door</strong>.</li>
+</ol>
+
+<h2 id="capturing-the-scs-bus-with-sigrok">Capturing the SCS bus with sigrok</h2>
+
+<p>The logic analyzer that I have at home only works with signals under 5V. As the
+SCS bus is running at 27V, I’m capturing the signal with my <a href="https://www.aliexpress.com/popular/hantek-6022be.html">Hantek 6022BE USB
+oscilloscope</a>.</p>
+
+<p><a href="https://sigrok.org/">sigrok</a> is a portable, cross-platform, free open source
+signal analysis software suite and <a href="https://sigrok.org/wiki/Hantek_6022BE">supports the Hantek
+6022BE</a> out of the box, provided you have
+at least version 0.1.4 of the the sigrok fx2lafw package installed.</p>
+
+<p>Check out <a href="https://sigrok.org/wiki/Getting_started_with_a_logic_analyzer">sigrok’s “Getting started with a logic
+analyzer”</a> if
+you’re new to sigrok!</p>
+
+<p>The Nuki Opener has 3 different pin headers you can use, depending on where you
+want to attach it on your wall. These are connected straight through, so I used
+them to conveniently grab BUS+ and BUS- just like the Nuki sees it:</p>
+
+<p><a href="../../Bilder/2020-09-27-bticino-capture.jpg"><img src="../../Bilder/2020-09-27-bticino-capture.thumb.1x.jpg" srcset="../../Bilder/2020-09-27-bticino-capture.thumb.2x.jpg 2x,../../Bilder/2020-09-27-bticino-capture.thumb.3x.jpg 3x" width="200" height="264" alt="bTicino capture" style="border: 1px solid #000" loading="lazy"></a></p>
+
+<p>I set the oscilloscope probe head to its 10X divider setting, so that I had the
+full value range available, then started sampling 5M samples at 500 kHz:</p>
+
+<p><a href="../../Bilder/2020-09-27-scs-pulseview.jpg"><img src="../../Bilder/2020-09-27-scs-pulseview.thumb.1x.jpg" srcset="../../Bilder/2020-09-27-scs-pulseview.thumb.2x.jpg 2x,../../Bilder/2020-09-27-scs-pulseview.thumb.3x.jpg 3x" width="600" height="260" alt="sigrok PulseView screenshot" style="border: 1px solid #000" loading="lazy"></a></p>
+
+<p>You can see 10s worth of signal. The three bursts are transmissions on the SCS
+bus.</p>
+
+<p>The labeling didn’t quite match for me: it shows e.g. 3.2V instead of 27V, but
+as long as the signal comes in clearly, it doesn’t matter if it is offset or
+scaled.</p>
+
+<h2 id="scs-bus-decoding-with-sigrok-voltage-levels">SCS bus decoding with sigrok: voltage levels</h2>
+
+<p>Let’s tell sigrok what voltage level corresponds to a low or high signal:</p>
+
+<ol>
+<li>left-click on channel <code>CH1</code></li>
+<li>set “conversion” to “to logic via threshold”</li>
+<li>set “conversion threshold” to 3.0V</li>
+</ol>
+
+<p>Now you’ll see not only the captured signal, but also the logical signal below
+in green:</p>
+
+<p><a href="../../Bilder/2020-09-27-scs-pulseview-logic.jpg"><img src="../../Bilder/2020-09-27-scs-pulseview-logic.thumb.1x.jpg" srcset="../../Bilder/2020-09-27-scs-pulseview-logic.thumb.2x.jpg 2x,../../Bilder/2020-09-27-scs-pulseview-logic.thumb.3x.jpg 3x" width="600" height="228" alt="sigrok PulseView screenshot" style="border: 1px solid #000" loading="lazy"></a></p>
+
+<h2 id="scs-bus-decoding-with-sigrok-scs-decoder">SCS bus decoding with sigrok: SCS decoder</h2>
+
+<p>Now that we have obtained a logical/digital signal (low/high), we can write a
+sigrok decoder for the SCS bus. See <a href="https://sigrok.org/wiki/Protocol_decoder_HOWTO">sigrok’s Protocol decoder
+HOWTO</a> for an introduction.</p>
+
+<p>In general, I strongly recommend investing into tooling, in particular when
+decoding protocols. Spending a few minutes to an hour at this stage will
+minimize mistakes and save lots of time later, and—when you contribute your
+tooling—enable others to do more interesting work!</p>
+
+<p>I found it easy to write a sigrok decoder, having never used their API
+before. It was quick to get something onto the screen, mistakes were easy to
+correct, and the whole process was nicely iterative.</p>
+
+<p>Until it is merged and released with a new version of <code>libsigrokdecode</code>, you can
+find <a href="https://github.com/stapelberg/libsigrokdecode/commit/7f12be634628d52222eb879f5b076c256ab8ba08">my SCS decoder on
+GitHub</a>.</p>
+
+<p>The decoder looks at every layer of an SCS telegram: the start/stop bits, the
+data bits, the value and the value’s logical position/function in the SCS
+telegram.</p>
+
+<p><a href="../../Bilder/2020-09-28-pulseview-scs-full.jpg"><img src="../../Bilder/2020-09-28-pulseview-scs-full.thumb.1x.jpg" srcset="../../Bilder/2020-09-28-pulseview-scs-full.thumb.2x.jpg 2x,../../Bilder/2020-09-28-pulseview-scs-full.thumb.3x.jpg 3x" width="600" height="173" alt="SCS full" style="border: 1px solid #000" loading="lazy"></a></p>
+
+<p>Our SCS decoder displays the 3 bursts on the SCS bus when we ring the doorbell:</p>
+
+<p><a href="../../Bilder/2020-09-27-anlern-klingel-burst1.jpg"><img src="../../Bilder/2020-09-27-anlern-klingel-burst1.thumb.1x.jpg" srcset="../../Bilder/2020-09-27-anlern-klingel-burst1.thumb.2x.jpg 2x,../../Bilder/2020-09-27-anlern-klingel-burst1.thumb.3x.jpg 3x" width="600" height="90" alt="SCS bus door ring" style="border: 1px solid #000" loading="lazy"></a></p>
+
+<p><a href="../../Bilder/2020-09-27-anlern-klingel-burst2.jpg"><img src="../../Bilder/2020-09-27-anlern-klingel-burst2.thumb.1x.jpg" srcset="../../Bilder/2020-09-27-anlern-klingel-burst2.thumb.2x.jpg 2x,../../Bilder/2020-09-27-anlern-klingel-burst2.thumb.3x.jpg 3x" width="600" height="90" alt="SCS bus door ring" style="border: 1px solid #000" loading="lazy"></a></p>
+
+<p><a href="../../Bilder/2020-09-27-anlern-klingel-burst3.jpg"><img src="../../Bilder/2020-09-27-anlern-klingel-burst3.thumb.1x.jpg" srcset="../../Bilder/2020-09-27-anlern-klingel-burst3.thumb.2x.jpg 2x,../../Bilder/2020-09-27-anlern-klingel-burst3.thumb.3x.jpg 3x" width="600" height="90" alt="SCS bus door ring" style="border: 1px solid #000" loading="lazy"></a></p>
+
+<p>Only the middle burst sets a destination address of <code>0x3</code>, the configured number
+of my intercom system. I am not sure what the first and last burst indicate!</p>
+
+<p>The SCS bus activity when opening the door seems more clear:</p>
+
+<p><a href="../../Bilder/2020-09-27-anlern-open-burst1.jpg"><img src="../../Bilder/2020-09-27-anlern-open-burst1.thumb.1x.jpg" srcset="../../Bilder/2020-09-27-anlern-open-burst1.thumb.2x.jpg 2x,../../Bilder/2020-09-27-anlern-open-burst1.thumb.3x.jpg 3x" width="600" height="90" alt="SCS bus door ring" style="border: 1px solid #000" loading="lazy"></a></p>
+
+<p><a href="../../Bilder/2020-09-27-anlern-open-burst2.jpg"><img src="../../Bilder/2020-09-27-anlern-open-burst2.thumb.1x.jpg" srcset="../../Bilder/2020-09-27-anlern-open-burst2.thumb.2x.jpg 2x,../../Bilder/2020-09-27-anlern-open-burst2.thumb.3x.jpg 3x" width="600" height="90" alt="SCS bus door ring" style="border: 1px solid #000" loading="lazy"></a></p>
+
+<p>These 2 bursts are sent one second apart, and only differ in the request
+parameter field: my guess is that <code>0xa4</code> means “start buzzing the door open” and
+<code>0xa0</code> means “stop buzzing the door open”.</p>
+
+<p>I’m not sure why all these bursts repeat their SCS telegrams 3 times. My
+understanding was that SCS telegrams are repeated only when they are not
+acknowledged, and I indeed see no acknowledgement telegrams in my captures. Does
+that mean something is wrong with our intercom and it only works due to
+retransmissions?</p>
+
+<h2 id="captured-scs-telegrams">Captured SCS telegrams</h2>
+
+<p>Find a capture of the door bell and door buzzer in <a
+href="../../2020-09-27-rohdaten-klingel.zip">2020-09-27-rohdaten-klingel.zip</a>.</p>
+
+<p>To extract the interesting parts from the sigrok files, I had to use
+<code>sigrok-cli</code> to convert the data to CSV, cut the data and convert from CSV to
+sigrok again:</p>
+
+<pre><code>% sigrok-cli \
+  -i 2020-09-27-anlern-01-open.srzip \
+  --output-format csv \
+  -o 2020-09-27-anlern-01-open-PUR.csv
+
+% tail -n 4050629 2020-09-27-anlern-01-open-PUR.csv \
+  &gt; 2020-09-27-anlern-01-open-PUR-filtered.csv
+
+% $EDITOR *.csv # copy over the header
+
+% sigrok-cli \
+  -I csv:single_column=true:header=true:column_formats=1a \
+  -i 2020-09-27-anlern-01-open-PUR-filtered.csv \
+  --output-format srzip \
+  -o 2020-09-27-anlern-01-open-PUR-filtered.srzip
+</code></pre>
+
+<h2 id="further-reading">Further reading</h2>
+
+<p>I used the following sources; please let me know of any others!</p>
+
+<ul>
+<li><a href="https://it.wikipedia.org/wiki/Bus_SCS">https://it.wikipedia.org/wiki/Bus_SCS</a></li>
+<li><a href="http://guidopic.altervista.org/alter/eibscsgt.html">http://guidopic.altervista.org/alter/eibscsgt.html</a></li>
+<li><a href="https://www.mikrocontroller.net/topic/493823">https://www.mikrocontroller.net/topic/493823</a></li>
+</ul>
+
+	  </div>
+	</div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -327,29 +327,21 @@ checks.</p>
 
 <h2 id="captured-scs-telegrams">Captured SCS telegrams</h2>
 
-<p>Find a capture of the door bell and door buzzer in <a
-href="../../2020-09-27-rohdaten-klingel.zip">2020-09-27-rohdaten-klingel.zip</a>.</p>
+<p>You can find my most recent captures in <a
+href="../../2020-09-27-rohdaten-klingel-rev2.zip">2020-09-27-rohdaten-klingel-rev2.zip</a>:</p>
 
-<p>To extract the interesting parts from the sigrok files, I had to use
-<code>sigrok-cli</code> to convert the data to CSV, cut the data and convert from CSV to
-sigrok again:</p>
+<ul>
+<li><code>2020-09-27-anlern-01-open-PUR-filtered.srzip</code> is the door buzzer</li>
+<li><code>2020-09-27-anlern-02-klingel-PUR-filtered.srzip</code> is the bell ringing</li>
+</ul>
 
-<pre><code>% sigrok-cli \
-  -i 2020-09-27-anlern-01-open.srzip \
-  --output-format csv \
-  -o 2020-09-27-anlern-01-open-PUR.csv
+<p>To extract the interesting parts from the sigrok files, I:</p>
 
-% tail -n 4050629 2020-09-27-anlern-01-open-PUR.csv \
-  &gt; 2020-09-27-anlern-01-open-PUR-filtered.csv
-
-% $EDITOR *.csv # copy over the header
-
-% sigrok-cli \
-  -I csv:single_column=true:header=true:column_formats=1a \
-  -i 2020-09-27-anlern-01-open-PUR-filtered.csv \
-  --output-format srzip \
-  -o 2020-09-27-anlern-01-open-PUR-filtered.srzip
-</code></pre>
+<ol>
+<li>Click the <code>Show Cursors</code> icon in PulseView’s toolbar.</li>
+<li>Position the left and right cursor edges such that the signal of interest is selected.</li>
+<li>Click the drop-down next to the <code>Save</code> icon and select <code>Save Selected Range As</code>.</li>
+</ol>
 
 <h2 id="further-reading">Further reading</h2>
 

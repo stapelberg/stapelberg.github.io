@@ -3,7 +3,7 @@
   <link href="https://michael.stapelberg.ch/feed.xml" rel="self"/>
   <link href="https://michael.stapelberg.ch/"/>
 
-    <updated>2020-09-28T08:51:47+02:00</updated>
+    <updated>2020-10-01T08:22:23+02:00</updated>
     
   <id>https://michael.stapelberg.ch/</id>
   <generator>Hugo -- gohugo.io</generator>
@@ -12,7 +12,7 @@
     <link href="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/"/>
     <id>https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/</id>
     <published>2020-09-28T08:43:00+02:00</published>
-    <updated>2020-09-28T08:51:47+02:00</updated>
+    <updated>2020-10-01T08:22:23+02:00</updated>
     <content type="html"><![CDATA[
 
 <p>I have long been looking for a way to make my intercom a little more pleasant.</p>
@@ -198,6 +198,23 @@ understanding was that SCS telegrams are repeated only when they are not
 acknowledged, and I indeed see no acknowledgement telegrams in my captures. Does
 that mean something is wrong with our intercom and it only works due to
 retransmissions?</p>
+
+<h2 id="scs-bus-decoding-with-sigrok-git-uart-scs-decoder">SCS bus decoding with sigrok git: UART+SCS decoder</h2>
+
+<p>As <a href="https://sourceforge.net/p/sigrok/mailman/message/37118252/">Gerhard Sittig pointed
+out</a>, in the git
+version of libsigrokdecode, one can use the existing UART decoder to decode SCS:</p>
+
+<ol>
+<li>Set <code>Baud rate</code> to <code>9600</code></li>
+<li>Set <code>Sample point</code> to <code>20%</code></li>
+</ol>
+
+<p>This seems a little more robust than my cobbled-together SCS decoder from above :)</p>
+
+<p>In addition to the UART decoder, we can still use a custom SCS decoder to label
+individual bytes within an SCS telegram according to their function, and do CRC
+checks.</p>
 
 <h2 id="captured-scs-telegrams">Captured SCS telegrams</h2>
 

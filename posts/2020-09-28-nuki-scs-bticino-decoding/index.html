@@ -86,7 +86,7 @@ body, td, th {
 	<div id="contentBox" class="col-md-10">
 	  <h2 class="title">Nuki Opener with an SCS bus intercom (bTicino 344212)</h2>
 	  <div style="margin-bottom: 2em">
-	    <span id="date">published 2020-09-28</span>
+	    <span id="date">published 2020-09-28, last modified 2020-10-01</span>
 	    
 	  
 	  <span style="padding-left: 0.1em; padding-right: 0.1em; margin-left: .5em; margin-right: .5em"><a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2020-09-28-nuki-scs-bticino-decoding.markdown"><img src="../../Bilder/pen-square-solid.svg" style="height: 1.25em"></a></span>
@@ -97,6 +97,31 @@ body, td, th {
 	  
 	  </div>
 	  <div class="Artikel" id="content">
+	    <style type="text/css">
+	      #TableOfContents > ul, #TableOfContents > ul > li > ul {
+		  list-style: none;
+		  margin: 0;
+		  padding: 0;
+	      }
+	    </style>
+	    <details style="margin-bottom: 2em">
+	      <summary>Table of contents</summary>
+	      <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#connecting-the-nuki-opener-to-the-bticino-344212">Connecting the Nuki Opener to the bTicino 344212</a></li>
+<li><a href="#configuring-the-nuki-opener">Configuring the Nuki Opener</a></li>
+<li><a href="#capturing-the-scs-bus-with-sigrok">Capturing the SCS bus with sigrok</a></li>
+<li><a href="#scs-bus-decoding-with-sigrok-voltage-levels">SCS bus decoding with sigrok: voltage levels</a></li>
+<li><a href="#scs-bus-decoding-with-sigrok-scs-decoder">SCS bus decoding with sigrok: SCS decoder</a></li>
+<li><a href="#scs-bus-decoding-with-sigrok-git-uart-scs-decoder">SCS bus decoding with sigrok git: UART+SCS decoder</a></li>
+<li><a href="#captured-scs-telegrams">Captured SCS telegrams</a></li>
+<li><a href="#further-reading">Further reading</a></li>
+</ul></li>
+</ul>
+</nav>
+	    </details>
 	    
 
 <p>I have long been looking for a way to make my intercom a little more pleasant.</p>
@@ -282,6 +307,23 @@ understanding was that SCS telegrams are repeated only when they are not
 acknowledged, and I indeed see no acknowledgement telegrams in my captures. Does
 that mean something is wrong with our intercom and it only works due to
 retransmissions?</p>
+
+<h2 id="scs-bus-decoding-with-sigrok-git-uart-scs-decoder">SCS bus decoding with sigrok git: UART+SCS decoder</h2>
+
+<p>As <a href="https://sourceforge.net/p/sigrok/mailman/message/37118252/">Gerhard Sittig pointed
+out</a>, in the git
+version of libsigrokdecode, one can use the existing UART decoder to decode SCS:</p>
+
+<ol>
+<li>Set <code>Baud rate</code> to <code>9600</code></li>
+<li>Set <code>Sample point</code> to <code>20%</code></li>
+</ol>
+
+<p>This seems a little more robust than my cobbled-together SCS decoder from above :)</p>
+
+<p>In addition to the UART decoder, we can still use a custom SCS decoder to label
+individual bytes within an SCS telegram according to their function, and do CRC
+checks.</p>
 
 <h2 id="captured-scs-telegrams">Captured SCS telegrams</h2>
 

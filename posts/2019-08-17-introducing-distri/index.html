@@ -86,7 +86,7 @@ body, td, th {
 	<div id="contentBox" class="col-md-10">
 	  <h2 class="title">distri: a Linux distribution to research fast package management</h2>
 	  <div style="margin-bottom: 2em">
-	    <span id="date">published 2019-08-17, last modified 2020-08-12</span>
+	    <span id="date">published 2019-08-17, last modified 2020-10-14</span>
 	    
 	  
 	  
@@ -261,20 +261,19 @@ exchange directory and contain files from their <code>lib/irssi/modules</code>.<
 </ol>
 
 <aside class="admonition note">
-  <div class="note-icon">
-    <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+  <div class="note-container">
+    <div class="note-icon">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
     <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
     <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
         <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
     </g>
 </svg>
 
+    </div>
+    <div class="admonition-content"><strong>Note:</strong> Only a few exchange directories are also available in the package build
+environment (as opposed to run-time).</div>
   </div>
-  <div class="admonition-content">
-    <strong>Note</strong>:
-Only a few exchange directories are also available in the package build
-environment (as opposed to run-time).
-</div>
 </aside>
 
 
@@ -294,24 +293,21 @@ e.g. <code>--prefix=/ro/zsh-amd64-5.6.2-3/out</code> and need to be pointed to a
 directory via a specific command line flag.</p>
 
 <aside class="admonition note">
-  <div class="note-icon">
-    <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+  <div class="note-container">
+    <div class="note-icon">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
     <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
     <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
         <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
     </g>
 </svg>
 
+    </div>
+    <div class="admonition-content"><strong>Note:</strong> To create the illusion of a writable search path at package
+build-time, <code>$DESTDIR/ro/share</code> and <code>$DESTDIR/ro/lib</code> are
+diverted to <code>$DESTDIR/$PREFIX/share</code> and
+<code>$DESTDIR/$PREFIX/lib</code>, respectively.</div>
   </div>
-  <div class="admonition-content">
-    <strong>Note</strong>:
-
-To create the illusion of a writable search path at package build-time,
-<code>$DESTDIR/ro/share</code> and <code>$DESTDIR/ro/lib</code> are diverted to
-<code>$DESTDIR/$PREFIX/share</code> and <code>$DESTDIR/$PREFIX/lib</code>,
-respectively.
-
-</div>
 </aside>
 
 
@@ -369,19 +365,18 @@ them on real hardware from a USB drive, or for cloud providers such as Google
 Cloud.</p>
 
 <aside class="admonition note">
-  <div class="note-icon">
-    <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+  <div class="note-container">
+    <div class="note-icon">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
     <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
     <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
         <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
     </g>
 </svg>
 
+    </div>
+    <div class="admonition-content"><strong>Note:</strong> To saturate links above 1 Gbps, transfer packages without compression.</div>
   </div>
-  <div class="admonition-content">
-    <strong>Note</strong>:
-To saturate links above 1 Gbps, transfer packages without compression.
-</div>
 </aside>
 
 

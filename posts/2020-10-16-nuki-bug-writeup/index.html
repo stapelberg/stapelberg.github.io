@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Bug Report: Regression: Nuki Opener &#43; BTicino 344212</title>
+    <title>Bug Report: Defekter Nuki Opener (an BTicino 344212)</title>
     <meta name="viewport" content="width=device-width">
     <link rel="shortcut icon" href="/favicon.ico" />
     <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
@@ -84,9 +84,9 @@ body, td, th {
 </div>
 
 	<div id="contentBox" class="col-md-10">
-	  <h2 class="title">Bug Report: Regression: Nuki Opener &#43; BTicino 344212</h2>
+	  <h2 class="title">Bug Report: Defekter Nuki Opener (an BTicino 344212)</h2>
 	  <div style="margin-bottom: 2em">
-	    <span id="date">published 2020-10-16</span>
+	    <span id="date">published 2020-10-16, last modified 2020-11-03</span>
 	    
 	  
 	  <span style="padding-left: 0.1em; padding-right: 0.1em; margin-left: .5em; margin-right: .5em"><a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2020-10-16-nuki-bug-writeup.markdown"><img src="../../Bilder/pen-square-solid.svg" style="height: 1.25em"></a></span>
@@ -94,6 +94,26 @@ body, td, th {
 	  </div>
 	  <div class="Artikel" id="content">
 	    
+
+<aside class="admonition note">
+  <div class="note-container">
+    <div class="note-icon">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+    </div>
+    <div class="admonition-content"><p><strong>Update 2020-11-03:</strong> Ich habe den zweiten Nuki Opener auf Software-Version
+1.5.3 aktualisiert, und wider erwarten funktioniert er!</p>
+
+<p>Offenbar war mein erster Nuki Opener defekt.</p>
+</div>
+  </div>
+</aside>
+
 
 <p>Ich habe kürzlich einen Nuki Opener gekauft und leider nicht in Betrieb nehmen
 können.</p>
@@ -133,14 +153,20 @@ der alten Software-Version:</p>
 <td>1.3.1</td>
 <td>funktioniert!</td>
 </tr>
+
+<tr>
+<td>Nuki Opener #2</td>
+<td>1.5.3</td>
+<td>funktioniert!</td>
+</tr>
 </tbody>
 </table>
 
-<p>Für mich sieht alles danach aus, als ob sich in neuere Software-Versionen ein
-Fehler eingeschlichen hat.</p>
+<p><s>Für mich sieht alles danach aus, als ob sich in neuere Software-Versionen ein
+Fehler eingeschlichen hat.</s></p>
 
 <p>Meine Oszilloskop-Aufzeichnungen beider Software-Versionen belegen, dass das
-Signal, welches die aktuelle Software-Version 1.5.3 auf den <a href="https://en.wikipedia.org/wiki/Bus_SCS">BTicino SCS
+Signal, welches der Nuki Opener #1 auf den <a href="https://en.wikipedia.org/wiki/Bus_SCS">BTicino SCS
 Bus</a> schickt, kaputt ist!</p>
 
 <p>Ich stelle die rohen Messwerte jeweils in mehreren Formaten zur Verfügung, mit

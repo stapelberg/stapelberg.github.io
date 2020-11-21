@@ -1,110 +1,194 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> Android hat mich ;-). Ich möc… - Michael Stapelberg</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <meta name="description" content="Android hat mich ;-). Ich möchte kurz darauf eingehen, warum ich gewechselt habe.  Mein altes (erstes) Smartphone, das Nokia N900, habe ich mir gekauft, weil ich damit viele Aufgaben erledigen kann, für die ich sonst verschiedene Geräte brauchte: SIP-Telefon, MP3-Player (man kann sich auch in der Bahn mal einen Film anschauen, das funktioniert ziemlich gut), Telefon, mobiler IRC- und Webclient, Navigationssystem.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2010-10-15-android-hat-mich-ich-mc/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
 
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title> Android hat mich ;-). Ich möc…</title>
-    <meta name="viewport" content="width=device-width">
-    <link rel="shortcut icon" href="/favicon.ico" />
-    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
-    <link rel="canonical" href="https://michael.stapelberg.ch/posts/2010-10-15-android-hat-mich-ich-mc/">
-    <meta name="author" content="Michael Stapelberg">
-    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
-    <style type="text/css">
-@font-face {
-  font-family: 'Yanone Kaffeesatz Regular';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
 
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: normal;
-  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
 
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: bold;
-  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
 
-body, td, th {
-  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  color: #000;
-} 
-    </style>
-    <link rel="stylesheet" href="/2.css" type="text/css">
-    
-    <link rel="stylesheet" href="/1.min.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2">
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2">
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
 
 
-  <body>
-    <div class="container-fluid">
-      <div class="row">
-	<div id="menu" class="col-md-2">
-  <div style="display: flex; align-items: center">
-    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
-    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
   </div>
 
-  <ul class="menu_open">
-    <li><a class="menu_item" href="/"><span class="menu_title">About</span></a></li>
-    <li><a class="menu_item" href="/posts/"><span class="menu_title">Blog</span></a></li>
-    <li><span class="menu_title">Programs</span>
-      <div class="subitem">
-	<ul class="menu_open">
-	  <li><a class="menu_item" href="https://gokrazy.org/"><span class="menu_title">gokrazy</span></a></li>
-	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
-	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
-	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
-	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
-	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
-	</ul>
-      </div>
-    </li>
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
 
-    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
-      <div class="subitem">
-	<ul class="menu_open">
-	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
-	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
-	</ul>
-      </div>
-    </li>
+  <input type="checkbox" id="ms_burger">
 
-    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
-    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
-  </ul>
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div>
+<h1 class="ms_title"> Android hat mich ;-). Ich möc…</h1>
+<div class="ms_meta">
+  <div id="ms_date">published 2010-10-15, last modified 2018-03-23</div>
+  
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2010-10-15-Android-hat-mich---Ich-mc.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
 </div>
-
-	<div id="contentBox" class="col-md-10">
-	  <h2 class="title"> Android hat mich ;-). Ich möc…</h2>
-	  <div style="margin-bottom: 2em">
-	    <span id="date">published 2010-10-15, last modified 2018-03-23</span>
-	    
-	  
-	  <span style="padding-left: 0.1em; padding-right: 0.1em; margin-left: .5em; margin-right: .5em"><a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2010-10-15-Android-hat-mich---Ich-mc.html"><img src="../../Bilder/pen-square-solid.svg" style="height: 1.25em"></a></span>
-	  
-	  </div>
-	  <div class="Artikel" id="content">
-	    <style type="text/css">
-	      #TableOfContents > ul, #TableOfContents > ul > li > ul {
-		  list-style: none;
-		  margin: 0;
-		  padding: 0;
-	      }
-	    </style>
-	    <details style="margin-bottom: 2em">
-	      <summary>Table of contents</summary>
-	      
-	    </details>
-	    <p>
+<div class="Artikel" id="content">
+  <style type="text/css">
+    .TableOfContents > ul, .TableOfContents > ul > li > ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+    }
+    .TableOfContents li {
+	margin-bottom: 1rem;
+    }
+  </style>
+  <details class="ms_toc_details">
+    <summary>Table of contents</summary>
+    
+  </details>
+  <p>
 Android hat mich ;-). Ich möchte kurz darauf eingehen, warum ich gewechselt habe.
 </p>
 
@@ -256,9 +340,19 @@ den USA), werde ich vermutlich darauf umsteigen, sobald es auf dem Markt ist.
 </p>
 
 
-	  </div>
-	</div>
+</div>
+
       </div>
-    </div>
-  </body>
+<div id="ms_toc">
+  <div>
+    <strong>Table Of Contents</strong>
+
+    
+  </div>
+</div>
+
+    </main><div id="ms_footer">
+  © 2020 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
 </html>

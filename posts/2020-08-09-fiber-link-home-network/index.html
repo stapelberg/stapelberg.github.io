@@ -1,112 +1,197 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Adding a fiber link to my home network - Michael Stapelberg</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <meta name="description" content="Motivation Despite using a FTTH internet connection since 2014, aside from the one fiber uplink, I had always used network gear with 1 Gbit/s links over regular old rj45 cat5(e) cables.
+I liked the simplicity and uniformity of that setup, but decided it’s time to add at least one fiber connection, to get rid of a temporary ethernet cable that connected my kitchen with the rest of my network that is largely in the living room and office.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
 
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Adding a fiber link to my home network</title>
-    <meta name="viewport" content="width=device-width">
-    <link rel="shortcut icon" href="/favicon.ico" />
-    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
-    <link rel="canonical" href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/">
-    <meta name="author" content="Michael Stapelberg">
-    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
-    <style type="text/css">
-@font-face {
-  font-family: 'Yanone Kaffeesatz Regular';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
 
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: normal;
-  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
 
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: bold;
-  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
 
-body, td, th {
-  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  color: #000;
-} 
-    </style>
-    <link rel="stylesheet" href="/2.css" type="text/css">
-    
-    <link rel="stylesheet" href="/1.min.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2">
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2">
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
 
 
-  <body>
-    <div class="container-fluid">
-      <div class="row">
-	<div id="menu" class="col-md-2">
-  <div style="display: flex; align-items: center">
-    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
-    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
   </div>
 
-  <ul class="menu_open">
-    <li><a class="menu_item" href="/"><span class="menu_title">About</span></a></li>
-    <li><a class="menu_item" href="/posts/"><span class="menu_title">Blog</span></a></li>
-    <li><span class="menu_title">Programs</span>
-      <div class="subitem">
-	<ul class="menu_open">
-	  <li><a class="menu_item" href="https://gokrazy.org/"><span class="menu_title">gokrazy</span></a></li>
-	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
-	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
-	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
-	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
-	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
-	</ul>
-      </div>
-    </li>
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
 
-    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
-      <div class="subitem">
-	<ul class="menu_open">
-	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
-	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
-	</ul>
-      </div>
-    </li>
+  <input type="checkbox" id="ms_burger">
 
-    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
-    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
-  </ul>
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div>
+<h1 class="ms_title">Adding a fiber link to my home network</h1>
+<div class="ms_meta">
+  <div id="ms_date">published 2020-08-09, last modified 2020-11-21</div>
+  
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/index.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
+  <div>
+    <a href="https://twitter.com/zekjur/status/1292450019904311296"><img src="/Bilder/twitter-brands.svg" width="18" height="18" alt="Twitter icon" title="Discuss this article on Twitter!"></a>
+  </div>
+  
 </div>
-
-	<div id="contentBox" class="col-md-10">
-	  <h2 class="title">Adding a fiber link to my home network</h2>
-	  <div style="margin-bottom: 2em">
-	    <span id="date">published 2020-08-09, last modified 2020-08-28</span>
-	    
-	  
-	  <span style="padding-left: 0.1em; padding-right: 0.1em; margin-left: .5em; margin-right: .5em"><a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2020-08-09-fiber-link-home-network.markdown"><img src="../../Bilder/pen-square-solid.svg" style="height: 1.25em"></a></span>
-	  
-	  <span style="padding-left: 0.1em; padding-right: 0.1em">
-	    <a style="text-decoration: none; color: white" href="https://twitter.com/zekjur/status/1292450019904311296"><img src="../../Bilder/twitter-brands.svg" style="height: 1.25em"></a>
-	  </span>
-	  
-	  </div>
-	  <div class="Artikel" id="content">
-	    <style type="text/css">
-	      #TableOfContents > ul, #TableOfContents > ul > li > ul {
-		  list-style: none;
-		  margin: 0;
-		  padding: 0;
-	      }
-	    </style>
-	    <details style="margin-bottom: 2em">
-	      <summary>Table of contents</summary>
-	      <nav id="TableOfContents">
+<div class="Artikel" id="content">
+  <style type="text/css">
+    .TableOfContents > ul, .TableOfContents > ul > li > ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+    }
+    .TableOfContents li {
+	margin-bottom: 1rem;
+    }
+  </style>
+  <details class="ms_toc_details">
+    <summary>Table of contents</summary>
+    <nav class="TableOfContents">
 <ul>
 <li>
 <ul>
@@ -123,8 +208,8 @@ body, td, th {
 </ul></li>
 </ul>
 </nav>
-	    </details>
-	    
+  </details>
+  
 
 <h2 id="motivation">Motivation</h2>
 
@@ -148,7 +233,26 @@ walls and still close the doors.</p>
 <p>So, we will replace one ethernet cable with one fiber cable and converters at
 each end:</p>
 
-<p><a href="../../Bilder/2020-08-04-media-converters.jpg"><img src="../../Bilder/2020-08-04-media-converters.thumb.1x.jpg" srcset="../../Bilder/2020-08-04-media-converters.thumb.2x.jpg 2x,../../Bilder/2020-08-04-media-converters.thumb.3x.jpg 3x" width="600" height="216" alt="0.9mm thin fiber cables" style="border: 1px solid #000" loading="lazy"></a></p>
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-media-converters.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-media-converters_hu863a0a53ff58eb79e087ca8992fd5d37_416326_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-media-converters_hu863a0a53ff58eb79e087ca8992fd5d37_416326_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-media-converters_hu863a0a53ff58eb79e087ca8992fd5d37_416326_600x0_resize_q75_box.jpg"
+  alt="0.9mm thin fiber cables" title="0.9mm thin fiber cables"
+  width="600"
+  height="217"
+  style="border: 1px solid #000"
+  loading="lazy"></a>
+
 
 <p>Why is it good to switch from copper ethernet cables to fiber in this case?
 Fiber cables are <strong>smaller and hence easier to fit</strong> into existing cable
@@ -161,7 +265,26 @@ hidden in plain sight! I had only ever seen 2mm fiber cables before, and the
 0.9mm cables are incredibly light, flexible and thin! Even pasta is typically
 thicker:</p>
 
-<p><a href="../../Bilder/2020-08-04-glasnudeln.jpg"><img src="../../Bilder/2020-08-04-glasnudeln.thumb.jpg" srcset="../../Bilder/2020-08-04-glasnudeln.thumb.2x.jpg 2x,../../Bilder/2020-08-04-glasnudeln.thumb.3x.jpg 3x" width="600" height="450" alt="0.9mm thin fiber cables" style="border: 1px solid #000" loading="lazy"></a></p>
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-glasnudeln.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-glasnudeln_huff6805db50351ab1fa4ea96b741ae340_1675440_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-glasnudeln_huff6805db50351ab1fa4ea96b741ae340_1675440_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-glasnudeln_huff6805db50351ab1fa4ea96b741ae340_1675440_600x0_resize_q75_box.jpg"
+  alt="Preparing a delicious pot of glass noodles ;)" title="Preparing a delicious pot of glass noodles ;)"
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  loading="lazy"></a>
+
 
 <p><small><em>Preparing a delicious pot of glass noodles ;)</em></small></p>
 
@@ -423,7 +546,26 @@ existing connectors on the fiber. I have successfully just used a piece of tape
 to fix the fiber connector on the cable puller, pushing down the nose
 temporarily:</p>
 
-<p><a href="../../Bilder/2020-08-04-cable-puller.jpg"><img src="../../Bilder/2020-08-04-cable-puller.thumb.jpg" srcset="../../Bilder/2020-08-04-cable-puller.thumb.2x.jpg 2x,../../Bilder/2020-08-04-cable-puller.thumb.3x.jpg 3x" width="600" height="450" alt="fiber cable taped to cable puller" style="border: 1px solid #000" loading="lazy"></a></p>
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-cable-puller.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-cable-puller_hu671a386c131e99c47b0e8674d4173388_933240_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-cable-puller_hu671a386c131e99c47b0e8674d4173388_933240_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-cable-puller_hu671a386c131e99c47b0e8674d4173388_933240_600x0_resize_q75_box.jpg"
+  alt="fiber cable taped to cable puller" title="fiber cable taped to cable puller"
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  loading="lazy"></a>
+
 
 <p>Where there are no existing ducts, you may need to lay the fiber on top of the
 wall. Obviously, this is tricky as soon as you need to make a connection going
@@ -433,7 +575,26 @@ door frames, you quickly risk breaking fiber cables.</p>
 <p>Luckily, the fiber is very light, so it’s very easy to fix to the wall with a
 piece of tape:</p>
 
-<p><a href="../../Bilder/2020-08-04-wand-kabel.jpg"><img src="../../Bilder/2020-08-04-wand-kabel.thumb.1x.jpg" srcset="../../Bilder/2020-08-04-wand-kabel.thumb.2x.jpg 2x,../../Bilder/2020-08-04-wand-kabel.thumb.3x.jpg 3x" width="600" height="450" alt="fiber cables on the wall" style="border: 1px solid #000" loading="lazy"></a></p>
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-wand-kabel.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-wand-kabel_hu266a050a008f40ca1627a87ee11d809f_563690_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-wand-kabel_hu266a050a008f40ca1627a87ee11d809f_563690_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-wand-kabel_hu266a050a008f40ca1627a87ee11d809f_563690_600x0_resize_q75_box.jpg"
+  alt="fiber cables on the wall" title="fiber cables on the wall"
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  loading="lazy"></a>
+
 
 <p>You can see the upstream internet fiber in the top right corner, which is rather
 thick in comparison to my 0.9mm yellow fiber that’s barely visible in the middle
@@ -455,11 +616,49 @@ too. This is possible because the 0.9mm fiber cable is so thin!</p>
 too full, but there is a cable that can be removed and put back after pulling
 the fiber through:</p>
 
-<p><a href="../../Bilder/2020-08-04-loch.jpg"><img src="../../Bilder/2020-08-04-loch.thumb.1x.jpg" srcset="../../Bilder/2020-08-04-loch.thumb.2x.jpg 2x,../../Bilder/2020-08-04-loch.thumb.3x.jpg 3x" width="600" height="450" alt="fiber cable next to existing cable" style="border: 1px solid #000" loading="lazy"></a></p>
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-loch.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-loch_hu72eb317f66154a6cd4cb4580e2e045bd_823912_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-loch_hu72eb317f66154a6cd4cb4580e2e045bd_823912_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-loch_hu72eb317f66154a6cd4cb4580e2e045bd_823912_600x0_resize_q75_box.jpg"
+  alt="fiber cable next to existing cable" title="fiber cable next to existing cable"
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  loading="lazy"></a>
+
 
 <p>…and on the other side of the wall:</p>
 
-<p><a href="../../Bilder/2020-08-04-dose.jpg"><img src="../../Bilder/2020-08-04-dose.thumb.1x.jpg" srcset="../../Bilder/2020-08-04-dose.thumb.2x.jpg 2x,../../Bilder/2020-08-04-dose.thumb.3x.jpg 3x" width="600" height="450" alt="fiber cable next to existing socket" style="border: 1px solid #000" loading="lazy"></a></p>
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-dose.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-dose_hubb166f4dcb345f6dba1f730b24be242a_880410_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-dose_hubb166f4dcb345f6dba1f730b24be242a_880410_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-dose_hubb166f4dcb345f6dba1f730b24be242a_880410_600x0_resize_q75_box.jpg"
+  alt="fiber cable next to existing socket" title="fiber cable next to existing socket"
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  loading="lazy"></a>
+
 
 <p>Note how the fiber is thin enough to fit between the socket and duct!</p>
 
@@ -510,7 +709,26 @@ measure.</p>
 
 <p>For establishing an intuition of their different sizes, here are the different connectors:</p>
 
-<p><a href="../../Bilder/2020-08-07-fiber-cable-connector-size.jpg"><img src="../../Bilder/2020-08-07-fiber-cable-connector-size.thumb.1x.jpg" srcset="../../Bilder/2020-08-07-fiber-cable-connector-size.thumb.2x.jpg 2x,../../Bilder/2020-08-07-fiber-cable-connector-size.thumb.3x.jpg 3x" width="600" height="450" alt="fiber cable next to existing socket" style="border: 1px solid #000" loading="lazy"></a></p>
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-07-fiber-cable-connector-size-featured.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-07-fiber-cable-connector-size-featured_hu6d8d68e7ce7a86b2365302ce19348267_984529_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-07-fiber-cable-connector-size-featured_hu6d8d68e7ce7a86b2365302ce19348267_984529_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-07-fiber-cable-connector-size-featured_hu6d8d68e7ce7a86b2365302ce19348267_984529_600x0_resize_q75_box.jpg"
+  alt="fiber cable connectors" title="fiber cable connectors"
+  width="600"
+  height="398"
+  style="border: 1px solid #000"
+  loading="lazy"></a>
+
 
 <p>From left to right:</p>
 
@@ -556,9 +774,35 @@ electrician!</p>
 
 <p>Stay tuned for the next part, where I upgrade the 1G link to a 10G link!</p>
 
-	  </div>
-	</div>
+</div>
+
       </div>
-    </div>
-  </body>
+<div id="ms_toc">
+  <div>
+    <strong>Table Of Contents</strong>
+
+    <nav class="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#hardware-selection">Hardware Selection</a>
+<ul>
+<li><a href="#hardware-selection-process">Hardware Selection Process</a></li>
+<li><a href="#fs-com-details">FS.COM details</a></li>
+</ul></li>
+<li><a href="#delivery-times">Delivery times</a></li>
+<li><a href="#laying-the-fiber">Laying The Fiber</a></li>
+<li><a href="#field-assembly-connectors">Field assembly connectors</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    </main><div id="ms_footer">
+  © 2020 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
 </html>

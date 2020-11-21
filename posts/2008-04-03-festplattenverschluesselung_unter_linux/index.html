@@ -1,114 +1,228 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Festplattenverschlüsselung unter Linux - Michael Stapelberg</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <meta name="description" content="Linux/UNIX-kenntnisse erforderlich! (in den Bereichen Dateisystem, Konsole)    Vorab: Ja, ich weiß, dass es schon genügend Anleitungen zu dem Thema gibt, aber ich möchte es sicherheitshalber noch mal mit allen Hürden, vor die ich gestellt wurde, aufschreiben.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2008-04-03-festplattenverschluesselung_unter_linux/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
 
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Festplattenverschlüsselung unter Linux</title>
-    <meta name="viewport" content="width=device-width">
-    <link rel="shortcut icon" href="/favicon.ico" />
-    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
-    <link rel="canonical" href="https://michael.stapelberg.ch/posts/2008-04-03-festplattenverschluesselung_unter_linux/">
-    <meta name="author" content="Michael Stapelberg">
-    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
-    <style type="text/css">
-@font-face {
-  font-family: 'Yanone Kaffeesatz Regular';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
 
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: normal;
-  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
 
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: bold;
-  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
 
-body, td, th {
-  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  color: #000;
-} 
-    </style>
-    <link rel="stylesheet" href="/2.css" type="text/css">
-    
-    <link rel="stylesheet" href="/1.min.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2">
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2">
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
 
 
-  <body>
-    <div class="container-fluid">
-      <div class="row">
-	<div id="menu" class="col-md-2">
-  <div style="display: flex; align-items: center">
-    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
-    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
   </div>
 
-  <ul class="menu_open">
-    <li><a class="menu_item" href="/"><span class="menu_title">About</span></a></li>
-    <li><a class="menu_item" href="/posts/"><span class="menu_title">Blog</span></a></li>
-    <li><span class="menu_title">Programs</span>
-      <div class="subitem">
-	<ul class="menu_open">
-	  <li><a class="menu_item" href="https://gokrazy.org/"><span class="menu_title">gokrazy</span></a></li>
-	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
-	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
-	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
-	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
-	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
-	</ul>
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
       </div>
-    </li>
-
-    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
-      <div class="subitem">
-	<ul class="menu_open">
-	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
-	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
-	</ul>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
       </div>
-    </li>
+    </div>
 
-    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
-    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
-  </ul>
-</div>
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
 
-	<div id="contentBox" class="col-md-10">
-	  <h2 class="title">Festplattenverschlüsselung unter Linux</h2>
-	  <div style="margin-bottom: 2em">
-	    <span id="date">published 2008-04-03, last modified 2018-03-18</span>
-	    
-	  
-	  <span style="padding-left: 0.1em; padding-right: 0.1em; margin-left: .5em; margin-right: .5em"><a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2008-04-03-Festplattenverschluesselung_unter_Linux.markdown"><img src="../../Bilder/pen-square-solid.svg" style="height: 1.25em"></a></span>
-	  
-	  </div>
-	  <div class="Artikel" id="content">
-	    <style type="text/css">
-	      #TableOfContents > ul, #TableOfContents > ul > li > ul {
-		  list-style: none;
-		  margin: 0;
-		  padding: 0;
-	      }
-	    </style>
-	    <details style="margin-bottom: 2em">
-	      <summary>Table of contents</summary>
-	      
-	    </details>
-	    <div class="warning" style="min-height: 50px">
-<img src="/Bilder/Warning.png" class="backButton">
-<p style="margin-top: 15px" class="strong">Linux/UNIX-kenntnisse erforderlich!
-(in den Bereichen Dateisystem, Konsole)</p>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div>
+<h1 class="ms_title">Festplattenverschlüsselung unter Linux</h1>
+<div class="ms_meta">
+  <div id="ms_date">published 2008-04-03, last modified 2020-11-21</div>
+  
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2008-04-03-Festplattenverschluesselung_unter_Linux.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
 </div>
+<div class="Artikel" id="content">
+  <style type="text/css">
+    .TableOfContents > ul, .TableOfContents > ul > li > ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+    }
+    .TableOfContents li {
+	margin-bottom: 1rem;
+    }
+  </style>
+  <details class="ms_toc_details">
+    <summary>Table of contents</summary>
+    <nav class="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#1-das-system-vorbereiten">1) Das System vorbereiten</a>
+<ul>
+<li><a href="#1-1-module">1.1) Module</a></li>
+<li><a href="#1-2-hilfsprogramme">1.2) Hilfsprogramme</a></li>
+</ul></li>
+<li><a href="#2-komplette-partition-verschlüsseln">2.) Komplette Partition verschlüsseln</a>
+<ul>
+<li><a href="#2-1-die-partition-wieder-aushängen">2.1) Die Partition wieder aushängen</a></li>
+</ul></li>
+<li><a href="#3-einen-verschlüsselten-container-erstellen">3.) Einen verschlüsselten Container erstellen</a></li>
+<li><a href="#4-swapspace-verschlüsseln">4.) Swapspace verschlüsseln</a></li>
+<li><a href="#5-mögliche-fehlermeldungen">5.) Mögliche Fehlermeldungen</a></li>
+</ul></li>
+</ul>
+</nav>
+  </details>
+  
+
+<aside class="admonition note">
+  <div class="note-container">
+    <div class="note-icon">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+    </div>
+    <div class="admonition-content">Linux/UNIX-kenntnisse erforderlich! (in den Bereichen Dateisystem, Konsole)</div>
+  </div>
+</aside>
+
 
 <p>
 Vorab: Ja, ich weiß, dass es schon genügend Anleitungen zu dem Thema gibt, aber
@@ -116,24 +230,9 @@ ich möchte es sicherheitshalber noch mal mit allen Hürden, vor die ich gestell
 wurde, aufschreiben.
 </p>
 
-<table class="toc">
-<tr><td><h3>Inhaltsverzeichnis:</h3>
-<ul>
-    <li class="level1"><a href="#vorbereitung">1.) Das System vorbereiten</a></li>
-        <li class="level2"><a href="#module">1.1) Module</a></li>
-        <li class="level2"><a href="#hilfsprogramme">1.2) Hilfsprogramme</a></li>
-    <li class="level1"><a href="#partition">2.) Komplette Partition verschlüsseln</a></li>
-        <li class="level2"><a href="#partitionaushaengen">2.1) Die Partition wieder aushängen</a></li>
-    <li class="level1"><a href="#container">3.) Einen verschlüsselten Container erstellen</a></li>
-    <li class="level1"><a href="#swap">4.) Swapspace verschlüsseln</a></li>
-    <li class="level1"><a href="#fehler">5.) Mögliche Fehlermeldungen</a></li>
-</ul>
-</td></tr>
-</table>
+<h2 id="1-das-system-vorbereiten">1) Das System vorbereiten</h2>
 
-<h3>1) Das System vorbereiten</h3>
-
-<h4>1.1) Module</h4>
+<h3 id="1-1-module">1.1) Module</h3>
 
 <p>
 Zum Verschlüsseln brauchen wir die Module (oder die fest einkompilierte
@@ -155,9 +254,9 @@ Namen des Moduls natürlich.
 <p>
 Der typische Ablauf sieht also so aus:
 </p>
-<pre><b>#</b> modprobe dm_crypt
-<b>#</b> modprobe loop
-<b>#</b> lsmod | egrep "(^dm_crypt|^loop)"
+<pre># modprobe dm_crypt
+# modprobe loop
+# lsmod | egrep "(^dm_crypt|^loop)"
 loop                   17288  4 
 dm_crypt               12424  1 </pre>
 
@@ -203,9 +302,9 @@ Das Modul <code>dm_crypt</code> muss in den Modulordner
 <code>kernel/drivers/block/</code> und die Hash- und Cipher-Module müssen in
 <code>kernel/drivers/crypto/</code>:
 </p>
-<pre><b>#</b> cp drivers/md/dm_crypt.ko /lib/modules/2.6.15-25-386/kernel/drivers/md/
-<b>#</b> cp drivers/block/loop.ko /lib/modules/2.6.15-25-386/kernel/drivers/block/
-<b>#</b> cp crypto/*.ko /lib/modules/2.6.15-25-386/kernel/crypto</pre>
+<pre># cp drivers/md/dm_crypt.ko /lib/modules/2.6.15-25-386/kernel/drivers/md/
+# cp drivers/block/loop.ko /lib/modules/2.6.15-25-386/kernel/drivers/block/
+# cp crypto/*.ko /lib/modules/2.6.15-25-386/kernel/crypto</pre>
 
 <p>
 Nun müssen wir noch <code>depmod</code> ausführen, damit dem System die neuen
@@ -222,7 +321,7 @@ verewigen. Dies kann man mit einem Texteditor oder mit dem Befehl <code>echo -e
 verwenden müssen.)
 </p>
 
-<h4>1.2) Hilfsprogramme</h4>
+<h3 id="1-2-hilfsprogramme">1.2) Hilfsprogramme</h3>
 
 <p>
 Da das direkte Aufrufen von <code>dm_crypt</code> ein bisschen kompliziert ist,
@@ -248,7 +347,7 @@ cryptsetup</code>) die LUKS-Erweiterung.
 Dieses Paket muss für diese Anleitung installiert sein.
 </p>
 
-<h3>2.) Komplette Partition verschlüsseln</h3>
+<h2 id="2-komplette-partition-verschlüsseln">2.) Komplette Partition verschlüsseln</h2>
 
 <p>
 Ich gehe in diesem Beispiel davon aus, dass die zu verschlüsselnde Partition
@@ -305,7 +404,7 @@ Daten wollen.
 Nach Eingabe der richtigen Passphrase sagt uns <code>cryptsetup</code>, dass
 alles in Ordnung ist:
 </p>
-<pre><b>#</b> cryptsetup luksOpen /dev/hda2 daten
+<pre># cryptsetup luksOpen /dev/hda2 daten
 Enter LUKS passphrase:
 key slot 0 unlocked.
 Command successful.</pre>
@@ -317,7 +416,8 @@ mit <code>mkfs.ext3 /dev/mapper/daten</code> ein Dateisystem, erstellen einen
 Mountpoint mit <code>mkdir /mnt/daten</code> und hängen die Festplatte dann mit
 <code>mount /dev/mapper/daten /mnt/daten</code> dort ein:
 </p>
-<pre><b>#</b> mkfs.ext3 /dev/mapper/daten
+
+<pre><code># mkfs.ext3 /dev/mapper/daten
 mke2fs 1.39 (29-May-2006)
 Dateisystem-Label=
 OS-Typ: Linux
@@ -341,18 +441,23 @@ Schreibe Superblöcke und Dateisystem-Accountinginformationen: erledigt
 Das Dateisystem wird automatisch alle 27 Mounts bzw. alle 180 Tage überprüft,
 je nachdem, was zuerst eintritt. Veränderbar mit tune2fs -c oder -t .
 
-<b>#</b> mkdir /mnt/daten
-<b>#</b> mount /dev/mapper/daten /mnt/daten</pre>
+# mkdir /mnt/daten
+# mount /dev/mapper/daten /mnt/daten
+</code></pre>
 
-<h4>2.1) Die Partition wieder aushängen</h4>
+<h3 id="2-1-die-partition-wieder-aushängen">2.1) Die Partition wieder aushängen</h3>
+
 <p>
 Mit folgenden Befehlen hängt man die verschlüsselte Partition wieder aus dem
 Dateisystem aus und entfernt das Loopdevice:
 </p>
-<pre><b>#</b> umount /mnt/daten
-<b>#</b> cryptsetup luksClose daten</pre>
 
-<h3>3.) Einen verschlüsselten Container erstellen</h3>
+<pre><code># umount /mnt/daten
+# cryptsetup luksClose daten
+</code></pre>
+
+<h2 id="3-einen-verschlüsselten-container-erstellen">3.) Einen verschlüsselten Container erstellen</h2>
+
 <p>
 Ein verschlüsselter Container hat verschiedene Vorteile gegenüber einer
 komplett verschlüsselten Partition. Zum einen kann man dadurch die
@@ -361,32 +466,38 @@ gleich für jeden Benutzer eine eigene Festplatte einbauen muss. Außerdem kann
 man den Container auf andere Systeme transportieren, oder natürlich auch – wenn
 er klein genug ist – auf CD-ROM sichern.
 </p>
+
 <p>
 Ein Container ist lediglich eine Datei, die dann über ein Loopdevice eingehängt
 wird, also genau wie vorhin…
 </p>
+
 <p>
 Mit folgendem Befehl schreiben wir uns eine 5GB große Datei, in der wir private
 Daten wie Bilder und Dokumente ablegen könnten:
 </p>
-<pre><b>#</b> dd if=/dev/urandom of=/home/michael/privat.crypt bs=1024 count=5242880
+
+<pre># dd if=/dev/urandom of=/home/michael/privat.crypt bs=1024 count=5242880
 5242880+0 records in
 5242880+0 records out</pre>
+
 <p>
 In die Datei werden also Zufallswerte aus <code>/dev/urandom</code> gelesen,
 davon 5242880 * 1024 Stück, also 5GB. In der Beispielausgabe fehlt eine Zeile,
 in der <code>dd</code> angibt, wieviel Bytes das nun waren und wielange das
 gedauert hat (Ich habe bei mir das System mit anderen Werten aufgesetzt…).
 </p>
+
 <p>
 Vor diese Datei klemmen wir nun das Loopdevice <code>/dev/loop0</code> (0-9
 stehen zur Verfügung):
 </p>
-<pre><b>#</b> losetup /dev/loop0 /home/michael/privat.crypt</pre>
+<pre># losetup /dev/loop0 /home/michael/privat.crypt</pre>
 <p>
 Und schließlich verschlüsseln wir sie wie in Abschnitt 2:
 </p>
-<pre><b>#</b> cryptsetup -c blowfish-cbc-essiv:sha256 -y -s 256 luksFormat /dev/loop0
+
+<pre><code># cryptsetup -c blowfish-cbc-essiv:sha256 -y -s 256 luksFormat /dev/loop0
 
 WARNING!
 ========
@@ -396,15 +507,17 @@ Are you sure? (Type uppercase yes): YES
 Enter LUKS passphrase:
 Verify passphrase:
 Command successful.
-<b>#</b> cryptsetup luksOpen /dev/loop0 privat
+# cryptsetup luksOpen /dev/loop0 privat
 Enter LUKS passphrase:
 key slot 0 unlocked.
 Command successful.
-<b>#</b> mkfs.ext3 /dev/mapper/privat
-<b>#</b> mkdir /home/michael/privat/
-<b>#</b> mount /dev/mapper/privat /home/michael/privat</pre>
+# mkfs.ext3 /dev/mapper/privat
+# mkdir /home/michael/privat/
+# mount /dev/mapper/privat /home/michael/privat
+</code></pre>
 
-<h3>4.) Swapspace verschlüsseln</h3>
+<h2 id="4-swapspace-verschlüsseln">4.) Swapspace verschlüsseln</h2>
+
 <p>
 Hierfür müssen die Module wie unter Abschnitt erwähnt automatisch geladen werden.
 </p>
@@ -438,8 +551,9 @@ In der <code>/etc/fstab</code> muss „/dev/hda3” durch „/dev/mapper/swap”
 ersetzt werden.
 </p>
 
-<p><h3>5.) Mögliche Fehlermeldungen</h3>
-<pre>Failed to setup dm-crypt key mapping.
+<h2 id="5-mögliche-fehlermeldungen">5.) Mögliche Fehlermeldungen</h2>
+
+<p><pre>Failed to setup dm-crypt key mapping.
 Check kernel for support for the blowfish-cbc-essiv:sha256 cipher spec and verify
 that /dev/hda2 contains at least 258 sectors.
 Failed to write to key storage.</pre>
@@ -448,9 +562,37 @@ Failed to write to key storage.</pre>
 nicht geladen, siehe Abschnitt 1.1.
 </p></p>
 
-	  </div>
-	</div>
+</div>
+
       </div>
-    </div>
-  </body>
+<div id="ms_toc">
+  <div>
+    <strong>Table Of Contents</strong>
+
+    <nav class="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#1-das-system-vorbereiten">1) Das System vorbereiten</a>
+<ul>
+<li><a href="#1-1-module">1.1) Module</a></li>
+<li><a href="#1-2-hilfsprogramme">1.2) Hilfsprogramme</a></li>
+</ul></li>
+<li><a href="#2-komplette-partition-verschlüsseln">2.) Komplette Partition verschlüsseln</a>
+<ul>
+<li><a href="#2-1-die-partition-wieder-aushängen">2.1) Die Partition wieder aushängen</a></li>
+</ul></li>
+<li><a href="#3-einen-verschlüsselten-container-erstellen">3.) Einen verschlüsselten Container erstellen</a></li>
+<li><a href="#4-swapspace-verschlüsseln">4.) Swapspace verschlüsseln</a></li>
+<li><a href="#5-mögliche-fehlermeldungen">5.) Mögliche Fehlermeldungen</a></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    </main><div id="ms_footer">
+  © 2020 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
 </html>

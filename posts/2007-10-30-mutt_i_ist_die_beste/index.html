@@ -1,111 +1,227 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Konsolen-Mailprogramm mutt-ng einrichten - Michael Stapelberg</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <meta name="description" content="Worum geht’s?  Diesmal geht es um das Einrichten und Benutzen des Kommandozeilen-Mailclients mutt-ng (Weiterentwicklung von mutt). Als System kommt Linux zum Einsatz, prinzipiell sollte es jedoch auf allen unixoiden Systemen funktionieren, ich habe sogar mal von einer Portierung von mutt für Windows gehört… (das soll nicht heißen, dass Windows unixoid sei, im Gegenteil!">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2007-10-30-mutt_i_ist_die_beste/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
 
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Konsolen-Mailprogramm mutt-ng einrichten</title>
-    <meta name="viewport" content="width=device-width">
-    <link rel="shortcut icon" href="/favicon.ico" />
-    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
-    <link rel="canonical" href="https://michael.stapelberg.ch/posts/2007-10-30-mutt_i_ist_die_beste/">
-    <meta name="author" content="Michael Stapelberg">
-    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
-    <style type="text/css">
-@font-face {
-  font-family: 'Yanone Kaffeesatz Regular';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
 
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: normal;
-  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
 
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: bold;
-  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
 
-body, td, th {
-  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  color: #000;
-} 
-    </style>
-    <link rel="stylesheet" href="/2.css" type="text/css">
-    
-    <link rel="stylesheet" href="/1.min.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2">
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2">
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
 
 
-  <body>
-    <div class="container-fluid">
-      <div class="row">
-	<div id="menu" class="col-md-2">
-  <div style="display: flex; align-items: center">
-    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
-    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
   </div>
 
-  <ul class="menu_open">
-    <li><a class="menu_item" href="/"><span class="menu_title">About</span></a></li>
-    <li><a class="menu_item" href="/posts/"><span class="menu_title">Blog</span></a></li>
-    <li><span class="menu_title">Programs</span>
-      <div class="subitem">
-	<ul class="menu_open">
-	  <li><a class="menu_item" href="https://gokrazy.org/"><span class="menu_title">gokrazy</span></a></li>
-	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
-	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
-	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
-	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
-	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
-	</ul>
-      </div>
-    </li>
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
 
-    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
-      <div class="subitem">
-	<ul class="menu_open">
-	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
-	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
-	</ul>
-      </div>
-    </li>
+  <input type="checkbox" id="ms_burger">
 
-    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
-    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
-  </ul>
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div>
+<h1 class="ms_title">Konsolen-Mailprogramm mutt-ng einrichten</h1>
+<div class="ms_meta">
+  <div id="ms_date">published 2007-10-30, last modified 2020-11-21</div>
+  
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2007-10-30-Mutt_i_ist_die_Beste.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
 </div>
+<div class="Artikel" id="content">
+  <style type="text/css">
+    .TableOfContents > ul, .TableOfContents > ul > li > ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+    }
+    .TableOfContents li {
+	margin-bottom: 1rem;
+    }
+  </style>
+  <details class="ms_toc_details">
+    <summary>Table of contents</summary>
+    <nav class="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#worum-geht-s">Worum geht’s?</a>
+<ul>
+<li><a href="#kommandozeile">Kommandozeile?</a></li>
+</ul></li>
+<li><a href="#installation">1.) Installation</a></li>
+<li><a href="#einrichtung">2.) Einrichtung</a>
+<ul>
+<li><a href="#ohneimap">2.1) Ohne eigenen IMAP-Server</a></li>
+<li><a href="#mitimap">2.2) Eigener IMAP-Server</a></li>
+</ul></li>
+<li><a href="#config">3.) Konfiguration</a>
+<ul>
+<li><a href="#pgp">3.2) PGP</a></li>
+<li><a href="#pgpgenkey">3.2.1) Schlüssel erstellen</a></li>
+<li><a href="#pgppubkey">3.2.2) Schlüssel veröffentlichen</a></li>
+</ul></li>
+<li><a href="#benutzung">4.) Benutzung</a>
+<ul>
+<li><a href="#benutzung_lesen">4.1) Mails lesen</a></li>
+<li><a href="#benutzung_schreiben">4.2) Mails beantworten/schreiben</a></li>
+<li><a href="#benutzung_suchen">4.3) Mails suchen</a></li>
+<li><a href="#benutzung_vermischtes">4.4) Vermischtes</a></li>
+</ul></li>
+<li><a href="#links">5.) Weiterführende Links</a></li>
+</ul></li>
+</ul>
+</nav>
+  </details>
+  
 
-	<div id="contentBox" class="col-md-10">
-	  <h2 class="title">Konsolen-Mailprogramm mutt-ng einrichten</h2>
-	  <div style="margin-bottom: 2em">
-	    <span id="date">published 2007-10-30, last modified 2018-03-18</span>
-	    
-	  
-	  <span style="padding-left: 0.1em; padding-right: 0.1em; margin-left: .5em; margin-right: .5em"><a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2007-10-30-Mutt_i_ist_die_Beste.markdown"><img src="../../Bilder/pen-square-solid.svg" style="height: 1.25em"></a></span>
-	  
-	  </div>
-	  <div class="Artikel" id="content">
-	    <style type="text/css">
-	      #TableOfContents > ul, #TableOfContents > ul > li > ul {
-		  list-style: none;
-		  margin: 0;
-		  padding: 0;
-	      }
-	    </style>
-	    <details style="margin-bottom: 2em">
-	      <summary>Table of contents</summary>
-	      
-	    </details>
-	    <div class="visiblelinks">
-<h3>Worum geht’s?</h3>
+<h2 id="worum-geht-s">Worum geht’s?</h2>
+
 <p>
 Diesmal geht es um das Einrichten und Benutzen des Kommandozeilen-Mailclients
 <code>mutt-ng</code> (Weiterentwicklung von <code>mutt</code>). Als System
@@ -122,7 +238,8 @@ das effizient zu synchronisieren und eventuell auch gerne mal von einem
 beliebigen anderen Rechner meine Mails beantworten möchte…
 </p>
 
-<h3>Kommandozeile?</h3>
+<h3 id="kommandozeile">Kommandozeile?</h3>
+
 <p>
 Ja, <code>mutt-ng</code> hat keine grafische Oberfläche und das macht ihn um
 einiges flexibler als andere Mailclients – auch in der allgemeinen Flexibilität
@@ -143,47 +260,22 @@ Tastatur nach einer gewissen Eingewöhnungsphase schneller, als wenn man dauernd
 mit der Maus umhersuchen muss.
 </p>
 
-<p>
-Zu den Abbildungen: Die Bildschirmfotos wurden gemacht, als
+<p>Zu den Abbildungen: Die Bildschirmfotos wurden gemacht, als
 <code>mutt-ng</code> in einer <a href="http://de.wikipedia.org/wiki/GNU_Screen"
 title="Wikipedia: GNU screen" target="_blank"><code>screen</code></a>-Session
 (daher kommt die zusätzliche Zeile ganz unten) lief. Zu sehen ist die
 lojban-beginners-Mailingliste. Da es sich hier um ein Konsolenprogramm handelt,
 liegt es in der Natur der Sache, dass man auf den Vorschauversionen der
-Abbildungen eigentlich nur schwarz sieht ;-).
-</p>
+Abbildungen eigentlich nur schwarz sieht ;-).</p>
 
-<h3>Inhaltsverzeichnis</h3>
+<h2 id="installation">1.) Installation</h2>
 
-<div class="toc">
-<ul>
-    <li class="level1"><a href="#installation">1.) Installation von mutt-ng</a></li>
-    <li class="level1"><a href="#einrichtung">2.) Einrichtung von procmail, fetchmail (und cyrus-imapd)</a></li>
-        <li class="level2"><a href="#ohneimap">2.1) ohne IMAP-Server</a></li>
-        <li class="level2"><a href="#mitimap">2.2) Eigener IMAP-Server</a></li>
-    <li class="level1"><a href="#config">3.) Konfiguration von mutt-ng</a></li>
-        <li class="level2"><a href="#pgp">3.1) PGP</a></li>
-        <li class="level2"><a href="#pgpgenkey">3.1.1) Schlüssel erstellen</a></li>
-
-        <li class="level2"><a href="#pgppubkey">3.1.2) Schlüssel veröffentlichen</a></li>
-    <li class="level1"><a href="#benutzung">4.) Benutzung</a></li>
-        <li class="level2"><a href="#benutzung_lesen">4.1) Mails lesen</a></li>
-        <li class="level2"><a href="#benutzung_schreiben">4.2) Mails beantworten/schreiben</a></li>
-        <li class="level2"><a href="#benutzung_suchen">4.3) Mails suchen</a></li>
-        <li class="level2"><a href="#benutzung_vermischtes">4.4) Vermischtes</a></li>
-    <li class="level1"><a href="#links">5.) Weiterführende Links</li>
-</ul>
-</div>
-
-<h3><a name="installation">1.) Installation</a></h3>
-<p>
-<code>mutt-ng</code> ist zur Zeit noch in Entwicklung aber durchaus benutzbar.
+<p><code>mutt-ng</code> ist zur Zeit noch in Entwicklung aber durchaus benutzbar.
 Die aktuelle Version kann man sich aus dem CVS laden, einen täglichen Snapshot
 gibt’s unter <a href="http://nion.modprobe.de/mutt-ng/snapshots/"
 title="mutt-ng snapshots">http://nion.modprobe.de/mutt-ng/snapshots/</a>. Ich
 persönlich benutze den Snapshot vom 27.03.2006 (mittlerweile ziemlich alt, aber
-er funktioniert gut).
-</p>
+er funktioniert gut).</p>
 
 <p>
 Die Installation selbst verläuft wie bei den meisten anderen Linuxprogrammen,
@@ -223,7 +315,8 @@ Nachdem <code>configure</code> fertig ist, kann man mit <code>make &amp;&amp;
 make install</code> mutt kompilieren und installieren</code>.
 </p>
 
-<h3><a name="einrichtung">2.) Einrichtung</a></h3>
+<h2 id="einrichtung">2.) Einrichtung</h2>
+
 <p>
 OK, ab hier wird’s kompliziert ;-). Ich persönlich habe mich dafür entschieden,
 einen eigenen IMAP-Server aufzusetzen, damit ich zur Not auch mit anderen
@@ -285,7 +378,8 @@ Hinweis: Wenn man einen eigenen IMAP-Server verwendet, kann man die Zeile mit
 ohnehin so anpassen werden, dass er <code>procmail</code> benutzt.
 </p>
 
-<h4><a name="ohneimap">2.1) Ohne eigenen IMAP-Server</a></h4>
+<h3 id="ohneimap">2.1) Ohne eigenen IMAP-Server</h3>
+
 <p>
 Wir werden nun <code>procmail</code> einrichten und im nächsten Abschnitt
 schließlich <code>mutt-ng</code> in Betrieb nehmen. Hier direkt ’mal meine
@@ -327,7 +421,8 @@ dieser Stelle nicht eingehen, gerade auch zur Spamvermeidung gibt’s da schon
 einige Websites im Netz, die sich damit befassen.
 </p>
 
-<h4><a name="mitimap">2.2) Eigener IMAP-Server</a></h4>
+<h3 id="mitimap">2.2) Eigener IMAP-Server</h3>
+
 <p>
 Mit einem eigenen IMAP-Server fungieren wir wie ein kleiner E-Mailprovider –
 nur eben lokal. Das bedeutet, dass sich andere Rechner mit dem Server verbinden
@@ -396,12 +491,13 @@ So, das war’s auch schon. Nun müssen wir nur noch <code>procmail</code> selbs
 einrichten, die Konfiguration für einen IMAP-Server unterscheidet sich leicht
 von der obigen.
 </p>
-<pre>DELIVERMAIL="/usr/sbin/cyrdeliver"
-LOGFILE="/var/log/mail/procmail.log"
-DEFAULT="$DELIVERMAIL -e -a $LOGNAME -m user.$LOGNAME"
-PRIVAT="$DELIVERMAIL -e -a $LOGNAME -m user.$LOGNAME.privat"
-FIRMA="$DELIVERMAIL -e -a $LOGNAME -m user.$LOGNAME.firma"
-FREUNDE="$DELIVERMAIL -e -a $LOGNAME -m user.$LOGNAME.freunde"
+
+<pre><code>DELIVERMAIL=&quot;/usr/sbin/cyrdeliver&quot;
+LOGFILE=&quot;/var/log/mail/procmail.log&quot;
+DEFAULT=&quot;$DELIVERMAIL -e -a $LOGNAME -m user.$LOGNAME&quot;
+PRIVAT=&quot;$DELIVERMAIL -e -a $LOGNAME -m user.$LOGNAME.privat&quot;
+FIRMA=&quot;$DELIVERMAIL -e -a $LOGNAME -m user.$LOGNAME.firma&quot;
+FREUNDE=&quot;$DELIVERMAIL -e -a $LOGNAME -m user.$LOGNAME.freunde&quot;
 VERBOSE=off
 
 :0 w
@@ -423,11 +519,12 @@ VERBOSE=off
 # Wir loggen das Ergebnis der Zustellung:
 :0 w
 {
-    EXITCODE=$?
-    HOST
-}</pre>
+	EXITCODE=$?
+	HOST
+}
+</code></pre>
 
-<h3><a name="config">3.) Konfiguration</a></h3>
+<h2 id="config">3.) Konfiguration</h2>
 
 <p>
 Ich werde hier auf meine Konfiguration eingehen, das heißt, welche Optionen ich
@@ -441,7 +538,6 @@ Klartext abgelegt werden, sollte sie nur für den Benutzer lesbar sein
 (<code>chmod 600 ~/.muttngrc</code>).</strong>
 </p>
 
-<div style="border: 1px solid black; padding: 5px; background-color: #C0C0C0">
 <h4>Allgemeine Einstellungen</h4>
 
 <p><code>set pager_context=1</code><br>
@@ -615,7 +711,8 @@ Mail nicht gesetzt sind, werden sie garnicht angezeigt) geordnet.</p>
 
 
 <h4>Farben</h4>
-<pre>color normal     white          black   # Normaler Text
+
+<pre><code>color normal     white          black   # Normaler Text
 color indicator  black          red     # Die ausgewählte Nachricht
 color tree       red            black   # Die Pfeile, die einen Thread zusammenhalten
 color status     brightyellow   blue    # Die Statuszeile
@@ -642,38 +739,40 @@ color quoted9    blue           black
 #
 #     object     foreground backg.   RegExp
 #
-color header     green      black  "^(Subject):"
-color header     red        black  "^(From|X-Mailer|To|Cc|Reply-To|Date):"
-color body       black      white    "((ftp|http|https)://|(file|mailto|news):|www\\.)[-a-z0-9_.:]*
-[a-z0-9](/[^][{} \t\n\r\"&lt;&gt;()]*[^][{} \t\n\r\"&lt;&gt;().,:!])?/?"
-color body       green      black  "((;|:|8\\:|\\=)(-|=|~|_|-'|%|&lt;|)(\\)|Q|P|\\)%))"
-color body       cyan       black  "[-a-z_0-9.+]+@[-a-z_0-9.]+"
-color body       red        black  "(^| )\\*[-a-z0-9*]+\\*[,.?]?[ \n]"
-color body       green      black  "(^| )_[-a-z0-9_]+_[,.?]?[ \n]"
+color header     green      black  &quot;^(Subject):&quot;
+color header     red        black  &quot;^(From|X-Mailer|To|Cc|Reply-To|Date):&quot;
+color body       black      white    &quot;((ftp|http|https)://|(file|mailto|news):|www\\.)[-a-z0-9_.:]*
+[a-z0-9](/[^][{} \t\n\r\&quot;&amp;lt;&amp;gt;()]*[^][{} \t\n\r\&quot;&amp;lt;&amp;gt;().,:!])?/?&quot;
+color body       green      black  &quot;((;|:|8\\:|\\=)(-|=|~|_|-'|%|&amp;lt;|)(\\)|Q|P|\\)%))&quot;
+color body       cyan       black  &quot;[-a-z_0-9.+]+@[-a-z_0-9.]+&quot;
+color body       red        black  &quot;(^| )\\*[-a-z0-9*]+\\*[,.?]?[ \n]&quot;
+color body       green      black  &quot;(^| )_[-a-z0-9_]+_[,.?]?[ \n]&quot;
 color index      blue       black  ~F           # geflagged Nachrichte
 color index      red        black  ~N           # Neue Nachrichten
 color index      magenta    black  ~T           # getaggte Nachrichten
 color index      yellow     black  ~D           # Nachrichten, die als gelöscht
-                                                # markiert sind</pre>
+                                                # markiert sind
+</code></pre>
+
 <p>
 Diese Farbkonfiguration stammt von <a
 href="http://liesdiemanpage.de/index.php?content=linux%2Fmutt"
 title="liesdiemanpage.de">liesdiemanpage.de</a>.
 </p>
 
-<h4>Titelleiste</h4>
+<p><h4>Titelleiste</h4>
 <p><code>set xterm_set_titles=yes</code><br>
-Aktiviert das Setzen der Titelzeile.</p>
+Aktiviert das Setzen der Titelzeile.</p></p>
 
 <p><code>set xterm_title="muttng [new: %n c/%b o]"</code><br>
 Legt das Format der Titelzeile fest.</p>
 
-<h4>Tastenbelegung</h4>
+<p><h4>Tastenbelegung</h4>
 <p><code>bind index \CP sidebar-prev</code><br>
 <code>bind pager \CP sidebar-prev</code><br>
 Steuerung (Ctrl) und P (Groß-/Kleinschreibung ist hierbei nicht relevant) wählt
 den vorhergehenden Eintrag der Sidebar aus, und das sowohl in der
-Index-Ansicht, als auch im Pager.</p>
+Index-Ansicht, als auch im Pager.</p></p>
 
 <p><code>bind index \CN sidebar-next</code><br>
 <code>bind pager \CN sidebar-next</code><br>
@@ -689,9 +788,9 @@ Groß-P löscht die ausgewählte Mail sofort (hier ist Groß-/Kleinschreibung wi
 <p><code>bind pager h display-toggle-weed</code><br>
 h blendet die kompletten Header ein- oder aus.</p>
 
-<h4>Reguläre Ausdrücke</h4>
-<p><code>set quote_regexp="^( {0,4}[&gt;|:%]| {0,4}[a-z0-9]+[&gt;|]+)+"</code><br>
-Erkennt Zitate um sie richtig einfärben zu können.</p>
+<p><h4>Reguläre Ausdrücke</h4>
+<p><code>set quote_regexp=&quot;^( {0,4}[&gt;|:%]| {0,4}[a-z0-9]+[&gt;|]+)+&quot;</code><br>
+Erkennt Zitate um sie richtig einfärben zu können.</p></p>
 
 <p><code>set smileys="((:|\\(|;|=)(-|=|-'|%)(\\)|:|\\=))"</code><br>
 Erkennt Smilies wie <code>:-)</code>, <code>%-(</code> und so weiter…</p>
@@ -701,16 +800,16 @@ Wandelt bei Antworten alle überflüssigen AW, Re, ANTWORT, WG, FWD, etc in ein
 simples „Re:” um - besonders nützlich, wenn man mit Outlook-Benutzern
 kommuniziert.</p>
 
-<h4>Mailinglisten</h4>
+<p><h4>Mailinglisten</h4>
 <p><code>subscribe lojban-beginners</code><br>
 Sagt <code>muttng</code>, dass man die Mailingliste
 <code>lojban-beginners</code> abonniert hat. Dadurch funktioniert der
 Reply-to-Befehl und <code>muttng</code> setzt den
-<code>followup-to</code>-Header richtig.</p>
+<code>followup-to</code>-Header richtig.</p></p>
 
-<h4>GPG-Einstellungen</h4>
+<p><h4>GPG-Einstellungen</h4>
 <p><code>source ~/.muttng/gpg.rc</code><br>
-Bindet die mitgelieferten Standardwerte mit ein (Die GnuPG aufrufen).</p>
+Bindet die mitgelieferten Standardwerte mit ein (Die GnuPG aufrufen).</p></p>
 
 <p><code>unset crypt_autosign</code><br>
 <code>unset crypt_autoencrypt</code><br>
@@ -729,69 +828,78 @@ Signieren verwendet.</p>
 Die komplette Konfiguration könnt ihr euch <a href="/Config/muttngrc"
 title="mutt-ng-Config">hier herunterladen</a>.
 </p>
-<h4><a name="pgp">3.2) PGP</a></h4>
+
+<h3 id="pgp">3.2) PGP</h3>
+
 <p>
 Selbstverständlich hat mutt auch PGP-Unterstützung, sodass man signierte und
 verschlüsselte Mails versenden kann. Dazu verwendet man in der Regel GNUPG,
 kurz GPG. Sollte GPG noch nicht installiert sein, kann man dies mit folgendem
 Befehl nachholen:
 </p>
-<pre>$ apt-get install gnupg</pre>
-<h5><a name="pgpgenkey">3.2.1) Schlüssel erstellen</a></h5>
-<pre>$ gpg --gen-key
+
+<pre><code>$ apt-get install gnupg
+</code></pre>
+
+<h3 id="pgpgenkey">3.2.1) Schlüssel erstellen</h3>
+
+<p><pre>$ gpg --gen-key
 Bitte wählen Sie, welche Art von Schlüssel Sie möchten:
    (1) DSA und ElGamal (voreingestellt)
    (2) DSA (nur signieren/beglaubigen)
    (4) ElGamal (signieren/beglaubigen und verschlüsseln)
-Ihre Auswahl? <b>1</b>
+Ihre Auswahl? <b>1</b></p>
 
-Der DSA Schlüssel wird 1024 Bits haben.
+<p>Der DSA Schlüssel wird 1024 Bits haben.
 Es wird ein neues ELG-E Schlüsselpaar erzeugt.
               kleinste Schlüssellänge ist  768 Bit
               standard Schlüssellänge ist 1024 Bit
       größte sinnvolle Schlüssellänge ist 2048 Bit
-Welche Schlüssellänge wünschen Sie? (1024) <b>2048</b>
+Welche Schlüssellänge wünschen Sie? (1024) <b>2048</b></p>
 
-Bitte wählen Sie, wie lange der Schlüssel gültig bleiben soll.
+<p>Bitte wählen Sie, wie lange der Schlüssel gültig bleiben soll.
          0 = Schlüssel verfällt nie
       <n>  = Schlüssel verfällt nach n Tagen
       <n>w = Schlüssel verfällt nach n Wochen
       <n>m = Schlüssel verfällt nach n Monaten
       <n>y = Schlüssel verfällt nach n Jahren
-Der Schlüssel bleibt wie lange gültig? (0) <b>5y</b>
+Der Schlüssel bleibt wie lange gültig? (0) <b>5y</b></p>
 
-Sie benötigen eine User-ID, um Ihren Schlüssel eindeutig zu machen; das
+<p>Sie benötigen eine User-ID, um Ihren Schlüssel eindeutig zu machen; das
 Programm baut diese User-ID aus Ihrem echten Namen, einem Kommentar und
 Ihrer E-Mail-Adresse in dieser Form auf:
-    ``Heinrich Heine (Der Dichter) &lt;heinrichh@duesseldorf.de&gt;''
+    ``Heinrich Heine (Der Dichter) &lt;heinrichh@duesseldorf.de&gt;''</p>
 
-Ihr Name (``Vorname Nachname''): <b>Michael Stapelberg &lt;michael@nospamplease.de&gt;</b>
+<p>Ihr Name (``Vorname Nachname''): <b>Michael Stapelberg &lt;michael@nospamplease.de&gt;</b></p>
 
-Sie benötigen ein Mantra, um den geheimen Schlüssel zu schützen.
+<p>Sie benötigen ein Mantra, um den geheimen Schlüssel zu schützen.</p>
 
-Geben Sie das Mantra ein:</pre>
+<p>Geben Sie das Mantra ein:</pre>
 <p>
 (Das Mantra sollte ein für Fremde schwer zu erratender, aber für einen selbst
 leicht zu merkender, ausreichend langer Satz sein – ca 20 Zeichen sollten
 genügen.)
-</p>
-<h5><a name="pgppubkey">3.2.2) Schlüssel veröffentlichen</a></h5>
+</p></p>
+
+<h3 id="pgppubkey">3.2.2) Schlüssel veröffentlichen</h3>
+
 <p>
 Mit <code>gpg -K</code> kann man sich alle Schlüssel im geheimen Schlüsselbund
 anzeigen lassen. In der ersten Zeile sieht man auch die ID, die wir nachher im
 GPG-Teil der mutt-Konfiguration verwenden werden:
 </p>
-<pre>pub   1024D/<b>65B790C2</b> 2006-07-24 [expires: 2011-07-23]</pre>
-<p>
-&nbsp;
-</p>
+
+<pre><code>pub   1024D/65B790C2 2006-07-24 [expires: 2011-07-23]
+</code></pre>
+
 <p>
 Nun kopieren wir uns noch die Standard-GPG-Konfiguration aus
 <code>contrib/gpg.rc</code> in dem Verzeichnis in dem der mutt-ng-Quelltext
 liegt in unser Konfigurationsverzeichnis.
 </p>
 
-<p><h3><a name="benutzung">4.) Benutzung</a></h3>
+<h2 id="benutzung">4.) Benutzung</h2>
+
 <p>
 Die meiste Zeit wird man vermutlich Mails lesen, beantworten und verzweifelt
 nach Mails suchen ;-), daher habe ich diesen Abschnitt in die entsprechenden
@@ -799,7 +907,7 @@ Kapitel unterteilt. Übrigens: In jeder Ansicht sind kontextabhängige
 Erklärungen der wichtigsten Befehle unten eingeblendet, über die
 <code>?</code>-Taste kommt man zu einer ausführlichen Erklärung, die man dann
 mit <code>q</code> wieder schließen kann.
-</p></p>
+</p>
 
 <p>
 Hinweis: Diese Beschreibung ist natürlich nur die Spitze des Eisbergs, für eine
@@ -808,8 +916,9 @@ href="http://mutt-ng.berlios.de/manual/getting-started.html"
 title="mutt-ng-Handbuch">mutt-ng-Handbuch</a> zu Rate ziehen.
 </p>
 
-<p><h4><a name="benutzung_lesen">4.1) Mails lesen</a></h4>
-<div style="float: left" class="pictureLink"><a href="/Bilder/mutt-ng/mutt_overview.png" title="Bild „Übersicht” öffnen"><img alt="Vorschau: Übersicht" src="/Bilder/mutt-ng/thumbs/mutt_overview.png" border="0"></a><br><small><i>Abb.: Übersicht</i></small></div></p>
+<h3 id="benutzung_lesen">4.1) Mails lesen</h3>
+
+<div style="float: left"><a href="/Bilder/mutt-ng/mutt_overview.png" title="Bild „Übersicht” öffnen"><img alt="Vorschau: Übersicht" src="/Bilder/mutt-ng/thumbs/mutt_overview.png" border="0" style="margin-right: 1em"></a><br><small><i>Abb.: Übersicht</i></small></div>
 
 <p>
 In der Nachrichtenübersicht (siehe Abbildung links) werden soviele Nachrichten
@@ -829,8 +938,10 @@ eine Seite zurück. Die <code>Page Up/Page Dn</code>-Tasten funktionieren
 ebenfalls.
 </p>
 
-<p><h4><a name="benutzung_schreiben">4.2) Mails beantworten/schreiben</a></h4>
-<div style="float: right" class="pictureLink"><a href="/Bilder/mutt-ng/mutt_reply.png" title="Bild „Schreiben” öffnen"><img alt="Vorschau: Schreiben" src="/Bilder/mutt-ng/thumbs/mutt_reply.png" border="0"></a><br><small><i>Abb.: Schreiben</i></small></div>
+<h3 id="benutzung_schreiben">4.2) Mails beantworten/schreiben</h3>
+
+<div style="float: right"><a href="/Bilder/mutt-ng/mutt_reply.png" title="Bild „Schreiben” öffnen"><img alt="Vorschau: Schreiben" src="/Bilder/mutt-ng/thumbs/mutt_reply.png" border="0" style="margin-right: 1em"></a><br><small><i>Abb.: Schreiben</i></small></div>
+
 <p>
 Sowohl im Pager als auch in der Nachrichtenübersicht kann man der Taste
 <code>r</code> eine Mail beantworten. Es öffnet sich dann direkt der
@@ -840,9 +951,10 @@ ins <a href="/Bilder/mutt-ng/mutt_send.png" title="Bildschirmfoto:
 Absendefenster" target="_blank">übliche Fenster zum Absenden der Mail
 (Bildschirmfoto)</a>. Dort kann man gegebenenfalls Empfänger hinzufügen oder
 den Titel verändern.
-</p></p>
+</p>
 
-<p><h4><a name="benutzung_suchen">4.3) Mails suchen</a></h4>
+<h3 id="benutzung_suchen">4.3) Mails suchen</h3>
+
 <p>
 <strong>Filtern</strong>: Da wir bei der Installation die <a
 href="http://mutt-ng.berlios.de/manual/advanced-usage.html#advanced-regexp"
@@ -852,7 +964,7 @@ haben, können wir diese nun verwenden. Mit <code>l</code> (kleines L) fragt
 die diesem Filter entsprechen Dieser kann ein einfaches Wort, oder eben ein
 regulärer Ausdruck sein. Wenn man „all” eingibt, werden wieder alle Mails
 angezeigt.
-</p></p>
+</p>
 
 <p>
 <strong>Suchen</strong>: Wie in den meisten Ansichten kann man mit
@@ -862,7 +974,8 @@ erneut, diesmal mit dem vorher gesuchten Text. Dadurch kann man mit
 <code>Enter</code> bestätigen und kommt zum nächsten Treffer.
 </p>
 
-<p><h4><a name="benutzung_vermischtes">4.4) Vermischtes</a></h4>
+<h3 id="benutzung_vermischtes">4.4) Vermischtes</h3>
+
 <ul>
     <li>
     <strong>Mails löschen</strong>: <code>D</code>
@@ -873,19 +986,60 @@ erneut, diesmal mit dem vorher gesuchten Text. Dadurch kann man mit
     Nachricht drücken und dann <code>Enter</code> drücken. Anschließend
     kann man mit <code>u</code> das Löschen rückgängig machen.
     </li>
-</ul></p>
+</ul>
 
-<p><h3><a name="links">5.) Weiterführende Links</a></h3>
-<ul>
+<h2 id="links">5.) Weiterführende Links</h2>
+
+<p><ul>
     <li><a href="http://mutt.sourceforge.net/imap/">mutt-Beschreibung zu IMAP</a></li>
     <li><a href="http://mutt-ng.supersized.org/">mutt-ng development blog</a> mit Informationen über den Status des Projekts</li>
     <li><a href="http://mutt-ng.berlios.de/manual/">mutt-ng-Handbuch</a></li>
 </ul>
 </div></p>
 
-	  </div>
-	</div>
+</div>
+
       </div>
-    </div>
-  </body>
+<div id="ms_toc">
+  <div>
+    <strong>Table Of Contents</strong>
+
+    <nav class="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#worum-geht-s">Worum geht’s?</a>
+<ul>
+<li><a href="#kommandozeile">Kommandozeile?</a></li>
+</ul></li>
+<li><a href="#installation">1.) Installation</a></li>
+<li><a href="#einrichtung">2.) Einrichtung</a>
+<ul>
+<li><a href="#ohneimap">2.1) Ohne eigenen IMAP-Server</a></li>
+<li><a href="#mitimap">2.2) Eigener IMAP-Server</a></li>
+</ul></li>
+<li><a href="#config">3.) Konfiguration</a>
+<ul>
+<li><a href="#pgp">3.2) PGP</a></li>
+<li><a href="#pgpgenkey">3.2.1) Schlüssel erstellen</a></li>
+<li><a href="#pgppubkey">3.2.2) Schlüssel veröffentlichen</a></li>
+</ul></li>
+<li><a href="#benutzung">4.) Benutzung</a>
+<ul>
+<li><a href="#benutzung_lesen">4.1) Mails lesen</a></li>
+<li><a href="#benutzung_schreiben">4.2) Mails beantworten/schreiben</a></li>
+<li><a href="#benutzung_suchen">4.3) Mails suchen</a></li>
+<li><a href="#benutzung_vermischtes">4.4) Vermischtes</a></li>
+</ul></li>
+<li><a href="#links">5.) Weiterführende Links</a></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    </main><div id="ms_footer">
+  © 2020 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
 </html>

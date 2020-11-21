@@ -1,106 +1,189 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>golang: types such as []uint32 and cgo - Michael Stapelberg</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <meta name="description" content="There is official documentation on the Go C language interface (or cgo in golang terminology), but the things it covers are relatively simple. I have used cgo recently in a real-world project and I want to share my experiences in this short article, that is, how to use types properly (avoiding the void* equivalent unsafe.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2012-09-27-cgo_uint32/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
 
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>golang: types such as []uint32 and cgo</title>
-    <meta name="viewport" content="width=device-width">
-    <link rel="shortcut icon" href="/favicon.ico" />
-    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
-    <link rel="canonical" href="https://michael.stapelberg.ch/posts/2012-09-27-cgo_uint32/">
-    <meta name="author" content="Michael Stapelberg">
-    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
-    <style type="text/css">
-@font-face {
-  font-family: 'Yanone Kaffeesatz Regular';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
 
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: normal;
-  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
 
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: bold;
-  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
 
-body, td, th {
-  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  color: #000;
-} 
-    </style>
-    <link rel="stylesheet" href="/2.css" type="text/css">
-    
-    <link rel="stylesheet" href="/1.min.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2">
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2">
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
 
 
-  <body>
-    <div class="container-fluid">
-      <div class="row">
-	<div id="menu" class="col-md-2">
-  <div style="display: flex; align-items: center">
-    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
-    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
   </div>
 
-  <ul class="menu_open">
-    <li><a class="menu_item" href="/"><span class="menu_title">About</span></a></li>
-    <li><a class="menu_item" href="/posts/"><span class="menu_title">Blog</span></a></li>
-    <li><span class="menu_title">Programs</span>
-      <div class="subitem">
-	<ul class="menu_open">
-	  <li><a class="menu_item" href="https://gokrazy.org/"><span class="menu_title">gokrazy</span></a></li>
-	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
-	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
-	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
-	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
-	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
-	</ul>
-      </div>
-    </li>
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
 
-    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
-      <div class="subitem">
-	<ul class="menu_open">
-	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
-	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
-	</ul>
-      </div>
-    </li>
+  <input type="checkbox" id="ms_burger">
 
-    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
-    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
-  </ul>
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div>
+<h1 class="ms_title">golang: types such as []uint32 and cgo</h1>
+<div class="ms_meta">
+  <div id="ms_date">published 2012-09-27, last modified 2020-11-21</div>
+  
+  
+  <div id="ms_tags">
+  
+  in tag
+  
+  
+  <span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
+  
+  </div>
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2012-09-27-cgo_uint32.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
 </div>
-
-	<div id="contentBox" class="col-md-10">
-	  <h2 class="title">golang: types such as []uint32 and cgo</h2>
-	  <div style="margin-bottom: 2em">
-	    <span id="date">published 2012-09-27, last modified 2020-02-03</span>
-	    
-	  
-	  
-	  in tag
-	  
-	  
-	  <span class="tag"><a href="/posts/tags/golang/">golang</a></span>
-	  
-	  
-	  <span style="padding-left: 0.1em; padding-right: 0.1em; margin-left: .5em; margin-right: .5em"><a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2012-09-27-cgo_uint32.markdown"><img src="../../Bilder/pen-square-solid.svg" style="height: 1.25em"></a></span>
-	  
-	  </div>
-	  <div class="Artikel" id="content">
-	    <p>
+<div class="Artikel" id="content">
+  <p>
 There is <a href="http://golang.org/doc/articles/c_go_cgo.html">official
 documentation on the Go C language interface</a> (or <code>cgo</code> in golang
 terminology), but the things it covers are relatively simple. I have used cgo
@@ -115,18 +198,14 @@ Go’s data structures such as slices.
 <p>
 To make sure we’re on the same page, let’s consider this simple example:
 </p>
-
-<pre>
-package main
-import "fmt"
-func main() {
-    list := []int{23, 42, 17}
-    for idx, val := range list {
-        fmt.Printf("index %d: value %d\n", idx, val)
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">package</span> main
+<span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;fmt&#34;</span>
+<span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+    list <span style="color:#666">:=</span> []<span style="color:#902000">int</span>{<span style="color:#40a070">23</span>, <span style="color:#40a070">42</span>, <span style="color:#40a070">17</span>}
+    <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> list {
+        fmt.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;index %d: value %d\n&#34;</span>, idx, val)
     }
-}
-</pre>
-
+}</code></pre></div>
 <p>
 The output of that program is:
 </p>
@@ -143,69 +222,61 @@ index 2: value 17
 Let’s assume that we want to multiply all these numbers by 2. In Go, that’s
 pretty simple:
 </p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">package</span> main
+<span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;fmt&#34;</span>
 
-<pre>
-package main
-import "fmt"
-
-func multiply(input []int) []int {
-    // Create an output list with the same size
-    output := make([]int, len(input))
-    for idx, val := range input {
-        output[idx] = val * 2
+<span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">multiply</span>(input []<span style="color:#902000">int</span>) []<span style="color:#902000">int</span> {
+    <span style="color:#60a0b0;font-style:italic">// Create an output list with the same size
+</span><span style="color:#60a0b0;font-style:italic"></span>    output <span style="color:#666">:=</span> <span style="color:#007020">make</span>([]<span style="color:#902000">int</span>, <span style="color:#007020">len</span>(input))
+    <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> input {
+        output[idx] = val <span style="color:#666">*</span> <span style="color:#40a070">2</span>
     }
-    return output
+    <span style="color:#007020;font-weight:bold">return</span> output
 }
 
-func main() {
-    list := []int{23, 42, 17}
-    list = multiply(list)
-    for idx, val := range list {
-        fmt.Printf("index %d: value %d\n", idx, val)
+<span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+    list <span style="color:#666">:=</span> []<span style="color:#902000">int</span>{<span style="color:#40a070">23</span>, <span style="color:#40a070">42</span>, <span style="color:#40a070">17</span>}
+    list = <span style="color:#06287e">multiply</span>(list)
+    <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> list {
+        fmt.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;index %d: value %d\n&#34;</span>, idx, val)
     }
-}
-</pre>
-
+}</code></pre></div>
 <p>
 Now let’s see how we would do that in C with cgo. Note that we switch to using
 <code>uint32</code> instead of <code>int</code> because that makes the point
 I’m trying to make easier to convey.
 </p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">package</span> main
+<span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;fmt&#34;</span>
 
-<pre>
-package main
-import "fmt"
+<span style="color:#60a0b0;font-style:italic">/*
+</span><span style="color:#60a0b0;font-style:italic">// Note the -std=gnu99. Using -std=c99 will not work.
+</span><span style="color:#60a0b0;font-style:italic">#cgo CFLAGS: -std=gnu99
+</span><span style="color:#60a0b0;font-style:italic">#include &lt;stdint.h&gt;
+</span><span style="color:#60a0b0;font-style:italic">
+</span><span style="color:#60a0b0;font-style:italic">void cMultiply(int len, uint32_t *input, uint32_t *output) {
+</span><span style="color:#60a0b0;font-style:italic">    for (int i = 0; i &lt; len; i++) {
+</span><span style="color:#60a0b0;font-style:italic">        output[i] = input[i] * 2;
+</span><span style="color:#60a0b0;font-style:italic">    }
+</span><span style="color:#60a0b0;font-style:italic">}
+</span><span style="color:#60a0b0;font-style:italic">*/</span>
+<span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;C&#34;</span>
 
-/*
-// Note the -std=gnu99. Using -std=c99 will not work.
-#cgo CFLAGS: -std=gnu99
-#include &lt;stdint.h&gt;
+<span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">multiply</span>(input []<span style="color:#902000">uint32</span>) []<span style="color:#902000">uint32</span> {
+    output <span style="color:#666">:=</span> <span style="color:#007020">make</span>([]<span style="color:#902000">uint32</span>, <span style="color:#007020">len</span>(input))
+    C.<span style="color:#06287e">cMultiply</span>(C.<span style="color:#007020">int</span>(<span style="color:#007020">len</span>(input)),
+        (<span style="color:#666">*</span>C.uint32_t)(<span style="color:#666">&amp;</span>input[<span style="color:#40a070">0</span>]),
+	(<span style="color:#666">*</span>C.uint32_t)(<span style="color:#666">&amp;</span>output[<span style="color:#40a070">0</span>]))
+    <span style="color:#007020;font-weight:bold">return</span> output
+}
 
-void cMultiply(int len, uint32_t *input, uint32_t *output) {
-    for (int i = 0; i < len; i++) {
-        output[i] = input[i] * 2;
+<span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+    list <span style="color:#666">:=</span> []<span style="color:#902000">uint32</span>{<span style="color:#40a070">23</span>, <span style="color:#40a070">42</span>, <span style="color:#40a070">17</span>}
+    list = <span style="color:#06287e">multiply</span>(list)
+    <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> list {
+        fmt.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;index %d: value %d\n&#34;</span>, idx, val)
     }
-}
-*/
-import "C"
-
-func multiply(input []uint32) []uint32 {
-    output := make([]uint32, len(input))
-    C.cMultiply(C.int(len(input)),
-        (*C.uint32_t)(&input[0]),
-    (*C.uint32_t)(&output[0]))
-    return output
-}
-
-func main() {
-    list := []uint32{23, 42, 17}
-    list = multiply(list)
-    for idx, val := range list {
-        fmt.Printf("index %d: value %d\n", idx, val)
-    }
-}
-</pre>
-
+}</code></pre></div>
 <p>
 As you can see, we need to convert the Go types into C types, which can be done
 by simply type-casting them. Also, we need to manually implement the array
@@ -230,9 +301,12 @@ the function call overhead is much higher than the normal go function call
 overhead.
 </p>
 
-	  </div>
-	</div>
+</div>
+
       </div>
-    </div>
-  </body>
+
+    </main><div id="ms_footer">
+  © 2020 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
 </html>

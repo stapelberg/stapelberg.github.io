@@ -1,110 +1,206 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Dokumentation: Aufbau meines Fileservers - Michael Stapelberg</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <meta name="description" content="Inhaltsverzeichnis  Einleitung Update: Mehr Karten und Skalierungsprobleme Das Gehäuse (Yeong Yang W201) Installation Kernel kompilieren Grundeinstellungen Initrd erstellen Update: Neue initrd Bootloader installieren Nach dem Boot Script zum automatischen Mounten Encrypted swap Abschluss: Serveranwendungen installieren 
+ Als System habe ich mir für Gentoo Linux entschieden, da ich ohnehin vorhabe, die Serverprogramme selbst zu kompilieren um die nicht benötigten Features von vorneherein draußen zu lassen und etwas Geschwindigkeit herauszuholen.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2008-02-21-fileserver/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
 
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Dokumentation: Aufbau meines Fileservers</title>
-    <meta name="viewport" content="width=device-width">
-    <link rel="shortcut icon" href="/favicon.ico" />
-    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
-    <link rel="canonical" href="https://michael.stapelberg.ch/posts/2008-02-21-fileserver/">
-    <meta name="author" content="Michael Stapelberg">
-    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
-    <style type="text/css">
-@font-face {
-  font-family: 'Yanone Kaffeesatz Regular';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
 
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: normal;
-  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
 
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: bold;
-  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
 
-body, td, th {
-  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  color: #000;
-} 
-    </style>
-    <link rel="stylesheet" href="/2.css" type="text/css">
-    
-    <link rel="stylesheet" href="/1.min.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2">
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2">
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
 
 
-  <body>
-    <div class="container-fluid">
-      <div class="row">
-	<div id="menu" class="col-md-2">
-  <div style="display: flex; align-items: center">
-    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
-    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
   </div>
 
-  <ul class="menu_open">
-    <li><a class="menu_item" href="/"><span class="menu_title">About</span></a></li>
-    <li><a class="menu_item" href="/posts/"><span class="menu_title">Blog</span></a></li>
-    <li><span class="menu_title">Programs</span>
-      <div class="subitem">
-	<ul class="menu_open">
-	  <li><a class="menu_item" href="https://gokrazy.org/"><span class="menu_title">gokrazy</span></a></li>
-	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
-	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
-	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
-	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
-	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
-	</ul>
-      </div>
-    </li>
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
 
-    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
-      <div class="subitem">
-	<ul class="menu_open">
-	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
-	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
-	</ul>
-      </div>
-    </li>
+  <input type="checkbox" id="ms_burger">
 
-    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
-    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
-  </ul>
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div>
+<h1 class="ms_title">Dokumentation: Aufbau meines Fileservers</h1>
+<div class="ms_meta">
+  <div id="ms_date">published 2008-02-21, last modified 2020-11-21</div>
+  
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2008-02-21-Fileserver.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
 </div>
+<div class="Artikel" id="content">
+  <style type="text/css">
+    .TableOfContents > ul, .TableOfContents > ul > li > ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+    }
+    .TableOfContents li {
+	margin-bottom: 1rem;
+    }
+  </style>
+  <details class="ms_toc_details">
+    <summary>Table of contents</summary>
+    <nav class="TableOfContents">
+<ul>
+<li><a href="#startup-script-to-create-the-device-mapper-control-device">Startup script to create the device-mapper control device</a></li>
+<li><a href="#on-non-devfs-systems">on non-devfs systems.</a></li>
+<li><a href="#non-zero-exit-status-indicates-failure">Non-zero exit status indicates failure.</a></li>
+<li><a href="#check-for-devfs-procfs">Check for devfs, procfs</a></li>
+<li><a href="#get-major-minor-and-mknod">Get major, minor, and mknod</a></li>
+<li><a href="#sobald-das-richtige-passwort-eingegeben-wurde-und-die-erste-festplatte-gemountet-wurde-folgen-die-anderen">Sobald das richtige Passwort eingegeben wurde und die erste Festplatte gemountet wurde, folgen die anderen</a></li>
+</ul>
+</nav>
+  </details>
+  
 
-	<div id="contentBox" class="col-md-10">
-	  <h2 class="title">Dokumentation: Aufbau meines Fileservers</h2>
-	  <div style="margin-bottom: 2em">
-	    <span id="date">published 2008-02-21, last modified 2018-03-18</span>
-	    
-	  
-	  <span style="padding-left: 0.1em; padding-right: 0.1em; margin-left: .5em; margin-right: .5em"><a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2008-02-21-Fileserver.markdown"><img src="../../Bilder/pen-square-solid.svg" style="height: 1.25em"></a></span>
-	  
-	  </div>
-	  <div class="Artikel" id="content">
-	    <style type="text/css">
-	      #TableOfContents > ul, #TableOfContents > ul > li > ul {
-		  list-style: none;
-		  margin: 0;
-		  padding: 0;
-	      }
-	    </style>
-	    <details style="margin-bottom: 2em">
-	      <summary>Table of contents</summary>
-	      
-	    </details>
-	    <p><h3>Inhaltsverzeichnis</h3>
+<p><h3>Inhaltsverzeichnis</h3>
 <ul>
     <li class="level1">Einleitung</li>
         <li class="level2"><a href="#skalierungsprobleme">Update: Mehr Karten und Skalierungsprobleme</a></li>
@@ -317,21 +413,23 @@ Danach setzen wir das Serverprofil:
 Und passen die Einstellungen zum Kompilieren an unsere Plattform und Wünsche
 an:
 </p>
-<p class="filenameHeader">/etc/make.conf</p>
+
+<p><strong>/etc/make.conf</strong>:
 <pre>
-CFLAGS="-O2 -march=athlon-xp -pipe"
-USE="-ldap -x11"
-</pre>
+CFLAGS=&quot;-O2 -march=athlon-xp -pipe&quot;
+USE=&quot;-ldap -x11&quot;
+</pre></p>
 
 <p>
 Anschließend wählen wir noch die Locales:
 </p>
-<p class="filenameHeader">/etc/locale.gen</p>
+
+<p><strong>/etc/locale.gen</strong>:
 <pre>
 en_US ISO-8859-1
 de_DE ISO-8859-1
 de_DE@euro ISO-8859-15
-</pre>
+</pre></p>
 
 <p>
 …und generieren die selbigen:
@@ -385,32 +483,35 @@ Befehl:
 Nun sollten wir dem System noch klarmachen, welche (virtuellen) Laufwerke er
 wohin zu mounten hat bei Systemstart:
 </p>
-<p class="filenameHeader">/etc/fstab</p>
+
+<p><strong>/etc/fstab</strong>:
 <pre>
 /dev/sdc1       /boot       ext2    noauto,noatime      1   2
 /dev/mapper/root    /       ext3    noatime         0   1
 proc            /proc       proc    defaults        0   0
 shm         /dev/shm    tmpfs   nodev,nosuid,noexec 0   0
-</pre>
+</pre></p>
 
 <p>
 Dann setzen wir noch den Hostname:
 </p>
-<p class="filenameHeader">/etc/conf.d/hostname</p>
+
+<p><strong>/etc/conf.d/hostname</strong>:
 <pre>
-HOSTNAME="stability"
-</pre>
+HOSTNAME=&quot;stability&quot;
+</pre></p>
 
 <p>
 Und erledigen die Netzwerkkonfiguration:
 </p>
-<p class="filenameHeader">/etc/conf.d/net</p>
+
+<p><strong>/etc/conf.d/net</strong>:
 <pre>
-dns_servers_eth0="192.168.1.2 192.168.1.1 194.25.2.129"
-dns_sortlist_eth0="192.168.1.0/24"
-config_eth0=( "192.168.1.5 netmask 255.255.255.0 brd 192.168.1.255" )
-routes_eth0=( "default gw 192.168.1.1" )
-</pre>
+dns_servers_eth0=&quot;192.168.1.2 192.168.1.1 194.25.2.129&quot;
+dns_sortlist_eth0=&quot;192.168.1.0/24&quot;
+config_eth0=( &quot;192.168.1.5 netmask 255.255.255.0 brd 192.168.1.255&quot; )
+routes_eth0=( &quot;default gw 192.168.1.1&quot; )
+</pre></p>
 
 <p>
 Dieses Interface möchten wir beim Systemstart automatisch konfigurieren lassen:
@@ -504,65 +605,68 @@ cp /lib/{ld-linux.so.2,libblkid.so.1,libc.so.6,libdl.so.2,libncurses.so.5,libuui
 Anschließend erzeugen wir das eigentliche Script (stammt größtenteils aus dem
 Gentoo-Wiki, siehe Quellen):
 </p>
-<p class="filenameHeader">ramdisk/sbin/init</p>
+
+<p><strong>ramdisk/sbin/init</strong>:
 <pre>
-#!/bin/sh
+#!/bin/sh</p>
 
-echo "INITRD Loading :-)"
+<p>echo &quot;INITRD Loading :-)&quot;
 ROOT_DEV=/dev/sdc3
-ROOT_MAP=root
+ROOT_MAP=root</p>
 
-export PATH=/bin:/sbin
+<p>export PATH=/bin:/sbin
 mount -t proc proc /proc
-CMDLINE=`cat /proc/cmdline`
+CMDLINE=<code>cat /proc/cmdline</code>
 sh /sbin/devmap_mknod.sh
 if [ $? -ne 0 ]; then
         echo Creation of /dev/mapper/control failed
         exit 0
-fi
+fi</p>
 
-echo "Ok, let's have a look at the headers..."
-cryptsetup luksDump ${ROOT_DEV}
+<p>echo &quot;Ok, let's have a look at the headers...&quot;
+cryptsetup luksDump ${ROOT_DEV}</p>
 
-count=0
+<p>count=0
 sesam=1
 while [ ${sesam} -ne 0 ]; do
-        if [ "$count" = "3" ]; then
-                echo "Hm, doesnt seem to work. Go play with the shell. Press Ctrl+D when done."
+        if [ &quot;$count&quot; = &quot;3&quot; ]; then
+                echo &quot;Hm, doesnt seem to work. Go play with the shell. Press Ctrl+D when done.&quot;
                 bash
                 echo System halted
                 exit 0
-        fi
+        fi</p>
 
-        count=$(( $count + 1 ))
-        echo "Enter passphrase:"
-        read -s pass
-        echo
-        echo ${pass} | cryptsetup luksOpen ${ROOT_DEV} ${ROOT_MAP}
-        sesam=$?
-done
-echo "Mounting root..."
+<pre><code>    count=$(( $count + 1 ))
+    echo &quot;Enter passphrase:&quot;
+    read -s pass
+    echo
+    echo ${pass} | cryptsetup luksOpen ${ROOT_DEV} ${ROOT_MAP}
+    sesam=$?
+</code></pre>
+
+<p>done
+echo &quot;Mounting root...&quot;
 mount /dev/mapper/${ROOT_MAP} /mnt
 if [ $? -ne 0 ]; then
-        echo "Mounting root failed"
+        echo &quot;Mounting root failed&quot;
         cryptsetup luksClose ${ROOT_MAP}
         exit 0
-fi
+fi</p>
 
-echo "Booting..."
+<p>echo &quot;Booting...&quot;
 umount /proc
 cd /mnt
 mkdir initrd
 pivot_root . initrd
-echo "Starting init"
+echo &quot;Starting init&quot;
 exec chroot . /bin/sh &lt;&lt;- EOF &gt;/dev/console 2&gt;&amp;1
 umount initrd
 rm -rf initrd
 blockdev --flushbufs /dev/ram0
-echo "Exec init ${CMDLINE}"
+echo &quot;Exec init ${CMDLINE}&quot;
 exec /sbin/init ${CMDLINE}
 EOF
-</pre>
+</pre></p>
 
 <p>
 Im Gegensatz zu der Originalversion von Gentoo-Wiki gibt diese Version beim
@@ -585,45 +689,52 @@ tippt (vertauschte Position von y und z und der Sonderzeichen).
 <p>
 Hier noch das Script um die device-mapper-Nodes anzulegen:
 </p>
-<p class="filenameHeader">ramdisk/sbin/devmap_mknod.sh</p>
+
+<p><strong>ramdisk/sbin/devmap_mknod.sh</strong>:
 <pre>
-#!/bin/sh
+#!/bin/sh</p>
 
-# Startup script to create the device-mapper control device
-# on non-devfs systems.
-# Non-zero exit status indicates failure.
-DM_DIR="mapper"
-DM_NAME="device-mapper"
+<h1 id="startup-script-to-create-the-device-mapper-control-device">Startup script to create the device-mapper control device</h1>
 
-set -e
+<h1 id="on-non-devfs-systems">on non-devfs systems.</h1>
 
-DIR="/dev/$DM_DIR"
-CONTROL="$DIR/control"
+<h1 id="non-zero-exit-status-indicates-failure">Non-zero exit status indicates failure.</h1>
 
-# Check for devfs, procfs
-if test -e /dev/.devfsd ; then
-        echo "devfs detected: devmap_mknod.sh script not required."
+<p>DM_DIR=&quot;mapper&quot;
+DM_NAME=&quot;device-mapper&quot;</p>
+
+<p>set -e</p>
+
+<p>DIR=&quot;/dev/$DM_DIR&quot;
+CONTROL=&quot;$DIR/control&quot;</p>
+
+<h1 id="check-for-devfs-procfs">Check for devfs, procfs</h1>
+
+<p>if test -e /dev/.devfsd ; then
+        echo &quot;devfs detected: devmap_mknod.sh script not required.&quot;
         exit
 fi
 if test ! -e /proc/devices ; then
-        echo "procfs not found; please create $CONTROL manually."
+        echo &quot;procfs not found; please create $CONTROL manually.&quot;
         exit 1
-fi
-# Get major, minor, and mknod
-MAJOR=$(sed -n 's/^ *\([0-9]\+\) \+misc$/\1/p' /proc/devices)
-MINOR=$(sed -n "s/^ *\([0-9]\+\) \+$DM_NAME\$/\1/p" /proc/misc)
+fi</p>
 
-if test -z "$MAJOR" -o -z "$MINOR" ; then
-        echo "$DM_NAME kernel module not loaded: can't create $CONTROL."
+<h1 id="get-major-minor-and-mknod">Get major, minor, and mknod</h1>
+
+<p>MAJOR=$(sed -n 's/^ *([0-9]+) +misc$/\1/p' /proc/devices)
+MINOR=$(sed -n &quot;s/^ *([0-9]+) +$DM_NAME\$/\1/p&quot; /proc/misc)</p>
+
+<p>if test -z &quot;$MAJOR&quot; -o -z &quot;$MINOR&quot; ; then
+        echo &quot;$DM_NAME kernel module not loaded: can't create $CONTROL.&quot;
         exit 1
-fi
+fi</p>
 
-mkdir -p --mode=755 $DIR
-test -e $CONTROL && rm -f $CONTROL
+<p>mkdir -p --mode=755 $DIR
+test -e $CONTROL &amp;&amp; rm -f $CONTROL</p>
 
-echo "Creating $CONTROL character device with major:$MAJOR minor:$MINOR."
+<p>echo &quot;Creating $CONTROL character device with major:$MAJOR minor:$MINOR.&quot;
 mknod --mode=600 $CONTROL c $MAJOR $MINOR
-</pre>
+</pre></p>
 
 <p>
 Dieser Schritt ist wichtig, sonst wird gar nichts ausgeführt:
@@ -670,17 +781,18 @@ Die Konfigurationsdatei von GRUB ist <code>/boot/grub/menu.lst</code>. Dort
 bringen wir GRUB nun bei, welchen Kernel auf welcher Festplatte mit welcher
 Initrd er booten soll:
 </p>
-<p class="filenameHeader">/boot/grub/menu.lst</p>
+
+<p><strong>/boot/grub/menu.lst</strong>:
 <pre>
 default 0
-timeout 5
+timeout 5</p>
 
-title=Gentoo Linux 2.6.19-r5-stability
+<p>title=Gentoo Linux 2.6.19-r5-stability
 root (hd0,0)
 kernel /kernel-2.6.19-r5-stability root=/dev/ram0 ide0=0x1f0,0x3f6,14 rw
 initrd /initrd.gz
 boot
-</pre>
+</pre></p>
 
 <p>
 Die Nummern der Festplatte bekommt man übrigens per Tab-Completion in GRUB
@@ -806,7 +918,8 @@ mount /dev/mapper/home /home
 Damit wir nun nicht jedesmal nach dem Boot die ganzen Festplatten manuell
 mounten müssen, nutzen wir folgendes Script:
 </p>
-<p class="filenameHeader">/root/mountHDDs.sh</p>
+
+<p><strong>/root/mountHDDs.sh</strong>:
 <pre>
 #!/bin/sh
 status=1
@@ -814,21 +927,23 @@ while [ ${status} -ne 0 ]; do
     read -s pass
     echo ${pass} | cryptsetup luksOpen /dev/sda backup
     status=$?
-done
-# Sobald das richtige Passwort eingegeben wurde und die erste Festplatte gemountet wurde, folgen die anderen
-echo ${pass} | cryptsetup luksOpen /dev/hda2 movies
-echo ${pass} | cryptsetup luksOpen /dev/hdb2 wii
-echo ${pass} | cryptsetup luksOpen /dev/hdc mp3
+done</p>
 
-mount /dev/mapper/backup /fs/Backup
+<h1 id="sobald-das-richtige-passwort-eingegeben-wurde-und-die-erste-festplatte-gemountet-wurde-folgen-die-anderen">Sobald das richtige Passwort eingegeben wurde und die erste Festplatte gemountet wurde, folgen die anderen</h1>
+
+<p>echo ${pass} | cryptsetup luksOpen /dev/hda2 movies
+echo ${pass} | cryptsetup luksOpen /dev/hdb2 wii
+echo ${pass} | cryptsetup luksOpen /dev/hdc mp3</p>
+
+<p>mount /dev/mapper/backup /fs/Backup
 mount /dev/mapper/movies /fs/Movies
 mount /dev/mapper/wii /fs/Wii
-mount /dev/mapper/mp3 /fs/MP3
+mount /dev/mapper/mp3 /fs/MP3</p>
 
-mdadm -As /dev/md0
+<p>mdadm -As /dev/md0
 echo ${pass} | cryptsetup luksOpen /dev/md0 home
 mount /dev/mapper/home /home
-</pre>
+</pre></p>
 
 <p>
 Ich gehe davon aus, dass für alle verschlüsselten Partitionen (außer der
@@ -898,9 +1013,28 @@ Diese Seiten haben mir beim Installieren geholfen und sind einen Besuch wert:
     </li>
 </ul></p>
 
-	  </div>
-	</div>
+</div>
+
       </div>
-    </div>
-  </body>
+<div id="ms_toc">
+  <div>
+    <strong>Table Of Contents</strong>
+
+    <nav class="TableOfContents">
+<ul>
+<li><a href="#startup-script-to-create-the-device-mapper-control-device">Startup script to create the device-mapper control device</a></li>
+<li><a href="#on-non-devfs-systems">on non-devfs systems.</a></li>
+<li><a href="#non-zero-exit-status-indicates-failure">Non-zero exit status indicates failure.</a></li>
+<li><a href="#check-for-devfs-procfs">Check for devfs, procfs</a></li>
+<li><a href="#get-major-minor-and-mknod">Get major, minor, and mknod</a></li>
+<li><a href="#sobald-das-richtige-passwort-eingegeben-wurde-und-die-erste-festplatte-gemountet-wurde-folgen-die-anderen">Sobald das richtige Passwort eingegeben wurde und die erste Festplatte gemountet wurde, folgen die anderen</a></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    </main><div id="ms_footer">
+  © 2020 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
 </html>

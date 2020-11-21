@@ -1,99 +1,183 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Making GitLab authenticate against dex - Michael Stapelberg</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <meta name="description" content="Because I found it frustratingly hard to make GitLab and dex talk to each other, this article walks you through what I did step-by-step.
+Let’s establish some terminology:
+ dex is our OpenID Connect (OIDC) “Provider (OP)”
+in other words: the component which verifies usernames and passwords.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2017-10-21-gitlab-with-dex/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
 
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Making GitLab authenticate against dex</title>
-    <meta name="viewport" content="width=device-width">
-    <link rel="shortcut icon" href="/favicon.ico" />
-    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
-    <link rel="canonical" href="https://michael.stapelberg.ch/posts/2017-10-21-gitlab-with-dex/">
-    <meta name="author" content="Michael Stapelberg">
-    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
-    <style type="text/css">
-@font-face {
-  font-family: 'Yanone Kaffeesatz Regular';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
 
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: normal;
-  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
 
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: bold;
-  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
 
-body, td, th {
-  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  color: #000;
-} 
-    </style>
-    <link rel="stylesheet" href="/2.css" type="text/css">
-    
-    <link rel="stylesheet" href="/1.min.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2">
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2">
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
 
 
-  <body>
-    <div class="container-fluid">
-      <div class="row">
-	<div id="menu" class="col-md-2">
-  <div style="display: flex; align-items: center">
-    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
-    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
   </div>
 
-  <ul class="menu_open">
-    <li><a class="menu_item" href="/"><span class="menu_title">About</span></a></li>
-    <li><a class="menu_item" href="/posts/"><span class="menu_title">Blog</span></a></li>
-    <li><span class="menu_title">Programs</span>
-      <div class="subitem">
-	<ul class="menu_open">
-	  <li><a class="menu_item" href="https://gokrazy.org/"><span class="menu_title">gokrazy</span></a></li>
-	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
-	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
-	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
-	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
-	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
-	</ul>
-      </div>
-    </li>
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
 
-    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
-      <div class="subitem">
-	<ul class="menu_open">
-	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
-	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
-	</ul>
-      </div>
-    </li>
+  <input type="checkbox" id="ms_burger">
 
-    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
-    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
-  </ul>
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div>
+<h1 class="ms_title">Making GitLab authenticate against dex</h1>
+<div class="ms_meta">
+  <div id="ms_date">published 2017-10-21, last modified 2018-03-18</div>
+  
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2017-10-21-gitlab-with-dex.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
 </div>
-
-	<div id="contentBox" class="col-md-10">
-	  <h2 class="title">Making GitLab authenticate against dex</h2>
-	  <div style="margin-bottom: 2em">
-	    <span id="date">published 2017-10-21, last modified 2018-03-18</span>
-	    
-	  
-	  <span style="padding-left: 0.1em; padding-right: 0.1em; margin-left: .5em; margin-right: .5em"><a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2017-10-21-gitlab-with-dex.markdown"><img src="../../Bilder/pen-square-solid.svg" style="height: 1.25em"></a></span>
-	  
-	  </div>
-	  <div class="Artikel" id="content">
-	    
+<div class="Artikel" id="content">
+  
 
 <p>Because I found it frustratingly hard to make GitLab and dex talk to each other,
 this article walks you through what I did step-by-step.</p>
@@ -125,43 +209,41 @@ guide until I had dex serving the example config.</p>
 </ol>
 
 <p>Here is a diff:</p>
-
-<pre><code class="language-diff">--- /proc/self/fd/11	2017-10-21 15:01:49.005587935 +0200
-+++ /tmp/config-dev.yaml	2017-10-21 15:01:47.121632025 +0200
-@@ -1,7 +1,7 @@
- # The base path of dex and the external name of the OpenID Connect service.
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff"><span style="color:#a00000">--- /proc/self/fd/11	2017-10-21 15:01:49.005587935 +0200
+</span><span style="color:#a00000"></span><span style="color:#00a000">+++ /tmp/config-dev.yaml	2017-10-21 15:01:47.121632025 +0200
+</span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -1,7 +1,7 @@
+</span><span style="color:#800080;font-weight:bold"></span> # The base path of dex and the external name of the OpenID Connect service.
  # This is the canonical URL that all clients MUST use to refer to dex. If a
- # path is provided, dex's HTTP service will listen at a non-root URL.
--issuer: http://127.0.0.1:5556/dex
-+issuer: https://dex.example.net:5554/dex
- 
+ # path is provided, dex&#39;s HTTP service will listen at a non-root URL.
+<span style="color:#a00000">-issuer: http://127.0.0.1:5556/dex
+</span><span style="color:#a00000"></span><span style="color:#00a000">+issuer: https://dex.example.net:5554/dex
+</span><span style="color:#00a000"></span> 
  # The storage configuration determines where dex stores its state. Supported
  # options include SQL flavors and Kubernetes third party resources.
-@@ -14,11 +14,9 @@
- 
+<span style="color:#800080;font-weight:bold">@@ -14,11 +14,9 @@
+</span><span style="color:#800080;font-weight:bold"></span> 
  # Configuration for the HTTP endpoints.
  web:
--  http: 0.0.0.0:5556
--  # Uncomment for HTTPS options.
--  # https: 127.0.0.1:5554
--  # tlsCert: /etc/dex/tls.crt
--  # tlsKey: /etc/dex/tls.key
-+  https: dex.example.net:5554
-+  tlsCert: /etc/letsencrypt/live/dex.example.net/fullchain.pem
-+  tlsKey: /etc/letsencrypt/live/dex.example.net/privkey.pem
- 
+<span style="color:#a00000">-  http: 0.0.0.0:5556
+</span><span style="color:#a00000">-  # Uncomment for HTTPS options.
+</span><span style="color:#a00000">-  # https: 127.0.0.1:5554
+</span><span style="color:#a00000">-  # tlsCert: /etc/dex/tls.crt
+</span><span style="color:#a00000">-  # tlsKey: /etc/dex/tls.key
+</span><span style="color:#a00000"></span><span style="color:#00a000">+  https: dex.example.net:5554
+</span><span style="color:#00a000">+  tlsCert: /etc/letsencrypt/live/dex.example.net/fullchain.pem
+</span><span style="color:#00a000">+  tlsKey: /etc/letsencrypt/live/dex.example.net/privkey.pem
+</span><span style="color:#00a000"></span> 
  # Uncomment this block to enable the gRPC API. This values MUST be different
  # from the HTTP endpoints.
-@@ -50,7 +48,7 @@
- staticClients:
+<span style="color:#800080;font-weight:bold">@@ -50,7 +48,7 @@
+</span><span style="color:#800080;font-weight:bold"></span> staticClients:
  - id: example-app
    redirectURIs:
--  - 'http://127.0.0.1:5555/callback'
-+  - 'http://gitlab.example.net/users/auth/mydex/callback'
-   name: 'Example App'
+<span style="color:#a00000">-  - &#39;http://127.0.0.1:5555/callback&#39;
+</span><span style="color:#a00000"></span><span style="color:#00a000">+  - &#39;http://gitlab.example.net/users/auth/mydex/callback&#39;
+</span><span style="color:#00a000"></span>   name: &#39;Example App&#39;
    secret: ZXhhbXBsZS1hcHAtc2VjcmV0
-</code></pre>
-
+</code></pre></div>
 <h3 id="step-2-configure-gitlab">Step 2: configure GitLab</h3>
 
 <p>First, I followed <a href="https://docs.gitlab.com/omnibus/docker/">GitLab Docker
@@ -228,50 +310,51 @@ gitlab_rails['omniauth_providers'] = [
 
 <p>Until <a href="https://github.com/coreos/dex/issues/376">dex issue #376</a> is fixed, the
 following patch for the omniauth-openid-connect gem is required:</p>
-
-<pre><code class="language-diff">--- /opt/gitlab/embedded/lib/ruby/gems/2.3.0/gems/omniauth-openid-connect-0.2.3/lib/omniauth/strategies/openid_connect.rb.orig	2017-10-21 12:31:50.777602847 +0000
-+++ /opt/gitlab/embedded/lib/ruby/gems/2.3.0/gems/omniauth-openid-connect-0.2.3/lib/omniauth/strategies/openid_connect.rb	2017-10-21 12:34:20.063308560 +0000
-@@ -42,24 +42,13 @@
-       option :send_nonce, true
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff"><span style="color:#a00000">--- /opt/gitlab/embedded/lib/ruby/gems/2.3.0/gems/omniauth-openid-connect-0.2.3/lib/omniauth/strategies/openid_connect.rb.orig	2017-10-21 12:31:50.777602847 +0000
+</span><span style="color:#a00000"></span><span style="color:#00a000">+++ /opt/gitlab/embedded/lib/ruby/gems/2.3.0/gems/omniauth-openid-connect-0.2.3/lib/omniauth/strategies/openid_connect.rb	2017-10-21 12:34:20.063308560 +0000
+</span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -42,24 +42,13 @@
+</span><span style="color:#800080;font-weight:bold"></span>       option :send_nonce, true
        option :client_auth_method
  
--      uid { user_info.sub }
--
-+      uid { @email }
-       info do
--        {
--          name: user_info.name,
--          email: user_info.email,
--          nickname: user_info.preferred_username,
--          first_name: user_info.given_name,
--          last_name: user_info.family_name,
--          gender: user_info.gender,
--          image: user_info.picture,
--          phone: user_info.phone_number,
--          urls: { website: user_info.website }
--        }
-+        { email: @email }
-       end
+<span style="color:#a00000">-      uid { user_info.sub }
+</span><span style="color:#a00000">-
+</span><span style="color:#a00000"></span><span style="color:#00a000">+      uid { @email }
+</span><span style="color:#00a000"></span>       info do
+<span style="color:#a00000">-        {
+</span><span style="color:#a00000">-          name: user_info.name,
+</span><span style="color:#a00000">-          email: user_info.email,
+</span><span style="color:#a00000">-          nickname: user_info.preferred_username,
+</span><span style="color:#a00000">-          first_name: user_info.given_name,
+</span><span style="color:#a00000">-          last_name: user_info.family_name,
+</span><span style="color:#a00000">-          gender: user_info.gender,
+</span><span style="color:#a00000">-          image: user_info.picture,
+</span><span style="color:#a00000">-          phone: user_info.phone_number,
+</span><span style="color:#a00000">-          urls: { website: user_info.website }
+</span><span style="color:#a00000">-        }
+</span><span style="color:#a00000"></span><span style="color:#00a000">+        { email: @email }
+</span><span style="color:#00a000"></span>       end
  
        extra do
--        {raw_info: user_info.raw_attributes}
-+        {raw_info: {}}
-       end
+<span style="color:#a00000">-        {raw_info: user_info.raw_attributes}
+</span><span style="color:#a00000"></span><span style="color:#00a000">+        {raw_info: {}}
+</span><span style="color:#00a000"></span>       end
  
        credentials do
-@@ -165,6 +154,7 @@
-               client_id: client_options.identifier,
+<span style="color:#800080;font-weight:bold">@@ -165,6 +154,7 @@
+</span><span style="color:#800080;font-weight:bold"></span>               client_id: client_options.identifier,
                nonce: stored_nonce
            )
-+          @email = _id_token.raw_attributes['email']
-           _access_token
+<span style="color:#00a000">+          @email = _id_token.raw_attributes[&#39;email&#39;]
+</span><span style="color:#00a000"></span>           _access_token
          }.call()
        end
-</code></pre>
+</code></pre></div>
+</div>
 
-	  </div>
-	</div>
       </div>
-    </div>
-  </body>
+
+    </main><div id="ms_footer">
+  © 2020 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
 </html>

@@ -810,7 +810,7 @@ mount /dev/dm-0 /mnt
     <link href="https://michael.stapelberg.ch/posts/2019-09-29-dcs-positional-turbopfor-index/"/>
     <id>https://michael.stapelberg.ch/posts/2019-09-29-dcs-positional-turbopfor-index/</id>
     <published>2019-09-29T00:00:00+00:00</published>
-    <updated>2020-02-03T08:54:25+01:00</updated>
+    <updated>2020-11-21T10:01:02+01:00</updated>
     <content type="html"><![CDATA[
 
 <style type="text/css">
@@ -1505,7 +1505,7 @@ list</a> so that everyone can participate!</p>
     <link href="https://michael.stapelberg.ch/posts/2019-08-17-linux-package-managers-are-slow/"/>
     <id>https://michael.stapelberg.ch/posts/2019-08-17-linux-package-managers-are-slow/</id>
     <published>2019-08-17T18:27:00+02:00</published>
-    <updated>2020-10-14T21:22:54+02:00</updated>
+    <updated>2020-11-21T10:01:02+01:00</updated>
     <content type="html"><![CDATA[
 
 <aside class="admonition note">
@@ -2629,7 +2629,7 @@ practices or not introduce an optional dependency.</p>
     <link href="https://michael.stapelberg.ch/posts/2019-03-10-debian-winding-down/"/>
     <id>https://michael.stapelberg.ch/posts/2019-03-10-debian-winding-down/</id>
     <published>2019-03-10T00:00:00+00:00</published>
-    <updated>2019-03-10T21:43:19+01:00</updated>
+    <updated>2020-11-21T10:01:02+01:00</updated>
     <content type="html"><![CDATA[
 
 <p>This post is hard to write, both in the emotional sense but also in the “I would
@@ -2655,7 +2655,7 @@ fit for me.</p>
 <p>So I’m finally making a decision that I should have made a long time ago: I am
 winding down my involvement in Debian to a minimum.</p>
 
-<h3 id="what-does-this-mean">What does this mean?</h3>
+<h2 id="what-does-this-mean">What does this mean?</h2>
 
 <p>Over the coming weeks, I will:</p>
 
@@ -2674,7 +2674,7 @@ would be much appreciated.</p>
 try to be around for administrative issues (e.g. permission transfers) and
 questions addressed directly to me, permitted they are easy enough to answer.</p>
 
-<h3 id="why">Why?</h3>
+<h2 id="why">Why?</h2>
 
 <p>When I joined Debian, I was still studying, i.e. I had luxurious amounts of
 spare time. Now, over 5 years of full time work later, my day job taught me a
@@ -2687,7 +2687,7 @@ particular order. Some of them influence each other—for example, if changes
 worked better, we could have a chance at transitioning packages to be more
 easily machine readable.</p>
 
-<h4 id="change-process-in-debian">Change process in Debian</h4>
+<h3 id="change-process-in-debian">Change process in Debian</h3>
 
 <p>The last few years, my current team at work conducted various smaller and larger
 refactorings across the entire code base (touching thousands of projects), so we
@@ -2759,7 +2759,7 @@ individual maintainers.</li>
 colleague Hyrum Wright’s talk “Large-Scale Changes at Google: Lessons Learned
 From 5 Yrs of Mass Migrations”</a>.</p>
 
-<h4 id="fragmented-workflow-and-infrastructure">Fragmented workflow and infrastructure</h4>
+<h3 id="fragmented-workflow-and-infrastructure">Fragmented workflow and infrastructure</h3>
 
 <p>Debian generally seems to prefer decentralized approaches over centralized
 ones. For example, individual packages are maintained in separate repositories
@@ -2791,7 +2791,7 @@ succeed in implementing it. The lack of effective automation and slow pace of
 changes in the surrounding tooling despite my willingness to contribute time and
 energy killed any motivation I had.</p>
 
-<h4 id="old-infrastructure-package-uploads">Old infrastructure: package uploads</h4>
+<h3 id="old-infrastructure-package-uploads">Old infrastructure: package uploads</h3>
 
 <p>When you want to make a package available in Debian, you upload GPG-signed files
 via anonymous FTP. There are several batch jobs (the queue daemon, <code>unchecked</code>,
@@ -2821,7 +2821,7 @@ status and when the package will be available via the mirror network.</li>
 <li>Packages should be available within a few minutes after the build completed.</li>
 </ol>
 
-<h4 id="old-infrastructure-bug-tracker">Old infrastructure: bug tracker</h4>
+<h3 id="old-infrastructure-bug-tracker">Old infrastructure: bug tracker</h3>
 
 <p>I dread interacting with the Debian bug
 tracker. <a href="https://en.wikipedia.org/wiki/Debbugs">debbugs</a> is a piece of software
@@ -2855,7 +2855,7 @@ paper-trail and artifacts of the process in the form of a bug report, but the
 primary interface should be more convenient (e.g. a web form).</li>
 </ol>
 
-<h4 id="old-infrastructure-mailing-list-archives">Old infrastructure: mailing list archives</h4>
+<h3 id="old-infrastructure-mailing-list-archives">Old infrastructure: mailing list archives</h3>
 
 <p>It baffles me that in 2019, we still don’t have a conveniently browsable
 threaded archive of mailing list discussions. Email and threading is more widely
@@ -2867,7 +2867,7 @@ the least (it is down as I write this).</p>
 <p>I tried to contribute a threaded list archive, but our listmasters didn’t seem
 to care or want to support the project.</p>
 
-<h4 id="debian-is-hard-to-machine-read">Debian is hard to machine-read</h4>
+<h3 id="debian-is-hard-to-machine-read">Debian is hard to machine-read</h3>
 
 <p>While it is obviously possible to deal with Debian packages programmatically,
 the experience is far from pleasant. Everything seems slow and cumbersome. I
@@ -2892,19 +2892,19 @@ packages as quickly as possible. There used to be a
 longer seems to exist. It is unclear where to get notifications from for new
 packages, and where best to fetch those packages.</p>
 
-<h4 id="complicated-build-stack">Complicated build stack</h4>
+<h3 id="complicated-build-stack">Complicated build stack</h3>
 
 <p>See my <a href="/posts/2016-11-25-build-tools/">“Debian package build tools”</a> post. It
 really bugs me that the sprawl of tools is not seen as a problem by others.</p>
 
-<h4 id="developer-experience-pretty-painful">Developer experience pretty painful</h4>
+<h3 id="developer-experience-pretty-painful">Developer experience pretty painful</h3>
 
 <p>Most of the points discussed so far deal with the experience in <em>developing
 Debian</em>, but as I recently described in my post <a href="/posts/2019-02-15-debian-debugging-devex/">“Debugging experience in
 Debian”</a>, the experience when
 <em>developing using Debian</em> leaves a lot to be desired, too.</p>
 
-<h4 id="i-have-more-ideas">I have more ideas</h4>
+<h3 id="i-have-more-ideas">I have more ideas</h3>
 
 <p>At this point, the article is getting pretty long, and hopefully you got a rough
 idea of my motivation.</p>

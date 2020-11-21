@@ -1,122 +1,301 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>kinX - Michael Stapelberg</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/tags/kinx/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
 
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>kinX</title>
-    <meta name="viewport" content="width=device-width">
-    <link rel="shortcut icon" href="/favicon.ico" />
-    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
-    <link rel="canonical" href="https://michael.stapelberg.ch/posts/tags/kinx/">
-    <meta name="author" content="Michael Stapelberg">
-    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
-    <style type="text/css">
-@font-face {
-  font-family: 'Yanone Kaffeesatz Regular';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
 
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: normal;
-  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
 
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: bold;
-  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
 
-body, td, th {
-  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  color: #000;
-} 
-    </style>
-    <link rel="stylesheet" href="/2.css" type="text/css">
-    
-    <link rel="stylesheet" href="/1.min.css" type="text/css">
-    <link rel="alternate" href="https://michael.stapelberg.ch/posts/tags/kinx/feed.xml" type="application/atom+xml" title="ATOM feed for posts tagged kinx"></head>
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2">
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2">
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="https://michael.stapelberg.ch/posts/tags/kinx/feed.xml" type="application/atom+xml" title="ATOM feed for posts tagged kinx">
+</head>
+<body>
 
 
-  <body>
-    <div class="container-fluid">
-      <div class="row">
-	<div id="menu" class="col-md-2">
-  <div style="display: flex; align-items: center">
-    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
-    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
   </div>
 
-  <ul class="menu_open">
-    <li><a class="menu_item" href="/"><span class="menu_title">About</span></a></li>
-    <li><a class="menu_item" href="/posts/"><span class="menu_title">Blog</span></a></li>
-    <li><span class="menu_title">Programs</span>
-      <div class="subitem">
-	<ul class="menu_open">
-	  <li><a class="menu_item" href="https://gokrazy.org/"><span class="menu_title">gokrazy</span></a></li>
-	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
-	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
-	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
-	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
-	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
-	</ul>
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
       </div>
-    </li>
-
-    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
-      <div class="subitem">
-	<ul class="menu_open">
-	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
-	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
-	</ul>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
       </div>
-    </li>
+    </div>
 
-    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
-    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
-  </ul>
-</div>
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
 
-	<div id="contentBox" class="col-md-10">
-	  <h2 class="title">Posts tagged kinx
-	    <a href="https://michael.stapelberg.ch/posts/tags/kinx/feed.xml">
-	      <img src="/feed-icon.svg" style="width: .75em"
-		   alt="ATOM feed for posts tagged kinx"
-		   title="ATOM feed for posts tagged kinx">
-	    </a>
-	  </h2>
-	  <div class="Artikel" id="content">
-	    <p>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div>
+<h1 class="ms_title">Blog Posts tagged kinx
+  <a href="https://michael.stapelberg.ch/posts/tags/kinx/feed.xml">
+    <img src="/feed-icon.svg" style="width: .75em"
+	 alt="ATOM feed for posts tagged kinx"
+	 title="ATOM feed for posts tagged kinx">
+  </a>
+</h1>
+
+<div class="Artikel" id="content">
+  <p>
   The kinX project concerns itself with input latency. Its artifacts are a
   drop-in keyboard controller replacement for the Kinesis Advantage keyboard
   with &lt;0.225ms input latency, a drop-in USB hub replacement, and a device for
   measuring processing latency.
 </p>
 
-	    <ul class="ArticleList">
-	      
-	      <li><a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-keyboard-controller/">kinX: keyboard controller with &lt;0.225ms input latency</a></li>
-	      
-	      <li><a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-latency-measurement/">kinX: latency measurement</a></li>
-	      
-	      <li><a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx/">kinX: overview</a></li>
-	      
-	      <li><a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-usb-hub/">kinX: USB Hub</a></li>
-	      
-	    </ul>
-	  </div>
+  
+    
+  <h2>2018-Apr</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx/"><h3>kinX: overview</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/kinx/">kinX</a></span>
+	
 	</div>
+	
       </div>
-    </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  The kinX project is described in a series of blog posts:
+ While not strictly a part of this series, “Hacking your own Kinesis keyboard controller” describes the first controller I built in 2013 (maybe interesting for context).
+ The first post introduces the kinX, a keyboard controller with merely 0.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-keyboard-controller/"><h3>kinX: keyboard controller with &lt;0.225ms input latency</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/kinx/">kinX</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<img src="https://michael.stapelberg.ch/posts/2018-04-17-kinx-keyboard-controller/kinx-mk66f_huadaad7ed50f8d38b8cbe347b2c1948f3_1364992_200x200_fit_q75_box.jpg" width="200" height="156"/>
+	
+	<p>
+	  This post is part of a series of posts about the kinX project.
+Background 10 years ago I got a Kinesis Advantage keyboard. I wrote about the experience of learning to touch-type using the ergonomic NEO layout in my (German) post “Neo-Layout auf einer Kinesis-Tastatur”.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-keyboard-controller/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-usb-hub/"><h3>kinX: USB Hub</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/kinx/">kinX</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<img src="https://michael.stapelberg.ch/posts/2018-04-17-kinx-usb-hub/kinx-hub_hub171d3553dfb50fbddf8778151525534_430879_200x200_fit_q75_box.jpg" width="200" height="171"/>
+	
+	<p>
+	  This post is part of a series of posts about the kinX project.
+Motivation The Kinesis Advantage comes with a built-in 2-port USB hub. That hub uses a proprietary connector to interface with a PS/2 keyboard controller, so it cannot be used with a USB keyboard controller.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-usb-hub/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-latency-measurement/"><h3>kinX: latency measurement</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/kinx/">kinX</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  This post is part of a series of posts about the kinX project.
+Latency measurement End-to-end latency consists of 3 parts:
+ input latency (keyboard) processing latency (computer) output latency (monitor)  During the development of the kinX keyboard controller, I realized that measuring processing latency was quite simple with my hardware: I could start a timer when sending a key press HID report to the computer and measure the elapsed time when I would receive a reply from the computer.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-latency-measurement/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+  
+
 </div>
+
+      </div>
+    </main><div id="ms_footer">
+  © 2020 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
 </div>
 </body>
 </html>
-

@@ -1,122 +1,220 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Debian Code Search: improving client-side latency - Michael Stapelberg</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <meta name="description" content="A while ago, it occurred to me that querying Debian Code Search seemed slow, which surprised me because I previously spent quite some effort on making it faster, see Debian Code Search Instant and Taming the latency tail for the most recent substantial architecture overhaul and related optimizations.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2016-08-08-debian-codesearch-latency/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
 
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Debian Code Search: improving client-side latency</title>
-    <meta name="viewport" content="width=device-width">
-    <link rel="shortcut icon" href="/favicon.ico" />
-    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
-    <link rel="canonical" href="https://michael.stapelberg.ch/posts/2016-08-08-debian-codesearch-latency/">
-    <meta name="author" content="Michael Stapelberg">
-    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
-    <style type="text/css">
-@font-face {
-  font-family: 'Yanone Kaffeesatz Regular';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
 
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: normal;
-  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
 
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: bold;
-  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
 
-body, td, th {
-  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  color: #000;
-} 
-    </style>
-    <link rel="stylesheet" href="/2.css" type="text/css">
-    
-    <link rel="stylesheet" href="/1.min.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2">
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2">
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
 
 
-  <body>
-    <div class="container-fluid">
-      <div class="row">
-	<div id="menu" class="col-md-2">
-  <div style="display: flex; align-items: center">
-    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
-    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
   </div>
 
-  <ul class="menu_open">
-    <li><a class="menu_item" href="/"><span class="menu_title">About</span></a></li>
-    <li><a class="menu_item" href="/posts/"><span class="menu_title">Blog</span></a></li>
-    <li><span class="menu_title">Programs</span>
-      <div class="subitem">
-	<ul class="menu_open">
-	  <li><a class="menu_item" href="https://gokrazy.org/"><span class="menu_title">gokrazy</span></a></li>
-	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
-	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
-	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
-	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
-	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
-	</ul>
-      </div>
-    </li>
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
 
-    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
-      <div class="subitem">
-	<ul class="menu_open">
-	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
-	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
-	</ul>
-      </div>
-    </li>
+  <input type="checkbox" id="ms_burger">
 
-    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
-    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
-  </ul>
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div>
+<h1 class="ms_title">Debian Code Search: improving client-side latency</h1>
+<div class="ms_meta">
+  <div id="ms_date">published 2016-08-08, last modified 2020-11-21</div>
+  
+  
+  <div id="ms_tags">
+  
+  in tag
+  
+  
+  <span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+  
+  </div>
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/index.md"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
 </div>
+<div class="Artikel" id="content">
+  
 
-	<div id="contentBox" class="col-md-10">
-	  <h2 class="title">Debian Code Search: improving client-side latency</h2>
-	  <div style="margin-bottom: 2em">
-	    <span id="date">published 2016-08-08, last modified 2019-02-04</span>
-	    
-	  
-	  
-	  in tag
-	  
-	  
-	  <span class="tag"><a href="/posts/tags/debian/">debian</a></span>
-	  
-	  
-	  <span style="padding-left: 0.1em; padding-right: 0.1em; margin-left: .5em; margin-right: .5em"><a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2016-08-08-debian-codesearch-latency.html"><img src="../../Bilder/pen-square-solid.svg" style="height: 1.25em"></a></span>
-	  
-	  </div>
-	  <div class="Artikel" id="content">
-	    <p>
-A while ago, it occurred to me that querying Debian Code Search seemed slow, which surprised me because I previously spent quite some effort on making it faster, see <a href="https://people.debian.org/~stapelberg/2014/12/03/debian-code-search-instant.html">Debian Code Search Instant</a> and <a href="https://people.debian.org/~stapelberg/2014/12/23/code-search-taming-the-latency-tail.html">Taming the latency tail</a> for the most recent substantial architecture overhaul and related optimizations.
-</p>
+<p>A while ago, it occurred to me that querying Debian Code Search seemed slow, which surprised me because I previously spent quite some effort on making it faster, see <a href="https://people.debian.org/~stapelberg/2014/12/03/debian-code-search-instant.html">Debian Code Search Instant</a> and <a href="https://people.debian.org/~stapelberg/2014/12/23/code-search-taming-the-latency-tail.html">Taming the latency tail</a> for the most recent substantial architecture overhaul and related optimizations.</p>
 
-<p>
-Upon taking a closer look, I realized that while performing the search query on the server side was pretty fast, the perceived slowness was due to the client side being slow. By “being slow”, I mean that it took a long time until something was drawn on the screen (high latency) and that what was happening on the screen was janky (stuttering, not smooth).
-</p>
+<p>Upon taking a closer look, I realized that while performing the search query on the server side was pretty fast, the perceived slowness was due to the client side being slow. By “being slow”, I mean that it took a long time until something was drawn on the screen (high latency) and that what was happening on the screen was janky (stuttering, not smooth).</p>
 
-<p>
-Part of that slowness was due to historical reasons: the client-side architecture was optimized for the use-case where users open Debian Code Search’s index page and then submit a search query, but I was using Chrome’s address bar to send a search query (type “codesearch”, then hit the TAB key). Further, we only added a non-JavaScript version after we launched the JavaScript version. Hence, the redirects and progressive enhancements we implemented are more of a kludge than a well thought out design.
-</p>
+<p>Part of that slowness was due to historical reasons: the client-side architecture was optimized for the use-case where users open Debian Code Search’s index page and then submit a search query, but I was using Chrome’s address bar to send a search query (type “codesearch”, then hit the TAB key). Further, we only added a non-JavaScript version after we launched the JavaScript version. Hence, the redirects and progressive enhancements we implemented are more of a kludge than a well thought out design.</p>
 
-<p>
-After this bit of original investigation, I opened <a href="https://github.com/Debian/dcs/issues/69">GitHub issue #69</a> to track the work on making Debian Code Search faster. In that issue, I captured how Chrome’s network inspector visualizes the work necessary to render the page: <img src="https://people.debian.org/~stapelberg/screenshots/2016-08-08-dcs-before.png" width="626" height="278" alt="Chrome network inspector: before">
-</p>
+<p>After this bit of original investigation, I opened <a href="https://github.com/Debian/dcs/issues/69">GitHub issue #69</a> to track the work on making Debian Code Search faster. In that issue, I captured how Chrome’s network inspector visualizes the work necessary to render the page:</p>
 
-<h3>A couple of quick wins</h3>
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2016-08-08-debian-codesearch-latency/2016-08-08-dcs-before.png"><img
+  srcset="https://michael.stapelberg.ch/posts/2016-08-08-debian-codesearch-latency/2016-08-08-dcs-before_huc0cd959d5bde36e210184881f13990ae_342853_1200x0_resize_box_2.png 2x,https://michael.stapelberg.ch/posts/2016-08-08-debian-codesearch-latency/2016-08-08-dcs-before_huc0cd959d5bde36e210184881f13990ae_342853_1800x0_resize_box_2.png 3x"
+  src="https://michael.stapelberg.ch/posts/2016-08-08-debian-codesearch-latency/2016-08-08-dcs-before_huc0cd959d5bde36e210184881f13990ae_342853_600x0_resize_box_2.png"
+  alt="Chrome network inspector: before" title="Chrome network inspector: before"
+  width="600"
+  height="267"
+  style="border: 1px solid #000"
+  loading="lazy"></a>
+
+
+<h2 id="a-couple-of-quick-wins">A couple of quick wins</h2>
 
 <p>
 There are a couple of little fixes and improvements on which I’m not going to spend too much time on, but which I list for completeness anyway just in case they come in handy for a similar project of yours:
@@ -170,9 +268,12 @@ With all of these improvements in place, rendering latency goes down from half a
 <img src="https://people.debian.org/~stapelberg/screenshots/2016-08-08-dcs-after.png" width="471" height="333" alt="Chrome network inspector: after">
 </p>
 
-	  </div>
-	</div>
+</div>
+
       </div>
-    </div>
-  </body>
+
+    </main><div id="ms_footer">
+  © 2020 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
 </html>

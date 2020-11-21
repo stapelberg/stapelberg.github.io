@@ -1,118 +1,237 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Häufige Rechtschreibfehler - Michael Stapelberg</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <meta name="description" content="Als Tipp gemeint: Bitte interpretiere diesen Artikel nicht zu kritisch, und bitte kritisiere die Fehler deiner Mitmenschen nur wenn es konstruktiv ankommen kann; nie als Angriff.    Heute habe ich endlich die Zeit gefunden, alle Korrekturen, die ich meinen lieben Mitmenschen charmant entgegenbringe, wenn ich als „Leichtsinnsfehler”-Polizist auf Streife gehe, zusammenzufassen.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2008-12-19-haeufige_rechtschreibfehler/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
 
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Häufige Rechtschreibfehler</title>
-    <meta name="viewport" content="width=device-width">
-    <link rel="shortcut icon" href="/favicon.ico" />
-    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
-    <link rel="canonical" href="https://michael.stapelberg.ch/posts/2008-12-19-haeufige_rechtschreibfehler/">
-    <meta name="author" content="Michael Stapelberg">
-    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
-    <style type="text/css">
-@font-face {
-  font-family: 'Yanone Kaffeesatz Regular';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
 
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: normal;
-  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
 
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: bold;
-  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
 
-body, td, th {
-  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  color: #000;
-} 
-    </style>
-    <link rel="stylesheet" href="/2.css" type="text/css">
-    
-    <link rel="stylesheet" href="/1.min.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2">
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2">
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
 
 
-  <body>
-    <div class="container-fluid">
-      <div class="row">
-	<div id="menu" class="col-md-2">
-  <div style="display: flex; align-items: center">
-    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
-    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
   </div>
 
-  <ul class="menu_open">
-    <li><a class="menu_item" href="/"><span class="menu_title">About</span></a></li>
-    <li><a class="menu_item" href="/posts/"><span class="menu_title">Blog</span></a></li>
-    <li><span class="menu_title">Programs</span>
-      <div class="subitem">
-	<ul class="menu_open">
-	  <li><a class="menu_item" href="https://gokrazy.org/"><span class="menu_title">gokrazy</span></a></li>
-	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
-	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
-	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
-	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
-	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
-	</ul>
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
       </div>
-    </li>
-
-    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
-      <div class="subitem">
-	<ul class="menu_open">
-	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
-	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
-	</ul>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
       </div>
-    </li>
+    </div>
 
-    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
-    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
-  </ul>
-</div>
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
 
-	<div id="contentBox" class="col-md-10">
-	  <h2 class="title">Häufige Rechtschreibfehler</h2>
-	  <div style="margin-bottom: 2em">
-	    <span id="date">published 2008-12-19, last modified 2018-03-18</span>
-	    
-	  
-	  <span style="padding-left: 0.1em; padding-right: 0.1em; margin-left: .5em; margin-right: .5em"><a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2008-12-19-Haeufige_Rechtschreibfehler.markdown"><img src="../../Bilder/pen-square-solid.svg" style="height: 1.25em"></a></span>
-	  
-	  </div>
-	  <div class="Artikel" id="content">
-	    <style type="text/css">
-	      #TableOfContents > ul, #TableOfContents > ul > li > ul {
-		  list-style: none;
-		  margin: 0;
-		  padding: 0;
-	      }
-	    </style>
-	    <details style="margin-bottom: 2em">
-	      <summary>Table of contents</summary>
-	      
-	    </details>
-	    <div class="warning" style="min-height: 50px; overflow: hidden">
-<img src="/Bilder/Warning.png" class="backButton" alt="Warnung">
-<p style="margin-top: 15px;" class="strong">Vorsicht! Dies ist ein
-Weltverbesserungsartikel</p>
-<p style="clear: left">Sollten Sie nicht in der Stimmung für
-Weltverbesserungen sein oder jemand, der sich leicht über Weltverbesserer
-aufregt, betätigen Sie bitte jetzt Ihren „Zurück”-Knopf.
-Danke.</p>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div>
+<h1 class="ms_title">Häufige Rechtschreibfehler</h1>
+<div class="ms_meta">
+  <div id="ms_date">published 2008-12-19, last modified 2020-11-21</div>
+  
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2008-12-19-Haeufige_Rechtschreibfehler.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
 </div>
+<div class="Artikel" id="content">
+  <style type="text/css">
+    .TableOfContents > ul, .TableOfContents > ul > li > ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+    }
+    .TableOfContents li {
+	margin-bottom: 1rem;
+    }
+  </style>
+  <details class="ms_toc_details">
+    <summary>Table of contents</summary>
+    <nav class="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#absatz_1">1.: Häufig gemachte, ganz klar falsche, Fehler</a>
+<ul>
+<li><a href="#dassdas">1.1) dass/das</a></li>
+<li><a href="#seitseid">1.2) seit/seid</a></li>
+<li><a href="#todtot">1.3) tod/tot</a></li>
+<li><a href="#alswie">1.4) als/wie</a></li>
+<li><a href="#standart">1.5) Standart</a></li>
+<li><a href="#nonexistente_woerter">1.6) „Wörter, die’s SO einfach nicht gibt”</a></li>
+</ul></li>
+<li><a href="#absatz_2">2.: Häufig gemachte Fehler, die kaum einem auffallen…</a>
+<ul>
+<li><a href="#deppenapostroph">2.1) Der Deppenapostroph</a></li>
+<li><a href="#deppenleerzeichen">2.2) Das Deppenleerzeichen</a></li>
+<li><a href="#kommafehler">2.3) Kommafehler</a></li>
+<li><a href="#scheinbar">2.4) Anscheinend und scheinbar</a></li>
+<li><a href="#superlativ">2.5) Die einzigste Sache, die jetzt noch bleibt…</a></li>
+<li><a href="#dennweil">2.6) Denn/Weil</a></li>
+</ul></li>
+<li><a href="#absatz_3">3.: Weitere interessante, themenverwandte Websites</a></li>
+</ul></li>
+</ul>
+</nav>
+  </details>
+  
+
+<aside class="admonition note">
+  <div class="note-container">
+    <div class="note-icon">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+    </div>
+    <div class="admonition-content"><strong>Als Tipp gemeint:</strong> Bitte interpretiere diesen Artikel nicht zu kritisch, und
+bitte kritisiere die Fehler deiner Mitmenschen nur wenn es konstruktiv ankommen
+kann; nie als Angriff.</div>
+  </div>
+</aside>
+
 
 <p>
 Heute habe ich endlich die Zeit gefunden, alle Korrekturen, die ich meinen
@@ -135,33 +254,14 @@ via E-Mail oder IRC gekommen bist, so sei dir versichert, dass derjenige, der
 den Link geschickt hat, dir nur helfen möchte, keinesfalls dich beleidigen.</i>
 </p>
 
-<p><table class="toc">
-<tr><td><h3>Inhaltsverzeichnis:</h3>
-<ul>
-    <li class="level1"><a href="#absatz_1">1.: Häufig gemachte, ganz klar falsche, Fehler</a></li>
-        <li class="level2"><a href="#dassdas">1.1) dass/das</a></li>
-        <li class="level2"><a href="#seitseid">1.2) seit/seid</a></li>
-        <li class="level2"><a href="#todtot">1.3) tod/tot</a></li>
-        <li class="level2"><a href="#alswie">1.4) als/wie</a></li>
-        <li class="level2"><a href="#standart">1.5) standart</a></li>
-        <li class="level2"><a href="#nonexistente_woerter">1.6) „Wörter, die’s SO einfach nicht gibt”</a></li>
-    <li class="level1"><a href="#absatz_2">2.: Häufig gemachte Fehler, die kaum einem auffallen…</a></li>
-        <li class="level2"><a href="#deppenapostroph">2.1) Der Deppenapostroph</a></li>
-        <li class="level2"><a href="#deppenleerzeichen">2.2) Das Deppenleerzeichen</a></li>
-        <li class="level2"><a href="#kommafehler">2.3) Kommafehler</a></li>
-        <li class="level2"><a href="#scheinbar">2.4) Anscheinend und scheinbar</a></li>
-        <li class="level2"><a href="#superlativ">2.5) Die einzigste Sache, die jetzt noch bleibt…</a></li>
-        <li class="level2"><a href="#dennweil">2.6) Denn/Weil</a></li>
-    <li class="level1"><a href="#absatz_3">3.: Weitere interessante, themenverwandte Websites</a></li>
-</ul>
-</td></tr>
-</table>
-<h3><a name="absatz_1">1.: Häufig gemachte, ganz klar falsche, Fehler</a></h3>
-<h3><a name="dassdas">1.1) dass/das</a></h3>
+<h2 id="absatz_1">1.: Häufig gemachte, ganz klar falsche, Fehler</h2>
+
+<h3 id="dassdas">1.1) dass/das</h3>
+
 <p>
 <small>Siehe auch: <a href="http://www.dass-das.de/" target="_blank">
 dass-das.de</a></small>
-</p></p>
+</p>
 
 <p>
 Dies ist sicher einer der Fehler, die den meisten Menschen auffallen. Es ist
@@ -199,7 +299,7 @@ Mit der Zeit verinnerlicht man sich das aber und wählt ganz automatisch das
 richtige Wort.
 </p>
 
-<h3><a name="seitseid">1.2) seit/seid</a></h3>
+<h3 id="seitseid">1.2) seit/seid</h3>
 
 <p>
 <small>Siehe auch: <a href="http://www.seit-seid.de/" target="_blank"
@@ -218,7 +318,7 @@ fällt mir die Unterscheidung zwischen seit und seid gar nicht mehr schwer.</i>
 und <i>Seit er nicht mehr zur Schule geht, hat er nur noch Flausen im Kopf.</i>
 </p>
 
-<h3><a name="todtot">1.3) tod/tot</a></h3>
+<h3 id="todtot">1.3) tod/tot</h3>
 
 <p>
 Der Unterschied zwischen dem „Tod” als Substantiv und „tot” als Adjektiv ist
@@ -241,7 +341,7 @@ fanden.”</i> Hier ist das Subjekt nicht mehr „Er”, sondern der Tod. Man fr
 nach einem Subjekt mit „Wer oder was?”.
 </p>
 
-<h3><a name="alswie">1.4) als/wie</a></h2>
+<h3 id="alswie">1.4) als/wie</h3>
 
 <p>
 Da ich mehrmals gefragt wurde, ob ich nicht auch den Unterschied zwischen als
@@ -257,12 +357,15 @@ Beispiel „doppelt so viel wie du”.
 <p>
 Zur Veranschaulichung noch ein paar Beispiele:
 </p>
-    <ul>
-        <li>Er nimmt sich immer mehr Kuchen <b>als</b> Peter.</li>
-        <li>Er ist älter <b>als</b> sein Bruder.</li>
-        <li>Er ist doppelt so alt <b>wie</b> seine Schwester</li>
-    </ul>
-<h3><a name="standart">1.5) Standart</a></h3>
+
+<ul>
+<li>Er nimmt sich immer mehr Kuchen <b>als</b> Peter.</li>
+<li>Er ist älter <b>als</b> sein Bruder.</li>
+<li>Er ist doppelt so alt <b>wie</b> seine Schwester</li>
+</ul>
+
+<h3 id="standart">1.5) Standart</h3>
+
 <p>
 <small>Siehe auch: <a href="http://www.k-faktor.com/standart/" target="_blank"
 title="k-faktor.com/standart">k-faktor.com/standart</a></small>
@@ -275,21 +378,25 @@ title="k-faktor.com/standart">k-faktor.com/standart</a>). Weder im Deutschen,
 noch im Englischen. Nein. Wirklich. Ihr meint zu 100% Standard, mit „d”.
 Einfach merken: <i>immer</i> mit „d”. Danke.
 </p>
-<h3><a name="nonexistente_woerter">1.6) „Wörter, die’s SO einfach nicht gibt”</a></h3>
+
+<h3 id="nonexistente_woerter">1.6) „Wörter, die’s SO einfach nicht gibt”</h3>
+
 <p>
 Diese Wortgruppe ist schnell erklärt: Für den einen sind sie im alltäglichen
 Sprachgebrauch durchaus üblich, andere haben das Wort nie gehört – der örtliche
 Dialekt ist schuld. Hier eine kurze Auflistung:
 </p>
-    <ul>
-        <li>Richtig: <b>anders</b>, Falsch: <i>anderst, anderster</i></li>
-        <li>Richtig: <b>eben</b>, Falsch: <i>ebend, ebent</i></li>
-    </ul>
 
-<h3><a name="absatz_2">2.: Häufig gemachte Fehler, die kaum einem auffallen…</a></h3>
-<small>(…aber trotzdem tierisch nerven!)</small>
+<ul>
+<li>Richtig: <b>anders</b>, Falsch: <i>anderst, anderster</i></li>
+<li>Richtig: <b>eben</b>, Falsch: <i>ebend, ebent</i></li>
+</ul>
 
-<h3><a name="deppenapostroph">2.1) Der Deppenapostroph</a></h3>
+<h2 id="absatz_2">2.: Häufig gemachte Fehler, die kaum einem auffallen…</h2>
+
+<p><small>(…aber trotzdem tierisch nerven!)</small></p>
+
+<h3 id="deppenapostroph">2.1) Der Deppenapostroph</h3>
 
 <p>
 <small>Siehe auch: <a href="http://www.deppenapostroph.de/" target="_blank"
@@ -354,7 +461,8 @@ Textverarbeitungsprogramme bieten aber eine automatische Erkennung von
 „falschen” Apostrophen und wandeln sie korrekt um.
 </p>
 
-<h3><a name="deppenleerzeichen">2.2) Das Deppenleerzeichen</a></h3>
+<h3 id="deppenleerzeichen">2.2) Das Deppenleerzeichen</h3>
+
 <p>
 <small>Siehe auch: <a href="http://www.deppenleerzeichen.de/" target="_blank"
 title="deppenleerzeichen.de">deppenleerzeichen.de</a></small>
@@ -368,13 +476,15 @@ eine <a href="http://www.deppenleerzeichen.de/?page_id=217"
 target="_blank">gute Begründung</a> dafür.
 </p>
 
-<h3><a name="kommafehler">2.3) Kommafehler</a></h3>
+<h3 id="kommafehler">2.3) Kommafehler</h3>
+
 <p>
 Anstatt die gängigen Kommafehler aufzulisten, gehe ich hier einfach auf die
 Regeln ein und biete euch eine kleine Zusammenfassung. Man braucht natürlich
 nicht alle auswendig zu lernen, meistens hat man das nach kurzer Zeit im
 Gefühl.
 </p>
+
 <ol>
     <li style="margin-bottom: 2%; margin-left: 2%">
     Zwischen Aufzählungen steht ein Komma, vorausgesetzt, dass die
@@ -444,7 +554,7 @@ Gefühl.
     </li>
 </ol>
 
-<h3><a name="scheinbar">2.4) Anscheinend und scheinbar</a></h3>
+<h3 id="scheinbar">2.4) Anscheinend und scheinbar</h3>
 
 <p>
 <small>Siehe auch: Bastian Sicks „Der Dativ ist dem Genitiv sein Tod” (auch
@@ -475,7 +585,8 @@ Einen schönen Spruch dazu erhielt ich letztens von einem Freund:
 <strong>„Das scheinbar hör’ ich weinend, du meinst gewiss anscheinend!”</strong>
 </p>
 
-<p><h3><a name="superlativ">2.5) Die einzigste Sache, die jetzt noch bleibt…</a></h3>
+<h3 id="superlativ">2.5) Die einzigste Sache, die jetzt noch bleibt…</h3>
+
 <p>
 <small>Siehe auch: <a href="http://de.wikipedia.org/wiki/Hyperlativ"
 title="Hyperlativ (Wikipedia)">Hyperlativ (Wikipedia)</a></small>
@@ -494,8 +605,10 @@ title="Hyperlativ (Wikipedia)">Wikipedia-Artikel
 „Hyperlativ”</a> findet sich eine kurze Erklärung, die auch noch 2 andere Fälle
 neben den absoluten Adjektiven erklärt.
 </p>
-<h3><a name="dennweil">2.6) Denn/Weil</a></h3>
-<p>
+
+<h3 id="dennweil">2.6) Denn/Weil</h3>
+
+<p><p>
 <small>Zitiert von meiner Partnerseite <a href="http://www.dennweil.de/"
 title="dennweil.de" target="_blank">dennweil.de</a></small>
 </p>
@@ -531,46 +644,80 @@ Stelle des Nebensatzes, wie in einem Hauptsatz.
     <li>Er möchte, weil er hat zuviel gegessen, keinen Kuchen mehr.</li>
 </ul></p>
 
-<p><h3><a name="absatz_3">3.: Weitere interessante, themenverwandte Websites</a></h3>
+<h2 id="absatz_3">3.: Weitere interessante, themenverwandte Websites</h2>
+
 <ul>
     <li style="margin-bottom: 2%; margin-left: 2%">
     <a href="http://webdesign.crissov.de/Typographie" target="_blank"
-    title="http://webdesign.crissov.de/Typographie"><a href="http://webdesign.crissov.de/Typographie">http://webdesign.crissov.de/Typographie</a></a>:
+    title="http://webdesign.crissov.de/Typographie">http://webdesign.crissov.de/Typographie</a>:
     behandelt Typographie für Webmaster
-    </li></p>
+    </li>
 
-<pre><code>&lt;li style=&quot;margin-bottom: 2%; margin-left: 2%&quot;&gt;
-&lt;a href=&quot;http://www.agb-s.de&quot; target=&quot;_blank&quot;
-title=&quot;agb-s.de&quot;&gt;http://www.agb-s.de&lt;/a&gt;: Diese Seite versucht, uns
-beizubringen, dass es AGB statt AGBs heißen muss. Leider ist das laut
-Duden falsch, worauf auch im &lt;a
-href=&quot;http://www.agb-s.de/?seite=board&amp;amp;modul=1&amp;amp;action=zeigeThread&amp;amp;template_last=agbs&amp;amp;bereichid=1&amp;amp;threadid=1&quot;
-target=&quot;_blank&quot; title=&quot;AGB-s.de-Forum&quot;&gt;websiteeigenen Forum
-hingewiesen&lt;/a&gt; wurde: &lt;small&gt;„Bevor so ein Quatsch verbreitet wird wie
-&amp;sbquo;Es heißt richtig AGB anstatt AGBs&amp;lsquo;, lest doch einfach mal
-im Duden nach. Die Sache mit Apostroph, also AGB's ist natürlich falsch
-aber der Plural AGBs ist nicht falsch. Es ist in der deutschen
-Rechtschreibung eindeutig erklärt, dass bei Abkürzungen, die als solche
-auch ausgesprochen werden (wie eben AGB, GmbH usw.) zur Pluralbildung
-ein sogenanntes plural-s angehängt werden kann und bei
-Verwechselungsgefahr mit dem Genitiv sogar empfohlen wird, auch dann,
-wenn der ausgeschriebene Begriff im Plural nicht auf ein
-&amp;sbquo;s&amp;lsquo; endet.”&lt;/small&gt;. Interessant sind aber die Pleonasmen
-(gleich auf der Startseite unten zu finden).
-&lt;/li&gt;
+    <li style="margin-bottom: 2%; margin-left: 2%">
+    <a href="http://www.agb-s.de" target="_blank"
+    title="agb-s.de">http://www.agb-s.de</a>: Diese Seite versucht, uns
+    beizubringen, dass es AGB statt AGBs heißen muss. Leider ist das laut
+    Duden falsch, worauf auch im <a
+    href="http://www.agb-s.de/?seite=board&amp;modul=1&amp;action=zeigeThread&amp;template_last=agbs&amp;bereichid=1&amp;threadid=1"
+    target="_blank" title="AGB-s.de-Forum">websiteeigenen Forum
+    hingewiesen</a> wurde: <small>„Bevor so ein Quatsch verbreitet wird wie
+    &sbquo;Es heißt richtig AGB anstatt AGBs&lsquo;, lest doch einfach mal
+    im Duden nach. Die Sache mit Apostroph, also AGB's ist natürlich falsch
+    aber der Plural AGBs ist nicht falsch. Es ist in der deutschen
+    Rechtschreibung eindeutig erklärt, dass bei Abkürzungen, die als solche
+    auch ausgesprochen werden (wie eben AGB, GmbH usw.) zur Pluralbildung
+    ein sogenanntes plural-s angehängt werden kann und bei
+    Verwechselungsgefahr mit dem Genitiv sogar empfohlen wird, auch dann,
+    wenn der ausgeschriebene Begriff im Plural nicht auf ein
+    &sbquo;s&lsquo; endet.”</small>. Interessant sind aber die Pleonasmen
+    (gleich auf der Startseite unten zu finden).
+    </li>
 
-&lt;li style=&quot;margin-bottom: 2%; margin-left: 2%&quot;&gt;
-&lt;a href=&quot;http://blog.pri-dev.net/archiv/2006/03/24/74/&quot; target=&quot;_blank&quot;
-title=&quot;Deutsch-Crashkurs&quot;&gt;Deutsch-Crashkurs&lt;/a&gt; von Matze: Einige
-typische Fehler, auch bei Redewendungen
-&lt;/li&gt;
-</code></pre>
+    <li style="margin-bottom: 2%; margin-left: 2%">
+    <a href="http://blog.pri-dev.net/archiv/2006/03/24/74/" target="_blank"
+    title="Deutsch-Crashkurs">Deutsch-Crashkurs</a> von Matze: Einige
+    typische Fehler, auch bei Redewendungen
+    </li>
+</ul>
 
-<p></ul></p>
+</div>
 
-	  </div>
-	</div>
       </div>
-    </div>
-  </body>
+<div id="ms_toc">
+  <div>
+    <strong>Table Of Contents</strong>
+
+    <nav class="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#absatz_1">1.: Häufig gemachte, ganz klar falsche, Fehler</a>
+<ul>
+<li><a href="#dassdas">1.1) dass/das</a></li>
+<li><a href="#seitseid">1.2) seit/seid</a></li>
+<li><a href="#todtot">1.3) tod/tot</a></li>
+<li><a href="#alswie">1.4) als/wie</a></li>
+<li><a href="#standart">1.5) Standart</a></li>
+<li><a href="#nonexistente_woerter">1.6) „Wörter, die’s SO einfach nicht gibt”</a></li>
+</ul></li>
+<li><a href="#absatz_2">2.: Häufig gemachte Fehler, die kaum einem auffallen…</a>
+<ul>
+<li><a href="#deppenapostroph">2.1) Der Deppenapostroph</a></li>
+<li><a href="#deppenleerzeichen">2.2) Das Deppenleerzeichen</a></li>
+<li><a href="#kommafehler">2.3) Kommafehler</a></li>
+<li><a href="#scheinbar">2.4) Anscheinend und scheinbar</a></li>
+<li><a href="#superlativ">2.5) Die einzigste Sache, die jetzt noch bleibt…</a></li>
+<li><a href="#dennweil">2.6) Denn/Weil</a></li>
+</ul></li>
+<li><a href="#absatz_3">3.: Weitere interessante, themenverwandte Websites</a></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    </main><div id="ms_footer">
+  © 2020 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
 </html>

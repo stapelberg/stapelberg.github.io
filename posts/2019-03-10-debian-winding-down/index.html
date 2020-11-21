@@ -1,117 +1,201 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Winding down my Debian involvement - Michael Stapelberg</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <meta name="description" content="This post is hard to write, both in the emotional sense but also in the “I would have written a shorter letter, but I didn’t have the time” sense. Hence, please assume the best of intentions when reading it—it is not my intention to make anyone feel bad about their contributions, but rather to provide some insight into why my frustration level ultimately exceeded the threshold.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2019-03-10-debian-winding-down/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
 
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Winding down my Debian involvement</title>
-    <meta name="viewport" content="width=device-width">
-    <link rel="shortcut icon" href="/favicon.ico" />
-    <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
-    <link rel="canonical" href="https://michael.stapelberg.ch/posts/2019-03-10-debian-winding-down/">
-    <meta name="author" content="Michael Stapelberg">
-    <meta name="keywords" content="Michael, Stapelberg, Linux, Debian">
-    <style type="text/css">
-@font-face {
-  font-family: 'Yanone Kaffeesatz Regular';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Yanone Kaffeesatz Regular'), url('/YanoneKaffeesatz-Regular.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
 
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: normal;
-  src: local('Droid Sans'), local('DroidSans'), url('/droid_sans.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
 
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: bold;
-  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/droid_sans_bold.ttf') format('truetype');
-}
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
 
-body, td, th {
-  font-family: 'Droid Sans', Verdana, Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  color: #000;
-} 
-    </style>
-    <link rel="stylesheet" href="/2.css" type="text/css">
-    
-    <link rel="stylesheet" href="/1.min.css" type="text/css"><link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed"></head>
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2">
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2">
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
 
 
-  <body>
-    <div class="container-fluid">
-      <div class="row">
-	<div id="menu" class="col-md-2">
-  <div style="display: flex; align-items: center">
-    <img src="/logo1x.jpg" srcset="/logo2x.jpg 2x, /logo3x.jpg 3x" width="45" style="border-radius: 40%; margin-right: .25em">
-    <h1 style="letter-spacing: .75px">Michael Stapelberg</h1>
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
   </div>
 
-  <ul class="menu_open">
-    <li><a class="menu_item" href="/"><span class="menu_title">About</span></a></li>
-    <li><a class="menu_item" href="/posts/"><span class="menu_title">Blog</span></a></li>
-    <li><span class="menu_title">Programs</span>
-      <div class="subitem">
-	<ul class="menu_open">
-	  <li><a class="menu_item" href="https://gokrazy.org/"><span class="menu_title">gokrazy</span></a></li>
-	  <li><a class="menu_item" href="https://i3wm.org/"><span class="menu_title">i3</span></a></li>
-	  <li><a class="menu_item" href="https://robustirc.net/"><span class="menu_title">RobustIRC</span></a></li>
-	  <li><a class="menu_item" href="https://github.com/rtr7/router7/"><span class="menu_title">router7</span></a></li>
-	  <li><a class="menu_item" href="https://www.x11vis.org/"><span class="menu_title">x11vis</span></a></li>
-	  <li><a class="menu_item" href="/c128_kasse"><span class="menu_title">c128_kasse</span></a></li>
-	</ul>
-      </div>
-    </li>
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
 
-    <li><a class="menu_item" href="https://www.debian.org/"><span class="menu_title">Debian</span></a>
-      <div class="subitem">
-	<ul class="menu_open">
-	  <li><a class="menu_item" href="https://codesearch.debian.net/"><span class="menu_title">Debian Code Search</span></a></li>
-	  <li><a class="menu_item" href="https://manpages.debian.org/"><span class="menu_title">manpages.debian.org</span></a></li>
-	</ul>
-      </div>
-    </li>
+  <input type="checkbox" id="ms_burger">
 
-    <li><a class="menu_item" href="/talks"><span class="menu_title">Talks</span></a></li>
-    <li><a class="menu_item" href="/series"><span class="menu_title">TV series</span></a></li>
-  </ul>
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div>
+<h1 class="ms_title">Winding down my Debian involvement</h1>
+<div class="ms_meta">
+  <div id="ms_date">published 2019-03-10, last modified 2020-11-21</div>
+  
+  
+  <div id="ms_tags">
+  
+  in tag
+  
+  
+  <span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+  
+  </div>
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2019-03-10-debian-winding-down.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
 </div>
-
-	<div id="contentBox" class="col-md-10">
-	  <h2 class="title">Winding down my Debian involvement</h2>
-	  <div style="margin-bottom: 2em">
-	    <span id="date">published 2019-03-10</span>
-	    
-	  
-	  
-	  in tag
-	  
-	  
-	  <span class="tag"><a href="/posts/tags/debian/">debian</a></span>
-	  
-	  
-	  <span style="padding-left: 0.1em; padding-right: 0.1em; margin-left: .5em; margin-right: .5em"><a style="text-decoration: none; color: white" href="https://github.com/stapelberg/hugo/edit/master/content/posts/2019-03-10-debian-winding-down.markdown"><img src="../../Bilder/pen-square-solid.svg" style="height: 1.25em"></a></span>
-	  
-	  </div>
-	  <div class="Artikel" id="content">
-	    <style type="text/css">
-	      #TableOfContents > ul, #TableOfContents > ul > li > ul {
-		  list-style: none;
-		  margin: 0;
-		  padding: 0;
-	      }
-	    </style>
-	    <details style="margin-bottom: 2em">
-	      <summary>Table of contents</summary>
-	      <nav id="TableOfContents">
-<ul>
-<li>
+<div class="Artikel" id="content">
+  <style type="text/css">
+    .TableOfContents > ul, .TableOfContents > ul > li > ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+    }
+    .TableOfContents li {
+	margin-bottom: 1rem;
+    }
+  </style>
+  <details class="ms_toc_details">
+    <summary>Table of contents</summary>
+    <nav class="TableOfContents">
 <ul>
 <li>
 <ul>
@@ -129,11 +213,10 @@ body, td, th {
 <li><a href="#i-have-more-ideas">I have more ideas</a></li>
 </ul></li>
 </ul></li>
-</ul></li>
 </ul>
 </nav>
-	    </details>
-	    
+  </details>
+  
 
 <p>This post is hard to write, both in the emotional sense but also in the “I would
 have written a shorter letter, but I didn’t have the time” sense. Hence, please
@@ -158,7 +241,7 @@ fit for me.</p>
 <p>So I’m finally making a decision that I should have made a long time ago: I am
 winding down my involvement in Debian to a minimum.</p>
 
-<h3 id="what-does-this-mean">What does this mean?</h3>
+<h2 id="what-does-this-mean">What does this mean?</h2>
 
 <p>Over the coming weeks, I will:</p>
 
@@ -177,7 +260,7 @@ would be much appreciated.</p>
 try to be around for administrative issues (e.g. permission transfers) and
 questions addressed directly to me, permitted they are easy enough to answer.</p>
 
-<h3 id="why">Why?</h3>
+<h2 id="why">Why?</h2>
 
 <p>When I joined Debian, I was still studying, i.e. I had luxurious amounts of
 spare time. Now, over 5 years of full time work later, my day job taught me a
@@ -190,7 +273,7 @@ particular order. Some of them influence each other—for example, if changes
 worked better, we could have a chance at transitioning packages to be more
 easily machine readable.</p>
 
-<h4 id="change-process-in-debian">Change process in Debian</h4>
+<h3 id="change-process-in-debian">Change process in Debian</h3>
 
 <p>The last few years, my current team at work conducted various smaller and larger
 refactorings across the entire code base (touching thousands of projects), so we
@@ -262,7 +345,7 @@ individual maintainers.</li>
 colleague Hyrum Wright’s talk “Large-Scale Changes at Google: Lessons Learned
 From 5 Yrs of Mass Migrations”</a>.</p>
 
-<h4 id="fragmented-workflow-and-infrastructure">Fragmented workflow and infrastructure</h4>
+<h3 id="fragmented-workflow-and-infrastructure">Fragmented workflow and infrastructure</h3>
 
 <p>Debian generally seems to prefer decentralized approaches over centralized
 ones. For example, individual packages are maintained in separate repositories
@@ -294,7 +377,7 @@ succeed in implementing it. The lack of effective automation and slow pace of
 changes in the surrounding tooling despite my willingness to contribute time and
 energy killed any motivation I had.</p>
 
-<h4 id="old-infrastructure-package-uploads">Old infrastructure: package uploads</h4>
+<h3 id="old-infrastructure-package-uploads">Old infrastructure: package uploads</h3>
 
 <p>When you want to make a package available in Debian, you upload GPG-signed files
 via anonymous FTP. There are several batch jobs (the queue daemon, <code>unchecked</code>,
@@ -324,7 +407,7 @@ status and when the package will be available via the mirror network.</li>
 <li>Packages should be available within a few minutes after the build completed.</li>
 </ol>
 
-<h4 id="old-infrastructure-bug-tracker">Old infrastructure: bug tracker</h4>
+<h3 id="old-infrastructure-bug-tracker">Old infrastructure: bug tracker</h3>
 
 <p>I dread interacting with the Debian bug
 tracker. <a href="https://en.wikipedia.org/wiki/Debbugs">debbugs</a> is a piece of software
@@ -358,7 +441,7 @@ paper-trail and artifacts of the process in the form of a bug report, but the
 primary interface should be more convenient (e.g. a web form).</li>
 </ol>
 
-<h4 id="old-infrastructure-mailing-list-archives">Old infrastructure: mailing list archives</h4>
+<h3 id="old-infrastructure-mailing-list-archives">Old infrastructure: mailing list archives</h3>
 
 <p>It baffles me that in 2019, we still don’t have a conveniently browsable
 threaded archive of mailing list discussions. Email and threading is more widely
@@ -370,7 +453,7 @@ the least (it is down as I write this).</p>
 <p>I tried to contribute a threaded list archive, but our listmasters didn’t seem
 to care or want to support the project.</p>
 
-<h4 id="debian-is-hard-to-machine-read">Debian is hard to machine-read</h4>
+<h3 id="debian-is-hard-to-machine-read">Debian is hard to machine-read</h3>
 
 <p>While it is obviously possible to deal with Debian packages programmatically,
 the experience is far from pleasant. Everything seems slow and cumbersome. I
@@ -395,19 +478,19 @@ packages as quickly as possible. There used to be a
 longer seems to exist. It is unclear where to get notifications from for new
 packages, and where best to fetch those packages.</p>
 
-<h4 id="complicated-build-stack">Complicated build stack</h4>
+<h3 id="complicated-build-stack">Complicated build stack</h3>
 
 <p>See my <a href="/posts/2016-11-25-build-tools/">“Debian package build tools”</a> post. It
 really bugs me that the sprawl of tools is not seen as a problem by others.</p>
 
-<h4 id="developer-experience-pretty-painful">Developer experience pretty painful</h4>
+<h3 id="developer-experience-pretty-painful">Developer experience pretty painful</h3>
 
 <p>Most of the points discussed so far deal with the experience in <em>developing
 Debian</em>, but as I recently described in my post <a href="/posts/2019-02-15-debian-debugging-devex/">“Debugging experience in
 Debian”</a>, the experience when
 <em>developing using Debian</em> leaves a lot to be desired, too.</p>
 
-<h4 id="i-have-more-ideas">I have more ideas</h4>
+<h3 id="i-have-more-ideas">I have more ideas</h3>
 
 <p>At this point, the article is getting pretty long, and hopefully you got a rough
 idea of my motivation.</p>
@@ -423,9 +506,38 @@ operating systems here. Stay tuned.</p>
 <p>Lastly, I hope this post inspires someone, ideally a group of people, to improve
 the developer experience within Debian.</p>
 
-	  </div>
-	</div>
+</div>
+
       </div>
-    </div>
-  </body>
+<div id="ms_toc">
+  <div>
+    <strong>Table Of Contents</strong>
+
+    <nav class="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#what-does-this-mean">What does this mean?</a></li>
+<li><a href="#why">Why?</a>
+<ul>
+<li><a href="#change-process-in-debian">Change process in Debian</a></li>
+<li><a href="#fragmented-workflow-and-infrastructure">Fragmented workflow and infrastructure</a></li>
+<li><a href="#old-infrastructure-package-uploads">Old infrastructure: package uploads</a></li>
+<li><a href="#old-infrastructure-bug-tracker">Old infrastructure: bug tracker</a></li>
+<li><a href="#old-infrastructure-mailing-list-archives">Old infrastructure: mailing list archives</a></li>
+<li><a href="#debian-is-hard-to-machine-read">Debian is hard to machine-read</a></li>
+<li><a href="#complicated-build-stack">Complicated build stack</a></li>
+<li><a href="#developer-experience-pretty-painful">Developer experience pretty painful</a></li>
+<li><a href="#i-have-more-ideas">I have more ideas</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    </main><div id="ms_footer">
+  © 2020 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
 </html>

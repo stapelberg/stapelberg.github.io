@@ -3,10 +3,697 @@
   <link href="https://michael.stapelberg.ch/feed.xml" rel="self"/>
   <link href="https://michael.stapelberg.ch/"/>
 
-    <updated>2020-11-03T09:09:43+01:00</updated>
+    <updated>2020-11-30T08:12:28+01:00</updated>
     
   <id>https://michael.stapelberg.ch/</id>
   <generator>Hugo -- gohugo.io</generator>
+  <entry>
+    <title type="html"><![CDATA[Fixing the Nuki Opener smart intercom IOT device (on the BTicino SCS bus intercom system)]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/"/>
+    <id>https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/</id>
+    <published>2020-11-30T08:12:00+01:00</published>
+    <updated>2020-11-30T08:12:28+01:00</updated>
+    <content type="html"><![CDATA[
+
+<p>I recently bought a <a href="https://nuki.io/en/opener/">Nuki Opener, which “turns your existing intercom into a
+smart door opener”</a>.</p>
+
+<p>Unfortunately, I have had a lot of trouble getting it to work.</p>
+
+<p>I finally got the device working by interjecting my own micro controller between
+the intercom bus and the Nuki Opener, then driving the Nuki Opener in its
+Analogue mode:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-28-nuki-opener-filtered.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-28-nuki-opener-filtered_hu46bb619362d02271ee9d454f3a246020_1421516_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-28-nuki-opener-filtered_hu46bb619362d02271ee9d454f3a246020_1421516_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-28-nuki-opener-filtered_hu46bb619362d02271ee9d454f3a246020_1421516_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  loading="lazy"></a>
+
+
+
+
+<p>The rest of this article outlines how this setup works at a high level.</p>
+
+<aside class="admonition note">
+  <div class="note-container">
+    <div class="note-icon">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+    </div>
+    <div class="admonition-content"><p><strong>Warning:</strong> The SCS bus’s voltage is dangerously high!</p>
+
+<p>I accidentally broke a Teensy and an intercom unit while working with the SCS
+bus, which is specified at 27 Vdc, but my measurements show 28 volts. Please be
+extra careful!</p>
+</div>
+  </div>
+</aside>
+
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<p>For reliable interpretation and transmission of SCS bus data, we’ll need:</p>
+
+<ol>
+<li><p>SCS receive/transmit circuits. These can be prototyped on a breadboard if you
+have the required diodes, transistors, resistors and capacitors.</p></li>
+
+<li><p>A microcontroller with an Analog Comparator. If your microcontroller has one,
+you’ll find a corresponding section in the datasheet. This function is
+sometimes abbreviated to <code>CMP</code> or <code>AC</code>, or might be part of a larger
+Analog/Digital Converter (<code>ADC</code>).</p></li>
+
+<li><p>A UART (serial) decoder. Most microcontrollers have at least one UART, but if
+you don’t have one available for whichever reason, you could use a software
+UART implementation, too.</p></li>
+</ol>
+
+<h3 id="scs-receive-circuit">SCS receive circuit</h3>
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-29-scs-rx.svg"><img
+  src="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-29-scs-rx.svg"
+  alt="SCS receive circuit" title="SCS receive circuit"
+  style="border: 1px solid #000; margin-right: 1rem"
+  
+  align="left"
+  
+  loading="lazy"></a>
+
+
+
+<p>An R-C network, directly connected to the SCS bus, is used for incoming signal
+conditioning.</p>
+
+<p>The resistor values have been chosen to divide the voltage of the input signal
+from 28V down to approx. 2V, i.e. well within the 0-3.3V range for modern
+microcontroller GPIO pins.</p>
+
+<p>A zener diode limits the 28V level to 3.3V, which should be safe for most
+microcontrollers.</p>
+
+<p>Simulation: <a href="https://tinyurl.com/yxhrkejn">https://tinyurl.com/yxhrkejn</a></p>
+
+<p><br clear="all"></p>
+
+<h3 id="scs-transmit-circuit">SCS transmit circuit</h3>
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-29-scs-tx.svg"><img
+  src="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-29-scs-tx.svg"
+  alt="SCS transmit circuit" title="SCS transmit circuit"
+  style="border: 1px solid #000; margin-right: 1rem"
+  
+  align="left"
+  
+  loading="lazy"></a>
+
+
+
+<p>We directly connect the gate of a mosfet transistor to a GPIO pin of our
+microcontroller, so that when the microcontroller drives the pin high, we use
+the 100Ω resistor to attach a load to the SCS bus.</p>
+
+<p>For comparison, the KNX bus, which is similar to the SCS bus, uses a 68Ω
+resistor here.</p>
+
+<p>Simulation: <a href="https://tinyurl.com/y6nv4yg7">https://tinyurl.com/y6nv4yg7</a></p>
+
+<p><br clear="all"></p>
+
+<h3 id="scs-lab-setup">SCS lab setup</h3>
+
+<p>Use a lab power supply to generate 28V DC. I’m using the <a href="https://www.galaxus.ch/de/s1/product/velleman-labornetzgeraet-labornetzgeraet-5779537">Velleman LABPS3005SM</a> because it was in stock at Galaxus, but any power supply rated for at least 30V DC will do.</p>
+
+<p>As <a href="https://www.open-homeautomation.com/2016/05/11/a-minimal-knx-setup/">the DIY home automation blog entry “A minimal KNX setup”</a> describes, you’ll need to place a 47Ω resistor between the power line and your components.</p>
+
+<p>Afterwards, just connect your components to the bus. The supply/ground line of a <a href="https://en.wikipedia.org/wiki/Breadboard">breadboard</a> will work nicely.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-29-scs-lab-setup.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-29-scs-lab-setup_huf43c3b3dca98c428537fa46c6d1931d3_1264545_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-29-scs-lab-setup_huf43c3b3dca98c428537fa46c6d1931d3_1264545_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-29-scs-lab-setup_huf43c3b3dca98c428537fa46c6d1931d3_1264545_600x0_resize_q75_box.jpg"
+  alt="SCS lab setup" title="SCS lab setup"
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  loading="lazy"></a>
+
+
+
+
+<h3 id="micro-controller-choice">Micro Controller choice</h3>
+
+<p>In this blog post, I’m using a <a href="https://www.pjrc.com/store/teensy40.html">Teensy
+4</a> development board that is widely
+available for ≈20 USD:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-29-teensy4.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-29-teensy4_hu855bbe0a9c47ac557e5b09db74fa3b06_1510905_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-29-teensy4_hu855bbe0a9c47ac557e5b09db74fa3b06_1510905_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-29-teensy4_hu855bbe0a9c47ac557e5b09db74fa3b06_1510905_600x0_resize_q75_box.jpg"
+  alt="Teensy 4" title="Teensy 4"
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  loading="lazy"></a>
+
+
+
+
+<p>With its 600 MHz, the Teensy 4 has enough sheer clock frequency to allow for
+sloppier coding while still achieving high quality input/output.</p>
+
+<p>The teensy tiny form factor (3.5 x 1.7 cm) works well for this project and will
+allow me to store the microcontroller in an existing intercom case.</p>
+
+<p>The <strong>biggest downside is that NXP’s own MCUXpresso IDE cannot target the
+Teensy 4</strong>!</p>
+
+<p>The only officially supported development environment for the Teensy 4 is
+Teensyduino, which is a board support package for the Arduino IDE. Having
+Arduino support is great, but let’s compare:</p>
+
+<p>I also have NXP’s <a href="https://www.nxp.com/design/development-boards/i-mx-evaluation-and-development-boards/mimxrt1060-evk-i-mx-rt1060-evaluation-kit:MIMXRT1060-EVK?&amp;&amp;tid=vanMIMXRT1060-EVK">MIMXRT1060-EVK eval
+kit</a>,
+which uses the same i.MX RT1060 micro controller family as the Teensy 4, but is
+much larger and comes with all the bells and whistles; notably:</p>
+
+<ol>
+<li>The MCUXpresso IDE works with the eval kit’s built-in debugger out of the box!
+Being able to inspect a stack trace, set breakpoints and look at register
+contents are invaluable tools when doing micro controller development.</li>
+<li>The MCUXpresso IDE comes with convenient graphical Pin and Clock config
+tools. Setting a pin’s alternate function becomes a few clicks instead of
+hours of fumbling around.</li>
+<li>The NXP SDK contains a number of drivers and examples that are tested on the
+eval kit. That makes it really easy to get started!</li>
+</ol>
+
+<p>Each of these points is very attractive on their own, but together they make the
+whole experience so different!</p>
+
+<p>Being able to deploy to the Teensy from MCUXpresso would be a killer feature! So
+many NXP SDK examples would suddenly become available, filling the Teensy
+community’s gaps.</p>
+
+<h2 id="signal-setup">Signal Setup</h2>
+
+<p>On a high level, this is how we are going to connect the various signals:</p>
+
+<p>Step 1. We start with the SCS intercom bus signal (28V high, 22V low):</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-10-06-scs-bus.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-10-06-scs-bus_hucbd1cf38e2c23c2f6ccc4d43d53e5fa3_262726_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-10-06-scs-bus_hucbd1cf38e2c23c2f6ccc4d43d53e5fa3_262726_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-10-06-scs-bus_hucbd1cf38e2c23c2f6ccc4d43d53e5fa3_262726_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="160"
+  style="border: 1px solid #000"
+  loading="lazy"></a>
+
+
+
+
+<p>Step 2. Our SCS receive circuit takes the bus signal and divides it down to 2V:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-25-scs-rx.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-25-scs-rx_huda44e0426bfee0fc7f10a0aefe6154d7_193510_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-25-scs-rx_huda44e0426bfee0fc7f10a0aefe6154d7_193510_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-25-scs-rx_huda44e0426bfee0fc7f10a0aefe6154d7_193510_600x0_resize_q75_box.jpg"
+  alt="voltage-divided SCS signal" title="voltage-divided SCS signal"
+  width="600"
+  height="447"
+  style="border: 1px solid #000"
+  loading="lazy"></a>
+
+
+
+
+<p>Step 3. We convert the voltage-divided analog signal into a digital <code>SCSRXOUT</code> signal:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-25-acmp-out.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-25-acmp-out_hud21e06aec62e4c2328f97cadeb89169a_202741_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-25-acmp-out_hud21e06aec62e4c2328f97cadeb89169a_202741_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-25-acmp-out_hud21e06aec62e4c2328f97cadeb89169a_202741_600x0_resize_q75_box.jpg"
+  alt="Analog Comparator output signal" title="Analog Comparator output signal"
+  width="600"
+  height="104"
+  style="border: 1px solid #000"
+  loading="lazy"></a>
+
+
+
+
+<p>Step 4. We modify our <code>SCSRXOUT</code> signal so that it can be sampled at 50%:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-26-modified-scs.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-26-modified-scs_huf442b516588f4a97de6b824c24ce97c9_400929_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-26-modified-scs_huf442b516588f4a97de6b824c24ce97c9_400929_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-26-modified-scs_huf442b516588f4a97de6b824c24ce97c9_400929_600x0_resize_q75_box.jpg"
+  alt="modified SCS signal" title="modified SCS signal"
+  width="600"
+  height="422"
+  style="border: 1px solid #000"
+  loading="lazy"></a>
+
+
+
+
+<p>Step 5. We decode the signal using our micro controller’s UART:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-26-teensy-uart-scs-hex.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-26-teensy-uart-scs-hex_hu39435dced393ae623f524c34c9d5a9f1_269597_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-26-teensy-uart-scs-hex_hu39435dced393ae623f524c34c9d5a9f1_269597_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-26-teensy-uart-scs-hex_hu39435dced393ae623f524c34c9d5a9f1_269597_600x0_resize_q75_box.jpg"
+  alt="Teensy 4 UART decodes SCS" title="Teensy 4 UART decodes SCS"
+  width="600"
+  height="424"
+  style="border: 1px solid #000"
+  loading="lazy"></a>
+
+
+
+
+<h2 id="micro-controller-firmware">Micro Controller firmware</h2>
+
+<p>Once I complete the next revision of the SCS interface PCB, I plan to release
+all design files, schematics, sources, etc. in full.</p>
+
+<p>Until then, the following sections describe how the most important parts work,
+but skip over the implementation-specific glue code that wires everything
+together.</p>
+
+<h3 id="analog-comparator">Analog Comparator</h3>
+
+<p>The Analog Comparator in our microcontroller lets us know whether a voltage is
+above or below a configured threshold voltage by raising an interrupt. A good
+threshold is 1.65V in my case.</p>
+
+<p>In response to the voltage change, we set GPIO pin 15 to a digital high (3.3V) or
+low (0V) level:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020;font-weight:bold">volatile</span> uint32_t cmpflags;
+
+<span style="color:#60a0b0;font-style:italic">// ISR (Interrupt Service Routine), called by the Analog Comparator:
+</span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#902000">void</span> <span style="color:#06287e">acmp1_isr</span>() {
+  cmpflags <span style="color:#666">=</span> CMP1_SCR;
+
+  { <span style="color:#60a0b0;font-style:italic">// clear interrupt status flags:
+</span><span style="color:#60a0b0;font-style:italic"></span>    uint8_t scr <span style="color:#666">=</span> (CMP1_SCR <span style="color:#666">&amp;</span> <span style="color:#666">~</span>(CMP_SCR_CFR_MASK <span style="color:#666">|</span> CMP_SCR_CFF_MASK));
+    CMP1_SCR <span style="color:#666">=</span> scr <span style="color:#666">|</span> CMP_SCR_CFR_MASK <span style="color:#666">|</span> CMP_SCR_CFF_MASK;
+  }
+
+  <span style="color:#007020;font-weight:bold">if</span> (cmpflags <span style="color:#666">&amp;</span> CMP_SCR_CFR_MASK) {
+    <span style="color:#60a0b0;font-style:italic">// See below! This line will be modified:
+</span><span style="color:#60a0b0;font-style:italic"></span>    digitalWrite(<span style="color:#40a070">15</span>, HIGH);
+  }
+
+  <span style="color:#007020;font-weight:bold">if</span> (cmpflags <span style="color:#666">&amp;</span> CMP_SCR_CFF_MASK) {
+    digitalWrite(<span style="color:#40a070">15</span>, LOW);
+  }
+}</code></pre></div>
+<p>This signal can easily be verified by attaching an oscilloscope probe each to
+the <code>SCSRX</code> voltage-regulated bus signal input and to the <code>SCSRXOUT</code> GPIO pin
+output:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-25-acmp-out.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-25-acmp-out_hud21e06aec62e4c2328f97cadeb89169a_202741_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-25-acmp-out_hud21e06aec62e4c2328f97cadeb89169a_202741_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/2020-11-25-acmp-out_hud21e06aec62e4c2328f97cadeb89169a_202741_600x0_resize_q75_box.jpg"
+  alt="Analog Comparator output signal" title="Analog Comparator output signal"
+  width="600"
+  height="104"
+  style="border: 1px solid #000"
+  loading="lazy"></a>
+
+
+
+
+<h3 id="analog-comparator-modification">Analog Comparator Modification</h3>
+
+<p>There is one crucial difference between SCS and UART:</p>
+
+<p>To transmit a 0 (or start bit):</p>
+
+<ul>
+<li>SCS is low 34μs, then high 70μs</li>
+<li>UART is low the entire 104μs</li>
+</ul>
+
+<p>UART implementations typically sample at 50%, the middle of the bit period.</p>
+
+<p>For SCS, we would need to sample at 20%, because the signal returns to high so
+quickly.</p>
+
+<p>While setting a custom sample point is <em>possible</em> in
+e.g. <a href="https://sigrok.org/">sigrok</a>’s UART decoder, neither software nor hardware
+serial implementations on micro controllers typically support it.</p>
+
+<p>On a micro controller it is much easier to just modify the signal so that it can
+be sampled at 50%.</p>
+
+<p>In practical terms, this means modifying the <code>acmp1_isr</code> function to return to
+high later than the Analog Comparator indicates:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020;font-weight:bold">volatile</span> uint32_t cmpflags;
+
+<span style="color:#60a0b0;font-style:italic">// ISR (Interrupt Service Routine), called by the Analog Comparator:
+</span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#902000">void</span> <span style="color:#06287e">acmp1_isr</span>() {
+  cmpflags <span style="color:#666">=</span> CMP1_SCR;
+
+  { <span style="color:#60a0b0;font-style:italic">// clear interrupt status flags:
+</span><span style="color:#60a0b0;font-style:italic"></span>    uint8_t scr <span style="color:#666">=</span> (CMP1_SCR <span style="color:#666">&amp;</span> <span style="color:#666">~</span>(CMP_SCR_CFR_MASK <span style="color:#666">|</span> CMP_SCR_CFF_MASK));
+    CMP1_SCR <span style="color:#666">=</span> scr <span style="color:#666">|</span> CMP_SCR_CFR_MASK <span style="color:#666">|</span> CMP_SCR_CFF_MASK;
+  }
+
+  <span style="color:#007020;font-weight:bold">if</span> (cmpflags <span style="color:#666">&amp;</span> CMP_SCR_CFR_MASK) {
+    <span style="color:#60a0b0;font-style:italic">// Instead of setting our output pin high immediately,
+</span><span style="color:#60a0b0;font-style:italic"></span>    <span style="color:#60a0b0;font-style:italic">// we delay going up by approx. 40us,
+</span><span style="color:#60a0b0;font-style:italic"></span>    <span style="color:#60a0b0;font-style:italic">// turning the SCS signal into a UART signal:
+</span><span style="color:#60a0b0;font-style:italic"></span>    delayMicroseconds(<span style="color:#40a070">40</span>);
+    digitalWrite(<span style="color:#40a070">15</span>, HIGH);
+  }
+
+  <span style="color:#007020;font-weight:bold">if</span> (cmpflags <span style="color:#666">&amp;</span> CMP_SCR_CFF_MASK) {
+    digitalWrite(<span style="color:#40a070">15</span>, LOW);
+  }
+}</code></pre></div>
+<p>You can now read this signal using your laptop and a USB-to-serial adapter!</p>
+
+<p>On a micro controller, we now feed this signal back into a UART decoder. For
+prototyping, this can literally mean a jumper wire connecting the output GPIO
+pin with a serial RX pin. Some micro controllers also support internal wiring of
+peripherals, allowing you to get rid of that cable.</p>
+
+<h3 id="scs-rx-receive">SCS RX (receive)</h3>
+
+<p>With the SCS intercom bus signal bytes now available through the UART decoder,
+we can design a streaming SCS decoder. The decoder self-synchronizes and skips
+invalid SCS telegrams by checking their checksum. We start with a ring buffer
+and a convenience working copy:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">constexpr <span style="color:#902000">int</span> telegramLen <span style="color:#666">=</span> <span style="color:#40a070">7</span>;
+
+<span style="color:#007020;font-weight:bold">typedef</span> <span style="color:#007020;font-weight:bold">struct</span> {
+  <span style="color:#60a0b0;font-style:italic">// circular buffer for incoming bytes, indexed using cur
+</span><span style="color:#60a0b0;font-style:italic"></span>  uint8_t buf[telegramLen];
+  <span style="color:#902000">int</span> cur;
+
+  uint8_t tbuf[telegramLen];
+} scsfilter;</code></pre></div>
+<p>Each byte we receive from the UART, we store in our ring buffer:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#902000">void</span> <span style="color:#06287e">sf_WriteByte</span>(scsfilter <span style="color:#666">*</span>sf, uint8_t b) {
+  sf<span style="color:#666">-&gt;</span>buf[sf<span style="color:#666">-&gt;</span>cur] <span style="color:#666">=</span> b;
+  sf<span style="color:#666">-&gt;</span>cur <span style="color:#666">=</span> (sf<span style="color:#666">-&gt;</span>cur <span style="color:#666">+</span> <span style="color:#40a070">1</span>) <span style="color:#666">%</span> telegramLen;
+}</code></pre></div>
+<p>After every byte, we can check if the ring buffer decodes to a valid ring signal
+SCS bus telegram:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#902000">bool</span> <span style="color:#06287e">sf_completeAndValid</span>(scsfilter <span style="color:#666">*</span>sf) {
+  <span style="color:#007020;font-weight:bold">const</span> uint8_t prev <span style="color:#666">=</span> sf<span style="color:#666">-&gt;</span>buf[(sf<span style="color:#666">-&gt;</span>cur<span style="color:#666">+</span>(telegramLen<span style="color:#666">-</span><span style="color:#40a070">1</span>))<span style="color:#666">%</span>telegramLen];
+  <span style="color:#007020;font-weight:bold">if</span> (prev <span style="color:#666">!=</span> <span style="color:#40a070">0xa3</span>) {
+    <span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020">false</span>; <span style="color:#60a0b0;font-style:italic">// incomplete: previous byte not a telegram termination
+</span><span style="color:#60a0b0;font-style:italic"></span>  }
+
+  <span style="color:#60a0b0;font-style:italic">// Copy the whole telegram into tbuf; makes working with it easier:
+</span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#007020;font-weight:bold">for</span> (<span style="color:#902000">int</span> i <span style="color:#666">=</span> <span style="color:#40a070">0</span>; i <span style="color:#666">&lt;</span> telegramLen; i<span style="color:#666">++</span>) {
+    sf<span style="color:#666">-&gt;</span>tbuf[i] <span style="color:#666">=</span> sf<span style="color:#666">-&gt;</span>buf[(sf<span style="color:#666">-&gt;</span>cur<span style="color:#666">+</span>i)<span style="color:#666">%</span>telegramLen];
+  }
+
+  <span style="color:#007020;font-weight:bold">const</span> uint8_t stored <span style="color:#666">=</span> sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">5</span>];
+  <span style="color:#007020;font-weight:bold">const</span> uint8_t computed <span style="color:#666">=</span> sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">1</span>] <span style="color:#666">^</span>
+    sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">2</span>] <span style="color:#666">^</span>
+	sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">3</span>] <span style="color:#666">^</span>
+	sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">4</span>];
+  <span style="color:#007020;font-weight:bold">if</span> (stored <span style="color:#666">!=</span> computed) {
+    <span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020">false</span>; <span style="color:#60a0b0;font-style:italic">// corrupt? checksum mismatch
+</span><span style="color:#60a0b0;font-style:italic"></span>  }
+
+  <span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020">true</span>;
+}
+
+<span style="color:#902000">int</span> <span style="color:#06287e">sf_ringForApartment</span>(scsfilter <span style="color:#666">*</span>sf) {
+  <span style="color:#007020;font-weight:bold">if</span> (<span style="color:#666">!</span>sf_completeAndValid(sf)) {
+    <span style="color:#007020;font-weight:bold">return</span> <span style="color:#666">-</span><span style="color:#40a070">1</span>;
+  }
+
+  <span style="color:#007020;font-weight:bold">if</span> (sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">3</span>] <span style="color:#666">!=</span> <span style="color:#40a070">0x60</span>) {
+    <span style="color:#007020;font-weight:bold">return</span> <span style="color:#666">-</span><span style="color:#40a070">1</span>; <span style="color:#60a0b0;font-style:italic">// not a ring command
+</span><span style="color:#60a0b0;font-style:italic"></span>  }
+
+  <span style="color:#007020;font-weight:bold">if</span> (sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">1</span>] <span style="color:#666">!=</span> <span style="color:#40a070">0x91</span>) {
+    <span style="color:#007020;font-weight:bold">return</span> <span style="color:#666">-</span><span style="color:#40a070">1</span>; <span style="color:#60a0b0;font-style:italic">// not sent by the intercom house station
+</span><span style="color:#60a0b0;font-style:italic"></span>  }
+
+  <span style="color:#007020;font-weight:bold">return</span> (<span style="color:#902000">int</span>)(sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">2</span>]); <span style="color:#60a0b0;font-style:italic">// apartment id
+</span><span style="color:#60a0b0;font-style:italic"></span>}</code></pre></div>
+<h3 id="scs-tx-send">SCS TX (send)</h3>
+
+<p>Conceptually, writing serial data to a GPIO output from software is done with
+<a href="https://www.arduino.cc/en/Reference/SoftwareSerial">e.g. the Arduino SoftwareSerial
+library</a>, but there are
+plenty of implementations for different micro controllers. This technique is
+also sometimes called <a href="https://en.wikipedia.org/wiki/Bit_banging">“Bit banging”</a>.</p>
+
+<p>I started with the <a href="https://github.com/PaulStoffregen/SoftwareSerial/blob/63f9b1aae6564d301d7ba31261d1f2390e2a7359/SoftwareSerial.cpp#L218">the Teensy <code>SoftwareSerial::write</code>
+implementation</a>
+and modified it to:</p>
+
+<ol>
+<li><p>Invert the output to drive the <a href="#scs-transmit-circuit">SCS transmit circuit’s Mosfet
+transistor</a> gate, i.e. low on idle and high on
+transmitting a 0 bit.</p></li>
+
+<li><p>Return to idle 70μs earlier than the signal would, i.e. after ≈34μs already.</p></li>
+</ol>
+
+<p>The modified <code>write</code> function looks like this:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020">#define V27 LOW
+</span><span style="color:#007020">#define V22 HIGH
+</span><span style="color:#007020"></span>
+<span style="color:#007020">#define scs0() do { \
+</span><span style="color:#007020">  while (ARM_DWT_CYCCNT - begin_cycle &lt; (target-43750</span><span style="color:#60a0b0;font-style:italic">/*70us*/</span><span style="color:#007020">)) ; \
+</span><span style="color:#007020">  digitalWriteFast(11, V27); \
+</span><span style="color:#007020">} while (0)
+</span><span style="color:#007020"></span>
+size_t SCSSerial<span style="color:#666">::</span>write(uint8_t b)
+{
+  elapsedMicros elapsed;
+  uint32_t target;
+  uint8_t mask;
+  uint32_t begin_cycle;
+
+  ARM_DEMCR <span style="color:#666">|=</span> ARM_DEMCR_TRCENA;
+  ARM_DWT_CTRL <span style="color:#666">|=</span> ARM_DWT_CTRL_CYCCNTENA;
+  ARM_DWT_CYCCNT <span style="color:#666">=</span> <span style="color:#40a070">0</span>;
+
+  <span style="color:#60a0b0;font-style:italic">// start bit
+</span><span style="color:#60a0b0;font-style:italic"></span>  target <span style="color:#666">=</span> cycles_per_bit;
+  noInterrupts();
+  begin_cycle <span style="color:#666">=</span> ARM_DWT_CYCCNT;
+  digitalWriteFast(<span style="color:#40a070">11</span>, V22);
+  scs0();
+  wait_for_target(begin_cycle, target);
+
+  <span style="color:#60a0b0;font-style:italic">// 8 data bits
+</span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#007020;font-weight:bold">for</span> (mask <span style="color:#666">=</span> <span style="color:#40a070">1</span>; mask; mask <span style="color:#666">&lt;&lt;=</span> <span style="color:#40a070">1</span>) {
+    <span style="color:#007020;font-weight:bold">if</span> (b<span style="color:#666">&amp;</span>mask) {
+      digitalWriteFast(<span style="color:#40a070">11</span>, V27);
+    } <span style="color:#007020;font-weight:bold">else</span> {
+      digitalWriteFast(<span style="color:#40a070">11</span>, V22);
+    }
+    target <span style="color:#666">+=</span> cycles_per_bit;
+    scs0();
+    wait_for_target(begin_cycle, target);
+  }
+
+  <span style="color:#60a0b0;font-style:italic">// stop bit
+</span><span style="color:#60a0b0;font-style:italic"></span>  digitalWriteFast(<span style="color:#40a070">11</span>, V27);
+  interrupts();
+  target <span style="color:#666">+=</span> cycles_per_bit;
+  scs0();
+  <span style="color:#007020;font-weight:bold">while</span> (ARM_DWT_CYCCNT <span style="color:#666">-</span> begin_cycle <span style="color:#666">&lt;</span> target) ; <span style="color:#60a0b0;font-style:italic">// wait
+</span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#007020;font-weight:bold">return</span> <span style="color:#40a070">1</span>;
+}</code></pre></div>
+<h2 id="it-works">It works!</h2>
+
+<p>With the approach described above, I now have a micro controller that recognizes
+doorbell rings for my apartment and ignores doorbell rings for my neighbors. The
+micro controller can unlock the door, too, and both features are available
+through the Nuki Opener.</p>
+
+<h2 id="how-is-the-nuki-opener">How is the Nuki Opener?</h2>
+
+<p>It took over 2 months before I saw the Nuki Opener working correctly for the
+first time.</p>
+
+<p>I really hope the Nuki developers can work with what I described above and
+improve their product’s reliability for all customers with an SCS intercom
+system!</p>
+
+<p>The device itself seems useful and usable, but time will tell how reliable it
+turns out in practice. I think I noticed push notifications when the door rang
+coming in rather late (many seconds later).</p>
+
+<p>I’ll keep an eye on this and explore the various Nuki APIs more.</p>
+
+<h2 id="appendix-project-journal">Appendix: Project Journal</h2>
+
+<ul>
+<li>2020-09-26: I buy a Nuki Opener (Nuki Opener #1), but despite connecting it correctly, it never successfully opens the door. I start learning about <a href="https://en.wikipedia.org/wiki/Bus_SCS">the SCS home automation bus system that our intercom uses</a>.</li>
+<li>2020-09-28: I publish an <a href="/posts/2020-09-28-nuki-scs-bticino-decoding/">SCS bus decoder for sigrok</a> and contact the Nuki Support.</li>
+<li>2020-10-15: I buy another Nuki Opener (Nuki Opener #2) to test their old firmware version, because downgrading firmware versions is impossible. Opener #2 actually opens the door, so I assume we are dealing with a firmware problem [turns out incorrect later].</li>
+<li>2020-10-16: I publish a detailed <a href="/posts/2020-10-16-nuki-bug-writeup/">analysis of the Nuki Opener not sending the correct signal</a> for the Nuki developers to go through.</li>
+<li>2020-11-03: I update my new Nuki Opener #2 to the latest firmware and realize that my old Nuki Opener #1 most likely just has some sort of hardware defect. However, Opener #2 has trouble detecting the ring signal: either it doesn’t detect any rings at all, or it detects all rings, including those for my neighbors!</li>
+<li>2020-11-16: In their 13th (!) email reply, Nuki Support confirms that the Opener firmware is capturing and matching the incoming ring signal, if I understand their developers correctly.</li>
+<li>2020-11-18: I suggest to Nuki developers (via Nuki Support) to decode the SCS signal with a UART decoder instead of comparing waveforms. This should be a lot more reliable!</li>
+<li>2020-11-23: My self-designed SCS receiver/transmitter/power supply PCB arrives. The schematics are based on existing SCS DIY work, but I created my own KiCad files because I was only interested in the SCS bus interface, not the PIC microcontroller they used.</li>
+<li>2020-11-25: Working on the intercom, I assume some wire touched an unlucky spot, and my BTicino intercom went up in smoke. We enabled the Nuki Opener’s ring sound and started using it as our main door bell. This meant we now started hearing the ring sound for (some) of our neighbors as well.</li>
+<li>2020-11-26: My Teensy 4 microcontroller <a href="https://twitter.com/zekjur/status/1332021864206626817">successfully decodes the SCS bus signal with its Analog Comparator and UART decoder</a>.</li>
+<li>2020-11-28: My Teensy 4 microcontroller <a href="https://twitter.com/zekjur/status/1332740378907250693">is deployed to filter the SCS bus ring signal and drive the Nuki Opener in analogue mode</a>.</li>
+</ul>
+]]></content>
+  </entry>
   <entry>
     <title type="html"><![CDATA[Nuki Opener with an SCS bus intercom (bTicino 344212)]]></title>
     <link href="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/"/>
@@ -49,6 +736,10 @@ shows:</p>
 
 
 
+
+
+
+
 <a href="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-bticino-multimeter.jpg"><img
   srcset="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-bticino-multimeter_hue87d963a37b5686cd2ac4655a3d8c0c5_1225652_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-bticino-multimeter_hue87d963a37b5686cd2ac4655a3d8c0c5_1225652_1800x0_resize_q75_box.jpg 3x"
   src="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-bticino-multimeter_hue87d963a37b5686cd2ac4655a3d8c0c5_1225652_600x0_resize_q75_box.jpg"
@@ -57,6 +748,8 @@ shows:</p>
   height="800"
   style="border: 1px solid #000"
   loading="lazy"></a>
+
+
 
 
 <p>I then connected the Nuki Opener as described in <a href="https://developer.nuki.io/uploads/short-url/3naDfQDFbzh3Je7ytrNzRDscvFz.pdf">“Connect the Nuki Opener to an
@@ -105,6 +798,10 @@ Page 8, Bus intercoms → Basic setup without doorbell suppression:</p>
 
 
 
+
+
+
+
 <a href="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-bticino-wiring.jpg"><img
   srcset="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-bticino-wiring_huc0f372d5b57e289c2da0f2c150ab65f2_1202733_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-bticino-wiring_huc0f372d5b57e289c2da0f2c150ab65f2_1202733_1800x0_resize_q75_box.jpg 3x"
   src="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-bticino-wiring_huc0f372d5b57e289c2da0f2c150ab65f2_1202733_600x0_resize_q75_box.jpg"
@@ -113,6 +810,8 @@ Page 8, Bus intercoms → Basic setup without doorbell suppression:</p>
   height="800"
   style="border: 1px solid #000"
   loading="lazy"></a>
+
+
 
 
 <p>I had previously tried the enhanced setup with doorbell suppression, as the Nuki
@@ -167,6 +866,10 @@ them to conveniently grab BUS+ and BUS- just like the Nuki sees it:</p>
 
 
 
+
+
+
+
 <a href="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-bticino-capture-featured.jpg"><img
   srcset="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-bticino-capture-featured_hu1b08a9ba183caef576fbb945ebca4cbc_886388_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-bticino-capture-featured_hu1b08a9ba183caef576fbb945ebca4cbc_886388_1800x0_resize_q75_box.jpg 3x"
   src="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-bticino-capture-featured_hu1b08a9ba183caef576fbb945ebca4cbc_886388_600x0_resize_q75_box.jpg"
@@ -177,8 +880,14 @@ them to conveniently grab BUS+ and BUS- just like the Nuki sees it:</p>
   loading="lazy"></a>
 
 
+
+
 <p>I set the oscilloscope probe head to its 10X divider setting, so that I had the
 full value range available, then started sampling 5M samples at 500 kHz:</p>
+
+
+
+
 
 
 
@@ -199,6 +908,8 @@ full value range available, then started sampling 5M samples at 500 kHz:</p>
   height="262"
   style="border: 1px solid #000"
   loading="lazy"></a>
+
+
 
 
 <p>You can see 10s worth of signal. The three bursts are transmissions on the SCS
@@ -232,6 +943,10 @@ in green:</p>
 
 
 
+
+
+
+
 <a href="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-scs-pulseview-logic.jpg"><img
   srcset="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-scs-pulseview-logic_huc90cbbc8b90f54cdc1f48da49df0db02_296922_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-scs-pulseview-logic_huc90cbbc8b90f54cdc1f48da49df0db02_296922_1800x0_resize_q75_box.jpg 3x"
   src="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-scs-pulseview-logic_huc90cbbc8b90f54cdc1f48da49df0db02_296922_600x0_resize_q75_box.jpg"
@@ -240,6 +955,8 @@ in green:</p>
   height="229"
   style="border: 1px solid #000"
   loading="lazy"></a>
+
+
 
 
 <h2 id="scs-bus-decoding-with-sigrok-scs-decoder">SCS bus decoding with sigrok: SCS decoder</h2>
@@ -276,6 +993,10 @@ telegram.</p>
 
 
 
+
+
+
+
 <a href="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-28-pulseview-scs-full.jpg"><img
   srcset="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-28-pulseview-scs-full_hu14666f27c137a3c87abffb185038b668_793701_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-28-pulseview-scs-full_hu14666f27c137a3c87abffb185038b668_793701_1800x0_resize_q75_box.jpg 3x"
   src="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-28-pulseview-scs-full_hu14666f27c137a3c87abffb185038b668_793701_600x0_resize_q75_box.jpg"
@@ -286,7 +1007,13 @@ telegram.</p>
   loading="lazy"></a>
 
 
+
+
 <p>Our SCS decoder displays the 3 bursts on the SCS bus when we ring the doorbell:</p>
+
+
+
+
 
 
 
@@ -307,6 +1034,12 @@ telegram.</p>
   height="91"
   style="border: 1px solid #000"
   loading="lazy"></a>
+
+
+
+
+
+
 
 
 
@@ -341,6 +1074,12 @@ telegram.</p>
 
 
 
+
+
+
+
+
+
 <a href="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-anlern-klingel-burst3.jpg"><img
   srcset="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-anlern-klingel-burst3_hua419f52baa7795a675e007bfe81705d1_1218910_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-anlern-klingel-burst3_hua419f52baa7795a675e007bfe81705d1_1218910_1800x0_resize_q75_box.jpg 3x"
   src="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-anlern-klingel-burst3_hua419f52baa7795a675e007bfe81705d1_1218910_600x0_resize_q75_box.jpg"
@@ -351,10 +1090,16 @@ telegram.</p>
   loading="lazy"></a>
 
 
+
+
 <p>Only the middle burst sets a destination address of <code>0x3</code>, the configured number
 of my intercom system. I am not sure what the first and last burst indicate!</p>
 
 <p>The SCS bus activity when opening the door seems more clear:</p>
+
+
+
+
 
 
 
@@ -388,6 +1133,12 @@ of my intercom system. I am not sure what the first and last burst indicate!</p>
 
 
 
+
+
+
+
+
+
 <a href="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-anlern-open-burst2.jpg"><img
   srcset="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-anlern-open-burst2_hua7c03685b3c05826c12f366402b5649a_1173245_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-anlern-open-burst2_hua7c03685b3c05826c12f366402b5649a_1173245_1800x0_resize_q75_box.jpg 3x"
   src="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-anlern-open-burst2_hua7c03685b3c05826c12f366402b5649a_1173245_600x0_resize_q75_box.jpg"
@@ -396,6 +1147,8 @@ of my intercom system. I am not sure what the first and last burst indicate!</p>
   height="81"
   style="border: 1px solid #000"
   loading="lazy"></a>
+
+
 
 
 <p>These 2 bursts are sent one second apart, and only differ in the request
@@ -495,6 +1248,10 @@ each end:</p>
 
 
 
+
+
+
+
 <a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-media-converters.jpg"><img
   srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-media-converters_hu863a0a53ff58eb79e087ca8992fd5d37_416326_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-media-converters_hu863a0a53ff58eb79e087ca8992fd5d37_416326_1800x0_resize_q75_box.jpg 3x"
   src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-media-converters_hu863a0a53ff58eb79e087ca8992fd5d37_416326_600x0_resize_q75_box.jpg"
@@ -503,6 +1260,8 @@ each end:</p>
   height="217"
   style="border: 1px solid #000"
   loading="lazy"></a>
+
+
 
 
 <p>Why is it good to switch from copper ethernet cables to fiber in this case?
@@ -527,6 +1286,10 @@ thicker:</p>
 
 
 
+
+
+
+
 <a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-glasnudeln.jpg"><img
   srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-glasnudeln_huff6805db50351ab1fa4ea96b741ae340_1675440_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-glasnudeln_huff6805db50351ab1fa4ea96b741ae340_1675440_1800x0_resize_q75_box.jpg 3x"
   src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-glasnudeln_huff6805db50351ab1fa4ea96b741ae340_1675440_600x0_resize_q75_box.jpg"
@@ -535,6 +1298,8 @@ thicker:</p>
   height="450"
   style="border: 1px solid #000"
   loading="lazy"></a>
+
+
 
 
 <p><small><em>Preparing a delicious pot of glass noodles ;)</em></small></p>
@@ -808,6 +1573,10 @@ temporarily:</p>
 
 
 
+
+
+
+
 <a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-cable-puller.jpg"><img
   srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-cable-puller_hu671a386c131e99c47b0e8674d4173388_933240_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-cable-puller_hu671a386c131e99c47b0e8674d4173388_933240_1800x0_resize_q75_box.jpg 3x"
   src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-cable-puller_hu671a386c131e99c47b0e8674d4173388_933240_600x0_resize_q75_box.jpg"
@@ -816,6 +1585,8 @@ temporarily:</p>
   height="450"
   style="border: 1px solid #000"
   loading="lazy"></a>
+
+
 
 
 <p>Where there are no existing ducts, you may need to lay the fiber on top of the
@@ -837,6 +1608,10 @@ piece of tape:</p>
 
 
 
+
+
+
+
 <a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-wand-kabel.jpg"><img
   srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-wand-kabel_hu266a050a008f40ca1627a87ee11d809f_563690_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-wand-kabel_hu266a050a008f40ca1627a87ee11d809f_563690_1800x0_resize_q75_box.jpg 3x"
   src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-wand-kabel_hu266a050a008f40ca1627a87ee11d809f_563690_600x0_resize_q75_box.jpg"
@@ -845,6 +1620,8 @@ piece of tape:</p>
   height="450"
   style="border: 1px solid #000"
   loading="lazy"></a>
+
+
 
 
 <p>You can see the upstream internet fiber in the top right corner, which is rather
@@ -878,6 +1655,10 @@ the fiber through:</p>
 
 
 
+
+
+
+
 <a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-loch.jpg"><img
   srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-loch_hu72eb317f66154a6cd4cb4580e2e045bd_823912_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-loch_hu72eb317f66154a6cd4cb4580e2e045bd_823912_1800x0_resize_q75_box.jpg 3x"
   src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-loch_hu72eb317f66154a6cd4cb4580e2e045bd_823912_600x0_resize_q75_box.jpg"
@@ -888,7 +1669,13 @@ the fiber through:</p>
   loading="lazy"></a>
 
 
+
+
 <p>…and on the other side of the wall:</p>
+
+
+
+
 
 
 
@@ -909,6 +1696,8 @@ the fiber through:</p>
   height="450"
   style="border: 1px solid #000"
   loading="lazy"></a>
+
+
 
 
 <p>Note how the fiber is thin enough to fit between the socket and duct!</p>
@@ -971,6 +1760,10 @@ measure.</p>
 
 
 
+
+
+
+
 <a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-07-fiber-cable-connector-size-featured.jpg"><img
   srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-07-fiber-cable-connector-size-featured_hu6d8d68e7ce7a86b2365302ce19348267_984529_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-07-fiber-cable-connector-size-featured_hu6d8d68e7ce7a86b2365302ce19348267_984529_1800x0_resize_q75_box.jpg 3x"
   src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-07-fiber-cable-connector-size-featured_hu6d8d68e7ce7a86b2365302ce19348267_984529_600x0_resize_q75_box.jpg"
@@ -979,6 +1772,8 @@ measure.</p>
   height="398"
   style="border: 1px solid #000"
   loading="lazy"></a>
+
+
 
 
 <p>From left to right:</p>
@@ -1084,6 +1879,10 @@ controller for your Kinesis Advantage or Advantage 2 ergonomic keyboards.</p>
 
 
 
+
+
+
+
 <a href="https://michael.stapelberg.ch/posts/2020-07-09-kint-kinesis-keyboard-controller/kint-pcb-3d-render-back-v2020-06-30.png"><img
   srcset="https://michael.stapelberg.ch/posts/2020-07-09-kint-kinesis-keyboard-controller/kint-pcb-3d-render-back-v2020-06-30_hu30a1e426a4c0be1e0484551f5906a1ac_928372_1200x0_resize_box_2.png 2x,https://michael.stapelberg.ch/posts/2020-07-09-kint-kinesis-keyboard-controller/kint-pcb-3d-render-back-v2020-06-30_hu30a1e426a4c0be1e0484551f5906a1ac_928372_1800x0_resize_box_2.png 3x"
   src="https://michael.stapelberg.ch/posts/2020-07-09-kint-kinesis-keyboard-controller/kint-pcb-3d-render-back-v2020-06-30_hu30a1e426a4c0be1e0484551f5906a1ac_928372_600x0_resize_box_2.png"
@@ -1092,6 +1891,8 @@ controller for your Kinesis Advantage or Advantage 2 ergonomic keyboards.</p>
   height="488"
   style="border: 1px solid #000"
   loading="lazy"></a>
+
+
 
 
 <p>The Teensy footprint looks a bit odd, but it’s a combined footprint so that you
@@ -1221,6 +2022,10 @@ history and context, and want to see me solder a kinT controller live on stream!
 
 
 
+
+
+
+
 <a href="https://michael.stapelberg.ch/posts/2020-06-06-iphone-camera-linux-v4l2loopback/2020-06-06-iphone-cam.jpg"><img
   srcset="https://michael.stapelberg.ch/posts/2020-06-06-iphone-camera-linux-v4l2loopback/2020-06-06-iphone-cam_hud2d472f6b7b139eb735fe6ed7f317f07_1422223_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-06-06-iphone-camera-linux-v4l2loopback/2020-06-06-iphone-cam_hud2d472f6b7b139eb735fe6ed7f317f07_1422223_1800x0_resize_q75_box.jpg 3x"
   src="https://michael.stapelberg.ch/posts/2020-06-06-iphone-camera-linux-v4l2loopback/2020-06-06-iphone-cam_hud2d472f6b7b139eb735fe6ed7f317f07_1422223_600x0_resize_q75_box.jpg"
@@ -1229,6 +2034,8 @@ history and context, and want to see me solder a kinT controller live on stream!
   height="800"
   style="border: 1px solid #000"
   loading="lazy"></a>
+
+
 
 
 <p>For my <a href="https://www.twitch.tv/stapelberg">programming stream at
@@ -1402,6 +2209,10 @@ default unless the <code>--binary</code> flag is used.</p>
 
 
 
+
+
+
+
 <a href="https://michael.stapelberg.ch/posts/2020-05-23-desk-setup/2020-05-22-desk-setup.jpg"><img
   srcset="https://michael.stapelberg.ch/posts/2020-05-23-desk-setup/2020-05-22-desk-setup_hu10db40f5c3156b454e7677b477ea23e3_3331547_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-05-23-desk-setup/2020-05-22-desk-setup_hu10db40f5c3156b454e7677b477ea23e3_3331547_1800x0_resize_q75_box.jpg 3x"
   src="https://michael.stapelberg.ch/posts/2020-05-23-desk-setup/2020-05-22-desk-setup_hu10db40f5c3156b454e7677b477ea23e3_3331547_600x0_resize_q75_box.jpg"
@@ -1410,6 +2221,8 @@ default unless the <code>--binary</code> flag is used.</p>
   height="450"
   style="border: 1px solid #000"
   loading="lazy"></a>
+
+
 
 
 <p>I generally enjoy reading the <a href="https://usesthis.com/">uses this</a> blog, and
@@ -4532,169 +5345,6 @@ sys	0m 0.09s
 </code></pre>
 
 <p></details></p>
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[Linux distributions: Can we do without hooks and triggers?]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2019-07-20-hooks-and-triggers/"/>
-    <id>https://michael.stapelberg.ch/posts/2019-07-20-hooks-and-triggers/</id>
-    <published>2019-07-20T00:00:00+00:00</published>
-    <updated>2020-08-12T10:08:02+02:00</updated>
-    <content type="html"><![CDATA[
-
-<p>Hooks are an extension feature provided by all package managers that are used in
-larger Linux distributions. For example, Debian uses apt, which has various
-<a href="https://www.debian.org/doc/debian-policy/ap-flowcharts.html">maintainer
-scripts</a>. Fedora
-uses rpm, which has
-<a href="https://fedoraproject.org/wiki/Packaging:Scriptlets">scriptlets</a>. Different
-package managers use different names for the concept, but all of them offer
-package maintainers the ability to run arbitrary code during package
-installation and upgrades. Example hook use cases include adding daemon user
-accounts to your system (e.g. <code>postgres</code>), or generating/updating cache files.</p>
-
-<p>Triggers are a kind of hook which run when <em>other</em> packages are installed. For
-example, on Debian, the <a href="https://manpages.debian.org/man.1"><code>man(1)</code></a> package
-comes with a trigger which regenerates the search database index whenever any
-package installs a manpage. When, for example, the
-<a href="https://manpages.debian.org/nginx.8"><code>nginx(8)</code></a> package is installed, a
-trigger provided by the <a href="https://manpages.debian.org/man.1"><code>man(1)</code></a> package
-runs.</p>
-
-<p>Over the past few decades, Open Source software has become more and more
-uniform: instead of each piece of software defining its own rules, a small
-number of build systems are now widely adopted.</p>
-
-<p>Hence, I think it makes sense to revisit whether offering extension via hooks
-and triggers is a net win or net loss.</p>
-
-<h3 id="hooks-preclude-concurrent-package-installation">Hooks preclude concurrent package installation</h3>
-
-<p>Package managers commonly can make very little assumptions about what hooks do,
-what preconditions they require, and which conflicts might be caused by running
-multiple package’s hooks concurrently.</p>
-
-<p>Hence, package managers cannot concurrently install packages. At least the
-hook/trigger part of the installation needs to happen in sequence.</p>
-
-<p>While it seems technically feasible to retrofit package manager hooks with
-concurrency primitives such as locks for mutual exclusion between different hook
-processes, the required overhaul of all hooks¹ seems like such a daunting task
-that it might be better to just get rid of the hooks instead. Only deleting code
-frees you from the burden of maintenance, automated testing and debugging.</p>
-
-<p>① In Debian, there are 8620 non-generated maintainer scripts, as reported by
-   <code>find shard*/src/*/debian -regex &quot;.*\(pre\|post\)\(inst\|rm\)$&quot;</code> on a Debian
-   Code Search instance.</p>
-
-<h3 id="triggers-slow-down-installing-updating-other-packages">Triggers slow down installing/updating other packages</h3>
-
-<p>Personally, I never use the
-<a href="https://manpages.debian.org/apropos.1"><code>apropos(1)</code></a> command, so I don’t
-appreciate the <a href="https://manpages.debian.org/man.1"><code>man(1)</code></a> package’s trigger
-which updates the database used by
-<a href="https://manpages.debian.org/apropos.1"><code>apropos(1)</code></a>. The process takes a long
-time and, because hooks and triggers must be executed serially (see previous
-section), blocks my installation or update.</p>
-
-<p>When I tell people this, they are often surprised to learn about the existance
-of the <a href="https://manpages.debian.org/apropos.1"><code>apropos(1)</code></a> command. I suggest
-adopting an opt-in model.</p>
-
-<h3 id="unnecessary-work-if-programs-are-not-used-between-updates">Unnecessary work if programs are not used between updates</h3>
-
-<p>Hooks run when packages are installed. If a package’s contents are not used
-between two updates, running the hook in the first update could have been
-skipped. Running the hook lazily when the package contents are used reduces
-unnecessary work.</p>
-
-<p>As a welcome side-effect, lazy hook evaluation automatically makes the hook work
-in operating system images, such as live USB thumb drives or SD card images for
-the Raspberry Pi. Such images must not ship the same crypto keys (e.g. OpenSSH
-host keys) to all machines, but instead generate a different key on each
-machine.</p>
-
-<p>Why do users keep packages installed they don’t use? It’s extra work to remember
-and clean up those packages after use. Plus, users might not realize or value
-that having fewer packages installed has benefits such as faster updates.</p>
-
-<p>I can also imagine that there are people for whom the cost of re-installing
-packages incentivizes them to just keep packages installed—you never know when
-you might need the program again…</p>
-
-<h3 id="implemented-in-an-interpreted-language">Implemented in an interpreted language</h3>
-
-<p>While working on hermetic packages (more on that in another blog post), where
-the contained programs are started with modified environment variables
-(e.g. <code>PATH</code>) via a wrapper bash script, I noticed that the overhead of those
-wrapper bash scripts quickly becomes significant. For example, when using the
-excellent <a href="https://magit.vc/">magit</a> interface for Git in Emacs, I encountered
-second-long delays² when using hermetic packages compared to standard
-packages. Re-implementing wrappers in a compiled language provided a significant
-speed-up.</p>
-
-<p>Similarly, getting rid of an extension point which mandates using shell scripts
-allows us to build an efficient and fast implementation of a predefined set of
-primitives, where you can reason about their effects and interactions.</p>
-
-<p>② magit needs to run git a few times for displaying the full status, so small
-   overhead quickly adds up.</p>
-
-<h3 id="incentivizing-more-upstream-standardization">Incentivizing more upstream standardization</h3>
-
-<p>Hooks are an escape hatch for distribution maintainers to express anything which
-their packaging system cannot express.</p>
-
-<p>Distributions should only rely on well-established interfaces such as autoconf’s
-classic <code>./configure &amp;&amp; make &amp;&amp; make install</code> (including commonly used flags) to
-build a distribution package. Integrating upstream software into a distribution
-should not require custom hooks. For example, instead of requiring a hook which
-updates a cache of schema files, the library used to interact with those files
-should transparently (re-)generate the cache or fall back to a slower code path.</p>
-
-<p>Distribution maintainers are hard to come by, so we should value their time. In
-particular, there is a 1:n relationship of packages to distribution package
-maintainers (software is typically available in multiple Linux distributions),
-so it makes sense to spend the work in the 1 and have the n benefit.</p>
-
-<h3 id="can-we-do-without-them">Can we do without them?</h3>
-
-<p>If we want to get rid of hooks, we need another mechanism to achieve what we
-currently achieve with hooks.</p>
-
-<p>If the hook is not specific to the package, it can be moved to the package
-manager. The desired system state should either be derived from the package
-contents (e.g. required system users can be discovered from systemd service
-files) or declaratively specified in the package build instructions—more on that
-in another blog post. This turns hooks (arbitrary code) into configuration,
-which allows the package manager to collapse and sequence the required state
-changes. E.g., when 5 packages are installed which each need a new system user,
-the package manager could update <code>/etc/passwd</code> just once.</p>
-
-<p>If the hook is specific to the package, it should be moved into the package
-contents. This typically means moving the functionality into the program start
-(or the systemd service file if we are talking about a daemon). If (while?)
-upstream is not convinced, you can either wrap the program or patch it. Note
-that this case is relatively rare: I have worked with hundreds of packages and
-the only package-specific functionality I came across was automatically
-generating host keys before starting OpenSSH’s
-<a href="https://manpages.debian.org/sshd.8"><code>sshd(8)</code></a>³.</p>
-
-<p>There is one exception where moving the hook doesn’t work: packages which modify
-state outside of the system, such as bootloaders or kernel images.</p>
-
-<p>③ Even that can be moved out of a package-specific hook, <a href="https://src.fedoraproject.org/rpms/openssh/blob/30922f629cc135e3233e263d5e3eb346f9251c4e/f/sshd-keygen%40.service">as Fedora
-demonstrates</a>.</p>
-
-<h3 id="conclusion">Conclusion</h3>
-
-<p>Global state modifications performed as part of package installation today use
-hooks, an overly expressive extension mechanism.</p>
-
-<p>Instead, all modifications should be driven by configuration. This is feasible
-because there are only a few different kinds of desired state
-modifications. This makes it possible for package managers to optimize package
-installation.</p>
 ]]></content>
   </entry>
 </feed>

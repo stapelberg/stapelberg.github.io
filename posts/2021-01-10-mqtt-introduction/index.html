@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>A quick introduction to MQTT for IOT - Michael Stapelberg</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <meta name="description" content="While I had heard the abbreviation MQTT many times, I never had a closer look at what MQTT is.
+Here are a few quick notes about using MQTT as Pub/Sub bus in a home IOT network.
+Motivation Once you have a few IOT devices, an obvious question is how to network them.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2021-01-10-mqtt-introduction/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div>
+<h1 class="ms_title">A quick introduction to MQTT for IOT</h1>
+<div class="ms_meta">
+  <div id="ms_date">published 2021-01-10</div>
+  
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/index.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
+</div>
+<div class="Artikel" id="content">
+  <style type="text/css">
+    .TableOfContents > ul, .TableOfContents > ul > li > ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+    }
+    .TableOfContents li {
+	margin-bottom: 1rem;
+    }
+  </style>
+  <details class="ms_toc_details">
+    <summary>Table of contents</summary>
+    <nav class="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#step-1-set-up-an-mqtt-broker-server">Step 1. Set up an MQTT broker (server)</a>
+<ul>
+<li><a href="#mqtt-broker-setup-displaying-sending-test-messages">MQTT broker setup: displaying/sending test messages</a></li>
+</ul></li>
+<li><a href="#step-2-integrate-with-mqtt">Step 2. Integrate with MQTT</a>
+<ul>
+<li><a href="#best-practices-for-your-own-structure">Best practices for your own structure</a></li>
+<li><a href="#integration-shelly-devices-with-mqtt-built-in">Integration: Shelly devices with MQTT built-in</a></li>
+<li><a href="#integration-zigbee2mqtt-for-zigbee-devices">Integration: Zigbee2MQTT for Zigbee devices</a></li>
+<li><a href="#integration-esphome-for-micro-controllers-sensors">Integration: ESPHome for micro controllers + sensors</a></li>
+<li><a href="#integration-mongoose-os-for-micro-controllers">Integration: Mongoose OS for micro controllers</a></li>
+<li><a href="#integration-arduino-for-custom-micro-controller-firmware">Integration: Arduino for custom micro controller firmware</a></li>
+</ul></li>
+<li><a href="#integration-webhook-to-mqtt">Integration: Webhook to MQTT</a></li>
+<li><a href="#step-3-express-your-logic">Step 3. Express your logic</a>
+<ul>
+<li><a href="#regelwerk-control-loops-definition">regelwerk: control loops definition</a></li>
+<li><a href="#regelwerk-mqtt-dispatcher">regelwerk: MQTT dispatcher</a></li>
+<li><a href="#regelwerk-control-loop-example">regelwerk: control loop example</a></li>
+</ul></li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul>
+</nav>
+  </details>
+  
+
+<p>While I had heard the abbreviation <a href="https://en.wikipedia.org/wiki/MQTT">MQTT</a>
+many times, I never had a closer look at what MQTT is.</p>
+
+<p>Here are a few quick notes about using MQTT as <a href="https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern">Pub/Sub
+bus</a> in a home
+IOT network.</p>
+
+<h2 id="motivation">Motivation</h2>
+
+<p>Once you have a few <a href="https://en.wikipedia.org/wiki/Internet_of_things">IOT
+devices</a>, an obvious question
+is how to network them.</p>
+
+<p>If all your devices are from the same vendor, the vendor takes care of it.</p>
+
+<p>In my home, I have many different vendors/devices, such as (incomplete list):</p>
+
+<ul>
+<li><a href="https://nuki.io/en/opener/">Nuki Opener</a> Smart Intercom</li>
+<li><a href="https://www.itead.cc/sonoff-s26-wifi-smart-plug.html">Sonoff S26 Smart Plug</a> (WiFi-controlled socket outlet)</li>
+<li><a href="https://www.aqara.com/en/door_and_window_sensor.html">Aqara Door &amp; Window Sensors</a></li>
+<li><a href="https://en.wikipedia.org/wiki/IKEA#Smart_home">IKEA Home Smart</a> (formerly TRÅDFRI) Smart Lights</li>
+</ul>
+
+<p>Here is how I combine these devices:</p>
+
+<ul>
+<li>When I’m close to my home (geo-fencing), the Nuki Opener enables Ring To Open (RTO): when I ring the door bell, it opens the door for me.</li>
+<li>When I open the apartment door, the Smart Lights in the hallway turn on.</li>
+<li>When I’m home, my stereo speakers should be powered on so I can play music.</li>
+</ul>
+
+<p>A conceptually simple way to hook this up is to connect things directly: listen
+to the Aqara Door Sensor and instruct the Smart Lights to turn on, for example.</p>
+
+<p>But, connecting everything to an MQTT bus has a couple of advantages:</p>
+
+<ol>
+<li>Unification: everything is visible in one place, the same tools work for all
+devices.</li>
+<li>Your custom logic is uncoupled from vendor details: you can receive and send
+MQTT.</li>
+<li>Compatibility with existing software, such as <a href="https://www.home-assistant.io/">Home
+Assistant</a> or
+<a href="https://www.openhab.org/">openHAB</a></li>
+</ol>
+
+<h2 id="step-1-set-up-an-mqtt-broker-server">Step 1. Set up an MQTT broker (server)</h2>
+
+<p>A broker is what relays messages between publishers and subscribers. As an
+optimization, the most recent value of a topic can be retained, so that e.g. a
+subscriber does not need to wait for the next change to obtain the current
+state.</p>
+
+<p>The most popular choice for broker software seems to be
+<a href="https://mosquitto.org/">Mosquitto</a>, but since I like to run Go software on
+<a href="https://gokrazy.org/">https://gokrazy.org/</a>, I kept looking and found <a href="https://github.com/fhmq/hmq">https://github.com/fhmq/hmq</a>.</p>
+
+<p>One downside of <code>hmq</code> might be that it does not seem to support persisting
+retained messages to disk. I’ll treat this as a feature for the time being,
+enforcing a fresh start on every daily reboot.</p>
+
+<p>To restrict hmq to only listen in my local network, I’m using <a href="https://github.com/gokrazy/tools/commit/fdd90fc6817876e08b352fae84f2a2794524ccc0">gokrazy’s flag
+file
+feature</a>:</p>
+
+<pre><code>mkdir -p flags/github.com/fhmq/hmq
+echo --host=10.0.0.217 &gt; flags/github.com/fhmq/hmq/flags.txt
+</code></pre>
+
+<p>Note that you’ll need <a href="https://github.com/fhmq/hmq/pull/105">https://github.com/fhmq/hmq/pull/105</a> in case your network
+does not come up quickly.</p>
+
+<h3 id="mqtt-broker-setup-displaying-sending-test-messages">MQTT broker setup: displaying/sending test messages</h3>
+
+<p>To display all messages going through your MQTT broker, subscribe using the
+<a href="https://mosquitto.org/">Mosquitto</a> tools:</p>
+
+<pre><code>% sudo pacman -S mosquitto
+% mosquitto_sub --id &quot;${HOST}_all&quot; --host dr.lan --topic '#' --verbose
+</code></pre>
+
+<p>The <code>#</code> sign denotes an <a href="https://subscription.packtpub.com/book/application_development/9781787287815/1/ch01lvl1sec18/understanding-wildcards">MQTT
+wildcard</a>,
+meaning subscribe to all topics in this case.</p>
+
+<p>Be sure to set a unique id for each <code>mosquitto_sub</code> command you run, so that you
+can see which subscribers are connected to your MQTT bus. Avoid id clashes,
+otherwise the subscribers will disconnect each other!</p>
+
+<p>Now, when you send a test message, you should see it:</p>
+
+<pre><code>% mosquitto_pub --host dr.lan --topic 'cmnd/tasmota_68462F/Power' -m 'ON'
+</code></pre>
+
+<p>Tip: If you have binary data on your MQTT bus, you can display it in hex with
+timestamps:</p>
+
+<pre><code>% mosquitto_sub \
+  --id &quot;${HOST}_bell&quot; \
+  --host dr.lan \
+  --topic 'doorbell/#' \
+  -F '@Y-@m-@dT@H:@M:@S@z : %t : %x'
+</code></pre>
+
+<h2 id="step-2-integrate-with-mqtt">Step 2. Integrate with MQTT</h2>
+
+<p>Now that communication via the bus works, what messages do we publish on which
+topics?</p>
+
+<p>MQTT only defines that topics are hierarchical; messages are arbitrary byte
+sequences.</p>
+
+<p>There are a few popular conventions for what to put onto MQTT:</p>
+
+<ul>
+<li><p><a href="https://homieiot.github.io/">The Homie convention</a></p></li>
+
+<li><p>Home Assistant has its own convention, but <a href="https://www.home-assistant.io/integrations/switch.mqtt/#full-configuration">allows full configuration</a>. Home Assistant does <a href="https://community.home-assistant.io/t/home-assistant-homie-compatibility/17135/8">not support the homie convention yet</a>.</p></li>
+
+<li><p>openHAB <a href="https://www.openhab.org/addons/bindings/mqtt.generic/">refers to Home Assistant and
+Homie</a>.</p></li>
+</ul>
+
+<p>If you design everything yourself, Homie seems like a good option. If you plan to
+use Home Assistant or similar, stick to the Home Assistant convention.</p>
+
+<h3 id="best-practices-for-your-own-structure">Best practices for your own structure</h3>
+
+<p>In case you want/need to define your own topics, keep these tips in mind:</p>
+
+<ul>
+<li>devices publish their state on a single, retained topic
+
+<ul>
+<li>the topic name could be e.g. <code>stat/tasmota_68462F/POWER</code></li>
+<li>retaining the topic allows consumers to catch up after (re-)connecting to the bus</li>
+</ul></li>
+<li>publish commands on a single, possibly-retained topic
+
+<ul>
+<li>e.g. publish <code>ON</code> to topic <code>cmnd/tasmota_68462F/Power</code></li>
+<li>publish the desired state: publish <code>ON</code> or <code>OFF</code> instead of <code>TOGGLE</code></li>
+<li>if you retain the topic and publish <code>TOGGLE</code> commands, your lights will mysteriously go off/on when they unexpectedly re-establish their MQTT connection</li>
+</ul></li>
+</ul>
+
+<h3 id="integration-shelly-devices-with-mqtt-built-in">Integration: Shelly devices with MQTT built-in</h3>
+
+<p><a href="https://shelly.cloud/">Shelly</a> has a number of smart devices that come with
+MQTT out of the box! This sounds like the easiest solution if you’re starting
+from scratch.</p>
+
+<p>I haven’t used these devices personally, but I hear good things about them.</p>
+
+<h3 id="integration-zigbee2mqtt-for-zigbee-devices">Integration: Zigbee2MQTT for Zigbee devices</h3>
+
+<p><a href="https://www.zigbee2mqtt.io/">Zigbee2MQTT</a> supports well <a href="https://www.zigbee2mqtt.io/information/supported_devices.html">over 1000 Zigbee
+devices</a> and
+exposes them on the MQTT bus.</p>
+
+<p>For example, this is what you would use to connect your IKEA TRÅDFRI Smart
+Lights to MQTT.</p>
+
+<h3 id="integration-esphome-for-micro-controllers-sensors">Integration: ESPHome for micro controllers + sensors</h3>
+
+<p>The <a href="https://esphome.io/">ESPHome</a> system is a ready-made solution to connect a
+wide array of sensors and devices to your home network via MQTT.</p>
+
+<p>If you want to use your own ESP-based micro controllers and sensors, this seems
+like the easiest way to get them programmed.</p>
+
+<h3 id="integration-mongoose-os-for-micro-controllers">Integration: Mongoose OS for micro controllers</h3>
+
+<p>Mongoose OS is an IOT firmware development framework, taking care of device
+management, Over-The-Air updates, and more.</p>
+
+<p><a href="https://mongoose-os.com/docs/mongoose-os/cloud/mqtt.md">Mongoose comes with MQTT
+support</a>, and with just
+a few lines you can build, flash and configure your device. Here’s an example
+for the NodeMCU (ESP8266-based):</p>
+
+<pre><code>% yay -S mos-bin
+% mos clone https://github.com/mongoose-os-apps/demo-js app1
+% cd app1
+% mos --platform esp8266 build
+% mos --platform esp8266 --port /dev/ttyUSB1 flash
+% mos --port /dev/ttyUSB1 config-set mqtt.enable=true mqtt.server=dr.lan:1883
+</code></pre>
+
+<p>Pressing the button on the NodeMCU publishes a message to MQTT:</p>
+
+<pre><code>% mosquitto_sub --host dr.lan --topic devices/esp8266_F4B37C/events
+{&quot;ram_free&quot;:31260,&quot;uptime&quot;:27.168680,&quot;btnCount&quot;:2,&quot;on&quot;:false}
+</code></pre>
+
+<h3 id="integration-arduino-for-custom-micro-controller-firmware">Integration: Arduino for custom micro controller firmware</h3>
+
+<p>Arduino has an <a href="https://www.arduino.cc/reference/en/libraries/mqtt-client/">MQTT Client
+library</a>. If your
+microcontroller is networked, e.g. an ESP32 with WiFi, you can publish MQTT
+messages from your Arduino sketch:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020">#include</span> <span style="color:#007020">&lt;WiFi.h&gt;</span><span style="color:#007020">
+</span><span style="color:#007020">#include</span> <span style="color:#007020">&lt;PubSubClient.h&gt;</span><span style="color:#007020">
+</span><span style="color:#007020"></span>
+WiFiClient wificlient;
+PubSubClient <span style="color:#06287e">client</span>(wificlient);
+
+<span style="color:#902000">void</span> <span style="color:#06287e">callback</span>(<span style="color:#902000">char</span><span style="color:#666">*</span> topic, byte<span style="color:#666">*</span> payload, <span style="color:#902000">unsigned</span> <span style="color:#902000">int</span> length) {
+    Serial.print(<span style="color:#4070a0">&#34;Message arrived [&#34;</span>);
+    Serial.print(topic);
+    Serial.print(<span style="color:#4070a0">&#34;] &#34;</span>);
+    <span style="color:#007020;font-weight:bold">for</span> (<span style="color:#902000">int</span> i <span style="color:#666">=</span> <span style="color:#40a070">0</span>; i <span style="color:#666">&lt;</span> length; i<span style="color:#666">++</span>) {
+      Serial.print((<span style="color:#902000">char</span>)payload[i]);
+    }
+    Serial.println();
+  
+    <span style="color:#007020;font-weight:bold">if</span> (strcmp(topic, <span style="color:#4070a0">&#34;doorbell/cmd/unlock&#34;</span>) <span style="color:#666">==</span> <span style="color:#40a070">0</span>) {
+  		<span style="color:#60a0b0;font-style:italic">// …
+</span><span style="color:#60a0b0;font-style:italic"></span>    }
+}
+
+<span style="color:#902000">void</span> <span style="color:#06287e">taskmqtt</span>(<span style="color:#902000">void</span> <span style="color:#666">*</span>pvParameters) {
+	<span style="color:#007020;font-weight:bold">for</span> (;;) {
+		<span style="color:#007020;font-weight:bold">if</span> (<span style="color:#666">!</span>client.connected()) {
+			client.connect(<span style="color:#4070a0">&#34;doorbell&#34;</span> <span style="color:#60a0b0;font-style:italic">/* clientid */</span>);
+			client.subscribe(<span style="color:#4070a0">&#34;doorbell/cmd/unlock&#34;</span>);
+		}
+
+		<span style="color:#60a0b0;font-style:italic">// Poll PubSubClient for new messages and invoke the callback.
+</span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// Should be called as infrequent as one is willing to delay
+</span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// reacting to MQTT messages.
+</span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// Should not be called too frequently to avoid strain on
+</span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// the network hardware:
+</span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// https://github.com/knolleary/pubsubclient/issues/756#issuecomment-654335096
+</span><span style="color:#60a0b0;font-style:italic"></span>		client.loop();
+		vTaskDelay(pdMS_TO_TICKS(<span style="color:#40a070">100</span>));
+	}
+}
+
+<span style="color:#902000">void</span> <span style="color:#06287e">setup</span>() {
+	connectToWiFi(); <span style="color:#60a0b0;font-style:italic">// WiFi configuration omitted for brevity
+</span><span style="color:#60a0b0;font-style:italic"></span>
+	client.setServer(<span style="color:#4070a0">&#34;dr.lan&#34;</span>, <span style="color:#40a070">1883</span>);
+	client.setCallback(callback);
+
+	xTaskCreatePinnedToCore(taskmqtt, <span style="color:#4070a0">&#34;MQTT&#34;</span>, <span style="color:#40a070">2048</span>, <span style="color:#007020">NULL</span>, <span style="color:#40a070">1</span>, <span style="color:#007020">NULL</span>, PRO_CPU_NUM);
+}
+
+<span style="color:#902000">void</span> <span style="color:#06287e">processEvent</span>(<span style="color:#902000">void</span> <span style="color:#666">*</span>buf, <span style="color:#902000">int</span> telegramLen) {
+	client.publish(<span style="color:#4070a0">&#34;doorbell/events/scs&#34;</span>, buf, telegramLen);
+}</code></pre></div>
+<h2 id="integration-webhook-to-mqtt">Integration: Webhook to MQTT</h2>
+
+<p>The Nuki Opener doesn’t support MQTT out of the box, but the Nuki Bridge can
+send Webhook requests. In a few lines of Go, you can forward what the Nuki
+Bridge sends to MQTT:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">package</span> main
+
+<span style="color:#007020;font-weight:bold">import</span> (
+	<span style="color:#4070a0">&#34;fmt&#34;</span>
+	<span style="color:#4070a0">&#34;io/ioutil&#34;</span>
+	<span style="color:#4070a0">&#34;log&#34;</span>
+	<span style="color:#4070a0">&#34;net/http&#34;</span>
+
+	mqtt <span style="color:#4070a0">&#34;github.com/eclipse/paho.mqtt.golang&#34;</span>
+)
+
+<span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">nukiBridge</span>() <span style="color:#902000">error</span> {
+	opts <span style="color:#666">:=</span> mqtt.<span style="color:#06287e">NewClientOptions</span>().<span style="color:#06287e">AddBroker</span>(<span style="color:#4070a0">&#34;tcp://dr.lan:1883&#34;</span>)
+	opts.<span style="color:#06287e">SetClientID</span>(<span style="color:#4070a0">&#34;nuki2mqtt&#34;</span>)
+	opts.<span style="color:#06287e">SetConnectRetry</span>(<span style="color:#007020;font-weight:bold">true</span>)
+	mqttClient <span style="color:#666">:=</span> mqtt.<span style="color:#06287e">NewClient</span>(opts)
+	<span style="color:#007020;font-weight:bold">if</span> token <span style="color:#666">:=</span> mqttClient.<span style="color:#06287e">Connect</span>(); token.<span style="color:#06287e">Wait</span>() <span style="color:#666">&amp;&amp;</span> token.<span style="color:#06287e">Error</span>() <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+		<span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;MQTT connection failed: %v&#34;</span>, token.<span style="color:#06287e">Error</span>())
+	}
+
+	mux <span style="color:#666">:=</span> http.<span style="color:#06287e">NewServeMux</span>()
+	mux.<span style="color:#06287e">HandleFunc</span>(<span style="color:#4070a0">&#34;/nuki&#34;</span>, <span style="color:#007020;font-weight:bold">func</span>(w http.ResponseWriter, r <span style="color:#666">*</span>http.Request) {
+		b, err <span style="color:#666">:=</span> ioutil.<span style="color:#06287e">ReadAll</span>(r.Body)
+		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+			log.<span style="color:#06287e">Print</span>(err)
+			http.<span style="color:#06287e">Error</span>(w, err.<span style="color:#06287e">Error</span>(), http.StatusInternalServerError)
+			<span style="color:#007020;font-weight:bold">return</span>
+		}
+
+		mqttClient.<span style="color:#06287e">Publish</span>(
+			<span style="color:#4070a0">&#34;zkj-nuki/webhook&#34;</span>, <span style="color:#60a0b0;font-style:italic">// topic
+</span><span style="color:#60a0b0;font-style:italic"></span>			<span style="color:#40a070">0</span>, <span style="color:#60a0b0;font-style:italic">// qos
+</span><span style="color:#60a0b0;font-style:italic"></span>			<span style="color:#007020;font-weight:bold">true</span>, <span style="color:#60a0b0;font-style:italic">// retained
+</span><span style="color:#60a0b0;font-style:italic"></span>			<span style="color:#007020">string</span>(b)) <span style="color:#60a0b0;font-style:italic">// payload
+</span><span style="color:#60a0b0;font-style:italic"></span>	})
+
+	<span style="color:#007020;font-weight:bold">return</span> http.<span style="color:#06287e">ListenAndServe</span>(<span style="color:#4070a0">&#34;:8319&#34;</span>, mux)
+}
+
+<span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">nukiBridge</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+		log.<span style="color:#06287e">Fatal</span>(err)
+	}
+}</code></pre></div>
+<p>See <a href="https://developer.nuki.io/t/bridge-http-api/26">Nuki’s Bridge HTTP-API</a>
+document for details on how to configure your bridge to send webhook callbacks.</p>
+
+<h2 id="step-3-express-your-logic">Step 3. Express your logic</h2>
+
+<p><a href="https://www.home-assistant.io/">Home Assistant</a> and
+<a href="https://nodered.org/">Node-RED</a> are both popular options, but also large
+software packages.</p>
+
+<p>Personally, I find it more fun to express my logic directly in a full
+programming language (Go).</p>
+
+<p>I call the <a href="https://github.com/stapelberg/regelwerk">resulting program <code>regelwerk</code> (“collection of
+rules”)</a>. The program consists of:</p>
+
+<ol>
+<li>various control loops that progress independently from each other</li>
+<li>an MQTT message dispatcher feeding these control loops</li>
+<li>a debugging web interface to visualize state</li>
+</ol>
+
+<p>This architecture is by no means a new approach: as
+<a href="https://github.com/rs/moquette">moquette</a> describes it, this is to MQTT what
+<code>inetd</code> is to IP. I find <code>moquette</code>’s one-process-per-message model to be too
+heavyweight and clumsy to deploy to <a href="https://gokrazy.org">https://gokrazy.org</a>, so <code>regelwerk</code> is
+entirely in-process and a single, easy-to-deploy binary, both to computers for
+notifications, or to headless Raspberry Pis.</p>
+
+<h3 id="regelwerk-control-loops-definition">regelwerk: control loops definition</h3>
+
+<p><code>regelwerk</code> defines a control loop as a stateful function that accepts an event
+(from MQTT) and returns messages to publish to MQTT, if any:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">type</span> controlLoop <span style="color:#007020;font-weight:bold">interface</span> {
+	sync.Locker
+
+	<span style="color:#06287e">StatusString</span>() <span style="color:#902000">string</span> <span style="color:#60a0b0;font-style:italic">// for human introspection
+</span><span style="color:#60a0b0;font-style:italic"></span>
+	<span style="color:#06287e">ProcessEvent</span>(MQTTEvent) []MQTTPublish
+}
+
+<span style="color:#60a0b0;font-style:italic">// Like mqtt.Message, but with timestamp
+</span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">type</span> MQTTEvent <span style="color:#007020;font-weight:bold">struct</span> {
+	Timestamp time.Time
+	Topic     <span style="color:#902000">string</span>
+	Payload   <span style="color:#007020;font-weight:bold">interface</span>{}
+}
+
+<span style="color:#60a0b0;font-style:italic">// Parameters for mqtt.Client.Publish()
+</span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">type</span> MQTTPublish <span style="color:#007020;font-weight:bold">struct</span> {
+	Topic    <span style="color:#902000">string</span>
+	Qos      <span style="color:#902000">byte</span>
+	Retained <span style="color:#902000">bool</span>
+	Payload  <span style="color:#007020;font-weight:bold">interface</span>{}
+}</code></pre></div>
+<h3 id="regelwerk-mqtt-dispatcher">regelwerk: MQTT dispatcher</h3>
+
+<p>Our MQTT message handler dispatches each incoming message to all control loops,
+in one goroutine per message and loop. With typical message volumes on a
+personal MQTT bus, this is a simple yet effective design that brings just enough
+isolation.</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">type</span> mqttMessageHandler <span style="color:#007020;font-weight:bold">struct</span> {
+	dryRun <span style="color:#902000">bool</span>
+	loops  []controlLoop
+}
+
+<span style="color:#007020;font-weight:bold">func</span> (h <span style="color:#666">*</span>mqttMessageHandler) <span style="color:#06287e">handle</span>(client mqtt.Client, m mqtt.Message) {
+	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;received message %q on %q&#34;</span>, m.<span style="color:#06287e">Payload</span>(), m.<span style="color:#06287e">Topic</span>())
+	ev <span style="color:#666">:=</span> MQTTEvent{
+		Timestamp: time.<span style="color:#06287e">Now</span>(), <span style="color:#60a0b0;font-style:italic">// consistent for all loops
+</span><span style="color:#60a0b0;font-style:italic"></span>		Topic:     m.<span style="color:#06287e">Topic</span>(),
+		Payload:   m.<span style="color:#06287e">Payload</span>(),
+	}
+
+	<span style="color:#007020;font-weight:bold">for</span> _, l <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> h.loops {
+		l <span style="color:#666">:=</span> l <span style="color:#60a0b0;font-style:italic">// copy
+</span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#007020;font-weight:bold">go</span> <span style="color:#007020;font-weight:bold">func</span>() {
+			<span style="color:#60a0b0;font-style:italic">// For reliability, we call each loop in its own goroutine
+</span><span style="color:#60a0b0;font-style:italic"></span>			<span style="color:#60a0b0;font-style:italic">// (yes, one per message), so that when one loop gets stuck,
+</span><span style="color:#60a0b0;font-style:italic"></span>			<span style="color:#60a0b0;font-style:italic">// the others still make progress.
+</span><span style="color:#60a0b0;font-style:italic"></span>			l.<span style="color:#06287e">Lock</span>()
+			results <span style="color:#666">:=</span> l.<span style="color:#06287e">ProcessEvent</span>(ev)
+			l.<span style="color:#06287e">Unlock</span>()
+			<span style="color:#007020;font-weight:bold">if</span> <span style="color:#007020">len</span>(results) <span style="color:#666">==</span> <span style="color:#40a070">0</span> {
+				<span style="color:#007020;font-weight:bold">return</span>
+			}
+			<span style="color:#007020;font-weight:bold">for</span> _, r <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> results {
+				log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;publishing: %+v&#34;</span>, r)
+				<span style="color:#007020;font-weight:bold">if</span> !h.dryRun {
+					client.<span style="color:#06287e">Publish</span>(r.Topic, r.Qos, r.Retained, r.Payload)
+				}
+			}
+			<span style="color:#60a0b0;font-style:italic">// …input/output logging omitted for brevity…
+</span><span style="color:#60a0b0;font-style:italic"></span>		}()
+	}
+}</code></pre></div>
+<h3 id="regelwerk-control-loop-example">regelwerk: control loop example</h3>
+
+<p>Now that we have the definition and dispatching out of the way, let’s take a
+look at an actual example control loop.</p>
+
+<p>This control loops looks at whether my PC is unlocked (in use) or whether my
+phone is home, and then turns off/on my stereo speakers accordingly.</p>
+
+<p>The inputs come from
+<a href="https://github.com/stapelberg/zkj-nas-tools/blob/master/runstatus/runstatus.go">runstatus</a>
+and
+<a href="https://github.com/rtr7/router7/blob/c30bf38438b3ba00ae13dff914f0ef4f05684250/cmd/dhcp4d/dhcp4d.go#L405-L433">dhcp4d</a>,
+the output goes to a Sonoff S26 Smart Power Plug running
+<a href="https://tasmota.github.io/docs/">Tasmota</a>.</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">type</span> avrPowerLoop <span style="color:#007020;font-weight:bold">struct</span> {
+	statusLoop <span style="color:#60a0b0;font-style:italic">// for l.statusf() debugging
+</span><span style="color:#60a0b0;font-style:italic"></span>
+	midnaUnlocked          <span style="color:#902000">bool</span>
+	michaelPhoneExpiration time.Time
+}
+
+<span style="color:#007020;font-weight:bold">func</span> (l <span style="color:#666">*</span>avrPowerLoop) <span style="color:#06287e">ProcessEvent</span>(ev MQTTEvent) []MQTTPublish {
+	<span style="color:#60a0b0;font-style:italic">// Update loop state based on inputs:
+</span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">switch</span> ev.Topic {
+	<span style="color:#007020;font-weight:bold">case</span> <span style="color:#4070a0">&#34;runstatus/midna/i3lock&#34;</span>:
+		<span style="color:#007020;font-weight:bold">var</span> status <span style="color:#007020;font-weight:bold">struct</span> {
+			Running <span style="color:#902000">bool</span> <span style="color:#4070a0">`json:&#34;running&#34;`</span>
+		}
+		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> json.<span style="color:#06287e">Unmarshal</span>(ev.Payload.([]<span style="color:#902000">byte</span>), <span style="color:#666">&amp;</span>status); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+			l.<span style="color:#06287e">statusf</span>(<span style="color:#4070a0">&#34;unmarshaling runstatus: %v&#34;</span>, err)
+			<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
+		}
+		l.midnaUnlocked = !status.Running
+
+	<span style="color:#007020;font-weight:bold">case</span> <span style="color:#4070a0">&#34;router7/dhcp4d/lease/Michaels-iPhone&#34;</span>:
+		<span style="color:#007020;font-weight:bold">var</span> lease <span style="color:#007020;font-weight:bold">struct</span> {
+			Expiration time.Time <span style="color:#4070a0">`json:&#34;expiration&#34;`</span>
+		}
+		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> json.<span style="color:#06287e">Unmarshal</span>(ev.Payload.([]<span style="color:#902000">byte</span>), <span style="color:#666">&amp;</span>lease); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+			l.<span style="color:#06287e">statusf</span>(<span style="color:#4070a0">&#34;unmarshaling router7 lease: %v&#34;</span>, err)
+			<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
+		}
+		l.michaelPhoneExpiration = lease.Expiration
+
+	<span style="color:#007020;font-weight:bold">default</span>:
+		<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span> <span style="color:#60a0b0;font-style:italic">// event did not influence our state
+</span><span style="color:#60a0b0;font-style:italic"></span>	}
+
+	<span style="color:#60a0b0;font-style:italic">// Publish desired state changes:
+</span><span style="color:#60a0b0;font-style:italic"></span>	now <span style="color:#666">:=</span> ev.Timestamp
+	phoneHome <span style="color:#666">:=</span> l.michaelPhoneExpiration.<span style="color:#06287e">After</span>(now)
+	anyoneHome <span style="color:#666">:=</span> l.midnaUnlocked <span style="color:#666">||</span> (now.<span style="color:#06287e">Hour</span>() &gt; <span style="color:#40a070">8</span> <span style="color:#666">&amp;&amp;</span> phoneHome)
+	l.<span style="color:#06287e">statusf</span>(<span style="color:#4070a0">&#34;midnaUnlocked=%v || (now.Hour=%v &gt; 8 &amp;&amp; phoneHome=%v)&#34;</span>,
+		l.midnaUnlocked, now.<span style="color:#06287e">Hour</span>(), phoneHome)
+
+	payload <span style="color:#666">:=</span> <span style="color:#4070a0">&#34;OFF&#34;</span>
+	<span style="color:#007020;font-weight:bold">if</span> anyoneHome {
+		payload = <span style="color:#4070a0">&#34;ON&#34;</span>
+	}
+	<span style="color:#007020;font-weight:bold">return</span> []MQTTPublish{
+		{
+			Topic:    <span style="color:#4070a0">&#34;cmnd/tasmota_68462F/Power&#34;</span>,
+			Payload:  payload,
+			Retained: <span style="color:#007020;font-weight:bold">true</span>,
+		},
+	}
+}</code></pre></div>
+<h2 id="conclusion">Conclusion</h2>
+
+<p>I like the Pub/Sub pattern for home automation, as it nicely uncouples all
+components.</p>
+
+<p>It’s a shame that standards such as <a href="https://homieiot.github.io/">The Homie
+convention</a> aren’t more widely supported, but it
+looks like software makes up for that via configuration options.</p>
+
+<p>There are plenty of existing integrations that should cover most needs.</p>
+
+<p>Ideally, more Smart Home and IOT vendors would add MQTT support out of the box,
+like <a href="https://shelly.cloud/">Shelly</a>.</p>
+
+</div>
+
+      </div>
+<div id="ms_toc">
+  <div>
+    <strong>Table Of Contents</strong>
+
+    <nav class="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#step-1-set-up-an-mqtt-broker-server">Step 1. Set up an MQTT broker (server)</a>
+<ul>
+<li><a href="#mqtt-broker-setup-displaying-sending-test-messages">MQTT broker setup: displaying/sending test messages</a></li>
+</ul></li>
+<li><a href="#step-2-integrate-with-mqtt">Step 2. Integrate with MQTT</a>
+<ul>
+<li><a href="#best-practices-for-your-own-structure">Best practices for your own structure</a></li>
+<li><a href="#integration-shelly-devices-with-mqtt-built-in">Integration: Shelly devices with MQTT built-in</a></li>
+<li><a href="#integration-zigbee2mqtt-for-zigbee-devices">Integration: Zigbee2MQTT for Zigbee devices</a></li>
+<li><a href="#integration-esphome-for-micro-controllers-sensors">Integration: ESPHome for micro controllers + sensors</a></li>
+<li><a href="#integration-mongoose-os-for-micro-controllers">Integration: Mongoose OS for micro controllers</a></li>
+<li><a href="#integration-arduino-for-custom-micro-controller-firmware">Integration: Arduino for custom micro controller firmware</a></li>
+</ul></li>
+<li><a href="#integration-webhook-to-mqtt">Integration: Webhook to MQTT</a></li>
+<li><a href="#step-3-express-your-logic">Step 3. Express your logic</a>
+<ul>
+<li><a href="#regelwerk-control-loops-definition">regelwerk: control loops definition</a></li>
+<li><a href="#regelwerk-mqtt-dispatcher">regelwerk: MQTT dispatcher</a></li>
+<li><a href="#regelwerk-control-loop-example">regelwerk: control loop example</a></li>
+</ul></li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    </main><div id="ms_footer">
+  © 2020 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

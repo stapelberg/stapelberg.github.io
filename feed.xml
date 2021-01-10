@@ -3,10 +3,496 @@
   <link href="https://michael.stapelberg.ch/feed.xml" rel="self"/>
   <link href="https://michael.stapelberg.ch/"/>
 
-    <updated>2020-11-30T08:18:12+01:00</updated>
+    <updated>2021-01-10T16:00:32+01:00</updated>
     
   <id>https://michael.stapelberg.ch/</id>
   <generator>Hugo -- gohugo.io</generator>
+  <entry>
+    <title type="html"><![CDATA[A quick introduction to MQTT for IOT]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2021-01-10-mqtt-introduction/"/>
+    <id>https://michael.stapelberg.ch/posts/2021-01-10-mqtt-introduction/</id>
+    <published>2021-01-10T15:26:00+01:00</published>
+    <updated>2021-01-10T16:00:32+01:00</updated>
+    <content type="html"><![CDATA[
+
+<p>While I had heard the abbreviation <a href="https://en.wikipedia.org/wiki/MQTT">MQTT</a>
+many times, I never had a closer look at what MQTT is.</p>
+
+<p>Here are a few quick notes about using MQTT as <a href="https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern">Pub/Sub
+bus</a> in a home
+IOT network.</p>
+
+<h2 id="motivation">Motivation</h2>
+
+<p>Once you have a few <a href="https://en.wikipedia.org/wiki/Internet_of_things">IOT
+devices</a>, an obvious question
+is how to network them.</p>
+
+<p>If all your devices are from the same vendor, the vendor takes care of it.</p>
+
+<p>In my home, I have many different vendors/devices, such as (incomplete list):</p>
+
+<ul>
+<li><a href="https://nuki.io/en/opener/">Nuki Opener</a> Smart Intercom</li>
+<li><a href="https://www.itead.cc/sonoff-s26-wifi-smart-plug.html">Sonoff S26 Smart Plug</a> (WiFi-controlled socket outlet)</li>
+<li><a href="https://www.aqara.com/en/door_and_window_sensor.html">Aqara Door &amp; Window Sensors</a></li>
+<li><a href="https://en.wikipedia.org/wiki/IKEA#Smart_home">IKEA Home Smart</a> (formerly TRÅDFRI) Smart Lights</li>
+</ul>
+
+<p>Here is how I combine these devices:</p>
+
+<ul>
+<li>When I’m close to my home (geo-fencing), the Nuki Opener enables Ring To Open (RTO): when I ring the door bell, it opens the door for me.</li>
+<li>When I open the apartment door, the Smart Lights in the hallway turn on.</li>
+<li>When I’m home, my stereo speakers should be powered on so I can play music.</li>
+</ul>
+
+<p>A conceptually simple way to hook this up is to connect things directly: listen
+to the Aqara Door Sensor and instruct the Smart Lights to turn on, for example.</p>
+
+<p>But, connecting everything to an MQTT bus has a couple of advantages:</p>
+
+<ol>
+<li>Unification: everything is visible in one place, the same tools work for all
+devices.</li>
+<li>Your custom logic is uncoupled from vendor details: you can receive and send
+MQTT.</li>
+<li>Compatibility with existing software, such as <a href="https://www.home-assistant.io/">Home
+Assistant</a> or
+<a href="https://www.openhab.org/">openHAB</a></li>
+</ol>
+
+<h2 id="step-1-set-up-an-mqtt-broker-server">Step 1. Set up an MQTT broker (server)</h2>
+
+<p>A broker is what relays messages between publishers and subscribers. As an
+optimization, the most recent value of a topic can be retained, so that e.g. a
+subscriber does not need to wait for the next change to obtain the current
+state.</p>
+
+<p>The most popular choice for broker software seems to be
+<a href="https://mosquitto.org/">Mosquitto</a>, but since I like to run Go software on
+<a href="https://gokrazy.org/">https://gokrazy.org/</a>, I kept looking and found <a href="https://github.com/fhmq/hmq">https://github.com/fhmq/hmq</a>.</p>
+
+<p>One downside of <code>hmq</code> might be that it does not seem to support persisting
+retained messages to disk. I’ll treat this as a feature for the time being,
+enforcing a fresh start on every daily reboot.</p>
+
+<p>To restrict hmq to only listen in my local network, I’m using <a href="https://github.com/gokrazy/tools/commit/fdd90fc6817876e08b352fae84f2a2794524ccc0">gokrazy’s flag
+file
+feature</a>:</p>
+
+<pre><code>mkdir -p flags/github.com/fhmq/hmq
+echo --host=10.0.0.217 &gt; flags/github.com/fhmq/hmq/flags.txt
+</code></pre>
+
+<p>Note that you’ll need <a href="https://github.com/fhmq/hmq/pull/105">https://github.com/fhmq/hmq/pull/105</a> in case your network
+does not come up quickly.</p>
+
+<h3 id="mqtt-broker-setup-displaying-sending-test-messages">MQTT broker setup: displaying/sending test messages</h3>
+
+<p>To display all messages going through your MQTT broker, subscribe using the
+<a href="https://mosquitto.org/">Mosquitto</a> tools:</p>
+
+<pre><code>% sudo pacman -S mosquitto
+% mosquitto_sub --id &quot;${HOST}_all&quot; --host dr.lan --topic '#' --verbose
+</code></pre>
+
+<p>The <code>#</code> sign denotes an <a href="https://subscription.packtpub.com/book/application_development/9781787287815/1/ch01lvl1sec18/understanding-wildcards">MQTT
+wildcard</a>,
+meaning subscribe to all topics in this case.</p>
+
+<p>Be sure to set a unique id for each <code>mosquitto_sub</code> command you run, so that you
+can see which subscribers are connected to your MQTT bus. Avoid id clashes,
+otherwise the subscribers will disconnect each other!</p>
+
+<p>Now, when you send a test message, you should see it:</p>
+
+<pre><code>% mosquitto_pub --host dr.lan --topic 'cmnd/tasmota_68462F/Power' -m 'ON'
+</code></pre>
+
+<p>Tip: If you have binary data on your MQTT bus, you can display it in hex with
+timestamps:</p>
+
+<pre><code>% mosquitto_sub \
+  --id &quot;${HOST}_bell&quot; \
+  --host dr.lan \
+  --topic 'doorbell/#' \
+  -F '@Y-@m-@dT@H:@M:@S@z : %t : %x'
+</code></pre>
+
+<h2 id="step-2-integrate-with-mqtt">Step 2. Integrate with MQTT</h2>
+
+<p>Now that communication via the bus works, what messages do we publish on which
+topics?</p>
+
+<p>MQTT only defines that topics are hierarchical; messages are arbitrary byte
+sequences.</p>
+
+<p>There are a few popular conventions for what to put onto MQTT:</p>
+
+<ul>
+<li><p><a href="https://homieiot.github.io/">The Homie convention</a></p></li>
+
+<li><p>Home Assistant has its own convention, but <a href="https://www.home-assistant.io/integrations/switch.mqtt/#full-configuration">allows full configuration</a>. Home Assistant does <a href="https://community.home-assistant.io/t/home-assistant-homie-compatibility/17135/8">not support the homie convention yet</a>.</p></li>
+
+<li><p>openHAB <a href="https://www.openhab.org/addons/bindings/mqtt.generic/">refers to Home Assistant and
+Homie</a>.</p></li>
+</ul>
+
+<p>If you design everything yourself, Homie seems like a good option. If you plan to
+use Home Assistant or similar, stick to the Home Assistant convention.</p>
+
+<h3 id="best-practices-for-your-own-structure">Best practices for your own structure</h3>
+
+<p>In case you want/need to define your own topics, keep these tips in mind:</p>
+
+<ul>
+<li>devices publish their state on a single, retained topic
+
+<ul>
+<li>the topic name could be e.g. <code>stat/tasmota_68462F/POWER</code></li>
+<li>retaining the topic allows consumers to catch up after (re-)connecting to the bus</li>
+</ul></li>
+<li>publish commands on a single, possibly-retained topic
+
+<ul>
+<li>e.g. publish <code>ON</code> to topic <code>cmnd/tasmota_68462F/Power</code></li>
+<li>publish the desired state: publish <code>ON</code> or <code>OFF</code> instead of <code>TOGGLE</code></li>
+<li>if you retain the topic and publish <code>TOGGLE</code> commands, your lights will mysteriously go off/on when they unexpectedly re-establish their MQTT connection</li>
+</ul></li>
+</ul>
+
+<h3 id="integration-shelly-devices-with-mqtt-built-in">Integration: Shelly devices with MQTT built-in</h3>
+
+<p><a href="https://shelly.cloud/">Shelly</a> has a number of smart devices that come with
+MQTT out of the box! This sounds like the easiest solution if you’re starting
+from scratch.</p>
+
+<p>I haven’t used these devices personally, but I hear good things about them.</p>
+
+<h3 id="integration-zigbee2mqtt-for-zigbee-devices">Integration: Zigbee2MQTT for Zigbee devices</h3>
+
+<p><a href="https://www.zigbee2mqtt.io/">Zigbee2MQTT</a> supports well <a href="https://www.zigbee2mqtt.io/information/supported_devices.html">over 1000 Zigbee
+devices</a> and
+exposes them on the MQTT bus.</p>
+
+<p>For example, this is what you would use to connect your IKEA TRÅDFRI Smart
+Lights to MQTT.</p>
+
+<h3 id="integration-esphome-for-micro-controllers-sensors">Integration: ESPHome for micro controllers + sensors</h3>
+
+<p>The <a href="https://esphome.io/">ESPHome</a> system is a ready-made solution to connect a
+wide array of sensors and devices to your home network via MQTT.</p>
+
+<p>If you want to use your own ESP-based micro controllers and sensors, this seems
+like the easiest way to get them programmed.</p>
+
+<h3 id="integration-mongoose-os-for-micro-controllers">Integration: Mongoose OS for micro controllers</h3>
+
+<p>Mongoose OS is an IOT firmware development framework, taking care of device
+management, Over-The-Air updates, and more.</p>
+
+<p><a href="https://mongoose-os.com/docs/mongoose-os/cloud/mqtt.md">Mongoose comes with MQTT
+support</a>, and with just
+a few lines you can build, flash and configure your device. Here’s an example
+for the NodeMCU (ESP8266-based):</p>
+
+<pre><code>% yay -S mos-bin
+% mos clone https://github.com/mongoose-os-apps/demo-js app1
+% cd app1
+% mos --platform esp8266 build
+% mos --platform esp8266 --port /dev/ttyUSB1 flash
+% mos --port /dev/ttyUSB1 config-set mqtt.enable=true mqtt.server=dr.lan:1883
+</code></pre>
+
+<p>Pressing the button on the NodeMCU publishes a message to MQTT:</p>
+
+<pre><code>% mosquitto_sub --host dr.lan --topic devices/esp8266_F4B37C/events
+{&quot;ram_free&quot;:31260,&quot;uptime&quot;:27.168680,&quot;btnCount&quot;:2,&quot;on&quot;:false}
+</code></pre>
+
+<h3 id="integration-arduino-for-custom-micro-controller-firmware">Integration: Arduino for custom micro controller firmware</h3>
+
+<p>Arduino has an <a href="https://www.arduino.cc/reference/en/libraries/mqtt-client/">MQTT Client
+library</a>. If your
+microcontroller is networked, e.g. an ESP32 with WiFi, you can publish MQTT
+messages from your Arduino sketch:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020">#include</span> <span style="color:#007020">&lt;WiFi.h&gt;</span><span style="color:#007020">
+</span><span style="color:#007020">#include</span> <span style="color:#007020">&lt;PubSubClient.h&gt;</span><span style="color:#007020">
+</span><span style="color:#007020"></span>
+WiFiClient wificlient;
+PubSubClient <span style="color:#06287e">client</span>(wificlient);
+
+<span style="color:#902000">void</span> <span style="color:#06287e">callback</span>(<span style="color:#902000">char</span><span style="color:#666">*</span> topic, byte<span style="color:#666">*</span> payload, <span style="color:#902000">unsigned</span> <span style="color:#902000">int</span> length) {
+    Serial.print(<span style="color:#4070a0">&#34;Message arrived [&#34;</span>);
+    Serial.print(topic);
+    Serial.print(<span style="color:#4070a0">&#34;] &#34;</span>);
+    <span style="color:#007020;font-weight:bold">for</span> (<span style="color:#902000">int</span> i <span style="color:#666">=</span> <span style="color:#40a070">0</span>; i <span style="color:#666">&lt;</span> length; i<span style="color:#666">++</span>) {
+      Serial.print((<span style="color:#902000">char</span>)payload[i]);
+    }
+    Serial.println();
+  
+    <span style="color:#007020;font-weight:bold">if</span> (strcmp(topic, <span style="color:#4070a0">&#34;doorbell/cmd/unlock&#34;</span>) <span style="color:#666">==</span> <span style="color:#40a070">0</span>) {
+  		<span style="color:#60a0b0;font-style:italic">// …
+</span><span style="color:#60a0b0;font-style:italic"></span>    }
+}
+
+<span style="color:#902000">void</span> <span style="color:#06287e">taskmqtt</span>(<span style="color:#902000">void</span> <span style="color:#666">*</span>pvParameters) {
+	<span style="color:#007020;font-weight:bold">for</span> (;;) {
+		<span style="color:#007020;font-weight:bold">if</span> (<span style="color:#666">!</span>client.connected()) {
+			client.connect(<span style="color:#4070a0">&#34;doorbell&#34;</span> <span style="color:#60a0b0;font-style:italic">/* clientid */</span>);
+			client.subscribe(<span style="color:#4070a0">&#34;doorbell/cmd/unlock&#34;</span>);
+		}
+
+		<span style="color:#60a0b0;font-style:italic">// Poll PubSubClient for new messages and invoke the callback.
+</span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// Should be called as infrequent as one is willing to delay
+</span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// reacting to MQTT messages.
+</span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// Should not be called too frequently to avoid strain on
+</span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// the network hardware:
+</span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// https://github.com/knolleary/pubsubclient/issues/756#issuecomment-654335096
+</span><span style="color:#60a0b0;font-style:italic"></span>		client.loop();
+		vTaskDelay(pdMS_TO_TICKS(<span style="color:#40a070">100</span>));
+	}
+}
+
+<span style="color:#902000">void</span> <span style="color:#06287e">setup</span>() {
+	connectToWiFi(); <span style="color:#60a0b0;font-style:italic">// WiFi configuration omitted for brevity
+</span><span style="color:#60a0b0;font-style:italic"></span>
+	client.setServer(<span style="color:#4070a0">&#34;dr.lan&#34;</span>, <span style="color:#40a070">1883</span>);
+	client.setCallback(callback);
+
+	xTaskCreatePinnedToCore(taskmqtt, <span style="color:#4070a0">&#34;MQTT&#34;</span>, <span style="color:#40a070">2048</span>, <span style="color:#007020">NULL</span>, <span style="color:#40a070">1</span>, <span style="color:#007020">NULL</span>, PRO_CPU_NUM);
+}
+
+<span style="color:#902000">void</span> <span style="color:#06287e">processEvent</span>(<span style="color:#902000">void</span> <span style="color:#666">*</span>buf, <span style="color:#902000">int</span> telegramLen) {
+	client.publish(<span style="color:#4070a0">&#34;doorbell/events/scs&#34;</span>, buf, telegramLen);
+}</code></pre></div>
+<h2 id="integration-webhook-to-mqtt">Integration: Webhook to MQTT</h2>
+
+<p>The Nuki Opener doesn’t support MQTT out of the box, but the Nuki Bridge can
+send Webhook requests. In a few lines of Go, you can forward what the Nuki
+Bridge sends to MQTT:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">package</span> main
+
+<span style="color:#007020;font-weight:bold">import</span> (
+	<span style="color:#4070a0">&#34;fmt&#34;</span>
+	<span style="color:#4070a0">&#34;io/ioutil&#34;</span>
+	<span style="color:#4070a0">&#34;log&#34;</span>
+	<span style="color:#4070a0">&#34;net/http&#34;</span>
+
+	mqtt <span style="color:#4070a0">&#34;github.com/eclipse/paho.mqtt.golang&#34;</span>
+)
+
+<span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">nukiBridge</span>() <span style="color:#902000">error</span> {
+	opts <span style="color:#666">:=</span> mqtt.<span style="color:#06287e">NewClientOptions</span>().<span style="color:#06287e">AddBroker</span>(<span style="color:#4070a0">&#34;tcp://dr.lan:1883&#34;</span>)
+	opts.<span style="color:#06287e">SetClientID</span>(<span style="color:#4070a0">&#34;nuki2mqtt&#34;</span>)
+	opts.<span style="color:#06287e">SetConnectRetry</span>(<span style="color:#007020;font-weight:bold">true</span>)
+	mqttClient <span style="color:#666">:=</span> mqtt.<span style="color:#06287e">NewClient</span>(opts)
+	<span style="color:#007020;font-weight:bold">if</span> token <span style="color:#666">:=</span> mqttClient.<span style="color:#06287e">Connect</span>(); token.<span style="color:#06287e">Wait</span>() <span style="color:#666">&amp;&amp;</span> token.<span style="color:#06287e">Error</span>() <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+		<span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;MQTT connection failed: %v&#34;</span>, token.<span style="color:#06287e">Error</span>())
+	}
+
+	mux <span style="color:#666">:=</span> http.<span style="color:#06287e">NewServeMux</span>()
+	mux.<span style="color:#06287e">HandleFunc</span>(<span style="color:#4070a0">&#34;/nuki&#34;</span>, <span style="color:#007020;font-weight:bold">func</span>(w http.ResponseWriter, r <span style="color:#666">*</span>http.Request) {
+		b, err <span style="color:#666">:=</span> ioutil.<span style="color:#06287e">ReadAll</span>(r.Body)
+		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+			log.<span style="color:#06287e">Print</span>(err)
+			http.<span style="color:#06287e">Error</span>(w, err.<span style="color:#06287e">Error</span>(), http.StatusInternalServerError)
+			<span style="color:#007020;font-weight:bold">return</span>
+		}
+
+		mqttClient.<span style="color:#06287e">Publish</span>(
+			<span style="color:#4070a0">&#34;zkj-nuki/webhook&#34;</span>, <span style="color:#60a0b0;font-style:italic">// topic
+</span><span style="color:#60a0b0;font-style:italic"></span>			<span style="color:#40a070">0</span>, <span style="color:#60a0b0;font-style:italic">// qos
+</span><span style="color:#60a0b0;font-style:italic"></span>			<span style="color:#007020;font-weight:bold">true</span>, <span style="color:#60a0b0;font-style:italic">// retained
+</span><span style="color:#60a0b0;font-style:italic"></span>			<span style="color:#007020">string</span>(b)) <span style="color:#60a0b0;font-style:italic">// payload
+</span><span style="color:#60a0b0;font-style:italic"></span>	})
+
+	<span style="color:#007020;font-weight:bold">return</span> http.<span style="color:#06287e">ListenAndServe</span>(<span style="color:#4070a0">&#34;:8319&#34;</span>, mux)
+}
+
+<span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">nukiBridge</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+		log.<span style="color:#06287e">Fatal</span>(err)
+	}
+}</code></pre></div>
+<p>See <a href="https://developer.nuki.io/t/bridge-http-api/26">Nuki’s Bridge HTTP-API</a>
+document for details on how to configure your bridge to send webhook callbacks.</p>
+
+<h2 id="step-3-express-your-logic">Step 3. Express your logic</h2>
+
+<p><a href="https://www.home-assistant.io/">Home Assistant</a> and
+<a href="https://nodered.org/">Node-RED</a> are both popular options, but also large
+software packages.</p>
+
+<p>Personally, I find it more fun to express my logic directly in a full
+programming language (Go).</p>
+
+<p>I call the <a href="https://github.com/stapelberg/regelwerk">resulting program <code>regelwerk</code> (“collection of
+rules”)</a>. The program consists of:</p>
+
+<ol>
+<li>various control loops that progress independently from each other</li>
+<li>an MQTT message dispatcher feeding these control loops</li>
+<li>a debugging web interface to visualize state</li>
+</ol>
+
+<p>This architecture is by no means a new approach: as
+<a href="https://github.com/rs/moquette">moquette</a> describes it, this is to MQTT what
+<code>inetd</code> is to IP. I find <code>moquette</code>’s one-process-per-message model to be too
+heavyweight and clumsy to deploy to <a href="https://gokrazy.org">https://gokrazy.org</a>, so <code>regelwerk</code> is
+entirely in-process and a single, easy-to-deploy binary, both to computers for
+notifications, or to headless Raspberry Pis.</p>
+
+<h3 id="regelwerk-control-loops-definition">regelwerk: control loops definition</h3>
+
+<p><code>regelwerk</code> defines a control loop as a stateful function that accepts an event
+(from MQTT) and returns messages to publish to MQTT, if any:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">type</span> controlLoop <span style="color:#007020;font-weight:bold">interface</span> {
+	sync.Locker
+
+	<span style="color:#06287e">StatusString</span>() <span style="color:#902000">string</span> <span style="color:#60a0b0;font-style:italic">// for human introspection
+</span><span style="color:#60a0b0;font-style:italic"></span>
+	<span style="color:#06287e">ProcessEvent</span>(MQTTEvent) []MQTTPublish
+}
+
+<span style="color:#60a0b0;font-style:italic">// Like mqtt.Message, but with timestamp
+</span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">type</span> MQTTEvent <span style="color:#007020;font-weight:bold">struct</span> {
+	Timestamp time.Time
+	Topic     <span style="color:#902000">string</span>
+	Payload   <span style="color:#007020;font-weight:bold">interface</span>{}
+}
+
+<span style="color:#60a0b0;font-style:italic">// Parameters for mqtt.Client.Publish()
+</span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">type</span> MQTTPublish <span style="color:#007020;font-weight:bold">struct</span> {
+	Topic    <span style="color:#902000">string</span>
+	Qos      <span style="color:#902000">byte</span>
+	Retained <span style="color:#902000">bool</span>
+	Payload  <span style="color:#007020;font-weight:bold">interface</span>{}
+}</code></pre></div>
+<h3 id="regelwerk-mqtt-dispatcher">regelwerk: MQTT dispatcher</h3>
+
+<p>Our MQTT message handler dispatches each incoming message to all control loops,
+in one goroutine per message and loop. With typical message volumes on a
+personal MQTT bus, this is a simple yet effective design that brings just enough
+isolation.</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">type</span> mqttMessageHandler <span style="color:#007020;font-weight:bold">struct</span> {
+	dryRun <span style="color:#902000">bool</span>
+	loops  []controlLoop
+}
+
+<span style="color:#007020;font-weight:bold">func</span> (h <span style="color:#666">*</span>mqttMessageHandler) <span style="color:#06287e">handle</span>(client mqtt.Client, m mqtt.Message) {
+	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;received message %q on %q&#34;</span>, m.<span style="color:#06287e">Payload</span>(), m.<span style="color:#06287e">Topic</span>())
+	ev <span style="color:#666">:=</span> MQTTEvent{
+		Timestamp: time.<span style="color:#06287e">Now</span>(), <span style="color:#60a0b0;font-style:italic">// consistent for all loops
+</span><span style="color:#60a0b0;font-style:italic"></span>		Topic:     m.<span style="color:#06287e">Topic</span>(),
+		Payload:   m.<span style="color:#06287e">Payload</span>(),
+	}
+
+	<span style="color:#007020;font-weight:bold">for</span> _, l <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> h.loops {
+		l <span style="color:#666">:=</span> l <span style="color:#60a0b0;font-style:italic">// copy
+</span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#007020;font-weight:bold">go</span> <span style="color:#007020;font-weight:bold">func</span>() {
+			<span style="color:#60a0b0;font-style:italic">// For reliability, we call each loop in its own goroutine
+</span><span style="color:#60a0b0;font-style:italic"></span>			<span style="color:#60a0b0;font-style:italic">// (yes, one per message), so that when one loop gets stuck,
+</span><span style="color:#60a0b0;font-style:italic"></span>			<span style="color:#60a0b0;font-style:italic">// the others still make progress.
+</span><span style="color:#60a0b0;font-style:italic"></span>			l.<span style="color:#06287e">Lock</span>()
+			results <span style="color:#666">:=</span> l.<span style="color:#06287e">ProcessEvent</span>(ev)
+			l.<span style="color:#06287e">Unlock</span>()
+			<span style="color:#007020;font-weight:bold">if</span> <span style="color:#007020">len</span>(results) <span style="color:#666">==</span> <span style="color:#40a070">0</span> {
+				<span style="color:#007020;font-weight:bold">return</span>
+			}
+			<span style="color:#007020;font-weight:bold">for</span> _, r <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> results {
+				log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;publishing: %+v&#34;</span>, r)
+				<span style="color:#007020;font-weight:bold">if</span> !h.dryRun {
+					client.<span style="color:#06287e">Publish</span>(r.Topic, r.Qos, r.Retained, r.Payload)
+				}
+			}
+			<span style="color:#60a0b0;font-style:italic">// …input/output logging omitted for brevity…
+</span><span style="color:#60a0b0;font-style:italic"></span>		}()
+	}
+}</code></pre></div>
+<h3 id="regelwerk-control-loop-example">regelwerk: control loop example</h3>
+
+<p>Now that we have the definition and dispatching out of the way, let’s take a
+look at an actual example control loop.</p>
+
+<p>This control loops looks at whether my PC is unlocked (in use) or whether my
+phone is home, and then turns off/on my stereo speakers accordingly.</p>
+
+<p>The inputs come from
+<a href="https://github.com/stapelberg/zkj-nas-tools/blob/master/runstatus/runstatus.go">runstatus</a>
+and
+<a href="https://github.com/rtr7/router7/blob/c30bf38438b3ba00ae13dff914f0ef4f05684250/cmd/dhcp4d/dhcp4d.go#L405-L433">dhcp4d</a>,
+the output goes to a Sonoff S26 Smart Power Plug running
+<a href="https://tasmota.github.io/docs/">Tasmota</a>.</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">type</span> avrPowerLoop <span style="color:#007020;font-weight:bold">struct</span> {
+	statusLoop <span style="color:#60a0b0;font-style:italic">// for l.statusf() debugging
+</span><span style="color:#60a0b0;font-style:italic"></span>
+	midnaUnlocked          <span style="color:#902000">bool</span>
+	michaelPhoneExpiration time.Time
+}
+
+<span style="color:#007020;font-weight:bold">func</span> (l <span style="color:#666">*</span>avrPowerLoop) <span style="color:#06287e">ProcessEvent</span>(ev MQTTEvent) []MQTTPublish {
+	<span style="color:#60a0b0;font-style:italic">// Update loop state based on inputs:
+</span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">switch</span> ev.Topic {
+	<span style="color:#007020;font-weight:bold">case</span> <span style="color:#4070a0">&#34;runstatus/midna/i3lock&#34;</span>:
+		<span style="color:#007020;font-weight:bold">var</span> status <span style="color:#007020;font-weight:bold">struct</span> {
+			Running <span style="color:#902000">bool</span> <span style="color:#4070a0">`json:&#34;running&#34;`</span>
+		}
+		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> json.<span style="color:#06287e">Unmarshal</span>(ev.Payload.([]<span style="color:#902000">byte</span>), <span style="color:#666">&amp;</span>status); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+			l.<span style="color:#06287e">statusf</span>(<span style="color:#4070a0">&#34;unmarshaling runstatus: %v&#34;</span>, err)
+			<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
+		}
+		l.midnaUnlocked = !status.Running
+
+	<span style="color:#007020;font-weight:bold">case</span> <span style="color:#4070a0">&#34;router7/dhcp4d/lease/Michaels-iPhone&#34;</span>:
+		<span style="color:#007020;font-weight:bold">var</span> lease <span style="color:#007020;font-weight:bold">struct</span> {
+			Expiration time.Time <span style="color:#4070a0">`json:&#34;expiration&#34;`</span>
+		}
+		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> json.<span style="color:#06287e">Unmarshal</span>(ev.Payload.([]<span style="color:#902000">byte</span>), <span style="color:#666">&amp;</span>lease); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+			l.<span style="color:#06287e">statusf</span>(<span style="color:#4070a0">&#34;unmarshaling router7 lease: %v&#34;</span>, err)
+			<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
+		}
+		l.michaelPhoneExpiration = lease.Expiration
+
+	<span style="color:#007020;font-weight:bold">default</span>:
+		<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span> <span style="color:#60a0b0;font-style:italic">// event did not influence our state
+</span><span style="color:#60a0b0;font-style:italic"></span>	}
+
+	<span style="color:#60a0b0;font-style:italic">// Publish desired state changes:
+</span><span style="color:#60a0b0;font-style:italic"></span>	now <span style="color:#666">:=</span> ev.Timestamp
+	phoneHome <span style="color:#666">:=</span> l.michaelPhoneExpiration.<span style="color:#06287e">After</span>(now)
+	anyoneHome <span style="color:#666">:=</span> l.midnaUnlocked <span style="color:#666">||</span> (now.<span style="color:#06287e">Hour</span>() &gt; <span style="color:#40a070">8</span> <span style="color:#666">&amp;&amp;</span> phoneHome)
+	l.<span style="color:#06287e">statusf</span>(<span style="color:#4070a0">&#34;midnaUnlocked=%v || (now.Hour=%v &gt; 8 &amp;&amp; phoneHome=%v)&#34;</span>,
+		l.midnaUnlocked, now.<span style="color:#06287e">Hour</span>(), phoneHome)
+
+	payload <span style="color:#666">:=</span> <span style="color:#4070a0">&#34;OFF&#34;</span>
+	<span style="color:#007020;font-weight:bold">if</span> anyoneHome {
+		payload = <span style="color:#4070a0">&#34;ON&#34;</span>
+	}
+	<span style="color:#007020;font-weight:bold">return</span> []MQTTPublish{
+		{
+			Topic:    <span style="color:#4070a0">&#34;cmnd/tasmota_68462F/Power&#34;</span>,
+			Payload:  payload,
+			Retained: <span style="color:#007020;font-weight:bold">true</span>,
+		},
+	}
+}</code></pre></div>
+<h2 id="conclusion">Conclusion</h2>
+
+<p>I like the Pub/Sub pattern for home automation, as it nicely uncouples all
+components.</p>
+
+<p>It’s a shame that standards such as <a href="https://homieiot.github.io/">The Homie
+convention</a> aren’t more widely supported, but it
+looks like software makes up for that via configuration options.</p>
+
+<p>There are plenty of existing integrations that should cover most needs.</p>
+
+<p>Ideally, more Smart Home and IOT vendors would add MQTT support out of the box,
+like <a href="https://shelly.cloud/">Shelly</a>.</p>
+]]></content>
+  </entry>
   <entry>
     <title type="html"><![CDATA[Fixing the Nuki Opener smart intercom IOT device (on the BTicino SCS bus intercom system)]]></title>
     <link href="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/"/>
@@ -4489,862 +4975,6 @@ maintainer experience (including declarative packaging).</p>
 
 <p>Please send feedback to the <a href="https://www.freelists.org/list/distri">distri mailing
 list</a> so that everyone can participate!</p>
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[Linux package managers are slow]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2019-08-17-linux-package-managers-are-slow/"/>
-    <id>https://michael.stapelberg.ch/posts/2019-08-17-linux-package-managers-are-slow/</id>
-    <published>2019-08-17T18:27:00+02:00</published>
-    <updated>2020-11-21T10:04:02+01:00</updated>
-    <content type="html"><![CDATA[
-
-<aside class="admonition note">
-  <div class="note-container">
-    <div class="note-icon">
-      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
-    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
-    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
-        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
-    </g>
-</svg>
-
-    </div>
-    <div class="admonition-content"><p><strong>Pending feedback:</strong> <a href="http://allanmcrae.com/2020/10/distri-comparing-apples-and-oranges/">Allan McRae pointed
-out</a> that I
-should be more precise with my terminology: strictly speaking, <em>distributions</em>
-are slow, and package managers are only part of the puzzle.</p>
-
-<p>I’ll try to be clearer in future revisions/posts.</p>
-</div>
-  </div>
-</aside>
-
-
-<aside class="admonition note">
-  <div class="note-container">
-    <div class="note-icon">
-      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
-    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
-    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
-        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
-    </g>
-</svg>
-
-    </div>
-    <div class="admonition-content"><strong>Pending feedback:</strong> For a more accurate picture, <a href="https://twitter.com/mueslix/status/1311581199723368448">it would be good to take the
-network out of the
-picture</a>, or at least
-measure and report network speed separately. Ideas/tips for an easy way very
-welcome!</div>
-  </div>
-</aside>
-
-
-<p>I measured how long the most popular Linux distribution’s package manager take
-to install small and large packages (the
-<a href="https://manpages.debian.org/ack.1p"><code>ack(1p)</code></a> source code search Perl script
-and <a href="https://en.wikipedia.org/wiki/QEMU">qemu</a>, respectively).</p>
-
-<p>Where required, my measurements include metadata updates such as transferring an
-up-to-date package list. For me, requiring a metadata update is the more common
-case, particularly on live systems or within Docker containers.</p>
-
-<p>All measurements were taken on an <code>Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz</code>
-running Docker 1.13.1 on Linux 4.19, backed by a Samsung 970 Pro NVMe drive
-boasting many hundreds of MB/s write performance. The machine is located in
-Zürich and connected to the Internet with a 1 Gigabit fiber connection, so the
-expected top download speed is ≈115 MB/s.</p>
-
-<p>See <a href="#appendix-c">Appendix C</a> for details on the measurement method and command
-outputs.</p>
-
-<h3 id="measurements">Measurements</h3>
-
-<p>Keep in mind that these are one-time measurements. They should be indicative of
-actual performance, but your experience may vary.</p>
-
-<h4 id="ack-small-perl-program">ack (small Perl program)</h4>
-
-<table>
-<thead>
-<tr>
-<th>distribution</th>
-<th>package manager</th>
-<th>data</th>
-<th>wall-clock time</th>
-<th>rate</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td>Fedora</td>
-<td>dnf</td>
-<td>114 MB</td>
-<td>33s</td>
-<td>3.4 MB/s</td>
-</tr>
-
-<tr>
-<td>Debian</td>
-<td>apt</td>
-<td>16 MB</td>
-<td>10s</td>
-<td>1.6 MB/s</td>
-</tr>
-
-<tr>
-<td>NixOS</td>
-<td>Nix</td>
-<td>15 MB</td>
-<td>5s</td>
-<td>3.0 MB/s</td>
-</tr>
-
-<tr>
-<td>Arch Linux</td>
-<td>pacman</td>
-<td>6.5 MB</td>
-<td>3s</td>
-<td>2.1 MB/s</td>
-</tr>
-
-<tr>
-<td>Alpine</td>
-<td>apk</td>
-<td>10 MB</td>
-<td>1s</td>
-<td>10.0 MB/s</td>
-</tr>
-</tbody>
-</table>
-
-<h4 id="qemu-large-c-program">qemu (large C program)</h4>
-
-<table>
-<thead>
-<tr>
-<th>distribution</th>
-<th>package manager</th>
-<th>data</th>
-<th>wall-clock time</th>
-<th>rate</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td>Fedora</td>
-<td>dnf</td>
-<td>226 MB</td>
-<td>4m37s</td>
-<td>1.2 MB/s</td>
-</tr>
-
-<tr>
-<td>Debian</td>
-<td>apt</td>
-<td>224 MB</td>
-<td>1m35s</td>
-<td>2.3 MB/s</td>
-</tr>
-
-<tr>
-<td>Arch Linux</td>
-<td>pacman</td>
-<td>142 MB</td>
-<td>44s</td>
-<td>3.2 MB/s</td>
-</tr>
-
-<tr>
-<td>NixOS</td>
-<td>Nix</td>
-<td>180 MB</td>
-<td>34s</td>
-<td>5.2 MB/s</td>
-</tr>
-
-<tr>
-<td>Alpine</td>
-<td>apk</td>
-<td>26 MB</td>
-<td>2.4s</td>
-<td>10.8 MB/s</td>
-</tr>
-</tbody>
-</table>
-
-<p><br>
-(Looking for older measurements? See <a href="#appendix-b">Appendix B (2019)</a>.</p>
-
-<p>The difference between the slowest and fastest package managers is 30x!</p>
-
-<p>How can Alpine’s apk and Arch Linux’s pacman be an order of magnitude faster
-than the rest? They are doing a lot less than the others, and more efficiently,
-too.</p>
-
-<h4 id="pain-point-too-much-metadata">Pain point: too much metadata</h4>
-
-<p>For example, Fedora transfers a lot more data than others because its main
-package list is 60 MB (compressed!) alone. Compare that with Alpine’s 734 KB
-<code>APKINDEX.tar.gz</code>.</p>
-
-<p>Of course the extra metadata which Fedora provides helps some use case,
-otherwise they hopefully would have removed it altogether. The amount of
-metadata seems excessive for the use case of installing a single package, which
-I consider the main use-case of an interactive package manager.</p>
-
-<p>I expect any modern Linux distribution to <strong>only transfer absolutely required
-data</strong> to complete my task.</p>
-
-<h4 id="pain-point-no-concurrency">Pain point: no concurrency</h4>
-
-<p>Because they need to sequence executing arbitrary package maintainer-provided
-code (hooks and triggers), all tested package managers need to install packages
-sequentially (one after the other) instead of concurrently (all at the same
-time).</p>
-
-<p>In my blog post <a href="/posts/2019-07-20-hooks-and-triggers/">“Can we do without hooks and
-triggers?”</a>, I outline that hooks and
-triggers are not strictly necessary to build a working Linux distribution.</p>
-
-<h3 id="thought-experiment-further-speed-ups">Thought experiment: further speed-ups</h3>
-
-<p>Strictly speaking, the only required feature of a package manager is to make
-available the package contents so that the package can be used: a program can be
-started, a kernel module can be loaded, etc.</p>
-
-<p>By only implementing what’s needed for this feature, and nothing more, a package
-manager could likely beat <code>apk</code>’s performance. It could, for example:</p>
-
-<ul>
-<li>skip archive extraction by mounting file system images (like AppImage or snappy)</li>
-<li>use compression which is light on CPU, as networks are fast (like <code>apk</code>)</li>
-<li>skip fsync when it is safe to do so, i.e.:
-
-<ul>
-<li>package installations don’t modify system state</li>
-<li>atomic package installation (e.g. an append-only package store)</li>
-<li>automatically clean up the package store after crashes</li>
-</ul></li>
-</ul>
-
-<h3 id="current-landscape">Current landscape</h3>
-
-<p>Here’s a table outlining how the various package managers listed on Wikipedia’s
-<a href="https://en.wikipedia.org/wiki/List_of_software_package_management_systems#Linux">list of software package management
-systems</a>
-fare:</p>
-
-<table>
-<thead>
-<tr>
-<th>name</th>
-<th>scope</th>
-<th>package file format</th>
-<th>hooks/triggers</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td>AppImage</td>
-<td>apps</td>
-<td>image: ISO9660, SquashFS</td>
-<td>no</td>
-</tr>
-
-<tr>
-<td><a href="https://snapcraft.io/">snappy</a></td>
-<td>apps</td>
-<td>image: SquashFS</td>
-<td>yes: <a href="https://docs.snapcraft.io/build-snaps/hooks">hooks</a></td>
-</tr>
-
-<tr>
-<td>FlatPak</td>
-<td>apps</td>
-<td>archive: <a href="https://ostree.readthedocs.io/en/latest/">OSTree</a></td>
-<td>no</td>
-</tr>
-
-<tr>
-<td>0install</td>
-<td>apps</td>
-<td>archive: tar.bz2</td>
-<td>no</td>
-</tr>
-
-<tr>
-<td>nix, guix</td>
-<td>distro</td>
-<td>archive: nar.{bz2,xz}</td>
-<td><a href="https://github.com/NixOS/nixos/blob/master/modules/system/activation/activation-script.nix">activation script</a></td>
-</tr>
-
-<tr>
-<td>dpkg</td>
-<td>distro</td>
-<td>archive: tar.{gz,xz,bz2} in ar(1)</td>
-<td>yes</td>
-</tr>
-
-<tr>
-<td>rpm</td>
-<td>distro</td>
-<td>archive: cpio.{bz2,lz,xz}</td>
-<td><a href="https://fedoraproject.org/wiki/Packaging:Scriptlets">scriptlets</a></td>
-</tr>
-
-<tr>
-<td>pacman</td>
-<td>distro</td>
-<td>archive: tar.xz</td>
-<td><a href="https://wiki.archlinux.org/index.php/PKGBUILD#install">install</a></td>
-</tr>
-
-<tr>
-<td>slackware</td>
-<td>distro</td>
-<td>archive: tar.{gz,xz}</td>
-<td>yes: doinst.sh</td>
-</tr>
-
-<tr>
-<td>apk</td>
-<td>distro</td>
-<td>archive: tar.gz</td>
-<td>yes: .post-install</td>
-</tr>
-
-<tr>
-<td>Entropy</td>
-<td>distro</td>
-<td>archive: tar.bz2</td>
-<td>yes</td>
-</tr>
-
-<tr>
-<td>ipkg, opkg</td>
-<td>distro</td>
-<td>archive: tar{,.gz}</td>
-<td>yes</td>
-</tr>
-</tbody>
-</table>
-
-<h3 id="conclusion">Conclusion</h3>
-
-<p>As per the <a href="#current-landscape">current landscape</a>, there is no
-distribution-scoped package manager which uses images and leaves out hooks and
-triggers, not even in smaller Linux distributions.</p>
-
-<p>I think that space is really interesting, as it uses a minimal design to achieve
-significant real-world speed-ups.</p>
-
-<p>I have explored this idea in much more detail, and am happy to talk more about
-it in my post “Introducing the distri research linux distribution&quot;.</p>
-
-<h3 id="appendix-a-related-work">Appendix A: related work</h3>
-
-<p>There are a couple of recent developments going into the same direction:</p>
-
-<ul>
-<li><a href="http://0pointer.net/blog/revisiting-how-we-put-together-linux-systems.html">“Revisiting How We Put Together Linux Systems”</a> describes mounting app bundles</li>
-<li><a href="https://android.googlesource.com/platform/system/apex/+/refs/heads/master/docs/README.md">Android Q uses ext4 loopback images</a></li>
-<li>The Haiku Operating System’s package manager <a href="https://en.wikipedia.org/wiki/Haiku_Depot">Haiku
-Depot</a> uses images</li>
-</ul>
-
-<h3 id="appendix-c">Appendix C: measurement details (2020)</h3>
-
-<h4 id="ack">ack</h4>
-
-<p>You can expand each of these:</p>
-
-<p><details>
-<summary>
-Fedora’s dnf takes almost 33 seconds to fetch and unpack 114 MB.
-</summary></p>
-
-<pre><code>% docker run -t -i fedora /bin/bash
-[root@62d3cae2e2f9 /]# time dnf install -y ack
-Fedora 32 openh264 (From Cisco) - x86_64     1.9 kB/s | 2.5 kB     00:01
-Fedora Modular 32 - x86_64                   6.8 MB/s | 4.9 MB     00:00
-Fedora Modular 32 - x86_64 - Updates         5.6 MB/s | 3.7 MB     00:00
-Fedora 32 - x86_64 - Updates                 9.9 MB/s |  23 MB     00:02
-Fedora 32 - x86_64                            39 MB/s |  70 MB     00:01
-[…]
-real	0m32.898s
-user	0m25.121s
-sys	0m1.408s
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary>
-NixOS’s Nix takes a little over 5s to fetch and unpack 15 MB.
-</summary></p>
-
-<pre><code>% docker run -t -i nixos/nix
-39e9186422ba:/# time sh -c 'nix-channel --update &amp;&amp; nix-env -iA nixpkgs.ack'
-unpacking channels...
-created 1 symlinks in user environment
-installing 'perl5.32.0-ack-3.3.1'
-these paths will be fetched (15.55 MiB download, 85.51 MiB unpacked):
-  /nix/store/34l8jdg76kmwl1nbbq84r2gka0kw6rc8-perl5.32.0-ack-3.3.1-man
-  /nix/store/9df65igwjmf2wbw0gbrrgair6piqjgmi-glibc-2.31
-  /nix/store/9fd4pjaxpjyyxvvmxy43y392l7yvcwy1-perl5.32.0-File-Next-1.18
-  /nix/store/czc3c1apx55s37qx4vadqhn3fhikchxi-libunistring-0.9.10
-  /nix/store/dj6n505iqrk7srn96a27jfp3i0zgwa1l-acl-2.2.53
-  /nix/store/ifayp0kvijq0n4x0bv51iqrb0yzyz77g-perl-5.32.0
-  /nix/store/w9wc0d31p4z93cbgxijws03j5s2c4gyf-coreutils-8.31
-  /nix/store/xim9l8hym4iga6d4azam4m0k0p1nw2rm-libidn2-2.3.0
-  /nix/store/y7i47qjmf10i1ngpnsavv88zjagypycd-attr-2.4.48
-  /nix/store/z45mp61h51ksxz28gds5110rf3wmqpdc-perl5.32.0-ack-3.3.1
-copying path '/nix/store/34l8jdg76kmwl1nbbq84r2gka0kw6rc8-perl5.32.0-ack-3.3.1-man' from 'https://cache.nixos.org'...
-copying path '/nix/store/czc3c1apx55s37qx4vadqhn3fhikchxi-libunistring-0.9.10' from 'https://cache.nixos.org'...
-copying path '/nix/store/9fd4pjaxpjyyxvvmxy43y392l7yvcwy1-perl5.32.0-File-Next-1.18' from 'https://cache.nixos.org'...
-copying path '/nix/store/xim9l8hym4iga6d4azam4m0k0p1nw2rm-libidn2-2.3.0' from 'https://cache.nixos.org'...
-copying path '/nix/store/9df65igwjmf2wbw0gbrrgair6piqjgmi-glibc-2.31' from 'https://cache.nixos.org'...
-copying path '/nix/store/y7i47qjmf10i1ngpnsavv88zjagypycd-attr-2.4.48' from 'https://cache.nixos.org'...
-copying path '/nix/store/dj6n505iqrk7srn96a27jfp3i0zgwa1l-acl-2.2.53' from 'https://cache.nixos.org'...
-copying path '/nix/store/w9wc0d31p4z93cbgxijws03j5s2c4gyf-coreutils-8.31' from 'https://cache.nixos.org'...
-copying path '/nix/store/ifayp0kvijq0n4x0bv51iqrb0yzyz77g-perl-5.32.0' from 'https://cache.nixos.org'...
-copying path '/nix/store/z45mp61h51ksxz28gds5110rf3wmqpdc-perl5.32.0-ack-3.3.1' from 'https://cache.nixos.org'...
-building '/nix/store/m0rl62grplq7w7k3zqhlcz2hs99y332l-user-environment.drv'...
-created 49 symlinks in user environment
-real	0m 5.60s
-user	0m 3.21s
-sys	0m 1.66s
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary>
-Debian’s apt takes almost 10 seconds to fetch and unpack 16 MB.
-</summary></p>
-
-<pre><code>% docker run -t -i debian:sid
-root@1996bb94a2d1:/# time (apt update &amp;&amp; apt install -y ack-grep)
-Get:1 http://deb.debian.org/debian sid InRelease [146 kB]
-Get:2 http://deb.debian.org/debian sid/main amd64 Packages [8400 kB]
-Fetched 8546 kB in 1s (8088 kB/s)
-[…]
-The following NEW packages will be installed:
-  ack libfile-next-perl libgdbm-compat4 libgdbm6 libperl5.30 netbase perl perl-modules-5.30
-0 upgraded, 8 newly installed, 0 to remove and 23 not upgraded.
-Need to get 7341 kB of archives.
-After this operation, 46.7 MB of additional disk space will be used.
-[…]
-real	0m9.544s
-user	0m2.839s
-sys	0m0.775s
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary>
-Arch Linux’s pacman takes a little under 3s to fetch and unpack 6.5 MB.
-</summary></p>
-
-<pre><code>% docker run -t -i archlinux/base
-[root@9f6672688a64 /]# time (pacman -Sy &amp;&amp; pacman -S --noconfirm ack)
-:: Synchronizing package databases...
- core            130.8 KiB  1090 KiB/s 00:00
- extra          1655.8 KiB  3.48 MiB/s 00:00
- community         5.2 MiB  6.11 MiB/s 00:01
-resolving dependencies...
-looking for conflicting packages...
-
-Packages (2) perl-file-next-1.18-2  ack-3.4.0-1
-
-Total Download Size:   0.07 MiB
-Total Installed Size:  0.19 MiB
-[…]
-real	0m2.936s
-user	0m0.375s
-sys	0m0.160s
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary>
-Alpine’s apk takes a little over 1 second to fetch and unpack 10 MB.
-</summary></p>
-
-<pre><code>% docker run -t -i alpine
-fetch http://dl-cdn.alpinelinux.org/alpine/v3.12/main/x86_64/APKINDEX.tar.gz
-fetch http://dl-cdn.alpinelinux.org/alpine/v3.12/community/x86_64/APKINDEX.tar.gz
-(1/4) Installing libbz2 (1.0.8-r1)
-(2/4) Installing perl (5.30.3-r0)
-(3/4) Installing perl-file-next (1.18-r0)
-(4/4) Installing ack (3.3.1-r0)
-Executing busybox-1.31.1-r16.trigger
-OK: 43 MiB in 18 packages
-real	0m 1.24s
-user	0m 0.40s
-sys	0m 0.15s
-</code></pre>
-
-<p></details></p>
-
-<h4 id="qemu">qemu</h4>
-
-<p>You can expand each of these:</p>
-
-<p><details>
-<summary>
-Fedora’s dnf takes over 4 minutes to fetch and unpack 226 MB.
-</summary></p>
-
-<pre><code>% docker run -t -i fedora /bin/bash
-[root@6a52ecfc3afa /]# time dnf install -y qemu
-Fedora 32 openh264 (From Cisco) - x86_64     3.1 kB/s | 2.5 kB     00:00
-Fedora Modular 32 - x86_64                   6.3 MB/s | 4.9 MB     00:00
-Fedora Modular 32 - x86_64 - Updates         6.0 MB/s | 3.7 MB     00:00
-Fedora 32 - x86_64 - Updates                 334 kB/s |  23 MB     01:10
-Fedora 32 - x86_64                            33 MB/s |  70 MB     00:02
-[…]
-
-Total download size: 181 M
-Downloading Packages:
-[…]
-
-real	4m37.652s
-user	0m38.239s
-sys	0m6.321s
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary>
-NixOS’s Nix takes almost 34s to fetch and unpack 180 MB.
-</summary></p>
-
-<pre><code>% docker run -t -i nixos/nix
-83971cf79f7e:/# time sh -c 'nix-channel --update &amp;&amp; nix-env -iA nixpkgs.qemu'
-unpacking channels...
-created 1 symlinks in user environment
-installing 'qemu-5.1.0'
-these paths will be fetched (180.70 MiB download, 1146.92 MiB unpacked):
-[…]
-real	0m 33.64s
-user	0m 16.96s
-sys	0m 3.05s
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary>
-Debian’s apt takes over 95 seconds to fetch and unpack 224 MB.
-</summary></p>
-
-<pre><code>% docker run -t -i debian:sid
-root@b7cc25a927ab:/# time (apt update &amp;&amp; apt install -y qemu-system-x86)
-Get:1 http://deb.debian.org/debian sid InRelease [146 kB]
-Get:2 http://deb.debian.org/debian sid/main amd64 Packages [8400 kB]
-Fetched 8546 kB in 1s (5998 kB/s)
-[…]
-Fetched 216 MB in 43s (5006 kB/s)
-[…]
-real	1m25.375s
-user	0m29.163s
-sys	0m12.835s
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary>
-Arch Linux’s pacman takes almost 44s to fetch and unpack 142 MB.
-</summary></p>
-
-<pre><code>% docker run -t -i archlinux/base
-[root@58c78bda08e8 /]# time (pacman -Sy &amp;&amp; pacman -S --noconfirm qemu)
-:: Synchronizing package databases...
- core          130.8 KiB  1055 KiB/s 00:00
- extra        1655.8 KiB  3.70 MiB/s 00:00
- community       5.2 MiB  7.89 MiB/s 00:01
-[…]
-Total Download Size:   135.46 MiB
-Total Installed Size:  661.05 MiB
-[…]
-real	0m43.901s
-user	0m4.980s
-sys	0m2.615s
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary>
-Alpine’s apk takes only about 2.4 seconds to fetch and unpack 26 MB.
-</summary></p>
-
-<pre><code>% docker run -t -i alpine
-/ # time apk add qemu-system-x86_64
-fetch http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/APKINDEX.tar.gz
-fetch http://dl-cdn.alpinelinux.org/alpine/v3.10/community/x86_64/APKINDEX.tar.gz
-[…]
-OK: 78 MiB in 95 packages
-real	0m 2.43s
-user	0m 0.46s
-sys	0m 0.09s
-</code></pre>
-
-<p></details></p>
-
-<h3 id="appendix-b">Appendix B: measurement details (2019)</h3>
-
-<h4 id="ack-1">ack</h4>
-
-<p>You can expand each of these:</p>
-
-<p><details>
-<summary>
-Fedora’s dnf takes almost 30 seconds to fetch and unpack 107 MB.
-</summary></p>
-
-<pre><code>% docker run -t -i fedora /bin/bash
-[root@722e6df10258 /]# time dnf install -y ack
-Fedora Modular 30 - x86_64            4.4 MB/s | 2.7 MB     00:00
-Fedora Modular 30 - x86_64 - Updates  3.7 MB/s | 2.4 MB     00:00
-Fedora 30 - x86_64 - Updates           17 MB/s |  19 MB     00:01
-Fedora 30 - x86_64                     31 MB/s |  70 MB     00:02
-[…]
-Install  44 Packages
-
-Total download size: 13 M
-Installed size: 42 M
-[…]
-real	0m29.498s
-user	0m22.954s
-sys	0m1.085s
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary>
-NixOS’s Nix takes 14s to fetch and unpack 15 MB.
-</summary></p>
-
-<pre><code>% docker run -t -i nixos/nix
-39e9186422ba:/# time sh -c 'nix-channel --update &amp;&amp; nix-env -i perl5.28.2-ack-2.28'
-unpacking channels...
-created 2 symlinks in user environment
-installing 'perl5.28.2-ack-2.28'
-these paths will be fetched (14.91 MiB download, 80.83 MiB unpacked):
-  /nix/store/57iv2vch31v8plcjrk97lcw1zbwb2n9r-perl-5.28.2
-  /nix/store/89gi8cbp8l5sf0m8pgynp2mh1c6pk1gk-attr-2.4.48
-  /nix/store/gkrpl3k6s43fkg71n0269yq3p1f0al88-perl5.28.2-ack-2.28-man
-  /nix/store/iykxb0bmfjmi7s53kfg6pjbfpd8jmza6-glibc-2.27
-  /nix/store/k8lhqzpaaymshchz8ky3z4653h4kln9d-coreutils-8.31
-  /nix/store/svgkibi7105pm151prywndsgvmc4qvzs-acl-2.2.53
-  /nix/store/x4knf14z1p0ci72gl314i7vza93iy7yc-perl5.28.2-File-Next-1.16
-  /nix/store/zfj7ria2kwqzqj9dh91kj9kwsynxdfk0-perl5.28.2-ack-2.28
-copying path '/nix/store/gkrpl3k6s43fkg71n0269yq3p1f0al88-perl5.28.2-ack-2.28-man' from 'https://cache.nixos.org'...
-copying path '/nix/store/iykxb0bmfjmi7s53kfg6pjbfpd8jmza6-glibc-2.27' from 'https://cache.nixos.org'...
-copying path '/nix/store/x4knf14z1p0ci72gl314i7vza93iy7yc-perl5.28.2-File-Next-1.16' from 'https://cache.nixos.org'...
-copying path '/nix/store/89gi8cbp8l5sf0m8pgynp2mh1c6pk1gk-attr-2.4.48' from 'https://cache.nixos.org'...
-copying path '/nix/store/svgkibi7105pm151prywndsgvmc4qvzs-acl-2.2.53' from 'https://cache.nixos.org'...
-copying path '/nix/store/k8lhqzpaaymshchz8ky3z4653h4kln9d-coreutils-8.31' from 'https://cache.nixos.org'...
-copying path '/nix/store/57iv2vch31v8plcjrk97lcw1zbwb2n9r-perl-5.28.2' from 'https://cache.nixos.org'...
-copying path '/nix/store/zfj7ria2kwqzqj9dh91kj9kwsynxdfk0-perl5.28.2-ack-2.28' from 'https://cache.nixos.org'...
-building '/nix/store/q3243sjg91x1m8ipl0sj5gjzpnbgxrqw-user-environment.drv'...
-created 56 symlinks in user environment
-real	0m 14.02s
-user	0m 8.83s
-sys	0m 2.69s
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary>
-Debian’s apt takes almost 10 seconds to fetch and unpack 16 MB.
-</summary></p>
-
-<pre><code>% docker run -t -i debian:sid
-root@b7cc25a927ab:/# time (apt update &amp;&amp; apt install -y ack-grep)
-Get:1 http://cdn-fastly.deb.debian.org/debian sid InRelease [233 kB]
-Get:2 http://cdn-fastly.deb.debian.org/debian sid/main amd64 Packages [8270 kB]
-Fetched 8502 kB in 2s (4764 kB/s)
-[…]
-The following NEW packages will be installed:
-  ack ack-grep libfile-next-perl libgdbm-compat4 libgdbm5 libperl5.26 netbase perl perl-modules-5.26
-The following packages will be upgraded:
-  perl-base
-1 upgraded, 9 newly installed, 0 to remove and 60 not upgraded.
-Need to get 8238 kB of archives.
-After this operation, 42.3 MB of additional disk space will be used.
-[…]
-real	0m9.096s
-user	0m2.616s
-sys	0m0.441s
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary>
-Arch Linux’s pacman takes a little over 3s to fetch and unpack 6.5 MB.
-</summary></p>
-
-<pre><code>% docker run -t -i archlinux/base
-[root@9604e4ae2367 /]# time (pacman -Sy &amp;&amp; pacman -S --noconfirm ack)
-:: Synchronizing package databases...
- core            132.2 KiB  1033K/s 00:00
- extra          1629.6 KiB  2.95M/s 00:01
- community         4.9 MiB  5.75M/s 00:01
-[…]
-Total Download Size:   0.07 MiB
-Total Installed Size:  0.19 MiB
-[…]
-real	0m3.354s
-user	0m0.224s
-sys	0m0.049s
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary>
-Alpine’s apk takes only about 1 second to fetch and unpack 10 MB.
-</summary></p>
-
-<pre><code>% docker run -t -i alpine
-/ # time apk add ack
-fetch http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/APKINDEX.tar.gz
-fetch http://dl-cdn.alpinelinux.org/alpine/v3.10/community/x86_64/APKINDEX.tar.gz
-(1/4) Installing perl-file-next (1.16-r0)
-(2/4) Installing libbz2 (1.0.6-r7)
-(3/4) Installing perl (5.28.2-r1)
-(4/4) Installing ack (3.0.0-r0)
-Executing busybox-1.30.1-r2.trigger
-OK: 44 MiB in 18 packages
-real	0m 0.96s
-user	0m 0.25s
-sys	0m 0.07s
-</code></pre>
-
-<p></details></p>
-
-<h4 id="qemu-1">qemu</h4>
-
-<p>You can expand each of these:</p>
-
-<p><details>
-<summary>
-Fedora’s dnf takes over a minute to fetch and unpack 266 MB.
-</summary></p>
-
-<pre><code>% docker run -t -i fedora /bin/bash
-[root@722e6df10258 /]# time dnf install -y qemu
-Fedora Modular 30 - x86_64            3.1 MB/s | 2.7 MB     00:00
-Fedora Modular 30 - x86_64 - Updates  2.7 MB/s | 2.4 MB     00:00
-Fedora 30 - x86_64 - Updates           20 MB/s |  19 MB     00:00
-Fedora 30 - x86_64                     31 MB/s |  70 MB     00:02
-[…]
-Install  262 Packages
-Upgrade    4 Packages
-
-Total download size: 172 M
-[…]
-real	1m7.877s
-user	0m44.237s
-sys	0m3.258s
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary>
-NixOS’s Nix takes 38s to fetch and unpack 262 MB.
-</summary></p>
-
-<pre><code>% docker run -t -i nixos/nix
-39e9186422ba:/# time sh -c 'nix-channel --update &amp;&amp; nix-env -i qemu-4.0.0'
-unpacking channels...
-created 2 symlinks in user environment
-installing 'qemu-4.0.0'
-these paths will be fetched (262.18 MiB download, 1364.54 MiB unpacked):
-[…]
-real	0m 38.49s
-user	0m 26.52s
-sys	0m 4.43s
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary>
-Debian’s apt takes 51 seconds to fetch and unpack 159 MB.
-</summary></p>
-
-<pre><code>% docker run -t -i debian:sid
-root@b7cc25a927ab:/# time (apt update &amp;&amp; apt install -y qemu-system-x86)
-Get:1 http://cdn-fastly.deb.debian.org/debian sid InRelease [149 kB]
-Get:2 http://cdn-fastly.deb.debian.org/debian sid/main amd64 Packages [8426 kB]
-Fetched 8574 kB in 1s (6716 kB/s)
-[…]
-Fetched 151 MB in 2s (64.6 MB/s)
-[…]
-real	0m51.583s
-user	0m15.671s
-sys	0m3.732s
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary>
-Arch Linux’s pacman takes 1m2s to fetch and unpack 124 MB.
-</summary></p>
-
-<pre><code>% docker run -t -i archlinux/base
-[root@9604e4ae2367 /]# time (pacman -Sy &amp;&amp; pacman -S --noconfirm qemu)
-:: Synchronizing package databases...
- core       132.2 KiB   751K/s 00:00
- extra     1629.6 KiB  3.04M/s 00:01
- community    4.9 MiB  6.16M/s 00:01
-[…]
-Total Download Size:   123.20 MiB
-Total Installed Size:  587.84 MiB
-[…]
-real	1m2.475s
-user	0m9.272s
-sys	0m2.458s
-</code></pre>
-
-<p></details></p>
-
-<p><details>
-<summary>
-Alpine’s apk takes only about 2.4 seconds to fetch and unpack 26 MB.
-</summary></p>
-
-<pre><code>% docker run -t -i alpine
-/ # time apk add qemu-system-x86_64
-fetch http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/APKINDEX.tar.gz
-fetch http://dl-cdn.alpinelinux.org/alpine/v3.10/community/x86_64/APKINDEX.tar.gz
-[…]
-OK: 78 MiB in 95 packages
-real	0m 2.43s
-user	0m 0.46s
-sys	0m 0.09s
-</code></pre>
-
-<p></details></p>
 ]]></content>
   </entry>
 </feed>

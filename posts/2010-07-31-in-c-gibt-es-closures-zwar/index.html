@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title> In C&#43;&#43; gibt es Closures! Zwar… - Michael Stapelberg</title>
+  <title> In C&#43;&#43; gibt es Closures! Zwar… (2010) - Michael Stapelberg</title>
+
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" href="/favicon.ico" />
   <meta name="description" content="In C&#43;&#43; gibt es Closures! Zwar erst mit C&#43;&#43;0x (wofür man g&#43;&#43; 4.5 braucht), aber immerhin. Damit wird das Erstellen asynchroner APIs endlich annehmbar (in diesem Fall der CouchDB-Teil einer Qt-Anwendung, wegen Qt muss ich überhaupt erst C&#43;&#43; nutzen).  Zum Vergleich mal die API vorher:  void MainWindow::clickedTask() { TodoButton *btn = (TodoButton*)sender(); /* Get the document from CouchDB */ QNetworkReply *nreply = db-get_document(btn-ID()); connect(nreply, SIGNAL(finished()), this, SLOT(recv_entry_edit())); } void MainWindow::recv_entry_edit() { QNetworkReply *reply = (QNetworkReply*)sender(); QByteArray answer = reply-readAll(); QJson::Parser p; bool ok; QVariant var = p.">
@@ -163,7 +164,8 @@
 </header>
 <main>
       <div>
-<h1 class="ms_title"> In C&#43;&#43; gibt es Closures! Zwar…</h1>
+<h1 class="ms_title"> In C&#43;&#43; gibt es Closures! Zwar… (2010)</h1>
+
 <div class="ms_meta">
   <div id="ms_date">published 2010-07-31, last modified 2018-03-23</div>
   

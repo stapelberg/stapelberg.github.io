@@ -168,7 +168,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 <h1 class="ms_title">Debugging experience in Debian (2019)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2019-02-15, last modified 2020-08-12</div>
+  <div id="ms_date">published 2019-02-15, last modified 2021-02-24</div>
   
   
   <div id="ms_tags">
@@ -203,6 +203,30 @@ able to reproduce the issue.</p>
 break point and step through the code.</p>
 
 <h3 id="enabling-debug-symbols-in-debian">Enabling debug symbols in Debian</h3>
+
+<aside class="admonition note">
+  <div class="note-container">
+    <div class="note-icon">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+    </div>
+    <div class="admonition-content"><p><strong>Update (February 2021):</strong> Debian <a href="https://lists.debian.org/debian-devel-announce/2021/02/msg00003.html">has
+announced</a>
+a <a href="https://wiki.debian.org/Debuginfod"><code>debuginfod</code> service</a>. This makes
+enabling and finding debug symbols much easier: <code>export
+DEBUGINFOD_URLS=&quot;https://debuginfod.debian.net&quot;</code> is all that’s necessary, and
+hopefully that step will become unnecessary next, too.</p>
+
+<p>Unfortunately, (this instance of?) debuginfod does not cover sources, yet.</p>
+</div>
+  </div>
+</aside>
+
 
 <p>Debian, by default, strips debug symbols when building packages to conserve disk
 space and network bandwidth. The motivation is very reasonable: most users will

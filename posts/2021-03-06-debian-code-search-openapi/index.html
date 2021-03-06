@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Debian Code Search: OpenAPI now available - Michael Stapelberg</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <meta name="description" content="Debian Code Search now offers an OpenAPI-based API!
+Various developers have created ad-hoc client libraries based on how the web interface works.
+The goal of offering an OpenAPI-based API is to provide developers with automatically generated client libraries for a large number of programming languages, that target a stable interface independent of the web interface’s implementation details.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2021-03-06-debian-code-search-openapi/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div><h1 class="ms_title">Debian Code Search: OpenAPI now available</h1>
+
+<div class="ms_meta">
+  <div id="ms_date">published 2021-03-06</div>
+  
+  
+  <div id="ms_tags">
+  
+  in tag
+  
+  
+  <span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+  
+  </div>
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2021-03-06-debian-code-search-openapi/index.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
+</div>
+<div class="Artikel" id="content">
+  
+
+<p><a href="https://codesearch.debian.net/">Debian Code Search</a> now offers an OpenAPI-based API!</p>
+
+<p>Various developers have created ad-hoc client libraries based on how the web
+interface works.</p>
+
+<p>The goal of offering an OpenAPI-based API is to provide developers with
+automatically generated client libraries for a large number of programming
+languages, that target a stable interface independent of the web interface’s
+implementation details.</p>
+
+<h2 id="getting-started">Getting started</h2>
+
+<ol>
+<li><p>Visit <a href="https://codesearch.debian.net/apikeys/">https://codesearch.debian.net/apikeys/</a> to download your personal API
+key. Login via <a href="https://salsa.debian.org/">Debian’s GitLab instance
+salsa.debian.org</a>; register there if you have no
+account yet.</p></li>
+
+<li><p>Find the Debian Code Search client library for your programming language. If
+none exists yet, <a href="https://editor.swagger.io/?url=https://codesearch.debian.net/openapi2.yaml">auto-generate a client library on editor.swagger.io: click
+“Generate
+Client”</a>.</p></li>
+
+<li><p>Search all code in Debian from your own analysis tool, migration tracking
+dashboard, etc.</p></li>
+</ol>
+
+<h2 id="curl-example">curl example</h2>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">curl <span style="color:#4070a0;font-weight:bold">\
+</span><span style="color:#4070a0;font-weight:bold"></span>  -H <span style="color:#4070a0">&#34;x-dcs-apikey: </span><span style="color:#007020;font-weight:bold">$(</span>cat dcs-apikey-stapelberg.txt<span style="color:#007020;font-weight:bold">)</span><span style="color:#4070a0">&#34;</span> <span style="color:#4070a0;font-weight:bold">\
+</span><span style="color:#4070a0;font-weight:bold"></span>  -X GET <span style="color:#4070a0;font-weight:bold">\
+</span><span style="color:#4070a0;font-weight:bold"></span>  <span style="color:#4070a0">&#34;https://codesearch.debian.net/api/v1/search?query=i3Font&amp;match_mode=regexp&#34;</span> </code></pre></div>
+<h2 id="web-browser-example">Web browser example</h2>
+
+<p>You can try out the API in your web browser in the <a href="https://codesearch.debian.net/apikeys/#openapi-doc-browser">OpenAPI
+documentation</a>.</p>
+
+<h2 id="code-example-go">Code example (Go)</h2>
+
+<p>Here’s an example program that demonstrates how to set up an auto-generated Go
+client for the Debian Code Search OpenAPI, run a query, and aggregate the results:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">burndown</span>() <span style="color:#902000">error</span> {
+	cfg <span style="color:#666">:=</span> openapiclient.<span style="color:#06287e">NewConfiguration</span>()
+	cfg.<span style="color:#06287e">AddDefaultHeader</span>(<span style="color:#4070a0">&#34;x-dcs-apikey&#34;</span>, apiKey)
+	client <span style="color:#666">:=</span> openapiclient.<span style="color:#06287e">NewAPIClient</span>(cfg)
+	ctx <span style="color:#666">:=</span> context.<span style="color:#06287e">Background</span>()
+
+	<span style="color:#60a0b0;font-style:italic">// Search through the full Debian Code Search corpus, blocking until all
+</span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// results are available:
+</span><span style="color:#60a0b0;font-style:italic"></span>	results, _, err <span style="color:#666">:=</span> client.SearchApi.<span style="color:#06287e">Search</span>(ctx, <span style="color:#4070a0">&#34;fmt.Sprint(err)&#34;</span>, <span style="color:#666">&amp;</span>openapiclient.SearchApiSearchOpts{
+		<span style="color:#60a0b0;font-style:italic">// Literal searches are faster and do not require escaping special
+</span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// characters, regular expression searches are more powerful.
+</span><span style="color:#60a0b0;font-style:italic"></span>		MatchMode: optional.<span style="color:#06287e">NewString</span>(<span style="color:#4070a0">&#34;literal&#34;</span>),
+	})
+	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+		<span style="color:#007020;font-weight:bold">return</span> err
+	}
+
+	<span style="color:#60a0b0;font-style:italic">// Print to stdout a CSV file with the path and number of occurrences:
+</span><span style="color:#60a0b0;font-style:italic"></span>	wr <span style="color:#666">:=</span> csv.<span style="color:#06287e">NewWriter</span>(os.Stdout)
+	header <span style="color:#666">:=</span> []<span style="color:#902000">string</span>{<span style="color:#4070a0">&#34;path&#34;</span>, <span style="color:#4070a0">&#34;number of occurrences&#34;</span>}
+	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> wr.<span style="color:#06287e">Write</span>(header); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+		<span style="color:#007020;font-weight:bold">return</span> err
+	}
+	occurrences <span style="color:#666">:=</span> <span style="color:#007020">make</span>(<span style="color:#007020;font-weight:bold">map</span>[<span style="color:#902000">string</span>]<span style="color:#902000">int</span>)
+	<span style="color:#007020;font-weight:bold">for</span> _, result <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> results {
+		occurrences[result.Path]<span style="color:#666">++</span>
+	}
+	<span style="color:#007020;font-weight:bold">for</span> _, result <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> results {
+		o, ok <span style="color:#666">:=</span> occurrences[result.Path]
+		<span style="color:#007020;font-weight:bold">if</span> !ok {
+			<span style="color:#007020;font-weight:bold">continue</span>
+		}
+		<span style="color:#60a0b0;font-style:italic">// Print one CSV record per path:
+</span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#007020">delete</span>(occurrences, result.Path)
+		record <span style="color:#666">:=</span> []<span style="color:#902000">string</span>{result.Path, strconv.<span style="color:#06287e">Itoa</span>(o)}
+		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> wr.<span style="color:#06287e">Write</span>(record); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+			<span style="color:#007020;font-weight:bold">return</span> err
+		}
+	}
+	wr.<span style="color:#06287e">Flush</span>()
+	<span style="color:#007020;font-weight:bold">return</span> wr.<span style="color:#06287e">Error</span>()
+}</code></pre></div>
+<p>The full example can be found under
+<a href="https://github.com/Debian/dcs/blob/3d6a18f010e915f77b4833189286100308c539cb/_example/burndown.go"><code>burndown.go</code></a>.</p>
+
+<h2 id="feedback">Feedback?</h2>
+
+<p>File a <a href="https://github.com/Debian/dcs/issues">GitHub issue on
+<code>github.com/Debian/dcs</code></a> please!</p>
+
+<h2 id="migration-status">Migration status</h2>
+
+<p>I’m aware of the following <a href="https://codesearch.debian.net/thirdparty">third-party projects using Debian Code
+Search</a>:</p>
+
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Migration status</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><a href="https://salsa.debian.org/debian/codesearch-cli">Debian Code Search CLI tool</a></td>
+<td><a href="https://salsa.debian.org/debian/codesearch-cli/-/merge_requests/1">Updated to OpenAPI</a></td>
+</tr>
+
+<tr>
+<td><a href="https://salsa.debian.org/aviau/identify-incomplete-xs-go-import-path">identify-incomplete-xs-go-import-path</a></td>
+<td><a href="https://salsa.debian.org/aviau/identify-incomplete-xs-go-import-path/-/merge_requests/1">Update pending</a></td>
+</tr>
+
+<tr>
+<td><a href="https://gitlab.gnome.org/nbenitez/gnome-codesearch">gnome-codesearch</a></td>
+<td>makes no API queries</td>
+</tr>
+</tbody>
+</table>
+
+<p>If you find any others, please point them to this post in case they are not
+using Debian Code Search’s OpenAPI yet.</p>
+
+</div>
+
+      </div>
+
+    </main><div id="ms_footer">
+  © 2020 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

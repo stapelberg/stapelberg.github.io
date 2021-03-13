@@ -5,6 +5,733 @@
   <id>https://michael.stapelberg.ch/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[Make your intercom smarter with an MQTT backpack]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/"/>
+    <id>https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/</id>
+    <published>2021-03-13T16:54:00+01:00</published>
+    <content type="html"><![CDATA[
+
+<p>I bought the cheapest compatible BTicino intercom device (BT 344232 for 32 €)
+that I could find on eBay, then soldered in 4 wires and added microcontrollers
+to make it smart. It now connects to my <a href="https://nuki.io/en/opener/">Nuki Opener Smart Intercom IOT
+device</a>, and to <a href="/posts/2021-01-10-mqtt-introduction/">my local MQTT Pub/Sub
+bus</a> (why not?).</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hub733b3134fea4b189ea38881ff1c39d2_1378037_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hub733b3134fea4b189ea38881ff1c39d2_1378037_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hub733b3134fea4b189ea38881ff1c39d2_1378037_600x0_resize_q75_box.jpg"
+  alt="modified BTicino" title="modified BTicino"
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<h2 id="background">Background</h2>
+
+<p>In my <a href="/posts/2020-11-30-scs-processing-microcontroller/">last post about the BTicino intercom from
+November</a>, I described how to
+use a Teensy microcontroller to reliably interpret SCS bus signals and drive a
+Nuki Opener (Smart Intercom).</p>
+
+<p>Originally, I had hoped the Nuki developers would be able to fix their device
+based on my SCS bus research, but they don’t seem to be interested. Instead,
+their support actually suggested I run my microcontroller workaround
+indefinitely!</p>
+
+<p>Hence, I decided to work on the next revision to clean up my setup in terms of
+cable clutter. I also figured: if I already need to run my own microcontroller,
+I also want to connect it to my local <a href="/posts/2021-01-10-mqtt-introduction/">MQTT Pub/Sub
+bus</a> for maximum flexibility.</p>
+
+<p>Unfortunately, the Teensy microcontroller lacks built-in WiFi, or any kind of
+networking.</p>
+
+<p>I switched to an ESP32-based microcontroller, but powering those from the SCS
+bus seems like a bad idea: they draw a lot of power, and building small
+high-quality power supplies is hard.</p>
+
+<p>This made me scrap <a href="https://twitter.com/zekjur/status/1331646748989788160">my previous plans to make my own SCS send/receive
+hardware</a>.</p>
+
+<p>Instead, I wondered what the easiest yet most reliable approach might be to make
+this intercom unit smart. Instead of building my own SCS hardware, could I use
+the intercom unit itself to send the door unlock signal, and could I obtain the
+unit’s already-decoded SCS bus signal?</p>
+
+<h2 id="finding-the-signals">Finding the signals</h2>
+
+<p>Based on my previous research, I roughly knew what to expect: closest to the bus
+terminals, there will be some components that filter the bus signal and convert
+the 27V into a lower voltage. Connected to that power supply is a
+microcontroller which deals with all user interface.</p>
+
+<p>To learn more about the components, I first identified all <a href="https://en.wikipedia.org/wiki/Integrated_circuit">ICs (Integrated
+Circuits)</a> based on their
+labeling. The following are relevant:</p>
+
+<ul>
+<li><a href="https://www.ti.com/lit/ds/symlink/lm393-n.pdf">TI LM393</a>: Dual Comparators</li>
+<li><a href="https://www.ti.com/lit/ds/symlink/lp2951-q1.pdf">TI LP2951</a>: Adjustable Micropower Voltage Regulators, 5V output</li>
+<li><a href="http://ww1.microchip.com/downloads/en/devicedoc/41202c.pdf">Microchip PIC16F684</a>: 8-bit microcontroller</li>
+</ul>
+
+<p>I connected my development intercom unit to <a href="/posts/2020-11-30-scs-processing-microcontroller/#scs-lab-setup">my SCS bus lab
+setup</a> and used
+my oscilloscope to confirm expected signal levels based on the pinout from the
+IC datasheets.</p>
+
+<p>I settled on the following 4 relatively easily accessible signals and soldered
+jumper wires to them:</p>
+
+<ul>
+<li><code>5V</code> and <code>GND</code>: 5V, 100mA. Our QT Py microcontroller uses 7mA.</li>
+<li><code>OPEN5V</code>: activates the button which unlocks the door</li>
+<li><code>SCSRX5V</code>: converted SCS signal</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/signals.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/signals_huad180b5f717872783fbf44350a70ae1a_718323_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/signals_huad180b5f717872783fbf44350a70ae1a_718323_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/signals_huad180b5f717872783fbf44350a70ae1a_718323_600x0_resize_q75_box.jpg"
+  alt="BTicino signals" title="BTicino signals"
+  width="600"
+  height="631"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<h2 id="converting-the-signals">Converting the signals</h2>
+
+<p>Because the BTicino intercom units runs at 5V, but more modern microcontrollers
+run at 3.3V, we need to convert between the two voltages:</p>
+
+<ol>
+<li><p>We need to convert a 3.3V signal to <code>OPEN5V</code> to trigger opening the door.</p></li>
+
+<li><p>We need to convert <code>SCSRX5V</code> signal to 3.3V so that I can use an ESP32
+microcontroller to read the signal and place it on MQTT.</p></li>
+</ol>
+
+<p>Here’s the corresponding schematic:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/schematic.png"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/schematic_hucc6cb59bde9ea030d5dc2bcd00b21a79_47323_1200x0_resize_box_2.png 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/schematic_hucc6cb59bde9ea030d5dc2bcd00b21a79_47323_1800x0_resize_box_2.png 3x"
+  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/schematic_hucc6cb59bde9ea030d5dc2bcd00b21a79_47323_600x0_resize_box_2.png"
+  alt="schematic" title="schematic"
+  width="600"
+  height="564"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<h2 id="microcontroller-selection">Microcontroller selection</h2>
+
+<p>I eventually decided to task a dedicated microcontroller with the signal
+conversion, instead of having the WiFi-enabled microcontroller do everything,
+for multiple reasons:</p>
+
+<ul>
+<li><p>Reliability. It turns out that using a hardware analog comparator results in a
+much higher signal quality than continuously sampling an ADC yourself, even
+when using the ESP32’s <a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/ulp.html">ULP (Ultra Low Power)
+co-processor</a>
+to do the sampling.</p></li>
+
+<li><p>Easy implementation. Converting an SCS signal to a serial signal is literally
+<a href="/posts/2020-11-30-scs-processing-microcontroller/#analog-comparator-modification">a single <code>delayMicroseconds(20);</code> call in the right
+place</a>. Having
+a whole microcontroller for only this task eliminates any concurrency
+concerns. I have not had to debug or change the software even once in the last
+few months.</p></li>
+
+<li><p>Easy debugging/introspection. I can connect a standard USB-to-serial adapter
+and verify the signal is read correctly. This quickly narrows down issues on
+either side of the serial interface. Issues with the microcontroller side can
+be reproduced by sending serial data.</p></li>
+</ul>
+
+<p>Here are the 2 microcontrollers I’m using in this project, plus the Teensy I
+used previously:</p>
+
+<table>
+<thead>
+<tr>
+<th>Microcontroller</th>
+<th>WiFi</th>
+<th>Analog Comparator</th>
+<th>Price</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><a href="https://www.pjrc.com/store/teensy40.html">Teensy 4.0</a></td>
+<td>no</td>
+<td>yes</td>
+<td>19 USD</td>
+</tr>
+
+<tr>
+<td><a href="https://www.adafruit.com/product/4600">Adafruit QT Py</a></td>
+<td>no</td>
+<td>yes</td>
+<td>6 USD</td>
+</tr>
+
+<tr>
+<td><a href="https://www.tinypico.com/">TinyPICO</a></td>
+<td>yes</td>
+<td>no</td>
+<td>20 USD</td>
+</tr>
+</tbody>
+</table>
+
+<p>If ESP32 boards such as the TinyPICO had a hardware Analog Comparator, I would
+likely use just one microcontroller, but keep the serial interface on a GPIO for
+easy debugging.</p>
+
+<h3 id="why-the-adafruit-qt-py">Why the Adafruit QT Py?</h3>
+
+<p>The minimal function we need for our signal conversion device is to convert an
+SCS signal (5V) to a serial signal (3.3V). For this conversion, we need a
+hardware analog comparator and an output GPIO that we can drive independently,
+so that we can modify the signal.</p>
+
+<p>Additionally, the device should use as little power as possible so that it can
+comfortably fit in the left-over energy budget of the intercom unit’s power
+supply.</p>
+
+<p>The smallest microcontroller I know of that comes with a hardware analog
+comparator is the <a href="https://www.adafruit.com/product/4600">Adafruit QT Py</a>. It’s
+a 32-bit Cortex M0+ (SAMD21) that can be programmed using the Arduino IDE, or
+MicroPython (hence the name).</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/qtpy.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/qtpy_hud5b1d29bf03dbaef00ea80c4fff123ac_742679_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/qtpy_hud5b1d29bf03dbaef00ea80c4fff123ac_742679_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/qtpy_hud5b1d29bf03dbaef00ea80c4fff123ac_742679_600x0_resize_q75_box.jpg"
+  alt="Adafruit QT Py" title="Adafruit QT Py"
+  width="600"
+  height="378"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>There are other SAMD21 boards with the same form factor, such as the <a href="https://wiki.seeedstudio.com/Seeeduino-XIAO/">Seeeduino
+XIAO</a>.</p>
+
+<h3 id="why-the-tinypico-esp32-board">Why the TinyPICO ESP32 board?</h3>
+
+<p>When looking for a WiFi-enabled microcontroller, definitely go with something
+ESP32-based!</p>
+
+<p>The community around the Espressif ESP32 (and its predecessor ESP8266) is
+definitely one of its biggest pluses: there are tons of Arduino sketches,
+troubleshooting tips, YouTube videos, reference documentation, forum posts, and
+so on.</p>
+
+<p>The ESPs have been around since ≈2014, so many (largely-compatible) boards are
+available. In fact, I started this project on an <a href="https://m5stack.com/collections/m5-core/products/basic-core-iot-development-kit">M5Stack ESP32 Basic Core IoT
+Development
+Kit</a>,
+deployed it on an <a href="https://www.adafruit.com/product/4172">Adafruit HUZZAH32 Breakout
+Board</a> and ultimately ported it to the
+<a href="https://www.tinypico.com/">TinyPICO</a>. Porting between the different
+microcontrollers was really smooth: the only adjustments were pin numbers and
+dropping in a TinyPICO helper library for its RGB LED, which I chose to use as a
+power LED.</p>
+
+<p>I chose the TinyPICO ESP32 board specifically for its small form factor and
+convenience:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-comparison.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-comparison_hu6f8a665b92c49e3c59fd49dc9db9188f_1416694_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-comparison_hu6f8a665b92c49e3c59fd49dc9db9188f_1416694_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-comparison_hu6f8a665b92c49e3c59fd49dc9db9188f_1416694_600x0_resize_q75_box.jpg"
+  alt="TinyPICO comparison with Adafruit Huzzah32 and Teensy 4.0" title="TinyPICO comparison with Adafruit Huzzah32 and Teensy 4.0"
+  width="600"
+  height="415"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>The TinyPICO is only 18mm × 32mm, slightly smaller than the Teensy 4.0’s 18mm × 35mm.</p>
+
+<p>In comparison, the <a href="https://www.adafruit.com/product/4172">Adafruit HUZZAH32 breakout
+board</a> is gigantic with its 25mm ×
+44mm. And that’s without the extra USB-to-serial adapter (FT232H in the picture
+above) you need for programming, serial console and powering the board!</p>
+
+<p>The TinyPICO does not need an extra adapter. You can plug it in and program it
+immediately, just like the Teensy!</p>
+
+<p>I’d like it if the next revision of the TinyPICO switched from Micro USB to USB
+C.</p>
+
+<p>If the TinyPICO is not for you (or unavailable), search for other boards that
+contain the ESP32-PICO-D4 chip. For example, <a href="https://www.dfrobot.com/product-1941.html">DFRobot’s
+ESP32-PICO-KIT</a> or <a href="https://www.amazon.de/Espressif-ESP32-ESP32-PICO-KIT-Board-ESP32-PICO-D4/dp/B07J1YMB8R">Espressif’s own
+ESP32-PICO-KIT</a>.</p>
+
+<h2 id="prototype">Prototype</h2>
+
+<p>After testing everything on a breadboard, I soldered a horizontal pin header
+onto the QT Py, connected it to my Sparkfun level shifter board and soldered the
+remaining voltage divider components “flying”. The result barely fit into the
+case, but worked flawlessly for weeks:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/prototype.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/prototype_hu9e7bb0ca740035a832123149efe1ff0b_1457519_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/prototype_hu9e7bb0ca740035a832123149efe1ff0b_1457519_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/prototype_hu9e7bb0ca740035a832123149efe1ff0b_1457519_600x0_resize_q75_box.jpg"
+  alt="prototype" title="prototype"
+  width="600"
+  height="527"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<h2 id="backpack-pcb-for-the-qt-py">Backpack PCB for the QT Py</h2>
+
+<p>After verifying this prototype works well in practice, I miniaturized it into a
+“backpack” PCB.</p>
+
+<p>The backpack contains all the same parts as the prototype, but with fewer bulky
+wires and connectors, and using only SMD parts. The build you see below uses
+0602 SMD parts, but if I made another revision I would probably chose the larger
+0805 parts for easier soldering.</p>
+
+<aside class="admonition note">
+  <div class="note-container">
+    <div class="note-icon">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+    </div>
+    <div class="admonition-content">If you only wanted to drive the Nuki Opener (without any networking), you could
+easily do that from the QT Py itself and skip the TinyPICO.</div>
+  </div>
+</aside>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack_hu6792fa18b3c27ff7621846a3ddcd41b1_1436932_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack_hu6792fa18b3c27ff7621846a3ddcd41b1_1436932_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack_hu6792fa18b3c27ff7621846a3ddcd41b1_1436932_600x0_resize_q75_box.jpg"
+  alt="QT Py with backpack" title="QT Py with backpack"
+  width="600"
+  height="462"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack-pcb.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack-pcb_hu7c3948370bbbb36c4b0624284e90cf21_991666_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack-pcb_hu7c3948370bbbb36c4b0624284e90cf21_991666_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack-pcb_hu7c3948370bbbb36c4b0624284e90cf21_991666_600x0_resize_q75_box.jpg"
+  alt="QT Py with backpack PCB" title="QT Py with backpack PCB"
+  width="600"
+  height="346"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<h2 id="assembly">Assembly</h2>
+
+<p>To save some space in the intercom unit case, I decided to solder the jumper
+wires directly onto the TinyPICO instead of using a pin header. I could have
+gone one step further by cutting the wires at length and soldering them directly
+on both ends, without any connectors, but I wanted to be able to easily unplug
+and re-combine the parts of this project.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-wires.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-wires_hu0ea0facd5de8df5b7e0832eec5ec06a2_2526440_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-wires_hu0ea0facd5de8df5b7e0832eec5ec06a2_2526440_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-wires_hu0ea0facd5de8df5b7e0832eec5ec06a2_2526440_600x0_resize_q75_box.jpg"
+  alt="wires soldered directly into the TinyPICO" title="wires soldered directly into the TinyPICO"
+  width="600"
+  height="678"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>From top to bottom, I made the following connections:</p>
+
+<table>
+<thead>
+<tr>
+<th>Pin</th>
+<th>Color</th>
+<th>Function</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>25</td>
+<td><span style="background-color: #ff4136; padding: 0 .5em 0 .5em">red</span></td>
+<td><code>SCSRX_3V3</code></td>
+</tr>
+
+<tr>
+<td>27</td>
+<td><span style="background-color: #2ecc40; padding: 0 .5em 0 .5em">green</span></td>
+<td><code>OPEN_3V3</code></td>
+</tr>
+
+<tr>
+<td>15</td>
+<td><span style="background-color: #0074d9; color: white; padding: 0 .5em 0 .5em">blue</span></td>
+<td>Nuki Opener blue cable</td>
+</tr>
+
+<tr>
+<td>14</td>
+<td><span style="background-color: #ffdc00; padding: 0 .5em 0 .5em">yellow</span></td>
+<td>Nuki Opener yellow cable</td>
+</tr>
+
+<tr>
+<td>4</td>
+<td><span style="background-color: #b10dc9; color: white; padding: 0 .5em 0 .5em">purple</span></td>
+<td>floor ring button pushed</td>
+</tr>
+
+<tr>
+<td>3V3</td>
+<td><span style="background-color: white; padding: 0 .5em 0 .5em">white</span></td>
+<td>3.3V for the floor ring button</td>
+</tr>
+
+<tr>
+<td>5V</td>
+<td><span style="background-color: #ff851b; padding: 0 .5em 0 .5em">orange</span></td>
+<td>power for the TinyPICO</td>
+</tr>
+
+<tr>
+<td>GND</td>
+<td><span style="background-color: brown; color: white; padding: 0 .5em 0 .5em">brown</span></td>
+<td>ground for the TinyPICO</td>
+</tr>
+
+<tr>
+<td>GND</td>
+<td><span style="background-color: brown; color: white; padding: 0 .5em 0 .5em">brown</span></td>
+<td>ground to the QT Py</td>
+</tr>
+
+<tr>
+<td>GND</td>
+<td><span style="background-color: brown; color: white; padding: 0 .5em 0 .5em">brown</span></td>
+<td>ground to the Nuki Opener</td>
+</tr>
+</tbody>
+</table>
+
+<p>The TinyPICO USB port is still usable for updating the software and serial console
+debugging.</p>
+
+<p>Here’s the TinyPICO connected to the QT Py inside the intercom unit:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hub733b3134fea4b189ea38881ff1c39d2_1378037_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hub733b3134fea4b189ea38881ff1c39d2_1378037_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hub733b3134fea4b189ea38881ff1c39d2_1378037_600x0_resize_q75_box.jpg"
+  alt="modified BTicino" title="modified BTicino"
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>The QT Py is powered by the intercom unit’s supply, and the TinyPICO I’m
+powering with an external USB power supply and a cut-open USB cable. This allows
+me to route the jumper wires through the intercom unit’s hole in the back,
+through which a USB plug doesn’t fit:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/final-installation.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/final-installation_hu026d112f6291a36ec32cbedad99b0fdb_1989526_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/final-installation_hu026d112f6291a36ec32cbedad99b0fdb_1989526_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/final-installation_hu026d112f6291a36ec32cbedad99b0fdb_1989526_600x0_resize_q75_box.jpg"
+  alt="final installation" title="final installation"
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<h2 id="software-artifacts">Software / Artifacts</h2>
+
+<p>You can find the Arduino sketches and KiCad files for this project at
+<a href="https://github.com/stapelberg/intercom-backpack">https://github.com/stapelberg/intercom-backpack</a></p>
+
+<p>For debugging, I found it useful to publish every single byte received from the
+SCS bus on the <code>doorbell/debug/scsrx</code> MQTT topic. Full SCS telegrams are
+published to <code>doorbell/events/scs</code>, so by observing both, you can verify that
+retransmission suppression and SCS decoding work correctly.</p>
+
+<p>Similarly, signaling a doorbell ring to the Nuki Opener can be debugged by
+sending a message to MQTT topic <code>doorbell/debug/cmd/ring</code>.</p>
+
+<p>Initially, it wasn’t clear to me whether the WiFi library would maintain the
+connection indefinitely. After observing my microcontroller eventually
+disappearing from my network, I added the <code>taskreconnect</code> FreeRTOS task, and
+things have been stable since.</p>
+
+<h2 id="nuki-opener-verdict">Nuki Opener: verdict</h2>
+
+<p>I now have a Nuki Opener running next to my own microcontroller, so I can see
+how well it works.</p>
+
+<h3 id="setup">setup</h3>
+
+<p>Setting up the Nuki is the worst part: their colorful cable is super flimsy and
+loose, often losing contact. They should definitely switch to a cable with a
+mechanical lock.</p>
+
+<p>The software part of the setup is okay, but the compatibility with the SCS bus
+is poor: I couldn’t get the device to work at all (see my initial post), and had
+to resort to using my own microcontroller to drive the Nuki in analogue mode.</p>
+
+<p>I’m disappointed that the Nuki developers aren’t interested in improving their
+device’s compatibility and reliability with the SCS bus. They seem to
+capture/replay the entire signal (including re-transmissions) instead of
+actually decoding the signal.</p>
+
+<h3 id="in-my-day-to-day">in my day-to-day</h3>
+
+<p>The push notifications I get on my iPhone from the Nuki are often
+delayed. Usually the delay is a few seconds, but sometimes notifications arrive
+hours later or just don’t arrive at all!</p>
+
+<p>While the push notifications are sent from a Nuki server and hence need the
+internet to function, the Nuki Bridge (translating Bluetooth Low Energey from
+the Nuki Opener to WiFi) allows configuring notifications in the local network
+via web hooks.</p>
+
+<p>The Nuki Bridge’s notifications are much more reliable in my experience.</p>
+
+<p>People sometimes ask why I use the Nuki Opener at all, given that I have some
+infrastructure of my own, too. While opening the door and receiving
+notifications is something I can do without the Nuki, too, I don’t want to spend
+my spare time re-implementing the Nuki app (on multiple platforms) with its geo
+fencing, friend invitations, ring to open, etc. In addition, the Nuki Opener
+physical device has a nice ring sound and large push button to open the door,
+both of which are convenient.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>My intercom is now much smarter! Doorbell notifications make their way to my
+various devices via MQTT, and I can conveniently open the door from any device,
+as opposed to rushing to the intercom unit in the hallway.</p>
+
+<p>Compared to the previous proof-of-concepts and development installations, I feel
+more confident in the current solution because it re-uses the intercom unit for
+the nitty-gritty SCS bus communication details.</p>
+
+<p>The overall strategy should be widely applicable regardless of the specific
+intercom vendor/unit you have. Be sure to buy your own unit (don’t solder into
+your landlord’s intercom unit!) and test in a separate lab setup first, of
+course!</p>
+]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[Debian Code Search: OpenAPI now available]]></title>
     <link href="https://michael.stapelberg.ch/posts/2021-03-06-debian-code-search-openapi/"/>
     <id>https://michael.stapelberg.ch/posts/2021-03-06-debian-code-search-openapi/</id>
@@ -4428,350 +5155,6 @@ AB350 is on the back of the mainboard, so an M.2 SSD is harder to reach. The
 performance disadvantage of a SATA SSD compared to an M.2 SSD might be
 measurable, but irrelevant for my day-to-day usage. Quickly accessing the
 physical hardware is more important.</p>
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[Debian Code Search: positional index, TurboPFor-compressed]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2019-09-29-dcs-positional-turbopfor-index/"/>
-    <id>https://michael.stapelberg.ch/posts/2019-09-29-dcs-positional-turbopfor-index/</id>
-    <published>2019-09-29T00:00:00+00:00</published>
-    <content type="html"><![CDATA[
-
-<style type="text/css">
-.bar {
-  display: inline-block;
-  padding: 0.25em;
-  text-align: center;
-  vertical-align: middle;
-}
-
-.barcon {
-  width: 40em;
-  display: flex;
-}
-</style>
-
-<p>See the <a href="#conclusion">Conclusion</a> for a summary if you’re impatient :-)</p>
-
-<h3 id="motivation">Motivation</h3>
-
-<p>Over the last few months, I have been developing a new index format for Debian
-Code Search. This required a lot of careful refactoring, re-implementation,
-debug tool creation and debugging.</p>
-
-<p>Multiple factors motivated my work on a new index format:</p>
-
-<ol>
-<li><p>The existing index format has a 2G size limit, into which we have bumped a
-few times, requiring manual intervention to keep the system running.</p></li>
-
-<li><p>Debugging the existing system required creating ad-hoc debugging tools, which
-made debugging sessions unnecessarily lengthy and painful.</p></li>
-
-<li><p>I wanted to check whether <a href="https://github.com/Debian/dcs/issues/85">switching to a different integer compression
-format</a> would improve performance
-(it does not).</p></li>
-
-<li><p>I wanted to check whether storing positions with the posting lists would
-improve performance of identifier queries (= queries which are not using any
-regular expression features), which make up 78.2% of all Debian Code Search
-queries (it does).</p></li>
-</ol>
-
-<p>I figured building a new index from scratch was the easiest approach, compared
-to refactoring the existing index to increase the size limit (point ①).</p>
-
-<p>I also figured it would be a good idea to develop the debugging tool in lock
-step with the index format so that I can be sure the tool works and is useful
-(point ②).</p>
-
-<h3 id="integer-compression-turbopfor">Integer compression: TurboPFor</h3>
-
-<p>As a quick refresher, search engines typically store document IDs (representing
-source code files, in our case) in an ordered list (“posting list”). It usually
-makes sense to apply at least a rudimentary level of compression: our existing
-system used variable integer encoding.</p>
-
-<p><a href="https://github.com/powturbo/TurboPFor">TurboPFor</a>, the self-proclaimed “Fastest
-Integer Compression” library, combines an advanced on-disk format with a
-carefully tuned SIMD implementation to reach better speeds (in micro benchmarks)
-at less disk usage than <a href="https://github.com/google/codesearch/blob/4fe90b597ae534f90238f82c7b5b1bb6d6d52dff/index/write.go#L561">Russ Cox’s varint implementation in
-<code>github.com/google/codesearch</code></a>.</p>
-
-<p>If you are curious about its inner workings, check out my “<a href="/posts/2019-02-05-turbopfor-analysis/">TurboPFor: an
-analysis</a>”.</p>
-
-<p>Applied on the Debian Code Search index, TurboPFor indeed compresses integers better:</p>
-
-<h4 id="disk-space">Disk space</h4>
-
-<p><div style="display: inline-block">
-    <div class="barcon">
-        <div class="bar" style="width: 100%; background-color: blue; color: white">
-            &nbsp;
-        </div>
-    </div>
-</div>
-<span style="margin-right: 2em">8.9G</span>
-codesearch varint index</p>
-
-<p><div style="display: inline-block">
-    <div class="barcon">
-        <div class="bar" style="width: 61%; background-color: blue; color: white">
-            &nbsp;
-        </div>
-    </div>
-</div>
-<span style="margin-right: 2em">5.5G</span>
-TurboPFor index</p>
-
-<p>Switching to TurboPFor (via cgo) for storing and reading the index results in a
-slight speed-up of a <code>dcs replay</code> benchmark, which is more pronounced the more
-i/o is required.</p>
-
-<h4 id="query-speed-regexp-cold-page-cache">Query speed (regexp, cold page cache)</h4>
-
-<p><div style="display: inline-block">
-    <div class="barcon">
-        <div class="bar" style="width: 100%; background-color: blue; color: white">
-            &nbsp;
-        </div>
-    </div>
-</div>
-<span style="margin-right: 2em">18s</span>
-codesearch varint index</p>
-
-<p><div style="display: inline-block">
-    <div class="barcon">
-        <div class="bar" style="width: 77.7%; background-color: blue; color: white">
-            &nbsp;
-        </div>
-    </div>
-</div>
-<span style="margin-right: 2em">14s</span>
-TurboPFor index (cgo)</p>
-
-<h4 id="query-speed-regexp-warm-page-cache">Query speed (regexp, warm page cache)</h4>
-
-<p><div style="display: inline-block">
-    <div class="barcon">
-        <div class="bar" style="width: 100%; background-color: blue; color: white">
-            &nbsp;
-        </div>
-    </div>
-</div>
-<span style="margin-right: 2em">15s</span>
-codesearch varint index</p>
-
-<p><div style="display: inline-block">
-    <div class="barcon">
-        <div class="bar" style="width: 93.3%; background-color: blue; color: white">
-            &nbsp;
-        </div>
-    </div>
-</div>
-<span style="margin-right: 2em">14s</span>
-TurboPFor index (cgo)</p>
-
-<p>Overall, TurboPFor is an all-around improvement in efficiency, albeit with a
-high cost in implementation complexity.</p>
-
-<h3 id="positional-index-trade-more-disk-for-faster-queries">Positional index: trade more disk for faster queries</h3>
-
-<p>This section builds on the previous section: all figures come from the TurboPFor
-index, which can optionally support positions.</p>
-
-<p>Conceptually, we’re going from:</p>
-
-<pre><code>type docid uint32
-type index map[trigram][]docid
-</code></pre>
-
-<p>…to:</p>
-
-<pre><code>type occurrence struct {
-    doc docid
-    pos uint32 // byte offset in doc
-}
-type index map[trigram][]occurrence
-</code></pre>
-
-<p>The resulting index consumes more disk space, but can be queried faster:</p>
-
-<ol>
-<li><p>We can do fewer queries: instead of reading all the posting lists for all
-the trigrams, we can read the posting lists for the query’s first and last
-trigram only.
-<br>
-This is one of the tricks described in the paper
-“<a href="https://cedric.cnam.fr/fichiers/art_3216.pdf">AS-Index: A
-Structure For String Search Using n-grams and Algebraic Signatures</a>”
-(PDF), and goes a long way without incurring the complexity, computational
-cost and additional disk usage of calculating algebraic signatures.</p></li>
-
-<li><p>Verifying the delta between the last and first position matches the length
-of the query term significantly reduces the number of files to read (lower
-false positive rate).</p></li>
-
-<li><p>The matching phase is quicker: instead of locating the query term in the
-file, we only need to compare a few bytes at a known offset for equality.</p></li>
-
-<li><p>More data is read sequentially (from the index), which is faster.</p></li>
-</ol>
-
-<h4 id="disk-space-1">Disk space</h4>
-
-<p>A positional index consumes significantly more disk space, but not so much as
-to pose a challenge: a Hetzner EX61-NVME dedicated server (≈ 64 €/month)
-provides 1 TB worth of fast NVMe flash storage.</p>
-
-<p><div style="display: inline-block">
-    <div class="barcon">
-        <div class="bar" style="width: 5.2%; background-color: blue; color: white">
-            &nbsp;
-        </div>
-    </div>
-</div>
-<span style="margin-right: 2em">&nbsp;6.5G</span>
-non-positional</p>
-
-<p><div style="display: inline-block">
-    <div class="barcon">
-        <div class="bar" style="width: 100%; background-color: blue; color: white">
-            &nbsp;
-        </div>
-    </div>
-</div>
-<span style="margin-right: 2em">123G</span>
-positional</p>
-
-<p><div style="display: inline-block">
-    <div class="barcon">
-        <div class="bar" style="width: 75.6%; background-color: blue; color: white">
-            &nbsp;
-        </div>
-    </div>
-</div>
-<span style="margin-right: 2em">&nbsp;&nbsp;93G</span>
-positional (posrel)</p>
-
-<p>The idea behind the positional index (posrel) is to not store a <code>(doc,pos)</code>
-tuple on disk, but to store positions, accompanied by a stream of doc/pos
-relationship bits: 1 means this position belongs to the next document, 0 means
-this position belongs to the current document.</p>
-
-<p>This is an easy way of saving some space without modifying the TurboPFor
-on-disk format: the posrel technique reduces the index size to about ¾.</p>
-
-<p>With the increase in size, the Linux page cache hit ratio will be lower for
-the positional index, i.e. more data will need to be fetched from disk for
-querying the index.</p>
-
-<p>As long as the disk can deliver data as fast as you can decompress posting
-lists, this only translates into one disk seek’s worth of additional
-latency. This is the case with modern NVMe disks that deliver thousands of MB/s,
-e.g. the Samsung 960 Pro (used in Hetzner’s aforementioned EX61-NVME server).</p>
-
-<p>The values were measured by running <code>dcs du -h /srv/dcs/shard*/full</code>
-without and with the <code>-pos</code> argument.</p>
-
-<h4 id="bytes-read">Bytes read</h4>
-
-<p>A positional index requires fewer queries: reading only the first and last
-trigram’s posting lists and positions is sufficient to achieve a lower (!) false
-positive rate than evaluating <strong>all</strong> trigram’s posting lists in a
-non-positional index.</p>
-
-<p>As a consequence, fewer files need to be read, resulting in fewer bytes required
-to read from disk overall.</p>
-
-<p>As an additional bonus, in a positional index, more data is read sequentially
-(index), which is faster than random i/o, regardless of the underlying disk.</p>
-
-<p><div style="display: inline-block">
-<div class="barcon">
-<div class="bar" style="width: calc(2 * 1.2em); background-color: blue; color: white">
-  1.2G
-</div>
-<div class="bar" style="width: calc(2 * 19.8em); background-color: green; color: white">
-  19.8G
-</div>
-</div>
-</div>
-<span style="margin-right: 2em">21.0G</span>
-regexp queries</p>
-
-<p><div style="display: inline-block">
-<div class="barcon">
-<div class="bar" style="width: calc(2 * 4.2em); background-color: blue; color: white">
-  4.2G (index)
-</div>
-<div class="bar" style="width: calc(2 * 10.8em); background-color: green; color: white">
-  10.8G (files)
-</div>
-</div>
-</div>
-<span style="margin-right: 2em">15.0G</span>
-identifier queries</p>
-
-<p>The values were measured by running <code>iostat -d 25</code> just before running
-<a href="https://codesearch.debian.net/research/2019-08-03-dcs-new-index/"><code>bench.zsh</code></a>
-on an otherwise idle system.</p>
-
-<h4 id="query-speed">Query speed</h4>
-
-<p>Even though the positional index is larger and requires more data to be read at
-query time (see above), thanks to the C TurboPFor library, the 2 queries on a
-positional index are roughly as fast as the n queries on a non-positional index
-(≈4s instead of ≈3s).</p>
-
-<p>This is more than made up for by the combined i/o matching stage, which shrinks
-from ≈18.5s (7.1s i/o + 11.4s matching) to ≈1.3s.</p>
-
-<p><div style="display: inline-block">
-<div class="barcon">
-<div class="bar" style="width: calc(2 * 3.3em); background-color: blue; color: white">
-  3.3s (index)
-</div>
-<div class="bar" style="width: calc(2 * 7.1em); background-color: green; color: white">
-  7.1s (i/o)
-</div>
-<div class="bar" style="width: calc(2 * 11.4em); background-color: purple; color: white">
-  11.4s (matching)
-</div>
-</div>
-</div>
-<span style="margin-right: 2em">21.8s</span>
-regexp queries</p>
-
-<p><div style="display: inline-block">
-<div class="barcon">
-<div class="bar" style="width: calc(2 * 3.92em); background-color: blue; color: white">
-  3.92s (index)
-</div>
-<div class="bar" style="width: calc(2 * 1.3em); background-color: green; color: white">
-  ≈1.3s
-</div>
-</div>
-</div>
-<span style="margin-right: 2em">5.22s</span>
-identifier queries</p>
-
-<p>Note that identifier query i/o was sped up not just by needing to read fewer
-bytes, but also by only having to verify bytes at a known offset instead of
-needing to locate the identifier within the file.</p>
-
-<h3 id="conclusion">Conclusion</h3>
-
-<p>The new index format is overall slightly more efficient. This disk space
-efficiency allows us to introduce a positional index section for the first
-time.</p>
-
-<p>Most Debian Code Search queries are positional queries (78.2%) and will be
-answered much quicker by leveraging the positions.</p>
-
-<p>Bottomline, it is beneficial to use a positional index on disk over a
-non-positional index in RAM.</p>
 ]]></content>
   </entry>
 </feed>

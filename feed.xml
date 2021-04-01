@@ -5,6 +5,289 @@
   <id>https://michael.stapelberg.ch/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[Eclipse: Enabling Compilation Database (CDB, compile_commands.json) in NXP MCUXpresso v11.3]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/"/>
+    <id>https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/</id>
+    <published>2021-04-01T11:59:23+02:00</published>
+    <content type="html"><![CDATA[
+
+<p>NXP’s Eclipse-based MCUXpresso IDE is the easiest way to make full use of the
+hardware debugging features of modern NXP micro controllers such as the <a href="https://www.nxp.com/products/processors-and-microcontrollers/arm-microcontrollers/i-mx-rt-crossover-mcus/i-mx-rt1060-crossover-mcu-with-arm-cortex-m7-core:i.MX-RT1060">i.MX
+RT1060</a>
+found on the <a href="https://www.nxp.com/design/development-boards/i-mx-evaluation-and-development-boards/mimxrt1060-evk-i-mx-rt1060-evaluation-kit:MIMXRT1060-EVK">NXP i.MX RT1060 Evaluation Kit
+(<code>MIMXRT1060-EVK</code>)</a>,
+which I use for Teensy 4 development.</p>
+
+<p>For projects that are fully under your control, such as imported SDK examples,
+or anything you created within Eclipse, you wouldn’t necessarily need
+Compilation Database support.</p>
+
+<p>When working with projects of type <code>Makefile Project with Existing Code</code>,
+however, Eclipse doesn’t know about preprocessor definition flags and include
+directories, unless you would manually duplicate them. In large and
+fast-changing projects, this is not an option.</p>
+
+<p>The lack of compiler configuration knowledge (defines and include directories)
+breaks various C/C++ tooling features, such as Macro Expansion or the <code>Open
+Declaration</code> feature, both of which are an essential tool in my toolbelt, and
+particularly useful in large code bases such as micro controller projects with
+various SDKs etc.</p>
+
+<p>In some configurations, Eclipse might be able to parse GCC build output, but
+when I was working with the <a href="https://qmk.fm/">QMK keyboard firmware</a>, I couldn’t
+get the QMK makefiles to print commands that Eclipse would understand, not even
+with <code>VERBOSE=true</code>.</p>
+
+<p>Luckily, there is a solution! <a href="https://wiki.eclipse.org/CDT/User/NewIn910#Build">Eclipse CDT 9.10 introduced Compilation Database
+support</a> in 2019. MCUXpresso
+v11.3.0 ships with CDT 9.11.1.202006011430, meaning it does contain Compilation
+Database support.</p>
+
+<p>In case you want to check which version your installed IDE has, open <code>Help</code> →
+<code>About MCUXpresso IDE</code>, click <code>Installation Details</code>, open the <code>Features</code> tab,
+then locate the <code>Eclipse CDT</code>, <code>C/C++ Development Platform</code> line.</p>
+
+<p>For comparison, Eclipse IDE 2021-03 contains 10.2.0.202103011047, if you want to
+verify that the issues I reference below are indeed fixed.</p>
+
+<h2 id="bug-command-vs-arguments">Bug: command vs. arguments</h2>
+
+<p>Before we can enable Compilation Database support, we need to ensure we have a
+compatible <code>compile_commands.json</code> database file. Eclipse CDT’s Compilation
+Database support before version CDT 10 suffered from <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=563006">Bug
+563006</a>: it only
+understood the <code>command</code> JSON property, not the <code>arguments</code> property.</p>
+
+<p>Depending on your build system, this isn’t a problem. For example, Meson/ninja’s
+<code>compile_commands.json</code> uses <code>command</code> and will work fine.</p>
+
+<p>But, when using Make with <a href="https://github.com/rizsotto/Bear">Bear</a>, you will end
+up with <code>arguments</code> by default.</p>
+
+<p>Bear 3.0 allows generating a <code>compile_commands.json</code> Compilation Database with
+<code>command</code>, but <a href="https://github.com/rizsotto/Bear/issues/196#issuecomment-691748584">requires multiple commands and config
+files</a>,
+which is a bit inconvenient with Eclipse.</p>
+
+<p>So, let’s put the extra commands into a <code>commandbear.sh</code> script:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#007020">#!/bin/sh
+</span><span style="color:#007020"></span>
+<span style="color:#007020">set</span> -eux
+
+intercept --output commands.json -- <span style="color:#4070a0">&#34;</span><span style="color:#bb60d5">$@</span><span style="color:#4070a0">&#34;</span>
+citnames <span style="color:#4070a0;font-weight:bold">\
+</span><span style="color:#4070a0;font-weight:bold"></span>  --input commands.json <span style="color:#4070a0;font-weight:bold">\
+</span><span style="color:#4070a0;font-weight:bold"></span>  --output compile_commands.json <span style="color:#4070a0;font-weight:bold">\
+</span><span style="color:#4070a0;font-weight:bold"></span>  --config config.json</code></pre></div>
+<p>The <code>&quot;command_as_array&quot;: false</code> option goes into <code>config.json</code>:</p>
+
+<pre><code>{
+  &quot;compilation&quot;: {
+  },
+  &quot;output&quot;: {
+    &quot;content&quot;: {
+      &quot;include_only_existing_source&quot;: true
+    },
+    &quot;format&quot;: {
+      &quot;command_as_array&quot;: false,
+      &quot;drop_output_field&quot;: false
+    }
+  }
+}
+</code></pre>
+
+<p>Don’t forget to make the script executable:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">chmod +x commandbear.sh</code></pre></div>
+<p>Then configure Eclipse to use the <code>commandbear.sh</code> script to build:</p>
+
+<ol>
+<li>Open Project Properties by right-clicking your project in the Project
+Explorer panel.</li>
+<li>Select <code>C/C++ Build</code> and open the <code>Builder Settings</code> tab</li>
+<li>In the <code>Builder</code> group, set the <code>Build command</code> text field to:
+<code>${workspace_loc:/qmk_firmware}/commandbear.sh make -j16</code></li>
+</ol>
+
+<p>Verify your build is working by selecting <code>Project</code> → <code>Clean…</code> and triggering a
+build.</p>
+
+<h2 id="enabling-compilation-database-support">Enabling Compilation Database support</h2>
+
+<ol>
+<li>Open Project Properties by right-clicking your project in the Project
+Explorer panel.</li>
+<li>Expand <code>C/C++ General</code>, select <code>Preprocessor Include Paths, Macros etc.</code> and
+open the <code>Providers</code> tab.</li>
+<li>Untick everything but:
+
+<ul>
+<li>MCU GCC Built-in Compiler Parser</li>
+<li>MCU GCC Build Output Parser</li>
+<li>Compilation Database Parser</li>
+</ul></li>
+<li>Select <code>Compilation Database Parser</code>, click <code>Apply</code> to make the Compilation
+Database text field editable.</li>
+<li>Put a full path to your compile_commands.json file into the text field,
+e.g. <code>/home/michael/kinx/workspace/qmk_firmware/compile_commands.json</code>. Note
+that variables will not be expanded! Support for using variables was added
+later in <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=559186">Bug 559186</a>.</li>
+<li>Select <code>MCU GCC Build Output Parser</code> as <code>Build parser</code>.</li>
+<li>Tick the <code>Exclude files not in the Compilation Database</code> checkbox.</li>
+<li>Click <code>Apply and Close</code>.</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-1.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-1_hu2472da729552826bf692ea90f41fcb42_1282459_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-1_hu2472da729552826bf692ea90f41fcb42_1282459_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-1_hu2472da729552826bf692ea90f41fcb42_1282459_600x0_resize_q75_box.jpg"
+  alt="Compilation Database Parser settings" title="Compilation Database Parser settings"
+  width="600"
+  height="562"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>You will know Compilation Database support works when its progress view shows
+up:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-2.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-2_hu3785c06d044add2745f30f8a2a36e111_353949_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-2_hu3785c06d044add2745f30f8a2a36e111_353949_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-2_hu3785c06d044add2745f30f8a2a36e111_353949_600x0_resize_q75_box.jpg"
+  alt="Compilation Database progress" title="Compilation Database progress"
+  width="600"
+  height="179"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>If you have an incompatible or empty <code>compile_commands.json</code>, nothing visible
+will happen (no progress indicator or error messages).</p>
+
+<p>After indexing completes, you should see:</p>
+
+<ol>
+<li>Files that were not used as greyed out in the <code>Project Explorer</code></li>
+<li><code>Open Declaration</code> in the context menu of a selected identifier (or <code>F3</code>)
+should jump to the correct file. For example, my test sequence for this
+feature in the QMK repository is:
+
+<ul>
+<li>in <code>tmk_core/protocol/chibios/main.c</code>, open <code>init_usb_driver</code></li>
+<li>open <code>usbStart</code>, should bring up <code>lib/chibios</code> git submodule</li>
+<li>open <code>usb_lld_start</code>, should bring up <code>MIMXRT1062</code> port</li>
+</ul></li>
+<li>Macros expanded correctly, e.g. <code>MIMXRT1062_USB_USE_USB1</code> in the following
+example</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-6.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-6_hu9efc4b93b6aefec1d634e69f8dd62cd0_914059_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-6_hu9efc4b93b6aefec1d634e69f8dd62cd0_914059_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-6_hu9efc4b93b6aefec1d634e69f8dd62cd0_914059_600x0_resize_q75_box.jpg"
+  alt="Compilation Database in effect: files greyed out and macros expanded" title="Compilation Database in effect: files greyed out and macros expanded"
+  width="600"
+  height="301"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<h2 id="slow-file-exclusion-in-projects-with-many-files">Slow file exclusion in projects with many files</h2>
+
+<p><a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=565457">Bug 565457</a> explains an
+optimization in the algorithm used to generate the list of excluded paths, which
+I would summarize as “use whole directories instead of individual files”.</p>
+
+<p>This optimization was introduced later, so in MCUXpresso v11.3, we still have to
+endure watching the slow algorithm for a few seconds:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-4.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-4_hu3785c06d044add2745f30f8a2a36e111_391538_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-4_hu3785c06d044add2745f30f8a2a36e111_391538_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-4_hu3785c06d044add2745f30f8a2a36e111_391538_600x0_resize_q75_box.jpg"
+  alt="Compilation Database exclusion slow" title="Compilation Database exclusion slow"
+  width="600"
+  height="179"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>NXP, please release a new MCUXpresso IDE with a more recent CDT version!</p>
+
+<p>The improvements in the newer version would make the setup so much simpler.</p>
+]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[Make your intercom smarter with an MQTT backpack]]></title>
     <link href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/"/>
     <id>https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/</id>
@@ -5042,119 +5325,6 @@ modprobe virtio_scsi
 ./cryptsetup luksOpen /dev/sda4 cryptroot1
 mount /dev/dm-0 /mnt
 </code></pre>
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[Network Storage PC Hardware (2019)]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2019-10-23-nas/"/>
-    <id>https://michael.stapelberg.ch/posts/2019-10-23-nas/</id>
-    <published>2019-10-23T00:00:00+00:00</published>
-    <content type="html"><![CDATA[
-
-<p>One of my two NAS builds recently died, so I bought a new one until I find some
-time to debug the old one. Since a couple of people have been asking me what I
-would recommend nowadays based on my <a href="/posts/2016-11-21-gigabit-nas-coreos/">November 2016 article “Gigabit NAS
-(running CoreOS)”</a>, I figured I would
-share the new hardware listing:</p>
-
-<table width="100%" style="margin-top: 1.5em; margin-bottom: 1.5em; margin-left: 2em">
-<tr>
-<th>Price</th>
-<th>Type</th>
-<th>Article</th>
-</tr>
-
-<tr>
-<td>54.00 CHF</td>
-<td>Case</td>
-<td><a href="https://www.digitec.ch/en/s1/product/silverstone-sst-sg05bb-lite-cube-pc-cases-3525365">Silverstone SST-SG05BB-Lite (cube)</a></td>
-</tr>
-
-<tr>
-<td valign="top">60.40 CHF</td>
-<td valign="top">Mainboard</td>
-<td><a href="https://www.digitec.ch/en/s1/product/asrock-ab350-gaming-itxac-am4-amd-b350-mini-itx-motherboards-7022839">AsRock AB350 Gaming-ITX/ac (AM4, AMD B350, Mini ITX)</a><br>
-<strong>Be sure to <a href="https://www.asrock.com/MB/AMD/Fatal1ty%20AB350%20Gaming-ITXac/index.asp#BIOS">update the UEFI</a> to the latest version (6.00)!</strong></td>
-</tr>
-
-<tr>
-<td>62.30 CHF</td>
-<td>CPU</td>
-<td><a href="https://www.digitec.ch/en/s1/product/amd-a6-9500e-2-am4-3ghz-processors-6436852">AMD A6-9500E (2, AM4, 3GHz)</a></td>
-</tr>
-
-<tr>
-<td>20.10 CHF</td>
-<td>Cooler</td>
-<td><a href="https://www.digitec.ch/en/s1/product/arctic-alpine-690cm-cpu-coolers-11053306">Arctic Alpine AM4 Passive</a></td>
-</tr>
-
-<tr>
-<td>42.80 CHF</td>
-<td>RAM</td>
-<td><a href="https://www.digitec.ch/en/s1/product/kingston-valueram-1x-8gb-ddr4-2400-dimm-288-memory-6149789">Kingston ValueRAM (1x, 8GB, DDR4-2400, DIMM 288)</a></td>
-</tr>
-
-<tr>
-<td>29.00 CHF</td>
-<td>Fan</td>
-<td><a href="https://www.digitec.ch/en/s1/product/noctua-nf-s12a-uln-120mm-1x-pc-fans-2451401">Noctua Nf-s12a ULN (120mm, 1x)</a></td>
-</tr>
-
-<tr>
-<td valign="top">55.00 CHF</td>
-<td valign="top">PSU</td>
-<td><a href="https://www.digitec.ch/en/s1/product/silverstone-st30sf-300w-sfx-300w-power-supply-computer-5808725">Silverstone ST30SF 300W SFX (300W)</a></td>
-</tr>
-
-<tr>
-<td valign="top">27.50 CHF</td>
-<td valign="top">System disk</td>
-<td><a href="https://www.digitec.ch/en/s1/product/intenso-high-performance-120gb-25-ssd-5984710?tagIds=76-535">Intenso High Performance (120GB, 2.5") SATA</a></td>
-</tr>
-
-<tr>
-<td>351.10 CHF</td>
-<td colspan="2"><strong>total sum</strong></td>
-</tr>
-</table>
-
-<p>In <a href="/posts/2016-11-21-gigabit-nas-coreos/">November 2016 I paid only 225 CHF</a>, i.e. 126 CHF less.</p>
-
-<p>Why is this build so much more expensive? There are two major reasons:</p>
-
-<h3 id="the-am4-platform">The AM4 platform</h3>
-
-<p>The AM4 platform replaced the AM1 APU series as the cheapest broadly available
-AMD platform.</p>
-
-<p>As you might have gathered from the links in the hardware listing above, I
-define “broadly available” as available at digitec, a large electronics shop in
-Zürich.</p>
-
-<p>They offer same-day orders for pick-up in their Zürich location during Weekdays
-and on Saturdays, so it is kind of like being on a hardware support plan :-)</p>
-
-<p>Unfortunately, the cheapest AM4 CPU is a lot more expensive (+ 23.31 CHF).</p>
-
-<p>Also, there are (currently?) no AM4 mainboards with DC barrel power plugs,
-meaning more expensive ATX power supplies (+ 26.30 CHF) become necessary.</p>
-
-<h3 id="additional-components-fan-and-system-disk">Additional components: fan and system disk</h3>
-
-<p>Definitely invest in the Noctua 120mm ULN (Ultra Low Noise) fan (+ 29.00
-CHF). The fan that comes in the Silverstone case is pretty noisy, and that might
-be bothersome if you don’t have the luxury of stashing your NAS away in the
-basement.</p>
-
-<p>In my last build, I had an SSD lying around that I used as system disk, this
-time I had to buy one (+ 27.50 CHF).</p>
-
-<p>Note that I intentionally picked a SATA SSD over an M.2 SSD: the M.2 slot of the
-AB350 is on the back of the mainboard, so an M.2 SSD is harder to reach. The
-performance disadvantage of a SATA SSD compared to an M.2 SSD might be
-measurable, but irrelevant for my day-to-day usage. Quickly accessing the
-physical hardware is more important.</p>
 ]]></content>
   </entry>
 </feed>

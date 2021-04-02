@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Emacs: overriding the project.el project directory - Michael Stapelberg</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <meta name="description" content="I recently learnt about the Emacs package project.el, which is used to figure out which files and directories belong to the same project. This is used under the covers by Eglot, for example.
+In practice, a project is recognized by looking for Git repositories, which is a decent first approximation that often just works.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2021-04-02-emacs-project-override/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div><h1 class="ms_title">Emacs: overriding the project.el project directory</h1>
+
+<div class="ms_meta">
+  <div id="ms_date">published 2021-04-02</div>
+  
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2021-04-02-emacs-project-override/index.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
+</div>
+<div class="Artikel" id="content">
+  <p>I recently learnt about the Emacs package <code>project.el</code>, which is used to figure
+out which files and directories belong to the same project. This is <a href="https://github.com/joaotavora/eglot/blob/2fbcab293e11e1502a0128ca5f59de0ea7888a75/eglot.el#L738">used under
+the covers by
+<code>Eglot</code></a>,
+for example.</p>
+
+<p>In practice, a project is recognized by looking for Git repositories, which is a
+decent first approximation that often just works.</p>
+
+<p>But what if the detection fails? For example, maybe you want to anchor your
+project-based commands in a parent directory that contains multiple Git
+repositories.</p>
+
+<p>Luckily, we can provide our own entry to the <code>project-find-functions</code> hook, and
+look for a <code>.project.el</code> file in the parent directories:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elisp" data-lang="elisp"><span style="color:#60a0b0;font-style:italic">;; Returns the parent directory containing a .project.el file, if any,</span>
+<span style="color:#60a0b0;font-style:italic">;; to override the standard project.el detection logic when needed.</span>
+(<span style="color:#007020">defun</span> <span style="color:#bb60d5">zkj-project-override</span> (<span style="color:#bb60d5">dir</span>)
+  (<span style="color:#007020">let</span> ((<span style="color:#bb60d5">override</span> (<span style="color:#bb60d5">locate-dominating-file</span> <span style="color:#bb60d5">dir</span> <span style="color:#4070a0">&#34;.project.el&#34;</span>)))
+    (<span style="color:#007020">if</span> <span style="color:#bb60d5">override</span>
+      (<span style="color:#06287e">cons</span> <span style="color:#517918">&#39;vc</span> <span style="color:#bb60d5">override</span>)
+      <span style="color:#60add5">nil</span>)))
+
+(<span style="color:#007020">use-package</span> <span style="color:#bb60d5">project</span>
+  <span style="color:#60a0b0;font-style:italic">;; Cannot use :hook because &#39;project-find-functions does not end in -hook</span>
+  <span style="color:#60a0b0;font-style:italic">;; Cannot use :init (must use :config) because otherwise</span>
+  <span style="color:#60a0b0;font-style:italic">;; project-find-functions is not yet initialized.</span>
+  <span style="color:#007020">:config</span>
+  (<span style="color:#bb60d5">add-hook</span> <span style="color:#517918">&#39;project-find-functions</span> <span style="color:#06287e">#&#39;</span><span style="color:#bb60d5">zkj-project-override</span>))</code></pre></div>
+<p>Now, we can use <code>touch .project.el</code> in any directory to make <code>project.el</code>
+recognize the directory as project root!</p>
+
+<p>By the way, in case you are unfamiliar, the configuration above uses
+<a href="https://github.com/jwiegley/use-package"><code>use-package</code></a>, which is a great way
+to (lazily, i.e. quickly!) load and configure Emacs packages.</p>
+
+<aside class="admonition note">
+  <div class="note-container">
+    <div class="note-icon">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+    </div>
+    <div class="admonition-content"><strong>Tip:</strong> With <a href="https://www.reddit.com/r/emacs/comments/jt8csn/fzf_from_project_root/">a few lines of
+code</a>,
+you can anchor helpful project-wide tools such as <code>fzf</code> (fuzzy finder) or <code>ag</code>
+(Ack Grep) in the <code>project.el</code> root, too!</div>
+  </div>
+</aside>
+
+
+</div>
+
+      </div>
+
+    </main><div id="ms_footer">
+  © 2020 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

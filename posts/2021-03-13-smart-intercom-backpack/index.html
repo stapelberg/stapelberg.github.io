@@ -165,7 +165,7 @@
       <div><h1 class="ms_title">Make your intercom smarter with an MQTT backpack</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2021-03-13</div>
+  <div id="ms_date">published 2021-03-13, last modified 2021-04-25</div>
   
   
   <div>
@@ -212,6 +212,7 @@
 <li><a href="#in-my-day-to-day">in my day-to-day</a></li>
 </ul></li>
 <li><a href="#conclusion">Conclusion</a></li>
+<li><a href="#appendix-a-troubleshooting">Appendix A: Troubleshooting</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -937,6 +938,34 @@ intercom vendor/unit you have. Be sure to buy your own unit (don’t solder into
 your landlord’s intercom unit!) and test in a separate lab setup first, of
 course!</p>
 
+<h2 id="appendix-a-troubleshooting">Appendix A: Troubleshooting</h2>
+
+<p>To debug the problem of ring detection no longer working, check:</p>
+
+<ul>
+<li>Is the ESP32 still working?
+
+<ul>
+<li><code>ping doorbelltp</code></li>
+<li><code>mosquitto_pub -h dr -t 'doorbell/debug/cmd/ring' -m '3'</code> should signal a
+ring to the Nuki Opener and result in events on the MQTT bus</li>
+</ul></li>
+<li>Is the QT Py still working?
+
+<ul>
+<li>Its power LED should be off. If the LED is on, the QT Py is in the bootloader.</li>
+<li>Unplug and replug the <code>+5V</code> wire to the QT Py, see if that fixes it.</li>
+<li>Connect a USB-to-serial adapter and see if triggering a door open results in SCS bytes on the serial interface.</li>
+<li>See if ringing the bell results in SCS bytes on the serial interface. If no, re-solder cable to <code>SCSRX5V</code>.</li>
+</ul></li>
+</ul>
+
+<p>To debug the problem of door opening no longer working, check:</p>
+
+<ul>
+<li>Does it work when triggering it via the button on the BTicino? If yes, re-solder cable to <code>OPEN5V</code>.</li>
+</ul>
+
 </div>
 
       </div>
@@ -966,6 +995,7 @@ course!</p>
 <li><a href="#in-my-day-to-day">in my day-to-day</a></li>
 </ul></li>
 <li><a href="#conclusion">Conclusion</a></li>
+<li><a href="#appendix-a-troubleshooting">Appendix A: Troubleshooting</a></li>
 </ul></li>
 </ul>
 </nav>

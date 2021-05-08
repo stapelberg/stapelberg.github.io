@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>kinX: keyboard controller with &lt;0.225ms input latency (2018) - Michael Stapelberg</title>
+  <title>kinX: keyboard controller with &lt;0.33ms input latency (2018) - Michael Stapelberg</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" href="/favicon.ico" />
@@ -165,10 +165,10 @@ Background 10 years ago I got a Kinesis Advantage keyboard. I wrote about the ex
 </header>
 <main>
       <div>
-<h1 class="ms_title">kinX: keyboard controller with &lt;0.225ms input latency (2018)</h1>
+<h1 class="ms_title">kinX: keyboard controller with &lt;0.33ms input latency (2018)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2018-04-17, last modified 2020-11-21</div>
+  <div id="ms_date">published 2018-04-17, last modified 2021-05-08</div>
   
   
   <div id="ms_tags">
@@ -322,7 +322,25 @@ and, most importantly, key matrix scanning code.</p>
 
 <p>In my firmware, the Teensy 3.6 runs at 180 MHz (compared to the Teensy++’s 16
 MHz) and scans the keyboard matrix in a busy loop (as opposed to on USB
-poll). Measurements confirmed a matrix scan time of only 100μs (0.1ms).</p>
+poll). Measurements confirmed a matrix scan time of only 208μs (0.2ms).</p>
+
+<aside class="admonition note">
+  <div class="note-container">
+    <div class="note-icon">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+    </div>
+    <div class="admonition-content"><strong>Update:</strong> Previously, I had measured the matrix scan time as 100μs
+(0.1ms). While that is technically correct, in practice, matrix scans take
+longer due to interrupts, so the new 208μs measurement is more realistic.</div>
+  </div>
+</aside>
+
 
 <p>I implemented debouncing the way it is described in <a href="https://summivox.wordpress.com/2016/06/03/keyboard-matrix-scanning-and-debouncing/">Yin Zhong’s “Keyboard
 Matrix Scanning and
@@ -340,7 +358,7 @@ micro frame, which is 1ms long with USB 1.x (Full Speed).</p>
 <p>This leaves us at an input latency within [0ms, 1.1ms]:</p>
 
 <ul>
-<li>≤ 0.1ms scan latency</li>
+<li>≤ 0.2ms scan latency</li>
 <li>0ms debounce latency</li>
 <li>≤ 1ms USB poll latency</li>
 </ul>
@@ -414,10 +432,10 @@ did not see any value in me maintaining a custom USB stack.</p>
 
 <p>The hardware can be found at <a href="https://github.com/kinx-project/mk66f-hw">https://github.com/kinx-project/mk66f-hw</a></p>
 
-<p>Using USB 2.0 High Speed leaves us at an input latency within [0ms, 0.225ms]:</p>
+<p>Using USB 2.0 High Speed leaves us at an input latency within [0ms, 0.33ms]:</p>
 
 <ul>
-<li>≤ 0.1ms scan latency</li>
+<li>≤ 0.2ms scan latency</li>
 <li>0ms debounce latency</li>
 <li>≤ 0.125ms USB poll latency</li>
 </ul>

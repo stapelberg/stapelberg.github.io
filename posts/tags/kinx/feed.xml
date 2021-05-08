@@ -99,7 +99,7 @@ measure Emacs’s processing latency.</p>
 <tbody>
 <tr>
 <td>Matrix scan</td>
-<td>≈ 100 μs</td>
+<td>≈ 208 μs</td>
 </tr>
 
 <tr>
@@ -119,7 +119,7 @@ measure Emacs’s processing latency.</p>
 </tbody>
 </table>
 
-<p><br>This sums up to ≈ 655 μs on average. On top of that, we have output latency
+<p><br>This sums up to ≈ 763 μs on average. On top of that, we have output latency
 within [0, 16ms] due to the 60 Hz refresh rate of our monitors.</p>
 
 <p>Note that using a compositor adds one frame of output latency.</p>
@@ -165,7 +165,7 @@ typing too much.</p>
 <p>When I started looking into input latency, my keyboard had dozens of
 milliseconds of latency. I found an easy win in the old firmware, then hit a
 wall, started the kinX project and eventually ended up with a keyboard with just
-0.225ms input latency.</p>
+0.33ms input latency.</p>
 
 <p>Even if I had not reduced the input latency of my keyboard at all, I feel that
 this project was a valuable learning experience: I now know a lot more about PCB
@@ -345,7 +345,7 @@ draws a conclusion.</p>
 ]]></content>
   </entry>
   <entry>
-    <title type="html"><![CDATA[kinX: keyboard controller with &lt;0.225ms input latency]]></title>
+    <title type="html"><![CDATA[kinX: keyboard controller with &lt;0.33ms input latency]]></title>
     <link href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-keyboard-controller/"/>
     <id>https://michael.stapelberg.ch/posts/2018-04-17-kinx-keyboard-controller/</id>
     <published>2018-04-17T17:49:00+02:00</published>
@@ -455,7 +455,25 @@ and, most importantly, key matrix scanning code.</p>
 
 <p>In my firmware, the Teensy 3.6 runs at 180 MHz (compared to the Teensy++’s 16
 MHz) and scans the keyboard matrix in a busy loop (as opposed to on USB
-poll). Measurements confirmed a matrix scan time of only 100μs (0.1ms).</p>
+poll). Measurements confirmed a matrix scan time of only 208μs (0.2ms).</p>
+
+<aside class="admonition note">
+  <div class="note-container">
+    <div class="note-icon">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+    </div>
+    <div class="admonition-content"><strong>Update:</strong> Previously, I had measured the matrix scan time as 100μs
+(0.1ms). While that is technically correct, in practice, matrix scans take
+longer due to interrupts, so the new 208μs measurement is more realistic.</div>
+  </div>
+</aside>
+
 
 <p>I implemented debouncing the way it is described in <a href="https://summivox.wordpress.com/2016/06/03/keyboard-matrix-scanning-and-debouncing/">Yin Zhong’s “Keyboard
 Matrix Scanning and
@@ -473,7 +491,7 @@ micro frame, which is 1ms long with USB 1.x (Full Speed).</p>
 <p>This leaves us at an input latency within [0ms, 1.1ms]:</p>
 
 <ul>
-<li>≤ 0.1ms scan latency</li>
+<li>≤ 0.2ms scan latency</li>
 <li>0ms debounce latency</li>
 <li>≤ 1ms USB poll latency</li>
 </ul>
@@ -547,10 +565,10 @@ did not see any value in me maintaining a custom USB stack.</p>
 
 <p>The hardware can be found at <a href="https://github.com/kinx-project/mk66f-hw">https://github.com/kinx-project/mk66f-hw</a></p>
 
-<p>Using USB 2.0 High Speed leaves us at an input latency within [0ms, 0.225ms]:</p>
+<p>Using USB 2.0 High Speed leaves us at an input latency within [0ms, 0.33ms]:</p>
 
 <ul>
-<li>≤ 0.1ms scan latency</li>
+<li>≤ 0.2ms scan latency</li>
 <li>0ms debounce latency</li>
 <li>≤ 0.125ms USB poll latency</li>
 </ul>
@@ -587,7 +605,7 @@ controller”</a> describes the first
 controller I built in 2013 (maybe interesting for context).</p></li>
 
 <li><p>The <a href="/posts/2018-04-17-kinx-keyboard-controller/">first post introduces the kinX, a keyboard
-controller</a> with merely 0.2ms of
+controller</a> with merely 0.33ms of
 input latency (including USB).</p></li>
 
 <li><p>The <a href="/posts/2018-04-17-kinx-usb-hub/">second post motivates and describes building a drop-in replacement USB

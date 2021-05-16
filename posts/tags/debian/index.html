@@ -213,32 +213,6 @@ The goal of offering an OpenAPI-based API is to provide developers with automati
     
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2020-05-09-distri-hermetic-packages/"><h3>Hermetic packages (in distri)</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/distri/">distri</a></span>
-	
-	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	<p>
-	  In distri, packages (e.g. emacs) are hermetic. By hermetic, I mean that the dependencies a package uses (e.g. libusb) don’t change, even when newer versions are installed.
-For example, if package libusb-amd64-1.0.22-7 is available at build time, the package will always use that same version, even after the newer libusb-amd64-1.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-05-09-distri-hermetic-packages/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
 	<a href="https://michael.stapelberg.ch/posts/2020-05-16-distri-release/"><h3>a new distri linux (fast package management) release</h3></a>
 	
 	<div class="tags">
@@ -261,6 +235,32 @@ The focus of this release lies on:
  a better developer experience, allowing users to debug any installed package without extra setup steps
  performance improvements in all areas (starting programs, building distri packages, generating distri images)
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-05-16-distri-release/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2020-05-09-distri-hermetic-packages/"><h3>Hermetic packages (in distri)</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/distri/">distri</a></span>
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  In distri, packages (e.g. emacs) are hermetic. By hermetic, I mean that the dependencies a package uses (e.g. libusb) don’t change, even when newer versions are installed.
+For example, if package libusb-amd64-1.0.22-7 is available at build time, the package will always use that same version, even after the newer libusb-amd64-1.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-05-09-distri-hermetic-packages/">Read more →</a></span>
 	</p>
       </div>
     </li>
@@ -335,31 +335,6 @@ The focus of this release lies on:
     
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2019-08-17-linux-package-managers-are-slow/"><h3>Linux package managers are slow</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/distri/">distri</a></span>
-	
-	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	<p>
-	  I measured how long the most popular Linux distribution’s package manager take to install small and large packages.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-08-17-linux-package-managers-are-slow/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
 	<a href="https://michael.stapelberg.ch/posts/2019-08-17-introducing-distri/"><h3>distri: a Linux distribution to research fast package management</h3></a>
 	
 	<div class="tags">
@@ -381,6 +356,31 @@ The focus of this release lies on:
 	<p>
 	  Over the last year or so I have worked on a research linux distribution in my spare time. It’s not a distribution for researchers (like Scientific Linux), but my personal playground project to research linux distribution development, i.e. try out fresh ideas.
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-08-17-introducing-distri/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2019-08-17-linux-package-managers-are-slow/"><h3>Linux package managers are slow</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/distri/">distri</a></span>
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I measured how long the most popular Linux distribution’s package manager take to install small and large packages.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-08-17-linux-package-managers-are-slow/">Read more →</a></span>
 	</p>
       </div>
     </li>
@@ -478,29 +478,6 @@ The focus of this release lies on:
     
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2019-02-05-turbopfor-analysis/"><h3>TurboPFor: an analysis</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	<p>
-	  Motivation I have recently been looking into speeding up Debian Code Search. As a quick reminder, search engines answer queries by consulting an inverted index: a map from term to documents containing that term (called a “posting list”). See the Debian Code Search Bachelor Thesis (PDF) for a lot more details.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-02-05-turbopfor-analysis/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
 	<a href="https://michael.stapelberg.ch/posts/2019-02-15-debian-debugging-devex/"><h3>Debugging experience in Debian</h3></a>
 	
 	<div class="tags">
@@ -519,6 +496,29 @@ The focus of this release lies on:
 	  Recently, a user reported that they don’t see window titles in i3 when running i3 on a Raspberry Pi with Debian.
 I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and was able to reproduce the issue.
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-02-15-debian-debugging-devex/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2019-02-05-turbopfor-analysis/"><h3>TurboPFor: an analysis</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Motivation I have recently been looking into speeding up Debian Code Search. As a quick reminder, search engines answer queries by consulting an inverted index: a map from term to documents containing that term (called a “posting list”). See the Debian Code Search Bachelor Thesis (PDF) for a lot more details.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-02-05-turbopfor-analysis/">Read more →</a></span>
 	</p>
       </div>
     </li>
@@ -558,29 +558,6 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
     
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2018-03-10-dput-usability/"><h3>dput usability changes</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	<p>
-	  dput-ng ≥ 1.16 contains two usability changes which make uploading easier:   When no arguments are specified, dput-ng auto-selects the most recent .changes file (with confirmation).   Instead of erroring out when detecting an unsigned .changes file, debsign(1) is invoked to sign the .
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-03-10-dput-usability/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
 	<a href="https://michael.stapelberg.ch/posts/2018-03-19-sbuild-debian-developer-setup/"><h3>sbuild-debian-developer-setup(1)</h3></a>
 	
 	<div class="tags">
@@ -602,14 +579,9 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
       </div>
     </li>
     
-  </ul>
-  
-  <h2>2018-Jan</h2>
-  <ul class="ArticleList">
-    
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2018-01-08-raspberry-pi-3/"><h3>Debian buster on the Raspberry Pi 3 (update)</h3></a>
+	<a href="https://michael.stapelberg.ch/posts/2018-03-10-dput-usability/"><h3>dput usability changes</h3></a>
 	
 	<div class="tags">
 	  Tags:
@@ -624,11 +596,16 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  I previously wrote about my Debian buster preview image for the Raspberry Pi 3.  Now, I’m publishing an updated version, containing the following changes:   WiFi works out of the box. Use e.g. ip link set dev wlan0 up, and iwlist wlan0 scan.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-01-08-raspberry-pi-3/">Read more →</a></span>
+	  dput-ng ≥ 1.16 contains two usability changes which make uploading easier:   When no arguments are specified, dput-ng auto-selects the most recent .changes file (with confirmation).   Instead of erroring out when detecting an unsigned .changes file, debsign(1) is invoked to sign the .
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-03-10-dput-usability/">Read more →</a></span>
 	</p>
       </div>
     </li>
+    
+  </ul>
+  
+  <h2>2018-Jan</h2>
+  <ul class="ArticleList">
     
     <li>
       <div>
@@ -653,14 +630,9 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
       </div>
     </li>
     
-  </ul>
-  
-  <h2>2017-Oct</h2>
-  <ul class="ArticleList">
-    
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2017-10-08-raspberry-pi-3/"><h3>Debian stretch on the Raspberry Pi 3 (update)</h3></a>
+	<a href="https://michael.stapelberg.ch/posts/2018-01-08-raspberry-pi-3/"><h3>Debian buster on the Raspberry Pi 3 (update)</h3></a>
 	
 	<div class="tags">
 	  Tags:
@@ -675,8 +647,38 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  I previously wrote about my Debian stretch preview image for the Raspberry Pi 3.  Now, I’m publishing an updated version, containing the following changes:   SSH host keys are generated on first boot.   Old kernel versions are now removed from /boot/firmware when purged.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-10-08-raspberry-pi-3/">Read more →</a></span>
+	  I previously wrote about my Debian buster preview image for the Raspberry Pi 3.  Now, I’m publishing an updated version, containing the following changes:   WiFi works out of the box. Use e.g. ip link set dev wlan0 up, and iwlist wlan0 scan.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-01-08-raspberry-pi-3/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+  
+  <h2>2017-Oct</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2017-10-22-pkg-go-upstreams/"><h3>Which VCS do Debian’s Go package upstreams use?</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	<span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  In the pkg-go team, we are currently discussing which workflows we should standardize on.  One of the considerations is what goes into the “upstream” Git branch of our repositories: should it track the upstream Git repository, or should it contain orig tarball imports?
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-10-22-pkg-go-upstreams/">Read more →</a></span>
 	</p>
       </div>
     </li>
@@ -706,14 +708,12 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
     
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2017-10-22-pkg-go-upstreams/"><h3>Which VCS do Debian’s Go package upstreams use?</h3></a>
+	<a href="https://michael.stapelberg.ch/posts/2017-10-08-raspberry-pi-3/"><h3>Debian stretch on the Raspberry Pi 3 (update)</h3></a>
 	
 	<div class="tags">
 	  Tags:
 	
 	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
-	
-	<span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
 	
 	</div>
 	
@@ -723,8 +723,8 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  In the pkg-go team, we are currently discussing which workflows we should standardize on.  One of the considerations is what goes into the “upstream” Git branch of our repositories: should it track the upstream Git repository, or should it contain orig tarball imports?
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-10-22-pkg-go-upstreams/">Read more →</a></span>
+	  I previously wrote about my Debian stretch preview image for the Raspberry Pi 3.  Now, I’m publishing an updated version, containing the following changes:   SSH host keys are generated on first boot.   Old kernel versions are now removed from /boot/firmware when purged.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-10-08-raspberry-pi-3/">Read more →</a></span>
 	</p>
       </div>
     </li>
@@ -820,29 +820,6 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
     
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2016-11-24-raspberry-pi-3/"><h3>Debian stretch on the Raspberry Pi 3</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	<p>
-	  The last couple of days, I worked on getting Debian to run on the Raspberry Pi 3.  Thanks to the work of many talented people, the Linux kernel in version 4.8 is _almost_ ready to run on the Raspberry Pi 3.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-11-24-raspberry-pi-3/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
 	<a href="https://michael.stapelberg.ch/posts/2016-11-25-build-tools/"><h3>Debian package build tools</h3></a>
 	
 	<div class="tags">
@@ -860,6 +837,29 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	<p>
 	  Personally, I find the packaging tools which are available in Debian far too complex. To better understand the options we have, I created a diagram of tools which are frequently used, only covering the build step (i.e. no post-build quality assurance checks or packaging-time helpers):   When I was first introduced to Debian packaging, people recommended I use pbuilder.
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-11-25-build-tools/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2016-11-24-raspberry-pi-3/"><h3>Debian stretch on the Raspberry Pi 3</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  The last couple of days, I worked on getting Debian to run on the Raspberry Pi 3.  Thanks to the work of many talented people, the Linux kernel in version 4.8 is _almost_ ready to run on the Raspberry Pi 3.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-11-24-raspberry-pi-3/">Read more →</a></span>
 	</p>
       </div>
     </li>
@@ -986,29 +986,6 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
     
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2014-12-03-debian-code-search-instant/"><h3>Announcing the new Debian Code Search Instant</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	<p>
-	  For the last few months, I have been working on a new version of Debian Code Search, and today it’s going live! I call it Debian Code Search Instant, for multiple reasons, see below. A lot faster  The new Debian Code Search is still hosted by Rackspace (thank you!
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-12-03-debian-code-search-instant/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
 	<a href="https://michael.stapelberg.ch/posts/2014-12-23-code-search-taming-the-latency-tail/"><h3>Debian Code Search: taming the latency tail</h3></a>
 	
 	<div class="tags">
@@ -1026,6 +1003,29 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	<p>
 	  It’s been a couple of weeks since I’ve launched Debian Code Search Instant, so people have had the chance to use it for a while and that gives me plenty of data points to look at :-). For every query, I log the search term itself as well as the duration the query took to execute.
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-12-23-code-search-taming-the-latency-tail/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2014-12-03-debian-code-search-instant/"><h3>Announcing the new Debian Code Search Instant</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  For the last few months, I have been working on a new version of Debian Code Search, and today it’s going live! I call it Debian Code Search Instant, for multiple reasons, see below. A lot faster  The new Debian Code Search is still hosted by Rackspace (thank you!
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-12-03-debian-code-search-instant/">Read more →</a></span>
 	</p>
       </div>
     </li>
@@ -1149,29 +1149,6 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
     
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2013-11-07-debian-meetup/"><h3>First Debian meetup in Zürich</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	<p>
-	  Thanks to Axel Beckert (abe@), 12 people interested in Debian met last Tuesday in Zürich and celebrated the start of our monthly Debian meetup.  New faces are always very welcome. If you live in Zürich, or if you’re visiting, please feel free to attend our meetup — no registration necessary.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-11-07-debian-meetup/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
 	<a href="https://michael.stapelberg.ch/posts/2013-11-27-pdiffs/"><h3>let’s disable pdiffs already!</h3></a>
 	
 	<div class="tags">
@@ -1193,14 +1170,9 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
       </div>
     </li>
     
-  </ul>
-  
-  <h2>2013-Aug</h2>
-  <ul class="ArticleList">
-    
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2013-08-08-debconf/"><h3>Going to DebConf</h3></a>
+	<a href="https://michael.stapelberg.ch/posts/2013-11-07-debian-meetup/"><h3>First Debian meetup in Zürich</h3></a>
 	
 	<div class="tags">
 	  Tags:
@@ -1215,8 +1187,36 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  I will arrive at DebConf 2013 on Sunday afternoon. In case you are interested in Go (the programming language), systemd, i3 or getting your package reviewed, please talk to me! :-)  Looking forward to meeting many of you in real life.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-08-08-debconf/">Read more →</a></span>
+	  Thanks to Axel Beckert (abe@), 12 people interested in Debian met last Tuesday in Zürich and celebrated the start of our monthly Debian meetup.  New faces are always very welcome. If you live in Zürich, or if you’re visiting, please feel free to attend our meetup — no registration necessary.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-11-07-debian-meetup/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+  
+  <h2>2013-Aug</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-08-30-git-performance/"><h3>How git performs when you throw all of Debian at it</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  During DebConf, Asheesh presented the idea of using git instead of the file system for storing the contents of Debian Code Search. The hope was that it would lead to fewer disk seeks and less data due to gits delta-encoding.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-08-30-git-performance/">Read more →</a></span>
 	</p>
       </div>
     </li>
@@ -1246,7 +1246,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
     
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2013-08-30-git-performance/"><h3>How git performs when you throw all of Debian at it</h3></a>
+	<a href="https://michael.stapelberg.ch/posts/2013-08-08-debconf/"><h3>Going to DebConf</h3></a>
 	
 	<div class="tags">
 	  Tags:
@@ -1261,8 +1261,8 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  During DebConf, Asheesh presented the idea of using git instead of the file system for storing the contents of Debian Code Search. The hope was that it would lead to fewer disk seeks and less data due to gits delta-encoding.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-08-30-git-performance/">Read more →</a></span>
+	  I will arrive at DebConf 2013 on Sunday afternoon. In case you are interested in Go (the programming language), systemd, i3 or getting your package reviewed, please talk to me! :-)  Looking forward to meeting many of you in real life.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-08-08-debconf/">Read more →</a></span>
 	</p>
       </div>
     </li>
@@ -1274,7 +1274,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
     
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2013-07-01-systemd-transition/"><h3>Survey answers part 2: the transition</h3></a>
+	<a href="https://michael.stapelberg.ch/posts/2013-07-31-dh-golang/"><h3>dh-golang in unstable</h3></a>
 	
 	<div class="tags">
 	  Tags:
@@ -1289,100 +1289,8 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  This blog post is the second of a series of posts dealing with the results of the Debian systemd survey. I intend to give a presentation at DebConf 2013, too, so you could either read my posts, or watch the talk, or both :-).
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-01-systemd-transition/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2013-07-13-systemd-not-portable/"><h3>Survey answers part 3: systemd is not portable and what this means for our ports</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	<p>
-	  This blog post is the third of a series of posts dealing with the results of the Debian systemd survey. I intend to give a presentation at DebConf 2013, too, so you could either read my posts, or watch the talk, or both :-).
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-13-systemd-not-portable/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2013-07-14-searchable-packages/"><h3>How many packages does Debian Code Search contain?</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	<p>
-	  The German computer magazine c't has covered Debsources in its most recent edition (c't 16/2013). In that article, they also state:  Debsources integriert auch eine Code-Suche, allerdings werden lediglich die Quellen des Unstable-Zweigs durchsucht, der zirka ein Drittel des Quellcodes von Debsources ausmacht.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-14-searchable-packages/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2013-07-14-systemd-how-to-help/"><h3>Systemd support in Debian packages: how to help</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	<p>
-	  Sometimes, people show up in our IRC channel #debian-systemd or on our mailing list pkg-systemd-maintainers@lists.alioth.debian.org and ask how they can help. This blog post answers that question.  First of all, whatever you end up doing, please coordinate with us first!
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-14-systemd-how-to-help/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2013-07-20-systemd-204-in-experimental/"><h3>systemd 204 in Debian experimental</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	<p>
-	  As of today, systemd 204 is available in Debian experimental. If you are interested in systemd, please install it and report any issues to the BTS — merely reporting them on IRC is not sufficient, we need to have them in the BTS so we don’t forget about them.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-20-systemd-204-in-experimental/">Read more →</a></span>
+	  Good news, everyone! dh-golang is now in Debian unstable. With this debhelper addon, packaging software written in Go is very simple.  Have a look at the example/ directory in dh-golang to see how it is meant to be used.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-31-dh-golang/">Read more →</a></span>
 	</p>
       </div>
     </li>
@@ -1412,7 +1320,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
     
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2013-07-31-dh-golang/"><h3>dh-golang in unstable</h3></a>
+	<a href="https://michael.stapelberg.ch/posts/2013-07-20-systemd-204-in-experimental/"><h3>systemd 204 in Debian experimental</h3></a>
 	
 	<div class="tags">
 	  Tags:
@@ -1427,8 +1335,100 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  Good news, everyone! dh-golang is now in Debian unstable. With this debhelper addon, packaging software written in Go is very simple.  Have a look at the example/ directory in dh-golang to see how it is meant to be used.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-31-dh-golang/">Read more →</a></span>
+	  As of today, systemd 204 is available in Debian experimental. If you are interested in systemd, please install it and report any issues to the BTS — merely reporting them on IRC is not sufficient, we need to have them in the BTS so we don’t forget about them.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-20-systemd-204-in-experimental/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-07-14-systemd-how-to-help/"><h3>Systemd support in Debian packages: how to help</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Sometimes, people show up in our IRC channel #debian-systemd or on our mailing list pkg-systemd-maintainers@lists.alioth.debian.org and ask how they can help. This blog post answers that question.  First of all, whatever you end up doing, please coordinate with us first!
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-14-systemd-how-to-help/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-07-14-searchable-packages/"><h3>How many packages does Debian Code Search contain?</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  The German computer magazine c't has covered Debsources in its most recent edition (c't 16/2013). In that article, they also state:  Debsources integriert auch eine Code-Suche, allerdings werden lediglich die Quellen des Unstable-Zweigs durchsucht, der zirka ein Drittel des Quellcodes von Debsources ausmacht.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-14-searchable-packages/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-07-13-systemd-not-portable/"><h3>Survey answers part 3: systemd is not portable and what this means for our ports</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  This blog post is the third of a series of posts dealing with the results of the Debian systemd survey. I intend to give a presentation at DebConf 2013, too, so you could either read my posts, or watch the talk, or both :-).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-13-systemd-not-portable/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-07-01-systemd-transition/"><h3>Survey answers part 2: the transition</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  This blog post is the second of a series of posts dealing with the results of the Debian systemd survey. I intend to give a presentation at DebConf 2013, too, so you could either read my posts, or watch the talk, or both :-).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-01-systemd-transition/">Read more →</a></span>
 	</p>
       </div>
     </li>
@@ -1440,7 +1440,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
     
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2013-06-08-uploading-via-sftp/"><h3>Uploading packages via SFTP</h3></a>
+	<a href="https://michael.stapelberg.ch/posts/2013-06-17-debian-code-search-talk/"><h3>Talk about Debian Code Search</h3></a>
 	
 	<div class="tags">
 	  Tags:
@@ -1455,8 +1455,8 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  Yesterday I uploaded a big package and got multiple timeouts. I then figured out that DDs can also upload using SFTP (i.e. SSH’s file transfer thingie) instead of traditional FTP, which seems like a more modern alternative. So let’s give that a try.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-06-08-uploading-via-sftp/">Read more →</a></span>
+	  At this year’s GPN13 I gave a talk about Debian Code Search. It was in German, so I spent a few hours creating english subtitles.  You can watch the video at youtube.com/watch?v=n6DtW3zCTvk with english subtitles.  In case you prefer to download the file(s), get http://ftp.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-06-17-debian-code-search-talk/">Read more →</a></span>
 	</p>
       </div>
     </li>
@@ -1486,7 +1486,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
     
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2013-06-17-debian-code-search-talk/"><h3>Talk about Debian Code Search</h3></a>
+	<a href="https://michael.stapelberg.ch/posts/2013-06-08-uploading-via-sftp/"><h3>Uploading packages via SFTP</h3></a>
 	
 	<div class="tags">
 	  Tags:
@@ -1501,8 +1501,8 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  At this year’s GPN13 I gave a talk about Debian Code Search. It was in German, so I spent a few hours creating english subtitles.  You can watch the video at youtube.com/watch?v=n6DtW3zCTvk with english subtitles.  In case you prefer to download the file(s), get http://ftp.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-06-17-debian-code-search-talk/">Read more →</a></span>
+	  Yesterday I uploaded a big package and got multiple timeouts. I then figured out that DDs can also upload using SFTP (i.e. SSH’s file transfer thingie) instead of traditional FTP, which seems like a more modern alternative. So let’s give that a try.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-06-08-uploading-via-sftp/">Read more →</a></span>
 	</p>
       </div>
     </li>
@@ -1514,7 +1514,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
     
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2013-05-20-systemd-survey/"><h3>Debian systemd survey</h3></a>
+	<a href="https://michael.stapelberg.ch/posts/2013-05-27-systemd-survey-results/"><h3>Results of the Debian systemd survey</h3></a>
 	
 	<div class="tags">
 	  Tags:
@@ -1529,8 +1529,8 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  In the past, we have had multiple heated discussions involving systemd. We (the pkg-systemd-maintainers team) would like to better understand why some people dislike systemd.  Therefore, we have created a survey, which you can find at http://survey.zekjur.net/index.php/391182  Please only submit your feedback to the survey and not this thread, we are not particularly interested in yet another systemd discussion at this point.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-05-20-systemd-survey/">Read more →</a></span>
+	  A week ago, we started the Debian systemd survey. The goal was to figure out a few trends and answer the following two questions:   Do our subjective impressions from the discussions on debian-devel reflect the general sentiment about systemd?
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-05-27-systemd-survey-results/">Read more →</a></span>
 	</p>
       </div>
     </li>
@@ -1560,7 +1560,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
     
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2013-05-27-systemd-survey-results/"><h3>Results of the Debian systemd survey</h3></a>
+	<a href="https://michael.stapelberg.ch/posts/2013-05-20-systemd-survey/"><h3>Debian systemd survey</h3></a>
 	
 	<div class="tags">
 	  Tags:
@@ -1575,8 +1575,8 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  A week ago, we started the Debian systemd survey. The goal was to figure out a few trends and answer the following two questions:   Do our subjective impressions from the discussions on debian-devel reflect the general sentiment about systemd?
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-05-27-systemd-survey-results/">Read more →</a></span>
+	  In the past, we have had multiple heated discussions involving systemd. We (the pkg-systemd-maintainers team) would like to better understand why some people dislike systemd.  Therefore, we have created a survey, which you can find at http://survey.zekjur.net/index.php/391182  Please only submit your feedback to the survey and not this thread, we are not particularly interested in yet another systemd discussion at this point.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-05-20-systemd-survey/">Read more →</a></span>
 	</p>
       </div>
     </li>
@@ -1585,29 +1585,6 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
   
   <h2>2013-Mar</h2>
   <ul class="ArticleList">
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2013-03-08-bts-notmuch-reply/"><h3>Replying to Debian BTS messages in notmuch</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	<p>
-	  Previously, my workflow regarding replying to bugreports outside my own packages was very uncomfortable: I first downloaded the mbox archive from the BTS, then imported that in claws-mail, hit reply all, remove submit@, add bugnumber@, then send the email.  Therefore, I decided to hack up a little elisp function to automate this process for notmuch.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-03-08-bts-notmuch-reply/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
     
     <li>
       <div>
@@ -1632,14 +1609,9 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
       </div>
     </li>
     
-  </ul>
-  
-  <h2>2013-Feb</h2>
-  <ul class="ArticleList">
-    
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2013-02-06-rc-bugs/"><h3>RC bugs</h3></a>
+	<a href="https://michael.stapelberg.ch/posts/2013-03-08-bts-notmuch-reply/"><h3>Replying to Debian BTS messages in notmuch</h3></a>
 	
 	<div class="tags">
 	  Tags:
@@ -1654,12 +1626,16 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  I recently worked on the following RC bugs:   #696187 — squid-cgi: CVE-2012-5643: cachemgr.cgi denial of service
-NMUed the upstream patches after nearly 2 months of no maintainer reaction on the bugreport.   #684645 — sendmail-bin: Order of fcntl and dotlock in maillock
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-02-06-rc-bugs/">Read more →</a></span>
+	  Previously, my workflow regarding replying to bugreports outside my own packages was very uncomfortable: I first downloaded the mbox archive from the BTS, then imported that in claws-mail, hit reply all, remove submit@, add bugnumber@, then send the email.  Therefore, I decided to hack up a little elisp function to automate this process for notmuch.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-03-08-bts-notmuch-reply/">Read more →</a></span>
 	</p>
       </div>
     </li>
+    
+  </ul>
+  
+  <h2>2013-Feb</h2>
+  <ul class="ArticleList">
     
     <li>
       <div>
@@ -1681,6 +1657,30 @@ NMUed the upstream patches after nearly 2 months of no maintainer reaction on th
 	  I recently worked on the following RC bugs:   #696532 — isdnlog: /etc/isdn/isdnlog.isdnctrl0 is easily destroyed in squeeze to wheezy upgrade
 Pinged the maintainer about uploading a fix to unstable, too (was only fixed in experimental).   #693208 — clang: unable to link trivial test program on armhf
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-02-06-rc-bugs-2/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-02-06-rc-bugs/"><h3>RC bugs</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I recently worked on the following RC bugs:   #696187 — squid-cgi: CVE-2012-5643: cachemgr.cgi denial of service
+NMUed the upstream patches after nearly 2 months of no maintainer reaction on the bugreport.   #684645 — sendmail-bin: Order of fcntl and dotlock in maillock
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-02-06-rc-bugs/">Read more →</a></span>
 	</p>
       </div>
     </li>
@@ -1720,7 +1720,7 @@ Pinged the maintainer about uploading a fix to unstable, too (was only fixed in 
     
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2012-12-01-kscd-rc/"><h3>rc bug #694670: kscd does not play any CD</h3></a>
+	<a href="https://michael.stapelberg.ch/posts/2012-12-05-rc-bugs/"><h3>RC bugs</h3></a>
 	
 	<div class="tags">
 	  Tags:
@@ -1735,57 +1735,10 @@ Pinged the maintainer about uploading a fix to unstable, too (was only fixed in 
 	
 	
 	<p>
-	  Dear Lazyweb,  I recently investigated #694670 - kscd does not play any CD — essentially, at least on my machine, phonon-based applications such as kscd won’t play Audio CDs when your CD drive is not called /dev/cdrom, but e.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-12-01-kscd-rc/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2012-12-03-rc-bugs/"><h3>RC bugs</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	<p>
-	  I recently worked on the following RC bugs:   #694892 — tvtime: package installation creates /root/.tvtime
-Sent a patch which fixes the issue. Needs a second pair of eyes plus possibly an NMU.   #684604 — eclipse-rcp: eclipse 3.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-12-03-rc-bugs/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2012-12-04-rc-bugs/"><h3>RC bugs</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	<p>
-	  I recently worked on the following RC bugs:   #694976 — sigit: doesn't work on amd64
-Filed a removal request.   #694796 — kscd: crash with no optical drive
-Downgraded severity, it’s not RC.   #672926 — oidentd: Missing dependency on net-tools
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-12-04-rc-bugs/">Read more →</a></span>
+	  I recently worked on the following RC bugs:   #669513 — gnat-4.4: FTBFS: unsatisfiable build-dependency
+Closed, no longer reproducible with the version in testing.   #694810 — plib: CVE-2012-4552
+Uploaded an NMU to unstable.   #684130 — digikam: crash when starts
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-12-05-rc-bugs/">Read more →</a></span>
 	</p>
       </div>
     </li>
@@ -1817,7 +1770,7 @@ Provided a patch, asked for instructions from the security team.
     
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2012-12-05-rc-bugs/"><h3>RC bugs</h3></a>
+	<a href="https://michael.stapelberg.ch/posts/2012-12-04-rc-bugs/"><h3>RC bugs</h3></a>
 	
 	<div class="tags">
 	  Tags:
@@ -1832,10 +1785,57 @@ Provided a patch, asked for instructions from the security team.
 	
 	
 	<p>
-	  I recently worked on the following RC bugs:   #669513 — gnat-4.4: FTBFS: unsatisfiable build-dependency
-Closed, no longer reproducible with the version in testing.   #694810 — plib: CVE-2012-4552
-Uploaded an NMU to unstable.   #684130 — digikam: crash when starts
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-12-05-rc-bugs/">Read more →</a></span>
+	  I recently worked on the following RC bugs:   #694976 — sigit: doesn't work on amd64
+Filed a removal request.   #694796 — kscd: crash with no optical drive
+Downgraded severity, it’s not RC.   #672926 — oidentd: Missing dependency on net-tools
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-12-04-rc-bugs/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-12-03-rc-bugs/"><h3>RC bugs</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I recently worked on the following RC bugs:   #694892 — tvtime: package installation creates /root/.tvtime
+Sent a patch which fixes the issue. Needs a second pair of eyes plus possibly an NMU.   #684604 — eclipse-rcp: eclipse 3.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-12-03-rc-bugs/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-12-01-kscd-rc/"><h3>rc bug #694670: kscd does not play any CD</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Dear Lazyweb,  I recently investigated #694670 - kscd does not play any CD — essentially, at least on my machine, phonon-based applications such as kscd won’t play Audio CDs when your CD drive is not called /dev/cdrom, but e.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-12-01-kscd-rc/">Read more →</a></span>
 	</p>
       </div>
     </li>
@@ -1844,6 +1844,30 @@ Uploaded an NMU to unstable.   #684130 — digikam: crash when starts
   
   <h2>2012-Nov</h2>
   <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-11-25-rc-bugs/"><h3>RC bugs</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I recently worked on the following RC bugs:   #677861 — lftp: FTBFS[kfreebsd-i386]: error: conflicting declaration 'typedef __int32_t gl_intptr_t'
+I provided some analysis. By rebuilding lftp’s configure script with recent autotools, this should be fixed.   #676229 — gnustep-make: should depend on a chosen version of gobjc, not just "
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-11-25-rc-bugs/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
     
     <li>
       <div>
@@ -1870,30 +1894,6 @@ FLOSS source code (including Debian packaging) with regular expressions.
       </div>
     </li>
     
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2012-11-25-rc-bugs/"><h3>RC bugs</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	<p>
-	  I recently worked on the following RC bugs:   #677861 — lftp: FTBFS[kfreebsd-i386]: error: conflicting declaration 'typedef __int32_t gl_intptr_t'
-I provided some analysis. By rebuilding lftp’s configure script with recent autotools, this should be fixed.   #676229 — gnustep-make: should depend on a chosen version of gobjc, not just "
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-11-25-rc-bugs/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
   </ul>
   
   <h2>2012-Oct</h2>
@@ -1901,7 +1901,7 @@ I provided some analysis. By rebuilding lftp’s configure script with recent au
     
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2012-10-02-hello/"><h3>Hello Planet Debian</h3></a>
+	<a href="https://michael.stapelberg.ch/posts/2012-10-27-rc-bugs/"><h3>RC bugs</h3></a>
 	
 	<div class="tags">
 	  Tags:
@@ -1916,8 +1916,32 @@ I provided some analysis. By rebuilding lftp’s configure script with recent au
 	
 	
 	<p>
-	   Hello Planet Debian. This post serves as a confirmation that my feed/blog setup is working.  I am a DD since a few months and will blog occasionally about my Debian activities. 
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-10-02-hello/">Read more →</a></span>
+	  I recently worked on the following RC bugs:   #691125 — ejabberd: package installation creates /root/.erlang.cookie
+I tracked down the cause of this and provided a patch. Now I also know how piuparts works in detail :-).   #691180 — connman: Connman won't run due to missing libxtables.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-10-27-rc-bugs/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-10-26-systemd-44-5/"><h3>systemd 44-5 available</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  mbiebl has recently uploaded systemd 44-5 to Debian unstable. If you are already using systemd, you should definitely upgrade to this version, it fixes a lot of little annoyances. This is especially important if you are using libvirt &gt;= 0.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-10-26-systemd-44-5/">Read more →</a></span>
 	</p>
       </div>
     </li>
@@ -1948,7 +1972,7 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
     
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2012-10-26-systemd-44-5/"><h3>systemd 44-5 available</h3></a>
+	<a href="https://michael.stapelberg.ch/posts/2012-10-02-hello/"><h3>Hello Planet Debian</h3></a>
 	
 	<div class="tags">
 	  Tags:
@@ -1963,32 +1987,8 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
 	
 	
 	<p>
-	  mbiebl has recently uploaded systemd 44-5 to Debian unstable. If you are already using systemd, you should definitely upgrade to this version, it fixes a lot of little annoyances. This is especially important if you are using libvirt &gt;= 0.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-10-26-systemd-44-5/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2012-10-27-rc-bugs/"><h3>RC bugs</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	<p>
-	  I recently worked on the following RC bugs:   #691125 — ejabberd: package installation creates /root/.erlang.cookie
-I tracked down the cause of this and provided a patch. Now I also know how piuparts works in detail :-).   #691180 — connman: Connman won't run due to missing libxtables.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-10-27-rc-bugs/">Read more →</a></span>
+	   Hello Planet Debian. This post serves as a confirmation that my feed/blog setup is working.  I am a DD since a few months and will blog occasionally about my Debian activities. 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-10-02-hello/">Read more →</a></span>
 	</p>
       </div>
     </li>

@@ -1,0 +1,1506 @@
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Michael Stapelbergs Website: posts tagged fiber</title>
+  <link href="https://michael.stapelberg.ch/posts/tags/fiber/feed.xml" rel="self"/>
+  <link href="https://michael.stapelberg.ch/posts/tags/fiber/"/>
+
+
+  <id>https://michael.stapelberg.ch/posts/tags/fiber/</id>
+  <generator>Hugo -- gohugo.io</generator>
+  <entry>
+    <title type="html"><![CDATA[Home network 10 Gbit/s upgrade]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/"/>
+    <id>https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/</id>
+    <published>2021-05-16T17:33:16+02:00</published>
+    <content type="html"><![CDATA[
+
+<p>After <a href="/posts/2020-08-09-fiber-link-home-network/">adding a fiber link to my home
+network</a>, I am upgrading that link
+from 1 Gbit/s to 10 Gbit/s.</p>
+
+<p>As a reminder, conceptually the fiber link is built using two media converters
+from/to ethernet:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-08-04-media-converters.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-08-04-media-converters_hu863a0a53ff58eb79e087ca8992fd5d37_416326_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-08-04-media-converters_hu863a0a53ff58eb79e087ca8992fd5d37_416326_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-08-04-media-converters_hu863a0a53ff58eb79e087ca8992fd5d37_416326_600x0_resize_q75_box.jpg"
+  alt="0.9mm thin fiber cables" title="0.9mm thin fiber cables"
+  width="600"
+  height="217"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>Schematically, this is what’s connected to both ends:</p>
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2021-05-15-bottleneck-1g.svg"><img
+  src="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2021-05-15-bottleneck-1g.svg"
+  alt="1 Gbit/s bottleneck" title="1 Gbit/s bottleneck"
+  style="border: 1px solid #000; margin-right: 1rem"
+  
+  loading="lazy"></a>
+
+
+
+<p>All links are 1 Gbit/s, so it’s easy to see that, for example, transfers between
+chuchi↔router7 and storage2↔midna cannot both use 1 Gbit/s at the same time.</p>
+
+<p>This upgrade serves 2 purposes:</p>
+
+<ol>
+<li><p><strong>Raise the floor to 1 Gbit/s end-to-end</strong>: Ensure that serving large files
+(e.g. distri Linux images and packages) does no longer impact, and is no
+longer impacted by, other bandwidth flows that also use this transfer link in
+my home network, e.g. daily backups.</p></li>
+
+<li><p><strong>Raise the ceiling to 10 Gbit/s</strong>: Make it possible to selectively upgrade
+Linux PCs on either end of the link to 10 Gbit/s peak bandwidth.</p></li>
+</ol>
+
+<p>Note that the internet uplink remains untouched at 1 Gbit/s — only transfers
+within the home network can happen at 10 Gbit/s.</p>
+
+<h2 id="replacing-the-media-converters-with-mikrotik-switches">Replacing the media converters with Mikrotik switches</h2>
+
+<p>We first replace both media converters and switches with a <a href="https://mikrotik.com/product/crs305_1g_4s_in">Mikrotik
+CRS305-1G-4S+IN</a>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-07-30-mikrotiks-featured.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-07-30-mikrotiks-featured_hu0957e5d484a34f5f279de33468b78758_1267758_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-07-30-mikrotiks-featured_hu0957e5d484a34f5f279de33468b78758_1267758_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-07-30-mikrotiks-featured_hu0957e5d484a34f5f279de33468b78758_1267758_600x0_resize_q75_box.jpg"
+  alt="Mikrotik CRS305-1G-4S&#43;IN" title="Mikrotik CRS305-1G-4S&#43;IN"
+  width="600"
+  height="411"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>This device <a href="https://www.digitec.ch/de/s1/product/mikrotik-crs305-1g-4sin-5ports-switch-9876046">costs 149 CHF on digitec</a> and comes with 5 ports:</p>
+
+<ul>
+<li>1 × RJ45 Ethernet port for management, can be used as a regular 1 Gbit/s port.</li>
+<li>4 × SFP+ ports</li>
+</ul>
+
+<p>Each SFP+ port can be used with either an RJ-45 Ethernet or a fiber SFP+
+module.</p>
+
+<h2 id="fiber-module-upgrade">Fiber module upgrade</h2>
+
+<p>I’m using 10 Gbit/s fiber SFP+ modules for the fiber link between my kitchen and
+living room.</p>
+
+<p>To make use of the 10 Gbit/s link between the switches, all devices that should
+get their guaranteed 1 Gbit/s end-to-end connection need to be connected
+directly to a Mikrotik switch.</p>
+
+<p>I’m connecting all PCs to the switch with RJ45 SFP+ modules for two reasons:</p>
+
+<ol>
+<li>My <a href="https://www.digitec.ch/de/s1/product/intel-x550-t2-pci-express-30-netzwerkadapter-5926807">Intel
+X550-T2</a>
+PCIe 10 Gbit/s network cards use RJ45.</li>
+<li>The SFP+ modules are backwards-compatible and can be used with 1 Gbit/s RJ45
+devices, too, which makes for a nice incremental upgrade path.</li>
+</ol>
+
+<p>The resulting list of SFP modules used in the two Mikrotik switches looks like
+so:</p>
+
+<table>
+<thead>
+<tr>
+<th>Mikrotik 1 SFP</th>
+<th>speed</th>
+<th></th>
+<th>speed</th>
+<th>Mikrotik 2 SFP</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>chuchi</td>
+<td>10 Gbit/s</td>
+<td></td>
+<td>10 Gbit/s</td>
+<td>midna</td>
+</tr>
+
+<tr>
+<td>storage2</td>
+<td>1 Gbit/s</td>
+<td></td>
+<td>1 Gbit/s</td>
+<td>router7</td>
+</tr>
+
+<tr>
+<td></td>
+<td>10 Gbit/s</td>
+<td>⬅ BiDi fiber link ➡</td>
+<td>10 Gbit/s</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="hardware-sourcing">Hardware sourcing</h2>
+
+<p>The total cost of this upgrade is 1241 CHF, with the biggest chunk spent on the
+Intel X550-T2 network cards. You can most likely find 10 Gbit/s network cards
+for cheaper, but I wanted something readily available with no doubts about Linux
+compatibility.</p>
+
+<h3 id="fs-fiber-store-order">FS (Fiber Store) order</h3>
+
+<p><a href="https://www.FS.COM">FS.COM</a> was my go-to source for anything
+fiber-related. Everything they have is very affordable, and products in stock at
+their German warehouse arrive in Switzerland (and presumably other European
+countries, too) within the same week.</p>
+
+<table>
+<thead>
+<tr>
+<th>num</th>
+<th>price</th>
+<th>name</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>1 ×</td>
+<td>34 CHF</td>
+<td><a href="https://www.fs.com/de/products/74681.html">Generic Compatible 10GBASE-BX BiDi SFP+ 1270nm-TX/1330nm-RX 10km DOM Transceiver Module, FS P/N: SFP-10G-BX #74681</a></td>
+</tr>
+
+<tr>
+<td>1 ×</td>
+<td>34 CHF</td>
+<td><a href="https://www.fs.com/de/products/74682.html">Generic Compatible 10GBASE-BX BiDi SFP+ 1330nm-TX/1270nm-RX 10km DOM Transceiver Module, FS P/N: SFP-10G-BX #74682</a></td>
+</tr>
+
+<tr>
+<td>4 ×</td>
+<td>56 CHF</td>
+<td><a href="https://www.fs.com/de/products/74680.html">SFP+ Transceiver Modul - Generisch kompatibel 10GBASE-T SFP+ Kupfer RJ-45 30m, FS P/N: SFP-10G-T #74680</a></td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="digitec-order">digitec order</h3>
+
+<p>There are a few items that <a href="https://www.FS.COM">FS.COM</a> doesn’t stock. These I
+bought at <a href="https://www.digitec.ch/">digitec</a>, a big and popular electronics
+store in Switzerland. My thinking is that if products are available at digitec,
+they most likely are available at your preferred big electronics store, too.</p>
+
+<table>
+<thead>
+<tr>
+<th>num</th>
+<th>price</th>
+<th>name</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>2 ×</td>
+<td>317 CHF</td>
+<td><a href="https://www.digitec.ch/de/s1/product/intel-x550-t2-pci-express-30-netzwerkadapter-5926807">Intel X550-T2 (PCI Express 3.0)</a> network card</td>
+</tr>
+
+<tr>
+<td>2 ×</td>
+<td>149 CHF</td>
+<td><a href="https://www.digitec.ch/de/s1/product/mikrotik-crs305-1g-4sin-5ports-switch-9876046">Mikrotik CRS305-1G-4S+IN</a> switch</td>
+</tr>
+
+<tr>
+<td>2 ×</td>
+<td>8.65 CHF</td>
+<td><a href="https://www.digitec.ch/de/s1/product/lindy-netzwerkkabel-sftp-kat-6-200cm-netzwerkkabel-630147">Lindy Cat 6 Ethernet network cables</a></td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="mikrotik-switch-setup">Mikrotik switch setup</h2>
+
+<p>I want to use my switches only as switches, not for any routing or other layer 3
+features that might reduce bandwidth, so I first reboot the <a href="https://mikrotik.com/product/crs305_1g_4s_in">MikroTik
+CRS305-1G-4S+</a> into SwOS:</p>
+
+<ol>
+<li><p>In the web interface menu, navigate to <em>System → Routerboard →
+Settings</em>, open the <em>Boot OS</em> drop-down and select option
+<em>SwOS</em>.</p></li>
+
+<li><p>In the web interface menu, navigate to <em>System → Reboot</em>.</p></li>
+
+<li><p>After the device rebooted, change the hostname which was reset to <code>MikroTik</code>.</p></li>
+</ol>
+
+<p>Next, upgrade the firmware to 2.12 to fix a weird issue with certain
+combinations of SFP modules (SFP-10G-BX in SFP1, SFP-10G-T in SFP2):</p>
+
+<ol>
+<li>In the SwOS web interface, select the <em>Upgrade</em> tab, then click
+<em>Download &amp; Upgrade</em>.</li>
+</ol>
+
+<h2 id="network-card-setup-linux">Network card setup (Linux)</h2>
+
+<p>After booting with the Intel X550-T2 in a PCIe slot, the card should show up in
+<a href="https://manpages.debian.org/dmesg.8"><code>dmesg(8)</code></a>
+:</p>
+
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">ixgbe: Intel(R) 10 Gigabit PCI Express Network Driver
+ixgbe 0000:03:00.0: Multiqueue Enabled: Rx Queue count = 16, Tx Queue count = 16 XDP Queue count = 0
+<span style="display:block;width:100%;background-color:#d8d8d8">ixgbe 0000:03:00.0: 31.504 Gb/s available PCIe bandwidth (8.0 GT/s PCIe x4 link)
+</span>ixgbe 0000:03:00.0: MAC: 4, PHY: 0, PBA No: H86377-006
+ixgbe 0000:03:00.0: Intel(R) 10 Gigabit Network Connection
+libphy: ixgbe-mdio: probed
+ixgbe 0000:03:00.1: Multiqueue Enabled: Rx Queue count = 16, Tx Queue count = 16 XDP Queue count = 0
+<span style="display:block;width:100%;background-color:#d8d8d8">ixgbe 0000:03:00.1: 31.504 Gb/s available PCIe bandwidth (8.0 GT/s PCIe x4 link)
+</span>ixgbe 0000:03:00.1: MAC: 4, PHY: 0, PBA No: H86377-006
+tun: Universal TUN/TAP device driver, 1.6
+ixgbe 0000:03:00.1: Intel(R) 10 Gigabit Network Connection
+libphy: ixgbe-mdio: probed
+ixgbe 0000:03:00.0 enp3s0f0: renamed from eth0
+ixgbe 0000:03:00.1 enp3s0f1: renamed from eth1
+pps pps0: new PPS source ptp1
+ixgbe 0000:03:00.0: registered PHC device on enp3s0f0
+pps pps1: new PPS source ptp2
+ixgbe 0000:03:00.1: registered PHC device on enp3s0f1</code></pre></div>
+
+<p>I think if you only use 1 of the card’s 4 network ports, you might not hit any
+bottlenecks even when running the card only at <a href="https://en.wikipedia.org/wiki/PCI_Express#History_and_revisions">PCIe 3.0 ×2 link
+speed</a>, but I
+haven’t verified this!</p>
+
+<p>Another way to verify the device is running at maximum speed on the computer’s
+PCIe bus, is to ensure <code>LnkSta</code> matches <code>LnkCap</code> in the <a href="https://manpages.debian.org/lspci.8"><code>lspci(8)</code></a>
+ output:</p>
+
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">% sudo lspci -vv
+[…]
+03:00.0 Ethernet controller: Intel Corporation Ethernet Controller 10G X550T (rev 01)
+        Subsystem: Intel Corporation Ethernet Converged Network Adapter X550-T2
+[…]
+        Capabilities: [a0] Express (v2) Endpoint, MSI 00
+[…]
+<span style="display:block;width:100%;background-color:#d8d8d8">                LnkCap: Port #0, Speed 8GT/s, Width x4, ASPM L0s L1, Exit Latency L0s &lt;2us, L1 &lt;16us
+</span>                        ClockPM- Surprise- LLActRep- BwNot- ASPMOptComp+
+                LnkCtl: ASPM Disabled; RCB 64 bytes, Disabled- CommClk+
+                        ExtSynch- ClockPM- AutWidDis- BWInt- AutBWInt-
+<span style="display:block;width:100%;background-color:#d8d8d8">                LnkSta: Speed 8GT/s (ok), Width x4 (ok)
+</span>                        TrErr- Train- SlotClk+ DLActive- BWMgmt- ABWMgmt-
+[…]</code></pre></div>
+
+<p>You can verify your network link is running at 10 Gbit/s using <a href="https://manpages.debian.org/ethtool.8"><code>ethtool(8)</code></a>
+:</p>
+
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">% sudo ethtool enp3s0f1 
+Settings for enp3s0f1:
+	Supported ports: [ TP ]
+	Supported link modes:   100baseT/Full
+	                        1000baseT/Full
+<span style="display:block;width:100%;background-color:#d8d8d8">	                        10000baseT/Full
+</span>	                        2500baseT/Full
+	                        5000baseT/Full
+	Supported pause frame use: Symmetric
+	Supports auto-negotiation: Yes
+	Supported FEC modes: Not reported
+	Advertised link modes:  100baseT/Full
+	                        1000baseT/Full
+	                        10000baseT/Full
+	Advertised pause frame use: Symmetric
+	Advertised auto-negotiation: Yes
+	Advertised FEC modes: Not reported
+<span style="display:block;width:100%;background-color:#d8d8d8">	Speed: 10000Mb/s
+</span>	Duplex: Full
+	Auto-negotiation: on
+	Port: Twisted Pair
+	PHYAD: 0
+	Transceiver: internal
+	MDI-X: Unknown
+	Supports Wake-on: d
+	Wake-on: d
+        Current message level: 0x00000007 (7)
+                               drv probe link
+	Link detected: yes</code></pre></div>
+
+<h2 id="benchmarking-batch-transfers">Benchmarking batch transfers</h2>
+
+<p>As mentioned in the introduction, routing 10 Gbit/s is out of scope in this
+article. If you’re interested in routing performance, check out Andree Toonk’s
+<a href="https://toonk.io/linux-kernel-and-measuring-network-throughput/index.html">post which confirms that Linux can route 10 Gbit/s at line
+rate</a>.</p>
+
+<p>The following sections cover individual batch transfers of large files, not many
+small flows.</p>
+
+<h3 id="iperf3-speed-test">iperf3 speed test</h3>
+
+<p>Out of the box, the speeds that <a href="https://manpages.debian.org/iperf3.1"><code>iperf3(1)</code></a>
+ measures
+are decent:</p>
+
+<pre><code>chuchi % iperf3 --version
+iperf 3.6 (cJSON 1.5.2)
+Linux chuchi 4.19.0-16-amd64 #1 SMP Debian 4.19.181-1 (2021-03-19) x86_64
+Optional features available: CPU affinity setting, IPv6 flow label, SCTP, TCP congestion algorithm setting, sendfile / zerocopy, socket pacing, authentication
+
+chuchi % iperf3 --server
+[…]
+
+midna % iperf3 --version          
+iperf 3.9 (cJSON 1.7.13)
+Linux midna 5.12.1-arch1-1 #1 SMP PREEMPT Sun, 02 May 2021 12:43:58 +0000 x86_64
+Optional features available: CPU affinity setting, IPv6 flow label, TCP congestion algorithm setting, sendfile / zerocopy, socket pacing, authentication
+
+midna % iperf3 --client chuchi.lan
+Connecting to host 10.0.0.173, port 5201
+[  5] local 10.0.0.76 port 43168 connected to 10.0.0.173 port 5201
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+[  5]   0.00-1.00   sec  1.10 GBytes  9.42 Gbits/sec    0   1.62 MBytes       
+[  5]   1.00-2.00   sec  1.09 GBytes  9.41 Gbits/sec    0   1.70 MBytes       
+[  5]   2.00-3.00   sec  1.10 GBytes  9.41 Gbits/sec    0   1.70 MBytes       
+[  5]   3.00-4.00   sec  1.09 GBytes  9.41 Gbits/sec    0   1.78 MBytes       
+[  5]   4.00-5.00   sec  1.09 GBytes  9.41 Gbits/sec    0   1.87 MBytes       
+[  5]   5.00-6.00   sec  1.10 GBytes  9.42 Gbits/sec    0   1.87 MBytes       
+[  5]   6.00-7.00   sec  1.10 GBytes  9.42 Gbits/sec    0   1.87 MBytes       
+[  5]   7.00-8.00   sec  1.10 GBytes  9.41 Gbits/sec    0   1.87 MBytes       
+[  5]   8.00-9.00   sec  1.09 GBytes  9.41 Gbits/sec    0   1.96 MBytes       
+[  5]   9.00-10.00  sec  1.09 GBytes  9.38 Gbits/sec  402   1.52 MBytes       
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-10.00  sec  11.0 GBytes  9.41 Gbits/sec  402             sender
+[  5]   0.00-10.00  sec  11.0 GBytes  9.40 Gbits/sec                  receiver
+
+iperf Done.
+</code></pre>
+
+<h3 id="http-speed-test">HTTP speed test</h3>
+
+<p>Downloading a file from an <a href="https://manpages.debian.org/nginx.1"><code>nginx(1)</code></a>
+ web server using <a href="https://manpages.debian.org/curl.1"><code>curl(1)</code></a>
+ is fast, too:</p>
+
+<pre><code>% curl -o /dev/null http://chuchi.lan/distri/supersilverhaze/img/distri-disk.img.zst
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  934M  100  934M    0     0  1118M      0 --:--:-- --:--:-- --:--:-- 1117M
+</code></pre>
+
+<p>Note that this download was served from RAM (Linux page cache). The next upgrade
+I need to do in this machine is replace the SATA SSD with an NVMe SSD, because
+the disk is now the bottleneck.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>This was a pleasantly simple upgrade: plug in a bunch of new hardware and batch
+transfers become faster.</p>
+
+<p>The Mikrotik switch provides great value for money, and the Intel X550-T2 works
+well, but you might want to look for a cheaper alternative.</p>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[Adding a fiber link to my home network]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/"/>
+    <id>https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/</id>
+    <published>2020-08-09T14:53:53+02:00</published>
+    <content type="html"><![CDATA[
+
+<h2 id="motivation">Motivation</h2>
+
+<p>Despite using a FTTH internet connection since 2014, aside from the one fiber
+uplink, I had always used network gear with 1 Gbit/s links over regular old rj45
+cat5(e) cables.</p>
+
+<hr />
+
+<p>I liked the simplicity and uniformity of that setup, but decided it’s time to
+add at least one fiber connection, to <strong>get rid of a temporary ethernet cable</strong>
+that connected my kitchen with the rest of my network that is largely in the
+living room and office.</p>
+
+<p>The temporary ethernet cable was an experiment to verify that running a server
+or two in my kitchen actually works (it does!). I used a <a href="https://www.digitec.ch/de/s1/product/hama-cat-6-flach-we-1000cm-netzwerkkabel-7465292">flat ethernet
+cable</a>,
+which is great for test setups like that, as you can often tape it onto the
+walls and still close the doors.</p>
+
+<p>So, we will replace one ethernet cable with one fiber cable and converters at
+each end:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-media-converters.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-media-converters_hu863a0a53ff58eb79e087ca8992fd5d37_416326_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-media-converters_hu863a0a53ff58eb79e087ca8992fd5d37_416326_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-media-converters_hu863a0a53ff58eb79e087ca8992fd5d37_416326_600x0_resize_q75_box.jpg"
+  alt="0.9mm thin fiber cables" title="0.9mm thin fiber cables"
+  width="600"
+  height="217"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>Why is it good to switch from copper ethernet cables to fiber in this case?
+Fiber cables are <strong>smaller and hence easier to fit</strong> into existing cable
+ducts. While regular ethernet cable is way too thick to fit into any of the
+existing ducts in my flat, I was hoping that fiber might fit!</p>
+
+<p>When I actually received the cables, I was surprised <strong>how much thinner</strong> fiber
+cables actually can be: there are 0.9mm cables, which are so thin, they can be
+hidden in plain sight! I had only ever seen 2mm fiber cables before, and the
+0.9mm cables are incredibly light, flexible and thin! Even pasta is typically
+thicker:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-glasnudeln.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-glasnudeln_huff6805db50351ab1fa4ea96b741ae340_1675440_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-glasnudeln_huff6805db50351ab1fa4ea96b741ae340_1675440_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-glasnudeln_huff6805db50351ab1fa4ea96b741ae340_1675440_600x0_resize_q75_box.jpg"
+  alt="Preparing a delicious pot of glass noodles ;)" title="Preparing a delicious pot of glass noodles ;)"
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p><small><em>Preparing a delicious pot of glass noodles ;)</em></small></p>
+
+<hr />
+
+<p>The cable shown above comes from <a href="https://www.FS.COM/company/about_us.html">the fiber store
+FS.COM</a>, which different people have
+praised on multiple occasions, so naturally I was curious to give them a shot
+myself.</p>
+
+<p>Also, for the longest time, it was my understanding that fiber connectors can
+only be put onto fiber cables using expensive (≫2000 CHF) machines. A while ago
+I heard about <strong>field assembly connectors</strong> so I wanted to verify that those
+indeed work.</p>
+
+<hr />
+
+<p>Aside from practical reasons, playing around with fiber networking also makes
+for a good hobby during a pandemic :)</p>
+
+<h2 id="hardware-selection">Hardware Selection</h2>
+
+<p>I ordered all my fiber equipment at <a href="https://www.FS.COM">FS.COM</a>: everything
+they have is very affordable, and products in stock at their German warehouse
+arrive in Switzerland (and presumably other European countries) within the same
+week.</p>
+
+<p>If you are in the luxurious position to have enough physical space and agility
+to pull through an entire fiber cable, <strong>without having to remove any
+connectors</strong>, you can make a new network connection with just a few parts:</p>
+
+<table>
+<thead>
+<tr>
+<th>amt</th>
+<th>price</th>
+<th>total</th>
+<th>article</th>
+<th>note</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>2x</td>
+<td>36 CHF</td>
+<td>72 CHF</td>
+<td><a href="https://www.FS.COM/de-en/products/17237.html">#17237</a></td>
+<td><a href="https://www.FS.COM/de-en/products/17237.html">1 Gbit/s media converter RJ45/SFP</a></td>
+</tr>
+
+<tr>
+<td>1x</td>
+<td>8.5 CHF</td>
+<td>8.5 CHF</td>
+<td><a href="https://www.FS.COM/de-en/products/75339.html">#39135</a></td>
+<td><a href="https://www.FS.COM/de-en/products/75339.html">1 Gbit/s BiDi SFP 1310nm-TX/1550nm-RX</a></td>
+</tr>
+
+<tr>
+<td>1x</td>
+<td>11 CHF</td>
+<td>11 CHF</td>
+<td><a href="https://www.FS.COM/de-en/products/75340.html">#39138</a></td>
+<td><a href="https://www.FS.COM/de-en/products/75340.html">1 Gbit/s BiDi SFP 1550nm-TX/1310nm-RX</a></td>
+</tr>
+
+<tr>
+<td>1x</td>
+<td>2.3 CHF</td>
+<td>2.3 CHF</td>
+<td><a href="https://www.FS.COM/de-en/products/12285.html">#12285</a></td>
+<td><a href="https://www.FS.COM/de-en/products/12285.html">fiber cable, 0.9mm LC UPC/LC UPC simplex</a></td>
+</tr>
+</tbody>
+</table>
+
+<p>I recommend buying an extra fiber cable or two so that you can accidentally
+damage a cable and still have enough spares.</p>
+
+<p>Total cost thus far: just under 100 CHF. If you have existing switches with a
+free SFP slot, you can use those instead of the media converters and save most
+of the cost.</p>
+
+<hr />
+
+<p>If you need to <strong>temporarily remove</strong> one or both of the fiber cable connector(s),
+you also need field assembly connectors and a few tools in addition:</p>
+
+<table>
+<thead>
+<tr>
+<th>amt</th>
+<th>price</th>
+<th>total</th>
+<th>article</th>
+<th>note</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>2x</td>
+<td>4 CHF</td>
+<td>8 CHF</td>
+<td><a href="https://www.FS.COM/de-en/products/35165.html">#35165</a></td>
+<td><a href="https://www.FS.COM/de-en/products/35165.html">LC/UPC 0.9mm pre-polished field assembly connector</a></td>
+</tr>
+
+<tr>
+<td>1x</td>
+<td>110 CHF</td>
+<td>110 CHF</td>
+<td><a href="https://www.FS.COM/de-en/products/14341.html">#14341</a></td>
+<td><a href="https://www.FS.COM/de-en/products/14341.html">High Precision Fibre Optic Cleaver FS-08C</a></td>
+</tr>
+
+<tr>
+<td>1x</td>
+<td>26 CHF</td>
+<td>26 CHF</td>
+<td><a href="https://www.FS.COM/de-en/products/14346.html">#14346</a></td>
+<td><a href="https://www.FS.COM/de-en/products/14346.html">Fibre Optic Kevlar Cutter</a></td>
+</tr>
+
+<tr>
+<td>1x</td>
+<td>14 CHF</td>
+<td>14 CHF</td>
+<td><a href="https://www.FS.COM/de-en/products/72812.html">#72812</a></td>
+<td><a href="https://www.FS.COM/de-en/products/72812.html">Fibre Optical Stripper</a></td>
+</tr>
+</tbody>
+</table>
+
+<p>I recommend buying twice the number of field assembly connectors, for practicing.</p>
+
+<p>Personally, I screwed up two connectors before figuring out <a href="#field-assembly-connectors">how the process
+goes</a>.</p>
+
+<p>Total cost: about 160 CHF for the field assembly equipment, so 260 CHF in total.</p>
+
+<hr />
+
+<p>To boost your confidence in the resulting fiber, the following items are nice to
+have, but you can get by without, if you’re on a budget.</p>
+
+<table>
+<thead>
+<tr>
+<th>price</th>
+<th>article</th>
+<th>note</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>18 CHF</td>
+<td><a href="https://www.FS.COM/de-en/products/35388.html">#35388</a></td>
+<td><a href="https://www.FS.COM/de-en/products/35388.html">FVFL-204 Visual Fault Locator</a></td>
+</tr>
+
+<tr>
+<td>9.40 CHF</td>
+<td><a href="https://www.FS.COM/de-en/products/82730.html">#82730</a></td>
+<td><a href="https://www.FS.COM/de-en/products/82730.html">2.5mm to 1.25mm adapter for Visual Fault Locator</a></td>
+</tr>
+
+<tr>
+<td>4.10 CHF</td>
+<td><a href="https://www.FS.COM/de-en/products/14010.html">#14010</a></td>
+<td><a href="https://www.FS.COM/de-en/products/14010.html">1.25mm fiber clean swabs (100pcs)</a></td>
+</tr>
+</tbody>
+</table>
+
+<p>With the visual fault locator, you can shine a light through your fiber. You can
+verify correct connector assembly by looking at how the light comes out of the
+connector.</p>
+
+<p>The fiber cleaning swabs are good to have in general, but for the field assembly
+connector, you need to use alcohol-soaked wipes anyway (which FS.COM does not
+stock).</p>
+
+<p>The total cost for everything is just under 300 CHF.</p>
+
+<h3 id="hardware-selection-process">Hardware Selection Process</h3>
+
+<p>The large selection at FS.COM can be overwhelming to navigate at first. My
+selection process went something like this:</p>
+
+<p>My first constraint is using bi-directional (BiDi) fiber optics modules so that
+I only need to lay a single fiber cable, as opposed to two fiber cables.</p>
+
+<p>The second constraint is to use field assembly connectors.</p>
+
+<p>If possible, I wanted to use <a href="https://community.FS.COM/blog/why-not-use-bend-insensitive-fiber-optic-cable-to-reduce-bend-radius.html">bend-insensitive
+fiber</a>
+so that I wouldn’t need to pay so much attention to the bend radius and have
+more flexibility in where and how I can lay fiber.</p>
+
+<p>With these constraints, there aren’t too many products left to combine. An
+obvious and good choice are 0.9mm fiber cable using LC/UPC connectors.</p>
+
+<h3 id="fs-com-details">FS.COM details</h3>
+
+<p>As of 2020-08-05, FS.COM states they have 5 warehouses in 4 locations:</p>
+
+<ul>
+<li>Delaware (US)</li>
+<li>Munich (Germany)</li>
+<li>Melbourne (Australia)</li>
+<li>Shenzhen (China)</li>
+</ul>
+
+<p>They recently built another, bigger (7 km²) warehouse in Shenzhen, and now
+produce inventory for the whole year.</p>
+
+<p>By 2019, FS.COM had over 300,000 registered corporate customers, reaching nearly
+200 million USD yearly sales.</p>
+
+<h2 id="delivery-times">Delivery times</h2>
+
+<p>As mentioned before, delivery times are quick when the products are in stock at
+FS.COM’s German warehouse.</p>
+
+<p>In my case, I put in my order on 2020-Jun-26.</p>
+
+<p>The items that shipped from the German warehouse arrived on 2020-Jul-01.</p>
+
+<p>Some items had to be manufactured and/or shipped from Asia. Those items arrived
+after 3 more weeks, on 2020-Jul-24.</p>
+
+<p>Unfortunately, FS.COM doesn’t stock any 0.9mm fiber cables in their German
+warehouse right now, so be prepared for a few weeks of waiting time.</p>
+
+<h2 id="laying-the-fiber">Laying The Fiber</h2>
+
+<p>Use a cable puller to pull the fiber through existing cable ducts where
+possible.</p>
+
+<ul>
+<li><p>In general, buy the thinnest one you can find. I have <a href="https://www.distrelec.ch/en/cable-pull-strap-10m-tools-495005/p/18092626">this 4mm diameter cable
+puller</a>,
+but a 3mm or even 2mm one would work in more situations.</p></li>
+
+<li><p>I found it worthwhile to buy a brand one. It is distinctly better to handle
+(less stiff, i.e. more flexible) than the cheap one I got, and thinner, too,
+which is always good.</p></li>
+</ul>
+
+<p>In my experience, it generally did not work well to <strong>push</strong> the fiber into an
+existing duct or alongside an existing cable. I really needed a cable
+<strong>puller</strong>.</p>
+
+<p>If you’re lucky and have enough space in your duct(s), you can leave the
+existing connectors on the fiber. I have successfully just used a piece of tape
+to fix the fiber connector on the cable puller, pushing down the nose
+temporarily:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-cable-puller.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-cable-puller_hu671a386c131e99c47b0e8674d4173388_933240_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-cable-puller_hu671a386c131e99c47b0e8674d4173388_933240_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-cable-puller_hu671a386c131e99c47b0e8674d4173388_933240_600x0_resize_q75_box.jpg"
+  alt="fiber cable taped to cable puller" title="fiber cable taped to cable puller"
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>Where there are no existing ducts, you may need to lay the fiber on top of the
+wall. Obviously, this is tricky as soon as you need to make a connection going
+through a wall: whereas copper ethernet cables can be bent and squeezed into
+door frames, you quickly risk breaking fiber cables.</p>
+
+<p>Luckily, the fiber is very light, so it’s very easy to fix to the wall with a
+piece of tape:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-wand-kabel.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-wand-kabel_hu266a050a008f40ca1627a87ee11d809f_563690_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-wand-kabel_hu266a050a008f40ca1627a87ee11d809f_563690_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-wand-kabel_hu266a050a008f40ca1627a87ee11d809f_563690_600x0_resize_q75_box.jpg"
+  alt="fiber cables on the wall" title="fiber cables on the wall"
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>You can see the upstream internet fiber in the top right corner, which is rather
+thick in comparison to my 0.9mm yellow fiber that’s barely visible in the middle
+of the picture.</p>
+
+<p>Note how the fiber entirely disappears behind the existing duct atop the
+door!</p>
+
+<p>Above, you can see the flat ethernet cable I have been using as a temporary
+experiment.</p>
+
+<hr />
+
+<p>Where there is an existing cable that you can temporarily remove, it might be
+possible to remove it, put the fiber in, and put the old cable back in,
+too. This is possible because the 0.9mm fiber cable is so thin!</p>
+
+<p>I’m using this technique to cross another wall where the existing cable duct is
+too full, but there is a cable that can be removed and put back after pulling
+the fiber through:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-loch.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-loch_hu72eb317f66154a6cd4cb4580e2e045bd_823912_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-loch_hu72eb317f66154a6cd4cb4580e2e045bd_823912_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-loch_hu72eb317f66154a6cd4cb4580e2e045bd_823912_600x0_resize_q75_box.jpg"
+  alt="fiber cable next to existing cable" title="fiber cable next to existing cable"
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>…and on the other side of the wall:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-dose.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-dose_hubb166f4dcb345f6dba1f730b24be242a_880410_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-dose_hubb166f4dcb345f6dba1f730b24be242a_880410_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-dose_hubb166f4dcb345f6dba1f730b24be242a_880410_600x0_resize_q75_box.jpg"
+  alt="fiber cable next to existing socket" title="fiber cable next to existing socket"
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>Note how the fiber is thin enough to fit between the socket and duct!</p>
+
+<hr />
+
+<p><strong>Note:</strong> despite measuring how long a fiber cable I would need, my cable turned
+out too short! While the cable was just as long as I had measured, with
+distances exceeding 10m, it is a good idea to <strong>add a few meters spare</strong> on each
+side of the connection.</p>
+
+<h2 id="field-assembly-connectors">Field assembly connectors</h2>
+
+<p>To give you an overview, these are the required steps at a high level:</p>
+
+<ol>
+<li>Cut the fiber with the <a href="https://www.FS.COM/de-en/products/14346.html">Fibre Optic Kevlar Cutter</a></li>
+<li>Strip the fiber with the <a href="https://www.FS.COM/de-en/products/72812.html">Fibre Optical Stripper</a></li>
+<li>Put the field assembly <em>jacket</em> onto the fiber</li>
+<li>Cut the stripped fiber cleanly with the <a href="https://www.FS.COM/de-en/products/14341.html">High Precision Fibre Optic Cleaver FS-08C</a></li>
+<li>Put the field assembly <em>connector</em> onto the fiber</li>
+</ol>
+
+<hr />
+
+<p>I thought the following resources were useful:</p>
+
+<ol>
+<li>Pictograms: <a href="https://img-en.fs.com/file/user_manual/lc-field-assembly-connector-quick-start-guide-v1.0.pdf">PDF: FS.COM LC UPC field assembley connectors quick start
+guide</a></li>
+<li>Pictures: <a href="https://www.fs.com/de-en/products/35165.html">Installation Procedure on
+FS.COM</a></li>
+<li>Video: <a href="https://www.youtube.com/watch?v=epTzemeJjAw">YouTube: Terminate Fiber in 5
+Minutes</a>: this video shows a
+different product, but I found it helpful to see any field assembly connector
+on video, and this is one of the better videos I could find.</li>
+</ol>
+
+<!-- TODO: include a link to my own video once published -->
+
+<hr />
+
+<p><strong>Beware:</strong> the little paper booklet that comes with the field assembly
+connector contains measurements which are <strong>not to scale</strong>. I have suggested to
+FS.COM that they fix this, but until then, you’ll need to use e.g. a tape
+measure.</p>
+
+<hr />
+
+<p>For establishing an intuition of their different sizes, here are the different connectors:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-07-fiber-cable-connector-size-featured.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-07-fiber-cable-connector-size-featured_hu6d8d68e7ce7a86b2365302ce19348267_984529_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-07-fiber-cable-connector-size-featured_hu6d8d68e7ce7a86b2365302ce19348267_984529_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-07-fiber-cable-connector-size-featured_hu6d8d68e7ce7a86b2365302ce19348267_984529_600x0_resize_q75_box.jpg"
+  alt="fiber cable connectors" title="fiber cable connectors"
+  width="600"
+  height="398"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>From left to right:</p>
+
+<ul>
+<li>2.0mm fiber cable</li>
+<li>cat6 ethernet cable</li>
+<li>0.9mm fiber cable (LC/UPC factory)</li>
+<li>0.9mm fiber cable (LC/UPC field assembly connector)</li>
+</ul>
+
+<p>The 0.9mm fiber cables come with smaller connectors than the 2.0mm fiber cables,
+and that alone might be a reason to prefer them in some situations.</p>
+
+<p>The field assembly connectors are pretty bulky in comparison, but since you can
+attach them yourself after pulling only the cable through the walls and/or
+ducts, you usually don’t care too much about their size.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Modern fiber cables available at FS.COM are:</p>
+
+<ul>
+<li>thinner than I expected</li>
+<li>more robust than I expected</li>
+<li>cheaper than I expected</li>
+<li>survive tighter bend radiuses than I expected</li>
+</ul>
+
+<p>Replacing this particular connection with a fiber connection was a smooth
+process overall, and I would recommend it in other situations as well.</p>
+
+<hr />
+
+<p>I would claim that it is <strong>totally feasible</strong> for anyone with an hour of
+patience to learn how to put a field assembly connector onto a fiber cable.</p>
+
+<p>If labor cost is expensive in your country or you just like doing things
+yourself, I can definitely recommend this approach. In case you mess the
+connector up and don’t want to fix it yourself, you can always call an
+electrician!</p>
+
+<hr />
+
+<p>Stay tuned for the next part, where I upgrade the 1G link to a 10G link!</p>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[Fiber7 performance]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2014-09-05-fiber7_performance/"/>
+    <id>https://michael.stapelberg.ch/posts/2014-09-05-fiber7_performance/</id>
+    <published>2014-09-05T12:00:00+00:00</published>
+    <content type="html"><![CDATA[<p>
+Ever since I moved to Zürich, I wanted to get a fiber internet connection. I’ve
+lived with a 6 Mbps DSL line at my parent’s place for about 10 years, so I was
+looking forward to a lot more Megabits and a lot less latency. For reasons that
+I won’t go into in this article, it took me about a year to get a fiber
+connection, and in the end I had to go with Swisscom (instead of <a
+href="http://www.init7.ch/">init7</a> on top of EWZ).
+</p>
+
+<p>
+But then <a href="http://www.fiber7.ch/">fiber7</a> launched. They provide a 1
+Gbps symmetrical connection (Swisscom provided a 1 Gbps/100 Mbps down/up
+connection) for a lot less money than Swisscom, and with native, static IPv6.
+</p>
+
+<p>
+A couple of people are interested in how fiber7 performs, and after being
+connected for about 2 months, I think I can answer this question by now :-).
+</p>
+
+<h2>Latency</h2>
+
+<p>
+I started running smokeping to see how my internet connection performs back
+when I was with Swisscom, because they had some routing issues to certain
+networks. This would manifest itself with getting 50 KB/s transfer rates,
+which is unacceptable for image boards or any other demanding application.
+</p>
+
+<p>
+So, here is the smokeping output for google.ch during the time period that
+covers both my Swisscom line, the temporary cablecom connection and finally
+fiber7:
+</p>
+
+<p><img src="/Bilder/fiber_ping_google_ch_annotated.png" width="800" height="424"
+ alt="smokeping latency to google.ch (annotated)"></p>
+
+<p>
+What you can see is that with Swisscom, I had a 6 ms ping time to google.ch.
+Interestingly, once I used the MikroTik RB2011 instead of the Swisscom-provided
+internet box, the latency improved to 5&nbsp;ms.
+</p>
+
+<p>
+Afterwards, latency changed twice. For the first change, I’m not sure what
+happened. It could be that Swisscom turned up a new, less loaded port to peer
+with Google. Or perhaps they configured their systems in a different way, or
+exchanged some hardware. The second change is relatively obvious: Swisscom
+enabled GGC, the <a href="https://peering.google.com/about/ggc.html">Google
+Global Cache</a>. GGC is a caching server provided by Google that is placed
+within the ISP’s own network, typically providing much better latencies (due to
+being placed very close to the customer) and reducing the traffic between the
+ISP and Google. I’m confident that Swisscom uses that because of the reverse
+pointer record of the IP address to which google.ch resolves to. So with that,
+latency is between 1&nbsp;ms and 3&nbsp;ms.
+</p>
+
+<p>
+Because switching to Fiber7 involves recabling the physical fiber connection in
+the POP, there is a 2-day downtime involved. During that time I used <a
+href="http://www.upc-cablecom.ch/en/get-cable/cable-information/basic-digital-offer/">UPC
+cablecom’s free offering</a>, which is a 2&nbsp;Mbps cable connection that you can
+use for free (as long as you pay for the cable connection itself, and after
+paying 50 CHF for the modem itself).
+</p>
+
+<p>
+As you can see on the graph, the cable connection has a surprisingly good
+latency of around 8&nbsp;ms to google.ch — until you start using it. Then it’s
+clear that 2 Mbps is not enough and the latency shoots through the roof.
+</p>
+
+<p>
+The pleasant surprise is that fiber7’s ping time to google.ch is about
+0.6&nbsp;ms (!). They achieve such low latency <a
+href="https://twitter.com/fiber7_ch/status/508344516622159872">with a dedicated
+10 gig interconnect to Google at the Interxion in Glattbrugg</a>.
+</p>
+
+<h2>Longer-term performance</h2>
+
+<p><img src="/Bilder/fiber_ping_google_ch_week.png" width="697" height="315"
+ alt="smokeping latency measurements to google.ch over more than a week"></p>
+
+<p>
+Let me say that I’m very happy with the performance of my internet connection.
+Some of the measurements where packet loss is registered may be outside of
+fiber7’s control, or even caused by me, when recabling my equipment for
+example. Overall, the latency is fine and consistent, much more so than with
+Swisscom. I have never experienced an internet outage during the two months
+I’ve been with fiber7 now.
+</p>
+
+<p>
+Also, while I am not continuously monitoring my bandwidth, rest assured that
+whenever I download something, I am able to utilize the full Gigabit, meaning I
+get an aggregate speed of 118 MB/s from servers that support it. Such servers
+are for example one-click hosters like uploaded, but also Debian mirrors (as
+soon as you download from multiple ones in parallel).
+</p>
+
+<h2>Conclusion</h2>
+
+<p>
+tl;dr: fiber7 delivers. Incredible latency, no outages (yet), full download speed.
+</p>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[Configuring a Ubiquiti EdgeRouter Lite (Erlite-3) for Fiber7]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2014-08-11-fiber7_ubnt_erlite/"/>
+    <id>https://michael.stapelberg.ch/posts/2014-08-11-fiber7_ubnt_erlite/</id>
+    <published>2014-08-11T09:55:00+00:00</published>
+    <content type="html"><![CDATA[<p>
+I immediately ordered a <a href="http://www.fiber7.ch/">fiber7</a> internet
+connection once it became available, and I’ve been connected since a few weeks.
+They offer a 1 Gbps symmetrical fiber connection, with native (static) IPv6 and
+no traffic limit — for 65 CHF per month (about 54 €).
+</p>
+
+<p>
+In the order form, they let you choose whether you want to order a
+pre-configured MikroTik RB2011UiAS-2HnD including fiber optic and fiber patch
+cable. I assumed this would be an excellent choice, so I ordered it.
+</p>
+
+<p>
+I really like the MikroTik device. Its CLI and web interface are well
+thought-out and easy to use once you understand their way of thinking. It’s
+small, absolutely silent and just works. However, there’s one shortcoming: it
+doesn’t do IPv4 hardware acceleration (they call it “fast path”) when you
+enable NAT, which you need for a fiber7 connection. Thus, the top bandwidth
+maxes out at 500 to 600 Mbps, so effectively you only use half of your
+available bandwidth.
+</p>
+
+<p>
+Therefore, I looked around for other routers which can do a full Gigabit
+WAN-to-LAN, i.e. with IPv4-NAT enabled. The selection of routers that can do
+that is very small, see for example <a
+href="http://www.smallnetbuilder.com/lanwan/router-charts/view">the
+smallnetbuilder WAN-to-LAN router charts</a>.
+</p>
+
+<p>
+In my first try, I went with the Netgear R7000 (“Nighthawk”) which is the
+highest-performing router with regards to WAN-to-LAN bandwidth on
+smallnetbuilder. It indeed does hardware acceleration for IPv4-NAT, so you
+<strong>can</strong> reach the full 118 MB/s TCP bandwidth that a Gigabit line
+offers. However, the firmware does not do DHCPv6-PD (Prefix Delegation), even
+though it’s certified as IPv6-ready. There are alternative firmwares, e.g.
+Tomato and DD-WRT. Tomato (v121 as of writing) comes with the kernel module
+that enables IPv4-NAT hardware acceleration, but has a nasty bug: the latency
+jumps up to 500ms for most of your packets, which is clearly not acceptable.
+DD-WRT does not come with such a kernel module because they use a newer kernel,
+so the speed maxes out at 400 Mbps (that’s what they claim, I didn’t even
+bother testing it).
+</p>
+
+<h2>Ubiquiti EdgeRouter Lite (Erlite-3)</h2>
+
+<p>
+So, as a second try, I ordered what everyone recommended me in the first place:
+the <a href="http://www.ubnt.com/edgemax/edgerouter-lite/">Ubiquiti EdgeRouter
+Lite (Erlite-3)</a>.
+</p>
+
+<p>
+The EdgeRouter Lite (tested with firmware v1.5.0 and v1.6.0) offers IPv4 and
+IPv6 offloading, and in fact reaches Gigabit line rate (118 MB/s measured TCP
+performance). An unwelcome surprise is that hardware acceleration only works
+when <strong>not</strong> using bridging at all, so if you want to connect two
+devices to your router in the same subnet, like a computer and a switch, you
+cannot do that. Effectively, the EdgeRouter needs to sit between the internet
+connection and a switch.
+</p>
+
+<p>
+With regards to the web interface of EdgeOS: the web interface feels very
+polished and modern, but it seems to lack a number of features that are only
+accessible in the CLI interface. The MikroTik web interface had a much higher
+coverage of features. In general, I like how Ubiquiti does many things right,
+though: firmware updates are quick and painless, the model selection and
+download on their website is very simple to find and use, and you even get a
+link to the relevant GPL tarball without asking :).
+</p>
+
+<h2>Properly disconnecting your old router</h2>
+
+<p>
+First of all, you should disconnect the MikroTik (or your current router) from
+the network. I recommend doing that by explicitly disabling both DHCP clients,
+so that the fiber7 router knows you are not using the old device any more. This
+is important because fiber7 uses a Cisco feature called “IP source guard”,
+which will disable any MAC address on your port that does not have a DHCP
+lease. Therefore, if you just switch routers, you need to wait for the old
+lease to expire before you get a new lease. In my first tests, this worked
+relatively well, but then a lease got stuck for some reason and I had to
+escalate the problem to their NOC. So, better disable the DHCP:
+</p>
+<pre>
+/ip dhcp-client set disabled=yes numbers=0
+/ipv6 dhcp-client set disabled=yes numbers=0
+</pre>
+
+<h2>Configuring the EdgeRouter Lite for fiber7</h2>
+
+<p>
+In my configuration, I connect a switch to eth0 and a media converter (the
+TP-LINK MC220L) to eth1. Pay attention to configure the media converter to
+“auto”, not “force”. In both cases you’ll get a link, but with “force”, you
+will not get any replies to your packets.
+</p>
+
+<p>
+A general tip: if you mess up your IP configuration, you can always use the
+link-local address of the EdgeRouter and SSH into that. Find the link-local
+address using <code>ping6 ff02::1%eth0</code>.
+</p>
+
+<p>
+After logging into the web interface, set the eth1 address to DHCP and it
+should get a public IPv4 address from fiber7. Afterwards, enable NAT by
+clicking on NAT → Add Source NAT Rule. Set the outbound interface to eth1 and
+select the “masquerade” radio button. You’ll also need to switch to the
+“services” tab and enable a DHCP and DNS server. This should give you IPv4
+connectivity to the internet.
+</p>
+
+<p>
+Now on to IPv6. Since EdgeOS version 1.6.0, DHCPv6-PD is an easily usable
+feature. Log into the router using <code>ssh ubnt@192.168.1.1</code>, then run
+the following commands:
+</p>
+
+<pre>
+configure
+set interfaces ethernet eth1 dhcpv6-pd pd 0 prefix-length /48
+set interfaces ethernet eth1 dhcpv6-pd pd 0 interface eth0 service slaac
+set interfaces ethernet eth1 dhcpv6-pd pd 0 interface eth0 prefix-id :0
+commit
+save
+exit
+reboot
+</pre>
+
+<p>
+The <code>prefix-length</code> specifies how big the prefix is that the ISP is
+giving us; a <code>/48</code> in the case of fiber7. The next lines specify
+that we want to use <a href="http://en.wikipedia.org/wiki/SLAAC">SLAAC</a> to
+hand out addresses of the delegated prefix on <code>eth0</code>. The
+<code>prefix-id</code> is used for the part after the /48, so if you set it to
+e.g. <code>ff23</code>, and your prefix is <code>2a02:168:4a09::/48</code>, the
+EdgeRouter will announce <code>2a02:168:4a09:ff23::/64</code> on
+<code>eth0</code>.
+</p>
+
+<p>
+For me, the reboot was necessary after changing settings, so try rebooting if
+things don’t work as they should.
+</p>
+
+<p>
+When running <code>ip -6 address show dev eth0</code> you should see that
+the router added an IPv6 address like
+<code>2a02:168:4a09:0:de9f:dbff:fe81:a905/64</code> to eth0.
+</p>
+
+<p>
+That’s it! On clients you should be able to <code>ping6 google.ch</code> now
+and get replies.
+</p>
+
+<h2>Bonus: Configuring a DHCPv6-DUID</h2>
+
+<p>
+fiber7 wants to hand out static IPv6 prefixes based on the DHCPv6 option 37,
+but that’s not ready yet. Until then, they offer you to set a static prefix
+based on your DUID (a device identifier based on the MAC address of your
+router). Since I switched from the MikroTik, I needed to port its DUID to the
+EdgeRouter to keep my static prefix.
+</p>
+
+<p>
+Luckily, wide-dhcpv6 reads a file called dhcp6c_duid that you can create with
+the proper DUID. The file starts with a 16-bit integer containing the length of
+the DUID, followed by the raw DUID:
+</p>
+
+<pre>
+echo -en '\x00\x0a\x00\x03\x00\x01\x4c\x5e\x0c\x43\xbf\x39' > /var/lib/dhcpv6/dhcp6c_duid
+</pre>
+
+<h2>Conclusion</h2>
+
+<p>
+I can see why fiber7 went with the MikroTik as their offer for customers: it
+combines a media converter (for fiber to ethernet), a router, a switch and a
+wifi router. In my configuration, those are now all separate devices: the
+TP-LINK MC220L (27 CHF), the Ubiquiti EdgeRouter Lite Erlite-3 (170 CHF) and
+the TP-LINK WDR4300 (57 CHF). The ping latency to google.ch has gone up from
+0.6ms to 0.7ms due to the additional device, but the download rate is about
+twice as high, so I think this is the setup that I’ll keep for a while — until
+somebody comes up with an all-in-one device that provides the same features and
+achieves the same rates :-).
+</p>
+
+<h2>Appendix: IPv6 with EdgeOS &lt; 1.7.0</h2>
+
+<p>
+For EdgeOS 1.6.0, you’ll need to add router advertisement settings:
+</p>
+<pre>
+configure
+set interfaces ethernet eth1 dhcpv6-pd pd 0 prefix-length /48
+set interfaces ethernet eth1 dhcpv6-pd pd 0 interface eth0 service slaac
+set interfaces ethernet eth1 dhcpv6-pd pd 0 interface eth0 prefix-id :0
+set interfaces ethernet eth0 ipv6 router-advert prefix ::/64
+set interfaces ethernet eth0 ipv6 router-advert radvd-options
+  "RDNSS 2001:4860:4860::8888 {};"
+commit
+save
+exit
+reboot
+</pre>
+
+<h2>Appendix: IPv6 with EdgeOS &lt; 1.6.0</h2>
+
+<p>
+IPv6 is a bit harder, since EdgeOS in its current version (1.5.0) does not
+support DHCPv6-PD via its Web or CLI interface. The necessary software
+(wide-dhcpv6) is included, though, so we can configure it manually.
+</p>
+
+<p>
+For the next steps, you need to know the transfer network IP range, which seems
+to be different for every fiber7 POP (location). You can get it by either using
+DHCPv6 and looking at the address you get, by checking your MikroTik
+configuration (if you have one) or by asking fiber7. In my case, the range is
+<code>2a02:168:2000:5::/64</code>, but I’ve heard from others that they have
+<code>2a02:168:2000:9::/64</code>.
+</p>
+
+<p>
+Use <code>ssh ubnt@192.168.1.1</code> to log into the CLI. In order to set the
+proper IPv6 address on the transfer network, run <code>ip -6 address show dev
+eth1</code> and look for a line that says <code>inet6
+fe80::de9f:dbff:fe81:a906/64 scope link</code>. Copy everything after the
+<code>::</code> and prefix it with <code>2a02:168:2000:5:</code> (your fiber7
+transfer network range), then configure that as static IPv6 address on eth1 and
+set the default route (and enable IPv6 offloading):
+</p>
+<pre>
+configure
+set system offload ipv6 forwarding enable
+set interfaces ethernet eth1 address 2a02:168:2000:5:de9f:dbff:fe81:a906/64
+set protocols static route6 ::/0 next-hop 2a02:168:2000:5::1 interface eth1
+commit
+save
+exit
+</pre>
+
+<p>
+Now you should be able to run <code>ping6 google.ch</code> and get a reply.
+We still need to enable DHCPv6 though so that the router gets a prefix and
+hands that out to its clients. Run <code>sudo -s</code> to get a root shell and
+configure DHCPv6:
+</p>
+<pre>
+cat >/etc/wide-dhcpv6/dhcp6c-script-zkj <<'EOT'
+#!/bin/sh
+# wide-dhcpv6-client 20080615-12 does not properly close
+# file descriptors when starting the script.
+# https://bugs.debian.org/757848
+exec 4>&- 5>&- 6>&- 7>&-
+# To prevent radvd from sending the final router advertisment
+# that unconfigures the prefixes.
+killall -KILL radvd
+/etc/init.d/radvd restart
+exit 0
+EOT
+chmod +x /etc/wide-dhcpv6/dhcp6c-script-zkj
+
+cat >/etc/wide-dhcpv6/dhcp6c.conf <<'EOT'
+interface eth1 {
+        send ia-pd 0;
+        request domain-name-servers;
+        script "/etc/wide-dhcpv6/dhcp6c-script-zkj";
+};
+
+id-assoc pd 0 {
+        prefix-interface eth0 {
+                sla-id 1;
+                sla-len 0;
+        };
+};
+EOT
+
+sed -i 's/eth0/eth1/g' /etc/default/wide-dhcpv6-client
+
+cat >/config/scripts/post-config.d/dhcpv6.sh <<'EOT'
+#!/bin/sh
+/etc/init.d/wide-dhcpv6-client start
+EOT
+chmod +x /config/scripts/post-config.d/dhcpv6.sh
+
+/config/scripts/post-config.d/dhcpv6.sh
+</pre>
+
+<p>
+Now, when running <code>ip -6 address show dev eth0</code> you should see that
+the router added an IPv6 address like
+<code>2a02:168:4a09:0:de9f:dbff:fe81:a905/48</code> to eth0. Let’s enable
+router advertisments so that clients get an IPv6 address, route and DNS server:
+</p>
+<pre>
+configure
+set interfaces ethernet eth0 ipv6 router-advert prefix ::/64
+set interfaces ethernet eth0 ipv6 router-advert radvd-options
+  "RDNSS 2001:4860:4860::8888 {};"
+commit
+save
+exit
+</pre>
+
+<p>
+That’s it! On clients you should be able to <code>ping6 google.ch</code> now and get replies.
+</p>
+]]></content>
+  </entry>
+</feed>

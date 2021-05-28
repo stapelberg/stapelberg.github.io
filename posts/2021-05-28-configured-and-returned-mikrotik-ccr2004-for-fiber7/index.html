@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>How I configured and then promptly returned a MikroTik CCR2004 router for Fiber7 - Michael Stapelberg</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <meta name="description" content="init7 recently announced that with their FTTH fiber offering Fiber7, they will now sell and connect you with 25 Gbit/s (Fiber7-X2) or 10 Gbit/s (Fiber7-X) fiber optics, if you want more than 1 Gbit/s.
+This is possible thanks to the upgrade of their network infrastructure as part of their “lifecycle management”, meaning the old networking gear was declared as end-of-life.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2021-05-28-configured-and-returned-mikrotik-ccr2004-for-fiber7/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div><h1 class="ms_title">How I configured and then promptly returned a MikroTik CCR2004 router for Fiber7</h1>
+
+<div class="ms_meta">
+  <div id="ms_date">published 2021-05-28</div>
+  
+  
+  <div id="ms_tags">
+  
+  in tag
+  
+  
+  <span class="ms_tag"><a href="/posts/tags/fiber/">fiber</a></span>
+  
+  </div>
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2021-05-28-configured-and-returned-mikrotik-ccr2004-for-fiber7/index.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
+</div>
+<div class="Artikel" id="content">
+  <style type="text/css">
+    .TableOfContents > ul, .TableOfContents > ul > li > ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+    }
+    .TableOfContents li {
+	margin-bottom: 1rem;
+    }
+  </style>
+  <details class="ms_toc_details">
+    <summary>Table of contents</summary>
+    <nav class="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#configuration">Configuration</a></li>
+<li><a href="#update-firmware">Update firmware</a></li>
+<li><a href="#set-up-auth">Set up auth</a></li>
+<li><a href="#lock-down-the-router">Lock down the router</a></li>
+<li><a href="#enable-dhcpv6-client">Enable DHCPv6 Client</a>
+<ul>
+<li><a href="#modify-the-ipv6-duid">Modify the IPv6 DUID</a></li>
+</ul></li>
+<li><a href="#enable-ipv6-router-advertisements">Enable IPv6 Router Advertisements</a></li>
+<li><a href="#enable-dhcpv4-client">Enable DHCPv4 Client</a></li>
+<li><a href="#enable-dns-server">Enable DNS Server</a></li>
+<li><a href="#enable-dhcpv4-server">Enable DHCPv4 Server</a></li>
+<li><a href="#enable-ipv4-nat">Enable IPv4 NAT</a></li>
+<li><a href="#todo-list">TODO list</a></li>
+<li><a href="#returned">Why I returned it</a></li>
+<li><a href="#appendix-a-full-configuration">Appendix A: Full configuration</a></li>
+</ul></li>
+</ul>
+</nav>
+  </details>
+  
+
+<p>init7 recently announced that with their <a href="https://www.init7.net/en/internet/fiber7/">FTTH fiber offering
+Fiber7</a>, they will now sell and
+connect you with 25 Gbit/s (Fiber7-X2) or 10 Gbit/s (Fiber7-X) fiber optics, if
+you want more than 1 Gbit/s.</p>
+
+<p>This is possible thanks to the upgrade of their network infrastructure as part
+of their “lifecycle management”, meaning the old networking gear was declared as
+end-of-life. The new networking gear supports not only SFP+ modules (10 Gbit/s),
+but also SFP28 modules (25 Gbit/s).</p>
+
+<p>Availability depends on the <a href="https://www.init7.net/en/infrastructure/fiber7-pops/">POP (Point Of Presence, German «Anschlusszentrale»)
+you’re connected to</a>. My
+POP is planned to be upgraded in September.</p>
+
+<p>Nevertheless, I wanted to already prepare my end of the connection, and ordered
+the only router that <a href="https://www.init7.net/en/internet/hardware/">init7 currently lists as compatible with
+Fiber7-X/X2</a>: the MikroTik
+CCR2004-1G-12S+2XS.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-05-28-configured-and-returned-mikrotik-ccr2004-for-fiber7/mikrotik-ccr2004.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-05-28-configured-and-returned-mikrotik-ccr2004-for-fiber7/mikrotik-ccr2004_hu855bbe0a9c47ac557e5b09db74fa3b06_1283584_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-28-configured-and-returned-mikrotik-ccr2004-for-fiber7/mikrotik-ccr2004_hu855bbe0a9c47ac557e5b09db74fa3b06_1283584_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-05-28-configured-and-returned-mikrotik-ccr2004-for-fiber7/mikrotik-ccr2004_hu855bbe0a9c47ac557e5b09db74fa3b06_1283584_600x0_resize_q75_box.jpg"
+  alt="MikroTik CCR2004-1G-12S&#43;2XS" title="MikroTik CCR2004-1G-12S&#43;2XS"
+  width="600"
+  height="347"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>The rest of this article walks through what I needed to configure (a lot,
+compared to Ubiquiti or OpenWRT) in the hope that it helps other MikroTik users,
+and then ends in <a href="#returned">Why I returned it</a>.</p>
+
+<h2 id="configuration">Configuration</h2>
+
+<p>Connect an Ethernet cable to the management port on the MikroTik and:</p>
+
+<ol>
+<li>log into the system using <code>ssh admin@192.168.88.1</code></li>
+<li>point a web browser to “Webfig” at <a href="http://192.168.88.1/">http://192.168.88.1/</a> (no login required)</li>
+</ol>
+
+<h2 id="update-firmware">Update firmware</h2>
+
+<p>Update the CCR2004 to the latest firmware version. At the time of writing, the
+Long-term RouterOS track is <a href="https://mikrotik.com/download">at version 6.47.9</a>
+for the CCR2004 (ARM64):</p>
+
+<ol>
+<li>Use <code>/system package print</code> to display the current version.</li>
+<li>Upload <code>routeros-arm64-6.47.9.npk</code> using Webfig.</li>
+<li><code>/system reboot</code> and verify that <code>/system package print</code> shows <code>6.47.9</code> now.</li>
+</ol>
+
+<h2 id="set-up-auth">Set up auth</h2>
+
+<p>Set a password to prevent others from logging into the router:</p>
+
+<pre><code>/user set admin password=secret
+</code></pre>
+
+<p>Additionally, you can enable passwordless SSH key login, if you
+want.</p>
+
+<ol>
+<li><p>Create an RSA key, because <a href="https://forum.mikrotik.com/viewtopic.php?t=109143">ed25519 keys are not
+supported</a>:</p>
+
+<pre><code>% ssh-keygen -t rsa
+Generating public/private rsa key pair.
+Enter file in which to save the key: /home/michael/.ssh/id_mikrotik
+</code></pre></li>
+
+<li><p>Upload the <code>id_mikrotik.pub</code> file in Webfig</p></li>
+
+<li><p>Import the SSH public key for the <code>admin</code> user:</p>
+
+<pre><code>/user ssh-keys import user=admin public-key-file=id_mikrotik.pub
+</code></pre></li>
+</ol>
+
+<h2 id="lock-down-the-router">Lock down the router</h2>
+
+<ol>
+<li><p><a href="https://help.mikrotik.com/docs/display/ROS/Webfig#Webfig-EnableHTTPS">Enable HTTPS in Webfig</a>.</p></li>
+
+<li><p>Disable all remote access except for SSH and HTTPS:</p>
+
+<pre><code>/ip service disable telnet,ftp,www,api,api-ssl,winbox
+</code></pre></li>
+
+<li><p>Follow <a href="https://wiki.mikrotik.com/wiki/Manual:Securing_Your_Router#Neighbor_Discovery">MikroTik Securing Your
+Router</a>
+recommendations:</p>
+
+<pre><code>/tool mac-server set allowed-interface-list=none
+/tool mac-server mac-winbox set allowed-interface-list=none
+/tool mac-server ping set enabled=no
+/tool bandwidth-server set enabled=no
+/ip ssh set strong-crypto=yes
+/ip neighbor discovery-settings set discover-interface-list=none
+</code></pre></li>
+</ol>
+
+<h2 id="enable-dhcpv6-client">Enable DHCPv6 Client</h2>
+
+<p>For some reason, you need to explicitly enable IPv6 in 2021:</p>
+
+<pre><code>/system package enable ipv6
+/system reboot
+</code></pre>
+
+<p>MikroTik says this is a precaution so that users don’t end up with default-open
+firewall settings for IPv6. But then why don’t they just add some default
+firewall rules?!</p>
+
+<p>Anyway, to configure and immediately enable the DHCPv6 client, use:</p>
+
+<pre><code>/ipv6 dhcp-client add pool-name=fiber7 pool-prefix-length=64 interface=sfp28-1 add-default-route=yes use-peer-dns=no request=address,prefix
+</code></pre>
+
+<h3 id="modify-the-ipv6-duid">Modify the IPv6 DUID</h3>
+
+<p>Unfortunately, MikroTik does not offer any user interface to set the IPv6 DUID,
+which I need to configure to obtain my static IPv6 network prefix from my
+provider’s DHCPv6 server.</p>
+
+<p>Luckily, the DUID is included in backup files, so we can edit it and restore
+from backup:</p>
+
+<ol>
+<li>Run <code>/system backup save</code></li>
+
+<li><p>Download the backup file in Webfig by navigating to Files → Backup → Download.</p></li>
+
+<li><p>Convert the backup file to hex in textual form, edit the DUID and convert it back to binary:</p>
+
+<pre><code>% xxd MikroTik-19700102-0111.backup MikroTik-19700102-0111.backup.hex
+
+% emacs MikroTik-19700102-0111.backup.hex
+# Search for “dhcp/duid” in the file and edit accordingly:
+# got:  00030001085531dfa69e
+
+% xxd -r MikroTik-19700102-0111.backup.hex MikroTik-19700102-0111-patched.backup
+</code></pre></li>
+
+<li><p>Upload the file in Webfig, then restore the backup:</p>
+
+<p><code>/system backup load name=MikroTik-19700102-0111-patched.backup</code></p></li>
+</ol>
+
+<h2 id="enable-ipv6-router-advertisements">Enable IPv6 Router Advertisements</h2>
+
+<p>To make the router assign an IPv6 address from the obtained pool for itself, and
+then send IPv6 Router Advertisements to the network, set:</p>
+
+<pre><code>/ipv6 address add address=::1 from-pool=fiber7 interface=bridge1
+/ipv6 nd add interface=bridge1 managed-address-configuration=yes other-configuration=yes
+</code></pre>
+
+<h2 id="enable-dhcpv4-client">Enable DHCPv4 Client</h2>
+
+<p>To configure and immediately enable the <a href="https://wiki.mikrotik.com/wiki/Manual:IP/DHCP_Client">DHCPv4
+client</a> on the upstream
+port, use:</p>
+
+<pre><code>/ip dhcp-client add interface=sfp28-1 disabled=no
+</code></pre>
+
+<p>I also changed the MAC address to match my old router’s address, just to take
+maximum precaution to avoid any Port Security related issues with my provider’s
+DHCP server:</p>
+
+<pre><code>/interface ethernet set sfp28-1 mac-address=00:0d:fa:4c:0c:31
+</code></pre>
+
+<h2 id="enable-dns-server">Enable DNS Server</h2>
+
+<p>By default, only the MikroTik itself can send DNS queries. Enable access for
+network clients:</p>
+
+<pre><code>/ip dns set allow-remote-requests=yes
+</code></pre>
+
+<h2 id="enable-dhcpv4-server">Enable DHCPv4 Server</h2>
+
+<p>First, let’s bundle all SFP+ ports into a single bridge interface:</p>
+
+<pre><code>/interface bridge add name=bridge1
+/interface bridge port add bridge=bridge1 interface=sfp-sfpplus1 hw=yes
+/interface bridge port add bridge=bridge1 interface=sfp-sfpplus2 hw=yes
+/interface bridge port add bridge=bridge1 interface=sfp-sfpplus3 hw=yes
+/interface bridge port add bridge=bridge1 interface=sfp-sfpplus4 hw=yes
+/interface bridge port add bridge=bridge1 interface=sfp-sfpplus5 hw=yes
+/interface bridge port add bridge=bridge1 interface=sfp-sfpplus6 hw=yes
+/interface bridge port add bridge=bridge1 interface=sfp-sfpplus7 hw=yes
+/interface bridge port add bridge=bridge1 interface=sfp-sfpplus8 hw=yes
+/interface bridge port add bridge=bridge1 interface=sfp-sfpplus9 hw=yes
+/interface bridge port add bridge=bridge1 interface=sfp-sfpplus10 hw=yes
+/interface bridge port add bridge=bridge1 interface=sfp-sfpplus11 hw=yes
+/interface bridge port add bridge=bridge1 interface=sfp-sfpplus12 hw=yes
+</code></pre>
+
+<p>This means we’ll use the device like a big switch with routing between the
+switch and the uplink port <code>sfp28-1</code>.</p>
+
+<aside class="admonition note">
+  <div class="note-container">
+    <div class="note-icon">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+    </div>
+    <div class="admonition-content"><strong>Note</strong>: I don’t know if this configuration reduces performance. I find
+MikroTik’s documentation regarding hardware offloading and performance not the
+clearest. Then again, the CCR2004 has no hardware offloading whatsoever (?) <a href="https://forum.mikrotik.com/viewtopic.php?t=173065">as
+per a forum post</a>.</div>
+  </div>
+</aside>
+
+
+<p>To configure the DHCPv4 Server, configure an IP address, then start the setup
+wizard:</p>
+
+<pre><code>/ip address add address=10.0.0.1/24 interface=bridge1
+/ip dhcp-server setup
+Select interface to run DHCP server on
+
+dhcp server interface: bridge1
+Select network for DHCP addresses
+
+dhcp address space: 10.0.0.0/24
+Select gateway for given network
+
+gateway for dhcp network: 10.0.0.1
+Select pool of ip addresses given out by DHCP server
+
+addresses to give out: 10.0.0.2-10.0.0.240
+Select DNS servers
+
+dns servers: 10.0.0.1
+Select lease time
+
+lease time: 20m
+</code></pre>
+
+<h2 id="enable-ipv4-nat">Enable IPv4 NAT</h2>
+
+<p>We need NAT to route all IPv4 traffic over our single public IP address:</p>
+
+<pre><code>/ip firewall nat add action=masquerade chain=srcnat out-interface=sfp28-1 to-addresses=0.0.0.0
+</code></pre>
+
+<p>Disable NAT services for security, e.g. to mitigate against NAT slipstreaming
+attacks:</p>
+
+<pre><code>/ip firewall service-port disable ftp,tftp,irc,h323,sip,pptp,udplite,dccp,sctp
+</code></pre>
+
+<p>I can observe ≈10-20% CPU load when doing a Gigabit speed test over IPv4.</p>
+
+<h2 id="todo-list">TODO list</h2>
+
+<p>The following features I did not get around to configuring, but they were on my
+list:</p>
+
+<ul>
+<li><a href="https://help.mikrotik.com/docs/display/ROS/First+Time+Configuration">IPv4 port forwardings</a></li>
+<li>Cloudflare DynDNS update script</li>
+<li><a href="https://wiki.mikrotik.com/wiki/Setting_static_DNS_record_for_each_DHCP_lease">DNS resolution for DHCP hostnames</a></li>
+</ul>
+
+<h2 id="returned">Why I returned it</h2>
+
+<p>Initially, I thought the device’s fan spins up only at boot, and then the large
+heatsink takes care of all cooling needs. Unfortunately, after an hour or so
+into my experiment, I noticed that the MikroTik would spin up the fan for a
+whole minute or so occasionally! Very annoying.</p>
+
+<p>I also ran into weird DNS slow-downs, which I didn’t fully diagnose. In
+Wireshark, it looked like my machine sent 2 DNS queries but received only 1 DNS
+result, and then waited for a timeout.</p>
+
+<p>I also noticed that I have a few more unexpected dependencies such as my home
+automation using DHCP lease state by subscribing to an MQTT topic. Addressing
+this issue and other similar little problems would have taken a bunch more time
+and would have resulted in a less reliable system than I have today.</p>
+
+<p>Since I last used MikroTik in 2014 the software seems to have barely changed. I
+wish they finally implemented some table-stakes features like DNS resolution for
+DHCP hostnames.</p>
+
+<p>Given all the above, I no longer felt like getting enough value for the money
+from the MikroTik, and found it easier to just switch back to <a href="https://router7.org/">my own
+router7</a> and return the MikroTik.</p>
+
+<p>I will probably stick with the router7 software, but exchange the PC Engines APU
+with the smallest PC that has enough PCI-E bandwidth for a multi-port SFP28
+network card.</p>
+
+<h2 id="appendix-a-full-configuration">Appendix A: Full configuration</h2>
+
+<pre><code># may/28/2021 11:40:15 by RouterOS 6.47.9
+# software id = 6YZE-HKM8
+#
+# model = CCR2004-1G-12S+2XS
+/interface bridge
+add name=bridge1
+/interface ethernet
+set [ find default-name=sfp28-1 ] auto-negotiation=no mac-address=00:0d:fa:4c:0c:31
+/interface wireless security-profiles
+set [ find default=yes ] supplicant-identity=MikroTik
+/ip pool
+add name=dhcp_pool0 ranges=10.0.0.2-10.0.0.240
+/ip dhcp-server
+add address-pool=dhcp_pool0 disabled=no interface=bridge1 lease-time=20m name=dhcp1
+/interface bridge port
+add bridge=bridge1 interface=sfp-sfpplus1
+add bridge=bridge1 interface=sfp-sfpplus2
+add bridge=bridge1 interface=sfp-sfpplus3
+add bridge=bridge1 interface=sfp-sfpplus4
+add bridge=bridge1 interface=sfp-sfpplus5
+add bridge=bridge1 interface=sfp-sfpplus6
+add bridge=bridge1 interface=sfp-sfpplus7
+add bridge=bridge1 interface=sfp-sfpplus8
+add bridge=bridge1 interface=sfp-sfpplus9
+add bridge=bridge1 interface=sfp-sfpplus10
+add bridge=bridge1 interface=sfp-sfpplus11
+add bridge=bridge1 interface=sfp-sfpplus12
+/ip neighbor discovery-settings
+set discover-interface-list=none
+/ip address
+add address=192.168.88.1/24 comment=defconf interface=ether1 network=192.168.88.0
+add address=10.0.0.1/24 interface=bridge1 network=10.0.0.0
+/ip dhcp-client
+add disabled=no interface=sfp28-1 use-peer-dns=no
+/ip dhcp-server lease
+add address=10.0.0.54 mac-address=DC:A6:32:02:AA:10
+/ip dhcp-server network
+add address=10.0.0.0/24 dns-server=10.0.0.1 domain=lan gateway=10.0.0.1
+/ip dns
+set allow-remote-requests=yes servers=8.8.8.8,8.8.4.4,2001:4860:4860::8888,2001:4860:4860::8844
+/ip firewall nat
+add action=masquerade chain=srcnat out-interface=sfp28-1 to-addresses=0.0.0.0
+/ip firewall service-port
+set ftp disabled=yes
+set tftp disabled=yes
+set irc disabled=yes
+set h323 disabled=yes
+set sip disabled=yes
+set pptp disabled=yes
+set udplite disabled=yes
+set dccp disabled=yes
+set sctp disabled=yes
+/ip service
+set telnet disabled=yes
+set ftp disabled=yes
+set www disabled=yes
+set www-ssl certificate=webfig disabled=no
+set api disabled=yes
+set winbox disabled=yes
+set api-ssl disabled=yes
+/ip ssh
+set strong-crypto=yes
+/ipv6 address
+add address=::1 from-pool=fiber7 interface=bridge1
+/ipv6 dhcp-client
+add add-default-route=yes interface=sfp28-1 pool-name=fiber7 request=address,prefix use-peer-dns=no
+/ipv6 nd
+add interface=bridge1 managed-address-configuration=yes other-configuration=yes
+/system clock
+set time-zone-name=Europe/Zurich
+/system logging
+add topics=dhcp
+/tool bandwidth-server
+set enabled=no
+/tool mac-server
+set allowed-interface-list=none
+/tool mac-server mac-winbox
+set allowed-interface-list=none
+/tool mac-server ping
+set enabled=no
+</code></pre>
+
+</div>
+
+      </div>
+<div id="ms_toc">
+  <div>
+    <strong>Table Of Contents</strong>
+
+    <nav class="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#configuration">Configuration</a></li>
+<li><a href="#update-firmware">Update firmware</a></li>
+<li><a href="#set-up-auth">Set up auth</a></li>
+<li><a href="#lock-down-the-router">Lock down the router</a></li>
+<li><a href="#enable-dhcpv6-client">Enable DHCPv6 Client</a>
+<ul>
+<li><a href="#modify-the-ipv6-duid">Modify the IPv6 DUID</a></li>
+</ul></li>
+<li><a href="#enable-ipv6-router-advertisements">Enable IPv6 Router Advertisements</a></li>
+<li><a href="#enable-dhcpv4-client">Enable DHCPv4 Client</a></li>
+<li><a href="#enable-dns-server">Enable DNS Server</a></li>
+<li><a href="#enable-dhcpv4-server">Enable DHCPv4 Server</a></li>
+<li><a href="#enable-ipv4-nat">Enable IPv4 NAT</a></li>
+<li><a href="#todo-list">TODO list</a></li>
+<li><a href="#returned">Why I returned it</a></li>
+<li><a href="#appendix-a-full-configuration">Appendix A: Full configuration</a></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    </main><div id="ms_footer">
+  © 2020 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

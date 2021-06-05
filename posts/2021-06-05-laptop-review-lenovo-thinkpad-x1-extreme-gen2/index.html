@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Laptop review: ThinkPad X1 Extreme (Gen 2) - Michael Stapelberg</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <meta name="description" content="For many of my school and university years, I used and liked my ThinkPad X200 ultraportable laptop. But now that these years are long gone, I realized my use-case for laptops had changed: instead of carrying my laptop with me every day, I am now only bringing it on occasion, for example when I travel to conferences, visit friends, or do volunteer work.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2021-06-05-laptop-review-lenovo-thinkpad-x1-extreme-gen2/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div><h1 class="ms_title">Laptop review: ThinkPad X1 Extreme (Gen 2)</h1>
+
+<div class="ms_meta">
+  <div id="ms_date">published 2021-06-05</div>
+  
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2021-06-05-laptop-review-lenovo-thinkpad-x1-extreme-gen2/index.md"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
+</div>
+<div class="Artikel" id="content">
+  <style type="text/css">
+    .TableOfContents > ul, .TableOfContents > ul > li > ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+    }
+    .TableOfContents li {
+	margin-bottom: 1rem;
+    }
+  </style>
+  <details class="ms_toc_details">
+    <summary>Table of contents</summary>
+    <nav class="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#peripherals">Peripherals</a>
+<ul>
+<li><a href="#keyboard">Keyboard</a></li>
+<li><a href="#touchpad">Touchpad</a></li>
+<li><a href="#display">Display</a></li>
+</ul></li>
+<li><a href="#hardware">Hardware</a>
+<ul>
+<li><a href="#wifi">WiFi</a></li>
+<li><a href="#gpu">GPU</a></li>
+<li><a href="#battery-life">Battery life</a></li>
+</ul></li>
+<li><a href="#software-support">Software support</a>
+<ul>
+<li><a href="#firmware-updates">Firmware updates</a></li>
+</ul></li>
+<li><a href="#performance">Performance</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul>
+</nav>
+  </details>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-06-05-laptop-review-lenovo-thinkpad-x1-extreme-gen2/2021-06-02-thinkpad-x1-extreme.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-06-05-laptop-review-lenovo-thinkpad-x1-extreme-gen2/2021-06-02-thinkpad-x1-extreme_hu855bbe0a9c47ac557e5b09db74fa3b06_2918849_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-06-05-laptop-review-lenovo-thinkpad-x1-extreme-gen2/2021-06-02-thinkpad-x1-extreme_hu855bbe0a9c47ac557e5b09db74fa3b06_2918849_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-06-05-laptop-review-lenovo-thinkpad-x1-extreme-gen2/2021-06-02-thinkpad-x1-extreme_hu855bbe0a9c47ac557e5b09db74fa3b06_2918849_600x0_resize_q75_box.jpg"
+  alt="ThinkPad X1 Extreme Gen 2, pear for scale" title="ThinkPad X1 Extreme Gen 2, pear for scale"
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>For many of my school and university years, I used and liked my ThinkPad X200
+ultraportable laptop. But now that these years are long gone, I realized my
+use-case for laptops had changed: instead of carrying my laptop with me every
+day, I am now only bringing it on occasion, for example when I travel to
+conferences, visit friends, or do volunteer work.</p>
+
+<p>After the ThinkPad X200, I used a few different laptops:</p>
+
+<ul>
+<li>MacBook Pro 13&quot; Retina, bought for its screen</li>
+<li>ThinkPad X1 Carbon, which newly introduced a hi-dpi screen to ThinkPads</li>
+<li>Dell XPS 9360, for a change, to try a device that ships with Linux</li>
+</ul>
+
+<p>With each of these devices, I have felt limited by the lack of connectors and
+slim compute power that comes with the Ultrabook brand, even after years of
+technical progress.</p>
+
+<p>More compute power is nice to be able to work on projects with larger data sets,
+for example debiman (scanning and converting all manpages in Debian), or distri
+(building Linux packages).</p>
+
+<p>More peripheral options such as USB ports are nice when connecting a keyboard,
+trackball, USB-to-serial adapter, etc., to work on a micro controller or
+Raspberry Pi project, for example.</p>
+
+<p>So, I was ready to switch from the heaviest Ultrabooks to the lightest of the
+“mobile workstation” category, when I stumbled upon Lenovo’s ThinkPad X1 Extreme
+(Gen 2), and it piqued my curiosity.</p>
+
+<h2 id="peripherals">Peripherals</h2>
+
+<p>Let me start by going into the key peripherals of a laptop: keyboard, touchpad
+and screen. I will talk about these independently from the remaining hardware
+because they define the experience of using the computer.</p>
+
+<h3 id="keyboard">Keyboard</h3>
+
+<p>After having used the Dell XPS 9360 for a few years, I can confidently say that
+the keyboard of the ThinkPads is definitely much better, and in a noticeable
+way.</p>
+
+<p>It’s not that the Dell keyboards are <em>bad</em>. But comparing the Dell and ThinkPad
+side-by-side makes it really clear that the ThinkPad keyboards are the best
+notebook keyboards.</p>
+
+<p>On the ThinkPad keyboard, every key press lands exactly as I imagine. Never do I
+need to hit a key twice because I didn’t press it just-right, and never do I
+notice additional ghost key presses.</p>
+
+<p>Even though I connect my external Kinesis Advantage keyboard when doing longer
+stretches of work, the quality of the built-in keyboard matters: a good keyboard
+enables using the laptop on the couch.</p>
+
+<h3 id="touchpad">Touchpad</h3>
+
+<p>Unfortunately, while the keyboard is great, I can’t say the same about the
+touchpad. I mean, it’s not terrible, but it’s also not good by any stretch.</p>
+
+<p>This seems to be the status quo with PC touchpads for decades. It really blows
+my mind that Apple’s touchpads are consistently so much better!</p>
+
+<p>My only hope is that <a href="https://github.com/sponsors/gitclear">Bill Harding
+(GitClear)</a>, who is working on improving
+the Linux touchpad experience, will eventually find a magic software tweak or
+something…</p>
+
+<p>As <a href="https://wiki.archlinux.org/index.php/Lenovo_ThinkPad_X1_Extreme_(Gen_2)#Touchpad">mentioned on the
+ArchWiki</a>,
+I also had to adjust the sensitivity like so:</p>
+
+<pre><code>% xinput set-prop 'SynPS/2 Synaptics TouchPad' 'libinput Accel Speed' 0.5
+</code></pre>
+
+<h3 id="display">Display</h3>
+
+<p>I have high demands regarding displays: since 2013, every device of mine has a
+hi-dpi display.</p>
+
+<p>The industry hasn’t improved displays across the board as fast as I’d like, so
+non-hi-dpi displays are still quite common. The silver lining is that it makes
+laptop selection a little easier for me: anything without a decent display I can
+discard right away.</p>
+
+<p>I’m glad to report that the 4K display in the ThinkPad X1 Extreme with its
+3840x2160 pixels is sharp, bright, and generally has good viewing angles.</p>
+
+<p>It’s also a touchscreen, which I don’t strictly need, but it’s nice to use it
+from time to time.</p>
+
+<p>I use the display in 200% scaling mode, i.e. I set <code>Xft.dpi: 192</code>. See also
+<a href="https://wiki.archlinux.org/index.php/HiDPI">HiDPI in ArchWiki</a>.</p>
+
+<aside class="admonition note">
+  <div class="note-container">
+    <div class="note-icon">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+    </div>
+    <div class="admonition-content"><strong>Tip</strong>: In case your brightness control keys don’t work, check if the <a href="https://gitlab.freedesktop.org/drm/intel/issues/510">required
+patches</a> have not been
+applied in your environment yet.</div>
+  </div>
+</aside>
+
+
+<h2 id="hardware">Hardware</h2>
+
+<p>Spec-wise, the ThinkPad X1 Extreme is a beast!</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-06-05-laptop-review-lenovo-thinkpad-x1-extreme-gen2/specs.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-06-05-laptop-review-lenovo-thinkpad-x1-extreme-gen2/specs_hub98e688078adf6db327505acb00135c2_814598_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-06-05-laptop-review-lenovo-thinkpad-x1-extreme-gen2/specs_hub98e688078adf6db327505acb00135c2_814598_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-06-05-laptop-review-lenovo-thinkpad-x1-extreme-gen2/specs_hub98e688078adf6db327505acb00135c2_814598_600x0_resize_q75_box.jpg"
+  alt="ThinkPad X1 Extreme Specs" title="ThinkPad X1 Extreme Specs"
+  width="600"
+  height="475"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>The build quality seems very robust to me.</p>
+
+<p>Another big plus of the ThinkPad series over other laptop series is the
+availability of the official Hardware Maintenance Manual: you can put “ThinkPad
+X1 Extreme Gen 2 Hardware Maintenance Manual” into Google and will find
+<a href="https://download.lenovo.com/pccbbs/mobiles_pdf/p1_gen2_x1extreme_hmm_v1.pdf"><code>p1_gen2_x1extreme_hmm_v1.pdf</code></a>
+as the first hit. This manual describes in detail how to repair or upgrade your
+device if you want to (or have to) do it yourself.</p>
+
+<h3 id="wifi">WiFi</h3>
+
+<p>The built-in Intel AX200 WiFi interface works fine, provided you have a
+new-enough <code>linux-firmware</code> package and kernel version installed.</p>
+
+<p>I had trouble with Linux 5.6.0, and Linux 5.6.5 fixed it. Luckily, at the time
+of writing, Linux 5.11 is the most recent release, so most distributions should
+be recent enough for things to just work.</p>
+
+<p>The WiFi card reaches almost the same download speed as the most modern WiFi
+device I can test: a MacBook Air M1. Both are connected to my <a href="https://unifi-hd.ui.com/">UniFi
+UAP-AC-HD</a> access point.</p>
+
+<table>
+<thead>
+<tr>
+<th>Laptop</th>
+<th>Download</th>
+<th>Upload</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>ThinkPad X1 Extreme</td>
+<td>500 Mbit/s</td>
+<td>150 Mbit/s</td>
+</tr>
+
+<tr>
+<td>MacBook Air M1</td>
+<td>600 Mbit/s</td>
+<td>500 Mbit/s</td>
+</tr>
+</tbody>
+</table>
+
+<p>I’m not sure why the upload speed is so low in comparison.</p>
+
+<h3 id="gpu">GPU</h3>
+
+<p>The GPU in this machine is by far the most troublesome bit of hardware.</p>
+
+<p>I had hoped that after many years of laptops containing Intel/nVidia hybrid
+graphics, this setup would largely work, but was disappointed.</p>
+
+<p>Both the proprietary nVidia driver and the <code>nouveau</code> driver would not work
+reliably for me. I ran into kernel error messages and hard-freezes, with even
+SSH sessions to the machine breaking.</p>
+
+<p>In the end, I blacklisted the <code>nouveau</code> driver to use Intel graphics only:</p>
+
+<pre><code>% echo blacklist nouveau | sudo tee /etc/modprobe.d/blacklist.conf 
+</code></pre>
+
+<p>Without the nVidia driver, the GPU will not go into powersave mode, so I remove
+it from the PCI bus entirely to save power:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#007020">#!/bin/zsh
+</span><span style="color:#007020"></span>
+sudo tee /sys/bus/pci/devices/0000<span style="color:#4070a0;font-weight:bold">\:</span><span style="color:#40a070">01</span><span style="color:#4070a0;font-weight:bold">\:</span><span style="color:#40a070">00</span>.0/remove <span style="color:#666">&lt;&lt;&lt;</span><span style="color:#40a070">1</span>
+sudo tee /sys/bus/pci/devices/0000<span style="color:#4070a0;font-weight:bold">\:</span><span style="color:#40a070">01</span><span style="color:#4070a0;font-weight:bold">\:</span><span style="color:#40a070">00</span>.1/remove <span style="color:#666">&lt;&lt;&lt;</span><span style="color:#40a070">1</span></code></pre></div>
+<p>You can only re-awaken the GPU with a reboot.</p>
+
+<p>Obviously this isn’t a great setup — I would prefer to be able to actually use
+the GPU. If you have any tips or a better experience, please let me know.</p>
+
+<p>Also note that the HDMI port will be unusable if you go this route, as the HDMI
+port is connected to the nVidia GPU only.</p>
+
+<h3 id="battery-life">Battery life</h3>
+
+<p>The 80 Wh battery lasts between 5 to 6 hours for me, without any extra power
+saving tuning beyond what the Linux distribution Fedora 33 comes with by
+default.</p>
+
+<p>This is good enough for using the laptop away from a power socket from time to
+time, which matches my expectation for this kind of mobile workstation.</p>
+
+<h2 id="software-support">Software support</h2>
+
+<p>Linux support is generally good on this machine! Yes, I provide a few pointers
+in this article regarding problems, patches and old software versions. But, if
+you use a newer Linux distribution, all of these fixes are included and things
+just work out of the box. I tested with Fedora 33.</p>
+
+<p>For a few months, I was using this laptop exclusively with my research Linux
+distribution <a href="https://distr1.org/">distri</a>, so even if you just track upstream
+software closely, the machine works well.</p>
+
+<h3 id="firmware-updates">Firmware updates</h3>
+
+<p>Lenovo partnered with the <a href="https://fwupd.org/">Linux Vendor Firmware Service Project
+(LVFS)</a>, which means that through <code>fwupd</code>, ThinkPad laptops
+such as this X1 Extreme can easily receive firmware updates!</p>
+
+<p>This is a huge improvement in comparison to earlier ThinkPad models, where you
+had to jump through hoops with Windows-only software, or CD images that you
+needed to boot just right.</p>
+
+<p>If your laptop has a very old firmware version (before <code>1.30</code>), you might be
+affected by the <a href="https://wiki.archlinux.org/index.php/Lenovo_ThinkPad_X1_Extreme_(Gen_2)#Skipping_keystrokes">skipping
+keystrokes</a>
+issues. You can check using the always-handy <a href="https://manpages.debian.org/lshw.1"><code>lshw(1)</code></a>
+
+tool.</p>
+
+<h2 id="performance">Performance</h2>
+
+<p>The specific configuration of my ThinkPad is:</p>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>ThinkPad X1 Extreme Spec (2020)</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>CPU</td>
+<td>Intel Core i7-9750H CPU @ 2.60GHz</td>
+</tr>
+
+<tr>
+<td>RAM</td>
+<td>2 × 32 GB Samsung M471A4G43MB1-CTD</td>
+</tr>
+
+<tr>
+<td>Disk</td>
+<td>2 × SAMSUNG MZVLB2T0HALB-000L7 NVMe disk</td>
+</tr>
+</tbody>
+</table>
+
+<p>You can google for CPU benchmarks and comparisons yourself, and those likely are
+more scientific and carefully done than I have time for.</p>
+
+<p>What I can provide however, is a comparison of working on one of my projects on
+the ThinkPad vs. on my workstation, an Intel Core i9-9900K that I bought in
+2018:</p>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Workstation Spec (2018)</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>CPU</td>
+<td>Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz</td>
+</tr>
+
+<tr>
+<td>RAM</td>
+<td>4 × Corsair CMK32GX4M2A2666C16</td>
+</tr>
+
+<tr>
+<td>Disk</td>
+<td>Corsair Force MP600 M.2 NVMe disk</td>
+</tr>
+</tbody>
+</table>
+
+<p>Specifically, I am comparing how long my manpage static archive generator
+<a href="https://github.com/Debian/debiman/">debiman</a> takes to analyze and render all
+manpages in Debian unstable, using the following command:</p>
+
+<pre><code>ulimit -n 8192; time ~/go/bin/debiman \
+  -keyring=/usr/share/keyrings/debian-archive-keyring.gpg \
+  -sync_codenames=, \
+  -sync_suites=unstable \
+  -serving_dir=/srv/man/benchmark \
+  -inject_assets=~/go/src/github.com/Debian/debiman/debian-assets \
+  -concurrency_render=20 \
+  -alternatives_dir=~/go/src/github.com/Debian/debiman/piuparts
+</code></pre>
+
+<p>On both machines, I ensured that:</p>
+
+<ol>
+<li>The CPU performance governor was set to <code>performance</code></li>
+<li>A warm <code>apt-cacher-ng</code> cache was present, i.e. network download was not part of the test.</li>
+<li>Linux kernel caches were dropped using <code>echo 3 | sudo tee /proc/sys/vm/drop_caches</code></li>
+<li>I was using <a href="https://github.com/Debian/debiman/tree/f78c160f05c1f4d25c7836a6ca9198019947c1b5">debiman git revision <code>f78c160</code></a></li>
+</ol>
+
+<p>Here are the results:</p>
+
+<table>
+<thead>
+<tr>
+<th>Machine</th>
+<th>Time</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>i9-9900K Workstation</td>
+<td>4:57,10 (100%)</td>
+</tr>
+
+<tr>
+<td>ThinkPad X1 Extreme (Gen 2)</td>
+<td>7:19,56 (147%)</td>
+</tr>
+</tbody>
+</table>
+
+<p>This reaffirms my impression that even high-end laptop hardware just cannot beat
+a workstation setup (which has more space and better thermals), but it comes
+close enough to be useful.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Positives:</p>
+
+<ul>
+<li><p>The ergonomics of the device really are great. It is a pleasure to type on a
+first-class, full-size ThinkPad keyboard. The screen has good quality and a
+high resolution.</p></li>
+
+<li><p>Performance-wise, this machine can almost replace a proper workstation.</p></li>
+</ul>
+
+<p>Negatives are:</p>
+
+<ul>
+<li>the mediocre battery life</li>
+<li>an annoyingly loud fan that spins up too frequently</li>
+<li>poor software/driver support for hybrid nVidia GPUs.</li>
+</ul>
+
+<p>Notably, all of these could be improved by better power saving, so perhaps it’s
+just a matter of time until Linux kernel developers land some improvements…? :)</p>
+
+</div>
+
+      </div>
+<div id="ms_toc">
+  <div>
+    <strong>Table Of Contents</strong>
+
+    <nav class="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#peripherals">Peripherals</a>
+<ul>
+<li><a href="#keyboard">Keyboard</a></li>
+<li><a href="#touchpad">Touchpad</a></li>
+<li><a href="#display">Display</a></li>
+</ul></li>
+<li><a href="#hardware">Hardware</a>
+<ul>
+<li><a href="#wifi">WiFi</a></li>
+<li><a href="#gpu">GPU</a></li>
+<li><a href="#battery-life">Battery life</a></li>
+</ul></li>
+<li><a href="#software-support">Software support</a>
+<ul>
+<li><a href="#firmware-updates">Firmware updates</a></li>
+</ul></li>
+<li><a href="#performance">Performance</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    </main><div id="ms_footer">
+  © 2020 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

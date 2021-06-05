@@ -5,6 +5,436 @@
   <id>https://michael.stapelberg.ch/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[Laptop review: ThinkPad X1 Extreme (Gen 2)]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2021-06-05-laptop-review-lenovo-thinkpad-x1-extreme-gen2/"/>
+    <id>https://michael.stapelberg.ch/posts/2021-06-05-laptop-review-lenovo-thinkpad-x1-extreme-gen2/</id>
+    <published>2021-06-05T20:43:00+02:00</published>
+    <content type="html"><![CDATA[
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-06-05-laptop-review-lenovo-thinkpad-x1-extreme-gen2/2021-06-02-thinkpad-x1-extreme.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-06-05-laptop-review-lenovo-thinkpad-x1-extreme-gen2/2021-06-02-thinkpad-x1-extreme_hu855bbe0a9c47ac557e5b09db74fa3b06_2918849_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-06-05-laptop-review-lenovo-thinkpad-x1-extreme-gen2/2021-06-02-thinkpad-x1-extreme_hu855bbe0a9c47ac557e5b09db74fa3b06_2918849_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-06-05-laptop-review-lenovo-thinkpad-x1-extreme-gen2/2021-06-02-thinkpad-x1-extreme_hu855bbe0a9c47ac557e5b09db74fa3b06_2918849_600x0_resize_q75_box.jpg"
+  alt="ThinkPad X1 Extreme Gen 2, pear for scale" title="ThinkPad X1 Extreme Gen 2, pear for scale"
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>For many of my school and university years, I used and liked my ThinkPad X200
+ultraportable laptop. But now that these years are long gone, I realized my
+use-case for laptops had changed: instead of carrying my laptop with me every
+day, I am now only bringing it on occasion, for example when I travel to
+conferences, visit friends, or do volunteer work.</p>
+
+<p>After the ThinkPad X200, I used a few different laptops:</p>
+
+<ul>
+<li>MacBook Pro 13&quot; Retina, bought for its screen</li>
+<li>ThinkPad X1 Carbon, which newly introduced a hi-dpi screen to ThinkPads</li>
+<li>Dell XPS 9360, for a change, to try a device that ships with Linux</li>
+</ul>
+
+<p>With each of these devices, I have felt limited by the lack of connectors and
+slim compute power that comes with the Ultrabook brand, even after years of
+technical progress.</p>
+
+<p>More compute power is nice to be able to work on projects with larger data sets,
+for example debiman (scanning and converting all manpages in Debian), or distri
+(building Linux packages).</p>
+
+<p>More peripheral options such as USB ports are nice when connecting a keyboard,
+trackball, USB-to-serial adapter, etc., to work on a micro controller or
+Raspberry Pi project, for example.</p>
+
+<p>So, I was ready to switch from the heaviest Ultrabooks to the lightest of the
+“mobile workstation” category, when I stumbled upon Lenovo’s ThinkPad X1 Extreme
+(Gen 2), and it piqued my curiosity.</p>
+
+<h2 id="peripherals">Peripherals</h2>
+
+<p>Let me start by going into the key peripherals of a laptop: keyboard, touchpad
+and screen. I will talk about these independently from the remaining hardware
+because they define the experience of using the computer.</p>
+
+<h3 id="keyboard">Keyboard</h3>
+
+<p>After having used the Dell XPS 9360 for a few years, I can confidently say that
+the keyboard of the ThinkPads is definitely much better, and in a noticeable
+way.</p>
+
+<p>It’s not that the Dell keyboards are <em>bad</em>. But comparing the Dell and ThinkPad
+side-by-side makes it really clear that the ThinkPad keyboards are the best
+notebook keyboards.</p>
+
+<p>On the ThinkPad keyboard, every key press lands exactly as I imagine. Never do I
+need to hit a key twice because I didn’t press it just-right, and never do I
+notice additional ghost key presses.</p>
+
+<p>Even though I connect my external Kinesis Advantage keyboard when doing longer
+stretches of work, the quality of the built-in keyboard matters: a good keyboard
+enables using the laptop on the couch.</p>
+
+<h3 id="touchpad">Touchpad</h3>
+
+<p>Unfortunately, while the keyboard is great, I can’t say the same about the
+touchpad. I mean, it’s not terrible, but it’s also not good by any stretch.</p>
+
+<p>This seems to be the status quo with PC touchpads for decades. It really blows
+my mind that Apple’s touchpads are consistently so much better!</p>
+
+<p>My only hope is that <a href="https://github.com/sponsors/gitclear">Bill Harding
+(GitClear)</a>, who is working on improving
+the Linux touchpad experience, will eventually find a magic software tweak or
+something…</p>
+
+<p>As <a href="https://wiki.archlinux.org/index.php/Lenovo_ThinkPad_X1_Extreme_(Gen_2)#Touchpad">mentioned on the
+ArchWiki</a>,
+I also had to adjust the sensitivity like so:</p>
+
+<pre><code>% xinput set-prop 'SynPS/2 Synaptics TouchPad' 'libinput Accel Speed' 0.5
+</code></pre>
+
+<h3 id="display">Display</h3>
+
+<p>I have high demands regarding displays: since 2013, every device of mine has a
+hi-dpi display.</p>
+
+<p>The industry hasn’t improved displays across the board as fast as I’d like, so
+non-hi-dpi displays are still quite common. The silver lining is that it makes
+laptop selection a little easier for me: anything without a decent display I can
+discard right away.</p>
+
+<p>I’m glad to report that the 4K display in the ThinkPad X1 Extreme with its
+3840x2160 pixels is sharp, bright, and generally has good viewing angles.</p>
+
+<p>It’s also a touchscreen, which I don’t strictly need, but it’s nice to use it
+from time to time.</p>
+
+<p>I use the display in 200% scaling mode, i.e. I set <code>Xft.dpi: 192</code>. See also
+<a href="https://wiki.archlinux.org/index.php/HiDPI">HiDPI in ArchWiki</a>.</p>
+
+<aside class="admonition note">
+  <div class="note-container">
+    <div class="note-icon">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+    </div>
+    <div class="admonition-content"><strong>Tip</strong>: In case your brightness control keys don’t work, check if the <a href="https://gitlab.freedesktop.org/drm/intel/issues/510">required
+patches</a> have not been
+applied in your environment yet.</div>
+  </div>
+</aside>
+
+
+<h2 id="hardware">Hardware</h2>
+
+<p>Spec-wise, the ThinkPad X1 Extreme is a beast!</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-06-05-laptop-review-lenovo-thinkpad-x1-extreme-gen2/specs.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-06-05-laptop-review-lenovo-thinkpad-x1-extreme-gen2/specs_hub98e688078adf6db327505acb00135c2_814598_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-06-05-laptop-review-lenovo-thinkpad-x1-extreme-gen2/specs_hub98e688078adf6db327505acb00135c2_814598_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-06-05-laptop-review-lenovo-thinkpad-x1-extreme-gen2/specs_hub98e688078adf6db327505acb00135c2_814598_600x0_resize_q75_box.jpg"
+  alt="ThinkPad X1 Extreme Specs" title="ThinkPad X1 Extreme Specs"
+  width="600"
+  height="475"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>The build quality seems very robust to me.</p>
+
+<p>Another big plus of the ThinkPad series over other laptop series is the
+availability of the official Hardware Maintenance Manual: you can put “ThinkPad
+X1 Extreme Gen 2 Hardware Maintenance Manual” into Google and will find
+<a href="https://download.lenovo.com/pccbbs/mobiles_pdf/p1_gen2_x1extreme_hmm_v1.pdf"><code>p1_gen2_x1extreme_hmm_v1.pdf</code></a>
+as the first hit. This manual describes in detail how to repair or upgrade your
+device if you want to (or have to) do it yourself.</p>
+
+<h3 id="wifi">WiFi</h3>
+
+<p>The built-in Intel AX200 WiFi interface works fine, provided you have a
+new-enough <code>linux-firmware</code> package and kernel version installed.</p>
+
+<p>I had trouble with Linux 5.6.0, and Linux 5.6.5 fixed it. Luckily, at the time
+of writing, Linux 5.11 is the most recent release, so most distributions should
+be recent enough for things to just work.</p>
+
+<p>The WiFi card reaches almost the same download speed as the most modern WiFi
+device I can test: a MacBook Air M1. Both are connected to my <a href="https://unifi-hd.ui.com/">UniFi
+UAP-AC-HD</a> access point.</p>
+
+<table>
+<thead>
+<tr>
+<th>Laptop</th>
+<th>Download</th>
+<th>Upload</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>ThinkPad X1 Extreme</td>
+<td>500 Mbit/s</td>
+<td>150 Mbit/s</td>
+</tr>
+
+<tr>
+<td>MacBook Air M1</td>
+<td>600 Mbit/s</td>
+<td>500 Mbit/s</td>
+</tr>
+</tbody>
+</table>
+
+<p>I’m not sure why the upload speed is so low in comparison.</p>
+
+<h3 id="gpu">GPU</h3>
+
+<p>The GPU in this machine is by far the most troublesome bit of hardware.</p>
+
+<p>I had hoped that after many years of laptops containing Intel/nVidia hybrid
+graphics, this setup would largely work, but was disappointed.</p>
+
+<p>Both the proprietary nVidia driver and the <code>nouveau</code> driver would not work
+reliably for me. I ran into kernel error messages and hard-freezes, with even
+SSH sessions to the machine breaking.</p>
+
+<p>In the end, I blacklisted the <code>nouveau</code> driver to use Intel graphics only:</p>
+
+<pre><code>% echo blacklist nouveau | sudo tee /etc/modprobe.d/blacklist.conf 
+</code></pre>
+
+<p>Without the nVidia driver, the GPU will not go into powersave mode, so I remove
+it from the PCI bus entirely to save power:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#007020">#!/bin/zsh
+</span><span style="color:#007020"></span>
+sudo tee /sys/bus/pci/devices/0000<span style="color:#4070a0;font-weight:bold">\:</span><span style="color:#40a070">01</span><span style="color:#4070a0;font-weight:bold">\:</span><span style="color:#40a070">00</span>.0/remove <span style="color:#666">&lt;&lt;&lt;</span><span style="color:#40a070">1</span>
+sudo tee /sys/bus/pci/devices/0000<span style="color:#4070a0;font-weight:bold">\:</span><span style="color:#40a070">01</span><span style="color:#4070a0;font-weight:bold">\:</span><span style="color:#40a070">00</span>.1/remove <span style="color:#666">&lt;&lt;&lt;</span><span style="color:#40a070">1</span></code></pre></div>
+<p>You can only re-awaken the GPU with a reboot.</p>
+
+<p>Obviously this isn’t a great setup — I would prefer to be able to actually use
+the GPU. If you have any tips or a better experience, please let me know.</p>
+
+<p>Also note that the HDMI port will be unusable if you go this route, as the HDMI
+port is connected to the nVidia GPU only.</p>
+
+<h3 id="battery-life">Battery life</h3>
+
+<p>The 80 Wh battery lasts between 5 to 6 hours for me, without any extra power
+saving tuning beyond what the Linux distribution Fedora 33 comes with by
+default.</p>
+
+<p>This is good enough for using the laptop away from a power socket from time to
+time, which matches my expectation for this kind of mobile workstation.</p>
+
+<h2 id="software-support">Software support</h2>
+
+<p>Linux support is generally good on this machine! Yes, I provide a few pointers
+in this article regarding problems, patches and old software versions. But, if
+you use a newer Linux distribution, all of these fixes are included and things
+just work out of the box. I tested with Fedora 33.</p>
+
+<p>For a few months, I was using this laptop exclusively with my research Linux
+distribution <a href="https://distr1.org/">distri</a>, so even if you just track upstream
+software closely, the machine works well.</p>
+
+<h3 id="firmware-updates">Firmware updates</h3>
+
+<p>Lenovo partnered with the <a href="https://fwupd.org/">Linux Vendor Firmware Service Project
+(LVFS)</a>, which means that through <code>fwupd</code>, ThinkPad laptops
+such as this X1 Extreme can easily receive firmware updates!</p>
+
+<p>This is a huge improvement in comparison to earlier ThinkPad models, where you
+had to jump through hoops with Windows-only software, or CD images that you
+needed to boot just right.</p>
+
+<p>If your laptop has a very old firmware version (before <code>1.30</code>), you might be
+affected by the <a href="https://wiki.archlinux.org/index.php/Lenovo_ThinkPad_X1_Extreme_(Gen_2)#Skipping_keystrokes">skipping
+keystrokes</a>
+issues. You can check using the always-handy <a href="https://manpages.debian.org/lshw.1"><code>lshw(1)</code></a>
+
+tool.</p>
+
+<h2 id="performance">Performance</h2>
+
+<p>The specific configuration of my ThinkPad is:</p>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>ThinkPad X1 Extreme Spec (2020)</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>CPU</td>
+<td>Intel Core i7-9750H CPU @ 2.60GHz</td>
+</tr>
+
+<tr>
+<td>RAM</td>
+<td>2 × 32 GB Samsung M471A4G43MB1-CTD</td>
+</tr>
+
+<tr>
+<td>Disk</td>
+<td>2 × SAMSUNG MZVLB2T0HALB-000L7 NVMe disk</td>
+</tr>
+</tbody>
+</table>
+
+<p>You can google for CPU benchmarks and comparisons yourself, and those likely are
+more scientific and carefully done than I have time for.</p>
+
+<p>What I can provide however, is a comparison of working on one of my projects on
+the ThinkPad vs. on my workstation, an Intel Core i9-9900K that I bought in
+2018:</p>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Workstation Spec (2018)</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>CPU</td>
+<td>Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz</td>
+</tr>
+
+<tr>
+<td>RAM</td>
+<td>4 × Corsair CMK32GX4M2A2666C16</td>
+</tr>
+
+<tr>
+<td>Disk</td>
+<td>Corsair Force MP600 M.2 NVMe disk</td>
+</tr>
+</tbody>
+</table>
+
+<p>Specifically, I am comparing how long my manpage static archive generator
+<a href="https://github.com/Debian/debiman/">debiman</a> takes to analyze and render all
+manpages in Debian unstable, using the following command:</p>
+
+<pre><code>ulimit -n 8192; time ~/go/bin/debiman \
+  -keyring=/usr/share/keyrings/debian-archive-keyring.gpg \
+  -sync_codenames=, \
+  -sync_suites=unstable \
+  -serving_dir=/srv/man/benchmark \
+  -inject_assets=~/go/src/github.com/Debian/debiman/debian-assets \
+  -concurrency_render=20 \
+  -alternatives_dir=~/go/src/github.com/Debian/debiman/piuparts
+</code></pre>
+
+<p>On both machines, I ensured that:</p>
+
+<ol>
+<li>The CPU performance governor was set to <code>performance</code></li>
+<li>A warm <code>apt-cacher-ng</code> cache was present, i.e. network download was not part of the test.</li>
+<li>Linux kernel caches were dropped using <code>echo 3 | sudo tee /proc/sys/vm/drop_caches</code></li>
+<li>I was using <a href="https://github.com/Debian/debiman/tree/f78c160f05c1f4d25c7836a6ca9198019947c1b5">debiman git revision <code>f78c160</code></a></li>
+</ol>
+
+<p>Here are the results:</p>
+
+<table>
+<thead>
+<tr>
+<th>Machine</th>
+<th>Time</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>i9-9900K Workstation</td>
+<td>4:57,10 (100%)</td>
+</tr>
+
+<tr>
+<td>ThinkPad X1 Extreme (Gen 2)</td>
+<td>7:19,56 (147%)</td>
+</tr>
+</tbody>
+</table>
+
+<p>This reaffirms my impression that even high-end laptop hardware just cannot beat
+a workstation setup (which has more space and better thermals), but it comes
+close enough to be useful.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Positives:</p>
+
+<ul>
+<li><p>The ergonomics of the device really are great. It is a pleasure to type on a
+first-class, full-size ThinkPad keyboard. The screen has good quality and a
+high resolution.</p></li>
+
+<li><p>Performance-wise, this machine can almost replace a proper workstation.</p></li>
+</ul>
+
+<p>Negatives are:</p>
+
+<ul>
+<li>the mediocre battery life</li>
+<li>an annoyingly loud fan that spins up too frequently</li>
+<li>poor software/driver support for hybrid nVidia GPUs.</li>
+</ul>
+
+<p>Notably, all of these could be improved by better power saving, so perhaps it’s
+just a matter of time until Linux kernel developers land some improvements…? :)</p>
+]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[How I configured and then promptly returned a MikroTik CCR2004 router for Fiber7]]></title>
     <link href="https://michael.stapelberg.ch/posts/2021-05-28-configured-and-returned-mikrotik-ccr2004-for-fiber7/"/>
     <id>https://michael.stapelberg.ch/posts/2021-05-28-configured-and-returned-mikrotik-ccr2004-for-fiber7/</id>
@@ -5947,195 +6377,6 @@ see all the custom builds and modifications!</p>
 <p>By the way, there is also a (4-hour!) <a href="https://youtu.be/I0kwQbnhlfk">stream
 recording</a> in case you are interested in some more
 history and context, and want to see me solder a kinT controller live on stream!</p>
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[Using the iPhone camera as a Linux webcam with v4l2loopback]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2020-06-06-iphone-camera-linux-v4l2loopback/"/>
-    <id>https://michael.stapelberg.ch/posts/2020-06-06-iphone-camera-linux-v4l2loopback/</id>
-    <published>2020-06-06T11:18:00+02:00</published>
-    <content type="html"><![CDATA[
-
-<!-- TODO: align=right -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2020-06-06-iphone-camera-linux-v4l2loopback/2020-06-06-iphone-cam.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2020-06-06-iphone-camera-linux-v4l2loopback/2020-06-06-iphone-cam_hud2d472f6b7b139eb735fe6ed7f317f07_1422223_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-06-06-iphone-camera-linux-v4l2loopback/2020-06-06-iphone-cam_hud2d472f6b7b139eb735fe6ed7f317f07_1422223_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2020-06-06-iphone-camera-linux-v4l2loopback/2020-06-06-iphone-cam_hud2d472f6b7b139eb735fe6ed7f317f07_1422223_600x0_resize_q75_box.jpg"
-  alt="iPhone camera setup" title="iPhone camera setup"
-  width="600"
-  height="800"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-
-<p>For my <a href="https://www.twitch.tv/stapelberg">programming stream at
-twitch.tv/stapelberg</a>, I wanted to add an
-additional camera to show test devices, electronics projects, etc. I couldn’t
-find my old webcam, and new ones are hard to come by currently, so I figured I
-would try to include a phone camera somehow.</p>
-
-<p>The setup that I ended up with is:</p>
-
-<p>iPhone camera<br>
-→ Instant Webcam<br>
-→ WiFi<br>
-→ gstreamer<br>
-→ v4l2loopback<br>
-→ OBS</p>
-
-<p>Disclaimer: I was only interested in a video stream! I don’t think this setup
-would be helpful for video conferencing, due to lacking audio/video
-synchronization.</p>
-
-<h3 id="iphone-software-instant-webcam-app">iPhone Software: Instant Webcam app</h3>
-
-<p>I’m using the <a href="https://instant-webcam.com/">PhobosLab Instant Webcam</a> (install
-from the <a href="https://apps.apple.com/us/app/instant-webcam/id683949930">Apple App
-Store</a>) app on an old
-iPhone 8 that I bought used.</p>
-
-<p>There are three interesting related blog posts by app author Dominic Szablewski:</p>
-
-<ol>
-<li><a href="https://phoboslab.org/log/2013/05/mpeg1-video-decoder-in-javascript">MPEG1 Video Decoder in JavaScript</a> (2013-May)</li>
-<li><a href="https://phoboslab.org/log/2013/09/html5-live-video-streaming-via-websockets">HTML5 Live Video Streaming via WebSockets</a> (2013-Sep)</li>
-<li><a href="https://phoboslab.org/log/2017/02/decode-it-like-its-1999">Decode it like it’s 1999</a> (2017-Feb)</li>
-</ol>
-
-<p>As hinted at in the blog posts, the way the app works is by streaming MPEG1
-video from the iPhone (presumably via ffmpeg?) to the <a href="https://jsmpeg.com/">jsmpeg JavaScript
-library</a> via WebSockets.</p>
-
-<p>After some git archeology, I figured out that <a href="https://github.com/phoboslab/jsmpeg/commit/7bf420fd0c176d626a50494bfe32135dd911483d">jsmpeg was rewritten in commit
-7bf420fd just after
-v0.2</a>. You
-can <a href="https://github.com/phoboslab/jsmpeg/tree/186666dd9c2d1fd3430d41f15f695d4a78ed1e42">browse the old version on
-GitHub</a>.</p>
-
-<p>Notably, the Instant Webcam app seems to <strong>still use the older v0.2 version</strong>,
-which <a href="https://github.com/phoboslab/jsmpeg/blob/186666dd9c2d1fd3430d41f15f695d4a78ed1e42/stream-server.js">starts WebSocket streams with a custom 8-byte
-header</a>
-that we need to strip.</p>
-
-<h3 id="linux-software">Linux Software</h3>
-
-<p>Install the <a href="https://github.com/umlaeute/v4l2loopback"><code>v4l2loopback</code></a> kernel
-module, e.g.
-<a href="https://www.archlinux.org/packages/community/any/v4l2loopback-dkms/"><code>community/v4l2loopback-dkms</code></a>
-on Arch Linux or
-<a href="https://packages.debian.org/bullseye/v4l2loopback-dkms"><code>v4l2loopback-dkms</code></a> on
-Debian. I used version 0.12.5-1 at the time of writing.</p>
-
-<p>Then, install <a href="https://gstreamer.freedesktop.org/">gstreamer</a> and required
-plugins. I used version 1.16.2 for all of these:</p>
-
-<ul>
-<li><a href="https://www.archlinux.org/packages/extra/x86_64/gstreamer/"><code>gstreamer</code></a></li>
-<li><a href="https://www.archlinux.org/packages/extra/x86_64/gst-plugins-bad/"><code>gst-plugins-bad</code></a> for <code>mpegvideoparse</code></li>
-<li><a href="https://www.archlinux.org/packages/extra/x86_64/gst-libav/"><code>gst-libav</code></a> for <code>avdec_mpeg2video</code></li>
-</ul>
-
-<p>Lastly, install either <a href="https://github.com/vi/websocat"><code>websocat</code></a> or
-<a href="https://github.com/esphen/wsta"><code>wsta</code></a> for accessing WebSockets. I
-successfully tested with <code>websocat</code> 1.5.0 and <code>wsta</code> 0.5.0.</p>
-
-<h3 id="streaming">Streaming</h3>
-
-<p>First, load the <code>v4l2loopback</code> kernel module:</p>
-
-<pre><code>% sudo modprobe v4l2loopback video_nr=10 card_label=v4l2-iphone
-</code></pre>
-
-<p>Then, we’re going to use gstreamer to decode the WebSocket MPEG1 stream (after
-stripping the custom 8-byte header) and send it into the <code>/dev/video10</code> V4L2
-device, to the <code>v4l2loopback</code> kernel module:</p>
-
-<pre><code>% websocat --binary ws://iPhone.lan/ws | \
-  dd bs=8 skip=1 | \
-  gst-launch-1.0 \
-    fdsrc \
-    ! queue \
-    ! mpegvideoparse \
-    ! avdec_mpeg2video \
-    ! videoconvert \
-    ! videorate \
-    ! 'video/x-raw, format=YUY2, framerate=30/1' \
-    ! v4l2sink device=/dev/video10 sync=false
-</code></pre>
-
-<p>Here are a couple of notes about individual parts of this pipeline:</p>
-
-<ul>
-<li><p>You must set <code>websocat</code> (or the alternative
-<a href="https://github.com/esphen/wsta"><code>wsta</code></a>) into binary mode, otherwise they
-will garble the output stream with newline characters, resulting in a
-seemingly kinda working stream that just displays garbage. Ask me how I know.</p></li>
-
-<li><p>The <code>queue</code> element uncouples decoding from reading from the network socket,
-which should help in case the network has intermittent troubles.</p></li>
-
-<li><p>Without enforcing <code>framerate=30/1</code>, you cannot cancel and restart the
-gstreamer pipeline: subsequent invocations will fail with <code>streaming stopped,
-reason not-negotiated (-4)</code></p></li>
-
-<li><p>Setting format <code>YUY2</code> allows <code>ffmpeg</code>-based decoders to play the
-stream. Without this setting, e.g. <code>ffplay</code> will fail with <code>[ffmpeg/demuxer]
-video4linux2,v4l2: Dequeued v4l2 buffer contains 462848 bytes, but 460800 were
-expected. Flags: 0x00000001.</code></p></li>
-
-<li><p>The <code>sync=false</code> property on <code>v4l2sink</code> plays frames as quickly as possible
-without trying to do any synchronization.</p></li>
-</ul>
-
-<p>Now, consumers such as <a href="https://obsproject.com/">OBS (Open Broadcaster
-Software)</a>, <code>ffplay</code> or <code>mpv</code> can capture from
-<code>/dev/video10</code>:</p>
-
-<pre><code>% ffplay /dev/video10
-% mpv av://v4l2:/dev/video10 --profile=low-latency
-</code></pre>
-
-<h3 id="debugging">Debugging</h3>
-
-<p>Hopefully the instructions above just work for you, but in case things go wrong,
-maybe the following notes are helpful.</p>
-
-<p>To debug issues, I used the <code>GST_DEBUG_DUMP_DOT_DIR</code> environment variable as
-described on <a href="https://gstreamer.freedesktop.org/documentation/tutorials/basic/debugging-tools.html?gi-language=c#getting-pipeline-graphs">Debugging tools: Getting pipeline
-graphs</a>. In
-these graphs, you can quickly see which pipeline elements negotiate which caps.</p>
-
-<p>I also used the <a href="https://github.com/phoboslab/pl_mpeg">PL_MPEG</a> example program
-to play the <a href="https://phoboslab.org/files/bjork-all-is-full-of-love.mpg">supplied MPEG test
-file</a>. PL_MPEG is
-written by Dominic Szablewski as well, and you can read more about it in
-Dominic’s blog post <a href="https://phoboslab.org/log/2019/06/pl-mpeg-single-file-library">MPEG1 Single file C
-library</a>. I
-figured the codec and parameters might be similar between the different projects
-of the same author and used this to gain more confidence into the stream
-parameters.</p>
-
-<p>I also used <a href="https://www.wireshark.org/">Wireshark</a> to look at the stream
-traffic to discover that <code>websocat</code> and <code>wsta</code> garble the stream output by
-default unless the <code>--binary</code> flag is used.</p>
 ]]></content>
   </entry>
 </feed>

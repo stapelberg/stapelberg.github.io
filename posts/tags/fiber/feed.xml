@@ -7,6 +7,1085 @@
   <id>https://michael.stapelberg.ch/posts/tags/fiber/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[25 Gigabit Linux internet router PC build]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/"/>
+    <id>https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/</id>
+    <published>2021-07-10T13:43:00+02:00</published>
+    <content type="html"><![CDATA[
+
+<p>init7 recently announced that with their <a href="https://www.init7.net/en/internet/fiber7/">FTTH fiber offering
+Fiber7</a>, they will now sell and
+connect you with 25 Gbit/s (Fiber7-X2) or 10 Gbit/s (Fiber7-X) fiber optics, if
+you want more than 1 Gbit/s.</p>
+
+<p>While this offer will only become available at my location late this year (<a href="https://twitter.com/init7/status/1403287499175235584">or
+possibly later due to the supply chain
+shortage</a>), I already
+wanted to get the hardware on my end sorted out.</p>
+
+<p>After my <a href="/posts/2021-05-28-configured-and-returned-mikrotik-ccr2004-for-fiber7/">previous
+disappointment</a>
+with the MikroTik CCR2004, I decided to try a custom PC build.</p>
+
+<p>An alternative to many specialized devices, including routers, is to use a PC
+with an expansion card. An internet router’s job is to configure a network
+connection and forward network packets. So, in our case, we’ll build a PC and
+install some network expansion cards!</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-router-featured.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-router-featured_hu1fe795dd8828eccf339de1acf31abbd0_2106743_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-router-featured_hu1fe795dd8828eccf339de1acf31abbd0_2106743_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-router-featured_hu1fe795dd8828eccf339de1acf31abbd0_2106743_600x0_resize_q75_box.jpg"
+  alt="router PC build" title="router PC build"
+  width="600"
+  height="607"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<h2 id="goals">Goals</h2>
+
+<p>For this PC internet router build, I had the following goals, highest priority
+to lowest priority:</p>
+
+<ol>
+<li>Enough performance to saturate 25 Gbit/s, e.g. with two 10 Gbit/s downloads.</li>
+<li>Silent: no loud fan noise.</li>
+<li>Power-efficient: low power usage, as little heat as possible.</li>
+<li>Low cost (well, for a high-end networking build…).</li>
+</ol>
+
+<h2 id="network-port-plan">Network Port Plan</h2>
+
+<p>The simplest internet router has 2 network connections: one uplink to the
+internet, and the local network. You can build a router without extra cards by
+using a mainboard with 2 network ports.</p>
+
+<p>Because there are no mainboards with SFP28 slots (for 25 Gbit/s SFP28 fiber
+modules), we need at least 1 network card for our build. You might be able to
+get by with a dual-port SFP28 network card if you have an SFP28-compatible
+network switch already, or need just one fast connection.</p>
+
+<p>I want to connect a few fast devices (directly and via fiber) to my router, so
+I’m using 2 network cards: an SFP28 network card for the uplink, and a quad-port
+10G SFP+ network card for the local network (LAN). This leaves us with the
+following network ports and connections:</p>
+
+<table>
+<thead>
+<tr>
+<th>Network Card</th>
+<th>max speed</th>
+<th>cable</th>
+<th>effective</th>
+<th>Connection</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Intel XXV710</td>
+<td>25 Gbit/s</td>
+<td>fiber</td>
+<td>25 Gbit/s</td>
+<td>Fiber7-X2 uplink</td>
+</tr>
+
+<tr>
+<td>Intel XXV710</td>
+<td>25 Gbit/s</td>
+<td>DAC</td>
+<td>10 Gbit/s</td>
+<td>workstation</td>
+</tr>
+
+<tr>
+<td>Intel XL710</td>
+<td>10 Gbit/s</td>
+<td>RJ45</td>
+<td>1 Gbit/s</td>
+<td>rest (RJ45 Gigabit)</td>
+</tr>
+
+<tr>
+<td>Intel XL710</td>
+<td>10 Gbit/s</td>
+<td>fiber</td>
+<td>10 Gbit/s</td>
+<td>MikroTik 1</td>
+</tr>
+
+<tr>
+<td>Intel XL710</td>
+<td>10 Gbit/s</td>
+<td>fiber</td>
+<td>10 Gbit/s</td>
+<td>MikroTik 2</td>
+</tr>
+
+<tr>
+<td>Intel XL710</td>
+<td>10 Gbit/s</td>
+<td>/</td>
+<td>10 Gbit/s</td>
+<td>(unused)</td>
+</tr>
+
+<tr>
+<td>onboard</td>
+<td>2.5 Gbit/s</td>
+<td>RJ45</td>
+<td>1 Gbit/s</td>
+<td>(management)</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-back-connectors.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-back-connectors_hu2cfa90931bbae9f0fd461262de6dceaf_1588951_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-back-connectors_hu2cfa90931bbae9f0fd461262de6dceaf_1588951_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-back-connectors_hu2cfa90931bbae9f0fd461262de6dceaf_1588951_600x0_resize_q75_box.jpg"
+  alt="network connectors" title="network connectors"
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<h2 id="hardware-selection">Hardware selection</h2>
+
+<p>Now that we have defined the goals and network needs, let’s select the actual
+hardware!</p>
+
+<h3 id="network-cards">Network Cards</h3>
+
+<p>My favorite store for 10 Gbit/s+ network equipment is
+<a href="https://www.fs.com/">FS.COM</a>. They offer Intel-based cards:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-03-network-cards.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-03-network-cards_hue8caea776ef0fb2df2e421fd4fc4446d_3100418_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-03-network-cards_hue8caea776ef0fb2df2e421fd4fc4446d_3100418_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-03-network-cards_hue8caea776ef0fb2df2e421fd4fc4446d_3100418_600x0_resize_q75_box.jpg"
+  alt="Network cards" title="Network cards"
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<ul>
+<li><p>(347 CHF) PCIe 3.0 x8 Dual-Port 25G SFP28 Ethernet Network Card (Intel XXV710) <br />
+<a href="https://www.fs.com/de/products/75603.html">FS.COM XXV710AM2-F2 #75603</a></p></li>
+
+<li><p>(329 CHF) PCIe 3.0 x8 Quad-Port 10G SFP+ Ethernet Network Card (Intel XL710-BM1) <br />
+<a href="https://www.fs.com/de/products/75602.html">FS.COM FTXL710BM1-F4 #75602</a></p></li>
+</ul>
+
+<p>Both cards work out of the box with the <a href="https://www.kernel.org/doc/Documentation/networking/i40e.txt"><code>i40e</code> Linux kernel
+driver</a>, no
+firmware blobs required.</p>
+
+<p>For a good overview over the different available Intel cards, check out the
+second page (“Product View”) in the card’s <a href="https://img-en.fs.com/file/user_manual/network-adapter-user-manual.pdf">User
+Manual</a>.</p>
+
+<h3 id="cpu-and-chipset">CPU and Chipset</h3>
+
+<p>I read on many different sites that AMD’s current CPUs beat Intel’s CPUs in
+terms of performance per watt. We can better achieve goals 2 and 3 (low noise
+and low power usage) by using fewer watts, so we’ll pick an AMD CPU and
+mainboard for this build.</p>
+
+<p>AMD’s current CPU generation is Zen 3, and <a href="https://en.wikipedia.org/wiki/List_of_AMD_Ryzen_processors#Zen_3_based">current Zen 3 based
+CPUs</a>
+can be divided into 65W <a href="https://en.wikipedia.org/wiki/Thermal_design_power">TDP (Thermal Design
+Power)</a> and 105W TDP
+models. Only one 65W model is available to customers right now: the Ryzen 5
+5600X.</p>
+
+<p>Mainboards are built for/with a certain so-called chipset. Zen 3 CPUs use the
+AM4 socket, for which <a href="https://en.wikipedia.org/wiki/Socket_AM4#Chipsets">8 different
+chipsets</a> exist. Our network
+cards need PCIe 3.0, so that disqualifies 5 chipsets right away: only the A520,
+B550 and X570 chipsets remain.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-08-ryzen5-on-mainboard.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-08-ryzen5-on-mainboard_hudb2375ee03466882b5ba09d7fd065b5d_1054095_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-08-ryzen5-on-mainboard_hudb2375ee03466882b5ba09d7fd065b5d_1054095_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-08-ryzen5-on-mainboard_hudb2375ee03466882b5ba09d7fd065b5d_1054095_600x0_resize_q75_box.jpg"
+  alt="Ryzen 5" title="Ryzen 5"
+  width="600"
+  height="440"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<h3 id="mainboard-pcie-bandwidth">Mainboard: PCIe bandwidth</h3>
+
+<p>I originally tried using the ASUS PRIME X570-P mainboard, but I ran into two
+problems:</p>
+
+<p>Too loud: X570 mainboards need an annoyingly loud chipset fan for their 15W
+TDP. Other chipsets such as the B550 don’t need a fan for their 5W TDP. With a
+loud chipset fan, goal 2 (low noise) cannot be achieved. Only the
+<a href="https://www.golem.de/news/sockel-am4-x570s-mainboards-mit-passivkuehlung-verfuegbar-2106-157434.html">recently-released X570<strong>S</strong>
+variant</a>
+comes without fans.</p>
+
+<p>Not enough PCIe bandwidth/slots! This is how the ASUS tech specs describe the slots:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/x570p_expansion.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/x570p_expansion_hu3e0f2d5aa6180df20bb553ed5c6fa57b_271626_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/x570p_expansion_hu3e0f2d5aa6180df20bb553ed5c6fa57b_271626_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/x570p_expansion_hu3e0f2d5aa6180df20bb553ed5c6fa57b_271626_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="244"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>This means the board has 2 slots (1 CPU, 1 chipset) that are physically wide
+enough to hold a full-length x16 card, but only the first port can
+electronically be used as an x16 slot. The other port only has PCIe lanes
+electronically connected for x4, hence “x16 (max at x4 mode)”.</p>
+
+<p>Unfortunately, our network cards need electrical connection of all their PCIe x8
+lanes to run at full speed. Perhaps Intel/FS.COM will one day offer a new
+generation of network cards that use PCIe <strong>4.0</strong>, because PCIe 4.0 x4 achieves
+the same 7.877 GB/s throughput as PCIe <strong>3.0</strong> x8. Until then, I needed to find
+a new mainboard.</p>
+
+<p>Searching mainboards by PCIe capabilities is rather tedious, as mainboard block
+diagrams or PCIe tree diagrams are not consistently available from all mainboard
+vendors.</p>
+
+<p>Instead, we can look explicitly for a feature called <strong>PCIe Bifurcation</strong>. In a
+nutshell, PCIe bifurcation lets us divide the PCIe bandwidth from the Ryzen CPU
+from 1 PCIe 4.0 x16 into 1 PCIe 4.0 x8 + 1 PCIe 4.0 x8, definitely satisfying
+our requirement for two x8 slots at full bandwidth.</p>
+
+<p>I found a list of (only!) three B550 mainboards supporting PCIe Bifurcation in <a href="https://www.anandtech.com/show/15850/the-amd-b550-motherboard-overview-asus-gigabyte-msi-asrock-and-others/39">an
+Anandtech
+review</a>. Two
+are made by Gigabyte, one by ASRock. I read the Gigabyte UEFI setup is rather
+odd, so I went with the ASRock B550 Taichi mainboard.</p>
+
+<h3 id="case">Case</h3>
+
+<p>For the case, I needed a midi case (large enough for the B550 mainboard’s ATX
+form factor) with plenty of options for large, low-spinning fans.</p>
+
+<p>I stumbled upon the <a href="#">Corsair 4000D Airflow</a>, which is available for 80 CHF
+and <a href="https://www.gamersnexus.net/hwreviews/3624-corsair-4000d-airflow-case-review-vs-solid-panel">achieved positive
+reviews</a>. I’m
+pleased with the 4000D: there are no sharp corners, installation is quick, easy
+and clean, and the front and top panels offer plenty of space for cooling behind
+large air intakes:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-01-airflow-case-top.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-01-airflow-case-top_hu74d32c9eb10022fb50f09605538b4d16_1754161_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-01-airflow-case-top_hu74d32c9eb10022fb50f09605538b4d16_1754161_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-01-airflow-case-top_hu74d32c9eb10022fb50f09605538b4d16_1754161_600x0_resize_q75_box.jpg"
+  alt="Airflow case (from the top)" title="Airflow case (from the top)"
+  width="600"
+  height="699"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>Inside, the case offers plenty of space and options for routing cables on the back side:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-case-back.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-case-back_hu24f36c0d8bab8e8a026702698b97bc68_1930320_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-case-back_hu24f36c0d8bab8e8a026702698b97bc68_1930320_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-case-back_hu24f36c0d8bab8e8a026702698b97bc68_1930320_600x0_resize_q75_box.jpg"
+  alt="Airflow case (back)" title="Airflow case (back)"
+  width="600"
+  height="536"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>Which in turn makes for a clean front side:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-case-front.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-case-front_hu876ee6dd48eb5e24d09b830a310f7016_2072230_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-case-front_hu876ee6dd48eb5e24d09b830a310f7016_2072230_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-case-front_hu876ee6dd48eb5e24d09b830a310f7016_2072230_600x0_resize_q75_box.jpg"
+  alt="Airflow case (front)" title="Airflow case (front)"
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<h3 id="fans">Fans</h3>
+
+<p>I have been happy with <a href="https://noctua.at/">Noctua</a> fans for many years. In this
+build, I’m using only Noctua fans so that I can reach goal 2 (silent, no loud
+fan noise):</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-01-noctua-fans.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-01-noctua-fans_hufa2be48cd91c5b51113bfeb4460bf154_1457999_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-01-noctua-fans_hufa2be48cd91c5b51113bfeb4460bf154_1457999_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-01-noctua-fans_hufa2be48cd91c5b51113bfeb4460bf154_1457999_600x0_resize_q75_box.jpg"
+  alt="Noctua fans" title="Noctua fans"
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>These fans are large (140mm), so they can spin on slow speeds and still be
+effective.</p>
+
+<p>The specific fan configuration I ended up with:</p>
+
+<ul>
+<li>1 Noctua NF-A14 PWM 140mm in the front, pulling air out of the case</li>
+<li>1 Noctua NF-A14 PWM 140mm in the top, pulling air into the case</li>
+<li>1 Noctua NF-A12x25 PWM 120mm in the back, pulling air into the case</li>
+<li>1 Noctua NH-L12S CPU fan</li>
+</ul>
+
+<p>Note that this is most likely overkill: I can well imagine that I could turn off
+one of these fans entirely without a noticeable effect on temperatures. But I
+wanted to be on the safe side and have a lot of cooling capacity, as I don’t
+know how hot the Intel network cards run in practice.</p>
+
+<h3 id="fan-controller">Fan Controller</h3>
+
+<p>The ASRock B550 Taichi <a href="https://www.techpowerup.com/review/asrock-b550-taichi/7.html">comes with a Nuvoton
+NCT6683D-T</a> fan
+controller.</p>
+
+<p>Unfortunately, ASRock seems to have set the Customer ID register to 0 instead of
+<code>CUSTOMER_ID_ASROCK</code>, so you need to load the <code>nct6683</code> Linux driver with its
+<code>force</code> option.</p>
+
+<p>Once the module is loaded, <code>lm-sensors</code> lists accurate PWM fan speeds, but the
+temperature values are mislabeled and don’t quite match the temperatures I see
+in the UEFI H/W Monitor:</p>
+
+<pre><code>nct6683-isa-0a20
+Adapter: ISA adapter
+fan1:              471 RPM  (min =    0 RPM)
+fan2:                0 RPM  (min =    0 RPM)
+fan3:                0 RPM  (min =    0 RPM)
+fan4:                0 RPM  (min =    0 RPM)
+fan5:                0 RPM  (min =    0 RPM)
+fan6:                0 RPM  (min =    0 RPM)
+fan7:                0 RPM  (min =    0 RPM)
+Thermistor 14:     +45.5 C  (low  =  +0.0 C)
+                            (high =  +0.0 C, hyst =  +0.0 C)
+                            (crit =  +0.0 C)  sensor = thermistor
+AMD TSI Addr 98h:  +40.0 C  (low  =  +0.0 C)
+                            (high =  +0.0 C, hyst =  +0.0 C)
+                            (crit =  +0.0 C)  sensor = AMD AMDSI
+intrusion0:       OK
+beep_enable:      disabled
+</code></pre>
+
+<p>At least with the <code>nct6683</code> Linux driver, there is no way to change the PWM fan
+speed: the corresponding files in the <code>hwmon</code> interface are marked read-only.</p>
+
+<p>At this point I accepted that I won’t be able to work with the fan controller
+from Linux, and tried just configuring static fan control settings in the UEFI
+setup.</p>
+
+<p>But despite identical fan settings, one of my 140mm fans would end up turned
+off. I’m not sure why — is it an unclean PWM signal, or is there just a bug in
+the fan controller?</p>
+
+<p>Controlling the fans to reliably spin at a low speed is vital to reach goal 2
+(low noise), so I looked around for third-party fan controllers and found the
+<a href="https://www.corsair.com/eu/en/Categories/Products/Accessories-%7C-Parts/iCUE-CONTROLLERS/iCUE-Commander-PRO-Smart-RGB-Lighting-and-Fan-Speed-Controller/p/CL-9011110-WW">Corsair Commander
+Pro</a>,
+which <a href="https://blog.ktz.me/a-usb-fan-controller-that-now-works-under-linux/">a blog post explains is compatible with
+Linux</a>.</p>
+
+<h3 id="server-disk">Server Disk</h3>
+
+<p>This part of the build is not router-related, but I figured if I have a fast
+machine with a fast network connection, I could add a fast big disk to it and
+retire my other server PC.</p>
+
+<p>Specifically, I chose the Samsung 970 EVO Plus M.2 SSD with 2 TB of
+capacity. This disk can <a href="https://www.tomshardware.com/reviews/samsung-970-evo-plus-ssd,5608.html">deliver 3500 MB/s of sequential read
+throughput</a>,
+which is more than the ≈3000 MB/s that a 25 Gbit/s link can handle.</p>
+
+<h3 id="graphics-card">Graphics Card</h3>
+
+<p>An important part of computer builds for me is making troubleshooting and
+maintenance as easy as possible. In my current tech landscape, that translates
+to connecting an HDMI monitor and a USB keyboard, for example to boot from a
+different device, to enter the UEFI setup, or to look at Linux console messages.</p>
+
+<p>Unfortunately, the Ryzen 5 5600X does not have integrated graphics, so to get
+any graphics output, we need to install a graphics card. I chose the Zotac
+GeForce GT 710 Zone Edition, because it was the cheapest available card (60 CHF)
+that’s passively cooled.</p>
+
+<p>An alternative to using a graphics card might be to use a PCIe IPMI card like
+the <a href="https://www.asrockrack.com/general/productdetail.asp?Model=PAUL#Specifications">ASRock
+PAUL</a>,
+however these seem to be harder to find, and more expensive.</p>
+
+<p>Longer-term, I think the best option would be to use the Ryzen 5 5600G with
+integrated graphics, but that model only <a href="https://www.pcmag.com/news/amds-new-ryzen-5000-g-series-will-come-with-an-integrated-gpu">becomes available later this
+year</a>.</p>
+
+<h3 id="component-list">Component List</h3>
+
+<p>I’m listing 2 different options here. Option A is what I built (router+server),
+but Option B is a lot cheaper if you only want a router. Both options use the
+same base components:</p>
+
+<table>
+<thead>
+<tr>
+<th>Price</th>
+<th>Type</th>
+<th>Article</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>347 CHF</td>
+<td>Network card</td>
+<td><a href="https://www.fs.com/products/75603.html">FS.COM Intel XXV710, 2 × 25 Gbit/s (#75603)</a></td>
+</tr>
+
+<tr>
+<td>329 CHF</td>
+<td>Network card</td>
+<td><a href="https://www.fs.com/products/75602.html">FS.COM Intel XL710, 4 × 10 Gbit/s (#75602)</a></td>
+</tr>
+
+<tr>
+<td>314 CHF</td>
+<td>CPU</td>
+<td><a href="https://www.digitec.ch/de/s1/product/amd-ryzen-5-5600x-am4-370ghz-6-core-prozessor-13987919">Ryzen 5 5600X</a></td>
+</tr>
+
+<tr>
+<td>290 CHF</td>
+<td>Mainboard</td>
+<td><a href="https://www.digitec.ch/de/s1/product/asrock-b550-taichi-am4-amd-b550-atx-mainboard-13348335">ASRock B550 Taichi</a></td>
+</tr>
+
+<tr>
+<td>92 CHF</td>
+<td>Case</td>
+<td><a href="https://www.digitec.ch/de/s1/product/corsair-4000d-airflow-midi-tower-pc-gehaeuse-13552873">Corsair 4000D Airflow (Midi Tower)</a></td>
+</tr>
+
+<tr>
+<td>67 CHF</td>
+<td>Fan control</td>
+<td><a href="https://www.digitec.ch/de/s1/product/corsair-commander-pro-extern-6x-luefter-kontroller-6332927">Corsair Commander Pro</a></td>
+</tr>
+
+<tr>
+<td>65 CHF</td>
+<td>Case fan</td>
+<td><a href="https://www.digitec.ch/de/s1/product/noctua-nf-a14-pwm-140mm-1x-pc-luefter-657800">2 × Noctua NF-A14 PWM (140mm)</a></td>
+</tr>
+
+<tr>
+<td>62 CHF</td>
+<td>CPU fan</td>
+<td><a href="https://www.digitec.ch/de/s1/product/noctua-nh-l12s-7cm-cpu-kuehler-6817433">Noctua NH-L12S</a></td>
+</tr>
+
+<tr>
+<td>35 CHF</td>
+<td>Case fan</td>
+<td><a href="https://www.digitec.ch/de/s1/product/noctua-nf-a12x25-pwm-120mm-1x-pc-luefter-9161307">1 × Noctua NF-A12x25 PWM (120mm)</a></td>
+</tr>
+
+<tr>
+<td>60 CHF</td>
+<td>GPU</td>
+<td><a href="https://www.digitec.ch/de/s1/product/zotac-geforce-gt-710-zone-edition-1gb-grafikkarte-7526609">Zotac GeForce GT 710 Zone Edition (1GB)</a></td>
+</tr>
+</tbody>
+</table>
+
+<p>Base total: 1590 CHF</p>
+
+<p><strong>Option A: Server extension</strong>. Because I had some parts lying around, and because I
+wanted to use my router for serving files (from large RAM cache/fast disk), I
+went with the following parts:</p>
+
+<table>
+<thead>
+<tr>
+<th>Price</th>
+<th>Type</th>
+<th>Article</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>309 CHF</td>
+<td>Disk</td>
+<td><a href="https://www.digitec.ch/de/s1/product/samsung-970-evo-plus-2000gb-m2-2280-ssd-10339167">Samsung 970 EVO Plus 2000GB, M.2 2280</a></td>
+</tr>
+
+<tr>
+<td>439 CHF</td>
+<td>RAM</td>
+<td><a href="https://www.digitec.ch/de/s1/product/kingston-hyperx-predator-rgb-4x-16gb-ddr4-3600-dimm-288-ram-14062636">64GB HyperX Predator RAM (4x, 16GB, DDR4-3600, DIMM 288)</a></td>
+</tr>
+
+<tr>
+<td>127 CHF</td>
+<td>Power supply</td>
+<td><a href="https://www.digitec.ch/de/s1/product/corsair-sf600-platinum-600w-pc-netzteil-9034178">Corsair SF600 Platinum (600W)</a></td>
+</tr>
+
+<tr>
+<td>14 CHF</td>
+<td>Power ext</td>
+<td><a href="https://www.digitec.ch/de/s1/product/silverstone-atx-24-24pin-verlaengerung-30cm-modding-sleeving-3456447">Silverstone ATX 24-24Pin Extension (30cm)</a></td>
+</tr>
+
+<tr>
+<td>10 CHF</td>
+<td>Power ext</td>
+<td><a href="https://www.digitec.ch/de/s1/product/silverstone-atx-extension-8-844pin-30cm-modding-sleeving-5808252">Silverstone ATX Extension 8-8(4+4)Pin (30cm)</a></td>
+</tr>
+</tbody>
+</table>
+
+<p>The Corsair SF600 power supply is not server-related, I just had it lying around. I’d
+recommend going for the Corsair RM650x *2018* (which has longer cables) instead.</p>
+
+<p>Server total: 2770 CHF</p>
+
+<p><strong>Option B: Non-server (router only) alternative</strong>. If you’re <em>only</em> interested
+in routing, you can opt for cheaper low-end disk and RAM, for example:</p>
+
+<table>
+<thead>
+<tr>
+<th>Price</th>
+<th>Type</th>
+<th>Article</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>112 CHF</td>
+<td>Power supply</td>
+<td><a href="https://www.digitec.ch/de/s1/product/corsair-rm650x-2018-650w-pc-netzteil-8849945">Corsair RM650x *2018*</a></td>
+</tr>
+
+<tr>
+<td>33 CHF</td>
+<td>Disk</td>
+<td><a href="https://www.digitec.ch/de/s1/product/kingston-a400-120gb-m2-2280-ssd-10628775">Kingston A400 120GB M.2 SSD</a></td>
+</tr>
+
+<tr>
+<td>29 CHF</td>
+<td>RAM</td>
+<td><a href="https://www.digitec.ch/de/s1/product/crucial-ct4g4dfs8266-1x-4gb-ddr4-2666-dimm-288-ram-10447900">Crucial CT4G4DFS8266 4GB DDR4-2666 RAM</a></td>
+</tr>
+</tbody>
+</table>
+
+<p>Non-server total: 1764 CHF</p>
+
+<aside class="admonition note">
+  <div class="note-container">
+    <div class="note-icon">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+    </div>
+    <div class="admonition-content"><p>I had the Noctua NH-L12S CPU fan lying around, so I re-used it.</p>
+
+<p>Noctua <a href="https://www.golem.de/news/nh-p1-noctuas-passiver-cpu-kuehler-schafft-125-watt-2106-157334.html">recently released a passive CPU
+cooler</a>,
+which might be an interesting alternative.</p>
+</div>
+  </div>
+</aside>
+
+
+<h2 id="asrock-b550-taichi-mainboard-uefi-setup">ASRock B550 Taichi Mainboard UEFI Setup</h2>
+
+<p>To enable PCIe Bifurcation for our two PCIe 3.0 x8 card setup:</p>
+
+<ol>
+<li>Set <code>Advanced &gt; AMD PBS &gt; PCIe/GFX Lanes Configuration</code> <br />
+to <code>x8x8</code>.</li>
+</ol>
+
+<p>To always turn on the PC after power is lost:</p>
+
+<ol>
+<li>Set <code>Advanced &gt; Onboard Devices Configuration &gt; Restore On AC Power Loss</code> <br />
+to <code>Power On</code>.</li>
+</ol>
+
+<p>To PXE boot (via UEFI) on the onboard ethernet port (management), but disable
+slow option roms for PXE boot on the FS.COM network cards:</p>
+
+<ol>
+<li>Set <code>Boot &gt; Boot From Onboard LAN</code> <br />
+to <code>Enabled</code>.</li>
+<li>Set <code>Boot &gt; CSM (Compatibility Support Module) &gt; Launch PXE OpROM Policy</code> <br />
+to <code>UEFI only</code>.</li>
+</ol>
+
+<h2 id="fan-controller-setup">Fan Controller Setup</h2>
+
+<p>The <a href="#">Corsair Commander Pro</a> fan controller is well-supported on Linux.</p>
+
+<p>After enabling the Linux kernel option <code>CONFIG_SENSORS_CORSAIR_CPRO</code>, the device
+shows up in the <code>hwmon</code> subsystem.</p>
+
+<p>You can completely spin up (100% PWM) or turn off (0% PWM) a fan like so:</p>
+
+<pre><code># echo 255 &gt; /sys/class/hwmon/hwmon3/pwm1
+# echo 0 &gt; /sys/class/hwmon/hwmon3/pwm1
+</code></pre>
+
+<p>I run my fans at 13% PWM, which translates to about 226 rpm:</p>
+
+<pre><code># echo 33 &gt; /sys/class/hwmon/hwmon3/pwm1
+# cat /sys/class/hwmon/hwmon3/fan1_input
+226
+</code></pre>
+
+<p>Conveniently, the Corsair Commander Pro stores your settings even when power is
+lost. So you don’t even need to run a permanent fan control process, a one-off
+adjustment might be sufficient.</p>
+
+<h2 id="power-usage">Power Usage</h2>
+
+<p>The PC consumes about 48W of power when idle (only management network connected)
+by default without further tuning. Each extra network link increases power usage
+by ≈1W:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-11-power-network-link.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-11-power-network-link_hu6de13347ba7e4b65728687062274fcb9_385234_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-11-power-network-link_hu6de13347ba7e4b65728687062274fcb9_385234_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-11-power-network-link_hu6de13347ba7e4b65728687062274fcb9_385234_600x0_resize_q75_box.jpg"
+  alt="graph showing power consumption when enabling network links" title="graph showing power consumption when enabling network links"
+  width="600"
+  height="370"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>Enabling all <a href="https://wiki.gentoo.org/wiki/Ryzen#Kernel">Ryzen-related options</a>
+in my Linux kernel and switching to the powersave CPU frequency governor lowers
+power usage by ≈1W.</p>
+
+<p>On some mainboards, you might need to <a href="https://twitter.com/falcon3754/status/1403102789367119876">force-enable Global
+C-States</a> to save
+power. Not on the B550 Taichi, though.</p>
+
+<p>I tried undervolting the CPU, but that didn’t even make ≈1W of difference in
+power usage. Potentially making my setup unreliable is not worth that little
+power saving to me.</p>
+
+<p>I measured these values using a <a href="https://www.conrad.ch/de/p/homematic-hm-es-pmsw1-pl-dn-r5-funk-schaltaktor-1-fach-funk-steckdose-2300-w-2507749.html">Homematic
+HM-ES-PMSw1-Pl-DN-R5</a>
+I had lying around.</p>
+
+<h2 id="performance">Performance</h2>
+
+<p>Goal 1 is to saturate 25 Gbit/s, for example using two 10 Gbit/s downloads. I’m
+talking about large bulk transfers here, not many small transfers.</p>
+
+<aside class="admonition note">
+  <div class="note-container">
+    <div class="note-icon">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+    </div>
+    <div class="admonition-content">If you’re interested in the “many small packets” scenario, check out <a href="https://netoptimizer.blogspot.com/2014/05/the-calculations-10gbits-wirespeed.html">“The
+calculations: 10Gbit/s
+wirespeed”</a>
+for a good intro, and <a href="https://twitter.com/fragstone/status/1401807613642280963">Thomas Fragstein’s benchmark tool
+recommendations</a>. I
+haven’t run any such tests yet.</div>
+  </div>
+</aside>
+
+
+<p>To get a feel for the performance/headroom of the router build, I ran 3 different tests.</p>
+
+<h3 id="test-a-10-gbit-s-bridging-throughput">Test A: 10 Gbit/s bridging throughput</h3>
+
+<p>For this test, I connected 2 PCs to the router’s XL710 network card and used <a href="https://manpages.debian.org/iperf3.1"><code>iperf3(1)</code></a>
+ to generate a 10 Gbit/s TCP stream between the
+2 PCs. The router doesn’t need to modify the packets in this scenario, only
+forward them, so this should be the lightest load scenario.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-06-bridging.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-06-bridging_hub0cd44ce68a3ab7a30e115765c391440_953670_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-06-bridging_hub0cd44ce68a3ab7a30e115765c391440_953670_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-06-bridging_hub0cd44ce68a3ab7a30e115765c391440_953670_600x0_resize_q75_box.jpg"
+  alt="bridging throughput" title="bridging throughput"
+  width="600"
+  height="315"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<h3 id="test-b-10-gbit-s-nat-throughput">Test B: 10 Gbit/s NAT throughput</h3>
+
+<p>In this test, the 2 PCs were connected such that the router performs <a href="https://en.wikipedia.org/wiki/Network_address_translation">Network
+Address Translation
+(NAT)</a>, which is
+required for downloads from the internet via IPv4.</p>
+
+<p>This scenario is slightly more involved, as the router needs to modify
+packets. But, as we can see below, a 10 Gbit/s NAT stream consumes barely more
+resources than 10 Gbit/s bridging:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-12-nat.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-12-nat_hu35fd080505f1a7e499871d8e450fe11e_573889_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-12-nat_hu35fd080505f1a7e499871d8e450fe11e_573889_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-12-nat_hu35fd080505f1a7e499871d8e450fe11e_573889_600x0_resize_q75_box.jpg"
+  alt="NAT throughput" title="NAT throughput"
+  width="600"
+  height="250"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<h3 id="test-c-4-10-gbit-s-tcp-streams">Test C: 4 × 10 Gbit/s TCP streams</h3>
+
+<p>In this test, I wanted to max out the XL710 network card, so I connected 4 PCs
+and started an <a href="https://manpages.debian.org/iperf3.1"><code>iperf3(1)</code></a>
+ benchmark between each PC
+and the router itself, simultaneously.</p>
+
+<p>This scenario consumes about 16% CPU, meaning we’ll most likely have plenty of
+headroom even when all ports are maxed out!</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-14-four.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-14-four_hu8fa147dd23d5c3ee204bf85eaa69eccf_646280_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-14-four_hu8fa147dd23d5c3ee204bf85eaa69eccf_646280_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-14-four_hu8fa147dd23d5c3ee204bf85eaa69eccf_646280_600x0_resize_q75_box.jpg"
+  alt="four 10 Gbit/s streams" title="four 10 Gbit/s streams"
+  width="600"
+  height="292"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>Tip: make sure to enable the <code>CONFIG_IRQ_TIME_ACCOUNTING</code> Linux kernel option to
+<a href="https://tanelpoder.com/posts/linux-hiding-interrupt-cpu-usage/">include IRQ handlers in CPU usage
+numbers</a> for
+accurate measurements.</p>
+
+<h2 id="alternatives-considered">Alternatives considered</h2>
+
+<p>The passively-cooled SuperServer E302-9D comes with 2 SFP+ ports (10 Gbit/s). It
+even comes with 2 PCIe 3.0 x8 capable slots. Unfortunately it seems impossible
+to currently buy this machine, at least in Switzerland.</p>
+
+<p>You can find a few more suggestions in the replies of <a href="https://twitter.com/zekjur/status/1361414105211437056">this Twitter
+thread</a>. Most are either
+unavailable, require a lot more DIY work (e.g. a custom case), or don’t support
+25 Gbit/s.</p>
+
+<h2 id="router-software-router7-porting">Router software: router7 porting</h2>
+
+<p>I wrote <a href="https://router7.org/">router7</a>, my own small home internet router
+software in Go, back in 2018, and have been using it ever since.</p>
+
+<p>I don’t have time to support any users, so I don’t recommend anyone else use
+router7, unless the project really excites you, and the lack of support doesn’t
+bother you! Instead, you might be better served with a more established and
+supported router software option. Popular options include
+<a href="https://en.wikipedia.org/wiki/OPNsense">OPNsense</a> or
+<a href="https://en.wikipedia.org/wiki/OpenWrt">OpenWrt</a>. See also Wikipedia’s <a href="https://en.wikipedia.org/wiki/List_of_router_and_firewall_distributions">List of
+router and firewall
+distributions</a>.</p>
+
+<p>To make router7 work for this 25 Gbit/s router PC build, I had to make a few
+adjustments.</p>
+
+<p>Because we are using UEFI network boot instead of BIOS network boot, I first had
+to make the PXE boot implementation in router7’s installer <a href="https://github.com/rtr7/tools/commits/00be57a557a5fb2bf8958fbc1417f57ab17fc54b">work with UEFI PXE
+boot</a>.</p>
+
+<p>I then enabled a few additional <a href="https://github.com/rtr7/kernel/commits/8694ece47fb07ffeea8a96dc48eb8faa3969250a">kernel options for network and storage
+drivers</a>
+in router7’s kernel.</p>
+
+<p>To router7’s control plane code, I <a href="https://github.com/rtr7/router7/commits/b88ddd41c377087cc4b6d1fe6c7a5550399a730c">added bridge network device
+configuration</a>,
+which in my previous 2-port router setup was not needed.</p>
+
+<p>During development, I compiled a few Linux programs statically or copied them
+with their dependencies (→ <a href="https://gokrazy.org/prototyping/">gokrazy
+prototyping</a>) to run them on router7, such as
+<a href="https://manpages.debian.org/sensors.1"><code>sensors(1)</code></a>
+, <a href="https://manpages.debian.org/ethtool.8"><code>ethtool(8)</code></a>
+,
+as well as iproute2’s <a href="https://manpages.debian.org/ip.8"><code>ip(8)</code></a>
+ and <a href="https://manpages.debian.org/bridge.8"><code>bridge(8)</code></a>
+ implementation.</p>
+
+<h2 id="next-steps">Next Steps</h2>
+
+<p>Based on my tests, the hardware I selected seems to deliver enough performance
+to use it for distributing a 25 Gbit/s upstream link across multiple 10 Gbit/s
+devices.</p>
+
+<p>I won’t know for sure until the <a href="https://twitter.com/fiber7_ch">fiber7</a> Point Of
+Presence (POP, German Anschlusszentrale) close to my home is upgraded to support
+25 Gbit/s “Fiber7-X2” connections. As I mentioned, unfortunately <a href="https://twitter.com/init7/status/1403287499175235584">the upgrade
+plan is delayed</a> due to
+the component shortage. I’ll keep you posted!</p>
+]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[How I configured and then promptly returned a MikroTik CCR2004 router for Fiber7]]></title>
     <link href="https://michael.stapelberg.ch/posts/2021-05-28-configured-and-returned-mikrotik-ccr2004-for-fiber7/"/>
     <id>https://michael.stapelberg.ch/posts/2021-05-28-configured-and-returned-mikrotik-ccr2004-for-fiber7/</id>

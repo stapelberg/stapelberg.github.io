@@ -166,7 +166,7 @@ While this offer will only become available at my location late this year (or po
       <div><h1 class="ms_title">25 Gigabit Linux internet router PC build</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2021-07-10, last modified 2021-07-11</div>
+  <div id="ms_date">published 2021-07-10, last modified 2021-08-07</div>
   
   
   <div id="ms_tags">
@@ -230,6 +230,7 @@ While this offer will only become available at my location late this year (or po
 <li><a href="#alternatives-considered">Alternatives considered</a></li>
 <li><a href="#router-software-router7-porting">Router software: router7 porting</a></li>
 <li><a href="#next-steps">Next Steps</a></li>
+<li><a href="#appendix-a-dpdk-test">Appendix A: DPDK test</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -605,8 +606,9 @@ odd, so I went with the ASRock B550 Taichi mainboard.</p>
 <p>For the case, I needed a midi case (large enough for the B550 mainboard’s ATX
 form factor) with plenty of options for large, low-spinning fans.</p>
 
-<p>I stumbled upon the <a href="#">Corsair 4000D Airflow</a>, which is available for 80 CHF
-and <a href="https://www.gamersnexus.net/hwreviews/3624-corsair-4000d-airflow-case-review-vs-solid-panel">achieved positive
+<p>I stumbled upon the <a href="https://www.corsair.com/us/en/Categories/Products/Cases/Mid-Tower-ATX-Cases/4000D-Airflow-Tempered-Glass-Mid-Tower-ATX-Case/p/CC-9011200-WW">Corsair 4000D
+Airflow</a>,
+which is available for 80 CHF and <a href="https://www.gamersnexus.net/hwreviews/3624-corsair-4000d-airflow-case-review-vs-solid-panel">achieved positive
 reviews</a>. I’m
 pleased with the 4000D: there are no sharp corners, installation is quick, easy
 and clean, and the front and top panels offer plenty of space for cooling behind
@@ -1049,7 +1051,7 @@ to <code>UEFI only</code>.</li>
 
 <h2 id="fan-controller-setup">Fan Controller Setup</h2>
 
-<p>The <a href="#">Corsair Commander Pro</a> fan controller is well-supported on Linux.</p>
+<p>The <a href="https://www.corsair.com/eu/en/Categories/Products/Accessories-%7C-Parts/iCUE-CONTROLLERS/iCUE-Commander-PRO-Smart-RGB-Lighting-and-Fan-Speed-Controller/p/CL-9011110-WW">Corsair Commander Pro</a> fan controller is well-supported on Linux.</p>
 
 <p>After enabling the Linux kernel option <code>CONFIG_SENSORS_CORSAIR_CPRO</code>, the device
 shows up in the <code>hwmon</code> subsystem.</p>
@@ -1328,6 +1330,50 @@ Presence (POP, German Anschlusszentrale) close to my home is upgraded to support
 plan is delayed</a> due to
 the component shortage. I’ll keep you posted!</p>
 
+<h2 id="appendix-a-dpdk-test">Appendix A: DPDK test</h2>
+
+<p><a href="https://twitter.com/ipngnetworks">Pim</a> ran a <a href="https://www.dpdk.org/">DPDK</a>
+based loadtester called <a href="https://trex-tgn.cisco.com/">T-Rex</a> on this
+machine. Here’s his summary of the test:</p>
+
+<p>For DPDK, this hardware does 4x10G at 64b frames. It does not do 6x10G as it
+tops out at 62Mpps using 4 cores (of 15.5Mpps per core).</p>
+
+<p>I couldn't test 25G symmetric [because we lacked a 25G DAC cable], but
+extrapolating from the numbers, 3 CPUs source and sink ~24.6Gbit per core, so
+we'd probably make it, leaving 1 core for OS and 2 cores for controlplane.</p>
+
+<p>If the machine had a 12 core Ryzen, it would saturate all NICs with room to
+spare. So that's what I'll end up buying :)</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-07-13-dpdk-test.png"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-07-13-dpdk-test_hu37b3af6bd791c24945ccf8bd92c24adc_280211_1200x0_resize_box_2.png 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-07-13-dpdk-test_hu37b3af6bd791c24945ccf8bd92c24adc_280211_1800x0_resize_box_2.png 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-07-13-dpdk-test_hu37b3af6bd791c24945ccf8bd92c24adc_280211_600x0_resize_box_2.png"
+  alt="DPDK test" title="DPDK test"
+  width="600"
+  height="447"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
 </div>
 
       </div>
@@ -1365,6 +1411,7 @@ the component shortage. I’ll keep you posted!</p>
 <li><a href="#alternatives-considered">Alternatives considered</a></li>
 <li><a href="#router-software-router7-porting">Router software: router7 porting</a></li>
 <li><a href="#next-steps">Next Steps</a></li>
+<li><a href="#appendix-a-dpdk-test">Appendix A: DPDK test</a></li>
 </ul></li>
 </ul>
 </nav>

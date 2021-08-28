@@ -5,6 +5,300 @@
   <id>https://michael.stapelberg.ch/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[Silent HP Z440 workstation: replacing noisy fans]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/"/>
+    <id>https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/</id>
+    <published>2021-08-28T15:16:00+02:00</published>
+    <content type="html"><![CDATA[
+
+<p>Since March 2020, I have been using my work computer at home: an <a href="https://support.hp.com/us-en/document/c04506309">HP Z440
+workstation</a>.</p>
+
+<p>When I originally took the machine home, I immediately noticed that it’s quite a
+bit louder than my other PCs, but only now did I finally decide to investigate
+what I could do about it.</p>
+
+<h2 id="finding-all-the-fans">Finding all the fans</h2>
+
+<p>I first identified all fans, both by opening the chassis and looking around, and
+by looking at the <a href="http://h10032.www1.hp.com/ctg/Manual/c04823811">HP Z440 Maintenance and Service
+Guide</a>, which contains this
+description:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/chassis-components.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/chassis-components_hu36d388d2b36bd958f883a2df8c1aaea4_273387_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/chassis-components_hu36d388d2b36bd958f883a2df8c1aaea4_273387_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/chassis-components_hu36d388d2b36bd958f883a2df8c1aaea4_273387_600x0_resize_q75_box.jpg"
+  alt="chassis components" title="chassis components"
+  width="600"
+  height="509"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>Specifically, I identified the following fans:</p>
+
+<ul>
+<li>“1 Fan”, a 92mm rear fan, sucking air out of the back of the chassis.</li>
+<li>“5 Memory fans”, two 60mm fans in a custom HP plastic enclosure that are
+positioned directly above the DIMM slots to the left and right of the CPU.</li>
+<li>“6 CPU Heat sink”, a 92mm fan on top of a heat sink</li>
+<li>“11 Rear System Fan”, a 92mm front (!) fan, pulling air into the front of the
+chassis.</li>
+<li>My aftermarket nVidia GeForce GPU has 3 fans on a massive heat sink.</li>
+<li>The power supply has a fan, too, which I will not touch.</li>
+</ul>
+
+<h2 id="memory-fans">Memory fans</h2>
+
+<p>The Z440 comes with a custom HP plastic enclosure that is put over the CPU
+cooler, fastened with two clips at opposite ends, and positions two small 60mm
+fans above the DIMM banks.</p>
+
+<p>This memory fan plastic enclosure is a pain to find anywhere. It looks like HP
+is no longer producing it.</p>
+
+<p>The enclosure plugs into the mainboard with a custom connector that is directly
+wired up to the fans, meaning it’s a pain to replace the fans.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/2021-08-21-memory-fans.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/2021-08-21-memory-fans_hu47042a7738bec735fd93d948ca344866_2106605_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/2021-08-21-memory-fans_hu47042a7738bec735fd93d948ca344866_2106605_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/2021-08-21-memory-fans_hu47042a7738bec735fd93d948ca344866_2106605_600x0_resize_q75_box.jpg"
+  alt="memory fans" title="memory fans"
+  width="600"
+  height="696"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>Luckily, while <a href="https://www.workstation4u.de/de/ersatzteile/hp/hp-z440/1513/hp-z440-memory-cooling-solution-neu">shopping around for an
+enclosure</a>
+I could modify, I realized that memory fans are only required when installing
+more than 4 DIMM modules!</p>
+
+<p>My machine “only” has 64 GB of RAM, in 4 DIMM modules, and I don’t intend to
+upgrade anytime soon, so I just unplugged the whole memory fan enclosure and
+removed it from the chassis.</p>
+
+<p>The UEFI firmware does not complain about the memory fans missing (contrary to
+the rear fan!), and this simple change alone makes a noticeable difference in
+noise levels.</p>
+
+<h2 id="gpu-fans">GPU fans</h2>
+
+<p>nVidia GPUs can be run at different “PowerMizer” performance levels:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/nvidia-powermizer.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/nvidia-powermizer_hueedf559e14cfb4ac2af7a6d6a30751ae_1050836_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/nvidia-powermizer_hueedf559e14cfb4ac2af7a6d6a30751ae_1050836_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/nvidia-powermizer_hueedf559e14cfb4ac2af7a6d6a30751ae_1050836_600x0_resize_q75_box.jpg"
+  alt="nVidia PowerMizer" title="nVidia PowerMizer"
+  width="600"
+  height="359"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>Many years ago, I ran into lag when using Chrome that went away as soon as I
+switched my nVidia GPU’s Preferred Mode to “Prefer Maximum Performance” instead
+of “Auto” or “Adaptive mode”.</p>
+
+<p>It turns out that nowadays, that is no longer a problem, so running at Prefer
+Maximum Performance is no longer necessary.</p>
+
+<p>Worse, pinning the GPU at the highest Performance Level means that it produces
+more heat, resulting in the fans having to spin up more often, and run for
+longer durations.</p>
+
+<p>But, even after switching to Auto, resulting in Adaptive mode being chosen, I
+noticed that my GPU was stuck at a higher PowerMizer level than I thought it
+should be.</p>
+
+<p>An easy fix is to limit the GPU to a certain PowerMizer level, and ideally not
+the lowest level (level 0). For me, one level after that (level 1) seems to
+result in no slow-down during my typical usage.</p>
+
+<p>I followed <a href="https://db.tannercrook.com/limiting-nvidia-gpu-in-linux/">this blog post to limit my GPU to PowerMizer level
+1</a>, i.e. I added
+<code>/etc/modprobe.d/nvidia-power-save.conf</code> with the following contents:</p>
+
+<pre><code>options nvidia NVreg_RegistryDwords=&quot;OverrideMaxPerf=0x2&quot;
+</code></pre>
+
+<p>…followed by a rebuild of my initramfs (<code>update-initramfs -u</code>) and a <code>reboot</code>.</p>
+
+<p>This way, the fans don’t typically need to spin up as the GPU stays below its
+temperature limit.</p>
+
+<aside class="admonition note">
+  <div class="note-container">
+    <div class="note-icon">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+    </div>
+    <div class="admonition-content">For some reason, the above method worked fine on my Debian work machine, but not
+on my Arch private machine…? I have not investigated why.</div>
+  </div>
+</aside>
+
+
+<h2 id="rear-and-front-fans">Rear and front fans</h2>
+
+<p>With the memory fans and GPU fans out of the way, two easy to check fans remain:
+the rear fan and front fan. These are 92mm in size, the model number is Foxconn
+PVA092G12S.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/2021-08-20-rear-fan-featured.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/2021-08-20-rear-fan-featured_hubc92ae85c899c14de0806668526f039c_1572517_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/2021-08-20-rear-fan-featured_hubc92ae85c899c14de0806668526f039c_1572517_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/2021-08-20-rear-fan-featured_hubc92ae85c899c14de0806668526f039c_1572517_600x0_resize_q75_box.jpg"
+  alt="rear fan" title="rear fan"
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<p>I unplugged both of them to see what effect these fans have on the noise level,
+and the difference was significant!</p>
+
+<p>Unfortunately, unplugging isn’t enough: the UEFI firmware complains on boot when
+the rear fan is not connected, requiring you to press <code>Enter</code> to boot. Also, the
+machine seems to get a few degrees Celsius hotter inside without the front and
+rear fans, so I don’t want to run the machine without these fans for an extended
+period of time.</p>
+
+<p>I ordered two <a href="https://noctua.at/en/nf-a9x14-pwm">Noctua NF-A9x14 PWM</a> fans (for
+about 25 CHF each) to replace the stock front and rear fans.</p>
+
+<p>Unfortunately, HP uses a custom 4-pin fan connector on its Z440 mainboard!
+Luckily, modifying the connector of the Noctua Low-Noise Adapter cable to fit on
+the custom 4-pin connector is as simple as using a knife to remove the
+connector’s guard rails:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/2021-08-24-fan-connector-mod.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/2021-08-24-fan-connector-mod_hu855bbe0a9c47ac557e5b09db74fa3b06_976008_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/2021-08-24-fan-connector-mod_hu855bbe0a9c47ac557e5b09db74fa3b06_976008_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/2021-08-24-fan-connector-mod_hu855bbe0a9c47ac557e5b09db74fa3b06_976008_600x0_resize_q75_box.jpg"
+  alt="fan connector mod" title="fan connector mod"
+  width="600"
+  height="557"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+<h2 id="cpu-fan">CPU fan</h2>
+
+<p>For the CPU fan, HP again chose to use a <a href="https://h30434.www3.hp.com/t5/Business-PCs-Workstations-and-Point-of-Sale-Systems/Z620-Aftermarker-CPU-Cooler-CPU-Cooling-shroud-necessary-or/td-p/7842134">custom (6-pin)
+connector</a>.</p>
+
+<p>On the web, I read that the Z440 CPU fan is quite efficient and not worth
+replacing. This matches my experience, so I kept the standard Z440 CPU cooler.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>I was quite happy to discover that I could just unplug the memory fans, and
+configure my GPU to make less noise. Together with replacing the front/rear fans
+with Noctua ones, the machine is much quieter now than before!</p>
+
+<p>One downside of workstation-class hardware is that manufacturers (at least HP)
+like to build custom parts and solutions. Using their own fan connectors instead
+of standard connectors is such a pain! I’ll be sure to stick to standard PC
+hardware :)</p>
+]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[25 Gigabit Linux internet router PC build]]></title>
     <link href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/"/>
     <id>https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/</id>
@@ -6904,626 +7198,6 @@ href="../../2020-09-27-rohdaten-klingel-rev2.zip">2020-09-27-rohdaten-klingel-re
 <li><a href="http://guidopic.altervista.org/alter/eibscsgt.html">http://guidopic.altervista.org/alter/eibscsgt.html</a></li>
 <li><a href="https://www.mikrocontroller.net/topic/493823">https://www.mikrocontroller.net/topic/493823</a></li>
 </ul>
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[Adding a fiber link to my home network]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/"/>
-    <id>https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/</id>
-    <published>2020-08-09T14:53:53+02:00</published>
-    <content type="html"><![CDATA[
-
-<h2 id="motivation">Motivation</h2>
-
-<p>Despite using a FTTH internet connection since 2014, aside from the one fiber
-uplink, I had always used network gear with 1 Gbit/s links over regular old rj45
-cat5(e) cables.</p>
-
-<hr />
-
-<p>I liked the simplicity and uniformity of that setup, but decided it’s time to
-add at least one fiber connection, to <strong>get rid of a temporary ethernet cable</strong>
-that connected my kitchen with the rest of my network that is largely in the
-living room and office.</p>
-
-<p>The temporary ethernet cable was an experiment to verify that running a server
-or two in my kitchen actually works (it does!). I used a <a href="https://www.digitec.ch/de/s1/product/hama-cat-6-flach-we-1000cm-netzwerkkabel-7465292">flat ethernet
-cable</a>,
-which is great for test setups like that, as you can often tape it onto the
-walls and still close the doors.</p>
-
-<p>So, we will replace one ethernet cable with one fiber cable and converters at
-each end:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-media-converters.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-media-converters_hu863a0a53ff58eb79e087ca8992fd5d37_416326_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-media-converters_hu863a0a53ff58eb79e087ca8992fd5d37_416326_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-media-converters_hu863a0a53ff58eb79e087ca8992fd5d37_416326_600x0_resize_q75_box.jpg"
-  alt="0.9mm thin fiber cables" title="0.9mm thin fiber cables"
-  width="600"
-  height="217"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-
-<p>Why is it good to switch from copper ethernet cables to fiber in this case?
-Fiber cables are <strong>smaller and hence easier to fit</strong> into existing cable
-ducts. While regular ethernet cable is way too thick to fit into any of the
-existing ducts in my flat, I was hoping that fiber might fit!</p>
-
-<p>When I actually received the cables, I was surprised <strong>how much thinner</strong> fiber
-cables actually can be: there are 0.9mm cables, which are so thin, they can be
-hidden in plain sight! I had only ever seen 2mm fiber cables before, and the
-0.9mm cables are incredibly light, flexible and thin! Even pasta is typically
-thicker:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-glasnudeln.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-glasnudeln_huff6805db50351ab1fa4ea96b741ae340_1675440_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-glasnudeln_huff6805db50351ab1fa4ea96b741ae340_1675440_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-glasnudeln_huff6805db50351ab1fa4ea96b741ae340_1675440_600x0_resize_q75_box.jpg"
-  alt="Preparing a delicious pot of glass noodles ;)" title="Preparing a delicious pot of glass noodles ;)"
-  width="600"
-  height="450"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-
-<p><small><em>Preparing a delicious pot of glass noodles ;)</em></small></p>
-
-<hr />
-
-<p>The cable shown above comes from <a href="https://www.FS.COM/company/about_us.html">the fiber store
-FS.COM</a>, which different people have
-praised on multiple occasions, so naturally I was curious to give them a shot
-myself.</p>
-
-<p>Also, for the longest time, it was my understanding that fiber connectors can
-only be put onto fiber cables using expensive (≫2000 CHF) machines. A while ago
-I heard about <strong>field assembly connectors</strong> so I wanted to verify that those
-indeed work.</p>
-
-<hr />
-
-<p>Aside from practical reasons, playing around with fiber networking also makes
-for a good hobby during a pandemic :)</p>
-
-<h2 id="hardware-selection">Hardware Selection</h2>
-
-<p>I ordered all my fiber equipment at <a href="https://www.FS.COM">FS.COM</a>: everything
-they have is very affordable, and products in stock at their German warehouse
-arrive in Switzerland (and presumably other European countries) within the same
-week.</p>
-
-<p>If you are in the luxurious position to have enough physical space and agility
-to pull through an entire fiber cable, <strong>without having to remove any
-connectors</strong>, you can make a new network connection with just a few parts:</p>
-
-<table>
-<thead>
-<tr>
-<th>amt</th>
-<th>price</th>
-<th>total</th>
-<th>article</th>
-<th>note</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td>2x</td>
-<td>36 CHF</td>
-<td>72 CHF</td>
-<td><a href="https://www.FS.COM/de-en/products/17237.html">#17237</a></td>
-<td><a href="https://www.FS.COM/de-en/products/17237.html">1 Gbit/s media converter RJ45/SFP</a></td>
-</tr>
-
-<tr>
-<td>1x</td>
-<td>8.5 CHF</td>
-<td>8.5 CHF</td>
-<td><a href="https://www.FS.COM/de-en/products/75339.html">#39135</a></td>
-<td><a href="https://www.FS.COM/de-en/products/75339.html">1 Gbit/s BiDi SFP 1310nm-TX/1550nm-RX</a></td>
-</tr>
-
-<tr>
-<td>1x</td>
-<td>11 CHF</td>
-<td>11 CHF</td>
-<td><a href="https://www.FS.COM/de-en/products/75340.html">#39138</a></td>
-<td><a href="https://www.FS.COM/de-en/products/75340.html">1 Gbit/s BiDi SFP 1550nm-TX/1310nm-RX</a></td>
-</tr>
-
-<tr>
-<td>1x</td>
-<td>2.3 CHF</td>
-<td>2.3 CHF</td>
-<td><a href="https://www.FS.COM/de-en/products/12285.html">#12285</a></td>
-<td><a href="https://www.FS.COM/de-en/products/12285.html">fiber cable, 0.9mm LC UPC/LC UPC simplex</a></td>
-</tr>
-</tbody>
-</table>
-
-<p>I recommend buying an extra fiber cable or two so that you can accidentally
-damage a cable and still have enough spares.</p>
-
-<p>Total cost thus far: just under 100 CHF. If you have existing switches with a
-free SFP slot, you can use those instead of the media converters and save most
-of the cost.</p>
-
-<hr />
-
-<p>If you need to <strong>temporarily remove</strong> one or both of the fiber cable connector(s),
-you also need field assembly connectors and a few tools in addition:</p>
-
-<table>
-<thead>
-<tr>
-<th>amt</th>
-<th>price</th>
-<th>total</th>
-<th>article</th>
-<th>note</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td>2x</td>
-<td>4 CHF</td>
-<td>8 CHF</td>
-<td><a href="https://www.FS.COM/de-en/products/35165.html">#35165</a></td>
-<td><a href="https://www.FS.COM/de-en/products/35165.html">LC/UPC 0.9mm pre-polished field assembly connector</a></td>
-</tr>
-
-<tr>
-<td>1x</td>
-<td>110 CHF</td>
-<td>110 CHF</td>
-<td><a href="https://www.FS.COM/de-en/products/14341.html">#14341</a></td>
-<td><a href="https://www.FS.COM/de-en/products/14341.html">High Precision Fibre Optic Cleaver FS-08C</a></td>
-</tr>
-
-<tr>
-<td>1x</td>
-<td>26 CHF</td>
-<td>26 CHF</td>
-<td><a href="https://www.FS.COM/de-en/products/14346.html">#14346</a></td>
-<td><a href="https://www.FS.COM/de-en/products/14346.html">Fibre Optic Kevlar Cutter</a></td>
-</tr>
-
-<tr>
-<td>1x</td>
-<td>14 CHF</td>
-<td>14 CHF</td>
-<td><a href="https://www.FS.COM/de-en/products/72812.html">#72812</a></td>
-<td><a href="https://www.FS.COM/de-en/products/72812.html">Fibre Optical Stripper</a></td>
-</tr>
-</tbody>
-</table>
-
-<p>I recommend buying twice the number of field assembly connectors, for practicing.</p>
-
-<p>Personally, I screwed up two connectors before figuring out <a href="#field-assembly-connectors">how the process
-goes</a>.</p>
-
-<p>Total cost: about 160 CHF for the field assembly equipment, so 260 CHF in total.</p>
-
-<hr />
-
-<p>To boost your confidence in the resulting fiber, the following items are nice to
-have, but you can get by without, if you’re on a budget.</p>
-
-<table>
-<thead>
-<tr>
-<th>price</th>
-<th>article</th>
-<th>note</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td>18 CHF</td>
-<td><a href="https://www.FS.COM/de-en/products/35388.html">#35388</a></td>
-<td><a href="https://www.FS.COM/de-en/products/35388.html">FVFL-204 Visual Fault Locator</a></td>
-</tr>
-
-<tr>
-<td>9.40 CHF</td>
-<td><a href="https://www.FS.COM/de-en/products/82730.html">#82730</a></td>
-<td><a href="https://www.FS.COM/de-en/products/82730.html">2.5mm to 1.25mm adapter for Visual Fault Locator</a></td>
-</tr>
-
-<tr>
-<td>4.10 CHF</td>
-<td><a href="https://www.FS.COM/de-en/products/14010.html">#14010</a></td>
-<td><a href="https://www.FS.COM/de-en/products/14010.html">1.25mm fiber clean swabs (100pcs)</a></td>
-</tr>
-</tbody>
-</table>
-
-<p>With the visual fault locator, you can shine a light through your fiber. You can
-verify correct connector assembly by looking at how the light comes out of the
-connector.</p>
-
-<p>The fiber cleaning swabs are good to have in general, but for the field assembly
-connector, you need to use alcohol-soaked wipes anyway (which FS.COM does not
-stock).</p>
-
-<p>The total cost for everything is just under 300 CHF.</p>
-
-<h3 id="hardware-selection-process">Hardware Selection Process</h3>
-
-<p>The large selection at FS.COM can be overwhelming to navigate at first. My
-selection process went something like this:</p>
-
-<p>My first constraint is using bi-directional (BiDi) fiber optics modules so that
-I only need to lay a single fiber cable, as opposed to two fiber cables.</p>
-
-<p>The second constraint is to use field assembly connectors.</p>
-
-<p>If possible, I wanted to use <a href="https://community.FS.COM/blog/why-not-use-bend-insensitive-fiber-optic-cable-to-reduce-bend-radius.html">bend-insensitive
-fiber</a>
-so that I wouldn’t need to pay so much attention to the bend radius and have
-more flexibility in where and how I can lay fiber.</p>
-
-<p>With these constraints, there aren’t too many products left to combine. An
-obvious and good choice are 0.9mm fiber cable using LC/UPC connectors.</p>
-
-<h3 id="fs-com-details">FS.COM details</h3>
-
-<p>As of 2020-08-05, FS.COM states they have 5 warehouses in 4 locations:</p>
-
-<ul>
-<li>Delaware (US)</li>
-<li>Munich (Germany)</li>
-<li>Melbourne (Australia)</li>
-<li>Shenzhen (China)</li>
-</ul>
-
-<p>They recently built another, bigger (7 km²) warehouse in Shenzhen, and now
-produce inventory for the whole year.</p>
-
-<p>By 2019, FS.COM had over 300,000 registered corporate customers, reaching nearly
-200 million USD yearly sales.</p>
-
-<h2 id="delivery-times">Delivery times</h2>
-
-<p>As mentioned before, delivery times are quick when the products are in stock at
-FS.COM’s German warehouse.</p>
-
-<p>In my case, I put in my order on 2020-Jun-26.</p>
-
-<p>The items that shipped from the German warehouse arrived on 2020-Jul-01.</p>
-
-<p>Some items had to be manufactured and/or shipped from Asia. Those items arrived
-after 3 more weeks, on 2020-Jul-24.</p>
-
-<p>Unfortunately, FS.COM doesn’t stock any 0.9mm fiber cables in their German
-warehouse right now, so be prepared for a few weeks of waiting time.</p>
-
-<h2 id="laying-the-fiber">Laying The Fiber</h2>
-
-<p>Use a cable puller to pull the fiber through existing cable ducts where
-possible.</p>
-
-<ul>
-<li><p>In general, buy the thinnest one you can find. I have <a href="https://www.distrelec.ch/en/cable-pull-strap-10m-tools-495005/p/18092626">this 4mm diameter cable
-puller</a>,
-but a 3mm or even 2mm one would work in more situations.</p></li>
-
-<li><p>I found it worthwhile to buy a brand one. It is distinctly better to handle
-(less stiff, i.e. more flexible) than the cheap one I got, and thinner, too,
-which is always good.</p></li>
-</ul>
-
-<p>In my experience, it generally did not work well to <strong>push</strong> the fiber into an
-existing duct or alongside an existing cable. I really needed a cable
-<strong>puller</strong>.</p>
-
-<p>If you’re lucky and have enough space in your duct(s), you can leave the
-existing connectors on the fiber. I have successfully just used a piece of tape
-to fix the fiber connector on the cable puller, pushing down the nose
-temporarily:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-cable-puller.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-cable-puller_hu671a386c131e99c47b0e8674d4173388_933240_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-cable-puller_hu671a386c131e99c47b0e8674d4173388_933240_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-cable-puller_hu671a386c131e99c47b0e8674d4173388_933240_600x0_resize_q75_box.jpg"
-  alt="fiber cable taped to cable puller" title="fiber cable taped to cable puller"
-  width="600"
-  height="450"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-
-<p>Where there are no existing ducts, you may need to lay the fiber on top of the
-wall. Obviously, this is tricky as soon as you need to make a connection going
-through a wall: whereas copper ethernet cables can be bent and squeezed into
-door frames, you quickly risk breaking fiber cables.</p>
-
-<p>Luckily, the fiber is very light, so it’s very easy to fix to the wall with a
-piece of tape:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-wand-kabel.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-wand-kabel_hu266a050a008f40ca1627a87ee11d809f_563690_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-wand-kabel_hu266a050a008f40ca1627a87ee11d809f_563690_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-wand-kabel_hu266a050a008f40ca1627a87ee11d809f_563690_600x0_resize_q75_box.jpg"
-  alt="fiber cables on the wall" title="fiber cables on the wall"
-  width="600"
-  height="450"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-
-<p>You can see the upstream internet fiber in the top right corner, which is rather
-thick in comparison to my 0.9mm yellow fiber that’s barely visible in the middle
-of the picture.</p>
-
-<p>Note how the fiber entirely disappears behind the existing duct atop the
-door!</p>
-
-<p>Above, you can see the flat ethernet cable I have been using as a temporary
-experiment.</p>
-
-<hr />
-
-<p>Where there is an existing cable that you can temporarily remove, it might be
-possible to remove it, put the fiber in, and put the old cable back in,
-too. This is possible because the 0.9mm fiber cable is so thin!</p>
-
-<p>I’m using this technique to cross another wall where the existing cable duct is
-too full, but there is a cable that can be removed and put back after pulling
-the fiber through:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-loch.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-loch_hu72eb317f66154a6cd4cb4580e2e045bd_823912_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-loch_hu72eb317f66154a6cd4cb4580e2e045bd_823912_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-loch_hu72eb317f66154a6cd4cb4580e2e045bd_823912_600x0_resize_q75_box.jpg"
-  alt="fiber cable next to existing cable" title="fiber cable next to existing cable"
-  width="600"
-  height="450"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-
-<p>…and on the other side of the wall:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-dose.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-dose_hubb166f4dcb345f6dba1f730b24be242a_880410_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-dose_hubb166f4dcb345f6dba1f730b24be242a_880410_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-04-dose_hubb166f4dcb345f6dba1f730b24be242a_880410_600x0_resize_q75_box.jpg"
-  alt="fiber cable next to existing socket" title="fiber cable next to existing socket"
-  width="600"
-  height="450"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-
-<p>Note how the fiber is thin enough to fit between the socket and duct!</p>
-
-<hr />
-
-<p><strong>Note:</strong> despite measuring how long a fiber cable I would need, my cable turned
-out too short! While the cable was just as long as I had measured, with
-distances exceeding 10m, it is a good idea to <strong>add a few meters spare</strong> on each
-side of the connection.</p>
-
-<h2 id="field-assembly-connectors">Field assembly connectors</h2>
-
-<p>To give you an overview, these are the required steps at a high level:</p>
-
-<ol>
-<li>Cut the fiber with the <a href="https://www.FS.COM/de-en/products/14346.html">Fibre Optic Kevlar Cutter</a></li>
-<li>Strip the fiber with the <a href="https://www.FS.COM/de-en/products/72812.html">Fibre Optical Stripper</a></li>
-<li>Put the field assembly <em>jacket</em> onto the fiber</li>
-<li>Cut the stripped fiber cleanly with the <a href="https://www.FS.COM/de-en/products/14341.html">High Precision Fibre Optic Cleaver FS-08C</a></li>
-<li>Put the field assembly <em>connector</em> onto the fiber</li>
-</ol>
-
-<hr />
-
-<p>I thought the following resources were useful:</p>
-
-<ol>
-<li>Pictograms: <a href="https://img-en.fs.com/file/user_manual/lc-field-assembly-connector-quick-start-guide-v1.0.pdf">PDF: FS.COM LC UPC field assembley connectors quick start
-guide</a></li>
-<li>Pictures: <a href="https://www.fs.com/de-en/products/35165.html">Installation Procedure on
-FS.COM</a></li>
-<li>Video: <a href="https://www.youtube.com/watch?v=epTzemeJjAw">YouTube: Terminate Fiber in 5
-Minutes</a>: this video shows a
-different product, but I found it helpful to see any field assembly connector
-on video, and this is one of the better videos I could find.</li>
-</ol>
-
-<!-- TODO: include a link to my own video once published -->
-
-<hr />
-
-<p><strong>Beware:</strong> the little paper booklet that comes with the field assembly
-connector contains measurements which are <strong>not to scale</strong>. I have suggested to
-FS.COM that they fix this, but until then, you’ll need to use e.g. a tape
-measure.</p>
-
-<hr />
-
-<p>For establishing an intuition of their different sizes, here are the different connectors:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-07-fiber-cable-connector-size-featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-07-fiber-cable-connector-size-featured_hu6d8d68e7ce7a86b2365302ce19348267_984529_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-07-fiber-cable-connector-size-featured_hu6d8d68e7ce7a86b2365302ce19348267_984529_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/2020-08-07-fiber-cable-connector-size-featured_hu6d8d68e7ce7a86b2365302ce19348267_984529_600x0_resize_q75_box.jpg"
-  alt="fiber cable connectors" title="fiber cable connectors"
-  width="600"
-  height="398"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-
-<p>From left to right:</p>
-
-<ul>
-<li>2.0mm fiber cable</li>
-<li>cat6 ethernet cable</li>
-<li>0.9mm fiber cable (LC/UPC factory)</li>
-<li>0.9mm fiber cable (LC/UPC field assembly connector)</li>
-</ul>
-
-<p>The 0.9mm fiber cables come with smaller connectors than the 2.0mm fiber cables,
-and that alone might be a reason to prefer them in some situations.</p>
-
-<p>The field assembly connectors are pretty bulky in comparison, but since you can
-attach them yourself after pulling only the cable through the walls and/or
-ducts, you usually don’t care too much about their size.</p>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>Modern fiber cables available at FS.COM are:</p>
-
-<ul>
-<li>thinner than I expected</li>
-<li>more robust than I expected</li>
-<li>cheaper than I expected</li>
-<li>survive tighter bend radiuses than I expected</li>
-</ul>
-
-<p>Replacing this particular connection with a fiber connection was a smooth
-process overall, and I would recommend it in other situations as well.</p>
-
-<hr />
-
-<p>I would claim that it is <strong>totally feasible</strong> for anyone with an hour of
-patience to learn how to put a field assembly connector onto a fiber cable.</p>
-
-<p>If labor cost is expensive in your country or you just like doing things
-yourself, I can definitely recommend this approach. In case you mess the
-connector up and don’t want to fix it yourself, you can always call an
-electrician!</p>
-
-<hr />
-
-<p>Stay tuned for the next part, where I upgrade the 1G link to a 10G link!</p>
 ]]></content>
   </entry>
 </feed>

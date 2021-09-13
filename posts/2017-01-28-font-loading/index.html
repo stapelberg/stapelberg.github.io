@@ -12,7 +12,10 @@
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
   <meta name="description" content="For manpages.debian.org, I looked at loading webfonts. I considered the following scenarios:  # local? cached? Network Expected Observed  1 Yes / / perfect render perfect render  2 No Yes / perfect render perfect render  3 No No Fast FOUT FOIT  4 No No Slow FOUT some FOUT, some FOIT    Scenario #1 and #2 are easy: the font is available, so if we inline the CSS into the HTML page, the browser should be able to render the page perfectly on the first try.">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2017-01-28-font-loading/">
   <meta name="author" content="Michael Stapelberg">

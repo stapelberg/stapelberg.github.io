@@ -11,79 +11,59 @@
     <link href="https://michael.stapelberg.ch/posts/2018-10-31-rgb2rv18-network/"/>
     <id>https://michael.stapelberg.ch/posts/2018-10-31-rgb2rv18-network/</id>
     <published>2018-10-30T23:00:00+01:00</published>
-    <content type="html"><![CDATA[
-
-<p>Our computer association <a href="https://www.noname-ev.de/">NoName e.V.</a> organizes a
+    <content type="html"><![CDATA[<p>Our computer association <a href="https://www.noname-ev.de/">NoName e.V.</a> organizes a
 retro computing event called <a href="https://www.rgb2r.de/">RGB2R</a> every year,
 located in Heidelberg, Germany. This year’s version is called RGB2Rv18.</p>
-
 <p>This article describes the network setup I created for this year’s event. If you
 haven’t read it, the article about <a href="/posts/2017-11-13-rgb2r-network/">last year’s RGB2Rv17
 network</a> is also available.</p>
-
 <h3 id="connectivity">Connectivity</h3>
-
 <p>As a reminder, the venue’s DSL connection tops out at a megabit or two, so we
 used my parent’s 400 Mbit/s cable internet line, like last year.</p>
-
 <p>A difference to last year is that we switched from the tp-link CPE510 devices to
 a pair of <a href="https://www.ubnt.com/airfiber/airfiber24/">Ubiquiti airFiber24</a>. The
 airFibers are specified to reach 1.4 Gbit/s. In practice, we reached
 approximately 700 Mbps displayed capacity (at a signal strength of ≈-60 dBm) and
 422 Mbit/s end-to-end download speed, limited by the cable uplink.</p>
-
 <p>Notably, using a single pair of radios removes a bunch of complexity from the
 network setup as we no longer need to load-balance over two separate uplinks.</p>
-
 <p>Like last year, the edge router for the event venue was a <a href="https://pcengines.ch/apu2c4.htm">PC Engines
 apu2c4</a>. For the Local Area Network (LAN)
 within the venue, we provided a few switches and WiFi using <a href="https://www.ubnt.com/">Ubiquiti
 Networks</a> access points.</p>
-
 <h3 id="wifi-setup">WiFi setup</h3>
-
 <p>It turns out that the 24 GHz-based airFiber radios are much harder to align than
 the 5 GHz-based tp-links we used last year. With the tp-link devices, we were
 able to easily obtain a link, and do maybe 45 minutes of fine tuning to achieve
 maximum bandwidth.</p>
-
 <p>With the airFiber radios mounted in the same location, we were unable to
 establish a link even once in about 1.5 hours of trying. We think this was due
 to trees/branches being in the way, so we decided to scout the property for a
 better radio location with as much of a direct line of sight as possible.</p>
-
 <p>We eventually found a better location on the other side of the house and managed
 to establish a link. It still took us an hour or so of fine tuning to move the
 link from weak (≈-80 dBm) to okay (≈-60 dBm).</p>
-
 <p>After the first night, in which it rained for a while, the radios had lost their
 link. We think that this might be due to the humidity, and managed to restore
 the link after another 30 minutes of re-adjustment.</p>
-
 <p>It also rained the second night, but this time, the link stayed up. During rain,
 signal strength dropped from ≈-60 dBm to ≈-72 dBm, but that still resulted in
 ≈500 Mbit/s of WiFi capacity, sufficient to max out our uplink.</p>
-
 <p>For next year, it would be great to use an antenna alignment tool of sorts to
 cut down on setup time. Alternatively, we could switch to more forgiving radios
 which also handle 500 Mbps+. Let me know if you have any suggestions!</p>
-
 <h3 id="software">Software</h3>
-
 <p>In May this year, I wrote <a href="https://github.com/rtr7/router7">router7</a>, a pure-Go
 small home internet router. Mostly out of curiosity, we gave it a shot, and I’m
 happy to announce that router7 ran the event without any trouble.</p>
-
 <p>In preparation, I <a href="https://github.com/rtr7/router7/commit/2e8e0daa0ac8a6a123893b27fb1de566768383d0">implemented TCP MSS
 clamping</a>
 and <a href="https://github.com/rtr7/kernel/commit/c7afbc1fd2efdb9e1149d271c4d2be59cc5c98f4">included the WireGuard kernel
 module</a>.</p>
-
 <p>I largely followed the <a href="https://github.com/rtr7/router7#installation">router7 installation
 instructions</a>. To be specific,
 here is the <code>Makefile</code> I used for creating the router7 image:</p>
-
-<pre><code># github.com/rtr7/router7/cmd/... without dhcp6,
+<pre tabindex="0"><code># github.com/rtr7/router7/cmd/... without dhcp6,
 # as the cable uplink does not provide IPv6:
 PKGS := github.com/rtr7/router7/cmd/backupd \
 	github.com/rtr7/router7/cmd/captured \
@@ -118,64 +98,52 @@ endif
 		-serial_console=ttyS0,115200n8 \
 		-hostname=rgb2router \
 		${PKGS}
-</code></pre>
-
-<p>After preparing an <code>interfaces.json</code> configuration file and a
+</code></pre><p>After preparing an <code>interfaces.json</code> configuration file and a
 <a href="https://github.com/gokrazy/breakglass">breakglass</a> SSH hostkey, I used
 <code>rtr7-recover</code> to net-install the image onto the apu2c4. For subsequent updates,
 I used <code>rtr7-safe-update</code>.</p>
-
 <p>The Go packages under <code>github.com/stapelberg/rgb2r</code> are wrappers which run
 software I installed to the permanent partition mounted at <code>/perm</code>. See
 <a href="https://gokrazy.org/prototyping.html">gokrazy: Prototyping</a> for more details.</p>
-
 <h3 id="tunnel-setup">Tunnel setup</h3>
-
 <p>Last year, we used a Foo-over-UDP tunnel after noticing that we didn’t get
 enough bandwidth with OpenVPN. This year, after hearing much about it, we
 successfully used <a href="https://www.wireguard.com/">WireGuard</a>.</p>
-
 <p>I found WireGuard to be more performant than OpenVPN, and easier to set up than
 either OpenVPN or Foo-over-UDP.</p>
-
 <p>The one wrinkle is that its wire protocol is not yet frozen, and its kernel
 module is not yet included in Linux.</p>
-
 <h3 id="traffic-shaping">Traffic shaping</h3>
-
 <p>With asymmetric internet connections, such as the 400/20 cable connection we’re
 using, it’s necessary to shape traffic such that the upstream is never entirely
 saturated, otherwise the TCP ACK packets won’t reach their destination in time
 to saturate the downstream.</p>
-
 <p>While the FritzBox might already provide traffic shaping, we wanted to
 voluntarily restrict our upstream usage to leave some headroom for my parents.</p>
-
-<pre><code>rgb2router# tc qdisc replace dev uplink0 root tbf \
+<pre tabindex="0"><code>rgb2router# tc qdisc replace dev uplink0 root tbf \
   rate 16mbit \
   latency 50ms \
   burst 4000
-</code></pre>
-
-<p>The specified <code>latency</code> value is a best guess, and the <code>burst</code> value is derived
+</code></pre><p>The specified <code>latency</code> value is a best guess, and the <code>burst</code> value is derived
 from the kernel internal timer frequency (<code>CONFIG_HZ</code>) (!), packet size and rate
 as per
 <a href="https://unix.stackexchange.com/questions/100785/bucket-size-in-tbf">https://unix.stackexchange.com/questions/100785/bucket-size-in-tbf</a>.</p>
-
 <p>Tip: keep in mind to disable shaping temporarily when you’re doing bandwidth
 tests ;-).</p>
-
 <h3 id="statistics">Statistics</h3>
-
 <ul>
-<li><p>We peaked at 59 active DHCP leases, which is very similar to the “about 60”
-last year.</p></li>
-
-<li><p>DNS traffic peaked at about 25 queries/second, while mostly remaining at less
-than 5 queries/second.</p></li>
-
-<li><p>We were able to obtain peaks of nearly 200 Mbit/s of download traffic and
-transferred over 200 GB of data, twice as much as last year.</p></li>
+<li>
+<p>We peaked at 59 active DHCP leases, which is very similar to the “about 60”
+last year.</p>
+</li>
+<li>
+<p>DNS traffic peaked at about 25 queries/second, while mostly remaining at less
+than 5 queries/second.</p>
+</li>
+<li>
+<p>We were able to obtain peaks of nearly 200 Mbit/s of download traffic and
+transferred over 200 GB of data, twice as much as last year.</p>
+</li>
 </ul>
 ]]></content>
   </entry>
@@ -184,28 +152,20 @@ transferred over 200 GB of data, twice as much as last year.</p></li>
     <link href="https://michael.stapelberg.ch/posts/2017-11-13-rgb2r-network/"/>
     <id>https://michael.stapelberg.ch/posts/2017-11-13-rgb2r-network/</id>
     <published>2017-11-13T22:45:00+01:00</published>
-    <content type="html"><![CDATA[
-
-<p>Our computer association <a href="https://www.noname-ev.de/">NoName e.V.</a> organizes a
+    <content type="html"><![CDATA[<p>Our computer association <a href="https://www.noname-ev.de/">NoName e.V.</a> organizes a
 retro computing event called <a href="https://rgb2r.noname-ev.de/">RGB2R</a> every year,
 located in Heidelberg, Germany. This year’s version is called RGB2Rv17.</p>
-
 <p>This article describes the network setup I created for this year’s event.</p>
-
 <p>The intention is not so much to provide a fully working setup (even though the
 setup did work fine for us as-is), but rather inspire to you to create your own
 network, based vaguely on what’s provided here.</p>
-
 <h3 id="connectivity">Connectivity</h3>
-
 <p>The venue has a DSL connection with speeds reaching 1 Mbit/s if you’re
 lucky. Needless to say, that is not sufficient for the about 40 participants we
 had.</p>
-
 <p>Luckily, there is (almost) direct line of sight to my parent’s place, and my dad
 recently got a 400 Mbit/s cable internet connection, which he’s happy to share
 with us :-).</p>
-
 
 
 
@@ -233,83 +193,56 @@ with us :-).</p>
 
 
 
-
 <h3 id="hardware">Hardware</h3>
-
 <p>For the WiFi links to my parent’s place, we used 2 <a href="http://www.tp-link.com/us/products/details/cat-37_CPE510.html">tp-link
 CPE510</a> (CPE
 stands for Customer Premise Equipment) on each site. The devices only have 100
 Mbit/s ethernet ports, which is why we used two of them.</p>
-
 <p>The edge router for the event venue was a <a href="https://pcengines.ch/apu2c4.htm">PC Engines
 apu2c4</a>. For the Local Area Network (LAN)
 within the venue, we provided a few switches and WiFi using <a href="https://www.ubnt.com/">Ubiquiti
 Networks</a> access points.</p>
-
 <h3 id="software">Software</h3>
-
 <p>On the apu2c4, I installed Debian “stretch” 9, the latest Debian stable version
 at the time of writing. I prepared a USB thumb drive with the netinst image:</p>
-
-<pre><code>% wget https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-9.2.1-amd64-netinst.iso
+<pre tabindex="0"><code>% wget https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-9.2.1-amd64-netinst.iso
 % cp debian-9.2.1-amd64-netinst.iso /dev/sdb
-</code></pre>
-
-<p>Then, I…</p>
-
+</code></pre><p>Then, I…</p>
 <ul>
 <li>plugged the USB thumb drive into the apu2c4</li>
 <li>On the serial console, pressed F10 (boot menu), then 1 (boot from USB)</li>
 <li>In the Debian installer, selected Help, pressed F6 (special boot parameters), entered <code>install console=ttyS0,115200n8</code></li>
 <li>installed Debian as usual.</li>
 </ul>
-
 <h4 id="initial-setup">Initial setup</h4>
-
 <p>Debian stretch comes with systemd by default, but not with
 <a href="https://manpages.debian.org/stretch/systemd/systemd-networkd.8.en.html"><code>systemd-networkd(8)</code></a>
 by default, so I changed that:</p>
-
-<pre><code>edge# systemctl enable systemd-networkd
+<pre tabindex="0"><code>edge# systemctl enable systemd-networkd
 edge# systemctl disable networking
-</code></pre>
-
-<p>Also, I cleared the MOTD, placed <code>/tmp</code> on <code>tmpfs</code> and configured my usual
+</code></pre><p>Also, I cleared the MOTD, placed <code>/tmp</code> on <code>tmpfs</code> and configured my usual
 environment:</p>
-
-<pre><code>edge# echo &gt; /etc/motd
+<pre tabindex="0"><code>edge# echo &gt; /etc/motd
 edge# echo 'tmpfs /tmp tmpfs defaults 0 0' &gt;&gt; /etc/fstab
 edge# wget -qO- https://d.zekjur.net | bash -s
-</code></pre>
-
-<p>I also installed a few troubleshooting tools which came in handy later:</p>
-
-<pre><code>edge# apt install tcpdump net-tools strace
-</code></pre>
-
-<h4 id="disabling-icmp-rate-limiting-for-debugging">Disabling ICMP rate-limiting for debugging</h4>
-
+</code></pre><p>I also installed a few troubleshooting tools which came in handy later:</p>
+<pre tabindex="0"><code>edge# apt install tcpdump net-tools strace
+</code></pre><h4 id="disabling-icmp-rate-limiting-for-debugging">Disabling ICMP rate-limiting for debugging</h4>
 <p>I had to learn the hard way that Linux imposes a rate-limit on outgoing ICMP
 packets by default. This manifests itself as spurious timeouts in the
 <code>traceroute</code> output. To ease debugging, I disabled the rate limit entirely:</p>
-
-<pre><code>edge# cat &gt;&gt; /etc/sysctl.conf &lt;&lt;'EOT'
+<pre tabindex="0"><code>edge# cat &gt;&gt; /etc/sysctl.conf &lt;&lt;'EOT'
 net.ipv4.icmp_ratelimit=0
 net.ipv6.icmp.ratelimit=0
 EOT
 edge# sysctl -p
-</code></pre>
-
-<h4 id="renaming-network-interfaces">Renaming network interfaces</h4>
-
+</code></pre><h4 id="renaming-network-interfaces">Renaming network interfaces</h4>
 <p>Descriptive network interface names are helpful when debugging. I won’t remember
 whether <code>enp0s3</code> is the interface for an uplink or the LAN, so I assigned the
 names <code>uplink0</code>, <code>uplink1</code> and <code>lan0</code> to the apu2c4’s interfaces.</p>
-
 <p>To rename network interfaces, I created a corresponding <code>.link</code> file, had the
 initramfs pick it up, and rebooted:</p>
-
-<pre><code>edge# cat &gt;/etc/systemd/network/10-uplink0.link &lt;&lt;'EOT'
+<pre tabindex="0"><code>edge# cat &gt;/etc/systemd/network/10-uplink0.link &lt;&lt;'EOT'
 [Match]
 MACAddress=00:0d:b9:49:db:18
 
@@ -318,31 +251,21 @@ Name=uplink0
 EOT
 edge# update-initramfs -u
 edge# reboot
-</code></pre>
-
-<h3 id="network-topology">Network topology</h3>
-
+</code></pre><h3 id="network-topology">Network topology</h3>
 <p>Because our internet provider didn’t offer IPv6, and to keep my dad out of the
 loop in case any abuse issues should arise, we tunneled all of our traffic.</p>
-
 <p>We decided to set up one tunnel per WiFi link, so that we could easily
 load-balance over the two links by routing IP flows into one of the two tunnels.</p>
-
 <p>Here’s a screenshot from the topology dashboard which I made using the
 <a href="https://grafana.com/plugins/jdbranham-diagram-panel">Diagram</a> Grafana plugin:</p>
-
-<p><img src="/Bilder/rgb2rv17-network-topology.jpg" width="943" height="536"></p>
-
+<img src="/Bilder/rgb2rv17-network-topology.jpg" width="943" height="536">
 <h3 id="network-interface-setup">Network interface setup</h3>
-
 <p>We configured IP addresses statically on the <code>uplink0</code> and <code>uplink1</code> interface
 because we needed to use static addresses in the tunnel setup anyway.</p>
-
 <p>Note that we placed a default route in route table 110. Later on, we used
 <a href="https://manpages.debian.org/stretch/iptables/iptables.8.en.html"><code>iptables(8)</code></a>
 to make traffic use either of these two default routes.</p>
-
-<pre><code>edge# cat &gt; /etc/systemd/network/uplink0.network &lt;&lt;'EOT'
+<pre tabindex="0"><code>edge# cat &gt; /etc/systemd/network/uplink0.network &lt;&lt;'EOT'
 [Match]
 Name=uplink0
 
@@ -354,9 +277,7 @@ IPForward=ipv4
 Gateway=192.168.178.1
 Table=110
 EOT
-</code></pre>
-
-<pre><code>edge# cat &gt; /etc/systemd/network/uplink1.network &lt;&lt;'EOT'
+</code></pre><pre tabindex="0"><code>edge# cat &gt; /etc/systemd/network/uplink1.network &lt;&lt;'EOT'
 [Match]
 Name=uplink1
 
@@ -368,70 +289,50 @@ IPForward=ipv4
 Gateway=192.168.178.1
 Table=111
 EOT
-</code></pre>
-
-<h3 id="tunnel-setup">Tunnel setup</h3>
-
+</code></pre><h3 id="tunnel-setup">Tunnel setup</h3>
 <p>Originally, I configured OpenVPN for our tunnels. However, it turned out the
 apu2c4 tops out at 130 Mbit/s of traffic through OpenVPN. Notably, using two
 tunnels didn’t help — I couldn’t reach more than 130 Mbit/s in total. This is
 with authentication and crypto turned off.</p>
-
 <p>This surprised me, but doesn’t seem too uncommon: on the internet, I could find
 reports of similar speeds with the same hardware.</p>
-
 <p>Given that our setup didn’t require cryptography (applications are using TLS
 these days), I looked for light-weight alternatives and found Foo-over-UDP
 (fou), a UDP encapsulation protocol supporting IPIP, GRE and SIT tunnels.</p>
-
 <p>Each configured Foo-over-UDP tunnel only handles sending packets. For receiving,
 you need to configure a listening port. If you want two machines to talk to each
 other, you therefore need a listening port on each, and a tunnel on each.</p>
-
 <p>Note that you need one tunnel per address family: IPIP only supports IPv4, SIT
 only supports IPv6. In total, we ended up with 4 tunnels (2 WiFi uplinks with 2
 address families each).</p>
-
 <p>Also note that Foo-over-UDP provides no authentication: anyone who is able to
 send packets to your configured listening port can spoof any IP address. If you
 don’t restrict traffic in some way (e.g. by source IP), you are effectively
 running an open proxy.</p>
-
 <h4 id="tunnel-configuration">Tunnel configuration</h4>
-
 <p>First, load the kernel modules and set the corresponding interfaces to UP:</p>
-
-<pre><code>edge# modprobe fou
+<pre tabindex="0"><code>edge# modprobe fou
 edge# modprobe ipip
 edge# ip link set dev tunl0 up
 edge# modprobe sit
 edge# ip link set dev sit0 up
-</code></pre>
-
-<p>Configure the listening ports for receiving FOU packets:</p>
-
-<pre><code>edge# ip fou add port 1704 ipproto 4
+</code></pre><p>Configure the listening ports for receiving FOU packets:</p>
+<pre tabindex="0"><code>edge# ip fou add port 1704 ipproto 4
 edge# ip fou add port 1706 ipproto 41
 
 edge# ip fou add port 1714 ipproto 4
 edge# ip fou add port 1716 ipproto 41
-</code></pre>
-
-<p>Configure the tunnels for sending FOU packets, using the local interface of the
+</code></pre><p>Configure the tunnels for sending FOU packets, using the local interface of the
 <code>uplink0</code> interface:</p>
-
-<pre><code>edge# ip link add name fou0v4 type ipip remote 203.0.113.1 local 192.168.178.10 encap fou encap-sport auto encap-dport 1704 dev uplink0
+<pre tabindex="0"><code>edge# ip link add name fou0v4 type ipip remote 203.0.113.1 local 192.168.178.10 encap fou encap-sport auto encap-dport 1704 dev uplink0
 edge# ip link set dev fou0v4 up
 edge# ip -4 address add 10.170.0.1/24 dev fou0v4
 
 edge# ip link add name fou0v6 type sit remote 203.0.113.1 local 192.168.178.10 encap fou encap-sport auto encap-dport 1706 dev uplink0
 edge# ip link set dev fou0v6 up
 edge# ip -6 address add fd00::10:170:0:1/112 dev fou0v6 preferred_lft 0
-</code></pre>
-
-<p>Repeat for the <code>uplink1</code> interface:</p>
-
-<pre><code># (IPv4) Set up the uplink1 transmit tunnel:
+</code></pre><p>Repeat for the <code>uplink1</code> interface:</p>
+<pre tabindex="0"><code># (IPv4) Set up the uplink1 transmit tunnel:
 edge# ip link add name fou1v4 type ipip remote 203.0.113.1 local 192.168.178.11 encap fou encap-sport auto encap-dport 1714 dev uplink1
 edge# ip link set dev fou1v4 up
 edge# ip -4 address add 10.171.0.1/24 dev fou1v4
@@ -440,126 +341,83 @@ edge# ip -4 address add 10.171.0.1/24 dev fou1v4
 edge# ip link add name fou1v6 type sit remote 203.0.113.1 local 192.168.178.11 encap fou encap-sport auto encap-dport 1716 dev uplink1
 edge# ip link set dev fou1v6 up
 edge# ip -6 address add fd00::10:171:0:1/112 dev fou1v6 preferred_lft 0
-</code></pre>
-
-<h3 id="load-balancing-setup">Load-balancing setup</h3>
-
+</code></pre><h3 id="load-balancing-setup">Load-balancing setup</h3>
 <p>In previous years, we experimented with setups using MLVPN for load-balancing
 traffic on layer 2 across multiple uplinks. Unfortunately, we weren’t able to
 get good results: when aggregating links, bandwidth would be limited to the
 slowest link. I expect that MLVPN and others would work better this year, if we
 were to set it up directly before and after the WiFi uplinks, as the two links
 should be almost identical in terms of latency and throughput.</p>
-
 <p>Regardless, we didn’t want to take any chances and decided to go with IP flow
 based load-balancing. The downside is that any individual connection can never
 be faster than the uplink over which it is routed. Given the number of
 concurrent connections in a typical network, in practice we observed good
 utilization of both links regardless.</p>
-
 <p>Let’s tell iptables to mark packets coming from the LAN with one of two values
 based on the hash of their source IP, source port, destination IP and
 destination port properties:</p>
-
-<pre><code>edge# iptables -t mangle -A PREROUTING -s 10.17.0.0/24 -j HMARK --hmark-tuple src,sport,dst,dport --hmark-mod 2 --hmark-offset 10 --hmark-rnd 0xdeadbeef
-</code></pre>
-
-<p>Note that the <code>--hmark-offset</code> parameter is required: mark 0 is the default, so
+<pre tabindex="0"><code>edge# iptables -t mangle -A PREROUTING -s 10.17.0.0/24 -j HMARK --hmark-tuple src,sport,dst,dport --hmark-mod 2 --hmark-offset 10 --hmark-rnd 0xdeadbeef
+</code></pre><p>Note that the <code>--hmark-offset</code> parameter is required: mark 0 is the default, so
 you need an offset of at least 1.</p>
-
 <p>For debugging, it is helpful to exempt the IP addresses we use on the tunnels
 themselves, otherwise we might not be able to ping an endpoint which is actually
 reachable:</p>
-
-<pre><code>edge# iptables -t mangle -A PREROUTING -s 10.17.0.0/24 -d 10.170.0.0/24 -m comment --comment &quot;for debugging&quot; -j MARK --set-mark 10
+<pre tabindex="0"><code>edge# iptables -t mangle -A PREROUTING -s 10.17.0.0/24 -d 10.170.0.0/24 -m comment --comment &quot;for debugging&quot; -j MARK --set-mark 10
 edge# iptables -t mangle -A PREROUTING -s 10.17.0.0/24 -d 10.171.0.0/24 -m comment --comment &quot;for debugging&quot; -j MARK --set-mark 11
-</code></pre>
-
-<p>Now, we need to add a routing policy to select the correct default route based
+</code></pre><p>Now, we need to add a routing policy to select the correct default route based
 on the firewall mark:</p>
-
-<pre><code>edge# ip -4 rule add fwmark 10 table 10
+<pre tabindex="0"><code>edge# ip -4 rule add fwmark 10 table 10
 edge# ip -4 rule add fwmark 11 table 11
-</code></pre>
-
-<p>The steps for IPv6 are identical.</p>
-
+</code></pre><p>The steps for IPv6 are identical.</p>
 <p>Note that current OpenWrt (15.05) does not provide the HMARK iptables module. I
 filed <a href="https://github.com/openwrt/openwrt/issues/572">a GitHub issue with OpenWrt</a>.</p>
-
 <h4 id="connectivity-for-the-edge-router">Connectivity for the edge router</h4>
-
 <p>Because our default routes are placed in table 110 and 111, the router does not
 have upstream connectivity. This is mostly working as intended, as it makes it
 harder to accidentally route traffic outside of the tunnels.</p>
-
 <p>There is one exception: we need a route to our DNS server:</p>
-
-<pre><code>edge# ip -4 rule add to 8.8.8.8/32 lookup 110
-</code></pre>
-
-<p>It doesn’t matter which uplink we use for that, since DNS traffic is tiny.</p>
-
+<pre tabindex="0"><code>edge# ip -4 rule add to 8.8.8.8/32 lookup 110
+</code></pre><p>It doesn’t matter which uplink we use for that, since DNS traffic is tiny.</p>
 <h4 id="connectivity-to-the-tunnel-endpoint">Connectivity to the tunnel endpoint</h4>
-
 <p>Of course, the tunnel endpoint itself must also be reachable:</p>
-
-<pre><code>edge# ip rule add fwmark 110 lookup 110
+<pre tabindex="0"><code>edge# ip rule add fwmark 110 lookup 110
 edge# ip rule add fwmark 111 lookup 111
 
 edge# iptables -t mangle -A OUTPUT -d 203.0.113.1/32 -p udp --dport 1704 -j MARK --set-mark 110
 edge# iptables -t mangle -A OUTPUT -d 203.0.113.1/32 -p udp --dport 1714 -j MARK --set-mark 111
 edge# iptables -t mangle -A OUTPUT -d 203.0.113.1/32 -p udp --dport 1706 -j MARK --set-mark 110
 edge# iptables -t mangle -A OUTPUT -d 203.0.113.1/32 -p udp --dport 1716 -j MARK --set-mark 111
-</code></pre>
-
-<h4 id="connectivity-to-the-access-points">Connectivity to the access points</h4>
-
+</code></pre><h4 id="connectivity-to-the-access-points">Connectivity to the access points</h4>
 <p>By clearing the firewall mark, we ensure traffic doesn’t get sent through our
 tunnel:</p>
-
-<pre><code>edge# iptables -t mangle -A PREROUTING -s 10.17.0.0/24 -d 192.168.178.250 -j MARK --set-mark 0 -m comment --comment &quot;for debugging&quot;
+<pre tabindex="0"><code>edge# iptables -t mangle -A PREROUTING -s 10.17.0.0/24 -d 192.168.178.250 -j MARK --set-mark 0 -m comment --comment &quot;for debugging&quot;
 edge# iptables -t mangle -A PREROUTING -s 10.17.0.0/24 -d 192.168.178.251 -j MARK --set-mark 0 -m comment --comment &quot;for debugging&quot;
 edge# iptables -t mangle -A PREROUTING -s 10.17.0.0/24 -d 192.168.178.252 -j MARK --set-mark 0 -m comment --comment &quot;for debugging&quot;
 edge# iptables -t mangle -A PREROUTING -s 10.17.0.0/24 -d 192.168.178.253 -j MARK --set-mark 0 -m comment --comment &quot;for debugging&quot;
-</code></pre>
-
-<p>Also, since the access points are all in the same subnet, we need to tell Linux
+</code></pre><p>Also, since the access points are all in the same subnet, we need to tell Linux
 on which interface to send the packets, otherwise packets might egress on the
 wrong link:</p>
-
-<pre><code>edge# ip -4 route add 192.168.178.252 dev uplink0 src 192.168.178.10
+<pre tabindex="0"><code>edge# ip -4 route add 192.168.178.252 dev uplink0 src 192.168.178.10
 edge# ip -4 route add 192.168.178.253 dev uplink1 src 192.168.178.11
-</code></pre>
-
-<h4 id="mtu-configuration">MTU configuration</h4>
-
-<pre><code>edge# ifconfig uplink0 mtu 1472
+</code></pre><h4 id="mtu-configuration">MTU configuration</h4>
+<pre tabindex="0"><code>edge# ifconfig uplink0 mtu 1472
 edge# ifconfig uplink1 mtu 1472
 edge# ifconfig fou0v4 mtu 1416
 edge# ifconfig fou0v6 mtu 1416
 edge# ifconfig fou1v4 mtu 1416
 edge# ifconfig fou1v6 mtu 1416
-</code></pre>
-
-<h4 id="for-maintenance-temporarily-use-only-one-uplink">For maintenance: temporarily use only one uplink</h4>
-
+</code></pre><h4 id="for-maintenance-temporarily-use-only-one-uplink">For maintenance: temporarily use only one uplink</h4>
 <p>It might come in handy to quickly be able to disable an uplink, be it for
 diagnosing issues, performing maintenance on a link, or to work around a broken
 uplink.</p>
-
 <p>Let’s create a separate iptables chain in which we can place temporary
 overrides:</p>
-
-<pre><code>edge# iptables -t mangle -N prerouting_override
+<pre tabindex="0"><code>edge# iptables -t mangle -N prerouting_override
 edge# iptables -t mangle -A PREROUTING -j prerouting_override
 edge# ip6tables -t mangle -N prerouting_override
 edge# ip6tables -t mangle -A PREROUTING -j prerouting_override
-</code></pre>
-
-<p>With the following shell script, we can then install such an override:</p>
-
-<pre><code>#!/bin/bash
+</code></pre><p>With the following shell script, we can then install such an override:</p>
+<pre tabindex="0"><code>#!/bin/bash
 # vim:ts=4:sw=4
 # enforces using a single uplink
 # syntax:
@@ -589,64 +447,44 @@ ip6tables -t mangle -A prerouting_override -j MARK --set-mark &quot;${MARK}&quot
 
 ip -4 rule del to 8.8.8.8/32
 ip -4 rule add to 8.8.8.8/32 lookup &quot;1${MARK}&quot;
-</code></pre>
-
-<h3 id="mss-clamping">MSS clamping</h3>
-
+</code></pre><h3 id="mss-clamping">MSS clamping</h3>
 <p>Because Path MTU discovery is often broken on the internet, it’s best practice
 to limit the Maximum Segment Size (MSS) of each TCP connection, achieving the
 same effect (but only for TCP connections).</p>
-
 <p>This technique is called “MSS clamping”, and can be implemented in Linux like
 so:</p>
-
-<pre><code>edge# iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o fou0v4 -j TCPMSS --clamp-mss-to-pmtu
+<pre tabindex="0"><code>edge# iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o fou0v4 -j TCPMSS --clamp-mss-to-pmtu
 edge# iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o fou1v4 -j TCPMSS --clamp-mss-to-pmtu
 edge# ip6tables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o fou0v6 -j TCPMSS --clamp-mss-to-pmtu
 edge# ip6tables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o fou1v6 -j TCPMSS --clamp-mss-to-pmtu
-</code></pre>
-
-<h3 id="traffic-shaping">Traffic shaping</h3>
-
+</code></pre><h3 id="traffic-shaping">Traffic shaping</h3>
 <h4 id="shaping-upstream">Shaping upstream</h4>
-
 <p>With asymmetric internet connections, such as the 400/20 cable connection we’re
 using, it’s necessary to shape traffic such that the upstream is never entirely
 saturated, otherwise the TCP ACK packets won’t reach their destination in time
 to saturate the downstream.</p>
-
 <p>While the FritzBox might already provide traffic shaping, we wanted to
 voluntarily restrict our upstream usage to leave some headroom for my parents.</p>
-
 <p>Hence, we’re shaping each uplink to 8 Mbit/s, which sums up to 16 Mbit/s, well
 below the available 20 Mbit/s:</p>
-
-<pre><code>edge# tc qdisc replace dev uplink0 root tbf rate 8mbit latency 50ms burst 4000
+<pre tabindex="0"><code>edge# tc qdisc replace dev uplink0 root tbf rate 8mbit latency 50ms burst 4000
 edge# tc qdisc replace dev uplink1 root tbf rate 8mbit latency 50ms burst 4000
-</code></pre>
-
-<p>The specified <code>latency</code> value is a best guess, and the <code>burst</code> value is derived
+</code></pre><p>The specified <code>latency</code> value is a best guess, and the <code>burst</code> value is derived
 from the kernel internal timer frequency (<code>CONFIG_HZ</code>) (!), packet size and rate
 as per
 <a href="https://unix.stackexchange.com/questions/100785/bucket-size-in-tbf">https://unix.stackexchange.com/questions/100785/bucket-size-in-tbf</a>.</p>
-
 <p>Tip: keep in mind to disable shaping temporarily when you’re doing bandwidth
 tests ;-).</p>
-
 <h4 id="shaping-downstream">Shaping downstream</h4>
-
 <p>It’s somewhat of a mystery to me why this helped, but we achieved noticeably
 better bandwidth (50 Mbit/s without, 100 Mbit/s with shaping) when we also
 shaped the downstream traffic (i.e. made the tunnel endpoint shape traffic).</p>
-
 <h3 id="lan">LAN</h3>
-
 <p>For DHCP, DNS and IPv6 router advertisments, we set up
 <a href="https://manpages.debian.org/stretch/dnsmasq-base/dnsmasq.8.en.html"><code>dnsmasq(8)</code></a>,
 which worked beautifully and was way quicker to configure than the bigger ISC
 servers:</p>
-
-<pre><code>edge# apt install dnsmasq
+<pre tabindex="0"><code>edge# apt install dnsmasq
 edge# cat &gt; /etc/dnsmasq.d/rgb2r &lt;&lt;'EOT'
 interface=lan0
 dhcp-range=10.17.0.10,10.17.0.250,30m
@@ -654,73 +492,64 @@ dhcp-range=::,constructor:lan0,ra-only
 enable-ra
 cache-size=10000
 EOT
-</code></pre>
-
-<h3 id="monitoring">Monitoring</h3>
-
+</code></pre><h3 id="monitoring">Monitoring</h3>
 <p>First, install and start Prometheus:</p>
-
-<pre><code>edge# apt install prometheus prometheus-node-exporter prometheus-blackbox-exporter
+<pre tabindex="0"><code>edge# apt install prometheus prometheus-node-exporter prometheus-blackbox-exporter
 edge# setcap CAP_NET_RAW=ep /usr/bin/prometheus-blackbox-exporter
 edge# systemctl enable --now prometheus prometheus-node-exporter prometheus-blackbox-exporter
-</code></pre>
-
-<p>Then, install and start Grafana:</p>
-
-<pre><code>edge# apt install apt-transport-https
+</code></pre><p>Then, install and start Grafana:</p>
+<pre tabindex="0"><code>edge# apt install apt-transport-https
 edge# wget -qO- https://packagecloud.io/gpg.key | apt-key add -
 edge# echo deb https://packagecloud.io/grafana/stable/debian/ stretch main &gt; /etc/apt/sources.list.d/grafana.list
 edge# apt update
 edge# apt install grafana
 edge# systemctl enable --now grafana-server
-</code></pre>
-
-<p>Also, install the excellent
+</code></pre><p>Also, install the excellent
 <a href="https://grafana.com/plugins/jdbranham-diagram-panel">Diagram</a> Grafana plugin:</p>
-
-<pre><code>edge# grafana-cli plugins install jdbranham-diagram-panel
+<pre tabindex="0"><code>edge# grafana-cli plugins install jdbranham-diagram-panel
 edge# systemctl restart grafana-server
-</code></pre>
-
-<h3 id="config-files">Config files</h3>
-
+</code></pre><h3 id="config-files">Config files</h3>
 <p>I realize this post contains a lot of configuration excerpts which might be hard
 to put together. So, you can <a href="http://code.stapelberg.de/git/rgb2rv17-network-setup/">find all the config files in a git
 repository</a>. As I
 mentioned at the beginning of the article, please create your own network and
 don’t expect the config files to just work out of the box.</p>
-
 <h3 id="statistics">Statistics</h3>
-
 <ul>
-<li><p>We peaked at about 60 active DHCP leases.</p></li>
-
-<li><p>The connection tracking table (holding an entry for each IPv4 connection)
-never exceeded 4000 connections.</p></li>
-
-<li><p>DNS traffic peaked at about 12 queries/second.</p></li>
-
-<li><p>dnsmasq’s maximum cache size of 10000 records was sufficient: we did not have
-a single cache eviction over the entire event.</p></li>
-
-<li><p>We were able to obtain peaks of over 150 Mbit/s of download traffic.</p></li>
-
-<li><p>At peak, about 10% of our traffic was IPv6.</p></li>
+<li>
+<p>We peaked at about 60 active DHCP leases.</p>
+</li>
+<li>
+<p>The connection tracking table (holding an entry for each IPv4 connection)
+never exceeded 4000 connections.</p>
+</li>
+<li>
+<p>DNS traffic peaked at about 12 queries/second.</p>
+</li>
+<li>
+<p>dnsmasq’s maximum cache size of 10000 records was sufficient: we did not have
+a single cache eviction over the entire event.</p>
+</li>
+<li>
+<p>We were able to obtain peaks of over 150 Mbit/s of download traffic.</p>
+</li>
+<li>
+<p>At peak, about 10% of our traffic was IPv6.</p>
+</li>
 </ul>
-
 <h3 id="wifi-statistics">WiFi statistics</h3>
-
 <ul>
-<li><p>On link 1, our signal to noise ratio hovered between 31 dBm to 33 dBm. When it
-started raining, it dropped by 2-3 dBm.</p></li>
-
-<li><p>On link 2, our signal to noise ratio hovered between 34 dBm to 36 dBm. When it
-started raining, it dropped by 1 dBm.</p></li>
+<li>
+<p>On link 1, our signal to noise ratio hovered between 31 dBm to 33 dBm. When it
+started raining, it dropped by 2-3 dBm.</p>
+</li>
+<li>
+<p>On link 2, our signal to noise ratio hovered between 34 dBm to 36 dBm. When it
+started raining, it dropped by 1 dBm.</p>
+</li>
 </ul>
-
 <p>Despite the relatively bad signal/noise ratios, we could easily obtain about 140
 Mbps on the WiFi layer, which results in 100 Mbps on the ethernet layer.</p>
-
 <p>The difference in signal/noise ratio between the two links had no visible impact
 on bandwidth, but ICMP probes showed measurably more packet loss on link 1.</p>
 ]]></content>

@@ -11,27 +11,21 @@
     <link href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/"/>
     <id>https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/</id>
     <published>2021-07-10T13:43:00+02:00</published>
-    <content type="html"><![CDATA[
-
-<p>init7 recently announced that with their <a href="https://www.init7.net/en/internet/fiber7/">FTTH fiber offering
+    <content type="html"><![CDATA[<p>init7 recently announced that with their <a href="https://www.init7.net/en/internet/fiber7/">FTTH fiber offering
 Fiber7</a>, they will now sell and
 connect you with 25 Gbit/s (Fiber7-X2) or 10 Gbit/s (Fiber7-X) fiber optics, if
 you want more than 1 Gbit/s.</p>
-
 <p>While this offer will only become available at my location late this year (<a href="https://twitter.com/init7/status/1403287499175235584">or
 possibly later due to the supply chain
 shortage</a>), I already
 wanted to get the hardware on my end sorted out.</p>
-
 <p>After my <a href="/posts/2021-05-28-configured-and-returned-mikrotik-ccr2004-for-fiber7/">previous
 disappointment</a>
 with the MikroTik CCR2004, I decided to try a custom PC build.</p>
-
 <p>An alternative to many specialized devices, including routers, is to use a PC
 with an expansion card. An internet router’s job is to configure a network
 connection and forward network packets. So, in our case, we’ll build a PC and
 install some network expansion cards!</p>
-
 
 
 
@@ -59,35 +53,27 @@ install some network expansion cards!</p>
 
 
 
-
 <h2 id="goals">Goals</h2>
-
 <p>For this PC internet router build, I had the following goals, highest priority
 to lowest priority:</p>
-
 <ol>
 <li>Enough performance to saturate 25 Gbit/s, e.g. with two 10 Gbit/s downloads.</li>
 <li>Silent: no loud fan noise.</li>
 <li>Power-efficient: low power usage, as little heat as possible.</li>
 <li>Low cost (well, for a high-end networking build…).</li>
 </ol>
-
 <h2 id="network-port-plan">Network Port Plan</h2>
-
 <p>The simplest internet router has 2 network connections: one uplink to the
 internet, and the local network. You can build a router without extra cards by
 using a mainboard with 2 network ports.</p>
-
 <p>Because there are no mainboards with SFP28 slots (for 25 Gbit/s SFP28 fiber
 modules), we need at least 1 network card for our build. You might be able to
 get by with a dual-port SFP28 network card if you have an SFP28-compatible
 network switch already, or need just one fast connection.</p>
-
 <p>I want to connect a few fast devices (directly and via fiber) to my router, so
 I’m using 2 network cards: an SFP28 network card for the uplink, and a quad-port
 10G SFP+ network card for the local network (LAN). This leaves us with the
 following network ports and connections:</p>
-
 <table>
 <thead>
 <tr>
@@ -98,7 +84,6 @@ following network ports and connections:</p>
 <th>Connection</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>Intel XXV710</td>
@@ -107,7 +92,6 @@ following network ports and connections:</p>
 <td>25 Gbit/s</td>
 <td>Fiber7-X2 uplink</td>
 </tr>
-
 <tr>
 <td>Intel XXV710</td>
 <td>25 Gbit/s</td>
@@ -115,7 +99,6 @@ following network ports and connections:</p>
 <td>10 Gbit/s</td>
 <td>workstation</td>
 </tr>
-
 <tr>
 <td>Intel XL710</td>
 <td>10 Gbit/s</td>
@@ -123,7 +106,6 @@ following network ports and connections:</p>
 <td>1 Gbit/s</td>
 <td>rest (RJ45 Gigabit)</td>
 </tr>
-
 <tr>
 <td>Intel XL710</td>
 <td>10 Gbit/s</td>
@@ -131,7 +113,6 @@ following network ports and connections:</p>
 <td>10 Gbit/s</td>
 <td>MikroTik 1</td>
 </tr>
-
 <tr>
 <td>Intel XL710</td>
 <td>10 Gbit/s</td>
@@ -139,7 +120,6 @@ following network ports and connections:</p>
 <td>10 Gbit/s</td>
 <td>MikroTik 2</td>
 </tr>
-
 <tr>
 <td>Intel XL710</td>
 <td>10 Gbit/s</td>
@@ -147,7 +127,6 @@ following network ports and connections:</p>
 <td>10 Gbit/s</td>
 <td>(unused)</td>
 </tr>
-
 <tr>
 <td>onboard</td>
 <td>2.5 Gbit/s</td>
@@ -157,7 +136,6 @@ following network ports and connections:</p>
 </tr>
 </tbody>
 </table>
-
 
 
 
@@ -185,17 +163,12 @@ following network ports and connections:</p>
 
 
 
-
 <h2 id="hardware-selection">Hardware selection</h2>
-
 <p>Now that we have defined the goals and network needs, let’s select the actual
 hardware!</p>
-
 <h3 id="network-cards">Network Cards</h3>
-
 <p>My favorite store for 10 Gbit/s+ network equipment is
 <a href="https://www.fs.com/">FS.COM</a>. They offer Intel-based cards:</p>
-
 
 
 
@@ -223,43 +196,38 @@ hardware!</p>
 
 
 
-
 <ul>
-<li><p>(347 CHF) PCIe 3.0 x8 Dual-Port 25G SFP28 Ethernet Network Card (Intel XXV710) <br />
-<a href="https://www.fs.com/de/products/75603.html">FS.COM XXV710AM2-F2 #75603</a></p></li>
-
-<li><p>(329 CHF) PCIe 3.0 x8 Quad-Port 10G SFP+ Ethernet Network Card (Intel XL710-BM1) <br />
-<a href="https://www.fs.com/de/products/75602.html">FS.COM FTXL710BM1-F4 #75602</a></p></li>
+<li>
+<p>(347 CHF) PCIe 3.0 x8 Dual-Port 25G SFP28 Ethernet Network Card (Intel XXV710)<br>
+<a href="https://www.fs.com/de/products/75603.html">FS.COM XXV710AM2-F2 #75603</a></p>
+</li>
+<li>
+<p>(329 CHF) PCIe 3.0 x8 Quad-Port 10G SFP+ Ethernet Network Card (Intel XL710-BM1)<br>
+<a href="https://www.fs.com/de/products/75602.html">FS.COM FTXL710BM1-F4 #75602</a></p>
+</li>
 </ul>
-
 <p>Both cards work out of the box with the <a href="https://www.kernel.org/doc/Documentation/networking/i40e.txt"><code>i40e</code> Linux kernel
 driver</a>, no
 firmware blobs required.</p>
-
 <p>For a good overview over the different available Intel cards, check out the
 second page (“Product View”) in the card’s <a href="https://img-en.fs.com/file/user_manual/network-adapter-user-manual.pdf">User
 Manual</a>.</p>
-
 <h3 id="cpu-and-chipset">CPU and Chipset</h3>
-
 <p>I read on many different sites that AMD’s current CPUs beat Intel’s CPUs in
 terms of performance per watt. We can better achieve goals 2 and 3 (low noise
 and low power usage) by using fewer watts, so we’ll pick an AMD CPU and
 mainboard for this build.</p>
-
 <p>AMD’s current CPU generation is Zen 3, and <a href="https://en.wikipedia.org/wiki/List_of_AMD_Ryzen_processors#Zen_3_based">current Zen 3 based
 CPUs</a>
 can be divided into 65W <a href="https://en.wikipedia.org/wiki/Thermal_design_power">TDP (Thermal Design
 Power)</a> and 105W TDP
 models. Only one 65W model is available to customers right now: the Ryzen 5
 5600X.</p>
-
 <p>Mainboards are built for/with a certain so-called chipset. Zen 3 CPUs use the
 AM4 socket, for which <a href="https://en.wikipedia.org/wiki/Socket_AM4#Chipsets">8 different
 chipsets</a> exist. Our network
 cards need PCIe 3.0, so that disqualifies 5 chipsets right away: only the A520,
 B550 and X570 chipsets remain.</p>
-
 <aside class="admonition note">
   <div class="note-container">
     <div class="note-icon">
@@ -295,7 +263,6 @@ mode should work, too.</div>
 
 
 
-
 <a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-08-ryzen5-on-mainboard.jpg"><img
   srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-08-ryzen5-on-mainboard_hudb2375ee03466882b5ba09d7fd065b5d_1054095_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-08-ryzen5-on-mainboard_hudb2375ee03466882b5ba09d7fd065b5d_1054095_1800x0_resize_q75_box.jpg 3x"
   src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-08-ryzen5-on-mainboard_hudb2375ee03466882b5ba09d7fd065b5d_1054095_600x0_resize_q75_box.jpg"
@@ -308,21 +275,16 @@ mode should work, too.</div>
 
 
 
-
 <h3 id="mainboard-pcie-bandwidth">Mainboard: PCIe bandwidth</h3>
-
 <p>I originally tried using the ASUS PRIME X570-P mainboard, but I ran into two
 problems:</p>
-
 <p>Too loud: X570 mainboards need an annoyingly loud chipset fan for their 15W
 TDP. Other chipsets such as the B550 don’t need a fan for their 5W TDP. With a
 loud chipset fan, goal 2 (low noise) cannot be achieved. Only the
 <a href="https://www.golem.de/news/sockel-am4-x570s-mainboards-mit-passivkuehlung-verfuegbar-2106-157434.html">recently-released X570<strong>S</strong>
 variant</a>
 comes without fans.</p>
-
 <p>Not enough PCIe bandwidth/slots! This is how the ASUS tech specs describe the slots:</p>
-
 
 
 
@@ -350,38 +312,30 @@ comes without fans.</p>
 
 
 
-
 <p>This means the board has 2 slots (1 CPU, 1 chipset) that are physically wide
 enough to hold a full-length x16 card, but only the first port can
 electronically be used as an x16 slot. The other port only has PCIe lanes
 electronically connected for x4, hence “x16 (max at x4 mode)”.</p>
-
 <p>Unfortunately, our network cards need electrical connection of all their PCIe x8
 lanes to run at full speed. Perhaps Intel/FS.COM will one day offer a new
 generation of network cards that use PCIe <strong>4.0</strong>, because PCIe 4.0 x4 achieves
 the same 7.877 GB/s throughput as PCIe <strong>3.0</strong> x8. Until then, I needed to find
 a new mainboard.</p>
-
 <p>Searching mainboards by PCIe capabilities is rather tedious, as mainboard block
 diagrams or PCIe tree diagrams are not consistently available from all mainboard
 vendors.</p>
-
 <p>Instead, we can look explicitly for a feature called <strong>PCIe Bifurcation</strong>. In a
 nutshell, PCIe bifurcation lets us divide the PCIe bandwidth from the Ryzen CPU
 from 1 PCIe 4.0 x16 into 1 PCIe 4.0 x8 + 1 PCIe 4.0 x8, definitely satisfying
 our requirement for two x8 slots at full bandwidth.</p>
-
 <p>I found a list of (only!) three B550 mainboards supporting PCIe Bifurcation in <a href="https://www.anandtech.com/show/15850/the-amd-b550-motherboard-overview-asus-gigabyte-msi-asrock-and-others/39">an
 Anandtech
 review</a>. Two
 are made by Gigabyte, one by ASRock. I read the Gigabyte UEFI setup is rather
 odd, so I went with the ASRock B550 Taichi mainboard.</p>
-
 <h3 id="case">Case</h3>
-
 <p>For the case, I needed a midi case (large enough for the B550 mainboard’s ATX
 form factor) with plenty of options for large, low-spinning fans.</p>
-
 <p>I stumbled upon the <a href="https://www.corsair.com/us/en/Categories/Products/Cases/Mid-Tower-ATX-Cases/4000D-Airflow-Tempered-Glass-Mid-Tower-ATX-Case/p/CC-9011200-WW">Corsair 4000D
 Airflow</a>,
 which is available for 80 CHF and <a href="https://www.gamersnexus.net/hwreviews/3624-corsair-4000d-airflow-case-review-vs-solid-panel">achieved positive
@@ -389,7 +343,6 @@ reviews</a>. I’m
 pleased with the 4000D: there are no sharp corners, installation is quick, easy
 and clean, and the front and top panels offer plenty of space for cooling behind
 large air intakes:</p>
-
 
 
 
@@ -417,9 +370,7 @@ large air intakes:</p>
 
 
 
-
 <p>Inside, the case offers plenty of space and options for routing cables on the back side:</p>
-
 
 
 
@@ -447,9 +398,7 @@ large air intakes:</p>
 
 
 
-
 <p>Which in turn makes for a clean front side:</p>
-
 
 
 
@@ -477,13 +426,10 @@ large air intakes:</p>
 
 
 
-
 <h3 id="fans">Fans</h3>
-
 <p>I have been happy with <a href="https://noctua.at/">Noctua</a> fans for many years. In this
 build, I’m using only Noctua fans so that I can reach goal 2 (silent, no loud
 fan noise):</p>
-
 
 
 
@@ -511,39 +457,30 @@ fan noise):</p>
 
 
 
-
 <p>These fans are large (140mm), so they can spin on slow speeds and still be
 effective.</p>
-
 <p>The specific fan configuration I ended up with:</p>
-
 <ul>
 <li>1 Noctua NF-A14 PWM 140mm in the front, pulling air out of the case</li>
 <li>1 Noctua NF-A14 PWM 140mm in the top, pulling air into the case</li>
 <li>1 Noctua NF-A12x25 PWM 120mm in the back, pulling air into the case</li>
 <li>1 Noctua NH-L12S CPU fan</li>
 </ul>
-
 <p>Note that this is most likely overkill: I can well imagine that I could turn off
 one of these fans entirely without a noticeable effect on temperatures. But I
 wanted to be on the safe side and have a lot of cooling capacity, as I don’t
 know how hot the Intel network cards run in practice.</p>
-
 <h3 id="fan-controller">Fan Controller</h3>
-
 <p>The ASRock B550 Taichi <a href="https://www.techpowerup.com/review/asrock-b550-taichi/7.html">comes with a Nuvoton
 NCT6683D-T</a> fan
 controller.</p>
-
 <p>Unfortunately, ASRock seems to have set the Customer ID register to 0 instead of
 <code>CUSTOMER_ID_ASROCK</code>, so you need to load the <code>nct6683</code> Linux driver with its
 <code>force</code> option.</p>
-
 <p>Once the module is loaded, <code>lm-sensors</code> lists accurate PWM fan speeds, but the
 temperature values are mislabeled and don’t quite match the temperatures I see
 in the UEFI H/W Monitor:</p>
-
-<pre><code>nct6683-isa-0a20
+<pre tabindex="0"><code>nct6683-isa-0a20
 Adapter: ISA adapter
 fan1:              471 RPM  (min =    0 RPM)
 fan2:                0 RPM  (min =    0 RPM)
@@ -560,64 +497,48 @@ AMD TSI Addr 98h:  +40.0 C  (low  =  +0.0 C)
                             (crit =  +0.0 C)  sensor = AMD AMDSI
 intrusion0:       OK
 beep_enable:      disabled
-</code></pre>
-
-<p>At least with the <code>nct6683</code> Linux driver, there is no way to change the PWM fan
+</code></pre><p>At least with the <code>nct6683</code> Linux driver, there is no way to change the PWM fan
 speed: the corresponding files in the <code>hwmon</code> interface are marked read-only.</p>
-
 <p>At this point I accepted that I won’t be able to work with the fan controller
 from Linux, and tried just configuring static fan control settings in the UEFI
 setup.</p>
-
 <p>But despite identical fan settings, one of my 140mm fans would end up turned
 off. I’m not sure why — is it an unclean PWM signal, or is there just a bug in
 the fan controller?</p>
-
 <p>Controlling the fans to reliably spin at a low speed is vital to reach goal 2
 (low noise), so I looked around for third-party fan controllers and found the
 <a href="https://www.corsair.com/eu/en/Categories/Products/Accessories-%7C-Parts/iCUE-CONTROLLERS/iCUE-Commander-PRO-Smart-RGB-Lighting-and-Fan-Speed-Controller/p/CL-9011110-WW">Corsair Commander
 Pro</a>,
 which <a href="https://blog.ktz.me/a-usb-fan-controller-that-now-works-under-linux/">a blog post explains is compatible with
 Linux</a>.</p>
-
 <h3 id="server-disk">Server Disk</h3>
-
 <p>This part of the build is not router-related, but I figured if I have a fast
 machine with a fast network connection, I could add a fast big disk to it and
 retire my other server PC.</p>
-
 <p>Specifically, I chose the Samsung 970 EVO Plus M.2 SSD with 2 TB of
 capacity. This disk can <a href="https://www.tomshardware.com/reviews/samsung-970-evo-plus-ssd,5608.html">deliver 3500 MB/s of sequential read
 throughput</a>,
 which is more than the ≈3000 MB/s that a 25 Gbit/s link can handle.</p>
-
 <h3 id="graphics-card">Graphics Card</h3>
-
 <p>An important part of computer builds for me is making troubleshooting and
 maintenance as easy as possible. In my current tech landscape, that translates
 to connecting an HDMI monitor and a USB keyboard, for example to boot from a
 different device, to enter the UEFI setup, or to look at Linux console messages.</p>
-
 <p>Unfortunately, the Ryzen 5 5600X does not have integrated graphics, so to get
 any graphics output, we need to install a graphics card. I chose the Zotac
 GeForce GT 710 Zone Edition, because it was the cheapest available card (60 CHF)
 that’s passively cooled.</p>
-
 <p>An alternative to using a graphics card might be to use a PCIe IPMI card like
 the <a href="https://www.asrockrack.com/general/productdetail.asp?Model=PAUL#Specifications">ASRock
 PAUL</a>,
 however these seem to be harder to find, and more expensive.</p>
-
 <p>Longer-term, I think the best option would be to use the Ryzen 5 5600G with
 integrated graphics, but that model only <a href="https://www.pcmag.com/news/amds-new-ryzen-5000-g-series-will-come-with-an-integrated-gpu">becomes available later this
 year</a>.</p>
-
 <h3 id="component-list">Component List</h3>
-
 <p>I’m listing 2 different options here. Option A is what I built (router+server),
 but Option B is a lot cheaper if you only want a router. Both options use the
 same base components:</p>
-
 <table>
 <thead>
 <tr>
@@ -626,62 +547,52 @@ same base components:</p>
 <th>Article</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>347 CHF</td>
 <td>Network card</td>
 <td><a href="https://www.fs.com/products/75603.html">FS.COM Intel XXV710, 2 × 25 Gbit/s (#75603)</a></td>
 </tr>
-
 <tr>
 <td>329 CHF</td>
 <td>Network card</td>
 <td><a href="https://www.fs.com/products/75602.html">FS.COM Intel XL710, 4 × 10 Gbit/s (#75602)</a></td>
 </tr>
-
 <tr>
 <td>314 CHF</td>
 <td>CPU</td>
 <td><a href="https://www.digitec.ch/de/s1/product/amd-ryzen-5-5600x-am4-370ghz-6-core-prozessor-13987919">Ryzen 5 5600X</a></td>
 </tr>
-
 <tr>
 <td>290 CHF</td>
 <td>Mainboard</td>
 <td><a href="https://www.digitec.ch/de/s1/product/asrock-b550-taichi-am4-amd-b550-atx-mainboard-13348335">ASRock B550 Taichi</a></td>
 </tr>
-
 <tr>
 <td>92 CHF</td>
 <td>Case</td>
 <td><a href="https://www.digitec.ch/de/s1/product/corsair-4000d-airflow-midi-tower-pc-gehaeuse-13552873">Corsair 4000D Airflow (Midi Tower)</a></td>
 </tr>
-
 <tr>
 <td>67 CHF</td>
 <td>Fan control</td>
 <td><a href="https://www.digitec.ch/de/s1/product/corsair-commander-pro-extern-6x-luefter-kontroller-6332927">Corsair Commander Pro</a></td>
 </tr>
-
 <tr>
 <td>65 CHF</td>
 <td>Case fan</td>
 <td><a href="https://www.digitec.ch/de/s1/product/noctua-nf-a14-pwm-140mm-1x-pc-luefter-657800">2 × Noctua NF-A14 PWM (140mm)</a></td>
 </tr>
-
 <tr>
 <td>62 CHF</td>
 <td>CPU fan</td>
 <td><a href="https://www.digitec.ch/de/s1/product/noctua-nh-l12s-7cm-cpu-kuehler-6817433">Noctua NH-L12S</a></td>
 </tr>
-
 <tr>
 <td>35 CHF</td>
 <td>Case fan</td>
 <td><a href="https://www.digitec.ch/de/s1/product/noctua-nf-a12x25-pwm-120mm-1x-pc-luefter-9161307">1 × Noctua NF-A12x25 PWM (120mm)</a></td>
 </tr>
-
 <tr>
 <td>60 CHF</td>
 <td>GPU</td>
@@ -689,13 +600,10 @@ same base components:</p>
 </tr>
 </tbody>
 </table>
-
 <p>Base total: 1590 CHF</p>
-
 <p><strong>Option A: Server extension</strong>. Because I had some parts lying around, and because I
 wanted to use my router for serving files (from large RAM cache/fast disk), I
 went with the following parts:</p>
-
 <table>
 <thead>
 <tr>
@@ -704,32 +612,27 @@ went with the following parts:</p>
 <th>Article</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>309 CHF</td>
 <td>Disk</td>
 <td><a href="https://www.digitec.ch/de/s1/product/samsung-970-evo-plus-2000gb-m2-2280-ssd-10339167">Samsung 970 EVO Plus 2000GB, M.2 2280</a></td>
 </tr>
-
 <tr>
 <td>439 CHF</td>
 <td>RAM</td>
 <td><a href="https://www.digitec.ch/de/s1/product/kingston-hyperx-predator-rgb-4x-16gb-ddr4-3600-dimm-288-ram-14062636">64GB HyperX Predator RAM (4x, 16GB, DDR4-3600, DIMM 288)</a></td>
 </tr>
-
 <tr>
 <td>127 CHF</td>
 <td>Power supply</td>
 <td><a href="https://www.digitec.ch/de/s1/product/corsair-sf600-platinum-600w-pc-netzteil-9034178">Corsair SF600 Platinum (600W)</a></td>
 </tr>
-
 <tr>
 <td>14 CHF</td>
 <td>Power ext</td>
 <td><a href="https://www.digitec.ch/de/s1/product/silverstone-atx-24-24pin-verlaengerung-30cm-modding-sleeving-3456447">Silverstone ATX 24-24Pin Extension (30cm)</a></td>
 </tr>
-
 <tr>
 <td>10 CHF</td>
 <td>Power ext</td>
@@ -737,15 +640,11 @@ went with the following parts:</p>
 </tr>
 </tbody>
 </table>
-
 <p>The Corsair SF600 power supply is not server-related, I just had it lying around. I’d
 recommend going for the Corsair RM650x *2018* (which has longer cables) instead.</p>
-
 <p>Server total: 2770 CHF</p>
-
 <p><strong>Option B: Non-server (router only) alternative</strong>. If you’re <em>only</em> interested
 in routing, you can opt for cheaper low-end disk and RAM, for example:</p>
-
 <table>
 <thead>
 <tr>
@@ -754,20 +653,17 @@ in routing, you can opt for cheaper low-end disk and RAM, for example:</p>
 <th>Article</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>112 CHF</td>
 <td>Power supply</td>
 <td><a href="https://www.digitec.ch/de/s1/product/corsair-rm650x-2018-650w-pc-netzteil-8849945">Corsair RM650x *2018*</a></td>
 </tr>
-
 <tr>
 <td>33 CHF</td>
 <td>Disk</td>
 <td><a href="https://www.digitec.ch/de/s1/product/kingston-a400-120gb-m2-2280-ssd-10628775">Kingston A400 120GB M.2 SSD</a></td>
 </tr>
-
 <tr>
 <td>29 CHF</td>
 <td>RAM</td>
@@ -775,9 +671,7 @@ in routing, you can opt for cheaper low-end disk and RAM, for example:</p>
 </tr>
 </tbody>
 </table>
-
 <p>Non-server total: 1764 CHF</p>
-
 <aside class="admonition note">
   <div class="note-container">
     <div class="note-icon">
@@ -790,7 +684,6 @@ in routing, you can opt for cheaper low-end disk and RAM, for example:</p>
 
     </div>
     <div class="admonition-content"><p>I had the Noctua NH-L12S CPU fan lying around, so I re-used it.</p>
-
 <p>Noctua <a href="https://www.golem.de/news/nh-p1-noctuas-passiver-cpu-kuehler-schafft-125-watt-2106-157334.html">recently released a passive CPU
 cooler</a>,
 which might be an interesting alternative.</p>
@@ -798,63 +691,43 @@ which might be an interesting alternative.</p>
   </div>
 </aside>
 
-
 <h2 id="asrock-b550-taichi-mainboard-uefi-setup">ASRock B550 Taichi Mainboard UEFI Setup</h2>
-
 <p>To enable PCIe Bifurcation for our two PCIe 3.0 x8 card setup:</p>
-
 <ol>
-<li>Set <code>Advanced &gt; AMD PBS &gt; PCIe/GFX Lanes Configuration</code> <br />
+<li>Set <code>Advanced &gt; AMD PBS &gt; PCIe/GFX Lanes Configuration</code><br>
 to <code>x8x8</code>.</li>
 </ol>
-
 <p>To always turn on the PC after power is lost:</p>
-
 <ol>
-<li>Set <code>Advanced &gt; Onboard Devices Configuration &gt; Restore On AC Power Loss</code> <br />
+<li>Set <code>Advanced &gt; Onboard Devices Configuration &gt; Restore On AC Power Loss</code><br>
 to <code>Power On</code>.</li>
 </ol>
-
 <p>To PXE boot (via UEFI) on the onboard ethernet port (management), but disable
 slow option roms for PXE boot on the FS.COM network cards:</p>
-
 <ol>
-<li>Set <code>Boot &gt; Boot From Onboard LAN</code> <br />
+<li>Set <code>Boot &gt; Boot From Onboard LAN</code><br>
 to <code>Enabled</code>.</li>
-<li>Set <code>Boot &gt; CSM (Compatibility Support Module) &gt; Launch PXE OpROM Policy</code> <br />
+<li>Set <code>Boot &gt; CSM (Compatibility Support Module) &gt; Launch PXE OpROM Policy</code><br>
 to <code>UEFI only</code>.</li>
 </ol>
-
 <h2 id="fan-controller-setup">Fan Controller Setup</h2>
-
 <p>The <a href="https://www.corsair.com/eu/en/Categories/Products/Accessories-%7C-Parts/iCUE-CONTROLLERS/iCUE-Commander-PRO-Smart-RGB-Lighting-and-Fan-Speed-Controller/p/CL-9011110-WW">Corsair Commander Pro</a> fan controller is well-supported on Linux.</p>
-
 <p>After enabling the Linux kernel option <code>CONFIG_SENSORS_CORSAIR_CPRO</code>, the device
 shows up in the <code>hwmon</code> subsystem.</p>
-
 <p>You can completely spin up (100% PWM) or turn off (0% PWM) a fan like so:</p>
-
-<pre><code># echo 255 &gt; /sys/class/hwmon/hwmon3/pwm1
+<pre tabindex="0"><code># echo 255 &gt; /sys/class/hwmon/hwmon3/pwm1
 # echo 0 &gt; /sys/class/hwmon/hwmon3/pwm1
-</code></pre>
-
-<p>I run my fans at 13% PWM, which translates to about 226 rpm:</p>
-
-<pre><code># echo 33 &gt; /sys/class/hwmon/hwmon3/pwm1
+</code></pre><p>I run my fans at 13% PWM, which translates to about 226 rpm:</p>
+<pre tabindex="0"><code># echo 33 &gt; /sys/class/hwmon/hwmon3/pwm1
 # cat /sys/class/hwmon/hwmon3/fan1_input
 226
-</code></pre>
-
-<p>Conveniently, the Corsair Commander Pro stores your settings even when power is
+</code></pre><p>Conveniently, the Corsair Commander Pro stores your settings even when power is
 lost. So you don’t even need to run a permanent fan control process, a one-off
 adjustment might be sufficient.</p>
-
 <h2 id="power-usage">Power Usage</h2>
-
 <p>The PC consumes about 48W of power when idle (only management network connected)
 by default without further tuning. Each extra network link increases power usage
 by ≈1W:</p>
-
 
 
 
@@ -882,28 +755,21 @@ by ≈1W:</p>
 
 
 
-
 <p>Enabling all <a href="https://wiki.gentoo.org/wiki/Ryzen#Kernel">Ryzen-related options</a>
 in my Linux kernel and switching to the powersave CPU frequency governor lowers
 power usage by ≈1W.</p>
-
 <p>On some mainboards, you might need to <a href="https://twitter.com/falcon3754/status/1403102789367119876">force-enable Global
 C-States</a> to save
 power. Not on the B550 Taichi, though.</p>
-
 <p>I tried undervolting the CPU, but that didn’t even make ≈1W of difference in
 power usage. Potentially making my setup unreliable is not worth that little
 power saving to me.</p>
-
 <p>I measured these values using a <a href="https://www.conrad.ch/de/p/homematic-hm-es-pmsw1-pl-dn-r5-funk-schaltaktor-1-fach-funk-steckdose-2300-w-2507749.html">Homematic
 HM-ES-PMSw1-Pl-DN-R5</a>
 I had lying around.</p>
-
 <h2 id="performance">Performance</h2>
-
 <p>Goal 1 is to saturate 25 Gbit/s, for example using two 10 Gbit/s downloads. I’m
 talking about large bulk transfers here, not many small transfers.</p>
-
 <aside class="admonition note">
   <div class="note-container">
     <div class="note-icon">
@@ -924,16 +790,12 @@ haven’t run any such tests yet.</div>
   </div>
 </aside>
 
-
 <p>To get a feel for the performance/headroom of the router build, I ran 3 different tests.</p>
-
-<h3 id="test-a-10-gbit-s-bridging-throughput">Test A: 10 Gbit/s bridging throughput</h3>
-
+<h3 id="test-a-10-gbits-bridging-throughput">Test A: 10 Gbit/s bridging throughput</h3>
 <p>For this test, I connected 2 PCs to the router’s XL710 network card and used <a href="https://manpages.debian.org/iperf3.1"><code>iperf3(1)</code></a>
  to generate a 10 Gbit/s TCP stream between the
 2 PCs. The router doesn’t need to modify the packets in this scenario, only
 forward them, so this should be the lightest load scenario.</p>
-
 
 
 
@@ -961,18 +823,14 @@ forward them, so this should be the lightest load scenario.</p>
 
 
 
-
-<h3 id="test-b-10-gbit-s-nat-throughput">Test B: 10 Gbit/s NAT throughput</h3>
-
+<h3 id="test-b-10-gbits-nat-throughput">Test B: 10 Gbit/s NAT throughput</h3>
 <p>In this test, the 2 PCs were connected such that the router performs <a href="https://en.wikipedia.org/wiki/Network_address_translation">Network
 Address Translation
 (NAT)</a>, which is
 required for downloads from the internet via IPv4.</p>
-
 <p>This scenario is slightly more involved, as the router needs to modify
 packets. But, as we can see below, a 10 Gbit/s NAT stream consumes barely more
 resources than 10 Gbit/s bridging:</p>
-
 
 
 
@@ -1000,17 +858,13 @@ resources than 10 Gbit/s bridging:</p>
 
 
 
-
-<h3 id="test-c-4-10-gbit-s-tcp-streams">Test C: 4 × 10 Gbit/s TCP streams</h3>
-
+<h3 id="test-c-4--10-gbits-tcp-streams">Test C: 4 × 10 Gbit/s TCP streams</h3>
 <p>In this test, I wanted to max out the XL710 network card, so I connected 4 PCs
 and started an <a href="https://manpages.debian.org/iperf3.1"><code>iperf3(1)</code></a>
  benchmark between each PC
 and the router itself, simultaneously.</p>
-
 <p>This scenario consumes about 16% CPU, meaning we’ll most likely have plenty of
 headroom even when all ports are maxed out!</p>
-
 
 
 
@@ -1038,28 +892,21 @@ headroom even when all ports are maxed out!</p>
 
 
 
-
 <p>Tip: make sure to enable the <code>CONFIG_IRQ_TIME_ACCOUNTING</code> Linux kernel option to
 <a href="https://tanelpoder.com/posts/linux-hiding-interrupt-cpu-usage/">include IRQ handlers in CPU usage
 numbers</a> for
 accurate measurements.</p>
-
 <h2 id="alternatives-considered">Alternatives considered</h2>
-
 <p>The passively-cooled SuperServer E302-9D comes with 2 SFP+ ports (10 Gbit/s). It
 even comes with 2 PCIe 3.0 x8 capable slots. Unfortunately it seems impossible
 to currently buy this machine, at least in Switzerland.</p>
-
 <p>You can find a few more suggestions in the replies of <a href="https://twitter.com/zekjur/status/1361414105211437056">this Twitter
 thread</a>. Most are either
 unavailable, require a lot more DIY work (e.g. a custom case), or don’t support
 25 Gbit/s.</p>
-
 <h2 id="router-software-router7-porting">Router software: router7 porting</h2>
-
 <p>I wrote <a href="https://router7.org/">router7</a>, my own small home internet router
 software in Go, back in 2018, and have been using it ever since.</p>
-
 <p>I don’t have time to support any users, so I don’t recommend anyone else use
 router7, unless the project really excites you, and the lack of support doesn’t
 bother you! Instead, you might be better served with a more established and
@@ -1068,22 +915,17 @@ supported router software option. Popular options include
 <a href="https://en.wikipedia.org/wiki/OpenWrt">OpenWrt</a>. See also Wikipedia’s <a href="https://en.wikipedia.org/wiki/List_of_router_and_firewall_distributions">List of
 router and firewall
 distributions</a>.</p>
-
 <p>To make router7 work for this 25 Gbit/s router PC build, I had to make a few
 adjustments.</p>
-
 <p>Because we are using UEFI network boot instead of BIOS network boot, I first had
 to make the PXE boot implementation in router7’s installer <a href="https://github.com/rtr7/tools/commits/00be57a557a5fb2bf8958fbc1417f57ab17fc54b">work with UEFI PXE
 boot</a>.</p>
-
 <p>I then enabled a few additional <a href="https://github.com/rtr7/kernel/commits/8694ece47fb07ffeea8a96dc48eb8faa3969250a">kernel options for network and storage
 drivers</a>
 in router7’s kernel.</p>
-
 <p>To router7’s control plane code, I <a href="https://github.com/rtr7/router7/commits/b88ddd41c377087cc4b6d1fe6c7a5550399a730c">added bridge network device
 configuration</a>,
 which in my previous 2-port router setup was not needed.</p>
-
 <p>During development, I compiled a few Linux programs statically or copied them
 with their dependencies (→ <a href="https://gokrazy.org/prototyping/">gokrazy
 prototyping</a>) to run them on router7, such as
@@ -1093,44 +935,32 @@ prototyping</a>) to run them on router7, such as
 as well as iproute2’s <a href="https://manpages.debian.org/ip.8"><code>ip(8)</code></a>
  and <a href="https://manpages.debian.org/bridge.8"><code>bridge(8)</code></a>
  implementation.</p>
-
 <h2 id="next-steps">Next Steps</h2>
-
 <p>Based on my tests, the hardware I selected seems to deliver enough performance
 to use it for distributing a 25 Gbit/s upstream link across multiple 10 Gbit/s
 devices.</p>
-
 <p>I won’t know for sure until the <a href="https://twitter.com/fiber7_ch">fiber7</a> Point Of
 Presence (POP, German Anschlusszentrale) close to my home is upgraded to support
 25 Gbit/s “Fiber7-X2” connections. As I mentioned, unfortunately <a href="https://twitter.com/init7/status/1403287499175235584">the upgrade
 plan is delayed</a> due to
 the component shortage. I’ll keep you posted!</p>
-
 <h2 id="other-builds">Other Builds</h2>
-
 <p>In case my build doesn’t exactly match your requirements, perhaps these others
 help inspire you:</p>
-
 <ul>
 <li><a href="https://medium.com/@sdier/new-internet-service-calls-for-a-new-router-4dbebbdc6dbd">Scott Dier’s Intel NUC 9 Pro build</a></li>
 </ul>
-
 <h2 id="appendix-a-dpdk-test">Appendix A: DPDK test</h2>
-
 <p><a href="https://twitter.com/ipngnetworks">Pim</a> ran a <a href="https://www.dpdk.org/">DPDK</a>
 based loadtester called <a href="https://trex-tgn.cisco.com/">T-Rex</a> on this
 machine. Here’s his summary of the test:</p>
-
 <p>For DPDK, this hardware does 4x10G at 64b frames. It does not do 6x10G as it
 tops out at 62Mpps using 4 cores (of 15.5Mpps per core).</p>
-
-<p>I couldn't test 25G symmetric [because we lacked a 25G DAC cable], but
+<p>I couldn&rsquo;t test 25G symmetric [because we lacked a 25G DAC cable], but
 extrapolating from the numbers, 3 CPUs source and sink ~24.6Gbit per core, so
-we'd probably make it, leaving 1 core for OS and 2 cores for controlplane.</p>
-
+we&rsquo;d probably make it, leaving 1 core for OS and 2 cores for controlplane.</p>
 <p>If the machine had a 12 core Ryzen, it would saturate all NICs with room to
-spare. So that's what I'll end up buying :)</p>
-
+spare. So that&rsquo;s what I&rsquo;ll end up buying :)</p>
 
 
 
@@ -1147,8 +977,8 @@ spare. So that's what I'll end up buying :)</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-07-13-dpdk-test.png"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-07-13-dpdk-test_hu37b3af6bd791c24945ccf8bd92c24adc_280211_1200x0_resize_box_2.png 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-07-13-dpdk-test_hu37b3af6bd791c24945ccf8bd92c24adc_280211_1800x0_resize_box_2.png 3x"
-  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-07-13-dpdk-test_hu37b3af6bd791c24945ccf8bd92c24adc_280211_600x0_resize_box_2.png"
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-07-13-dpdk-test_hu37b3af6bd791c24945ccf8bd92c24adc_280211_1200x0_resize_box_3.png 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-07-13-dpdk-test_hu37b3af6bd791c24945ccf8bd92c24adc_280211_1800x0_resize_box_3.png 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-07-13-dpdk-test_hu37b3af6bd791c24945ccf8bd92c24adc_280211_600x0_resize_box_3.png"
   alt="DPDK test" title="DPDK test"
   width="600"
   height="447"
@@ -1165,27 +995,21 @@ spare. So that's what I'll end up buying :)</p>
     <link href="https://michael.stapelberg.ch/posts/2021-05-28-configured-and-returned-mikrotik-ccr2004-for-fiber7/"/>
     <id>https://michael.stapelberg.ch/posts/2021-05-28-configured-and-returned-mikrotik-ccr2004-for-fiber7/</id>
     <published>2021-05-28T14:57:00+02:00</published>
-    <content type="html"><![CDATA[
-
-<p>init7 recently announced that with their <a href="https://www.init7.net/en/internet/fiber7/">FTTH fiber offering
+    <content type="html"><![CDATA[<p>init7 recently announced that with their <a href="https://www.init7.net/en/internet/fiber7/">FTTH fiber offering
 Fiber7</a>, they will now sell and
 connect you with 25 Gbit/s (Fiber7-X2) or 10 Gbit/s (Fiber7-X) fiber optics, if
 you want more than 1 Gbit/s.</p>
-
 <p>This is possible thanks to the upgrade of their network infrastructure as part
 of their “lifecycle management”, meaning the old networking gear was declared as
 end-of-life. The new networking gear supports not only SFP+ modules (10 Gbit/s),
 but also SFP28 modules (25 Gbit/s).</p>
-
 <p>Availability depends on the <a href="https://www.init7.net/en/infrastructure/fiber7-pops/">POP (Point Of Presence, German «Anschlusszentrale»)
 you’re connected to</a>. My
 POP is planned to be upgraded in September.</p>
-
 <p>Nevertheless, I wanted to already prepare my end of the connection, and ordered
 the only router that <a href="https://www.init7.net/en/internet/hardware/">init7 currently lists as compatible with
 Fiber7-X/X2</a>: the MikroTik
 CCR2004-1G-12S+2XS.</p>
-
 
 
 
@@ -1213,74 +1037,59 @@ CCR2004-1G-12S+2XS.</p>
 
 
 
-
 <p>The rest of this article walks through what I needed to configure (a lot,
 compared to Ubiquiti or OpenWRT) in the hope that it helps other MikroTik users,
 and then ends in <a href="#returned">Why I returned it</a>.</p>
-
 <h2 id="configuration">Configuration</h2>
-
 <p>Connect an Ethernet cable to the management port on the MikroTik and:</p>
-
 <ol>
 <li>log into the system using <code>ssh admin@192.168.88.1</code></li>
-<li>point a web browser to “Webfig” at <a href="http://192.168.88.1/">http://192.168.88.1/</a> (no login required)</li>
+<li>point a web browser to “Webfig” at http://192.168.88.1/ (no login required)</li>
 </ol>
-
 <h2 id="update-firmware">Update firmware</h2>
-
 <p>Update the CCR2004 to the latest firmware version. At the time of writing, the
 Long-term RouterOS track is <a href="https://mikrotik.com/download">at version 6.47.9</a>
 for the CCR2004 (ARM64):</p>
-
 <ol>
 <li>Use <code>/system package print</code> to display the current version.</li>
 <li>Upload <code>routeros-arm64-6.47.9.npk</code> using Webfig.</li>
 <li><code>/system reboot</code> and verify that <code>/system package print</code> shows <code>6.47.9</code> now.</li>
 </ol>
-
 <h2 id="set-up-auth">Set up auth</h2>
-
 <p>Set a password to prevent others from logging into the router:</p>
-
-<pre><code>/user set admin password=secret
-</code></pre>
-
-<p>Additionally, you can enable passwordless SSH key login, if you
+<pre tabindex="0"><code>/user set admin password=secret
+</code></pre><p>Additionally, you can enable passwordless SSH key login, if you
 want.</p>
-
 <ol>
-<li><p>Create an RSA key, because <a href="https://forum.mikrotik.com/viewtopic.php?t=109143">ed25519 keys are not
+<li>
+<p>Create an RSA key, because <a href="https://forum.mikrotik.com/viewtopic.php?t=109143">ed25519 keys are not
 supported</a>:</p>
-
-<pre><code>% ssh-keygen -t rsa
+<pre tabindex="0"><code>% ssh-keygen -t rsa
 Generating public/private rsa key pair.
 Enter file in which to save the key: /home/michael/.ssh/id_mikrotik
 </code></pre></li>
-
-<li><p>Upload the <code>id_mikrotik.pub</code> file in Webfig</p></li>
-
-<li><p>Import the SSH public key for the <code>admin</code> user:</p>
-
-<pre><code>/user ssh-keys import user=admin public-key-file=id_mikrotik.pub
+<li>
+<p>Upload the <code>id_mikrotik.pub</code> file in Webfig</p>
+</li>
+<li>
+<p>Import the SSH public key for the <code>admin</code> user:</p>
+<pre tabindex="0"><code>/user ssh-keys import user=admin public-key-file=id_mikrotik.pub
 </code></pre></li>
 </ol>
-
 <h2 id="lock-down-the-router">Lock down the router</h2>
-
 <ol>
-<li><p><a href="https://help.mikrotik.com/docs/display/ROS/Webfig#Webfig-EnableHTTPS">Enable HTTPS in Webfig</a>.</p></li>
-
-<li><p>Disable all remote access except for SSH and HTTPS:</p>
-
-<pre><code>/ip service disable telnet,ftp,www,api,api-ssl,winbox
+<li>
+<p><a href="https://help.mikrotik.com/docs/display/ROS/Webfig#Webfig-EnableHTTPS">Enable HTTPS in Webfig</a>.</p>
+</li>
+<li>
+<p>Disable all remote access except for SSH and HTTPS:</p>
+<pre tabindex="0"><code>/ip service disable telnet,ftp,www,api,api-ssl,winbox
 </code></pre></li>
-
-<li><p>Follow <a href="https://wiki.mikrotik.com/wiki/Manual:Securing_Your_Router#Neighbor_Discovery">MikroTik Securing Your
+<li>
+<p>Follow <a href="https://wiki.mikrotik.com/wiki/Manual:Securing_Your_Router#Neighbor_Discovery">MikroTik Securing Your
 Router</a>
 recommendations:</p>
-
-<pre><code>/tool mac-server set allowed-interface-list=none
+<pre tabindex="0"><code>/tool mac-server set allowed-interface-list=none
 /tool mac-server mac-winbox set allowed-interface-list=none
 /tool mac-server ping set enabled=no
 /tool bandwidth-server set enabled=no
@@ -1288,41 +1097,31 @@ recommendations:</p>
 /ip neighbor discovery-settings set discover-interface-list=none
 </code></pre></li>
 </ol>
-
 <h2 id="enable-dhcpv6-client">Enable DHCPv6 Client</h2>
-
 <p>For some reason, you need to explicitly enable IPv6 in 2021:</p>
-
-<pre><code>/system package enable ipv6
+<pre tabindex="0"><code>/system package enable ipv6
 /system reboot
-</code></pre>
-
-<p>MikroTik says this is a precaution so that users don’t end up with default-open
+</code></pre><p>MikroTik says this is a precaution so that users don’t end up with default-open
 firewall settings for IPv6. But then why don’t they just add some default
 firewall rules?!</p>
-
 <p>Anyway, to configure and immediately enable the DHCPv6 client, use:</p>
-
-<pre><code>/ipv6 dhcp-client add pool-name=fiber7 pool-prefix-length=64 interface=sfp28-1 add-default-route=yes use-peer-dns=no request=address,prefix
-</code></pre>
-
-<h3 id="modify-the-ipv6-duid">Modify the IPv6 DUID</h3>
-
+<pre tabindex="0"><code>/ipv6 dhcp-client add pool-name=fiber7 pool-prefix-length=64 interface=sfp28-1 add-default-route=yes use-peer-dns=no request=address,prefix
+</code></pre><h3 id="modify-the-ipv6-duid">Modify the IPv6 DUID</h3>
 <p>Unfortunately, MikroTik does not offer any user interface to set the IPv6 DUID,
 which I need to configure to obtain my static IPv6 network prefix from my
 provider’s DHCPv6 server.</p>
-
 <p>Luckily, the DUID is included in backup files, so we can edit it and restore
 from backup:</p>
-
 <ol>
-<li>Run <code>/system backup save</code></li>
-
-<li><p>Download the backup file in Webfig by navigating to Files → Backup → Download.</p></li>
-
-<li><p>Convert the backup file to hex in textual form, edit the DUID and convert it back to binary:</p>
-
-<pre><code>% xxd MikroTik-19700102-0111.backup MikroTik-19700102-0111.backup.hex
+<li>
+<p>Run <code>/system backup save</code></p>
+</li>
+<li>
+<p>Download the backup file in Webfig by navigating to Files → Backup → Download.</p>
+</li>
+<li>
+<p>Convert the backup file to hex in textual form, edit the DUID and convert it back to binary:</p>
+<pre tabindex="0"><code>% xxd MikroTik-19700102-0111.backup MikroTik-19700102-0111.backup.hex
 
 % emacs MikroTik-19700102-0111.backup.hex
 # Search for “dhcp/duid” in the file and edit accordingly:
@@ -1330,50 +1129,32 @@ from backup:</p>
 
 % xxd -r MikroTik-19700102-0111.backup.hex MikroTik-19700102-0111-patched.backup
 </code></pre></li>
-
-<li><p>Upload the file in Webfig, then restore the backup:</p>
-
-<p><code>/system backup load name=MikroTik-19700102-0111-patched.backup</code></p></li>
+<li>
+<p>Upload the file in Webfig, then restore the backup:</p>
+<p><code>/system backup load name=MikroTik-19700102-0111-patched.backup</code></p>
+</li>
 </ol>
-
 <h2 id="enable-ipv6-router-advertisements">Enable IPv6 Router Advertisements</h2>
-
 <p>To make the router assign an IPv6 address from the obtained pool for itself, and
 then send IPv6 Router Advertisements to the network, set:</p>
-
-<pre><code>/ipv6 address add address=::1 from-pool=fiber7 interface=bridge1
+<pre tabindex="0"><code>/ipv6 address add address=::1 from-pool=fiber7 interface=bridge1
 /ipv6 nd add interface=bridge1 managed-address-configuration=yes other-configuration=yes
-</code></pre>
-
-<h2 id="enable-dhcpv4-client">Enable DHCPv4 Client</h2>
-
+</code></pre><h2 id="enable-dhcpv4-client">Enable DHCPv4 Client</h2>
 <p>To configure and immediately enable the <a href="https://wiki.mikrotik.com/wiki/Manual:IP/DHCP_Client">DHCPv4
 client</a> on the upstream
 port, use:</p>
-
-<pre><code>/ip dhcp-client add interface=sfp28-1 disabled=no
-</code></pre>
-
-<p>I also changed the MAC address to match my old router’s address, just to take
+<pre tabindex="0"><code>/ip dhcp-client add interface=sfp28-1 disabled=no
+</code></pre><p>I also changed the MAC address to match my old router’s address, just to take
 maximum precaution to avoid any Port Security related issues with my provider’s
 DHCP server:</p>
-
-<pre><code>/interface ethernet set sfp28-1 mac-address=00:0d:fa:4c:0c:31
-</code></pre>
-
-<h2 id="enable-dns-server">Enable DNS Server</h2>
-
+<pre tabindex="0"><code>/interface ethernet set sfp28-1 mac-address=00:0d:fa:4c:0c:31
+</code></pre><h2 id="enable-dns-server">Enable DNS Server</h2>
 <p>By default, only the MikroTik itself can send DNS queries. Enable access for
 network clients:</p>
-
-<pre><code>/ip dns set allow-remote-requests=yes
-</code></pre>
-
-<h2 id="enable-dhcpv4-server">Enable DHCPv4 Server</h2>
-
+<pre tabindex="0"><code>/ip dns set allow-remote-requests=yes
+</code></pre><h2 id="enable-dhcpv4-server">Enable DHCPv4 Server</h2>
 <p>First, let’s bundle all SFP+ ports into a single bridge interface:</p>
-
-<pre><code>/interface bridge add name=bridge1
+<pre tabindex="0"><code>/interface bridge add name=bridge1
 /interface bridge port add bridge=bridge1 interface=sfp-sfpplus1 hw=yes
 /interface bridge port add bridge=bridge1 interface=sfp-sfpplus2 hw=yes
 /interface bridge port add bridge=bridge1 interface=sfp-sfpplus3 hw=yes
@@ -1386,11 +1167,8 @@ network clients:</p>
 /interface bridge port add bridge=bridge1 interface=sfp-sfpplus10 hw=yes
 /interface bridge port add bridge=bridge1 interface=sfp-sfpplus11 hw=yes
 /interface bridge port add bridge=bridge1 interface=sfp-sfpplus12 hw=yes
-</code></pre>
-
-<p>This means we’ll use the device like a big switch with routing between the
+</code></pre><p>This means we’ll use the device like a big switch with routing between the
 switch and the uplink port <code>sfp28-1</code>.</p>
-
 <aside class="admonition note">
   <div class="note-container">
     <div class="note-icon">
@@ -1409,11 +1187,9 @@ per a forum post</a>.</div>
   </div>
 </aside>
 
-
 <p>To configure the DHCPv4 Server, configure an IP address, then start the setup
 wizard:</p>
-
-<pre><code>/ip address add address=10.0.0.1/24 interface=bridge1
+<pre tabindex="0"><code>/ip address add address=10.0.0.1/24 interface=bridge1
 /ip dhcp-server setup
 Select interface to run DHCP server on
 
@@ -1433,65 +1209,44 @@ dns servers: 10.0.0.1
 Select lease time
 
 lease time: 20m
-</code></pre>
-
-<h2 id="enable-ipv4-nat">Enable IPv4 NAT</h2>
-
+</code></pre><h2 id="enable-ipv4-nat">Enable IPv4 NAT</h2>
 <p>We need NAT to route all IPv4 traffic over our single public IP address:</p>
-
-<pre><code>/ip firewall nat add action=masquerade chain=srcnat out-interface=sfp28-1 to-addresses=0.0.0.0
-</code></pre>
-
-<p>Disable NAT services for security, e.g. to mitigate against NAT slipstreaming
+<pre tabindex="0"><code>/ip firewall nat add action=masquerade chain=srcnat out-interface=sfp28-1 to-addresses=0.0.0.0
+</code></pre><p>Disable NAT services for security, e.g. to mitigate against NAT slipstreaming
 attacks:</p>
-
-<pre><code>/ip firewall service-port disable ftp,tftp,irc,h323,sip,pptp,udplite,dccp,sctp
-</code></pre>
-
-<p>I can observe ≈10-20% CPU load when doing a Gigabit speed test over IPv4.</p>
-
+<pre tabindex="0"><code>/ip firewall service-port disable ftp,tftp,irc,h323,sip,pptp,udplite,dccp,sctp
+</code></pre><p>I can observe ≈10-20% CPU load when doing a Gigabit speed test over IPv4.</p>
 <h2 id="todo-list">TODO list</h2>
-
 <p>The following features I did not get around to configuring, but they were on my
 list:</p>
-
 <ul>
 <li><a href="https://help.mikrotik.com/docs/display/ROS/First+Time+Configuration">IPv4 port forwardings</a></li>
 <li>Cloudflare DynDNS update script</li>
 <li><a href="https://wiki.mikrotik.com/wiki/Setting_static_DNS_record_for_each_DHCP_lease">DNS resolution for DHCP hostnames</a></li>
 </ul>
-
 <h2 id="returned">Why I returned it</h2>
-
 <p>Initially, I thought the device’s fan spins up only at boot, and then the large
 heatsink takes care of all cooling needs. Unfortunately, after an hour or so
 into my experiment, I noticed that the MikroTik would spin up the fan for a
 whole minute or so occasionally! Very annoying.</p>
-
 <p>I also ran into weird DNS slow-downs, which I didn’t fully diagnose. In
 Wireshark, it looked like my machine sent 2 DNS queries but received only 1 DNS
 result, and then waited for a timeout.</p>
-
 <p>I also noticed that I have a few more unexpected dependencies such as my home
 automation using DHCP lease state by subscribing to an MQTT topic. Addressing
 this issue and other similar little problems would have taken a bunch more time
 and would have resulted in a less reliable system than I have today.</p>
-
 <p>Since I last used MikroTik in 2014 the software seems to have barely changed. I
 wish they finally implemented some table-stakes features like DNS resolution for
 DHCP hostnames.</p>
-
 <p>Given all the above, I no longer felt like getting enough value for the money
 from the MikroTik, and found it easier to just switch back to <a href="https://router7.org/">my own
 router7</a> and return the MikroTik.</p>
-
 <p>I will probably stick with the router7 software, but exchange the PC Engines APU
 with the smallest PC that has enough PCI-E bandwidth for a multi-port SFP28
 network card.</p>
-
 <h2 id="appendix-a-full-configuration">Appendix A: Full configuration</h2>
-
-<pre><code># may/28/2021 11:40:15 by RouterOS 6.47.9
+<pre tabindex="0"><code># may/28/2021 11:40:15 by RouterOS 6.47.9
 # software id = 6YZE-HKM8
 #
 # model = CCR2004-1G-12S+2XS
@@ -1571,23 +1326,18 @@ set allowed-interface-list=none
 set allowed-interface-list=none
 /tool mac-server ping
 set enabled=no
-</code></pre>
-]]></content>
+</code></pre>]]></content>
   </entry>
   <entry>
     <title type="html"><![CDATA[Home network 10 Gbit/s upgrade]]></title>
     <link href="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/"/>
     <id>https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/</id>
     <published>2021-05-16T17:33:16+02:00</published>
-    <content type="html"><![CDATA[
-
-<p>After <a href="/posts/2020-08-09-fiber-link-home-network/">adding a fiber link to my home
+    <content type="html"><![CDATA[<p>After <a href="/posts/2020-08-09-fiber-link-home-network/">adding a fiber link to my home
 network</a>, I am upgrading that link
 from 1 Gbit/s to 10 Gbit/s.</p>
-
 <p>As a reminder, conceptually the fiber link is built using two media converters
 from/to ethernet:</p>
-
 
 
 
@@ -1615,9 +1365,7 @@ from/to ethernet:</p>
 
 
 
-
 <p>Schematically, this is what’s connected to both ends:</p>
-
 
 
 
@@ -1630,30 +1378,26 @@ from/to ethernet:</p>
   loading="lazy"></a>
 
 
-
 <p>All links are 1 Gbit/s, so it’s easy to see that, for example, transfers between
 chuchi↔router7 and storage2↔midna cannot both use 1 Gbit/s at the same time.</p>
-
 <p>This upgrade serves 2 purposes:</p>
-
 <ol>
-<li><p><strong>Raise the floor to 1 Gbit/s end-to-end</strong>: Ensure that serving large files
+<li>
+<p><strong>Raise the floor to 1 Gbit/s end-to-end</strong>: Ensure that serving large files
 (e.g. distri Linux images and packages) does no longer impact, and is no
 longer impacted by, other bandwidth flows that also use this transfer link in
-my home network, e.g. daily backups.</p></li>
-
-<li><p><strong>Raise the ceiling to 10 Gbit/s</strong>: Make it possible to selectively upgrade
-Linux PCs on either end of the link to 10 Gbit/s peak bandwidth.</p></li>
+my home network, e.g. daily backups.</p>
+</li>
+<li>
+<p><strong>Raise the ceiling to 10 Gbit/s</strong>: Make it possible to selectively upgrade
+Linux PCs on either end of the link to 10 Gbit/s peak bandwidth.</p>
+</li>
 </ol>
-
 <p>Note that the internet uplink remains untouched at 1 Gbit/s — only transfers
 within the home network can happen at 10 Gbit/s.</p>
-
 <h2 id="replacing-the-media-converters-with-mikrotik-switches">Replacing the media converters with Mikrotik switches</h2>
-
 <p>We first replace both media converters and switches with a <a href="https://mikrotik.com/product/crs305_1g_4s_in">Mikrotik
 CRS305-1G-4S+IN</a>.</p>
-
 
 
 
@@ -1681,35 +1425,26 @@ CRS305-1G-4S+IN</a>.</p>
 
 
 
-
 <p>This device <a href="https://www.digitec.ch/de/s1/product/mikrotik-crs305-1g-4sin-5ports-switch-9876046">costs 149 CHF on digitec</a> and comes with 5 ports:</p>
-
 <ul>
 <li>1 × RJ45 Ethernet port for management, can be used as a regular 1 Gbit/s port.</li>
 <li>4 × SFP+ ports</li>
 </ul>
-
 <p>Each SFP+ port can be used with either an RJ-45 Ethernet or a fiber SFP+ module,
 but beware! As <a href="https://twitter.com/Nexus2kSwiss/status/1394395280120897544">Nexus2kSwiss points out on
 twitter</a>, the
 Mikrotik supports <strong>at most 2 RJ-45 SFPs at a time</strong>!</p>
-
 <h2 id="fiber-module-upgrade">Fiber module upgrade</h2>
-
 <p>I’m using 10 Gbit/s fiber SFP+ modules for the fiber link between my kitchen and
 living room.</p>
-
 <p>To make use of the 10 Gbit/s link between the switches, all devices that should
 get their guaranteed 1 Gbit/s end-to-end connection need to be connected
 directly to a Mikrotik switch.</p>
-
 <p>I’m connecting the PCs to the switch using Direct Attach Cables (DAC) where
 possible. The advantage of DAC cables over RJ45 SFP+ modules is their lower
 power usage and heat.</p>
-
 <p>The resulting list of SFP modules used in the two Mikrotik switches looks like
 so:</p>
-
 <table>
 <thead>
 <tr>
@@ -1720,7 +1455,6 @@ so:</p>
 <th>Mikrotik 2 SFP</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>chuchi</td>
@@ -1729,7 +1463,6 @@ so:</p>
 <td>10 Gbit/s DAC</td>
 <td>midna</td>
 </tr>
-
 <tr>
 <td>storage2</td>
 <td>1 Gbit/s  RJ45</td>
@@ -1737,7 +1470,6 @@ so:</p>
 <td>1 Gbit/s RJ45</td>
 <td>router7</td>
 </tr>
-
 <tr>
 <td></td>
 <td>10 Gbit/s BiDi</td>
@@ -1747,19 +1479,14 @@ so:</p>
 </tr>
 </tbody>
 </table>
-
 <h2 id="hardware-sourcing">Hardware sourcing</h2>
-
 <p>The total cost of this upgrade is 676 CHF, with the biggest chunk spent on the
 Mellanox ConnectX-3 network cards and MikroTik switches.</p>
-
 <h3 id="fs-fiber-store-order">FS (Fiber Store) order</h3>
-
 <p><a href="https://www.FS.COM">FS.COM</a> was my go-to source for anything
 fiber-related. Everything they have is very affordable, and products in stock at
 their German warehouse arrive in Switzerland (and presumably other European
 countries, too) within the same week.</p>
-
 <table>
 <thead>
 <tr>
@@ -1768,26 +1495,22 @@ countries, too) within the same week.</p>
 <th>name</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>1 ×</td>
 <td>34 CHF</td>
 <td><a href="https://www.fs.com/de/products/74681.html">Generic Compatible 10GBASE-BX BiDi SFP+ 1270nm-TX/1330nm-RX 10km DOM Transceiver Module, FS P/N: SFP-10G-BX #74681</a></td>
 </tr>
-
 <tr>
 <td>1 ×</td>
 <td>34 CHF</td>
 <td><a href="https://www.fs.com/de/products/74682.html">Generic Compatible 10GBASE-BX BiDi SFP+ 1330nm-TX/1270nm-RX 10km DOM Transceiver Module, FS P/N: SFP-10G-BX #74682</a></td>
 </tr>
-
 <tr>
 <td>2 ×</td>
 <td>14 CHF</td>
 <td><a href="https://www.fs.com/de/products/74621.html">3m Generic Compatible 10G SFP+ Passive Direct Attach Copper Twinax Cable</a></td>
 </tr>
-
 <tr>
 <td>0 ×</td>
 <td>56 CHF</td>
@@ -1795,14 +1518,11 @@ countries, too) within the same week.</p>
 </tr>
 </tbody>
 </table>
-
 <h3 id="digitec-order">digitec order</h3>
-
 <p>There are a few items that <a href="https://www.FS.COM">FS.COM</a> doesn’t stock. These I
 bought at <a href="https://www.digitec.ch/">digitec</a>, a big and popular electronics
 store in Switzerland. My thinking is that if products are available at digitec,
 they most likely are available at your preferred big electronics store, too.</p>
-
 <table>
 <thead>
 <tr>
@@ -1811,7 +1531,6 @@ they most likely are available at your preferred big electronics store, too.</p>
 <th>name</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>2 ×</td>
@@ -1820,13 +1539,9 @@ they most likely are available at your preferred big electronics store, too.</p>
 </tr>
 </tbody>
 </table>
-
 <h3 id="misc-order">misc order</h3>
-
 <p>The Mellanox cards are not as widely available as I’d like.</p>
-
 <p>I’m waiting for an FS.COM card to arrive, which might be a better choice.</p>
-
 <table>
 <thead>
 <tr>
@@ -1835,7 +1550,6 @@ they most likely are available at your preferred big electronics store, too.</p>
 <th>name</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>2 ×</td>
@@ -1844,38 +1558,34 @@ they most likely are available at your preferred big electronics store, too.</p>
 </tr>
 </tbody>
 </table>
-
 <h2 id="mikrotik-switch-setup">Mikrotik switch setup</h2>
-
 <p>I want to use my switches only as switches, not for any routing or other layer 3
 features that might reduce bandwidth, so I first reboot the <a href="https://mikrotik.com/product/crs305_1g_4s_in">MikroTik
 CRS305-1G-4S+</a> into SwOS:</p>
-
 <ol>
-<li><p>In the web interface menu, navigate to <em>System → Routerboard →
+<li>
+<p>In the web interface menu, navigate to <em>System → Routerboard →
 Settings</em>, open the <em>Boot OS</em> drop-down and select option
-<em>SwOS</em>.</p></li>
-
-<li><p>In the web interface menu, navigate to <em>System → Reboot</em>.</p></li>
-
-<li><p>After the device rebooted, change the hostname which was reset to <code>MikroTik</code>.</p></li>
+<em>SwOS</em>.</p>
+</li>
+<li>
+<p>In the web interface menu, navigate to <em>System → Reboot</em>.</p>
+</li>
+<li>
+<p>After the device rebooted, change the hostname which was reset to <code>MikroTik</code>.</p>
+</li>
 </ol>
-
 <p>Next, upgrade the firmware to 2.12 to fix a weird issue with certain
 combinations of SFP modules (SFP-10G-BX in SFP1, SFP-10G-T in SFP2):</p>
-
 <ol>
 <li>In the SwOS web interface, select the <em>Upgrade</em> tab, then click
 <em>Download &amp; Upgrade</em>.</li>
 </ol>
-
 <h2 id="network-card-setup-linux">Network card setup (Linux)</h2>
-
 <p>After booting with the Mellanox ConnectX3 in a PCIe slot, the card should show
 up in <a href="https://manpages.debian.org/dmesg.8"><code>dmesg(8)</code></a>
 :</p>
-
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">mlx4_core: Mellanox ConnectX core driver v4.0-0
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">mlx4_core: Mellanox ConnectX core driver v4.0-0
 mlx4_core: Initializing 0000:03:00.0
 mlx4_core 0000:03:00.0: DMFS high rate steer mode is: disabled performance optimized steering
 <span style="display:block;width:100%;background-color:#d8d8d8">mlx4_core 0000:03:00.0: 31.504 Gb/s available PCIe bandwidth (8.0 GT/s PCIe x4 link)
@@ -1890,12 +1600,10 @@ mlx4_core 0000:03:00.0 enp3s0: renamed from eth0
 &lt;mlx4_ib&gt; mlx4_ib_add: counter index 1 for port 1 allocated 1
 mlx4_en: enp3s0: Steering Mode 1
 mlx4_en: enp3s0: Link Up</code></pre></div>
-
 <p>Another way to verify the device is running at maximum speed on the computer’s
 PCIe bus, is to ensure <code>LnkSta</code> matches <code>LnkCap</code> in the <a href="https://manpages.debian.org/lspci.8"><code>lspci(8)</code></a>
  output:</p>
-
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">% sudo lspci -vv
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">% sudo lspci -vv
 03:00.0 Ethernet controller: Mellanox Technologies MT27500 Family [ConnectX-3]
 	Subsystem: Mellanox Technologies Device 0055
 […]
@@ -1908,11 +1616,9 @@ PCIe bus, is to ensure <code>LnkSta</code> matches <code>LnkCap</code> in the <a
 <span style="display:block;width:100%;background-color:#d8d8d8">		LnkSta:	Speed 8GT/s (ok), Width x4 (ok)
 </span>			TrErr- Train- SlotClk+ DLActive- BWMgmt- ABWMgmt-
 […]</code></pre></div>
-
 <p>You can verify your network link is running at 10 Gbit/s using <a href="https://manpages.debian.org/ethtool.8"><code>ethtool(8)</code></a>
 :</p>
-
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">% sudo ethtool enp3s0
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">% sudo ethtool enp3s0
 Settings for enp3s0:
 	Supported ports: [ FIBRE ]
 	Supported link modes:   1000baseKX/Full
@@ -1936,24 +1642,18 @@ Settings for enp3s0:
         Current message level: 0x00000014 (20)
                                link ifdown
 	Link detected: yes</code></pre></div>
-
 <h2 id="benchmarking-batch-transfers">Benchmarking batch transfers</h2>
-
 <p>As mentioned in the introduction, routing 10 Gbit/s is out of scope in this
 article. If you’re interested in routing performance, check out Andree Toonk’s
 <a href="https://toonk.io/linux-kernel-and-measuring-network-throughput/index.html">post which confirms that Linux can route 10 Gbit/s at line
 rate</a>.</p>
-
 <p>The following sections cover individual batch transfers of large files, not many
 small flows.</p>
-
 <h3 id="iperf3-speed-test">iperf3 speed test</h3>
-
 <p>Out of the box, the speeds that <a href="https://manpages.debian.org/iperf3.1"><code>iperf3(1)</code></a>
  measures
 are decent:</p>
-
-<pre><code>chuchi % iperf3 --version
+<pre tabindex="0"><code>chuchi % iperf3 --version
 iperf 3.6 (cJSON 1.5.2)
 Linux chuchi 4.19.0-16-amd64 #1 SMP Debian 4.19.181-1 (2021-03-19) x86_64
 Optional features available: CPU affinity setting, IPv6 flow label, SCTP, TCP congestion algorithm setting, sendfile / zerocopy, socket pacing, authentication
@@ -1986,37 +1686,25 @@ Connecting to host 10.0.0.173, port 5201
 [  5]   0.00-10.00  sec  11.0 GBytes  9.40 Gbits/sec                  receiver
 
 iperf Done.
-</code></pre>
-
-<h3 id="http-speed-test">HTTP speed test</h3>
-
+</code></pre><h3 id="http-speed-test">HTTP speed test</h3>
 <p>Downloading a file from an <a href="https://manpages.debian.org/nginx.1"><code>nginx(1)</code></a>
  web server using <a href="https://manpages.debian.org/curl.1"><code>curl(1)</code></a>
  is fast, too:</p>
-
-<pre><code>% curl -o /dev/null http://chuchi.lan/distri/supersilverhaze/img/distri-disk.img.zst
+<pre tabindex="0"><code>% curl -o /dev/null http://chuchi.lan/distri/supersilverhaze/img/distri-disk.img.zst
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100  934M  100  934M    0     0  1118M      0 --:--:-- --:--:-- --:--:-- 1117M
-</code></pre>
-
-<p>Note that this download was served from RAM (Linux page cache). The next upgrade
+</code></pre><p>Note that this download was served from RAM (Linux page cache). The next upgrade
 I need to do in this machine is replace the SATA SSD with an NVMe SSD, because
 the disk is now the bottleneck.</p>
-
 <h2 id="conclusion">Conclusion</h2>
-
 <p>This was a pleasantly simple upgrade: plug in a bunch of new hardware and batch
 transfers become faster.</p>
-
 <p>The Mikrotik switch provides great value for money, and the Mellanox ConnectX-3
 cards work well, provided you can find them.</p>
-
 <h2 id="appendix-a-switching-from-rj45-sfp-modules-to-direct-attach-cables">Appendix A: Switching from RJ45 SFP+ modules to Direct Attach Cables</h2>
-
 <p>Originally, I connected all PCs to the MikroTik switches with RJ45 SFP+ modules
 for two reasons:</p>
-
 <ol>
 <li>I bought <a href="https://www.digitec.ch/de/s1/product/intel-x550-t2-pci-express-30-netzwerkadapter-5926807">Intel
 X550-T2</a>
@@ -2024,13 +1712,10 @@ PCIe 10 Gbit/s network cards that RJ45 as my first choice.</li>
 <li>The SFP+ modules are backwards-compatible and can be used with 1 Gbit/s RJ45
 devices, too, which makes for a nice incremental upgrade path.</li>
 </ol>
-
 <p>However, I later was made aware that the RJ45 SFP+ modules use significantly
 more power and run significantly hotter than Direct Attach Cables (DAC).</p>
-
 <p>I measured it: each RJ45 SFP+ module was causing my BiDi SFP+ module to run 5℃
 hotter!</p>
-
 
 
 
@@ -2058,27 +1743,19 @@ hotter!</p>
 
 
 
-
 <p>Around 06/02 I replaced one RJ45 SFP+ module with a Direct Attach Cable.</p>
-
 <p>Around 06/06 I replaced the remaining RJ45 SFP+ module with another Direct
 Attach Cable.</p>
-
 <p>As you can see, this caused a 10℃ drop in temperature of the BiDi SFP+ module.</p>
-
 <p>The MikroTik is still uncomfortably hot, making it hard to work with when it’s
 powered on.</p>
-
 <h2 id="appendix-b-network-card-setup-linux-with-intel-x550-t2">Appendix B: Network card setup (Linux) with Intel X550-T2</h2>
-
 <p>For reference, here is the Network card setup (Linux) section, but with the
 Intel X550-T2 that I previously used.</p>
-
 <p>After booting with the Intel X550-T2 in a PCIe slot, the card should show up in
 <a href="https://manpages.debian.org/dmesg.8"><code>dmesg(8)</code></a>
 :</p>
-
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">ixgbe: Intel(R) 10 Gigabit PCI Express Network Driver
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">ixgbe: Intel(R) 10 Gigabit PCI Express Network Driver
 ixgbe 0000:03:00.0: Multiqueue Enabled: Rx Queue count = 16, Tx Queue count = 16 XDP Queue count = 0
 <span style="display:block;width:100%;background-color:#d8d8d8">ixgbe 0000:03:00.0: 31.504 Gb/s available PCIe bandwidth (8.0 GT/s PCIe x4 link)
 </span>ixgbe 0000:03:00.0: MAC: 4, PHY: 0, PBA No: H86377-006
@@ -2096,17 +1773,14 @@ pps pps0: new PPS source ptp1
 ixgbe 0000:03:00.0: registered PHC device on enp3s0f0
 pps pps1: new PPS source ptp2
 ixgbe 0000:03:00.1: registered PHC device on enp3s0f1</code></pre></div>
-
 <p>I think if you only use 1 of the card’s 2 network ports, you might not hit any
 bottlenecks even when running the card only at <a href="https://en.wikipedia.org/wiki/PCI_Express#History_and_revisions">PCIe 3.0 ×2 link
 speed</a>, but I
 haven’t verified this!</p>
-
 <p>Another way to verify the device is running at maximum speed on the computer’s
 PCIe bus, is to ensure <code>LnkSta</code> matches <code>LnkCap</code> in the <a href="https://manpages.debian.org/lspci.8"><code>lspci(8)</code></a>
  output:</p>
-
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">% sudo lspci -vv
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">% sudo lspci -vv
 […]
 03:00.0 Ethernet controller: Intel Corporation Ethernet Controller 10G X550T (rev 01)
         Subsystem: Intel Corporation Ethernet Converged Network Adapter X550-T2
@@ -2120,11 +1794,9 @@ PCIe bus, is to ensure <code>LnkSta</code> matches <code>LnkCap</code> in the <a
 <span style="display:block;width:100%;background-color:#d8d8d8">                LnkSta: Speed 8GT/s (ok), Width x4 (ok)
 </span>                        TrErr- Train- SlotClk+ DLActive- BWMgmt- ABWMgmt-
 […]</code></pre></div>
-
 <p>You can verify your network link is running at 10 Gbit/s using <a href="https://manpages.debian.org/ethtool.8"><code>ethtool(8)</code></a>
 :</p>
-
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">% sudo ethtool enp3s0f1 
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">% sudo ethtool enp3s0f1 
 Settings for enp3s0f1:
 	Supported ports: [ TP ]
 	Supported link modes:   100baseT/Full
@@ -2153,13 +1825,10 @@ Settings for enp3s0f1:
         Current message level: 0x00000007 (7)
                                drv probe link
 	Link detected: yes</code></pre></div>
-
 <h2 id="appendix-c-bios-update-for-mellanox-connectx-3">Appendix C: BIOS update for Mellanox ConnectX-3</h2>
-
 <p>On my Supermicro X11SSZ-QF mainboard, the Mellanox ConnectX-3 would not
 establish a link. The Mellanox Linux kernel driver logged a number of errors:</p>
-
-<pre><code>kernel: mlx4_en: enp1s0: CQE error - cqn 0x8e, ci 0x0, vendor syndrome: 0x57 syndrome: 0x4
+<pre tabindex="0"><code>kernel: mlx4_en: enp1s0: CQE error - cqn 0x8e, ci 0x0, vendor syndrome: 0x57 syndrome: 0x4
 kernel: mlx4_en: enp1s0: Related WQE - qpn 0x20d, wqe index 0x0, wqe size 0x40
 kernel: mlx4_en: enp1s0: Scheduling port restart
 kernel: mlx4_core 0000:01:00.0: Internal error detected:
@@ -2194,9 +1863,7 @@ kernel: mlx4_core 0000:01:00.0: mlx4_pci_resume was called
 kernel: mlx4_core 0000:01:00.0: Multiple PFs not yet supported - Skipping PF
 kernel: mlx4_core 0000:01:00.0: mlx4_pci_resume: mlx4_load_one failed, err=-22
 kernel: pcieport 0000:00:1c.0: AER: device recovery successful
-</code></pre>
-
-<p>What helped was to update the X11SSZ-QF BIOS to the latest version.</p>
+</code></pre><p>What helped was to update the X11SSZ-QF BIOS to the latest version.</p>
 ]]></content>
   </entry>
   <entry>
@@ -2204,30 +1871,22 @@ kernel: pcieport 0000:00:1c.0: AER: device recovery successful
     <link href="https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/"/>
     <id>https://michael.stapelberg.ch/posts/2020-08-09-fiber-link-home-network/</id>
     <published>2020-08-09T14:53:53+02:00</published>
-    <content type="html"><![CDATA[
-
-<h2 id="motivation">Motivation</h2>
-
+    <content type="html"><![CDATA[<h2 id="motivation">Motivation</h2>
 <p>Despite using a FTTH internet connection since 2014, aside from the one fiber
 uplink, I had always used network gear with 1 Gbit/s links over regular old rj45
 cat5(e) cables.</p>
-
-<hr />
-
+<hr>
 <p>I liked the simplicity and uniformity of that setup, but decided it’s time to
 add at least one fiber connection, to <strong>get rid of a temporary ethernet cable</strong>
 that connected my kitchen with the rest of my network that is largely in the
 living room and office.</p>
-
 <p>The temporary ethernet cable was an experiment to verify that running a server
 or two in my kitchen actually works (it does!). I used a <a href="https://www.digitec.ch/de/s1/product/hama-cat-6-flach-we-1000cm-netzwerkkabel-7465292">flat ethernet
 cable</a>,
 which is great for test setups like that, as you can often tape it onto the
 walls and still close the doors.</p>
-
 <p>So, we will replace one ethernet cable with one fiber cable and converters at
 each end:</p>
-
 
 
 
@@ -2255,18 +1914,15 @@ each end:</p>
 
 
 
-
 <p>Why is it good to switch from copper ethernet cables to fiber in this case?
 Fiber cables are <strong>smaller and hence easier to fit</strong> into existing cable
 ducts. While regular ethernet cable is way too thick to fit into any of the
 existing ducts in my flat, I was hoping that fiber might fit!</p>
-
 <p>When I actually received the cables, I was surprised <strong>how much thinner</strong> fiber
 cables actually can be: there are 0.9mm cables, which are so thin, they can be
 hidden in plain sight! I had only ever seen 2mm fiber cables before, and the
 0.9mm cables are incredibly light, flexible and thin! Even pasta is typically
 thicker:</p>
-
 
 
 
@@ -2294,37 +1950,27 @@ thicker:</p>
 
 
 
-
 <p><small><em>Preparing a delicious pot of glass noodles ;)</em></small></p>
-
-<hr />
-
+<hr>
 <p>The cable shown above comes from <a href="https://www.FS.COM/company/about_us.html">the fiber store
 FS.COM</a>, which different people have
 praised on multiple occasions, so naturally I was curious to give them a shot
 myself.</p>
-
 <p>Also, for the longest time, it was my understanding that fiber connectors can
 only be put onto fiber cables using expensive (≫2000 CHF) machines. A while ago
 I heard about <strong>field assembly connectors</strong> so I wanted to verify that those
 indeed work.</p>
-
-<hr />
-
+<hr>
 <p>Aside from practical reasons, playing around with fiber networking also makes
 for a good hobby during a pandemic :)</p>
-
 <h2 id="hardware-selection">Hardware Selection</h2>
-
 <p>I ordered all my fiber equipment at <a href="https://www.FS.COM">FS.COM</a>: everything
 they have is very affordable, and products in stock at their German warehouse
 arrive in Switzerland (and presumably other European countries) within the same
 week.</p>
-
 <p>If you are in the luxurious position to have enough physical space and agility
 to pull through an entire fiber cable, <strong>without having to remove any
 connectors</strong>, you can make a new network connection with just a few parts:</p>
-
 <table>
 <thead>
 <tr>
@@ -2335,7 +1981,6 @@ connectors</strong>, you can make a new network connection with just a few parts
 <th>note</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>2x</td>
@@ -2344,7 +1989,6 @@ connectors</strong>, you can make a new network connection with just a few parts
 <td><a href="https://www.FS.COM/de-en/products/17237.html">#17237</a></td>
 <td><a href="https://www.FS.COM/de-en/products/17237.html">1 Gbit/s media converter RJ45/SFP</a></td>
 </tr>
-
 <tr>
 <td>1x</td>
 <td>8.5 CHF</td>
@@ -2352,7 +1996,6 @@ connectors</strong>, you can make a new network connection with just a few parts
 <td><a href="https://www.FS.COM/de-en/products/75339.html">#39135</a></td>
 <td><a href="https://www.FS.COM/de-en/products/75339.html">1 Gbit/s BiDi SFP 1310nm-TX/1550nm-RX</a></td>
 </tr>
-
 <tr>
 <td>1x</td>
 <td>11 CHF</td>
@@ -2360,7 +2003,6 @@ connectors</strong>, you can make a new network connection with just a few parts
 <td><a href="https://www.FS.COM/de-en/products/75340.html">#39138</a></td>
 <td><a href="https://www.FS.COM/de-en/products/75340.html">1 Gbit/s BiDi SFP 1550nm-TX/1310nm-RX</a></td>
 </tr>
-
 <tr>
 <td>1x</td>
 <td>2.3 CHF</td>
@@ -2370,19 +2012,14 @@ connectors</strong>, you can make a new network connection with just a few parts
 </tr>
 </tbody>
 </table>
-
 <p>I recommend buying an extra fiber cable or two so that you can accidentally
 damage a cable and still have enough spares.</p>
-
 <p>Total cost thus far: just under 100 CHF. If you have existing switches with a
 free SFP slot, you can use those instead of the media converters and save most
 of the cost.</p>
-
-<hr />
-
+<hr>
 <p>If you need to <strong>temporarily remove</strong> one or both of the fiber cable connector(s),
 you also need field assembly connectors and a few tools in addition:</p>
-
 <table>
 <thead>
 <tr>
@@ -2393,7 +2030,6 @@ you also need field assembly connectors and a few tools in addition:</p>
 <th>note</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>2x</td>
@@ -2402,7 +2038,6 @@ you also need field assembly connectors and a few tools in addition:</p>
 <td><a href="https://www.FS.COM/de-en/products/35165.html">#35165</a></td>
 <td><a href="https://www.FS.COM/de-en/products/35165.html">LC/UPC 0.9mm pre-polished field assembly connector</a></td>
 </tr>
-
 <tr>
 <td>1x</td>
 <td>110 CHF</td>
@@ -2410,7 +2045,6 @@ you also need field assembly connectors and a few tools in addition:</p>
 <td><a href="https://www.FS.COM/de-en/products/14341.html">#14341</a></td>
 <td><a href="https://www.FS.COM/de-en/products/14341.html">High Precision Fibre Optic Cleaver FS-08C</a></td>
 </tr>
-
 <tr>
 <td>1x</td>
 <td>26 CHF</td>
@@ -2418,7 +2052,6 @@ you also need field assembly connectors and a few tools in addition:</p>
 <td><a href="https://www.FS.COM/de-en/products/14346.html">#14346</a></td>
 <td><a href="https://www.FS.COM/de-en/products/14346.html">Fibre Optic Kevlar Cutter</a></td>
 </tr>
-
 <tr>
 <td>1x</td>
 <td>14 CHF</td>
@@ -2428,19 +2061,13 @@ you also need field assembly connectors and a few tools in addition:</p>
 </tr>
 </tbody>
 </table>
-
 <p>I recommend buying twice the number of field assembly connectors, for practicing.</p>
-
 <p>Personally, I screwed up two connectors before figuring out <a href="#field-assembly-connectors">how the process
 goes</a>.</p>
-
 <p>Total cost: about 160 CHF for the field assembly equipment, so 260 CHF in total.</p>
-
-<hr />
-
+<hr>
 <p>To boost your confidence in the resulting fiber, the following items are nice to
 have, but you can get by without, if you’re on a budget.</p>
-
 <table>
 <thead>
 <tr>
@@ -2449,20 +2076,17 @@ have, but you can get by without, if you’re on a budget.</p>
 <th>note</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>18 CHF</td>
 <td><a href="https://www.FS.COM/de-en/products/35388.html">#35388</a></td>
 <td><a href="https://www.FS.COM/de-en/products/35388.html">FVFL-204 Visual Fault Locator</a></td>
 </tr>
-
 <tr>
 <td>9.40 CHF</td>
 <td><a href="https://www.FS.COM/de-en/products/82730.html">#82730</a></td>
 <td><a href="https://www.FS.COM/de-en/products/82730.html">2.5mm to 1.25mm adapter for Visual Fault Locator</a></td>
 </tr>
-
 <tr>
 <td>4.10 CHF</td>
 <td><a href="https://www.FS.COM/de-en/products/14010.html">#14010</a></td>
@@ -2470,91 +2094,68 @@ have, but you can get by without, if you’re on a budget.</p>
 </tr>
 </tbody>
 </table>
-
 <p>With the visual fault locator, you can shine a light through your fiber. You can
 verify correct connector assembly by looking at how the light comes out of the
 connector.</p>
-
 <p>The fiber cleaning swabs are good to have in general, but for the field assembly
 connector, you need to use alcohol-soaked wipes anyway (which FS.COM does not
 stock).</p>
-
 <p>The total cost for everything is just under 300 CHF.</p>
-
 <h3 id="hardware-selection-process">Hardware Selection Process</h3>
-
 <p>The large selection at FS.COM can be overwhelming to navigate at first. My
 selection process went something like this:</p>
-
 <p>My first constraint is using bi-directional (BiDi) fiber optics modules so that
 I only need to lay a single fiber cable, as opposed to two fiber cables.</p>
-
 <p>The second constraint is to use field assembly connectors.</p>
-
 <p>If possible, I wanted to use <a href="https://community.FS.COM/blog/why-not-use-bend-insensitive-fiber-optic-cable-to-reduce-bend-radius.html">bend-insensitive
 fiber</a>
 so that I wouldn’t need to pay so much attention to the bend radius and have
 more flexibility in where and how I can lay fiber.</p>
-
 <p>With these constraints, there aren’t too many products left to combine. An
 obvious and good choice are 0.9mm fiber cable using LC/UPC connectors.</p>
-
-<h3 id="fs-com-details">FS.COM details</h3>
-
+<h3 id="fscom-details">FS.COM details</h3>
 <p>As of 2020-08-05, FS.COM states they have 5 warehouses in 4 locations:</p>
-
 <ul>
 <li>Delaware (US)</li>
 <li>Munich (Germany)</li>
 <li>Melbourne (Australia)</li>
 <li>Shenzhen (China)</li>
 </ul>
-
 <p>They recently built another, bigger (7 km²) warehouse in Shenzhen, and now
 produce inventory for the whole year.</p>
-
 <p>By 2019, FS.COM had over 300,000 registered corporate customers, reaching nearly
 200 million USD yearly sales.</p>
-
 <h2 id="delivery-times">Delivery times</h2>
-
 <p>As mentioned before, delivery times are quick when the products are in stock at
 FS.COM’s German warehouse.</p>
-
 <p>In my case, I put in my order on 2020-Jun-26.</p>
-
 <p>The items that shipped from the German warehouse arrived on 2020-Jul-01.</p>
-
 <p>Some items had to be manufactured and/or shipped from Asia. Those items arrived
 after 3 more weeks, on 2020-Jul-24.</p>
-
 <p>Unfortunately, FS.COM doesn’t stock any 0.9mm fiber cables in their German
 warehouse right now, so be prepared for a few weeks of waiting time.</p>
-
 <h2 id="laying-the-fiber">Laying The Fiber</h2>
-
 <p>Use a cable puller to pull the fiber through existing cable ducts where
 possible.</p>
-
 <ul>
-<li><p>In general, buy the thinnest one you can find. I have <a href="https://www.distrelec.ch/en/cable-pull-strap-10m-tools-495005/p/18092626">this 4mm diameter cable
+<li>
+<p>In general, buy the thinnest one you can find. I have <a href="https://www.distrelec.ch/en/cable-pull-strap-10m-tools-495005/p/18092626">this 4mm diameter cable
 puller</a>,
-but a 3mm or even 2mm one would work in more situations.</p></li>
-
-<li><p>I found it worthwhile to buy a brand one. It is distinctly better to handle
+but a 3mm or even 2mm one would work in more situations.</p>
+</li>
+<li>
+<p>I found it worthwhile to buy a brand one. It is distinctly better to handle
 (less stiff, i.e. more flexible) than the cheap one I got, and thinner, too,
-which is always good.</p></li>
+which is always good.</p>
+</li>
 </ul>
-
 <p>In my experience, it generally did not work well to <strong>push</strong> the fiber into an
 existing duct or alongside an existing cable. I really needed a cable
 <strong>puller</strong>.</p>
-
 <p>If you’re lucky and have enough space in your duct(s), you can leave the
 existing connectors on the fiber. I have successfully just used a piece of tape
 to fix the fiber connector on the cable puller, pushing down the nose
 temporarily:</p>
-
 
 
 
@@ -2582,15 +2183,12 @@ temporarily:</p>
 
 
 
-
 <p>Where there are no existing ducts, you may need to lay the fiber on top of the
 wall. Obviously, this is tricky as soon as you need to make a connection going
 through a wall: whereas copper ethernet cables can be bent and squeezed into
 door frames, you quickly risk breaking fiber cables.</p>
-
 <p>Luckily, the fiber is very light, so it’s very easy to fix to the wall with a
 piece of tape:</p>
-
 
 
 
@@ -2618,27 +2216,20 @@ piece of tape:</p>
 
 
 
-
 <p>You can see the upstream internet fiber in the top right corner, which is rather
 thick in comparison to my 0.9mm yellow fiber that’s barely visible in the middle
 of the picture.</p>
-
 <p>Note how the fiber entirely disappears behind the existing duct atop the
 door!</p>
-
 <p>Above, you can see the flat ethernet cable I have been using as a temporary
 experiment.</p>
-
-<hr />
-
+<hr>
 <p>Where there is an existing cable that you can temporarily remove, it might be
 possible to remove it, put the fiber in, and put the old cable back in,
 too. This is possible because the 0.9mm fiber cable is so thin!</p>
-
 <p>I’m using this technique to cross another wall where the existing cable duct is
 too full, but there is a cable that can be removed and put back after pulling
 the fiber through:</p>
-
 
 
 
@@ -2666,9 +2257,7 @@ the fiber through:</p>
 
 
 
-
 <p>…and on the other side of the wall:</p>
-
 
 
 
@@ -2696,20 +2285,14 @@ the fiber through:</p>
 
 
 
-
 <p>Note how the fiber is thin enough to fit between the socket and duct!</p>
-
-<hr />
-
+<hr>
 <p><strong>Note:</strong> despite measuring how long a fiber cable I would need, my cable turned
 out too short! While the cable was just as long as I had measured, with
 distances exceeding 10m, it is a good idea to <strong>add a few meters spare</strong> on each
 side of the connection.</p>
-
 <h2 id="field-assembly-connectors">Field assembly connectors</h2>
-
 <p>To give you an overview, these are the required steps at a high level:</p>
-
 <ol>
 <li>Cut the fiber with the <a href="https://www.FS.COM/de-en/products/14346.html">Fibre Optic Kevlar Cutter</a></li>
 <li>Strip the fiber with the <a href="https://www.FS.COM/de-en/products/72812.html">Fibre Optical Stripper</a></li>
@@ -2717,11 +2300,8 @@ side of the connection.</p>
 <li>Cut the stripped fiber cleanly with the <a href="https://www.FS.COM/de-en/products/14341.html">High Precision Fibre Optic Cleaver FS-08C</a></li>
 <li>Put the field assembly <em>connector</em> onto the fiber</li>
 </ol>
-
-<hr />
-
+<hr>
 <p>I thought the following resources were useful:</p>
-
 <ol>
 <li>Pictograms: <a href="https://img-en.fs.com/file/user_manual/lc-field-assembly-connector-quick-start-guide-v1.0.pdf">PDF: FS.COM LC UPC field assembley connectors quick start
 guide</a></li>
@@ -2732,20 +2312,14 @@ Minutes</a>: this video shows a
 different product, but I found it helpful to see any field assembly connector
 on video, and this is one of the better videos I could find.</li>
 </ol>
-
 <!-- TODO: include a link to my own video once published -->
-
-<hr />
-
+<hr>
 <p><strong>Beware:</strong> the little paper booklet that comes with the field assembly
 connector contains measurements which are <strong>not to scale</strong>. I have suggested to
 FS.COM that they fix this, but until then, you’ll need to use e.g. a tape
 measure.</p>
-
-<hr />
-
+<hr>
 <p>For establishing an intuition of their different sizes, here are the different connectors:</p>
-
 
 
 
@@ -2773,49 +2347,36 @@ measure.</p>
 
 
 
-
 <p>From left to right:</p>
-
 <ul>
 <li>2.0mm fiber cable</li>
 <li>cat6 ethernet cable</li>
 <li>0.9mm fiber cable (LC/UPC factory)</li>
 <li>0.9mm fiber cable (LC/UPC field assembly connector)</li>
 </ul>
-
 <p>The 0.9mm fiber cables come with smaller connectors than the 2.0mm fiber cables,
 and that alone might be a reason to prefer them in some situations.</p>
-
 <p>The field assembly connectors are pretty bulky in comparison, but since you can
 attach them yourself after pulling only the cable through the walls and/or
 ducts, you usually don’t care too much about their size.</p>
-
 <h2 id="conclusion">Conclusion</h2>
-
 <p>Modern fiber cables available at FS.COM are:</p>
-
 <ul>
 <li>thinner than I expected</li>
 <li>more robust than I expected</li>
 <li>cheaper than I expected</li>
 <li>survive tighter bend radiuses than I expected</li>
 </ul>
-
 <p>Replacing this particular connection with a fiber connection was a smooth
 process overall, and I would recommend it in other situations as well.</p>
-
-<hr />
-
+<hr>
 <p>I would claim that it is <strong>totally feasible</strong> for anyone with an hour of
 patience to learn how to put a field assembly connector onto a fiber cable.</p>
-
 <p>If labor cost is expensive in your country or you just like doing things
 yourself, I can definitely recommend this approach. In case you mess the
 connector up and don’t want to fix it yourself, you can always call an
 electrician!</p>
-
-<hr />
-
+<hr>
 <p>Stay tuned for the next part, where I upgrade the 1G link to a 10G link!</p>
 ]]></content>
   </entry>
@@ -2832,42 +2393,34 @@ I won’t go into in this article, it took me about a year to get a fiber
 connection, and in the end I had to go with Swisscom (instead of <a
 href="http://www.init7.ch/">init7</a> on top of EWZ).
 </p>
-
 <p>
 But then <a href="http://www.fiber7.ch/">fiber7</a> launched. They provide a 1
 Gbps symmetrical connection (Swisscom provided a 1 Gbps/100 Mbps down/up
 connection) for a lot less money than Swisscom, and with native, static IPv6.
 </p>
-
 <p>
 A couple of people are interested in how fiber7 performs, and after being
 connected for about 2 months, I think I can answer this question by now :-).
 </p>
-
 <h2>Latency</h2>
-
 <p>
 I started running smokeping to see how my internet connection performs back
 when I was with Swisscom, because they had some routing issues to certain
 networks. This would manifest itself with getting 50 KB/s transfer rates,
 which is unacceptable for image boards or any other demanding application.
 </p>
-
 <p>
 So, here is the smokeping output for google.ch during the time period that
 covers both my Swisscom line, the temporary cablecom connection and finally
 fiber7:
 </p>
-
 <p><img src="/Bilder/fiber_ping_google_ch_annotated.png" width="800" height="424"
- alt="smokeping latency to google.ch (annotated)"></p>
-
+alt="smokeping latency to google.ch (annotated)"></p>
 <p>
 What you can see is that with Swisscom, I had a 6 ms ping time to google.ch.
 Interestingly, once I used the MikroTik RB2011 instead of the Swisscom-provided
 internet box, the latency improved to 5&nbsp;ms.
 </p>
-
 <p>
 Afterwards, latency changed twice. For the first change, I’m not sure what
 happened. It could be that Swisscom turned up a new, less loaded port to peer
@@ -2881,7 +2434,6 @@ ISP and Google. I’m confident that Swisscom uses that because of the reverse
 pointer record of the IP address to which google.ch resolves to. So with that,
 latency is between 1&nbsp;ms and 3&nbsp;ms.
 </p>
-
 <p>
 Because switching to Fiber7 involves recabling the physical fiber connection in
 the POP, there is a 2-day downtime involved. During that time I used <a
@@ -2890,25 +2442,20 @@ cablecom’s free offering</a>, which is a 2&nbsp;Mbps cable connection that you
 use for free (as long as you pay for the cable connection itself, and after
 paying 50 CHF for the modem itself).
 </p>
-
 <p>
 As you can see on the graph, the cable connection has a surprisingly good
 latency of around 8&nbsp;ms to google.ch — until you start using it. Then it’s
 clear that 2 Mbps is not enough and the latency shoots through the roof.
 </p>
-
 <p>
 The pleasant surprise is that fiber7’s ping time to google.ch is about
 0.6&nbsp;ms (!). They achieve such low latency <a
 href="https://twitter.com/fiber7_ch/status/508344516622159872">with a dedicated
 10 gig interconnect to Google at the Interxion in Glattbrugg</a>.
 </p>
-
 <h2>Longer-term performance</h2>
-
 <p><img src="/Bilder/fiber_ping_google_ch_week.png" width="697" height="315"
- alt="smokeping latency measurements to google.ch over more than a week"></p>
-
+alt="smokeping latency measurements to google.ch over more than a week"></p>
 <p>
 Let me say that I’m very happy with the performance of my internet connection.
 Some of the measurements where packet loss is registered may be outside of
@@ -2917,7 +2464,6 @@ example. Overall, the latency is fine and consistent, much more so than with
 Swisscom. I have never experienced an internet outage during the two months
 I’ve been with fiber7 now.
 </p>
-
 <p>
 Also, while I am not continuously monitoring my bandwidth, rest assured that
 whenever I download something, I am able to utilize the full Gigabit, meaning I
@@ -2925,9 +2471,7 @@ get an aggregate speed of 118 MB/s from servers that support it. Such servers
 are for example one-click hosters like uploaded, but also Debian mirrors (as
 soon as you download from multiple ones in parallel).
 </p>
-
 <h2>Conclusion</h2>
-
 <p>
 tl;dr: fiber7 delivers. Incredible latency, no outages (yet), full download speed.
 </p>
@@ -2944,13 +2488,11 @@ connection once it became available, and I’ve been connected since a few weeks
 They offer a 1 Gbps symmetrical fiber connection, with native (static) IPv6 and
 no traffic limit — for 65 CHF per month (about 54 €).
 </p>
-
 <p>
 In the order form, they let you choose whether you want to order a
 pre-configured MikroTik RB2011UiAS-2HnD including fiber optic and fiber patch
 cable. I assumed this would be an excellent choice, so I ordered it.
 </p>
-
 <p>
 I really like the MikroTik device. Its CLI and web interface are well
 thought-out and easy to use once you understand their way of thinking. It’s
@@ -2960,7 +2502,6 @@ enable NAT, which you need for a fiber7 connection. Thus, the top bandwidth
 maxes out at 500 to 600 Mbps, so effectively you only use half of your
 available bandwidth.
 </p>
-
 <p>
 Therefore, I looked around for other routers which can do a full Gigabit
 WAN-to-LAN, i.e. with IPv4-NAT enabled. The selection of routers that can do
@@ -2968,7 +2509,6 @@ that is very small, see for example <a
 href="http://www.smallnetbuilder.com/lanwan/router-charts/view">the
 smallnetbuilder WAN-to-LAN router charts</a>.
 </p>
-
 <p>
 In my first try, I went with the Netgear R7000 (“Nighthawk”) which is the
 highest-performing router with regards to WAN-to-LAN bandwidth on
@@ -2983,15 +2523,12 @@ DD-WRT does not come with such a kernel module because they use a newer kernel,
 so the speed maxes out at 400 Mbps (that’s what they claim, I didn’t even
 bother testing it).
 </p>
-
 <h2>Ubiquiti EdgeRouter Lite (Erlite-3)</h2>
-
 <p>
 So, as a second try, I ordered what everyone recommended me in the first place:
 the <a href="http://www.ubnt.com/edgemax/edgerouter-lite/">Ubiquiti EdgeRouter
 Lite (Erlite-3)</a>.
 </p>
-
 <p>
 The EdgeRouter Lite (tested with firmware v1.5.0 and v1.6.0) offers IPv4 and
 IPv6 offloading, and in fact reaches Gigabit line rate (118 MB/s measured TCP
@@ -3001,7 +2538,6 @@ devices to your router in the same subnet, like a computer and a switch, you
 cannot do that. Effectively, the EdgeRouter needs to sit between the internet
 connection and a switch.
 </p>
-
 <p>
 With regards to the web interface of EdgeOS: the web interface feels very
 polished and modern, but it seems to lack a number of features that are only
@@ -3011,9 +2547,7 @@ though: firmware updates are quick and painless, the model selection and
 download on their website is very simple to find and use, and you even get a
 link to the relevant GPL tarball without asking :).
 </p>
-
 <h2>Properly disconnecting your old router</h2>
-
 <p>
 First of all, you should disconnect the MikroTik (or your current router) from
 the network. I recommend doing that by explicitly disabling both DHCP clients,
@@ -3029,22 +2563,18 @@ escalate the problem to their NOC. So, better disable the DHCP:
 /ip dhcp-client set disabled=yes numbers=0
 /ipv6 dhcp-client set disabled=yes numbers=0
 </pre>
-
 <h2>Configuring the EdgeRouter Lite for fiber7</h2>
-
 <p>
 In my configuration, I connect a switch to eth0 and a media converter (the
 TP-LINK MC220L) to eth1. Pay attention to configure the media converter to
 “auto”, not “force”. In both cases you’ll get a link, but with “force”, you
 will not get any replies to your packets.
 </p>
-
 <p>
 A general tip: if you mess up your IP configuration, you can always use the
 link-local address of the EdgeRouter and SSH into that. Find the link-local
 address using <code>ping6 ff02::1%eth0</code>.
 </p>
-
 <p>
 After logging into the web interface, set the eth1 address to DHCP and it
 should get a public IPv4 address from fiber7. Afterwards, enable NAT by
@@ -3053,13 +2583,11 @@ select the “masquerade” radio button. You’ll also need to switch to the
 “services” tab and enable a DHCP and DNS server. This should give you IPv4
 connectivity to the internet.
 </p>
-
 <p>
 Now on to IPv6. Since EdgeOS version 1.6.0, DHCPv6-PD is an easily usable
 feature. Log into the router using <code>ssh ubnt@192.168.1.1</code>, then run
 the following commands:
 </p>
-
 <pre>
 configure
 set interfaces ethernet eth1 dhcpv6-pd pd 0 prefix-length /48
@@ -3070,7 +2598,6 @@ save
 exit
 reboot
 </pre>
-
 <p>
 The <code>prefix-length</code> specifies how big the prefix is that the ISP is
 giving us; a <code>/48</code> in the case of fiber7. The next lines specify
@@ -3081,25 +2608,20 @@ e.g. <code>ff23</code>, and your prefix is <code>2a02:168:4a09::/48</code>, the
 EdgeRouter will announce <code>2a02:168:4a09:ff23::/64</code> on
 <code>eth0</code>.
 </p>
-
 <p>
 For me, the reboot was necessary after changing settings, so try rebooting if
 things don’t work as they should.
 </p>
-
 <p>
 When running <code>ip -6 address show dev eth0</code> you should see that
 the router added an IPv6 address like
 <code>2a02:168:4a09:0:de9f:dbff:fe81:a905/64</code> to eth0.
 </p>
-
 <p>
 That’s it! On clients you should be able to <code>ping6 google.ch</code> now
 and get replies.
 </p>
-
 <h2>Bonus: Configuring a DHCPv6-DUID</h2>
-
 <p>
 fiber7 wants to hand out static IPv6 prefixes based on the DHCPv6 option 37,
 but that’s not ready yet. Until then, they offer you to set a static prefix
@@ -3107,19 +2629,15 @@ based on your DUID (a device identifier based on the MAC address of your
 router). Since I switched from the MikroTik, I needed to port its DUID to the
 EdgeRouter to keep my static prefix.
 </p>
-
 <p>
 Luckily, wide-dhcpv6 reads a file called dhcp6c_duid that you can create with
 the proper DUID. The file starts with a 16-bit integer containing the length of
 the DUID, followed by the raw DUID:
 </p>
-
 <pre>
 echo -en '\x00\x0a\x00\x03\x00\x01\x4c\x5e\x0c\x43\xbf\x39' > /var/lib/dhcpv6/dhcp6c_duid
 </pre>
-
 <h2>Conclusion</h2>
-
 <p>
 I can see why fiber7 went with the MikroTik as their offer for customers: it
 combines a media converter (for fiber to ethernet), a router, a switch and a
@@ -3131,9 +2649,7 @@ twice as high, so I think this is the setup that I’ll keep for a while — unt
 somebody comes up with an all-in-one device that provides the same features and
 achieves the same rates :-).
 </p>
-
 <h2>Appendix: IPv6 with EdgeOS &lt; 1.7.0</h2>
-
 <p>
 For EdgeOS 1.6.0, you’ll need to add router advertisement settings:
 </p>
@@ -3150,15 +2666,12 @@ save
 exit
 reboot
 </pre>
-
 <h2>Appendix: IPv6 with EdgeOS &lt; 1.6.0</h2>
-
 <p>
 IPv6 is a bit harder, since EdgeOS in its current version (1.5.0) does not
 support DHCPv6-PD via its Web or CLI interface. The necessary software
 (wide-dhcpv6) is included, though, so we can configure it manually.
 </p>
-
 <p>
 For the next steps, you need to know the transfer network IP range, which seems
 to be different for every fiber7 POP (location). You can get it by either using
@@ -3167,7 +2680,6 @@ configuration (if you have one) or by asking fiber7. In my case, the range is
 <code>2a02:168:2000:5::/64</code>, but I’ve heard from others that they have
 <code>2a02:168:2000:9::/64</code>.
 </p>
-
 <p>
 Use <code>ssh ubnt@192.168.1.1</code> to log into the CLI. In order to set the
 proper IPv6 address on the transfer network, run <code>ip -6 address show dev
@@ -3186,7 +2698,6 @@ commit
 save
 exit
 </pre>
-
 <p>
 Now you should be able to run <code>ping6 google.ch</code> and get a reply.
 We still need to enable DHCPv6 though so that the router gets a prefix and
@@ -3207,33 +2718,27 @@ killall -KILL radvd
 exit 0
 EOT
 chmod +x /etc/wide-dhcpv6/dhcp6c-script-zkj
-
-cat >/etc/wide-dhcpv6/dhcp6c.conf <<'EOT'
+<p>cat &gt;/etc/wide-dhcpv6/dhcp6c.conf &laquo;&lsquo;EOT&rsquo;
 interface eth1 {
-        send ia-pd 0;
-        request domain-name-servers;
-        script "/etc/wide-dhcpv6/dhcp6c-script-zkj";
+send ia-pd 0;
+request domain-name-servers;
+script &ldquo;/etc/wide-dhcpv6/dhcp6c-script-zkj&rdquo;;
+};</p>
+<p>id-assoc pd 0 {
+prefix-interface eth0 {
+sla-id 1;
+sla-len 0;
 };
-
-id-assoc pd 0 {
-        prefix-interface eth0 {
-                sla-id 1;
-                sla-len 0;
-        };
 };
-EOT
-
-sed -i 's/eth0/eth1/g' /etc/default/wide-dhcpv6-client
-
-cat >/config/scripts/post-config.d/dhcpv6.sh <<'EOT'
+EOT</p>
+<p>sed -i &rsquo;s/eth0/eth1/g' /etc/default/wide-dhcpv6-client</p>
+<p>cat &gt;/config/scripts/post-config.d/dhcpv6.sh &laquo;&lsquo;EOT&rsquo;
 #!/bin/sh
 /etc/init.d/wide-dhcpv6-client start
 EOT
-chmod +x /config/scripts/post-config.d/dhcpv6.sh
-
-/config/scripts/post-config.d/dhcpv6.sh
-</pre>
-
+chmod +x /config/scripts/post-config.d/dhcpv6.sh</p>
+<p>/config/scripts/post-config.d/dhcpv6.sh
+</pre></p>
 <p>
 Now, when running <code>ip -6 address show dev eth0</code> you should see that
 the router added an IPv6 address like
@@ -3249,7 +2754,6 @@ commit
 save
 exit
 </pre>
-
 <p>
 That’s it! On clients you should be able to <code>ping6 google.ch</code> now and get replies.
 </p>

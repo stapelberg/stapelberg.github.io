@@ -176,7 +176,7 @@
 <h1 class="ms_title">Kurz-Howto: Bacula und TLS mit CACert (2008)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2008-09-05, last modified 2018-03-18</div>
+  <div id="ms_date">published 2008-09-05, last modified 2021-10-23</div>
   
   
   <div>
@@ -224,8 +224,10 @@ installieren.
 Folgendermaßen wird ein Private Key und ein Certificate Request erstellt (auf
 jedem Rechner ausführen):
 </p>
-<pre>cd /etc/ssl/private
-openssl req -newkey rsa:4096 -subj /CN=ipv6.server.de -nodes -keyout ipv6.server.de.key -out ipv6.server.de.csr</pre>
+
+<pre><code>cd /etc/ssl/private
+openssl req -newkey rsa:4096 -subj /CN=ipv6.server.de -nodes -keyout ipv6.server.de.key -out ipv6.server.de.csr
+</code></pre>
 
 <p>
 Den Certificate Request aus ipv6.server.de.csr geben wir nun bei CACert ein und
@@ -263,38 +265,41 @@ beiden anderen Daemons spielen entsprechend mit.
 </p>
 
 <h3>Director (bacula-dir.conf)</h3>
-<pre>Director {
+
+<pre><code>Director {
         Name = fs-dir
         DIRport = 9101
-        QueryFile = "/usr/libexec/bacula/query.sql"
-        WorkingDirectory = "/var/lib/bacula"
-        PidDirectory = "/var/run"
+        QueryFile = &quot;/usr/libexec/bacula/query.sql&quot;
+        WorkingDirectory = &quot;/var/lib/bacula&quot;
+        PidDirectory = &quot;/var/run&quot;
         Maximum Concurrent Jobs = 4
-        Password = ""
+        Password = &quot;&quot;
         Messages = Daemon
 
-        <strong>TLS Enable = yes
+        &lt;strong&gt;TLS Enable = yes
         TLS Require = no
         TLS Verify Peer = no
         TLS Certificate = /etc/ssl/certs/stability.crt
         TLS Key = /etc/ssl/private/stability.key
-        TLS CA Certificate File = /etc/ssl/certs/root.pem</strong>
-}</pre>
+        TLS CA Certificate File = /etc/ssl/certs/root.pem&lt;/strong&gt;
+}
+</code></pre>
 
-<pre>Client {
+<pre><code>Client {
         Name = server-fd
         Address = ipv6.server.de
         FDPort = 9102 
         Catalog = MyCatalog
-        Password = ""
+        Password = &quot;&quot;
         File Retention = 2 weeks
         Job Retention = 2 weeks
         AutoPrune = yes
 
-        <strong>TLS Enable = yes
+        &lt;strong&gt;TLS Enable = yes
         TLS Require = no
-        TLS CA Certificate File = /etc/ssl/certs/root.pem</strong>
-}</pre>
+        TLS CA Certificate File = /etc/ssl/certs/root.pem&lt;/strong&gt;
+}
+</code></pre>
 
 <p>
 Hinweis: Sollte der Storage-Daemon auf einem anderen Rechner laufen als der
@@ -304,51 +309,54 @@ man in der Storage-Resource <code>TLS Require</code> auf yes setzen.
 
 <h3>Storage Daemon (bacula-sd.conf)</h3>
 
-<pre>Storage {
+<pre><code>Storage {
         Name = fs-sd
         SDAddresses = {
-            ipv6 = { addr = 2001:xx:yy:zz; port = 9103; }
-    }
-        WorkingDirectory = "/var/lib/bacula"
-        Pid Directory = "/var/run"
+      		ipv6 = { addr = 2001:xx:yy:zz; port = 9103; }
+	}
+        WorkingDirectory = &quot;/var/lib/bacula&quot;
+        Pid Directory = &quot;/var/run&quot;
         Maximum Concurrent Jobs = 20
 
-        <strong>TLS Enable = yes
+        &lt;strong&gt;TLS Enable = yes
         TLS Require = no
         TLS Verify Peer = no
         TLS Certificate = /etc/ssl/certs/stability.crt
         TLS Key = /etc/ssl/private/stability.key
-    TLS CA Certificate File = /etc/ssl/certs/root.pem</strong>
-}</pre>
+	TLS CA Certificate File = /etc/ssl/certs/root.pem&lt;/strong&gt;
+}
+</code></pre>
 
 <h3>File Daemon (bacula-fd.conf)</h3>
 
-<pre>Director {
+<pre><code>Director {
   Name = fs-dir
-  Password = ""
+  Password = &quot;&quot;
 
-  <strong>TLS Enable = yes
+  &lt;strong&gt;TLS Enable = yes
   TLS Require = yes
   TLS Verify Peer = no
   TLS CA Certificate File = /etc/ssl/certs/root.pem
   TLS Certificate = /etc/bacula/ipv6.server.de.crt
-  TLS Key = /etc/ssl/private/ipv6.server.de.key</strong>
-}</pre>
+  TLS Key = /etc/ssl/private/ipv6.server.de.key&lt;/strong&gt;
+}
+</code></pre>
 
-<pre>FileDaemon {
+<pre><code>FileDaemon {
   Name = server-fd
   WorkingDirectory = /var/lib/bacula
   Pid Directory = /var/run/bacula
   Maximum Concurrent Jobs = 20
   FDAddresses = {
-    ipv6 = { addr = 2001:xx:yy:zz; port = 9102; }
+  	ipv6 = { addr = 2001:xx:yy:zz; port = 9102; }
   }
-  <strong>TLS Enable = yes
+  &lt;strong&gt;TLS Enable = yes
   TLS Require = yes
   TLS CA Certificate File = /etc/ssl/certs/root.pem
   TLS Certificate = /etc/bacula/ipv6.server.de.crt
-  TLS Key = /etc/ssl/private/ipv6.server.de.key</strong>
-}</pre>
+  TLS Key = /etc/ssl/private/ipv6.server.de.key&lt;/strong&gt;
+}
+</code></pre>
 
 <h2>Verify Peer/Allowed CN</h2>
 <p>

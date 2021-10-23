@@ -203,40 +203,36 @@
   <details class="ms_toc_details">
     <summary>Table of contents</summary>
     <nav class="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#background">Background</a></li>
-<li><a href="#finding-the-signals">Finding the signals</a></li>
-<li><a href="#converting-the-signals">Converting the signals</a></li>
-<li><a href="#microcontroller-selection">Microcontroller selection</a>
-<ul>
-<li><a href="#why-the-adafruit-qt-py">Why the Adafruit QT Py?</a></li>
-<li><a href="#why-the-tinypico-esp32-board">Why the TinyPICO ESP32 board?</a></li>
-</ul></li>
-<li><a href="#prototype">Prototype</a></li>
-<li><a href="#backpack-pcb-for-the-qt-py">Backpack PCB for the QT Py</a></li>
-<li><a href="#assembly">Assembly</a></li>
-<li><a href="#software-artifacts">Software / Artifacts</a></li>
-<li><a href="#nuki-opener-verdict">Nuki Opener: verdict</a>
-<ul>
-<li><a href="#setup">setup</a></li>
-<li><a href="#in-my-day-to-day">in my day-to-day</a></li>
-</ul></li>
-<li><a href="#conclusion">Conclusion</a></li>
-<li><a href="#appendix-a-troubleshooting">Appendix A: Troubleshooting</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#background">Background</a></li>
+    <li><a href="#finding-the-signals">Finding the signals</a></li>
+    <li><a href="#converting-the-signals">Converting the signals</a></li>
+    <li><a href="#microcontroller-selection">Microcontroller selection</a>
+      <ul>
+        <li><a href="#why-the-adafruit-qt-py">Why the Adafruit QT Py?</a></li>
+        <li><a href="#why-the-tinypico-esp32-board">Why the TinyPICO ESP32 board?</a></li>
+      </ul>
+    </li>
+    <li><a href="#prototype">Prototype</a></li>
+    <li><a href="#backpack-pcb-for-the-qt-py">Backpack PCB for the QT Py</a></li>
+    <li><a href="#assembly">Assembly</a></li>
+    <li><a href="#software--artifacts">Software / Artifacts</a></li>
+    <li><a href="#nuki-opener-verdict">Nuki Opener: verdict</a>
+      <ul>
+        <li><a href="#setup">setup</a></li>
+        <li><a href="#in-my-day-to-day">in my day-to-day</a></li>
+      </ul>
+    </li>
+    <li><a href="#conclusion">Conclusion</a></li>
+    <li><a href="#appendix-a-troubleshooting">Appendix A: Troubleshooting</a></li>
+  </ul>
 </nav>
   </details>
-  
-
-<p>I bought the cheapest compatible BTicino intercom device (BT 344232 for 32 €)
+  <p>I bought the cheapest compatible BTicino intercom device (BT 344232 for 32 €)
 that I could find on eBay, then soldered in 4 wires and added microcontrollers
 to make it smart. It now connects to my <a href="https://nuki.io/en/opener/">Nuki Opener Smart Intercom IOT
 device</a>, and to <a href="/posts/2021-01-10-mqtt-introduction/">my local MQTT Pub/Sub
 bus</a> (why not?).</p>
-
 
 
 
@@ -264,70 +260,54 @@ bus</a> (why not?).</p>
 
 
 
-
 <h2 id="background">Background</h2>
-
 <p>In my <a href="/posts/2020-11-30-scs-processing-microcontroller/">last post about the BTicino intercom from
 November</a>, I described how to
 use a Teensy microcontroller to reliably interpret SCS bus signals and drive a
 Nuki Opener (Smart Intercom).</p>
-
 <p>Originally, I had hoped the Nuki developers would be able to fix their device
 based on my SCS bus research, but they don’t seem to be interested. Instead,
 their support actually suggested I run my microcontroller workaround
 indefinitely!</p>
-
 <p>Hence, I decided to work on the next revision to clean up my setup in terms of
 cable clutter. I also figured: if I already need to run my own microcontroller,
 I also want to connect it to my local <a href="/posts/2021-01-10-mqtt-introduction/">MQTT Pub/Sub
 bus</a> for maximum flexibility.</p>
-
 <p>Unfortunately, the Teensy microcontroller lacks built-in WiFi, or any kind of
 networking.</p>
-
 <p>I switched to an ESP32-based microcontroller, but powering those from the SCS
 bus seems like a bad idea: they draw a lot of power, and building small
 high-quality power supplies is hard.</p>
-
 <p>This made me scrap <a href="https://twitter.com/zekjur/status/1331646748989788160">my previous plans to make my own SCS send/receive
 hardware</a>.</p>
-
 <p>Instead, I wondered what the easiest yet most reliable approach might be to make
 this intercom unit smart. Instead of building my own SCS hardware, could I use
 the intercom unit itself to send the door unlock signal, and could I obtain the
 unit’s already-decoded SCS bus signal?</p>
-
 <h2 id="finding-the-signals">Finding the signals</h2>
-
 <p>Based on my previous research, I roughly knew what to expect: closest to the bus
 terminals, there will be some components that filter the bus signal and convert
 the 27V into a lower voltage. Connected to that power supply is a
 microcontroller which deals with all user interface.</p>
-
 <p>To learn more about the components, I first identified all <a href="https://en.wikipedia.org/wiki/Integrated_circuit">ICs (Integrated
 Circuits)</a> based on their
 labeling. The following are relevant:</p>
-
 <ul>
 <li><a href="https://www.ti.com/lit/ds/symlink/lm393-n.pdf">TI LM393</a>: Dual Comparators</li>
 <li><a href="https://www.ti.com/lit/ds/symlink/lp2951-q1.pdf">TI LP2951</a>: Adjustable Micropower Voltage Regulators, 5V output</li>
 <li><a href="http://ww1.microchip.com/downloads/en/devicedoc/41202c.pdf">Microchip PIC16F684</a>: 8-bit microcontroller</li>
 </ul>
-
 <p>I connected my development intercom unit to <a href="/posts/2020-11-30-scs-processing-microcontroller/#scs-lab-setup">my SCS bus lab
 setup</a> and used
 my oscilloscope to confirm expected signal levels based on the pinout from the
 IC datasheets.</p>
-
 <p>I settled on the following 4 relatively easily accessible signals and soldered
 jumper wires to them:</p>
-
 <ul>
 <li><code>5V</code> and <code>GND</code>: 5V, 100mA. Our QT Py microcontroller uses 7mA.</li>
 <li><code>OPEN5V</code>: activates the button which unlocks the door</li>
 <li><code>SCSRX5V</code>: converted SCS signal</li>
 </ul>
-
 
 
 
@@ -355,19 +335,18 @@ jumper wires to them:</p>
 
 
 
-
 <h2 id="converting-the-signals">Converting the signals</h2>
-
 <p>Because the BTicino intercom units runs at 5V, but more modern microcontrollers
 run at 3.3V, we need to convert between the two voltages:</p>
-
 <ol>
-<li><p>We need to convert a 3.3V signal to <code>OPEN5V</code> to trigger opening the door.</p></li>
-
-<li><p>We need to convert <code>SCSRX5V</code> signal to 3.3V so that I can use an ESP32
-microcontroller to read the signal and place it on MQTT.</p></li>
+<li>
+<p>We need to convert a 3.3V signal to <code>OPEN5V</code> to trigger opening the door.</p>
+</li>
+<li>
+<p>We need to convert <code>SCSRX5V</code> signal to 3.3V so that I can use an ESP32
+microcontroller to read the signal and place it on MQTT.</p>
+</li>
 </ol>
-
 <p>Here’s the corresponding schematic:</p>
 
 
@@ -384,10 +363,9 @@ microcontroller to read the signal and place it on MQTT.</p></li>
 
 
 
-
 <a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/schematic.png"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/schematic_hucc6cb59bde9ea030d5dc2bcd00b21a79_47323_1200x0_resize_box_2.png 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/schematic_hucc6cb59bde9ea030d5dc2bcd00b21a79_47323_1800x0_resize_box_2.png 3x"
-  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/schematic_hucc6cb59bde9ea030d5dc2bcd00b21a79_47323_600x0_resize_box_2.png"
+  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/schematic_hucc6cb59bde9ea030d5dc2bcd00b21a79_47323_1200x0_resize_box_3.png 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/schematic_hucc6cb59bde9ea030d5dc2bcd00b21a79_47323_1800x0_resize_box_3.png 3x"
+  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/schematic_hucc6cb59bde9ea030d5dc2bcd00b21a79_47323_600x0_resize_box_3.png"
   alt="schematic" title="schematic"
   width="600"
   height="564"
@@ -397,36 +375,35 @@ microcontroller to read the signal and place it on MQTT.</p></li>
 
 
 
-
 <h2 id="microcontroller-selection">Microcontroller selection</h2>
-
 <p>I eventually decided to task a dedicated microcontroller with the signal
 conversion, instead of having the WiFi-enabled microcontroller do everything,
 for multiple reasons:</p>
-
 <ul>
-<li><p>Reliability. It turns out that using a hardware analog comparator results in a
+<li>
+<p>Reliability. It turns out that using a hardware analog comparator results in a
 much higher signal quality than continuously sampling an ADC yourself, even
 when using the ESP32’s <a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/ulp.html">ULP (Ultra Low Power)
 co-processor</a>
-to do the sampling.</p></li>
-
-<li><p>Easy implementation. Converting an SCS signal to a serial signal is literally
+to do the sampling.</p>
+</li>
+<li>
+<p>Easy implementation. Converting an SCS signal to a serial signal is literally
 <a href="/posts/2020-11-30-scs-processing-microcontroller/#analog-comparator-modification">a single <code>delayMicroseconds(20);</code> call in the right
 place</a>. Having
 a whole microcontroller for only this task eliminates any concurrency
 concerns. I have not had to debug or change the software even once in the last
-few months.</p></li>
-
-<li><p>Easy debugging/introspection. I can connect a standard USB-to-serial adapter
+few months.</p>
+</li>
+<li>
+<p>Easy debugging/introspection. I can connect a standard USB-to-serial adapter
 and verify the signal is read correctly. This quickly narrows down issues on
 either side of the serial interface. Issues with the microcontroller side can
-be reproduced by sending serial data.</p></li>
+be reproduced by sending serial data.</p>
+</li>
 </ul>
-
 <p>Here are the 2 microcontrollers I’m using in this project, plus the Teensy I
 used previously:</p>
-
 <table>
 <thead>
 <tr>
@@ -436,7 +413,6 @@ used previously:</p>
 <th>Price</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td><a href="https://www.pjrc.com/store/teensy40.html">Teensy 4.0</a></td>
@@ -444,14 +420,12 @@ used previously:</p>
 <td>yes</td>
 <td>19 USD</td>
 </tr>
-
 <tr>
 <td><a href="https://www.adafruit.com/product/4600">Adafruit QT Py</a></td>
 <td>no</td>
 <td>yes</td>
 <td>6 USD</td>
 </tr>
-
 <tr>
 <td><a href="https://www.tinypico.com/">TinyPICO</a></td>
 <td>yes</td>
@@ -460,27 +434,21 @@ used previously:</p>
 </tr>
 </tbody>
 </table>
-
 <p>If ESP32 boards such as the TinyPICO had a hardware Analog Comparator, I would
 likely use just one microcontroller, but keep the serial interface on a GPIO for
 easy debugging.</p>
-
 <h3 id="why-the-adafruit-qt-py">Why the Adafruit QT Py?</h3>
-
 <p>The minimal function we need for our signal conversion device is to convert an
 SCS signal (5V) to a serial signal (3.3V). For this conversion, we need a
 hardware analog comparator and an output GPIO that we can drive independently,
 so that we can modify the signal.</p>
-
 <p>Additionally, the device should use as little power as possible so that it can
 comfortably fit in the left-over energy budget of the intercom unit’s power
 supply.</p>
-
 <p>The smallest microcontroller I know of that comes with a hardware analog
 comparator is the <a href="https://www.adafruit.com/product/4600">Adafruit QT Py</a>. It’s
 a 32-bit Cortex M0+ (SAMD21) that can be programmed using the Arduino IDE, or
 MicroPython (hence the name).</p>
-
 
 
 
@@ -508,20 +476,15 @@ MicroPython (hence the name).</p>
 
 
 
-
 <p>There are other SAMD21 boards with the same form factor, such as the <a href="https://wiki.seeedstudio.com/Seeeduino-XIAO/">Seeeduino
 XIAO</a>.</p>
-
 <h3 id="why-the-tinypico-esp32-board">Why the TinyPICO ESP32 board?</h3>
-
 <p>When looking for a WiFi-enabled microcontroller, definitely go with something
 ESP32-based!</p>
-
 <p>The community around the Espressif ESP32 (and its predecessor ESP8266) is
 definitely one of its biggest pluses: there are tons of Arduino sketches,
 troubleshooting tips, YouTube videos, reference documentation, forum posts, and
 so on.</p>
-
 <p>The ESPs have been around since ≈2014, so many (largely-compatible) boards are
 available. In fact, I started this project on an <a href="https://m5stack.com/collections/m5-core/products/basic-core-iot-development-kit">M5Stack ESP32 Basic Core IoT
 Development
@@ -532,10 +495,8 @@ Board</a> and ultimately ported it to the
 microcontrollers was really smooth: the only adjustments were pin numbers and
 dropping in a TinyPICO helper library for its RGB LED, which I chose to use as a
 power LED.</p>
-
 <p>I chose the TinyPICO ESP32 board specifically for its small form factor and
 convenience:</p>
-
 
 
 
@@ -563,32 +524,24 @@ convenience:</p>
 
 
 
-
 <p>The TinyPICO is only 18mm × 32mm, slightly smaller than the Teensy 4.0’s 18mm × 35mm.</p>
-
 <p>In comparison, the <a href="https://www.adafruit.com/product/4172">Adafruit HUZZAH32 breakout
 board</a> is gigantic with its 25mm ×
 44mm. And that’s without the extra USB-to-serial adapter (FT232H in the picture
 above) you need for programming, serial console and powering the board!</p>
-
 <p>The TinyPICO does not need an extra adapter. You can plug it in and program it
 immediately, just like the Teensy!</p>
-
 <p>I’d like it if the next revision of the TinyPICO switched from Micro USB to USB
 C.</p>
-
 <p>If the TinyPICO is not for you (or unavailable), search for other boards that
 contain the ESP32-PICO-D4 chip. For example, <a href="https://www.dfrobot.com/product-1941.html">DFRobot’s
 ESP32-PICO-KIT</a> or <a href="https://www.amazon.de/Espressif-ESP32-ESP32-PICO-KIT-Board-ESP32-PICO-D4/dp/B07J1YMB8R">Espressif’s own
 ESP32-PICO-KIT</a>.</p>
-
 <h2 id="prototype">Prototype</h2>
-
 <p>After testing everything on a breadboard, I soldered a horizontal pin header
 onto the QT Py, connected it to my Sparkfun level shifter board and soldered the
 remaining voltage divider components “flying”. The result barely fit into the
 case, but worked flawlessly for weeks:</p>
-
 
 
 
@@ -616,17 +569,13 @@ case, but worked flawlessly for weeks:</p>
 
 
 
-
 <h2 id="backpack-pcb-for-the-qt-py">Backpack PCB for the QT Py</h2>
-
 <p>After verifying this prototype works well in practice, I miniaturized it into a
 “backpack” PCB.</p>
-
 <p>The backpack contains all the same parts as the prototype, but with fewer bulky
 wires and connectors, and using only SMD parts. The build you see below uses
 0602 SMD parts, but if I made another revision I would probably chose the larger
 0805 parts for easier soldering.</p>
-
 <aside class="admonition note">
   <div class="note-container">
     <div class="note-icon">
@@ -642,7 +591,6 @@ wires and connectors, and using only SMD parts. The build you see below uses
 easily do that from the QT Py itself and skip the TinyPICO.</div>
   </div>
 </aside>
-
 
 
 
@@ -686,7 +634,6 @@ easily do that from the QT Py itself and skip the TinyPICO.</div>
 
 
 
-
 <a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack-pcb.jpg"><img
   srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack-pcb_hu7c3948370bbbb36c4b0624284e90cf21_991666_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack-pcb_hu7c3948370bbbb36c4b0624284e90cf21_991666_1800x0_resize_q75_box.jpg 3x"
   src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack-pcb_hu7c3948370bbbb36c4b0624284e90cf21_991666_600x0_resize_q75_box.jpg"
@@ -699,15 +646,12 @@ easily do that from the QT Py itself and skip the TinyPICO.</div>
 
 
 
-
 <h2 id="assembly">Assembly</h2>
-
 <p>To save some space in the intercom unit case, I decided to solder the jumper
 wires directly onto the TinyPICO instead of using a pin header. I could have
 gone one step further by cutting the wires at length and soldering them directly
 on both ends, without any connectors, but I wanted to be able to easily unplug
 and re-combine the parts of this project.</p>
-
 
 
 
@@ -735,9 +679,7 @@ and re-combine the parts of this project.</p>
 
 
 
-
 <p>From top to bottom, I made the following connections:</p>
-
 <table>
 <thead>
 <tr>
@@ -746,62 +688,52 @@ and re-combine the parts of this project.</p>
 <th>Function</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>25</td>
 <td><span style="background-color: #ff4136; padding: 0 .5em 0 .5em">red</span></td>
 <td><code>SCSRX_3V3</code></td>
 </tr>
-
 <tr>
 <td>27</td>
 <td><span style="background-color: #2ecc40; padding: 0 .5em 0 .5em">green</span></td>
 <td><code>OPEN_3V3</code></td>
 </tr>
-
 <tr>
 <td>15</td>
 <td><span style="background-color: #0074d9; color: white; padding: 0 .5em 0 .5em">blue</span></td>
 <td>Nuki Opener blue cable</td>
 </tr>
-
 <tr>
 <td>14</td>
 <td><span style="background-color: #ffdc00; padding: 0 .5em 0 .5em">yellow</span></td>
 <td>Nuki Opener yellow cable</td>
 </tr>
-
 <tr>
 <td>4</td>
 <td><span style="background-color: #b10dc9; color: white; padding: 0 .5em 0 .5em">purple</span></td>
 <td>floor ring button pushed</td>
 </tr>
-
 <tr>
 <td>3V3</td>
 <td><span style="background-color: white; padding: 0 .5em 0 .5em">white</span></td>
 <td>3.3V for the floor ring button</td>
 </tr>
-
 <tr>
 <td>5V</td>
 <td><span style="background-color: #ff851b; padding: 0 .5em 0 .5em">orange</span></td>
 <td>power for the TinyPICO</td>
 </tr>
-
 <tr>
 <td>GND</td>
 <td><span style="background-color: brown; color: white; padding: 0 .5em 0 .5em">brown</span></td>
 <td>ground for the TinyPICO</td>
 </tr>
-
 <tr>
 <td>GND</td>
 <td><span style="background-color: brown; color: white; padding: 0 .5em 0 .5em">brown</span></td>
 <td>ground to the QT Py</td>
 </tr>
-
 <tr>
 <td>GND</td>
 <td><span style="background-color: brown; color: white; padding: 0 .5em 0 .5em">brown</span></td>
@@ -809,12 +741,9 @@ and re-combine the parts of this project.</p>
 </tr>
 </tbody>
 </table>
-
 <p>The TinyPICO USB port is still usable for updating the software and serial console
 debugging.</p>
-
 <p>Here’s the TinyPICO connected to the QT Py inside the intercom unit:</p>
-
 
 
 
@@ -842,12 +771,10 @@ debugging.</p>
 
 
 
-
 <p>The QT Py is powered by the intercom unit’s supply, and the TinyPICO I’m
 powering with an external USB power supply and a cut-open USB cable. This allows
 me to route the jumper wires through the intercom unit’s hole in the back,
 through which a USB plug doesn’t fit:</p>
-
 
 
 
@@ -875,58 +802,42 @@ through which a USB plug doesn’t fit:</p>
 
 
 
-
-<h2 id="software-artifacts">Software / Artifacts</h2>
-
+<h2 id="software--artifacts">Software / Artifacts</h2>
 <p>You can find the Arduino sketches and KiCad files for this project at
 <a href="https://github.com/stapelberg/intercom-backpack">https://github.com/stapelberg/intercom-backpack</a></p>
-
 <p>For debugging, I found it useful to publish every single byte received from the
 SCS bus on the <code>doorbell/debug/scsrx</code> MQTT topic. Full SCS telegrams are
 published to <code>doorbell/events/scs</code>, so by observing both, you can verify that
 retransmission suppression and SCS decoding work correctly.</p>
-
 <p>Similarly, signaling a doorbell ring to the Nuki Opener can be debugged by
 sending a message to MQTT topic <code>doorbell/debug/cmd/ring</code>.</p>
-
 <p>Initially, it wasn’t clear to me whether the WiFi library would maintain the
 connection indefinitely. After observing my microcontroller eventually
 disappearing from my network, I added the <code>taskreconnect</code> FreeRTOS task, and
 things have been stable since.</p>
-
 <h2 id="nuki-opener-verdict">Nuki Opener: verdict</h2>
-
 <p>I now have a Nuki Opener running next to my own microcontroller, so I can see
 how well it works.</p>
-
 <h3 id="setup">setup</h3>
-
 <p>Setting up the Nuki is the worst part: their colorful cable is super flimsy and
 loose, often losing contact. They should definitely switch to a cable with a
 mechanical lock.</p>
-
 <p>The software part of the setup is okay, but the compatibility with the SCS bus
 is poor: I couldn’t get the device to work at all (see my initial post), and had
 to resort to using my own microcontroller to drive the Nuki in analogue mode.</p>
-
 <p>I’m disappointed that the Nuki developers aren’t interested in improving their
 device’s compatibility and reliability with the SCS bus. They seem to
 capture/replay the entire signal (including re-transmissions) instead of
 actually decoding the signal.</p>
-
 <h3 id="in-my-day-to-day">in my day-to-day</h3>
-
 <p>The push notifications I get on my iPhone from the Nuki are often
 delayed. Usually the delay is a few seconds, but sometimes notifications arrive
 hours later or just don’t arrive at all!</p>
-
 <p>While the push notifications are sent from a Nuki server and hence need the
 internet to function, the Nuki Bridge (translating Bluetooth Low Energey from
 the Nuki Opener to WiFi) allows configuring notifications in the local network
 via web hooks.</p>
-
 <p>The Nuki Bridge’s notifications are much more reliable in my experience.</p>
-
 <p>People sometimes ask why I use the Nuki Opener at all, given that I have some
 infrastructure of my own, too. While opening the door and receiving
 notifications is something I can do without the Nuki, too, I don’t want to spend
@@ -934,46 +845,37 @@ my spare time re-implementing the Nuki app (on multiple platforms) with its geo
 fencing, friend invitations, ring to open, etc. In addition, the Nuki Opener
 physical device has a nice ring sound and large push button to open the door,
 both of which are convenient.</p>
-
 <h2 id="conclusion">Conclusion</h2>
-
 <p>My intercom is now much smarter! Doorbell notifications make their way to my
 various devices via MQTT, and I can conveniently open the door from any device,
 as opposed to rushing to the intercom unit in the hallway.</p>
-
 <p>Compared to the previous proof-of-concepts and development installations, I feel
 more confident in the current solution because it re-uses the intercom unit for
 the nitty-gritty SCS bus communication details.</p>
-
 <p>The overall strategy should be widely applicable regardless of the specific
 intercom vendor/unit you have. Be sure to buy your own unit (don’t solder into
 your landlord’s intercom unit!) and test in a separate lab setup first, of
 course!</p>
-
 <h2 id="appendix-a-troubleshooting">Appendix A: Troubleshooting</h2>
-
 <p>To debug the problem of ring detection no longer working, check:</p>
-
 <ul>
 <li>Is the ESP32 still working?
-
 <ul>
 <li><code>ping doorbelltp</code></li>
 <li><code>mosquitto_pub -h dr -t 'doorbell/debug/cmd/ring' -m '3'</code> should signal a
 ring to the Nuki Opener and result in events on the MQTT bus</li>
-</ul></li>
+</ul>
+</li>
 <li>Is the QT Py still working?
-
 <ul>
 <li>Its power LED should be off. If the LED is on, the QT Py is in the bootloader.</li>
 <li>Unplug and replug the <code>+5V</code> wire to the QT Py, see if that fixes it.</li>
 <li>Connect a USB-to-serial adapter and see if triggering a door open results in SCS bytes on the serial interface.</li>
 <li>See if ringing the bell results in SCS bytes on the serial interface. If no, re-solder cable to <code>SCSRX5V</code>.</li>
-</ul></li>
 </ul>
-
+</li>
+</ul>
 <p>To debug the problem of door opening no longer working, check:</p>
-
 <ul>
 <li>Does it work when triggering it via the button on the BTicino? If yes, re-solder cable to <code>OPEN5V</code>.</li>
 </ul>
@@ -986,30 +888,29 @@ ring to the Nuki Opener and result in events on the MQTT bus</li>
     <strong>Table Of Contents</strong>
 
     <nav class="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#background">Background</a></li>
-<li><a href="#finding-the-signals">Finding the signals</a></li>
-<li><a href="#converting-the-signals">Converting the signals</a></li>
-<li><a href="#microcontroller-selection">Microcontroller selection</a>
-<ul>
-<li><a href="#why-the-adafruit-qt-py">Why the Adafruit QT Py?</a></li>
-<li><a href="#why-the-tinypico-esp32-board">Why the TinyPICO ESP32 board?</a></li>
-</ul></li>
-<li><a href="#prototype">Prototype</a></li>
-<li><a href="#backpack-pcb-for-the-qt-py">Backpack PCB for the QT Py</a></li>
-<li><a href="#assembly">Assembly</a></li>
-<li><a href="#software-artifacts">Software / Artifacts</a></li>
-<li><a href="#nuki-opener-verdict">Nuki Opener: verdict</a>
-<ul>
-<li><a href="#setup">setup</a></li>
-<li><a href="#in-my-day-to-day">in my day-to-day</a></li>
-</ul></li>
-<li><a href="#conclusion">Conclusion</a></li>
-<li><a href="#appendix-a-troubleshooting">Appendix A: Troubleshooting</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#background">Background</a></li>
+    <li><a href="#finding-the-signals">Finding the signals</a></li>
+    <li><a href="#converting-the-signals">Converting the signals</a></li>
+    <li><a href="#microcontroller-selection">Microcontroller selection</a>
+      <ul>
+        <li><a href="#why-the-adafruit-qt-py">Why the Adafruit QT Py?</a></li>
+        <li><a href="#why-the-tinypico-esp32-board">Why the TinyPICO ESP32 board?</a></li>
+      </ul>
+    </li>
+    <li><a href="#prototype">Prototype</a></li>
+    <li><a href="#backpack-pcb-for-the-qt-py">Backpack PCB for the QT Py</a></li>
+    <li><a href="#assembly">Assembly</a></li>
+    <li><a href="#software--artifacts">Software / Artifacts</a></li>
+    <li><a href="#nuki-opener-verdict">Nuki Opener: verdict</a>
+      <ul>
+        <li><a href="#setup">setup</a></li>
+        <li><a href="#in-my-day-to-day">in my day-to-day</a></li>
+      </ul>
+    </li>
+    <li><a href="#conclusion">Conclusion</a></li>
+    <li><a href="#appendix-a-troubleshooting">Appendix A: Troubleshooting</a></li>
+  </ul>
 </nav>
   </div>
 </div>

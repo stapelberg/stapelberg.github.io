@@ -216,41 +216,36 @@ As a reminder, conceptually the fiber link is built using two media converters f
   <details class="ms_toc_details">
     <summary>Table of contents</summary>
     <nav class="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#replacing-the-media-converters-with-mikrotik-switches">Replacing the media converters with Mikrotik switches</a></li>
-<li><a href="#fiber-module-upgrade">Fiber module upgrade</a></li>
-<li><a href="#hardware-sourcing">Hardware sourcing</a>
-<ul>
-<li><a href="#fs-fiber-store-order">FS (Fiber Store) order</a></li>
-<li><a href="#digitec-order">digitec order</a></li>
-<li><a href="#misc-order">misc order</a></li>
-</ul></li>
-<li><a href="#mikrotik-switch-setup">Mikrotik switch setup</a></li>
-<li><a href="#network-card-setup-linux">Network card setup (Linux)</a></li>
-<li><a href="#benchmarking-batch-transfers">Benchmarking batch transfers</a>
-<ul>
-<li><a href="#iperf3-speed-test">iperf3 speed test</a></li>
-<li><a href="#http-speed-test">HTTP speed test</a></li>
-</ul></li>
-<li><a href="#conclusion">Conclusion</a></li>
-<li><a href="#appendix-a-switching-from-rj45-sfp-modules-to-direct-attach-cables">Appendix A: Switching from RJ45 SFP+ modules to Direct Attach Cables</a></li>
-<li><a href="#appendix-b-network-card-setup-linux-with-intel-x550-t2">Appendix B: Network card setup (Linux) with Intel X550-T2</a></li>
-<li><a href="#appendix-c-bios-update-for-mellanox-connectx-3">Appendix C: BIOS update for Mellanox ConnectX-3</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#replacing-the-media-converters-with-mikrotik-switches">Replacing the media converters with Mikrotik switches</a></li>
+    <li><a href="#fiber-module-upgrade">Fiber module upgrade</a></li>
+    <li><a href="#hardware-sourcing">Hardware sourcing</a>
+      <ul>
+        <li><a href="#fs-fiber-store-order">FS (Fiber Store) order</a></li>
+        <li><a href="#digitec-order">digitec order</a></li>
+        <li><a href="#misc-order">misc order</a></li>
+      </ul>
+    </li>
+    <li><a href="#mikrotik-switch-setup">Mikrotik switch setup</a></li>
+    <li><a href="#network-card-setup-linux">Network card setup (Linux)</a></li>
+    <li><a href="#benchmarking-batch-transfers">Benchmarking batch transfers</a>
+      <ul>
+        <li><a href="#iperf3-speed-test">iperf3 speed test</a></li>
+        <li><a href="#http-speed-test">HTTP speed test</a></li>
+      </ul>
+    </li>
+    <li><a href="#conclusion">Conclusion</a></li>
+    <li><a href="#appendix-a-switching-from-rj45-sfp-modules-to-direct-attach-cables">Appendix A: Switching from RJ45 SFP+ modules to Direct Attach Cables</a></li>
+    <li><a href="#appendix-b-network-card-setup-linux-with-intel-x550-t2">Appendix B: Network card setup (Linux) with Intel X550-T2</a></li>
+    <li><a href="#appendix-c-bios-update-for-mellanox-connectx-3">Appendix C: BIOS update for Mellanox ConnectX-3</a></li>
+  </ul>
 </nav>
   </details>
-  
-
-<p>After <a href="/posts/2020-08-09-fiber-link-home-network/">adding a fiber link to my home
+  <p>After <a href="/posts/2020-08-09-fiber-link-home-network/">adding a fiber link to my home
 network</a>, I am upgrading that link
 from 1 Gbit/s to 10 Gbit/s.</p>
-
 <p>As a reminder, conceptually the fiber link is built using two media converters
 from/to ethernet:</p>
-
 
 
 
@@ -278,9 +273,7 @@ from/to ethernet:</p>
 
 
 
-
 <p>Schematically, this is what’s connected to both ends:</p>
-
 
 
 
@@ -293,30 +286,26 @@ from/to ethernet:</p>
   loading="lazy"></a>
 
 
-
 <p>All links are 1 Gbit/s, so it’s easy to see that, for example, transfers between
 chuchi↔router7 and storage2↔midna cannot both use 1 Gbit/s at the same time.</p>
-
 <p>This upgrade serves 2 purposes:</p>
-
 <ol>
-<li><p><strong>Raise the floor to 1 Gbit/s end-to-end</strong>: Ensure that serving large files
+<li>
+<p><strong>Raise the floor to 1 Gbit/s end-to-end</strong>: Ensure that serving large files
 (e.g. distri Linux images and packages) does no longer impact, and is no
 longer impacted by, other bandwidth flows that also use this transfer link in
-my home network, e.g. daily backups.</p></li>
-
-<li><p><strong>Raise the ceiling to 10 Gbit/s</strong>: Make it possible to selectively upgrade
-Linux PCs on either end of the link to 10 Gbit/s peak bandwidth.</p></li>
+my home network, e.g. daily backups.</p>
+</li>
+<li>
+<p><strong>Raise the ceiling to 10 Gbit/s</strong>: Make it possible to selectively upgrade
+Linux PCs on either end of the link to 10 Gbit/s peak bandwidth.</p>
+</li>
 </ol>
-
 <p>Note that the internet uplink remains untouched at 1 Gbit/s — only transfers
 within the home network can happen at 10 Gbit/s.</p>
-
 <h2 id="replacing-the-media-converters-with-mikrotik-switches">Replacing the media converters with Mikrotik switches</h2>
-
 <p>We first replace both media converters and switches with a <a href="https://mikrotik.com/product/crs305_1g_4s_in">Mikrotik
 CRS305-1G-4S+IN</a>.</p>
-
 
 
 
@@ -344,35 +333,26 @@ CRS305-1G-4S+IN</a>.</p>
 
 
 
-
 <p>This device <a href="https://www.digitec.ch/de/s1/product/mikrotik-crs305-1g-4sin-5ports-switch-9876046">costs 149 CHF on digitec</a> and comes with 5 ports:</p>
-
 <ul>
 <li>1 × RJ45 Ethernet port for management, can be used as a regular 1 Gbit/s port.</li>
 <li>4 × SFP+ ports</li>
 </ul>
-
 <p>Each SFP+ port can be used with either an RJ-45 Ethernet or a fiber SFP+ module,
 but beware! As <a href="https://twitter.com/Nexus2kSwiss/status/1394395280120897544">Nexus2kSwiss points out on
 twitter</a>, the
 Mikrotik supports <strong>at most 2 RJ-45 SFPs at a time</strong>!</p>
-
 <h2 id="fiber-module-upgrade">Fiber module upgrade</h2>
-
 <p>I’m using 10 Gbit/s fiber SFP+ modules for the fiber link between my kitchen and
 living room.</p>
-
 <p>To make use of the 10 Gbit/s link between the switches, all devices that should
 get their guaranteed 1 Gbit/s end-to-end connection need to be connected
 directly to a Mikrotik switch.</p>
-
 <p>I’m connecting the PCs to the switch using Direct Attach Cables (DAC) where
 possible. The advantage of DAC cables over RJ45 SFP+ modules is their lower
 power usage and heat.</p>
-
 <p>The resulting list of SFP modules used in the two Mikrotik switches looks like
 so:</p>
-
 <table>
 <thead>
 <tr>
@@ -383,7 +363,6 @@ so:</p>
 <th>Mikrotik 2 SFP</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>chuchi</td>
@@ -392,7 +371,6 @@ so:</p>
 <td>10 Gbit/s DAC</td>
 <td>midna</td>
 </tr>
-
 <tr>
 <td>storage2</td>
 <td>1 Gbit/s  RJ45</td>
@@ -400,7 +378,6 @@ so:</p>
 <td>1 Gbit/s RJ45</td>
 <td>router7</td>
 </tr>
-
 <tr>
 <td></td>
 <td>10 Gbit/s BiDi</td>
@@ -410,19 +387,14 @@ so:</p>
 </tr>
 </tbody>
 </table>
-
 <h2 id="hardware-sourcing">Hardware sourcing</h2>
-
 <p>The total cost of this upgrade is 676 CHF, with the biggest chunk spent on the
 Mellanox ConnectX-3 network cards and MikroTik switches.</p>
-
 <h3 id="fs-fiber-store-order">FS (Fiber Store) order</h3>
-
 <p><a href="https://www.FS.COM">FS.COM</a> was my go-to source for anything
 fiber-related. Everything they have is very affordable, and products in stock at
 their German warehouse arrive in Switzerland (and presumably other European
 countries, too) within the same week.</p>
-
 <table>
 <thead>
 <tr>
@@ -431,26 +403,22 @@ countries, too) within the same week.</p>
 <th>name</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>1 ×</td>
 <td>34 CHF</td>
 <td><a href="https://www.fs.com/de/products/74681.html">Generic Compatible 10GBASE-BX BiDi SFP+ 1270nm-TX/1330nm-RX 10km DOM Transceiver Module, FS P/N: SFP-10G-BX #74681</a></td>
 </tr>
-
 <tr>
 <td>1 ×</td>
 <td>34 CHF</td>
 <td><a href="https://www.fs.com/de/products/74682.html">Generic Compatible 10GBASE-BX BiDi SFP+ 1330nm-TX/1270nm-RX 10km DOM Transceiver Module, FS P/N: SFP-10G-BX #74682</a></td>
 </tr>
-
 <tr>
 <td>2 ×</td>
 <td>14 CHF</td>
 <td><a href="https://www.fs.com/de/products/74621.html">3m Generic Compatible 10G SFP+ Passive Direct Attach Copper Twinax Cable</a></td>
 </tr>
-
 <tr>
 <td>0 ×</td>
 <td>56 CHF</td>
@@ -458,14 +426,11 @@ countries, too) within the same week.</p>
 </tr>
 </tbody>
 </table>
-
 <h3 id="digitec-order">digitec order</h3>
-
 <p>There are a few items that <a href="https://www.FS.COM">FS.COM</a> doesn’t stock. These I
 bought at <a href="https://www.digitec.ch/">digitec</a>, a big and popular electronics
 store in Switzerland. My thinking is that if products are available at digitec,
 they most likely are available at your preferred big electronics store, too.</p>
-
 <table>
 <thead>
 <tr>
@@ -474,7 +439,6 @@ they most likely are available at your preferred big electronics store, too.</p>
 <th>name</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>2 ×</td>
@@ -483,13 +447,9 @@ they most likely are available at your preferred big electronics store, too.</p>
 </tr>
 </tbody>
 </table>
-
 <h3 id="misc-order">misc order</h3>
-
 <p>The Mellanox cards are not as widely available as I’d like.</p>
-
 <p>I’m waiting for an FS.COM card to arrive, which might be a better choice.</p>
-
 <table>
 <thead>
 <tr>
@@ -498,7 +458,6 @@ they most likely are available at your preferred big electronics store, too.</p>
 <th>name</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>2 ×</td>
@@ -507,38 +466,34 @@ they most likely are available at your preferred big electronics store, too.</p>
 </tr>
 </tbody>
 </table>
-
 <h2 id="mikrotik-switch-setup">Mikrotik switch setup</h2>
-
 <p>I want to use my switches only as switches, not for any routing or other layer 3
 features that might reduce bandwidth, so I first reboot the <a href="https://mikrotik.com/product/crs305_1g_4s_in">MikroTik
 CRS305-1G-4S+</a> into SwOS:</p>
-
 <ol>
-<li><p>In the web interface menu, navigate to <em>System → Routerboard →
+<li>
+<p>In the web interface menu, navigate to <em>System → Routerboard →
 Settings</em>, open the <em>Boot OS</em> drop-down and select option
-<em>SwOS</em>.</p></li>
-
-<li><p>In the web interface menu, navigate to <em>System → Reboot</em>.</p></li>
-
-<li><p>After the device rebooted, change the hostname which was reset to <code>MikroTik</code>.</p></li>
+<em>SwOS</em>.</p>
+</li>
+<li>
+<p>In the web interface menu, navigate to <em>System → Reboot</em>.</p>
+</li>
+<li>
+<p>After the device rebooted, change the hostname which was reset to <code>MikroTik</code>.</p>
+</li>
 </ol>
-
 <p>Next, upgrade the firmware to 2.12 to fix a weird issue with certain
 combinations of SFP modules (SFP-10G-BX in SFP1, SFP-10G-T in SFP2):</p>
-
 <ol>
 <li>In the SwOS web interface, select the <em>Upgrade</em> tab, then click
 <em>Download &amp; Upgrade</em>.</li>
 </ol>
-
 <h2 id="network-card-setup-linux">Network card setup (Linux)</h2>
-
 <p>After booting with the Mellanox ConnectX3 in a PCIe slot, the card should show
 up in <a href="https://manpages.debian.org/dmesg.8"><code>dmesg(8)</code></a>
 :</p>
-
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">mlx4_core: Mellanox ConnectX core driver v4.0-0
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">mlx4_core: Mellanox ConnectX core driver v4.0-0
 mlx4_core: Initializing 0000:03:00.0
 mlx4_core 0000:03:00.0: DMFS high rate steer mode is: disabled performance optimized steering
 <span style="display:block;width:100%;background-color:#d8d8d8">mlx4_core 0000:03:00.0: 31.504 Gb/s available PCIe bandwidth (8.0 GT/s PCIe x4 link)
@@ -553,12 +508,10 @@ mlx4_core 0000:03:00.0 enp3s0: renamed from eth0
 &lt;mlx4_ib&gt; mlx4_ib_add: counter index 1 for port 1 allocated 1
 mlx4_en: enp3s0: Steering Mode 1
 mlx4_en: enp3s0: Link Up</code></pre></div>
-
 <p>Another way to verify the device is running at maximum speed on the computer’s
 PCIe bus, is to ensure <code>LnkSta</code> matches <code>LnkCap</code> in the <a href="https://manpages.debian.org/lspci.8"><code>lspci(8)</code></a>
  output:</p>
-
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">% sudo lspci -vv
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">% sudo lspci -vv
 03:00.0 Ethernet controller: Mellanox Technologies MT27500 Family [ConnectX-3]
 	Subsystem: Mellanox Technologies Device 0055
 […]
@@ -571,11 +524,9 @@ PCIe bus, is to ensure <code>LnkSta</code> matches <code>LnkCap</code> in the <a
 <span style="display:block;width:100%;background-color:#d8d8d8">		LnkSta:	Speed 8GT/s (ok), Width x4 (ok)
 </span>			TrErr- Train- SlotClk+ DLActive- BWMgmt- ABWMgmt-
 […]</code></pre></div>
-
 <p>You can verify your network link is running at 10 Gbit/s using <a href="https://manpages.debian.org/ethtool.8"><code>ethtool(8)</code></a>
 :</p>
-
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">% sudo ethtool enp3s0
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">% sudo ethtool enp3s0
 Settings for enp3s0:
 	Supported ports: [ FIBRE ]
 	Supported link modes:   1000baseKX/Full
@@ -599,24 +550,18 @@ Settings for enp3s0:
         Current message level: 0x00000014 (20)
                                link ifdown
 	Link detected: yes</code></pre></div>
-
 <h2 id="benchmarking-batch-transfers">Benchmarking batch transfers</h2>
-
 <p>As mentioned in the introduction, routing 10 Gbit/s is out of scope in this
 article. If you’re interested in routing performance, check out Andree Toonk’s
 <a href="https://toonk.io/linux-kernel-and-measuring-network-throughput/index.html">post which confirms that Linux can route 10 Gbit/s at line
 rate</a>.</p>
-
 <p>The following sections cover individual batch transfers of large files, not many
 small flows.</p>
-
 <h3 id="iperf3-speed-test">iperf3 speed test</h3>
-
 <p>Out of the box, the speeds that <a href="https://manpages.debian.org/iperf3.1"><code>iperf3(1)</code></a>
  measures
 are decent:</p>
-
-<pre><code>chuchi % iperf3 --version
+<pre tabindex="0"><code>chuchi % iperf3 --version
 iperf 3.6 (cJSON 1.5.2)
 Linux chuchi 4.19.0-16-amd64 #1 SMP Debian 4.19.181-1 (2021-03-19) x86_64
 Optional features available: CPU affinity setting, IPv6 flow label, SCTP, TCP congestion algorithm setting, sendfile / zerocopy, socket pacing, authentication
@@ -649,37 +594,25 @@ Connecting to host 10.0.0.173, port 5201
 [  5]   0.00-10.00  sec  11.0 GBytes  9.40 Gbits/sec                  receiver
 
 iperf Done.
-</code></pre>
-
-<h3 id="http-speed-test">HTTP speed test</h3>
-
+</code></pre><h3 id="http-speed-test">HTTP speed test</h3>
 <p>Downloading a file from an <a href="https://manpages.debian.org/nginx.1"><code>nginx(1)</code></a>
  web server using <a href="https://manpages.debian.org/curl.1"><code>curl(1)</code></a>
  is fast, too:</p>
-
-<pre><code>% curl -o /dev/null http://chuchi.lan/distri/supersilverhaze/img/distri-disk.img.zst
+<pre tabindex="0"><code>% curl -o /dev/null http://chuchi.lan/distri/supersilverhaze/img/distri-disk.img.zst
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100  934M  100  934M    0     0  1118M      0 --:--:-- --:--:-- --:--:-- 1117M
-</code></pre>
-
-<p>Note that this download was served from RAM (Linux page cache). The next upgrade
+</code></pre><p>Note that this download was served from RAM (Linux page cache). The next upgrade
 I need to do in this machine is replace the SATA SSD with an NVMe SSD, because
 the disk is now the bottleneck.</p>
-
 <h2 id="conclusion">Conclusion</h2>
-
 <p>This was a pleasantly simple upgrade: plug in a bunch of new hardware and batch
 transfers become faster.</p>
-
 <p>The Mikrotik switch provides great value for money, and the Mellanox ConnectX-3
 cards work well, provided you can find them.</p>
-
 <h2 id="appendix-a-switching-from-rj45-sfp-modules-to-direct-attach-cables">Appendix A: Switching from RJ45 SFP+ modules to Direct Attach Cables</h2>
-
 <p>Originally, I connected all PCs to the MikroTik switches with RJ45 SFP+ modules
 for two reasons:</p>
-
 <ol>
 <li>I bought <a href="https://www.digitec.ch/de/s1/product/intel-x550-t2-pci-express-30-netzwerkadapter-5926807">Intel
 X550-T2</a>
@@ -687,13 +620,10 @@ PCIe 10 Gbit/s network cards that RJ45 as my first choice.</li>
 <li>The SFP+ modules are backwards-compatible and can be used with 1 Gbit/s RJ45
 devices, too, which makes for a nice incremental upgrade path.</li>
 </ol>
-
 <p>However, I later was made aware that the RJ45 SFP+ modules use significantly
 more power and run significantly hotter than Direct Attach Cables (DAC).</p>
-
 <p>I measured it: each RJ45 SFP+ module was causing my BiDi SFP+ module to run 5℃
 hotter!</p>
-
 
 
 
@@ -721,27 +651,19 @@ hotter!</p>
 
 
 
-
 <p>Around 06/02 I replaced one RJ45 SFP+ module with a Direct Attach Cable.</p>
-
 <p>Around 06/06 I replaced the remaining RJ45 SFP+ module with another Direct
 Attach Cable.</p>
-
 <p>As you can see, this caused a 10℃ drop in temperature of the BiDi SFP+ module.</p>
-
 <p>The MikroTik is still uncomfortably hot, making it hard to work with when it’s
 powered on.</p>
-
 <h2 id="appendix-b-network-card-setup-linux-with-intel-x550-t2">Appendix B: Network card setup (Linux) with Intel X550-T2</h2>
-
 <p>For reference, here is the Network card setup (Linux) section, but with the
 Intel X550-T2 that I previously used.</p>
-
 <p>After booting with the Intel X550-T2 in a PCIe slot, the card should show up in
 <a href="https://manpages.debian.org/dmesg.8"><code>dmesg(8)</code></a>
 :</p>
-
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">ixgbe: Intel(R) 10 Gigabit PCI Express Network Driver
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">ixgbe: Intel(R) 10 Gigabit PCI Express Network Driver
 ixgbe 0000:03:00.0: Multiqueue Enabled: Rx Queue count = 16, Tx Queue count = 16 XDP Queue count = 0
 <span style="display:block;width:100%;background-color:#d8d8d8">ixgbe 0000:03:00.0: 31.504 Gb/s available PCIe bandwidth (8.0 GT/s PCIe x4 link)
 </span>ixgbe 0000:03:00.0: MAC: 4, PHY: 0, PBA No: H86377-006
@@ -759,17 +681,14 @@ pps pps0: new PPS source ptp1
 ixgbe 0000:03:00.0: registered PHC device on enp3s0f0
 pps pps1: new PPS source ptp2
 ixgbe 0000:03:00.1: registered PHC device on enp3s0f1</code></pre></div>
-
 <p>I think if you only use 1 of the card’s 2 network ports, you might not hit any
 bottlenecks even when running the card only at <a href="https://en.wikipedia.org/wiki/PCI_Express#History_and_revisions">PCIe 3.0 ×2 link
 speed</a>, but I
 haven’t verified this!</p>
-
 <p>Another way to verify the device is running at maximum speed on the computer’s
 PCIe bus, is to ensure <code>LnkSta</code> matches <code>LnkCap</code> in the <a href="https://manpages.debian.org/lspci.8"><code>lspci(8)</code></a>
  output:</p>
-
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">% sudo lspci -vv
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">% sudo lspci -vv
 […]
 03:00.0 Ethernet controller: Intel Corporation Ethernet Controller 10G X550T (rev 01)
         Subsystem: Intel Corporation Ethernet Converged Network Adapter X550-T2
@@ -783,11 +702,9 @@ PCIe bus, is to ensure <code>LnkSta</code> matches <code>LnkCap</code> in the <a
 <span style="display:block;width:100%;background-color:#d8d8d8">                LnkSta: Speed 8GT/s (ok), Width x4 (ok)
 </span>                        TrErr- Train- SlotClk+ DLActive- BWMgmt- ABWMgmt-
 […]</code></pre></div>
-
 <p>You can verify your network link is running at 10 Gbit/s using <a href="https://manpages.debian.org/ethtool.8"><code>ethtool(8)</code></a>
 :</p>
-
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">% sudo ethtool enp3s0f1 
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">% sudo ethtool enp3s0f1 
 Settings for enp3s0f1:
 	Supported ports: [ TP ]
 	Supported link modes:   100baseT/Full
@@ -816,13 +733,10 @@ Settings for enp3s0f1:
         Current message level: 0x00000007 (7)
                                drv probe link
 	Link detected: yes</code></pre></div>
-
 <h2 id="appendix-c-bios-update-for-mellanox-connectx-3">Appendix C: BIOS update for Mellanox ConnectX-3</h2>
-
 <p>On my Supermicro X11SSZ-QF mainboard, the Mellanox ConnectX-3 would not
 establish a link. The Mellanox Linux kernel driver logged a number of errors:</p>
-
-<pre><code>kernel: mlx4_en: enp1s0: CQE error - cqn 0x8e, ci 0x0, vendor syndrome: 0x57 syndrome: 0x4
+<pre tabindex="0"><code>kernel: mlx4_en: enp1s0: CQE error - cqn 0x8e, ci 0x0, vendor syndrome: 0x57 syndrome: 0x4
 kernel: mlx4_en: enp1s0: Related WQE - qpn 0x20d, wqe index 0x0, wqe size 0x40
 kernel: mlx4_en: enp1s0: Scheduling port restart
 kernel: mlx4_core 0000:01:00.0: Internal error detected:
@@ -857,9 +771,7 @@ kernel: mlx4_core 0000:01:00.0: mlx4_pci_resume was called
 kernel: mlx4_core 0000:01:00.0: Multiple PFs not yet supported - Skipping PF
 kernel: mlx4_core 0000:01:00.0: mlx4_pci_resume: mlx4_load_one failed, err=-22
 kernel: pcieport 0000:00:1c.0: AER: device recovery successful
-</code></pre>
-
-<p>What helped was to update the X11SSZ-QF BIOS to the latest version.</p>
+</code></pre><p>What helped was to update the X11SSZ-QF BIOS to the latest version.</p>
 
 </div>
 
@@ -869,30 +781,29 @@ kernel: pcieport 0000:00:1c.0: AER: device recovery successful
     <strong>Table Of Contents</strong>
 
     <nav class="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#replacing-the-media-converters-with-mikrotik-switches">Replacing the media converters with Mikrotik switches</a></li>
-<li><a href="#fiber-module-upgrade">Fiber module upgrade</a></li>
-<li><a href="#hardware-sourcing">Hardware sourcing</a>
-<ul>
-<li><a href="#fs-fiber-store-order">FS (Fiber Store) order</a></li>
-<li><a href="#digitec-order">digitec order</a></li>
-<li><a href="#misc-order">misc order</a></li>
-</ul></li>
-<li><a href="#mikrotik-switch-setup">Mikrotik switch setup</a></li>
-<li><a href="#network-card-setup-linux">Network card setup (Linux)</a></li>
-<li><a href="#benchmarking-batch-transfers">Benchmarking batch transfers</a>
-<ul>
-<li><a href="#iperf3-speed-test">iperf3 speed test</a></li>
-<li><a href="#http-speed-test">HTTP speed test</a></li>
-</ul></li>
-<li><a href="#conclusion">Conclusion</a></li>
-<li><a href="#appendix-a-switching-from-rj45-sfp-modules-to-direct-attach-cables">Appendix A: Switching from RJ45 SFP+ modules to Direct Attach Cables</a></li>
-<li><a href="#appendix-b-network-card-setup-linux-with-intel-x550-t2">Appendix B: Network card setup (Linux) with Intel X550-T2</a></li>
-<li><a href="#appendix-c-bios-update-for-mellanox-connectx-3">Appendix C: BIOS update for Mellanox ConnectX-3</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#replacing-the-media-converters-with-mikrotik-switches">Replacing the media converters with Mikrotik switches</a></li>
+    <li><a href="#fiber-module-upgrade">Fiber module upgrade</a></li>
+    <li><a href="#hardware-sourcing">Hardware sourcing</a>
+      <ul>
+        <li><a href="#fs-fiber-store-order">FS (Fiber Store) order</a></li>
+        <li><a href="#digitec-order">digitec order</a></li>
+        <li><a href="#misc-order">misc order</a></li>
+      </ul>
+    </li>
+    <li><a href="#mikrotik-switch-setup">Mikrotik switch setup</a></li>
+    <li><a href="#network-card-setup-linux">Network card setup (Linux)</a></li>
+    <li><a href="#benchmarking-batch-transfers">Benchmarking batch transfers</a>
+      <ul>
+        <li><a href="#iperf3-speed-test">iperf3 speed test</a></li>
+        <li><a href="#http-speed-test">HTTP speed test</a></li>
+      </ul>
+    </li>
+    <li><a href="#conclusion">Conclusion</a></li>
+    <li><a href="#appendix-a-switching-from-rj45-sfp-modules-to-direct-attach-cables">Appendix A: Switching from RJ45 SFP+ modules to Direct Attach Cables</a></li>
+    <li><a href="#appendix-b-network-card-setup-linux-with-intel-x550-t2">Appendix B: Network card setup (Linux) with Intel X550-T2</a></li>
+    <li><a href="#appendix-c-bios-update-for-mellanox-connectx-3">Appendix C: BIOS update for Mellanox ConnectX-3</a></li>
+  </ul>
 </nav>
   </div>
 </div>

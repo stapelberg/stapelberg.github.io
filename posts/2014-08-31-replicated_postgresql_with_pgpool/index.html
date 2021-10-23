@@ -197,7 +197,7 @@
   </style>
   <details class="ms_toc_details">
     <summary>Table of contents</summary>
-    
+    <nav class="TableOfContents"></nav>
   </details>
   <p>
 I run multiple web services, mostly related to <a
@@ -205,7 +205,6 @@ href="http://i3wm.org/">i3wm.org</a>. All of them use PostgreSQL as their
 database, so the data that is stored in that PostgreSQL database is pretty
 important to me and the users of these services.
 </p>
-
 <p>
 Since a while now, I have been thinking about storing that data in a more
 reliable way. Currently, it is stored on a single server, and is backed up to
@@ -214,11 +213,9 @@ question has a RAID-1 of course, but still: the setup implies that if that one
 server dies, the last backup may be about a day old in the worst case, and also
 it could take me significant time to get the services back up.
 </p>
-
 <p>
 The areas in which I’d like to improve my setup are thus:
 </p>
-
 <ol>
 <li>
 <strong>Durability:</strong> In case the entire server dies, I want to have an
@@ -232,7 +229,6 @@ solutions typically are either fragile or require a higher number of servers
 than I’m willing to afford.
 </li>
 </ol>
-
 <p>
 For PostgreSQL, there are various settings and additional programs that you can
 use which will provide you with some sort of clustering/replication. There is
@@ -244,9 +240,7 @@ href="https://wiki.postgresql.org/wiki/Pgpool-II">pgpool2</a> because it seems
 robust and mature (yet under active development) to me, it is reasonably well
 documented and I think I roughly understand what it does under the covers.
 </p>
-
 <h3>The plan</h3>
-
 <p>
 I have two servers, located in different data centers, that I will use for this
 setup. The number of servers does not really matter, meaning you can easily add
@@ -257,7 +251,6 @@ quorums will not work with only two servers. As a consequence, master election
 is out of the question and a human will need to do the actual
 failover/recovery.
 </p>
-
 <p>
 Each of the two servers will run PostgreSQL, but only one of them will run
 pgpool2 at a time. The DNS records for e.g. faq.i3wm.org will point to the
@@ -268,14 +261,12 @@ secondary, but the secondary does not handle any user traffic. This could be
 accomplished by either not running the applications in question, or by having
 them connect to the pgpool2 on the primary.
 </p>
-
 <p>
 When a catastrophe happens, the DNS records will be switched to point to the
 old-secondary server, and pgpool2 will be started there. Once the old-primary
 server is available again, it will become the secondary server, so that in case
 of another catastrophe, the same procedure can be executed again.
 </p>
-
 <p>
 With a solution that involves only two servers, an often encountered problem
 are split-brain situations. This means both servers think they are primary,
@@ -288,28 +279,22 @@ solution for that is to either kill pgpool2 manually if possible, or have a
 tool that kills pgpool2 when it cannot verify that the DNS record points to the
 server.
 </p>
-
 <h3>Configuration</h3>
-
 <p>
 I apologize for the overly long lines in some places, but there does not seem
 to be a way to use line continuations in the PostgreSQL configuration file.
 </p>
-
 <h3>Installing and configuring PostgreSQL</h3>
-
 <p>
 The following steps need to be done on each database server, whereas pgpool2
 will only be installed on precisely one server.
 </p>
-
 <p>
 Also note that a prerequisite for the configuration described below is that
 hostnames are configured properly on every involved server, i.e. <code>hostname
 -f</code> should return the fully qualified hostname of the server in question,
 and other servers must be able to connect to that hostname.
 </p>
-
 <pre>
 apt-get install postgresql postgresql-9.4-pgpool2 rsync ssh
 cat &gt;&gt;/etc/postgresql/9.4/main/postgresql.conf &lt;&lt;'EOT'
@@ -324,7 +309,6 @@ install -o postgres -g postgres -m 700 -d \
   /var/lib/postgresql/9.4/main/archive_log
 systemctl restart postgresql.service
 </pre>
-
 <p>
 pgpool comes with an extension (implemented in C) that provides a couple of
 functions which are necessary for recovery. We need to “create” the extension
@@ -336,7 +320,6 @@ installed properly.
 echo 'CREATE EXTENSION "pgpool_recovery"' | \
   su - postgres -c 'psql template1'
 </pre>
-
 <p>
 During recovery, pgpool needs to synchronize data between the PostgreSQL
 servers. This is done partly by running <code>pg_basebackup</code> on the
@@ -353,7 +336,6 @@ ssh-keygen -f /var/lib/postgresql/.ssh/id_rsa -N ''
 cat .ssh/id_rsa.pub &gt;&gt; .ssh/authorized_keys
 exit
 </pre>
-
 <p>
 We’ll also need to access remote databases with <code>pg_basebackup</code>
 non-interactively, so we need a password file:
@@ -364,7 +346,6 @@ echo '*:*:*:postgres:wQgvBEusf1NWDRKVXS15Fc8' > .pgpass
 chmod 0600 .pgpass
 exit
 </pre>
-
 <p>
 When pgpool recovers a node, it first makes sure the data directory is up to
 date, then it starts PostgreSQL and tries to connect repeatedly. Once the
@@ -379,7 +360,6 @@ postgres ALL=(ALL:ALL) NOPASSWD:/bin/systemctl start postgresql.service
 postgres ALL=(ALL:ALL) NOPASSWD:/bin/systemctl stop postgresql.service
 EOT
 </pre>
-
 <p>
 Now enable password-based authentication for all databases and replication
 traffic. In case your database nodes/clients don’t share a common hostname
@@ -392,26 +372,21 @@ host    all             all             .zekjur.net             md5
 host    replication     postgres        .zekjur.net             md5     
 EOT
 </pre>
-
 <p>
 After enabling password-based authentication, we need to set a password for the
 <code>postgres</code> user which we’ll use for making the base backup:
 </p>
-
 <pre>
 echo "ALTER USER postgres WITH PASSWORD 'wQgvBEusf1NWDRKVXS15Fc8';" | \
   su postgres -c psql
 </pre>
-
 <h3>Installing pgpool2</h3>
-
 <pre>
 apt-get install pgpool2
 cd /etc/pgpool2
 gunzip -c /usr/share/doc/pgpool2/examples/\
 pgpool.conf.sample-replication.gz > pgpool.conf
 </pre>
-
 <p>
 To interact with pgpool2, there are a few command-line utilities whose name
 starts with <code>pcp_</code>. In order for these to work, we must configure a
@@ -422,7 +397,6 @@ different username/password:
 <pre>
 echo "postgres:$(pg_md5 wQgvBEusf1NWDRKVXS15Fc8)" >> pcp.conf
 </pre>
-
 <p>
 In replication mode, when the client should authenticate towards the PostgreSQL
 database, we also need to tell pgpool2 that we are using password-based
@@ -432,7 +406,6 @@ authentication:
 sed -i 's/trust$/md5/g' pool_hba.conf
 sed -i 's/\(enable_pool_hba =\) off/\1 on/g' pgpool.conf
 </pre>
-
 <p>
 Furthermore, we need to provide all the usernames and passwords that we are going to use to pgpool2:
 </p>
@@ -441,7 +414,6 @@ touch pool_passwd
 chown postgres.postgres pool_passwd
 pg_md5 -m -u faq_i3wm_org secretpassword
 </pre>
-
 <p>
 For the use-case I am describing here, it is advisable to turn off
 <code>load_balance_mode</code>, otherwise queries will be sent to all healthy
@@ -453,28 +425,23 @@ pgpool2, so read-only queries are sent to the local backend only.
 sed -i 's/^load_balance_mode = on/load_balance_mode = off/g' \
     pgpool.conf
 </pre>
-
 <p>
 Now, we need to configure the backends.
 </p>
 <pre>
 sed -i 's/^\(backend_\)/# \1/g' pgpool.conf
-
-cat >>pgpool.conf <<'EOT'
-backend_hostname0 = 'midna.zekjur.net'
+<p>cat &raquo;pgpool.conf &laquo;&lsquo;EOT&rsquo;
+backend_hostname0 = &lsquo;midna.zekjur.net&rsquo;
 backend_port0 = 5432
 backend_weight0 = 2
-backend_data_directory0 = '/var/lib/postgresql/9.4/main'
-
-backend_hostname1 = 'alp.zekjur.net'
+backend_data_directory0 = &lsquo;/var/lib/postgresql/9.4/main&rsquo;</p>
+<p>backend_hostname1 = &lsquo;alp.zekjur.net&rsquo;
 backend_port1 = 5432
 backend_weight1 = 1
-backend_data_directory1 = '/var/lib/postgresql/9.4/main'
+backend_data_directory1 = &lsquo;/var/lib/postgresql/9.4/main&rsquo;
 EOT
-</pre>
-
+</pre></p>
 <h3>Overview: How recovery works</h3>
-
 <p>
 Let’s assume that pgpool is running on <code>midna.zekjur.net</code> (so
 <code>midna</code> is handling all the traffic), and
@@ -483,7 +450,6 @@ Let’s assume that pgpool is running on <code>midna.zekjur.net</code> (so
 <code>alp</code> because the machine is available again, it will do three
 things:
 </p>
-
 <ol>
 <li>
 (“1st stage”) SSH into <code>alp</code> and run pg_basebackup to get a copy of
@@ -502,20 +468,16 @@ seconds by default, and within that time PostgreSQL must start up in such a
 state that pgpool can connect to it.
 </li>
 </ol>
-
 <p>
 So, during the 1st stage, which copies the entire database, traffic will still
 be handled normally, only during 2nd stage and until PostgreSQL started up no
 queries are served.
 </p>
-
 <h3>Configuring recovery</h3>
-
 <p>
 For recovery, we need to provide pgpool2 with a couple of shell scripts that
 handle the details of how the recovery is performed.
 </p>
-
 <pre>
 sed -i 's/^\(recovery_\|client_idle_limit_in_recovery\)/# \1/g' \
     pgpool.conf
@@ -537,14 +499,12 @@ recovery_2nd_stage_command = '2nd_stage.sh'
 client_idle_limit_in_recovery = -1
 EOT
 </pre>
-
 <p>
 The 1st_stage.sh script logs into the backend that should be recovered and uses
 <code>pg_basebackup</code> to copy a full backup from the master(primary)
 backend. It also sets up the <code>recovery.conf</code> which will be used by
 PostgreSQL when starting up.
 </p>
-
 <pre>
 cat >/var/lib/postgresql/9.4/main/1st_stage.sh <<'EOF'
 #!/bin/sh
@@ -576,7 +536,6 @@ echo "restore_command = 'cp $RECOVERY_DATA/archive_log/%f %p'" | \
     ssh -T $RECOVERY_TARGET "cat > $RECOVERY_DATA/recovery.conf"
 EOF
 </pre>
-
 <pre>
 cat >/var/lib/postgresql/9.4/main/2nd_stage.sh <<'EOF'
 #! /bin/sh
@@ -607,7 +566,6 @@ rsync -avx --delete $MASTER_DATA/archive_log/ \
 rm $MASTER_DATA/archive_log/backup_in_progress
 EOF
 </pre>
-
 <pre>
 cat >/var/lib/postgresql/9.4/main/pgpool_remote_start <<'EOF'
 #!/bin/sh
@@ -618,7 +576,6 @@ chmod +x /var/lib/postgresql/9.4/main/1st_stage.sh
 chmod +x /var/lib/postgresql/9.4/main/2nd_stage.sh
 chmod +x /var/lib/postgresql/9.4/main/pgpool_remote_start
 </pre>
-
 <p>
 Now, let’s start pgpool2 and verify that it works and that we can access our
 first node. The <code>pcp_node_count</code> command should return an integer
@@ -630,14 +587,11 @@ systemctl restart pgpool2.service
 pcp_node_count 10 localhost 9898 postgres wQgvBEusf1NWDRKVXS15Fc8
 psql -p 5433 -U faq_i3wm_org faq_i3wm_org
 </pre>
-
 <h3>Monitoring</h3>
-
 <p>
 pgpool2 intercepts a couple of SHOW statements, so you can use the SQL command
 <code>SHOW pool_nodes</code> to see how many nodes are there:
 </p>
-
 <pre>
 &gt; SHOW pool_nodes;
  node_id |     hostname     | port | status | lb_weight |  role  
@@ -646,7 +600,6 @@ pgpool2 intercepts a couple of SHOW statements, so you can use the SQL command
  1       | alp.zekjur.net   | 5432 | 2      | 0.333333  | slave
 (2 rows)
 </pre>
-
 <p>
 You could export a cgi-script over HTTP, which just always runs this command,
 and then configure your monitoring software to watch for certain strings in the
@@ -655,7 +608,6 @@ for the <code>www-data</code> user. As an example, to monitor whether
 <code>alp</code> is still a healthy backend, match for “alp.zekjur.net,5432,2”
 in the output of this script:
 </p>
-
 <pre>
 #!/bin/sh
 cat &lt;&lt;'EOT'
@@ -665,21 +617,16 @@ EOT
 exec echo 'SHOW pool_nodes;' | psql -t -A -F, --host localhost \
   -U faq_i3wm_org faq_i3wm_org
 </pre>
-
 <h3>Performing/Debugging a recovery</h3>
-
 <p>
 In order to recover node 1 (<code>alp</code> in this case), use:
-
 <pre>
 pcp_recovery_node 300 localhost 9898 postgres wQgvBEusf1NWDRKVXS15Fc8 1
 </pre>
-
 <p>
 The “300” used to be a timeout, but these days it’s only supported for
 backwards compatibility and has no effect.
 </p>
-
 <p>
 In case the recovery fails, the only thing you’ll get back from
 pcp_recovery_node is the text “BackendError”, which is not very helpful. The
@@ -687,35 +634,29 @@ logfile of pgpool2 contains a bit more information, but to debug recovery
 problems, I typically strace all PostgreSQL processes and see what the scripts
 are doing/where they are failing.
 </p>
-
 <h3>pgpool2 behavior during recovery</h3>
-
 <p>
 In order to see how pgpool2 performs during recovery/degradation, you can use
 <a href="http://play.golang.org/p/xwMxt-BiDU">this little Go program</a> that
 tries to do three things every 0.25 seconds: check that the database is healthy
 (<code>SELECT 1;</code>), run a meaningful SELECT, run an UPDATE.
 </p>
-
 <p>
 When a database node goes down, a single query may fail until pgpool2 realizes
 that the node needs to be degraded. If your database load is light, chances are
 that pgpool2 will realize the database is down without even failing a single
 query, though.
 </p>
-
 <pre>
 2014-08-13 23:15:27.638 health: ✓  select: ✓  update: ✓
 2014-08-13 23:15:28.700 insert failed: driver: bad connection
 2014-08-13 23:15:28.707 health: ✓  select: ✓  update: x
 </pre>
-
 <p>
 During recovery, there is a time when pgpool2 will just disconnect all clients
 and not answer any queries any more (2nd stage). In this case, the state lasted
 for about 20 seconds:
 </p>
-
 <pre>
 …
 2014-08-13 23:16:01.900 health: ✓  select: ✓  update: ✓
@@ -725,9 +666,7 @@ for about 20 seconds:
 2014-08-13 23:16:24.308 health: ✓  select: ✓  update: ✓
 …
 </pre>
-
 <h3>Conclusion</h3>
-
 <p>
 Setting up a PostgreSQL setup that involves pgpool2 is definitely a lot of
 work. It could be a bit easier if the documentation was more specific on the
@@ -735,14 +674,12 @@ details of how recovery is supposed to work and would include the configuration
 that I came up with above. Ideally, something like pgpool2 would be part of
 PostgreSQL itself.
 </p>
-
 <p>
 I am not yet sure how much software I’ll need to touch in order to make it
 gracefully deal with the PostgreSQL connection dying and coming back up. I know
 of at least one program I use (buildbot) which does not handle this situation
 well at all — it needs a complete restart to work again.
 </p>
-
 <p>
 Time will tell if the setup is stable and easy to maintain. In case I make
 negative experiences, I’ll update this article :).
@@ -755,7 +692,7 @@ negative experiences, I’ll update this article :).
   <div>
     <strong>Table Of Contents</strong>
 
-    
+    <nav class="TableOfContents"></nav>
   </div>
 </div>
 

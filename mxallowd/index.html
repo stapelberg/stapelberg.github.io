@@ -186,9 +186,9 @@
 </div>
 <div class="Artikel" id="content">
   <div id="ml">
-        <p> To my english speaking visitors: There is an <a href="/mxallowd.en" id="ml_link">english version</a> of this page. </p>
-    </div>
-    <div id="content">
+		<p> To my english speaking visitors: There is an <a href="/mxallowd.en" id="ml_link">english version</a> of this page. </p>
+	</div>
+	<div id="content">
 <p>
   <code>mxallowd</code> ist ein Daemon für Linux/Netfilter (via
   <code>libnetfilter_queue</code>) oder BSD/pf (via pflog), der eine Verfeinerung
@@ -203,7 +203,6 @@
   sie die Mail zustellen können. Somit kommen echte Mails an und Spam bleibt
   draußen.
 </p>
-
 <p>
   Das Problem beim nolisting ist nun, dass einige Spammer (vermutlich
   aufgrunddessen) direkt den zweiten MX-Eintrag benutzen („direct-to-second-mx”).
@@ -211,7 +210,6 @@
   man sich nicht verbinden (das Paket wird einfach via <code>netfilter/iptables</code>
   verworfen), außer, wenn man es zuvor beim ersten Mailserver probiert hat.
 </p>
-
 <p>
   Dieses Problem hätte man prinzipiell auch nur via <code>iptables</code> mit
   dem Modul <code>ipt_recent</code> lösen können, wenn es nicht ein kleines
@@ -223,15 +221,12 @@
   Whitelist ein (außer, wenn man die Option <code>--no-rdns-whitelist</code>
   angibt).
 </p>
-
 <h2>Installation unter Linux</h2>
-
 <p>
   Damit neue Verbindungen an <code>mxallowd</code> geleitet werden, muss man
   folgende <code>iptables</code>-Regel hinzufügen:
 </p>
 <pre>iptables -A INPUT -p tcp --dport 25 -m state --state NEW -j NFQUEUE --queue-num 23</pre>
-
 <p>
   Falls das Einfügen dieser Regel nicht klappt, muss zuvor via <code>modprobe
   nfnetlink_queue</code> das Queue-Modul geladen werden.
@@ -242,11 +237,8 @@
   Verbindungen von bestimmten IP-Adressen von vorneherein akzeptiert werden
   (<code>-j ACCEPT</code> am Ende).
 </p>
-
 <h2>Installation unter BSD</h2>
-
 <p>Eine <code>/etc/pf.conf</code> könnte so aussehen:</p>
-
 <pre>table <mx-white> persist
 
 real_mailserver="192.168.1.4"
@@ -264,18 +256,14 @@ block in log on fxp0 proto tcp \
 block in log on fxp0 inet6 proto tcp \
               to { $fake_mailserver6 $real_mailserver6 } port smtp
 </pre>
-
 <p>
   Wichtig dabei ist, dass die Table <code>mx-white</code> existiert und dass
   sowohl die pass- als auch die block-Regeln loggen.
 </p>
-
 <p>
   Wenn man ein anderes pflog-interface verwendet, kann man mxallowd das via Parameter mitteilen.
 </p>
-
 <h2>Hilfe, ich kann keine Mails mehr versenden!</h2>
-
 <p>
   Das stimmt – wenn du den selben Mailserver auch verwendest, um Mails zu
   versenden, probiert dein Mailclient in der Regel nur eine Verbindung. Ich würde
@@ -289,16 +277,16 @@ block in log on fxp0 inet6 proto tcp \
 </p>
 <pre>iptables -I INPUT 1 -p tcp --dport 25 --s 192.168.2.3 -j ACCEPT</pre>
 </div>
-    <h3>Herunterladen</h3>
-    <ul id="downloads"><li><a class="download_filename" href="/mxallowd/mxallowd.1.9.tar.bz2"><span class="download_name">mxallowd 1.9</span></a> (<span class="download_size">33K</span>, <a class="download_gpg" href="/mxallowd/mxallowd.1.9.tar.bz2.asc">GPG-Signatur</a>)</li></ul>
-    <h3>Lizenz</h3>
-    <p><span class="name">mxallowd</span> ist freie Open-Source-Software unter der <span class="license">GPL2</span>.</p>
-    <div id="development">
-        <h3>Entwicklung</h3>
-        <p>Der aktuelle Entwicklungsstand kann <a class="dev_url" href="http://code.stapelberg.de/git/mxallowd">in gitweb</a> verfolgt werden.</p>
-    </div>
-    <h3>Feedback</h3>
-    <p>Solltest du mir eine Nachricht zukommen lassen wollen, <a href="/Impressum">schreib mir doch bitte eine E-Mail</a>.</p>
+	<h3>Herunterladen</h3>
+	<ul id="downloads"><li><a class="download_filename" href="/mxallowd/mxallowd.1.9.tar.bz2"><span class="download_name">mxallowd 1.9</span></a> (<span class="download_size">33K</span>, <a class="download_gpg" href="/mxallowd/mxallowd.1.9.tar.bz2.asc">GPG-Signatur</a>)</li></ul>
+	<h3>Lizenz</h3>
+	<p><span class="name">mxallowd</span> ist freie Open-Source-Software unter der <span class="license">GPL2</span>.</p>
+	<div id="development">
+		<h3>Entwicklung</h3>
+		<p>Der aktuelle Entwicklungsstand kann <a class="dev_url" href="http://code.stapelberg.de/git/mxallowd">in gitweb</a> verfolgt werden.</p>
+	</div>
+	<h3>Feedback</h3>
+	<p>Solltest du mir eine Nachricht zukommen lassen wollen, <a href="/Impressum">schreib mir doch bitte eine E-Mail</a>.</p>
 </div>
 
 </div>

@@ -190,21 +190,18 @@ Our local computer club <a href="https://www.noname-ev.de/">NoName e.V.</a> has
 about 20 members. Since we introduced membership fees to pay for server and
 domain costs a while ago, we have to deal with bank transfers.
 </p>
-
 <p>
 To automate confirmation and reminder mails about the payment situation of each
 member, it’d be helpful to have a unique identifier for each member so that we
 can build a script which can reliable match a bank transfer to a member
 (without using fuzzy matching on the name).
 </p>
-
 <p>
 Of course, being a computer club, we want to do it the best way possible, that
 is, we want to use some redundancy to ensure that the script still works even
 when somebody makes a typing error (or handwriting error for written bank
 transfers, though I suppose nobody uses them anymore) in the transfer subject.
 </p>
-
 <p>
 First of all, let’s see which letters and numbers we can use in a bank
 transfer. Banks normally allow A-Z and 0-9. Whether umlauts are allowed is
@@ -213,11 +210,9 @@ all upper-case, so our IDs cannot be case-sensitive either. After ruling out
 symbols which are prone to being confused with each other, we are left with the
 following symbols:
 </p>
-
 <pre>
 A C D E H K L P T W X Y 3 4 7 9
 </pre>
-
 <p>
 Since that are 16 symbols, we can use 4 bits to represent them (so
 2<sup>4</sup> = 16 possibilities). Considering that we have about 20 members,
@@ -226,7 +221,6 @@ that should be enough :-). A nice side effect is that this directly
 corresponds to the hexadecimal number system, which will be useful in the code
 below.
 </p>
-
 <p>
 An acceptable length for the bank transfer subject is 6 symbols plus a static
 prefix, let’s say <code>MF-xx-yy-zz</code> (MF means membership fees). Note
@@ -234,9 +228,7 @@ that adding dashes to point out that the ID consists of 6 symbols should lead
 to fewer forgotten symbols. That leaves us with 3 symbols plus 3 symbols of
 redundancy. But how do we actually encode the redundant information?
 </p>
-
 <h2>Reed-Solomon?</h2>
-
 <p>
 The first idea was to use <a
 href="http://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction">Reed-Solomon
@@ -245,16 +237,13 @@ understand (and simple solutions should be preferred to complex ones). Also,
 Reed-Solomon only allows you to correct ⌊t/2⌋ symbols when you have t redundant
 symbols. In our case, that is just 1 symbol which we can correct.
 </p>
-
 <h2>Levenshtein distance</h2>
-
 <p>
 A better approach is to consider the whole number of possible IDs
 (16<sup>6</sup> = 16777216) and then chose IDs with a big distance to each
 other. When the member makes a typo in the subject, it should still be nearer
 to the real ID than to any other ID.
 </p>
-
 <p>
 A good way to measure the distance between two pieces of text is the <a
 href="http://en.wikipedia.org/wiki/Levenshtein_distance">Levenshtein
@@ -263,7 +252,6 @@ href="http://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance">Damerau
 distance</a>). As an example, the Levenshtein distance between "kitten" and
 "sitting" is 3 ('k' to 's', 'e' to 'i', add 'g').
 </p>
-
 <p>
 When using 6 characters, there are only a few strings which have a Levenshtein
 distance of 6 between each other. There are a lot more when you only require a
@@ -271,9 +259,7 @@ Levenshtein distance of 5. As an example, consider <code>X3-EH-PT</code> and
 <code>9X-EK-7C</code>. Only the 'E' is in the same place, the other 5
 characters need to be edited.
 </p>
-
 <h3>Generating IDs with a specific Levenshtein distance</h3>
-
 <p>
 A simple way to generate IDs with a specific Levenshtein distance is to use a
 hash function like <a href="http://en.wikipedia.org/wiki/SHA-1">SHA-1</a>.
@@ -284,7 +270,6 @@ output. That sounds pretty good, since we want to have a lot of changes between
 ID 1 and ID 2. And indeed, with the following Perl code, you can easily
 generate enough IDs for our purpose:
 </p>
-
 <pre>
 use Digest::SHA qw(sha1_hex);
 use Text::Levenshtein::Damerau qw(edistance);
@@ -324,15 +309,12 @@ for (1 .. 20) {
     say "member ID $_: $identifier";
 }
 </pre>
-
 <h3>Matching IDs</h3>
-
 <p>
 Now, matching IDs is simple: You just calculate the Levenshtein distance of the
 input to all existing identifiers and then sort ascendingly. If the difference
 between the first and second result is big enough, we have a clear winner:
 </p>
-
 <pre>
 # Original: Y7XYPL
 my $input = 'Y1XPL';
@@ -347,7 +329,6 @@ if ($first->[0] == $second->[0]) {
 }
 say "Corrected $input to " . $first->[1];
 </pre>
-
 <p>
 In comparison to Reed-Solomon, we can fix any two errors guaranteed (typos and
 erasures) using this technique, and the chance that we will fix even more is

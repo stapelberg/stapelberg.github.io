@@ -197,7 +197,7 @@
   </style>
   <details class="ms_toc_details">
     <summary>Table of contents</summary>
-    
+    <nav class="TableOfContents"></nav>
   </details>
   <p>
 Bacula ist eine Netzwerk-Backup-Software, die für mich das Mittel der Wahl
@@ -206,7 +206,6 @@ mich ist die Fähigkeit, Linux-, Mac OS X- und Windows-Rechner zu sichern,
 die gut konfigurierbaren FileSets, inkrementelle Backups, Benachrichtigung via
 Mail und gzip-Kompression.
 </p>
-
 <p>
 Zur Sicherung und vor allem zur Bare-Metal-Recovery (das Wiederherstellen des
 Backups auf eine komplett leere Festplatte) auf Mac OS X spricht sich die <a
@@ -214,47 +213,41 @@ href="http://bacula.org/en/?page=documentation"
 title="Bacula-Dokumentation">Bacula-Dokumentation</a> leider nicht so sehr aus,
 sodass ich diesen Artikel schrieb.
 </p>
-
 <p>
 Ich gehe davon aus, dass die Prinzipien, Begriffe und Konfiguration von Bacula
 bekannt ist und dass der Server einwandfrei läuft.
 </p>
-
 <h2>Konfiguration</h2>
-
-<p><h3>Beteiligte Rechner</h3>
+<h3>Beteiligte Rechner</h3>
 <p>
 Der Director und Storage Daemon läuft bei mir auf einem Linux-Server, der
 zu sichernde Mac ist ein MacBook.
-</p></p>
-
-<p><h3>Konfiguration</h3>
+</p>
+<h3>Konfiguration</h3>
 <p>
 Da das Prinzip der Bacula-Konfiguration auf anderen Websites schon zur
 Genüge erklärt ist, beziehe ich mich hier nur auf die Einzelheiten,
 die für Mac OS X wichtig sind (<code>hfsplussuport</code>, FileVault und
 die Liste der auszuschließenden Dateien).
-</p></p>
-
+</p>
 <pre>FileSet {
-    Name = "macbook-set"
-    Include {
-        Options {
-            signature = MD5
-            compression = gzip
-            hfsplussupport = yes
-        }
-        File = /
-        # Da FileVault als anderes Dateisystem gilt, muessen wir den Pfad explizit angeben
-        File = /Users/michael
-    }
-    Exclude {
-        @/etc/bacula/std_mac_exclude.files
-        # Das FileVault-Image hingegen lassen wir aus, da wir ja die Dateien sichern
-        File = /Users/.michael/michael.sparseimage
-    }
+	Name = "macbook-set"
+	Include {
+		Options {
+			signature = MD5
+			compression = gzip
+			hfsplussupport = yes
+		}
+		File = /
+		# Da FileVault als anderes Dateisystem gilt, muessen wir den Pfad explizit angeben
+		File = /Users/michael
+	}
+	Exclude {
+		@/etc/bacula/std_mac_exclude.files
+		# Das FileVault-Image hingegen lassen wir aus, da wir ja die Dateien sichern
+		File = /Users/.michael/michael.sparseimage
+	}
 }</pre>
-
 <p>
 Damit man die Liste der auszuschließenden Dateien nicht bei jedem Mac, den man
 sichert, wiederholen muss, habe ich sie in die Datei
@@ -262,60 +255,54 @@ sichert, wiederholen muss, habe ich sie in die Datei
 Mountpoints (für FTP/SMB-Server, USB-Geräte, etc…), die temporären Dateien,
 eingelegte CD-ROMs und das automatisch durchsuchte Netzwerk.
 </p>
-
 <p><strong>/etc/bacula/std_mac_exclude.files</strong>:</p>
-
-<pre><code>File = /Volumes
+<pre tabindex="0"><code>File = /Volumes
 File = /tmp
 File = /private/tmp
 File = /cdrom
 File = /automount
 File = /Network
 File = /.vol
-</code></pre>
-
-<p><h3>FileVault</h3>
+</code></pre><h3>FileVault</h3>
 <p>
 Wenn man FileVault benutzt, hat man drei Möglichkeiten:
 </p>
 <ol>
-    <li>
-    Man gibt keine speziellen Einstellungen an und lässt somit Bacula das
-    FileVault-Image sichern.<br>Der Nachteil hierbei ist, dass man keine
-    einzelnen Dateien wiederherstellen kann. Der Vorteil ist, dass man
-    seine Wiederherstellung 1:1 durchführen kann.
-    </li>
-    <li>
-    Man konfiguriert Bacula wie oben gezeigt und sicher somit den Inhalt
-    des FileVault-Images, nicht aber das Image selbst.<br>Der Vorteil
-    hierbei ist das Wiederherstellen einzelner Dateien, der Nachteil ist,
-    dass man nach einer Bare-Metal-Recovery FileVault erst wieder
-    aktivieren muss (oder es manuell währenddessen aktiviert, da weiß ich
-    aber nicht, ob das überhaupt funktioniert).
-    </li>
-    <li>
-    Man sichert sowohl den Inhalt, als auch das Image.<br>Der Vorteil ist,
-    dass man sowohl einzelne Dateien wiederherstellen, als auch einfach
-    eine Bare-Metal-Recovery durchführen kann. Der Nachteil ist, dass man
-    doppelt so viel Speicherplatz für das Backup braucht.
-    </li>
-</ol></p>
-
-<p><h2>Bare-Metal-Recovery</h2>
+	<li>
+	Man gibt keine speziellen Einstellungen an und lässt somit Bacula das
+	FileVault-Image sichern.<br>Der Nachteil hierbei ist, dass man keine
+	einzelnen Dateien wiederherstellen kann. Der Vorteil ist, dass man
+	seine Wiederherstellung 1:1 durchführen kann.
+	</li>
+	<li>
+	Man konfiguriert Bacula wie oben gezeigt und sicher somit den Inhalt
+	des FileVault-Images, nicht aber das Image selbst.<br>Der Vorteil
+	hierbei ist das Wiederherstellen einzelner Dateien, der Nachteil ist,
+	dass man nach einer Bare-Metal-Recovery FileVault erst wieder
+	aktivieren muss (oder es manuell währenddessen aktiviert, da weiß ich
+	aber nicht, ob das überhaupt funktioniert).
+	</li>
+	<li>
+	Man sichert sowohl den Inhalt, als auch das Image.<br>Der Vorteil ist,
+	dass man sowohl einzelne Dateien wiederherstellen, als auch einfach
+	eine Bare-Metal-Recovery durchführen kann. Der Nachteil ist, dass man
+	doppelt so viel Speicherplatz für das Backup braucht.
+	</li>
+</ol>
+<h2>Bare-Metal-Recovery</h2>
 Voraussetzungen:
 <ul>
-    <li>Mac OS X Installation Disc (10.4)</li>
-    <li>Eine vorher kompilierte, statische Version vom Bacula-Client (<code>bacula-fd</code>)</li>
-    <li>Die Konfigurationsdatei (<code>bacula-fd.conf</code>) des Clients</li>
-    <li>
-    Einen USB-Stick oder eine externe Festplatte, um die beiden Dateien
-    (<code>bacula-fd</code> und <code>bacula-fd.conf</code>) auf die leere
-    Platte zu spielen sowie um das Script <code>rd.sh</code> auszuführen um
-    die RAM-Disk zu erstellen
-    </li>
-</ul></p>
-
-<p><h3>Statische Version des Bacula-Clients</h3>
+	<li>Mac OS X Installation Disc (10.4)</li>
+	<li>Eine vorher kompilierte, statische Version vom Bacula-Client (<code>bacula-fd</code>)</li>
+	<li>Die Konfigurationsdatei (<code>bacula-fd.conf</code>) des Clients</li>
+	<li>
+	Einen USB-Stick oder eine externe Festplatte, um die beiden Dateien
+	(<code>bacula-fd</code> und <code>bacula-fd.conf</code>) auf die leere
+	Platte zu spielen sowie um das Script <code>rd.sh</code> auszuführen um
+	die RAM-Disk zu erstellen
+	</li>
+</ul>
+<h3>Statische Version des Bacula-Clients</h3>
 <p>
 Auf der Mac OS X Installation Disc sind alle benötigten Libraries vorhanden,
 daher brauchen wir keine statische Version (das Kompilieren einer statischen
@@ -327,27 +314,22 @@ make</pre>
 Anschließend kopieren wir <code>src/filed/bacula-fd</code> und die
 Konfigurationsdatei, die wir zuvor schon verwende haben
 (<code>bacula-fd.conf</code>) auf den USB-Stick.
-</p></p>
-
-<p><h3>RAM-Disk</h3>
+</p>
+<h3>RAM-Disk</h3>
 <p>
 Das Script, um eine RAM-Disk unter Mac OS X zu erstellen, habe ich auf <a
 href="http://explanatorygap.net/2006/10/30/making-parts-of-the-filesystem-readwrite-from-netboot/"
 target="_blank" title="explanatorygap.net">explanatorygap.net</a> gefunden. Es
 muss auf dem USB-Stick (oder -Festplatte) gespeichert werden.
-</p></p>
-
+</p>
 <p><strong>rd.sh</strong>:</p>
-
-<pre><code>echo &quot;Creating RAM Disk for $1&quot;
+<pre tabindex="0"><code>echo &quot;Creating RAM Disk for $1&quot;
 dev=`hdik -drivekey system-image=yes -nomount ram://2048 `
 if [ $? -eq 0 ] ; then
 	newfs $dev
 	mount -o union $dev $1
 fi
-</code></pre>
-
-<p><h3>Die eigentliche Rettung</h3>
+</code></pre><h3>Die eigentliche Rettung</h3>
 <p>
 Ich gehe davon aus, dass eine leere Festplatte (oder eine, deren Daten nicht
 mehr benötigt werden) am Computer angeschlossen ist (ob via Firewire, USB, oder
@@ -403,8 +385,7 @@ werden (damit eine Verbindung ins Internet klappt):
 <p>
 Nun starten wir den File Daemon:
 </p>
-<pre>./bacula-fd</pre></p>
-
+<pre>./bacula-fd</pre>
 <p>
 Und dann geht’s am anderen Rechner weiter. Nach dem Start von
 <code>bconsole</code> zeigen wir uns mit <code>list jobs</code> die letzten
@@ -447,7 +428,7 @@ das Programm Startvolume, wo wir „Mac OS X auf MacHD” wählen und auf
   <div>
     <strong>Table Of Contents</strong>
 
-    
+    <nav class="TableOfContents"></nav>
   </div>
 </div>
 

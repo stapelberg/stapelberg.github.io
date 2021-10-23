@@ -190,7 +190,6 @@
   Backups vor der Frage, wie man das Backup organisiert. Hier gibt es
   (mindestens) die folgenden Ansätze:
 </p>
-
 <ol>
   <li style="margin-bottom: 25px">
     Man betrachtet jede virtuelle Instanz als eigenständig und installiert
@@ -201,7 +200,6 @@
     Nachteil: Pro Instanz ein Backup-Job nötig, je nach Anzahl der Instanzen
     wird es schnell unübersichtlich.
   </li>
-
   <li style="margin-bottom: 25px">
     Man fertigt vor dem Backup einen kompletten Snapshot der Instanzen an und
     sichert diesen dann auf dem Hostrechner.<br>
@@ -210,7 +208,6 @@
     Nachteil: Zeitaufwändig, Speicherplatzaufwändig, Wiederherstellung einzelner
     Dateien kompliziert/zeitaufwändig.
   </li>
-
   <li>
     Man benutzt LVM und fertigt einen Snapshot vor der Sicherung an, den man
     dann ins Dateisystem einhängt und einfach den kompletten Hostrechner
@@ -222,7 +219,6 @@
     aus den einzelnen Logical Volumes zu mounten.
   </li>
 </ol>
-
 <p>
   Ich möchte in diesem Artikel näher auf die dritte Methode eingehen, da bei
   allen anderen die Nachteile überwiegen. Weiterhin bietet sich die Methode
@@ -231,9 +227,7 @@
   kann – das ist bei einer herkömmlichen Installation <a
   href="/Artikel/Xen_resize">deutlich komplizierter</a>).
 </p>
-
 <h2>Installation von einer domU auf einem LV</h2>
-
 <p>
   Für die Installation einer domU auf einem LV geht man ganz normal vor (wie
   beispielsweise <a href="http://wiki.debian.org/Xen">im Debian Wiki</a>
@@ -242,17 +236,13 @@
   heißt und das LV <code>domu-infra</code>, sieht der passende Eintrag
   folgendermaßen aus:
 </p>
-
 <pre>disk = ['phy:in.zekjur.net/domu-infra,xvda,w']</pre>
-
 <p>
   Der Name des LVs ist übrigens später noch wichtig. Über den Prefix
   <code>domu-</code> identifizieren wir die LVs, von denen wir einen Snapshot
   anfertigen werden.
 </p>
-
 <h2>Das Prinzip von LVM-Snapshots</h2>
-
 <p>
   Snapshots werden angefertigt, indem man ein neues LV erstellt und beim
   Erstellen angibt, von welchem LV dieses ein Snapshot werden soll. Bei der
@@ -261,7 +251,6 @@
   Original zum Zeitpunkt der Anfertigung des Snapshots. Das sieht in etwa so
   aus:
 </p>
-
 <pre># lvcreate -n snap_infra -L 1G -s in.zekjur.net/domu-infra
 Logical volume "snap_infra" created
 # lvs
@@ -271,7 +260,6 @@ root       in.zekjur.net -wi-ao 10,00G
 snap_infra in.zekjur.net swi-a-  1,00G domu-infra   0,00                        
 swap_1     in.zekjur.net -wi-ao  9,47G                                          
 </pre>
-
 <p>
   Die vorhin angegebene Größe dient nun dazu, die Änderungen an einer der
   beiden Versionen (Original oder Snapshot) zu speichern. Das ist zum Beispiel
@@ -281,9 +269,7 @@ swap_1     in.zekjur.net -wi-ao  9,47G
   ausreichen sollte für meine Daten. Wenn sich mehr Daten ändern, muss man
   diesen Wert natürlich entsprechend erhöhen.
 </p>
-
 <h2>Die Problematik: Partitionen im LV</h2>
-
 <p>
   Sofern man nicht absichtlich die domU auf die komplette Platte (/dev/xvda)
   installiert hat, steht man nun vor einem kleinen Problem: Innerhalb des LVs
@@ -293,13 +279,11 @@ swap_1     in.zekjur.net -wi-ao  9,47G
   es einfach bleibt, gehe ich davon aus, dass die gewünschte Datenpartition
   die erste ext3-Partition ist, alle anderen Partitionen werden ignoriert.
 </p>
-
 <p>
   Um besagtes Offset zu finden, kann man sich <code>parted</code> zu nutze
   machen, welchem man folgendermaßen die Partitionstabelle in der passenden
   Einheit entlocken kann:
 </p>
-
 <pre># parted /dev/mapper/in.zekjur.net-snap_infra
 GNU Parted 1.8.8
 Using /dev/mapper/in.zekjur.net-snap_infra
@@ -319,17 +303,14 @@ Number  Start         End           Size          Type      File system  Flags
 
 (parted)                                                                  
 </pre>
-
 <p>
   In diesem Fall müssen wir also das LV ab Stelle 32256 benutzen, was
   folgendermaßen machbar ist:
 </p>
-
 <pre># losetup -o 32256 -f /dev/mapper/in.zekjur.net-snap_infra 
 # losetup -a
 /dev/loop0: [000c]:2119316 (/dev/mapper/in.zekjur.net-snap_infra), offset 32256
 </pre>
-
 <p>
   Wenn man nun allerdings versucht, <code>/dev/loop0</code> direkt zu mounten,
   wird dies nicht gelingen (ich gehe von <code>ext3</code> als Dateisystem
@@ -337,25 +318,20 @@ Number  Start         End           Size          Type      File system  Flags
   wurde, schließlich haben wir das Dateisystem nicht korrekt unmounted
   innerhalb unserer domU.
 </p>
-
 <p>
   Glücklicherweise kann man in LVM2 auch schreibend auf Snapshots zugreifen,
   sodass wir mit einem Aufruf von <code>fsck</code> das Journal „reparieren”
   können:
 </p>
-
 <pre># fsck.ext3 -y /dev/loop0
 e2fsck 1.41.3 (12-Oct-2008)
 /dev/loop0: recovering journal
 /dev/loop0: clean, 53600/624624 files, 366091/2498099 blocks
 </pre>
-
 <p>
   Anschließend kann man das Dateisystem ganz normal mounten und sichern.
 </p>
-
 <h2>Automatisieren</h2>
-
 <p>
   Da ich diesen Vorgang gerne automatisiert in meine Backup-Software einbinden
   würde, habe ich dazu ein Script geschrieben, welches alle oben genannten
@@ -364,25 +340,19 @@ e2fsck 1.41.3 (12-Oct-2008)
   LVs, deren Name mit <code>domu-</code> beginnt (muss er ohnehin für die
   anderen Scripts) die passende Aktion ausführt.
 </p>
-
 <p>
   Herunterladen kannst du dir die Scripts via git:
 </p>
-
 <pre># git clone git://code.stapelberg.de/xen-lvm-snapshot</pre>
-
 <p>
   Anschauen kannst du dir sie <a
   href="http://code.stapelberg.de/git/xen-lvm-snapshot">im Webinterface</a>.
 </p>
-
 <h2>Einbinden in bacula</h2>
-
 <p>
   Durch die „Client Run Before Job”- und „Client Run After Job”-Optionen von
   bacula ist das Einbinden ziemlich einfach:
 </p>
-
 <pre>
 Job {  
         Name = "in.zekjur.net"
@@ -401,7 +371,6 @@ Job {
         <strong>Client Run After Job = "/root/bin/xen-lvm-snapshot/foreach-domu.sh unmount"</strong>
 }
 </pre>
-
 <p>
   Anschließend sollte man sicherstellen, dass <code>/mnt</code> im FileSet
   nicht von der Sicherung ausgenommen wird.

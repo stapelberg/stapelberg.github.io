@@ -197,7 +197,6 @@
   <p>
 <strong>NOTE </strong> that the documented assumptions about fsync skipping are incorrect in the code below. Prefer using <a href="https://github.com/google/renameio">the renameio package</a>.
 </p>
-
 <p>
 Writing files is simple, but correctly writing files atomically in a performant
 way might not be as trivial as one might think. Here’s an extensively commented
@@ -205,7 +204,6 @@ function to atomically write compressed files (taken from <a
 href="https://github.com/Debian/debiman">debiman</a>, the software behind <a
 href="https://manpages.debian.org/">manpages.debian.org</a>):
 <p>
-
 <pre>
 package main
 
@@ -305,7 +303,6 @@ func main() {
     }
 }
 </pre>
-
 <p>
 <a href="https://manpages.debian.org/rsync.1">rsync(1)</a> will fail when it
 lacks permission to read files. Hence, if you are synchronizing a repository of
@@ -315,7 +312,6 @@ href="https://manpages.debian.org/rename.2">rename(2)</a> to work) which is not
 covered by your <a href="https://manpages.debian.org/rsync.1">rsync(1)</a>
 invocation.
 </p>
-
 <p>
 When calling <code>writeAtomically</code> repeatedly to create lots of small
 files, you’ll notice that creating <code>gzip.Writer</code>s is actually rather
@@ -324,7 +320,6 @@ expensive. Modifying the function to re-use the same <code>gzip.Writer</code>
 href="https://github.com/Debian/debiman/commit/2f891341daa6c2b24dc9b0bacd3b722b057d8e9b">yielded
 a significant decrease in wall-clock time</a>.
 </p>
-
 <p>
 Of course, if you’re looking for maximum write performance (as opposed to
 minimum resulting file size), you should use a different gzip level than

@@ -190,7 +190,6 @@ Da ich an meiner Schule vier PCs mit Linux betreue, suchte ich vor kurzem nach
 einer Möglichkeit, einen Ordner auf allen PCs gleichermaßen freizugeben und
 diesen auf allen anderen PCs einzubinden.
 </p>
-
 <p>
 Ich entschied mich für <a href="http://www.samba.org/" title="Samba"
 target="_blank">Samba</a>, weil eventuell auch Windows-PCs auf die Freigabe
@@ -201,14 +200,12 @@ href="http://www.pro-linux.de/work/server/samba_installation.html"
 title="Artikel über das Installieren von Samba" target="_blank">gute
 Artikel</a>.
 </p>
-
 <p>
 Die verwendete Linuxdistribution ist <a href="http://www.ubuntulinux.org/"
 title="Ubuntu" target="_blank">Ubuntu</a>, auf welcher standardmäßig das
 benötigte Paket <span class="linuxcommand">„smbfs”</span> nicht installiert
 ist.
 </p>
-
 <p>
 Nach dem Installieren via <span class="linuxcommand">„sudo apt-get install
 smbfs”</span> sollte man den vollen Pfad in die /etc/fstab eintragen, damit man
@@ -217,7 +214,6 @@ class="linuxcommand">„//&lt;hostname&gt;/&lt;freigabenname&gt;
 /home/schueler/&lt;mountpoint&gt; smbfs
 username=schueler,password=&lt;passwort&gt; 0 0”</span>.
 </p>
-
 <p>
 Nun werden die Mountpoints automatisch eingebunden, sobald der PC hochgefahren
 wird - allerdings nur, wenn die zu mountenden Laufwerke und deren PCs bereits
@@ -225,7 +221,6 @@ eingeschaltet sind. Das Problem ist schnell erkannt: Wenn man zwei Rechner
 anmacht, hat der zuerst hochgefahrene Rechner die Freigabe des zweiten Rechners
 nicht eingebunden.
 </p>
-
 <p>
 Bisher haben sich anscheinend wenige Leute diesem Problem angenommen, was auch
 meine Frage im Ubuntuforum bestätigte. Allerdings wurde mir dort ein Script ans
@@ -233,19 +228,14 @@ Herz gelegt, mit welchem man prüfen kann, ob ein Rechner online ist. Dieses
 wiederum kann man so abwandeln, dass es die Freigabe automatisch mountet,
 sobald der Rechner online ist.
 </p>
-
 <p>
 Nachdem man das folgende Script abgespeichert hat, kann man noch einen
 passenden Crontab-Eintrag hinzufügen, damit das Script minütlich ausgeführt
 wird:
 </p>
-
-<pre><code>* * * * * /home/schueler/checkhost.sh
-</code></pre>
-
-<p><strong>checkhost.sh</strong>:</p>
-
-<pre><code>#!/bin/bash
+<pre tabindex="0"><code>* * * * * /home/schueler/checkhost.sh
+</code></pre><p><strong>checkhost.sh</strong>:</p>
+<pre tabindex="0"><code>#!/bin/bash
 # a² - aquadraht@notmail.org 25.05.2005
 # Modifiziert von Michael Stapelberg @ 19.10.2005
 
@@ -275,11 +265,8 @@ fi
 
 cd /tmp
 touch $FLAG
-</code></pre>
-
-<p><strong>mount_it.sh</strong>:</p>
-
-<pre><code>#!/bin/sh
+</code></pre><p><strong>mount_it.sh</strong>:</p>
+<pre tabindex="0"><code>#!/bin/sh
 
 AMOUNT=`mount | grep //${1}/${MOUNTPOINT} | wc -l`
 # TODO: An dieser Stelle muss man den Mountpoint (=Freigabenname) anpassen
@@ -300,9 +287,7 @@ else
         mount //${1}/${MOUNTPOINT}
 fi
 echo &quot;Mounts now: `mount | grep //${1}/${MOUNTPOINT} | wc -l`&quot;
-</code></pre>
-
-<p>
+</code></pre><p>
 Die Dateien sollten beide im selben Verzeichnis liegen, ansonsten muss der Pfad
 angepasst werden.
 </p>

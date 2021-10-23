@@ -191,7 +191,6 @@ Linux to have a setup in which there are two servers: One server which hosts
 some virtual machines, and its hot-standby companion which holds exactly the
 same data and can take over if the hardware of the master server dies.
 </p>
-
 <p>
 Now, it is clear how to setup DRBD for the RAID array which holds all the
 data — DRBD’s documentation is really good. What remained unclear to me,
@@ -199,12 +198,10 @@ though, is how I can also use DRBD for the root file system. Otherwise, I’d
 need to put in some extra effort to remember to replicate all root filesystem
 changes, which makes the whole setup much more complex to use.
 </p>
-
 <p>
 I suspect people are deploying machines like this with root filesystems that
 are centrally managed by puppet or similar.
 </p>
-
 <p>
 Instead, I decided to also use DRBD for the root device. While that setup is
 largely undocumented and not recommended on the DRBD mailing list, for
@@ -213,16 +210,13 @@ Essentially, you need to shrink the existing root filesystem, create the DRBD
 metadata and then change the initramfs so that it will start DRBD before mounting
 the root filesystem.
 </p>
-
 <h2>Shrinking the root filesystem</h2>
-
 <p>
 To calculate the size to which you have to shrink the existing filesystem, you
 can use the following script which performs <a
 href="http://www.drbd.org/users-guide/ch-internals.html#s-meta-data-size">the
 calculation documented in the DRBD manual</a>:
 </p>
-
 <pre>
 #!/bin/bash
 
@@ -255,19 +249,15 @@ echo "Meta Data:  $MD_SIZE Sectors"
 echo "--"
 echo "Resize commands: resize2fs -p "$DEVICE $FS_SIZE_MB"M"
 </pre>
-
 <p>
 You might need to boot the system using a live system so that you can shrink
 the filesystem. ext4 for example does not support online shrinking.
 </p>
-
 <h2>Configure the DRBD resource</h2>
-
 <p>
 After rebooting into the system with the shrinked root filesystem, you need to
 configure the DRBD resource itself. Here is what I use:
 </p>
-
 <pre>
 cat &gt; /etc/drbd.d/root.res &lt;&lt;'EOT'
 resource root {
@@ -282,9 +272,9 @@ resource root {
                wfc-timeout 10;
        }
        net {
-           # While DRBD uses TCP, it might not detect all errors when
-           # checksum offloading is enabled. CRC32 is computationally
-           # cheap enough to just turn it on.
+	       # While DRBD uses TCP, it might not detect all errors when
+	       # checksum offloading is enabled. CRC32 is computationally
+	       # cheap enough to just turn it on.
                data-integrity-alg crc32c;
        }
        syncer {
@@ -306,16 +296,13 @@ resource root {
 }
 EOT
 </pre>
-
 <h2>Configuring the initramfs hook</h2>
-
 <p>
 The first script we create is the one which will be placed in the initramfs
 itself. It needs to set the correct hostname, setup the ethernet interface,
 possibly start mdadm, then create the DRBD devices and finally mount the root
 filesystem:
 </p>
-
 <pre>
 cat &gt; /usr/share/initramfs-tools/scripts/drbd &lt;&lt;'EOT'
 # vim:ts=4:sw=4:noet
@@ -385,19 +372,16 @@ mountroot()
 }
 EOT
 </pre>
-
 <p>
 After reading the script, it should be clear to you why such a script is not
 normally included in distributions nor recommended: The dependencies are hard
 to set up in a generic way (e.g. configuring the network, starting RAID arrays,
 etc.).
 </p>
-
 <p>
 The second script will run every time we generate a new initramfs and include
 the necessary tools and files.
 </p>
-
 <pre>
 cat &gt; /usr/share/initramfs-tools/hooks/drbd &lt;&lt;'EOT'
 #!/bin/sh
@@ -429,26 +413,21 @@ cp -p /var/lib/drbd/node_id "${DESTDIR}/var/lib/drbd/node_id"
 exit 0
 EOt
 </pre>
-
 <p>
 Afterwards, use <code>update-initramfs -u</code> to generate a new initramfs.
 You can verify that the new files are included in the initramfs by using
 <code>lsinitramfs /boot/initrd.img-$(uname -r)</code>.
 </p>
-
 <p>
 Without any further changes, nothing will change when you reboot.
 </p>
-
 <h2>Creating the metadata (once)</h2>
-
 <p>
 An easy way to create the metadata is to stop booting in the initramfs and use the
 provided shell. Reboot the machine, then, in grub, add the parameters
 <code>break=premount boot=drbd drbdroot=/dev/drbd0</code>, then run the
 following commands in the resulting shell:
 </p>
-
 <pre>
 modprobe drbd
 ifconfig eth0 up
@@ -459,19 +438,15 @@ drbdadm -- --overwrite-data-of-peer primary root
 mount -t ext4 /dev/drbd0 /root
 exit
 </pre>
-
 <p>
 Afterwards, your system should boot normally.
 </p>
-
 <h2>Boot parameters</h2>
-
 <p>
 To make the changes persistent, modify <code>GRUB_CMDLINE_LINUX_DEFAULT</code>
 in <code>/etc/default/grub</code> to include <code>boot=drbd
 drbdroot=/dev/drbd0</code>. Afterwards, run <code>update-grub</code>.
 </p>
-
 <p>
 That’s it. Enjoy your root on DRBD :-).
 </p>

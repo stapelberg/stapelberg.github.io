@@ -214,50 +214,42 @@ This is possible thanks to the upgrade of their network infrastructure as part o
   <details class="ms_toc_details">
     <summary>Table of contents</summary>
     <nav class="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#configuration">Configuration</a></li>
-<li><a href="#update-firmware">Update firmware</a></li>
-<li><a href="#set-up-auth">Set up auth</a></li>
-<li><a href="#lock-down-the-router">Lock down the router</a></li>
-<li><a href="#enable-dhcpv6-client">Enable DHCPv6 Client</a>
-<ul>
-<li><a href="#modify-the-ipv6-duid">Modify the IPv6 DUID</a></li>
-</ul></li>
-<li><a href="#enable-ipv6-router-advertisements">Enable IPv6 Router Advertisements</a></li>
-<li><a href="#enable-dhcpv4-client">Enable DHCPv4 Client</a></li>
-<li><a href="#enable-dns-server">Enable DNS Server</a></li>
-<li><a href="#enable-dhcpv4-server">Enable DHCPv4 Server</a></li>
-<li><a href="#enable-ipv4-nat">Enable IPv4 NAT</a></li>
-<li><a href="#todo-list">TODO list</a></li>
-<li><a href="#returned">Why I returned it</a></li>
-<li><a href="#appendix-a-full-configuration">Appendix A: Full configuration</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#configuration">Configuration</a></li>
+    <li><a href="#update-firmware">Update firmware</a></li>
+    <li><a href="#set-up-auth">Set up auth</a></li>
+    <li><a href="#lock-down-the-router">Lock down the router</a></li>
+    <li><a href="#enable-dhcpv6-client">Enable DHCPv6 Client</a>
+      <ul>
+        <li><a href="#modify-the-ipv6-duid">Modify the IPv6 DUID</a></li>
+      </ul>
+    </li>
+    <li><a href="#enable-ipv6-router-advertisements">Enable IPv6 Router Advertisements</a></li>
+    <li><a href="#enable-dhcpv4-client">Enable DHCPv4 Client</a></li>
+    <li><a href="#enable-dns-server">Enable DNS Server</a></li>
+    <li><a href="#enable-dhcpv4-server">Enable DHCPv4 Server</a></li>
+    <li><a href="#enable-ipv4-nat">Enable IPv4 NAT</a></li>
+    <li><a href="#todo-list">TODO list</a></li>
+    <li><a href="#returned">Why I returned it</a></li>
+    <li><a href="#appendix-a-full-configuration">Appendix A: Full configuration</a></li>
+  </ul>
 </nav>
   </details>
-  
-
-<p>init7 recently announced that with their <a href="https://www.init7.net/en/internet/fiber7/">FTTH fiber offering
+  <p>init7 recently announced that with their <a href="https://www.init7.net/en/internet/fiber7/">FTTH fiber offering
 Fiber7</a>, they will now sell and
 connect you with 25 Gbit/s (Fiber7-X2) or 10 Gbit/s (Fiber7-X) fiber optics, if
 you want more than 1 Gbit/s.</p>
-
 <p>This is possible thanks to the upgrade of their network infrastructure as part
 of their “lifecycle management”, meaning the old networking gear was declared as
 end-of-life. The new networking gear supports not only SFP+ modules (10 Gbit/s),
 but also SFP28 modules (25 Gbit/s).</p>
-
 <p>Availability depends on the <a href="https://www.init7.net/en/infrastructure/fiber7-pops/">POP (Point Of Presence, German «Anschlusszentrale»)
 you’re connected to</a>. My
 POP is planned to be upgraded in September.</p>
-
 <p>Nevertheless, I wanted to already prepare my end of the connection, and ordered
 the only router that <a href="https://www.init7.net/en/internet/hardware/">init7 currently lists as compatible with
 Fiber7-X/X2</a>: the MikroTik
 CCR2004-1G-12S+2XS.</p>
-
 
 
 
@@ -285,74 +277,59 @@ CCR2004-1G-12S+2XS.</p>
 
 
 
-
 <p>The rest of this article walks through what I needed to configure (a lot,
 compared to Ubiquiti or OpenWRT) in the hope that it helps other MikroTik users,
 and then ends in <a href="#returned">Why I returned it</a>.</p>
-
 <h2 id="configuration">Configuration</h2>
-
 <p>Connect an Ethernet cable to the management port on the MikroTik and:</p>
-
 <ol>
 <li>log into the system using <code>ssh admin@192.168.88.1</code></li>
-<li>point a web browser to “Webfig” at <a href="http://192.168.88.1/">http://192.168.88.1/</a> (no login required)</li>
+<li>point a web browser to “Webfig” at http://192.168.88.1/ (no login required)</li>
 </ol>
-
 <h2 id="update-firmware">Update firmware</h2>
-
 <p>Update the CCR2004 to the latest firmware version. At the time of writing, the
 Long-term RouterOS track is <a href="https://mikrotik.com/download">at version 6.47.9</a>
 for the CCR2004 (ARM64):</p>
-
 <ol>
 <li>Use <code>/system package print</code> to display the current version.</li>
 <li>Upload <code>routeros-arm64-6.47.9.npk</code> using Webfig.</li>
 <li><code>/system reboot</code> and verify that <code>/system package print</code> shows <code>6.47.9</code> now.</li>
 </ol>
-
 <h2 id="set-up-auth">Set up auth</h2>
-
 <p>Set a password to prevent others from logging into the router:</p>
-
-<pre><code>/user set admin password=secret
-</code></pre>
-
-<p>Additionally, you can enable passwordless SSH key login, if you
+<pre tabindex="0"><code>/user set admin password=secret
+</code></pre><p>Additionally, you can enable passwordless SSH key login, if you
 want.</p>
-
 <ol>
-<li><p>Create an RSA key, because <a href="https://forum.mikrotik.com/viewtopic.php?t=109143">ed25519 keys are not
+<li>
+<p>Create an RSA key, because <a href="https://forum.mikrotik.com/viewtopic.php?t=109143">ed25519 keys are not
 supported</a>:</p>
-
-<pre><code>% ssh-keygen -t rsa
+<pre tabindex="0"><code>% ssh-keygen -t rsa
 Generating public/private rsa key pair.
 Enter file in which to save the key: /home/michael/.ssh/id_mikrotik
 </code></pre></li>
-
-<li><p>Upload the <code>id_mikrotik.pub</code> file in Webfig</p></li>
-
-<li><p>Import the SSH public key for the <code>admin</code> user:</p>
-
-<pre><code>/user ssh-keys import user=admin public-key-file=id_mikrotik.pub
+<li>
+<p>Upload the <code>id_mikrotik.pub</code> file in Webfig</p>
+</li>
+<li>
+<p>Import the SSH public key for the <code>admin</code> user:</p>
+<pre tabindex="0"><code>/user ssh-keys import user=admin public-key-file=id_mikrotik.pub
 </code></pre></li>
 </ol>
-
 <h2 id="lock-down-the-router">Lock down the router</h2>
-
 <ol>
-<li><p><a href="https://help.mikrotik.com/docs/display/ROS/Webfig#Webfig-EnableHTTPS">Enable HTTPS in Webfig</a>.</p></li>
-
-<li><p>Disable all remote access except for SSH and HTTPS:</p>
-
-<pre><code>/ip service disable telnet,ftp,www,api,api-ssl,winbox
+<li>
+<p><a href="https://help.mikrotik.com/docs/display/ROS/Webfig#Webfig-EnableHTTPS">Enable HTTPS in Webfig</a>.</p>
+</li>
+<li>
+<p>Disable all remote access except for SSH and HTTPS:</p>
+<pre tabindex="0"><code>/ip service disable telnet,ftp,www,api,api-ssl,winbox
 </code></pre></li>
-
-<li><p>Follow <a href="https://wiki.mikrotik.com/wiki/Manual:Securing_Your_Router#Neighbor_Discovery">MikroTik Securing Your
+<li>
+<p>Follow <a href="https://wiki.mikrotik.com/wiki/Manual:Securing_Your_Router#Neighbor_Discovery">MikroTik Securing Your
 Router</a>
 recommendations:</p>
-
-<pre><code>/tool mac-server set allowed-interface-list=none
+<pre tabindex="0"><code>/tool mac-server set allowed-interface-list=none
 /tool mac-server mac-winbox set allowed-interface-list=none
 /tool mac-server ping set enabled=no
 /tool bandwidth-server set enabled=no
@@ -360,41 +337,31 @@ recommendations:</p>
 /ip neighbor discovery-settings set discover-interface-list=none
 </code></pre></li>
 </ol>
-
 <h2 id="enable-dhcpv6-client">Enable DHCPv6 Client</h2>
-
 <p>For some reason, you need to explicitly enable IPv6 in 2021:</p>
-
-<pre><code>/system package enable ipv6
+<pre tabindex="0"><code>/system package enable ipv6
 /system reboot
-</code></pre>
-
-<p>MikroTik says this is a precaution so that users don’t end up with default-open
+</code></pre><p>MikroTik says this is a precaution so that users don’t end up with default-open
 firewall settings for IPv6. But then why don’t they just add some default
 firewall rules?!</p>
-
 <p>Anyway, to configure and immediately enable the DHCPv6 client, use:</p>
-
-<pre><code>/ipv6 dhcp-client add pool-name=fiber7 pool-prefix-length=64 interface=sfp28-1 add-default-route=yes use-peer-dns=no request=address,prefix
-</code></pre>
-
-<h3 id="modify-the-ipv6-duid">Modify the IPv6 DUID</h3>
-
+<pre tabindex="0"><code>/ipv6 dhcp-client add pool-name=fiber7 pool-prefix-length=64 interface=sfp28-1 add-default-route=yes use-peer-dns=no request=address,prefix
+</code></pre><h3 id="modify-the-ipv6-duid">Modify the IPv6 DUID</h3>
 <p>Unfortunately, MikroTik does not offer any user interface to set the IPv6 DUID,
 which I need to configure to obtain my static IPv6 network prefix from my
 provider’s DHCPv6 server.</p>
-
 <p>Luckily, the DUID is included in backup files, so we can edit it and restore
 from backup:</p>
-
 <ol>
-<li>Run <code>/system backup save</code></li>
-
-<li><p>Download the backup file in Webfig by navigating to Files → Backup → Download.</p></li>
-
-<li><p>Convert the backup file to hex in textual form, edit the DUID and convert it back to binary:</p>
-
-<pre><code>% xxd MikroTik-19700102-0111.backup MikroTik-19700102-0111.backup.hex
+<li>
+<p>Run <code>/system backup save</code></p>
+</li>
+<li>
+<p>Download the backup file in Webfig by navigating to Files → Backup → Download.</p>
+</li>
+<li>
+<p>Convert the backup file to hex in textual form, edit the DUID and convert it back to binary:</p>
+<pre tabindex="0"><code>% xxd MikroTik-19700102-0111.backup MikroTik-19700102-0111.backup.hex
 
 % emacs MikroTik-19700102-0111.backup.hex
 # Search for “dhcp/duid” in the file and edit accordingly:
@@ -402,50 +369,32 @@ from backup:</p>
 
 % xxd -r MikroTik-19700102-0111.backup.hex MikroTik-19700102-0111-patched.backup
 </code></pre></li>
-
-<li><p>Upload the file in Webfig, then restore the backup:</p>
-
-<p><code>/system backup load name=MikroTik-19700102-0111-patched.backup</code></p></li>
+<li>
+<p>Upload the file in Webfig, then restore the backup:</p>
+<p><code>/system backup load name=MikroTik-19700102-0111-patched.backup</code></p>
+</li>
 </ol>
-
 <h2 id="enable-ipv6-router-advertisements">Enable IPv6 Router Advertisements</h2>
-
 <p>To make the router assign an IPv6 address from the obtained pool for itself, and
 then send IPv6 Router Advertisements to the network, set:</p>
-
-<pre><code>/ipv6 address add address=::1 from-pool=fiber7 interface=bridge1
+<pre tabindex="0"><code>/ipv6 address add address=::1 from-pool=fiber7 interface=bridge1
 /ipv6 nd add interface=bridge1 managed-address-configuration=yes other-configuration=yes
-</code></pre>
-
-<h2 id="enable-dhcpv4-client">Enable DHCPv4 Client</h2>
-
+</code></pre><h2 id="enable-dhcpv4-client">Enable DHCPv4 Client</h2>
 <p>To configure and immediately enable the <a href="https://wiki.mikrotik.com/wiki/Manual:IP/DHCP_Client">DHCPv4
 client</a> on the upstream
 port, use:</p>
-
-<pre><code>/ip dhcp-client add interface=sfp28-1 disabled=no
-</code></pre>
-
-<p>I also changed the MAC address to match my old router’s address, just to take
+<pre tabindex="0"><code>/ip dhcp-client add interface=sfp28-1 disabled=no
+</code></pre><p>I also changed the MAC address to match my old router’s address, just to take
 maximum precaution to avoid any Port Security related issues with my provider’s
 DHCP server:</p>
-
-<pre><code>/interface ethernet set sfp28-1 mac-address=00:0d:fa:4c:0c:31
-</code></pre>
-
-<h2 id="enable-dns-server">Enable DNS Server</h2>
-
+<pre tabindex="0"><code>/interface ethernet set sfp28-1 mac-address=00:0d:fa:4c:0c:31
+</code></pre><h2 id="enable-dns-server">Enable DNS Server</h2>
 <p>By default, only the MikroTik itself can send DNS queries. Enable access for
 network clients:</p>
-
-<pre><code>/ip dns set allow-remote-requests=yes
-</code></pre>
-
-<h2 id="enable-dhcpv4-server">Enable DHCPv4 Server</h2>
-
+<pre tabindex="0"><code>/ip dns set allow-remote-requests=yes
+</code></pre><h2 id="enable-dhcpv4-server">Enable DHCPv4 Server</h2>
 <p>First, let’s bundle all SFP+ ports into a single bridge interface:</p>
-
-<pre><code>/interface bridge add name=bridge1
+<pre tabindex="0"><code>/interface bridge add name=bridge1
 /interface bridge port add bridge=bridge1 interface=sfp-sfpplus1 hw=yes
 /interface bridge port add bridge=bridge1 interface=sfp-sfpplus2 hw=yes
 /interface bridge port add bridge=bridge1 interface=sfp-sfpplus3 hw=yes
@@ -458,11 +407,8 @@ network clients:</p>
 /interface bridge port add bridge=bridge1 interface=sfp-sfpplus10 hw=yes
 /interface bridge port add bridge=bridge1 interface=sfp-sfpplus11 hw=yes
 /interface bridge port add bridge=bridge1 interface=sfp-sfpplus12 hw=yes
-</code></pre>
-
-<p>This means we’ll use the device like a big switch with routing between the
+</code></pre><p>This means we’ll use the device like a big switch with routing between the
 switch and the uplink port <code>sfp28-1</code>.</p>
-
 <aside class="admonition note">
   <div class="note-container">
     <div class="note-icon">
@@ -481,11 +427,9 @@ per a forum post</a>.</div>
   </div>
 </aside>
 
-
 <p>To configure the DHCPv4 Server, configure an IP address, then start the setup
 wizard:</p>
-
-<pre><code>/ip address add address=10.0.0.1/24 interface=bridge1
+<pre tabindex="0"><code>/ip address add address=10.0.0.1/24 interface=bridge1
 /ip dhcp-server setup
 Select interface to run DHCP server on
 
@@ -505,65 +449,44 @@ dns servers: 10.0.0.1
 Select lease time
 
 lease time: 20m
-</code></pre>
-
-<h2 id="enable-ipv4-nat">Enable IPv4 NAT</h2>
-
+</code></pre><h2 id="enable-ipv4-nat">Enable IPv4 NAT</h2>
 <p>We need NAT to route all IPv4 traffic over our single public IP address:</p>
-
-<pre><code>/ip firewall nat add action=masquerade chain=srcnat out-interface=sfp28-1 to-addresses=0.0.0.0
-</code></pre>
-
-<p>Disable NAT services for security, e.g. to mitigate against NAT slipstreaming
+<pre tabindex="0"><code>/ip firewall nat add action=masquerade chain=srcnat out-interface=sfp28-1 to-addresses=0.0.0.0
+</code></pre><p>Disable NAT services for security, e.g. to mitigate against NAT slipstreaming
 attacks:</p>
-
-<pre><code>/ip firewall service-port disable ftp,tftp,irc,h323,sip,pptp,udplite,dccp,sctp
-</code></pre>
-
-<p>I can observe ≈10-20% CPU load when doing a Gigabit speed test over IPv4.</p>
-
+<pre tabindex="0"><code>/ip firewall service-port disable ftp,tftp,irc,h323,sip,pptp,udplite,dccp,sctp
+</code></pre><p>I can observe ≈10-20% CPU load when doing a Gigabit speed test over IPv4.</p>
 <h2 id="todo-list">TODO list</h2>
-
 <p>The following features I did not get around to configuring, but they were on my
 list:</p>
-
 <ul>
 <li><a href="https://help.mikrotik.com/docs/display/ROS/First+Time+Configuration">IPv4 port forwardings</a></li>
 <li>Cloudflare DynDNS update script</li>
 <li><a href="https://wiki.mikrotik.com/wiki/Setting_static_DNS_record_for_each_DHCP_lease">DNS resolution for DHCP hostnames</a></li>
 </ul>
-
 <h2 id="returned">Why I returned it</h2>
-
 <p>Initially, I thought the device’s fan spins up only at boot, and then the large
 heatsink takes care of all cooling needs. Unfortunately, after an hour or so
 into my experiment, I noticed that the MikroTik would spin up the fan for a
 whole minute or so occasionally! Very annoying.</p>
-
 <p>I also ran into weird DNS slow-downs, which I didn’t fully diagnose. In
 Wireshark, it looked like my machine sent 2 DNS queries but received only 1 DNS
 result, and then waited for a timeout.</p>
-
 <p>I also noticed that I have a few more unexpected dependencies such as my home
 automation using DHCP lease state by subscribing to an MQTT topic. Addressing
 this issue and other similar little problems would have taken a bunch more time
 and would have resulted in a less reliable system than I have today.</p>
-
 <p>Since I last used MikroTik in 2014 the software seems to have barely changed. I
 wish they finally implemented some table-stakes features like DNS resolution for
 DHCP hostnames.</p>
-
 <p>Given all the above, I no longer felt like getting enough value for the money
 from the MikroTik, and found it easier to just switch back to <a href="https://router7.org/">my own
 router7</a> and return the MikroTik.</p>
-
 <p>I will probably stick with the router7 software, but exchange the PC Engines APU
 with the smallest PC that has enough PCI-E bandwidth for a multi-port SFP28
 network card.</p>
-
 <h2 id="appendix-a-full-configuration">Appendix A: Full configuration</h2>
-
-<pre><code># may/28/2021 11:40:15 by RouterOS 6.47.9
+<pre tabindex="0"><code># may/28/2021 11:40:15 by RouterOS 6.47.9
 # software id = 6YZE-HKM8
 #
 # model = CCR2004-1G-12S+2XS
@@ -644,7 +567,6 @@ set allowed-interface-list=none
 /tool mac-server ping
 set enabled=no
 </code></pre>
-
 </div>
 
       </div>
@@ -653,27 +575,25 @@ set enabled=no
     <strong>Table Of Contents</strong>
 
     <nav class="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#configuration">Configuration</a></li>
-<li><a href="#update-firmware">Update firmware</a></li>
-<li><a href="#set-up-auth">Set up auth</a></li>
-<li><a href="#lock-down-the-router">Lock down the router</a></li>
-<li><a href="#enable-dhcpv6-client">Enable DHCPv6 Client</a>
-<ul>
-<li><a href="#modify-the-ipv6-duid">Modify the IPv6 DUID</a></li>
-</ul></li>
-<li><a href="#enable-ipv6-router-advertisements">Enable IPv6 Router Advertisements</a></li>
-<li><a href="#enable-dhcpv4-client">Enable DHCPv4 Client</a></li>
-<li><a href="#enable-dns-server">Enable DNS Server</a></li>
-<li><a href="#enable-dhcpv4-server">Enable DHCPv4 Server</a></li>
-<li><a href="#enable-ipv4-nat">Enable IPv4 NAT</a></li>
-<li><a href="#todo-list">TODO list</a></li>
-<li><a href="#returned">Why I returned it</a></li>
-<li><a href="#appendix-a-full-configuration">Appendix A: Full configuration</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#configuration">Configuration</a></li>
+    <li><a href="#update-firmware">Update firmware</a></li>
+    <li><a href="#set-up-auth">Set up auth</a></li>
+    <li><a href="#lock-down-the-router">Lock down the router</a></li>
+    <li><a href="#enable-dhcpv6-client">Enable DHCPv6 Client</a>
+      <ul>
+        <li><a href="#modify-the-ipv6-duid">Modify the IPv6 DUID</a></li>
+      </ul>
+    </li>
+    <li><a href="#enable-ipv6-router-advertisements">Enable IPv6 Router Advertisements</a></li>
+    <li><a href="#enable-dhcpv4-client">Enable DHCPv4 Client</a></li>
+    <li><a href="#enable-dns-server">Enable DNS Server</a></li>
+    <li><a href="#enable-dhcpv4-server">Enable DHCPv4 Server</a></li>
+    <li><a href="#enable-ipv4-nat">Enable IPv4 NAT</a></li>
+    <li><a href="#todo-list">TODO list</a></li>
+    <li><a href="#returned">Why I returned it</a></li>
+    <li><a href="#appendix-a-full-configuration">Appendix A: Full configuration</a></li>
+  </ul>
 </nav>
   </div>
 </div>

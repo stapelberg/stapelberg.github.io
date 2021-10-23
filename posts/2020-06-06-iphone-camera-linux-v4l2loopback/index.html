@@ -192,10 +192,7 @@
   
 </div>
 <div class="Artikel" id="content">
-  
-
-<!-- TODO: align=right -->
-
+  <!-- TODO: align=right -->
 
 
 
@@ -223,90 +220,68 @@
 
 
 
-
 <p>For my <a href="https://www.twitch.tv/stapelberg">programming stream at
 twitch.tv/stapelberg</a>, I wanted to add an
 additional camera to show test devices, electronics projects, etc. I couldn’t
 find my old webcam, and new ones are hard to come by currently, so I figured I
 would try to include a phone camera somehow.</p>
-
 <p>The setup that I ended up with is:</p>
-
 <p>iPhone camera<br>
 → Instant Webcam<br>
 → WiFi<br>
 → gstreamer<br>
 → v4l2loopback<br>
 → OBS</p>
-
 <p>Disclaimer: I was only interested in a video stream! I don’t think this setup
 would be helpful for video conferencing, due to lacking audio/video
 synchronization.</p>
-
 <h3 id="iphone-software-instant-webcam-app">iPhone Software: Instant Webcam app</h3>
-
 <p>I’m using the <a href="https://instant-webcam.com/">PhobosLab Instant Webcam</a> (install
 from the <a href="https://apps.apple.com/us/app/instant-webcam/id683949930">Apple App
 Store</a>) app on an old
 iPhone 8 that I bought used.</p>
-
 <p>There are three interesting related blog posts by app author Dominic Szablewski:</p>
-
 <ol>
 <li><a href="https://phoboslab.org/log/2013/05/mpeg1-video-decoder-in-javascript">MPEG1 Video Decoder in JavaScript</a> (2013-May)</li>
 <li><a href="https://phoboslab.org/log/2013/09/html5-live-video-streaming-via-websockets">HTML5 Live Video Streaming via WebSockets</a> (2013-Sep)</li>
 <li><a href="https://phoboslab.org/log/2017/02/decode-it-like-its-1999">Decode it like it’s 1999</a> (2017-Feb)</li>
 </ol>
-
 <p>As hinted at in the blog posts, the way the app works is by streaming MPEG1
 video from the iPhone (presumably via ffmpeg?) to the <a href="https://jsmpeg.com/">jsmpeg JavaScript
 library</a> via WebSockets.</p>
-
 <p>After some git archeology, I figured out that <a href="https://github.com/phoboslab/jsmpeg/commit/7bf420fd0c176d626a50494bfe32135dd911483d">jsmpeg was rewritten in commit
 7bf420fd just after
 v0.2</a>. You
 can <a href="https://github.com/phoboslab/jsmpeg/tree/186666dd9c2d1fd3430d41f15f695d4a78ed1e42">browse the old version on
 GitHub</a>.</p>
-
 <p>Notably, the Instant Webcam app seems to <strong>still use the older v0.2 version</strong>,
 which <a href="https://github.com/phoboslab/jsmpeg/blob/186666dd9c2d1fd3430d41f15f695d4a78ed1e42/stream-server.js">starts WebSocket streams with a custom 8-byte
 header</a>
 that we need to strip.</p>
-
 <h3 id="linux-software">Linux Software</h3>
-
 <p>Install the <a href="https://github.com/umlaeute/v4l2loopback"><code>v4l2loopback</code></a> kernel
 module, e.g.
 <a href="https://www.archlinux.org/packages/community/any/v4l2loopback-dkms/"><code>community/v4l2loopback-dkms</code></a>
 on Arch Linux or
 <a href="https://packages.debian.org/bullseye/v4l2loopback-dkms"><code>v4l2loopback-dkms</code></a> on
 Debian. I used version 0.12.5-1 at the time of writing.</p>
-
 <p>Then, install <a href="https://gstreamer.freedesktop.org/">gstreamer</a> and required
 plugins. I used version 1.16.2 for all of these:</p>
-
 <ul>
 <li><a href="https://www.archlinux.org/packages/extra/x86_64/gstreamer/"><code>gstreamer</code></a></li>
 <li><a href="https://www.archlinux.org/packages/extra/x86_64/gst-plugins-bad/"><code>gst-plugins-bad</code></a> for <code>mpegvideoparse</code></li>
 <li><a href="https://www.archlinux.org/packages/extra/x86_64/gst-libav/"><code>gst-libav</code></a> for <code>avdec_mpeg2video</code></li>
 </ul>
-
 <p>Lastly, install either <a href="https://github.com/vi/websocat"><code>websocat</code></a> or
 <a href="https://github.com/esphen/wsta"><code>wsta</code></a> for accessing WebSockets. I
 successfully tested with <code>websocat</code> 1.5.0 and <code>wsta</code> 0.5.0.</p>
-
 <h3 id="streaming">Streaming</h3>
-
 <p>First, load the <code>v4l2loopback</code> kernel module:</p>
-
-<pre><code>% sudo modprobe v4l2loopback video_nr=10 card_label=v4l2-iphone
-</code></pre>
-
-<p>Then, we’re going to use gstreamer to decode the WebSocket MPEG1 stream (after
+<pre tabindex="0"><code>% sudo modprobe v4l2loopback video_nr=10 card_label=v4l2-iphone
+</code></pre><p>Then, we’re going to use gstreamer to decode the WebSocket MPEG1 stream (after
 stripping the custom 8-byte header) and send it into the <code>/dev/video10</code> V4L2
 device, to the <code>v4l2loopback</code> kernel module:</p>
-
-<pre><code>% websocat --binary ws://iPhone.lan/ws | \
+<pre tabindex="0"><code>% websocat --binary ws://iPhone.lan/ws | \
   dd bs=8 skip=1 | \
   gst-launch-1.0 \
     fdsrc \
@@ -317,50 +292,43 @@ device, to the <code>v4l2loopback</code> kernel module:</p>
     ! videorate \
     ! 'video/x-raw, format=YUY2, framerate=30/1' \
     ! v4l2sink device=/dev/video10 sync=false
-</code></pre>
-
-<p>Here are a couple of notes about individual parts of this pipeline:</p>
-
+</code></pre><p>Here are a couple of notes about individual parts of this pipeline:</p>
 <ul>
-<li><p>You must set <code>websocat</code> (or the alternative
+<li>
+<p>You must set <code>websocat</code> (or the alternative
 <a href="https://github.com/esphen/wsta"><code>wsta</code></a>) into binary mode, otherwise they
 will garble the output stream with newline characters, resulting in a
-seemingly kinda working stream that just displays garbage. Ask me how I know.</p></li>
-
-<li><p>The <code>queue</code> element uncouples decoding from reading from the network socket,
-which should help in case the network has intermittent troubles.</p></li>
-
-<li><p>Without enforcing <code>framerate=30/1</code>, you cannot cancel and restart the
-gstreamer pipeline: subsequent invocations will fail with <code>streaming stopped,
-reason not-negotiated (-4)</code></p></li>
-
-<li><p>Setting format <code>YUY2</code> allows <code>ffmpeg</code>-based decoders to play the
-stream. Without this setting, e.g. <code>ffplay</code> will fail with <code>[ffmpeg/demuxer]
-video4linux2,v4l2: Dequeued v4l2 buffer contains 462848 bytes, but 460800 were
-expected. Flags: 0x00000001.</code></p></li>
-
-<li><p>The <code>sync=false</code> property on <code>v4l2sink</code> plays frames as quickly as possible
-without trying to do any synchronization.</p></li>
+seemingly kinda working stream that just displays garbage. Ask me how I know.</p>
+</li>
+<li>
+<p>The <code>queue</code> element uncouples decoding from reading from the network socket,
+which should help in case the network has intermittent troubles.</p>
+</li>
+<li>
+<p>Without enforcing <code>framerate=30/1</code>, you cannot cancel and restart the
+gstreamer pipeline: subsequent invocations will fail with <code>streaming stopped, reason not-negotiated (-4)</code></p>
+</li>
+<li>
+<p>Setting format <code>YUY2</code> allows <code>ffmpeg</code>-based decoders to play the
+stream. Without this setting, e.g. <code>ffplay</code> will fail with <code>[ffmpeg/demuxer] video4linux2,v4l2: Dequeued v4l2 buffer contains 462848 bytes, but 460800 were expected. Flags: 0x00000001.</code></p>
+</li>
+<li>
+<p>The <code>sync=false</code> property on <code>v4l2sink</code> plays frames as quickly as possible
+without trying to do any synchronization.</p>
+</li>
 </ul>
-
 <p>Now, consumers such as <a href="https://obsproject.com/">OBS (Open Broadcaster
 Software)</a>, <code>ffplay</code> or <code>mpv</code> can capture from
 <code>/dev/video10</code>:</p>
-
-<pre><code>% ffplay /dev/video10
+<pre tabindex="0"><code>% ffplay /dev/video10
 % mpv av://v4l2:/dev/video10 --profile=low-latency
-</code></pre>
-
-<h3 id="debugging">Debugging</h3>
-
+</code></pre><h3 id="debugging">Debugging</h3>
 <p>Hopefully the instructions above just work for you, but in case things go wrong,
 maybe the following notes are helpful.</p>
-
 <p>To debug issues, I used the <code>GST_DEBUG_DUMP_DOT_DIR</code> environment variable as
 described on <a href="https://gstreamer.freedesktop.org/documentation/tutorials/basic/debugging-tools.html?gi-language=c#getting-pipeline-graphs">Debugging tools: Getting pipeline
 graphs</a>. In
 these graphs, you can quickly see which pipeline elements negotiate which caps.</p>
-
 <p>I also used the <a href="https://github.com/phoboslab/pl_mpeg">PL_MPEG</a> example program
 to play the <a href="https://phoboslab.org/files/bjork-all-is-full-of-love.mpg">supplied MPEG test
 file</a>. PL_MPEG is
@@ -370,7 +338,6 @@ library</a>. I
 figured the codec and parameters might be similar between the different projects
 of the same author and used this to gain more confidence into the stream
 parameters.</p>
-
 <p>I also used <a href="https://www.wireshark.org/">Wireshark</a> to look at the stream
 traffic to discover that <code>websocat</code> and <code>wsta</code> garble the stream output by
 default unless the <code>--binary</code> flag is used.</p>

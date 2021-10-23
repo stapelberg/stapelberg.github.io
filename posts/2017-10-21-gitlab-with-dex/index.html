@@ -9,7 +9,7 @@
   <meta property="og:title" content="Making GitLab authenticate against dex">
   <meta property="og:description" content="Because I found it frustratingly hard to make GitLab and dex talk to each other, this article walks you through what I did step-by-step.
 Let’s establish some terminology:
- dex is our OpenID Connect (OIDC) “Provider (OP)”
+  dex is our OpenID Connect (OIDC) “Provider (OP)”
 in other words: the component which verifies usernames and passwords.">
   
   
@@ -21,7 +21,7 @@ in other words: the component which verifies usernames and passwords.">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
   <meta name="description" content="Because I found it frustratingly hard to make GitLab and dex talk to each other, this article walks you through what I did step-by-step.
 Let’s establish some terminology:
- dex is our OpenID Connect (OIDC) “Provider (OP)”
+  dex is our OpenID Connect (OIDC) “Provider (OP)”
 in other words: the component which verifies usernames and passwords.">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2017-10-21-gitlab-with-dex/">
   <meta name="author" content="Michael Stapelberg">
@@ -191,39 +191,33 @@ in other words: the component which verifies usernames and passwords.">
   
 </div>
 <div class="Artikel" id="content">
-  
-
-<p>Because I found it frustratingly hard to make GitLab and dex talk to each other,
+  <p>Because I found it frustratingly hard to make GitLab and dex talk to each other,
 this article walks you through what I did step-by-step.</p>
-
 <p>Let’s establish some terminology:</p>
-
 <ul>
-<li><p><a href="https://github.com/coreos/dex">dex</a> is our OpenID Connect (OIDC) “Provider
-(OP)”<br>in other words: the component which verifies usernames and passwords.</p></li>
-
-<li><p><a href="https://gitlab.com/">GitLab</a> is our OpenID Connect (OIDC) “Relying Party
+<li>
+<p><a href="https://github.com/coreos/dex">dex</a> is our OpenID Connect (OIDC) “Provider
+(OP)”<br>in other words: the component which verifies usernames and passwords.</p>
+</li>
+<li>
+<p><a href="https://gitlab.com/">GitLab</a> is our OpenID Connect (OIDC) “Relying Party
 (RP)”<br>in other words: the component where the user actually wants to log
-in.</p></li>
+in.</p>
+</li>
 </ul>
-
 <h3 id="step-1-configure-dex">Step 1: configure dex</h3>
-
 <p>First, I followed dex’s <a href="https://github.com/coreos/dex/blob/master/Documentation/getting-started.md">Getting
 started</a>
 guide until I had dex serving the example config.</p>
-
 <p>Then, I made the following changes to
 <a href="https://github.com/coreos/dex/blob/master/examples/config-dev.yaml">examples/config-dev.yaml</a>:</p>
-
 <ol>
 <li>Change the issuer URL to be fully qualified and use HTTPS.</li>
 <li>Configure the HTTPS listener.</li>
 <li>Configure GitLab’s redirect URI.</li>
 </ol>
-
 <p>Here is a diff:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff"><span style="color:#a00000">--- /proc/self/fd/11	2017-10-21 15:01:49.005587935 +0200
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff"><span style="color:#a00000">--- /proc/self/fd/11	2017-10-21 15:01:49.005587935 +0200
 </span><span style="color:#a00000"></span><span style="color:#00a000">+++ /tmp/config-dev.yaml	2017-10-21 15:01:47.121632025 +0200
 </span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -1,7 +1,7 @@
 </span><span style="color:#800080;font-weight:bold"></span> # The base path of dex and the external name of the OpenID Connect service.
@@ -257,20 +251,15 @@ guide until I had dex serving the example config.</p>
 </span><span style="color:#a00000"></span><span style="color:#00a000">+  - &#39;http://gitlab.example.net/users/auth/mydex/callback&#39;
 </span><span style="color:#00a000"></span>   name: &#39;Example App&#39;
    secret: ZXhhbXBsZS1hcHAtc2VjcmV0
-</code></pre></div>
-<h3 id="step-2-configure-gitlab">Step 2: configure GitLab</h3>
-
+</code></pre></div><h3 id="step-2-configure-gitlab">Step 2: configure GitLab</h3>
 <p>First, I followed <a href="https://docs.gitlab.com/omnibus/docker/">GitLab Docker
 images</a> to get GitLab running in
 Docker.</p>
-
 <p>Then, I swapped out the image with
 <a href="https://hub.docker.com/r/computersciencehouse/gitlab-ce-oidc/">computersciencehouse/gitlab-ce-oidc</a>,
 which is based on the official image, but adds OpenID Connect support.</p>
-
 <p>I added the following config to <code>/srv/gitlab/config/gitlab.rb</code>:</p>
-
-<pre><code>gitlab_rails['omniauth_enabled'] = true
+<pre tabindex="0"><code>gitlab_rails['omniauth_enabled'] = true
 
 # Must match the args.name (!) of our configured omniauth provider:
 gitlab_rails['omniauth_allow_single_sign_on'] = ['mydex']
@@ -318,13 +307,10 @@ gitlab_rails['omniauth_providers'] = [
   }
 ]
 
-</code></pre>
-
-<h3 id="step-3-patch-omniauth-openid-connect">Step 3: patch omniauth-openid-connect</h3>
-
+</code></pre><h3 id="step-3-patch-omniauth-openid-connect">Step 3: patch omniauth-openid-connect</h3>
 <p>Until <a href="https://github.com/coreos/dex/issues/376">dex issue #376</a> is fixed, the
 following patch for the omniauth-openid-connect gem is required:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff"><span style="color:#a00000">--- /opt/gitlab/embedded/lib/ruby/gems/2.3.0/gems/omniauth-openid-connect-0.2.3/lib/omniauth/strategies/openid_connect.rb.orig	2017-10-21 12:31:50.777602847 +0000
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff"><span style="color:#a00000">--- /opt/gitlab/embedded/lib/ruby/gems/2.3.0/gems/omniauth-openid-connect-0.2.3/lib/omniauth/strategies/openid_connect.rb.orig	2017-10-21 12:31:50.777602847 +0000
 </span><span style="color:#a00000"></span><span style="color:#00a000">+++ /opt/gitlab/embedded/lib/ruby/gems/2.3.0/gems/omniauth-openid-connect-0.2.3/lib/omniauth/strategies/openid_connect.rb	2017-10-21 12:34:20.063308560 +0000
 </span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -42,24 +42,13 @@
 </span><span style="color:#800080;font-weight:bold"></span>       option :send_nonce, true

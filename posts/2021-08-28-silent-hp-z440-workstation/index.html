@@ -192,22 +192,16 @@ When I originally took the machine home, I immediately noticed that it’s quite
   
 </div>
 <div class="Artikel" id="content">
-  
-
-<p>Since March 2020, I have been using my work computer at home: an <a href="https://support.hp.com/us-en/document/c04506309">HP Z440
+  <p>Since March 2020, I have been using my work computer at home: an <a href="https://support.hp.com/us-en/document/c04506309">HP Z440
 workstation</a>.</p>
-
 <p>When I originally took the machine home, I immediately noticed that it’s quite a
 bit louder than my other PCs, but only now did I finally decide to investigate
 what I could do about it.</p>
-
 <h2 id="finding-all-the-fans">Finding all the fans</h2>
-
 <p>I first identified all fans, both by opening the chassis and looking around, and
 by looking at the <a href="http://h10032.www1.hp.com/ctg/Manual/c04823811">HP Z440 Maintenance and Service
 Guide</a>, which contains this
 description:</p>
-
 
 
 
@@ -235,9 +229,7 @@ description:</p>
 
 
 
-
 <p>Specifically, I identified the following fans:</p>
-
 <ul>
 <li>“1 Fan”, a 92mm rear fan, sucking air out of the back of the chassis.</li>
 <li>“5 Memory fans”, two 60mm fans in a custom HP plastic enclosure that are
@@ -248,19 +240,14 @@ chassis.</li>
 <li>My aftermarket nVidia GeForce GPU has 3 fans on a massive heat sink.</li>
 <li>The power supply has a fan, too, which I will not touch.</li>
 </ul>
-
 <h2 id="memory-fans">Memory fans</h2>
-
 <p>The Z440 comes with a custom HP plastic enclosure that is put over the CPU
 cooler, fastened with two clips at opposite ends, and positions two small 60mm
 fans above the DIMM banks.</p>
-
 <p>This memory fan plastic enclosure is a pain to find anywhere. It looks like HP
 is no longer producing it.</p>
-
 <p>The enclosure plugs into the mainboard with a custom connector that is directly
 wired up to the fans, meaning it’s a pain to replace the fans.</p>
-
 
 
 
@@ -288,24 +275,18 @@ wired up to the fans, meaning it’s a pain to replace the fans.</p>
 
 
 
-
 <p>Luckily, while <a href="https://www.workstation4u.de/de/ersatzteile/hp/hp-z440/1513/hp-z440-memory-cooling-solution-neu">shopping around for an
 enclosure</a>
 I could modify, I realized that memory fans are only required when installing
 more than 4 DIMM modules!</p>
-
 <p>My machine “only” has 64 GB of RAM, in 4 DIMM modules, and I don’t intend to
 upgrade anytime soon, so I just unplugged the whole memory fan enclosure and
 removed it from the chassis.</p>
-
 <p>The UEFI firmware does not complain about the memory fans missing (contrary to
 the rear fan!), and this simple change alone makes a noticeable difference in
 noise levels.</p>
-
 <h2 id="gpu-fans">GPU fans</h2>
-
 <p>nVidia GPUs can be run at different “PowerMizer” performance levels:</p>
-
 
 
 
@@ -333,38 +314,27 @@ noise levels.</p>
 
 
 
-
 <p>Many years ago, I ran into lag when using Chrome that went away as soon as I
 switched my nVidia GPU’s Preferred Mode to “Prefer Maximum Performance” instead
 of “Auto” or “Adaptive mode”.</p>
-
 <p>It turns out that nowadays, that is no longer a problem, so running at Prefer
 Maximum Performance is no longer necessary.</p>
-
 <p>Worse, pinning the GPU at the highest Performance Level means that it produces
 more heat, resulting in the fans having to spin up more often, and run for
 longer durations.</p>
-
 <p>But, even after switching to Auto, resulting in Adaptive mode being chosen, I
 noticed that my GPU was stuck at a higher PowerMizer level than I thought it
 should be.</p>
-
 <p>An easy fix is to limit the GPU to a certain PowerMizer level, and ideally not
 the lowest level (level 0). For me, one level after that (level 1) seems to
 result in no slow-down during my typical usage.</p>
-
 <p>I followed <a href="https://db.tannercrook.com/limiting-nvidia-gpu-in-linux/">this blog post to limit my GPU to PowerMizer level
 1</a>, i.e. I added
 <code>/etc/modprobe.d/nvidia-power-save.conf</code> with the following contents:</p>
-
-<pre><code>options nvidia NVreg_RegistryDwords=&quot;OverrideMaxPerf=0x2&quot;
-</code></pre>
-
-<p>…followed by a rebuild of my initramfs (<code>update-initramfs -u</code>) and a <code>reboot</code>.</p>
-
+<pre tabindex="0"><code>options nvidia NVreg_RegistryDwords=&quot;OverrideMaxPerf=0x2&quot;
+</code></pre><p>…followed by a rebuild of my initramfs (<code>update-initramfs -u</code>) and a <code>reboot</code>.</p>
 <p>This way, the fans don’t typically need to spin up as the GPU stays below its
 temperature limit.</p>
-
 <aside class="admonition note">
   <div class="note-container">
     <div class="note-icon">
@@ -381,13 +351,10 @@ on my Arch private machine…? I have not investigated why.</div>
   </div>
 </aside>
 
-
 <h2 id="rear-and-front-fans">Rear and front fans</h2>
-
 <p>With the memory fans and GPU fans out of the way, two easy to check fans remain:
 the rear fan and front fan. These are 92mm in size, the model number is Foxconn
 PVA092G12S.</p>
-
 
 
 
@@ -415,24 +382,19 @@ PVA092G12S.</p>
 
 
 
-
 <p>I unplugged both of them to see what effect these fans have on the noise level,
 and the difference was significant!</p>
-
 <p>Unfortunately, unplugging isn’t enough: the UEFI firmware complains on boot when
 the rear fan is not connected, requiring you to press <code>Enter</code> to boot. Also, the
 machine seems to get a few degrees Celsius hotter inside without the front and
 rear fans, so I don’t want to run the machine without these fans for an extended
 period of time.</p>
-
 <p>I ordered two <a href="https://noctua.at/en/nf-a9x14-pwm">Noctua NF-A9x14 PWM</a> fans (for
 about 25 CHF each) to replace the stock front and rear fans.</p>
-
 <p>Unfortunately, HP uses a custom 4-pin fan connector on its Z440 mainboard!
 Luckily, modifying the connector of the Noctua Low-Noise Adapter cable to fit on
 the custom 4-pin connector is as simple as using a knife to remove the
 connector’s guard rails:</p>
-
 
 
 
@@ -460,21 +422,15 @@ connector’s guard rails:</p>
 
 
 
-
 <h2 id="cpu-fan">CPU fan</h2>
-
 <p>For the CPU fan, HP again chose to use a <a href="https://h30434.www3.hp.com/t5/Business-PCs-Workstations-and-Point-of-Sale-Systems/Z620-Aftermarker-CPU-Cooler-CPU-Cooling-shroud-necessary-or/td-p/7842134">custom (6-pin)
 connector</a>.</p>
-
 <p>On the web, I read that the Z440 CPU fan is quite efficient and not worth
 replacing. This matches my experience, so I kept the standard Z440 CPU cooler.</p>
-
 <h2 id="conclusion">Conclusion</h2>
-
 <p>I was quite happy to discover that I could just unplug the memory fans, and
 configure my GPU to make less noise. Together with replacing the front/rear fans
 with Noctua ones, the machine is much quieter now than before!</p>
-
 <p>One downside of workstation-class hardware is that manufacturers (at least HP)
 like to build custom parts and solutions. Using their own fan connectors instead
 of standard connectors is such a pain! I’ll be sure to stick to standard PC

@@ -197,14 +197,13 @@
   </style>
   <details class="ms_toc_details">
     <summary>Table of contents</summary>
-    
+    <nav class="TableOfContents"></nav>
   </details>
   <p>
   Da mir Volker freundlicherweise seine brandneue Solid State Disk ausgeliehen
   hat um damit ein paar Tests durchzuführen, möchte ich meine Erfahrungen hier
   festhalten.
 </p>
-
 <p>
   Solid State Disks sind „Festplatten”, die nicht magnetisch funktionieren,
   sondern stattdessen Flash-Speicher verwenden. Durch die starke Nachfrage nach
@@ -214,7 +213,6 @@
   Szenarien attraktiv macht (nichtsdestotrotz sprechen wir immernoch von ca.
   180 € für eine 80 GB große SSD, Stand Dezember 2009).
 </p>
-
 <p>
   Im Vergleich mit magnetischen Festplatten haben Solid State Disks einige
   Vorteile, beispielsweise sind sie deutlich robuster (keine beweglichen
@@ -226,7 +224,6 @@
   muss. Das lässt die Zugriffszeiten bei Random Seeks von 10ms auf weniger als
   0.1ms fallen, zu den Auswirkungen später mehr…
 </p>
-
 <p>
   In diesem Artikel geht es darum, wie groß der Geschwindigkeitsvorteil in
   reellen Szenarien und in Benchmarks tatsächlich ist und insbesondere wie
@@ -236,9 +233,7 @@
   Disk ist die Super Talent Ultradrive GX MLC 256GB (2.5"), unter Linux als
   STT_FTM56GX25H (Firmware-Version 1819) erkannt.
 </p>
-
 <h1>Testbedingungen</h1>
-
 <p>
   Alle Tests wurden jeweils direkt nach dem Systemstart ausgeführt, sodass
   der Filesystem Cache keinen Einfluss hatte. Gemessen wurde auf einem zweiten
@@ -246,7 +241,6 @@
   nötig, da die Messungen in einigen Tests manuell durchgeführt wurden). Die
   einzelnen Tests wurden folgendermaßen ausgewählt und durchgeführt:
 </p>
-
 <ol>
   <li>
     <strong>Bootzeit:</strong> Die Zeit, die das System zum Hochfahren braucht,
@@ -288,14 +282,11 @@
     Hinzufügen von neuen Paketen.
   </li>
 </ol>
-
 <p>
   Die interne Festplatte, gegen welche die SSD antreten muss, ist eine
   FUJITSU MHZ2250BH G1.
 </p>
-
 <h1>Test 1: Fragmentierung bei ext4</h1>
-
 <p>
   Ich besitze mein Notebook nun etwas länger als ein Jahr und habe vor etwas
   weniger als einem Jahr das Dateisystem nach ext4 konvertiert. Über die Zeit
@@ -305,16 +296,13 @@
   gewissen Fragmentierung führt. Den Grad der Fragmentierung habe ich nicht
   gemessen, da mir dazu keine Tools bekannt sind.
 </p>
-
 <p>
   Im ersten Test möchte ich also wissen, wieviel schneller mein System wird,
   wenn ich alle Dateien kopiere, ein frisches ext4 anlege, und alle Dateien
   wiederherstelle. Da die SSD später ebenso befüllt wird, ist dies eine gute
   Vergleichsbasis.
 </p>
-
 <h2>Alltags-Szenarien mit fragmentiertem ext4 (LVM + dmcrypt)</h2>
-
 <ol>
   <li>
     <strong>Bootzeit:</strong> 40 Sekunden
@@ -334,9 +322,7 @@
     </ul>
   </li>
 </ol>
-
 <h2>Alltags-Szenarien mit frischem ext4 (LVM + dmcrypt)</h2>
-
 <ol>
   <li>
     <strong>Bootzeit:</strong> 32 Sekunden
@@ -356,12 +342,9 @@
     </ul>
   </li>
 </ol>
-
 <h2>Vergleich und Fazit</h2>
-
 <p><img src="/Bilder/ssd/ssd_ext4_fragment.png" style="border: 1px solid black"
- alt="Fragmentierung" border="0" width="700" height="525"></p>
-
+alt="Fragmentierung" border="0" width="700" height="525"></p>
 <p>
   Es lohnt sich durchaus sein Dateisystem jedes halbe Jahr neu zu befüllen,
   solange es noch keine Programme gibt, um ext4 zu Defragmentieren (daran wird
@@ -369,9 +352,7 @@
   die Restore-Funktion deines Backup-Programms auch tatsächlich funktioniert
   :-).
 </p>
-
 <h1>Test 2: Partitionstabelle, LVM und Crypto auf der Solid State Disk</h1>
-
 <p>
   Bevor ich die SSD mit meinem System bespielt habe, habe ich <a
   href="http://www.grml.org/">grml</a> von einem USB-Stick gestartet und damit
@@ -381,7 +362,6 @@
   eigentliche Block muss geschrieben, sondern der benachbarte Block muss
   gelesen, verändert und erneut geschrieben werden).
 </p>
-
 <p>
   Dazu gibt es verschiedene Stellen, an denen man ansetzen muss. Zum einen die
   Partitionstabelle, die angibt, wo die einzelnen Partitionen anfangen. Ein
@@ -391,9 +371,7 @@
   Ts'o</a> schreibt, dass 224 Köpfe und 56 Sektoren derzeit die sinnvollste
   Variante sind, somit ergibt sich folgender Befehl:
 </p>
-
 <pre># fdisk <strong>-H 224 -S 56</strong> /dev/sda</pre>
-
 <p>
   Der Debian-Installer legt nun üblicherweise (sofern man sein System komplett
   verschlüsselt) eine kleine Partition für <code>/boot</code> an und eine
@@ -403,22 +381,18 @@
   welches das eigentliche Dateisystem enthält, sowie ein LV namens „swap” für
   den Swapspace.
 </p>
-
 <p>
   Wir haben also wiederum drei weitere Stellen, die angepasst werden müssen:
   Zunächst stellen wir sicher, dass <code>dmcrypt</code> die Nutzdaten (im
   Gegensatz zum Header) an einem 128 KB-Block abspeichert:
 </p>
-
 <pre># cryptsetup -c aes-xts-plain -s 512 -y luksFormat /dev/sda2 <strong>--align-payload=256</strong>
 # cryptsetup luksOpen /dev/sda2 sda2_crypt</pre>
-
 <p>
   Anschließend erstellen wir ein PV und geben an, dass die Metadaten insgesamt
   256 KB umfassen sollen, sodass die Nutzdaten also wieder an einem 128
   KB-Block anfangen (das LV für swap lege ich in diesem Beispiel nicht an):
 </p>
-
 <pre># pvcreate <strong>--metadatasize 250k</strong> /dev/mapper/sda2_crypt
 # vgcreate x200 /dev/mapper/sda2_crypt
 # lvcreate -n root -L 230G x200
@@ -427,35 +401,27 @@
 # pvscan /dev/mapper/sda2_crypt
 # vgchange -ay
 </pre>
-
 <p>
   Als letzten Schritt erstellen wir das Dateisystem, welches die Daten in 32 *
   4 KB-Blöcke, also 128 KB-Blöcke verteilen soll.
 </p>
-
 <pre># mkfs.ext4 <strong>-E stripe-width=32</strong> /dev/mapper/x200-root</pre>
-
 <p>
   Weiterhin ist es erwähnenswert, dass man als I/O-Scheduler <code>noop</code>
   benutzen sollte, also kein Scheduling, da dies bei einer SSD nicht nötig ist
   (der Lesekopf muss nicht positioniert werden). Man startet also sein System
   mit folgendem Parameter in GRUB:
 </p>
-
 <pre>elevator=noop</pre>
-
 <p>
   Zum Testen habe ich nun Bonnie++ benutzt.
 </p>
-
 <h2>Vergleich und Fazit</h2>
-
 <p><img src="/Bilder/ssd/ssd_alignment_data.png" style="border: 1px solid black;
 margin-bottom: 15px" border="0" alt="Alignment" width="700" height="525">
 <br>
 <img src="/Bilder/ssd/ssd_alignment_seeks.png" style="border: 1px solid black"
- alt="Alignment" width="700" height="525"></p>
-
+alt="Alignment" width="700" height="525"></p>
 <p>
   Fazit: In der Praxis sind die Optimierungen auf Blockgröße nicht wirklich
   spürbar (die leichten Unterschiede lassen sich wohl am besten als
@@ -464,23 +430,18 @@ margin-bottom: 15px" border="0" alt="Alignment" width="700" height="525">
   jeweiligen Parameter zu setzen, schließlich ist es ja schnell gemacht und
   schlechter als garnicht ausgerichtet geht nicht…
 </p>
-
 <h1>Test 3: Solid State Disk und Vollverschlüsselung</h1>
-
 <p>
   Nachdem im vorigen Test die Datenrate stark einbrach und die Random Seeks
   etwas weniger, aber immer noch recht deutlich einbrachen, stellt sich die
   Frage: Wie sehr wirkt sich das auf die Alltagsszenarien aus?
 </p>
-
 <p>
   Zum Test habe ich also einmal das System ohne Verschlüsselung auf die
   SSD kopiert und anschließend mit Verschlüsselung. Dann wurden dieselben
   Testfälle wie in Test 1 durchgeführt:
 </p>
-
 <h2>Solid State Disk ohne LVM und ohne Verschlüsselung</h2>
-
 <ol>
   <li>
     <strong>Bootzeit:</strong> 9 Sekunden
@@ -500,9 +461,7 @@ margin-bottom: 15px" border="0" alt="Alignment" width="700" height="525">
     </ul>
   </li>
 </ol>
-
 <h2>Solid State Disk mit LVM und Verschlüsselung</h2>
-
 <ol>
   <li>
     <strong>Bootzeit:</strong> 9 Sekunden
@@ -522,12 +481,9 @@ margin-bottom: 15px" border="0" alt="Alignment" width="700" height="525">
     </ul>
   </li>
 </ol>
-
 <h2>Vergleich und Fazit</h2>
-
 <p><img src="/Bilder/ssd/ssd_crypto.png" style="border: 1px solid black"
- border="0" alt="Vollverschlüsselung" width="700" height="525"></p>
-
+border="0" alt="Vollverschlüsselung" width="700" height="525"></p>
 <p>
   Glücklicherweise macht sich die Vollverschlüsselung in den Alltagsszenarien
   kaum bemerkbar. Lediglich die Paketinstallation ist überhaupt messbar
@@ -535,9 +491,7 @@ margin-bottom: 15px" border="0" alt="Alignment" width="700" height="525">
   die Werte des frisch befüllten (ebenfalls verschlüsselten) ext4 auf meiner
   herkömmlichen Festplatte in die Grafik integriert.
 </p>
-
 <h1>Fazit</h1>
-
 <p>
   Die Solid State Disk von Super Talent ist ohne Zweifel sehr schnell (ich
   habe leider keinen direkten Vergleich zu anderen SSDs in meinem System)
@@ -552,14 +506,12 @@ margin-bottom: 15px" border="0" alt="Alignment" width="700" height="525">
   günstiger), dürfte dieses Manko nur bei wenigen Anwendungsfällen ins Gewicht
   fallen.
 </p>
-
 <p>
   Positiv aufgefallen ist mir, dass die SSD wirklich lautlos ist (oder die
   Geräusche komplett von den sonstigen Geräuschen wie CPU-Lüfter übertönt
   werden). Das macht das Arbeiten sehr angenehm, auch bei zugriffsintensiven
   Anwendungen (Suchen einer Datei beispielsweise).
 </p>
-
 <p>
   Der geringere Stromverbrauch zeigt sich nicht sehr deutlich, lediglich ein
   halbes Watt weniger frisst die SSD (bei der herkömmlichen Festplatte war
@@ -567,7 +519,6 @@ margin-bottom: 15px" border="0" alt="Alignment" width="700" height="525">
   die Festplatte die meiste Zeit im idle-Modus verbringen dürfte). Je nach
   Akku und Gerät kann das ca. eine halbe Stunde mehr Laufzeit bringen.
 </p>
-
 <p>
   Mir persönlich sind es die Vorteile noch nicht wert, mir eine SSD für mein
   Notebook zuzulegen. Oftmals möchte ich größere Dateien kopieren, wenn ich
@@ -578,9 +529,7 @@ margin-bottom: 15px" border="0" alt="Alignment" width="700" height="525">
   Systemplatte, ergänzt durch eine herkömmliche Festplatte für die Daten,
   durchaus Sinn ergeben :-).
 </p>
-
 <h1>PS</h1>
-
 <p>
   Übrigens: Die STT_FTM56GX25H (Firmware-Version 1819) hatte bei mir das
   Problem, dass sie, sobald SATA power link management auf
@@ -591,9 +540,7 @@ margin-bottom: 15px" border="0" alt="Alignment" width="700" height="525">
   geändert wird. Beliebte Orte zum Ändern dieser Einstellung sind
   beispielsweise <code>/etc/rc.local</code> oder <code>/etc/sysfs.conf</code>.
 </p>
-
 <h1>Weitere Links</h1>
-
 <ul>
   <li>
     <a href="http://thunk.org/tytso/blog/2009/02/20/aligning-filesystems-to-an-ssds-erase-block-size/">
@@ -629,7 +576,7 @@ margin-bottom: 15px" border="0" alt="Alignment" width="700" height="525">
   <div>
     <strong>Table Of Contents</strong>
 
-    
+    <nav class="TableOfContents"></nav>
   </div>
 </div>
 

@@ -189,9 +189,7 @@ Offenbar war mein erster Nuki Opener defekt.
   
 </div>
 <div class="Artikel" id="content">
-  
-
-<aside class="admonition note">
+  <aside class="admonition note">
   <div class="note-container">
     <div class="note-icon">
       <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
@@ -204,30 +202,23 @@ Offenbar war mein erster Nuki Opener defekt.
     </div>
     <div class="admonition-content"><p><strong>Update 2020-11-03:</strong> Ich habe den zweiten Nuki Opener auf Software-Version
 1.5.3 aktualisiert, und wider erwarten funktioniert er!</p>
-
 <p>Offenbar war mein erster Nuki Opener defekt.</p>
 </div>
   </div>
 </aside>
 
-
 <p>Ich habe kürzlich einen Nuki Opener gekauft und leider nicht in Betrieb nehmen
 können.</p>
-
 <p>Den Nuki Opener konnte ich zwar anlernen, aber wenn er versucht, die Tür zu
 öffnen, passiert im Haus einfach nichts — die Klingelanlage reagiert nicht.</p>
-
 <p>Nachdem ich mit dem Nuki Support nicht weiterkam, habe ich mir zum Vergleich
 einen zweiten Nuki Opener gekauft.</p>
-
 <p>Mit dem <strong>zweiten Nuki Opener funktioniert</strong> die gleiche Modellwahl (Hersteller
 BTicino, Modell 344212) und <a href="/posts/2020-09-28-nuki-scs-bticino-decoding/">gleiche
 Verkabelung</a>: die Klingelanlage
 entsperrt die Tür.</p>
-
 <p>Ein Unterschied zwischen den beiden Geräten: der zweite Opener läuft noch mit
 der alten Software-Version:</p>
-
 <table>
 <thead>
 <tr>
@@ -236,20 +227,17 @@ der alten Software-Version:</p>
 <th>Funktioniert?</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>Nuki Opener #1</td>
 <td>1.5.3 (aktuell)</td>
 <td>kaputt :-(</td>
 </tr>
-
 <tr>
 <td>Nuki Opener #2</td>
 <td>1.3.1</td>
 <td>funktioniert!</td>
 </tr>
-
 <tr>
 <td>Nuki Opener #2</td>
 <td>1.5.3</td>
@@ -257,43 +245,36 @@ der alten Software-Version:</p>
 </tr>
 </tbody>
 </table>
-
 <p><s>Für mich sieht alles danach aus, als ob sich in neuere Software-Versionen ein
 Fehler eingeschlichen hat.</s></p>
-
 <p>Meine Oszilloskop-Aufzeichnungen beider Software-Versionen belegen, dass das
 Signal, welches der Nuki Opener #1 auf den <a href="https://en.wikipedia.org/wiki/Bus_SCS">BTicino SCS
 Bus</a> schickt, kaputt ist!</p>
-
 <p>Ich stelle die rohen Messwerte jeweils in mehreren Formaten zur Verfügung, mit
 denen die Engineers bei Nuki das Problem einfach nachstellen und beheben können:</p>
-
 <ul>
-<li><p>Die original Rigol Waveform-Dateien kann man mit <a href="https://www.rigolna.com/download/">Rigol
-Ultrascope</a> öffnen.</p></li>
-
-<li><p>Bequemer ist wohl, die CSV-Variante in andere Waveform Viewer zu importieren.</p></li>
-
-<li><p><a href="/posts/2020-09-28-nuki-scs-bticino-decoding/">SCS Signale dekodiert man am
+<li>
+<p>Die original Rigol Waveform-Dateien kann man mit <a href="https://www.rigolna.com/download/">Rigol
+Ultrascope</a> öffnen.</p>
+</li>
+<li>
+<p>Bequemer ist wohl, die CSV-Variante in andere Waveform Viewer zu importieren.</p>
+</li>
+<li>
+<p><a href="/posts/2020-09-28-nuki-scs-bticino-decoding/">SCS Signale dekodiert man am
 einfachsten</a> mit dem <a href="https://sigrok.org/">freien
-Logic Analyzer sigrok</a>.</p></li>
+Logic Analyzer sigrok</a>.</p>
+</li>
 </ul>
-
-<h2 id="nuki-opener-software-version-1-3-1-funktioniert">Nuki Opener Software-Version 1.3.1 (funktioniert)</h2>
-
+<h2 id="nuki-opener-software-version-131-funktioniert">Nuki Opener Software-Version 1.3.1 (funktioniert)</h2>
 <p>Mit Software-Version 1.3.1 erscheint nach dem Anlernen im Debug Protokoll:</p>
-
-<pre><code>bv/ct:276/260dV,ba:22%
+<pre tabindex="0"><code>bv/ct:276/260dV,ba:22%
 R:n75,m35@0,d7
 O:n67,m32@0,d7
-</code></pre>
-
-<p>Die <code>n</code> und <code>m</code> Werte entsprechen etwa den relevanten Zeiten auf dem SCS Bus, wo
+</code></pre><p>Die <code>n</code> und <code>m</code> Werte entsprechen etwa den relevanten Zeiten auf dem SCS Bus, wo
 einzelne Bits 104μs lang sind, aufgeteilt in 34μs für High/Low und 70μs Stille.</p>
-
 <p>Die Base Voltage (<code>bv</code>) von 27.6V, und der Comparator Trigger (<code>ct</code>) von 26.0V
 stimmen mit den erwarteten Pegeln des SCS Bus überein.</p>
-
 <table>
 <thead>
 <tr>
@@ -303,7 +284,6 @@ stimmen mit den erwarteten Pegeln des SCS Bus überein.</p>
 <th>Sigrok</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>2020-10-15-nuki131-door-open.sr</td>
@@ -311,14 +291,12 @@ stimmen mit den erwarteten Pegeln des SCS Bus überein.</p>
 <td><a href="/nuki/2020-10-15-nuki131-door-open.zip">csv (2 MB)</a></td>
 <td><a href="/nuki/2020-10-15-nuki131-door-open.sr">sr (160 KB)</a></td>
 </tr>
-
 <tr>
 <td>2020-10-15-nuki131-ring.sr</td>
 <td><a href="/nuki/2020-10-15-nuki131-ring.wfm">wfm (1,1 MB)</a></td>
 <td><a href="/nuki/2020-10-15-nuki131-ring.zip">csv (2 MB)</a></td>
 <td><a href="/nuki/2020-10-15-nuki131-ring.sr">sr (160 KB)</a></td>
 </tr>
-
 <tr>
 <td>2020-10-15-nuki131-nuki-open.sr</td>
 <td><a href="/nuki/2020-10-15-nuki131-nuki-open.wfm">wfm (1,1 MB)</a></td>
@@ -327,27 +305,17 @@ stimmen mit den erwarteten Pegeln des SCS Bus überein.</p>
 </tr>
 </tbody>
 </table>
-
 <p>Hier ist das Öffnen-Signal des Nuki Openers (<code>2020-10-15-nuki131-nuki-open</code>):</p>
-
 <p><a href="../../nuki/2020-10-15-nuki131-nuki-open.jpg"><img src="../../nuki/2020-10-15-nuki131-nuki-open.thumb.1x.jpg" srcset="../../nuki/2020-10-15-nuki131-nuki-open.thumb.2x.jpg 2x,../../nuki/2020-10-15-nuki131-nuki-open.thumb.3x.jpg 3x" width="600" alt="2020-10-15-nuki131-nuki-open" style="border: 1px solid #000" loading="lazy"></a></p>
-
-<h2 id="nuki-opener-software-version-1-5-3-kaputt">Nuki Opener Software-Version 1.5.3 (kaputt)</h2>
-
+<h2 id="nuki-opener-software-version-153-kaputt">Nuki Opener Software-Version 1.5.3 (kaputt)</h2>
 <p>Mit Software-Version 1.5.3 erscheint nach dem Anlernen im Debug Protokoll:</p>
-
-<pre><code>bv/ct:277/261dV,ba:35%
+<pre tabindex="0"><code>bv/ct:277/261dV,ba:35%
 R:n83,m31@0,d7
 O:n7,m30@2,d0
-</code></pre>
-
-<p>Während sich Ring (<code>R</code>) noch in der Toleranz bewegt, sieht Open (<code>O</code>) sehr
+</code></pre><p>Während sich Ring (<code>R</code>) noch in der Toleranz bewegt, sieht Open (<code>O</code>) sehr
 anders aus.</p>
-
 <p>Statt <code>0,d7</code> (7 Daten-Bytes, wie auf dem SCS Bus?) findet sich hier <code>2,d0</code>.</p>
-
 <p>Die Länge des Signals wurde mit <code>n7</code> falsch erkannt.</p>
-
 <table>
 <thead>
 <tr>
@@ -357,7 +325,6 @@ anders aus.</p>
 <th>Sigrok</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>2020-10-09-nuki-open.sr</td>
@@ -367,26 +334,17 @@ anders aus.</p>
 </tr>
 </tbody>
 </table>
-
 <p>Hier ist das kaputte Öffnen-Signal des Nuki Openers (<code>2020-10-09-nuki-open</code>):</p>
-
 <p><a href="../../nuki/2020-10-09-nuki-open.jpg"><img src="../../nuki/2020-10-09-nuki-open.thumb.1x.jpg" srcset="../../nuki/2020-10-09-nuki-open.thumb.2x.jpg 2x,../../nuki/2020-10-09-nuki-open.thumb.3x.jpg 3x" width="600" alt="2020-10-09-nuki-open" style="border: 1px solid #000" loading="lazy"></a></p>
-
 <h2 id="appendix-a-installation-nuki-opener">Appendix A: Installation Nuki Opener</h2>
-
 <p>Wie ich mein Nuki Opener installiert habe, ist in <a href="/posts/2020-09-28-nuki-scs-bticino-decoding/">meinem Post «Nuki Opener with
 an SCS bus intercom (bTicino 344212)» vom
 2020-09-28</a> ausführlich
 beschrieben, inkl. Bilder.</p>
-
 <h2 id="appendix-b-messumgebung">Appendix B: Messumgebung</h2>
-
 <p>Die Messungen wurden mit einem Rigol DS1102E Oszilloskop angefertigt.</p>
-
 <p>Kanal 1 war auf 10X eingestellt und an den SCS Bus angeschlossen.</p>
-
 <p>Die Sample Rate war auf 10 MHz eingestellt, denn:</p>
-
 <ol>
 <li><code>Acquire</code> → <code>Memdepth</code> war auf <code>Long mem</code> eingestellt.</li>
 <li>Die Time Base war auf 2ms eingestellt (→ <a href="https://www.eevblog.com/forum/blog/rigol-ds1052e-sample-rate-vs-timebase-setting/msg115617/#msg115617">Sample Rate

@@ -203,37 +203,32 @@ short article, that is, how to use types properly (avoiding the
 <code>void*</code> equivalent <code>unsafe.Pointer</code>) and how to deal with
 Go’s data structures such as slices.
 </p>
-
 <h2>A simple example</h2>
-
 <p>
 To make sure we’re on the same page, let’s consider this simple example:
 </p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">package</span> main
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">package</span> main
 <span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;fmt&#34;</span>
 <span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
     list <span style="color:#666">:=</span> []<span style="color:#902000">int</span>{<span style="color:#40a070">23</span>, <span style="color:#40a070">42</span>, <span style="color:#40a070">17</span>}
     <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> list {
         fmt.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;index %d: value %d\n&#34;</span>, idx, val)
     }
-}</code></pre></div>
-<p>
+}
+</code></pre></div><p>
 The output of that program is:
 </p>
-
 <pre>
 index 0: value 23
 index 1: value 42
 index 2: value 17
 </pre>
-
 <h2>Multiplying these numbers</h2>
-
 <p>
 Let’s assume that we want to multiply all these numbers by 2. In Go, that’s
 pretty simple:
 </p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">package</span> main
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">package</span> main
 <span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;fmt&#34;</span>
 
 <span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">multiply</span>(input []<span style="color:#902000">int</span>) []<span style="color:#902000">int</span> {
@@ -251,13 +246,13 @@ pretty simple:
     <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> list {
         fmt.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;index %d: value %d\n&#34;</span>, idx, val)
     }
-}</code></pre></div>
-<p>
+}
+</code></pre></div><p>
 Now let’s see how we would do that in C with cgo. Note that we switch to using
 <code>uint32</code> instead of <code>int</code> because that makes the point
 I’m trying to make easier to convey.
 </p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">package</span> main
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">package</span> main
 <span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;fmt&#34;</span>
 
 <span style="color:#60a0b0;font-style:italic">/*
@@ -287,25 +282,22 @@ I’m trying to make easier to convey.
     <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> list {
         fmt.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;index %d: value %d\n&#34;</span>, idx, val)
     }
-}</code></pre></div>
-<p>
+}
+</code></pre></div><p>
 As you can see, we need to convert the Go types into C types, which can be done
 by simply type-casting them. Also, we need to manually implement the array
 calling convention which is normally done by the C compiler: We pass a pointer
 to the first element.
 </p>
-
 <p>
 We have also avoided passing the slice directly to the C code and instead
 passed the length plus a pointer to the contents. This is a simple way to avoid
 having to use the internal Go <code>SliceHeader</code> data type.
 </p>
-
 <p>
 If you are using C code to speed up some critical routines, you might want to
 throw in a <code>-O3</code> in the <code>#cgo CFLAGS</code> pragma.
 </p>
-
 <p>
 It is noteworthy that you should avoid calling a lot of cgo-functions, since
 the function call overhead is much higher than the normal go function call

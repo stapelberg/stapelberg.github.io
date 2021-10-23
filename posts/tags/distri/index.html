@@ -97,7 +97,7 @@
   <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
   
   <link rel="stylesheet" href="/1.min.css" type="text/css">
-  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+  <link rel="alternate" href="https://michael.stapelberg.ch/posts/tags/distri/feed.xml" type="application/atom+xml" title="ATOM feed for posts tagged distri">
 </head>
 <body>
 
@@ -173,10 +173,207 @@
 </header>
 <main>
       <div>
-<h1 class="ms_title">distri</h1>
+<h1 class="ms_title">Blog Posts tagged distri
+  <a href="https://michael.stapelberg.ch/posts/tags/distri/feed.xml">
+    <img src="/feed-icon.svg" style="width: .75em"
+	 alt="ATOM feed for posts tagged distri"
+	 title="ATOM feed for posts tagged distri">
+  </a>
+</h1>
 
 <div class="Artikel" id="content">
+  <p>
+  <a href="https://distr1.org/">distri</a> is a research linux distribution.
+</p>
+
+<p>
+  For an overview, see
+  my <a href="/posts/2019-08-17-introducing-distri/">“distri: a Linux
+  distribution to research fast package management”</a> article.
+</p>
+
   
+    
+  <h2>2020-May</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2020-05-16-distri-release/"><h3>a new distri linux (fast package management) release</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/distri/">distri</a></span>
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I just released a new version of distri.
+The focus of this release lies on:
+  a better developer experience, allowing users to debug any installed package without extra setup steps
+  performance improvements in all areas (starting programs, building distri packages, generating distri images)
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-05-16-distri-release/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2020-05-09-distri-hermetic-packages/"><h3>Hermetic packages (in distri)</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/distri/">distri</a></span>
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  In distri, packages (e.g. emacs) are hermetic. By hermetic, I mean that the dependencies a package uses (e.g. libusb) don’t change, even when newer versions are installed.
+For example, if package libusb-amd64-1.0.22-7 is available at build time, the package will always use that same version, even after the newer libusb-amd64-1.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-05-09-distri-hermetic-packages/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+  
+  <h2>2020-Jan</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2020-01-21-initramfs-from-scratch-golang/"><h3>distri: 20x faster initramfs (initrd) from scratch</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/distri/">distri</a></span>
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	<span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  In case you are not yet familiar with why an initramfs (or initrd, or initial ramdisk) is typically used when starting Linux, let me quote the wikipedia definition:
+“[…] initrd is a scheme for loading a temporary root file system into memory, which may be used as part of the Linux startup process […] to make preparations before the real root file system can be mounted.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-01-21-initramfs-from-scratch-golang/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+  
+  <h2>2019-Aug</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2019-08-17-introducing-distri/"><h3>distri: a Linux distribution to research fast package management</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/distri/">distri</a></span>
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	<span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Over the last year or so I have worked on a research linux distribution in my spare time. It’s not a distribution for researchers (like Scientific Linux), but my personal playground project to research linux distribution development, i.e. try out fresh ideas.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-08-17-introducing-distri/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2019-08-17-linux-package-managers-are-slow/"><h3>Linux package managers are slow</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/distri/">distri</a></span>
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I measured how long the most popular Linux distribution’s package manager take to install small and large packages.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-08-17-linux-package-managers-are-slow/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+  
+  <h2>2019-Jul</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2019-07-20-hooks-and-triggers/"><h3>Linux distributions: Can we do without hooks and triggers?</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/distri/">distri</a></span>
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Hooks are an extension feature provided by all package managers that are used in larger Linux distributions. For example, Debian uses apt, which has various maintainer scripts. Fedora uses rpm, which has scriptlets. Different package managers use different names for the concept, but all of them offer package maintainers the ability to run arbitrary code during package installation and upgrades.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-07-20-hooks-and-triggers/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+  
+
 </div>
 
       </div>

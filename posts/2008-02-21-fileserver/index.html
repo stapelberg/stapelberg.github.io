@@ -7,8 +7,7 @@
 
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="Dokumentation: Aufbau meines Fileservers">
-  <meta property="og:description" content="Inhaltsverzeichnis  Einleitung Update: Mehr Karten und Skalierungsprobleme Das Gehäuse (Yeong Yang W201) Installation Kernel kompilieren Grundeinstellungen Initrd erstellen Update: Neue initrd Bootloader installieren Nach dem Boot Script zum automatischen Mounten Encrypted swap Abschluss: Serveranwendungen installieren 
- Als System habe ich mir für Gentoo Linux entschieden, da ich ohnehin vorhabe, die Serverprogramme selbst zu kompilieren um die nicht benötigten Features von vorneherein draußen zu lassen und etwas Geschwindigkeit herauszuholen.">
+  <meta property="og:description" content="Inhaltsverzeichnis  Einleitung Update: Mehr Karten und Skalierungsprobleme Das Gehäuse (Yeong Yang W201) Installation Kernel kompilieren Grundeinstellungen Initrd erstellen Update: Neue initrd Bootloader installieren Nach dem Boot Script zum automatischen Mounten Encrypted swap Abschluss: Serveranwendungen installieren   Als System habe ich mir für Gentoo Linux entschieden, da ich ohnehin vorhabe, die Serverprogramme selbst zu kompilieren um die nicht benötigten Features von vorneherein draußen zu lassen und etwas Geschwindigkeit herauszuholen.">
   
   
   
@@ -17,8 +16,7 @@
   <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
-  <meta name="description" content="Inhaltsverzeichnis  Einleitung Update: Mehr Karten und Skalierungsprobleme Das Gehäuse (Yeong Yang W201) Installation Kernel kompilieren Grundeinstellungen Initrd erstellen Update: Neue initrd Bootloader installieren Nach dem Boot Script zum automatischen Mounten Encrypted swap Abschluss: Serveranwendungen installieren 
- Als System habe ich mir für Gentoo Linux entschieden, da ich ohnehin vorhabe, die Serverprogramme selbst zu kompilieren um die nicht benötigten Features von vorneherein draußen zu lassen und etwas Geschwindigkeit herauszuholen.">
+  <meta name="description" content="Inhaltsverzeichnis  Einleitung Update: Mehr Karten und Skalierungsprobleme Das Gehäuse (Yeong Yang W201) Installation Kernel kompilieren Grundeinstellungen Initrd erstellen Update: Neue initrd Bootloader installieren Nach dem Boot Script zum automatischen Mounten Encrypted swap Abschluss: Serveranwendungen installieren   Als System habe ich mir für Gentoo Linux entschieden, da ich ohnehin vorhabe, die Serverprogramme selbst zu kompilieren um die nicht benötigten Features von vorneherein draußen zu lassen und etwas Geschwindigkeit herauszuholen.">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2008-02-21-fileserver/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -199,36 +197,24 @@
   </style>
   <details class="ms_toc_details">
     <summary>Table of contents</summary>
-    <nav class="TableOfContents">
-<ul>
-<li><a href="#startup-script-to-create-the-device-mapper-control-device">Startup script to create the device-mapper control device</a></li>
-<li><a href="#on-non-devfs-systems">on non-devfs systems.</a></li>
-<li><a href="#non-zero-exit-status-indicates-failure">Non-zero exit status indicates failure.</a></li>
-<li><a href="#check-for-devfs-procfs">Check for devfs, procfs</a></li>
-<li><a href="#get-major-minor-and-mknod">Get major, minor, and mknod</a></li>
-<li><a href="#sobald-das-richtige-passwort-eingegeben-wurde-und-die-erste-festplatte-gemountet-wurde-folgen-die-anderen">Sobald das richtige Passwort eingegeben wurde und die erste Festplatte gemountet wurde, folgen die anderen</a></li>
-</ul>
-</nav>
+    <nav class="TableOfContents"></nav>
   </details>
-  
-
-<p><h3>Inhaltsverzeichnis</h3>
+  <h3>Inhaltsverzeichnis</h3>
 <ul>
-    <li class="level1">Einleitung</li>
-        <li class="level2"><a href="#skalierungsprobleme">Update: Mehr Karten und Skalierungsprobleme</a></li>
-    <li class="level1"><a href="#gehaeuse">Das Gehäuse (Yeong Yang W201)</a></li>
-    <li class="level1"><a href="#installation">Installation</a></li>
-        <li class="level2"><a href="#kernel">Kernel kompilieren</a></li>
-    <li class="level1"><a href="#grundeinstellungen">Grundeinstellungen</a></li>
-    <li class="level1"><a href="#initrd">Initrd erstellen</a></li>
-        <li class="level2"><a href="#update_initrd">Update: Neue initrd</a></li>
-    <li class="level1"><a href="#bootloader">Bootloader installieren</a></li>
-    <li class="level1"><a href="#nach_boot">Nach dem Boot</a></li>
-    <li class="level1"><a href="#automount">Script zum automatischen Mounten</a></li>
-    <li class="level1"><a href="#encrypted_swap">Encrypted swap</a></li>
-    <li class="level1"><a href="#anwendungen">Abschluss: Serveranwendungen installieren</a></li>
-</ul></p>
-
+	<li class="level1">Einleitung</li>
+		<li class="level2"><a href="#skalierungsprobleme">Update: Mehr Karten und Skalierungsprobleme</a></li>
+	<li class="level1"><a href="#gehaeuse">Das Gehäuse (Yeong Yang W201)</a></li>
+	<li class="level1"><a href="#installation">Installation</a></li>
+		<li class="level2"><a href="#kernel">Kernel kompilieren</a></li>
+	<li class="level1"><a href="#grundeinstellungen">Grundeinstellungen</a></li>
+	<li class="level1"><a href="#initrd">Initrd erstellen</a></li>
+		<li class="level2"><a href="#update_initrd">Update: Neue initrd</a></li>
+	<li class="level1"><a href="#bootloader">Bootloader installieren</a></li>
+	<li class="level1"><a href="#nach_boot">Nach dem Boot</a></li>
+	<li class="level1"><a href="#automount">Script zum automatischen Mounten</a></li>
+	<li class="level1"><a href="#encrypted_swap">Encrypted swap</a></li>
+	<li class="level1"><a href="#anwendungen">Abschluss: Serveranwendungen installieren</a></li>
+</ul>
 <p>
 Als System habe ich mir für Gentoo Linux entschieden, da ich ohnehin vorhabe,
 die Serverprogramme selbst zu kompilieren um die nicht benötigten Features von
@@ -236,22 +222,21 @@ vorneherein draußen zu lassen und etwas Geschwindigkeit herauszuholen. Außerde
 klappte die Einrichtung der Festplattenverschlüsselung und des Software-RAIDs
 erstaunlich problemlos.
 </p>
-
 <p>
 Die Komponenten des Systems sind schon etwas älter, haben mir aber gute Dienste
 erwiesen, sodass ich sie weiterhin verwenden werde. Im einzelnen sind das:
 </p>
 <ul>
-    <li>AMD Athlon XP 2400+</li>
-    <li>1024 MB Infineon DDR-RAM</li>
-    <li>EPoX 8RDA3 Mainboard (nForce2-400 Chipsatz, weder Onboard-LAN noch SATA)</li>
-    <li>Promise SATA300 TX4 (SATA-Controller mit 4 Anschlüssen)</li>
-    <li>D-Link DGE-528T Gigabit-LAN-Karte</li>
-    <li>WDC WD2000JB-00GVA0 (200 GB)</li>
-    <li>WDC WD2500JB-00GVA0 (250 GB)</li>
-    <li>WDC WD1200JB-75CRA0 (120 GB)</li>
-    <li>WDC WD740GD-00FL (74 GB, Systemplatte)</li>
-    <li>SAMSUNG HD400LJ (400 GB)</li>
+	<li>AMD Athlon XP 2400+</li>
+	<li>1024 MB Infineon DDR-RAM</li>
+	<li>EPoX 8RDA3 Mainboard (nForce2-400 Chipsatz, weder Onboard-LAN noch SATA)</li>
+	<li>Promise SATA300 TX4 (SATA-Controller mit 4 Anschlüssen)</li>
+	<li>D-Link DGE-528T Gigabit-LAN-Karte</li>
+	<li>WDC WD2000JB-00GVA0 (200 GB)</li>
+	<li>WDC WD2500JB-00GVA0 (250 GB)</li>
+	<li>WDC WD1200JB-75CRA0 (120 GB)</li>
+	<li>WDC WD740GD-00FL (74 GB, Systemplatte)</li>
+	<li>SAMSUNG HD400LJ (400 GB)</li>
 </ul>
 <p>
 (Ja, der Festplattenbestand ist historisch gewachsen ;-).)
@@ -261,9 +246,7 @@ Eingebaut wird das ganze in ein 19&quot;-Rackgehäuse von Yeong-Yang. Alle
 Platten sollen komplett verschlüsselt werden, die Heimverzeichnisse der
 einzelnen User sollen zudem noch auf einem Software-RAID-1 abgelegt werden.
 </p>
-
 <p><a name="skalierungsprobleme"><h2>Update: Mehr Karten und Skalierungsprobleme</h2></a></p>
-
 <p>
 Nachdem ich im Laufe der Zeit für Asterisk eine Fritz!ISDN PCI-Karte einbaute
 und dann noch der 3WARE-RAID-Controller dazukam, stürzte der Rechner scheinbar
@@ -271,7 +254,6 @@ unregelmäßig ab. Genauere Analysen brachten dann zu Tage, dass das Problem sic
 bei hoher Interrupt-Load zeigte. Durch den Vollausbau (Ethernet, ISDN, 2xSATA)
 an PCI-Karten war diese Auslastung erheblich höher als früher.
 </p>
-
 <p>
 Das Problem äußerte sich dadurch, dass die System-Festplatte, welche am
 Promise-Controller hing, plötzlich nicht mehr vorhanden war. Nach dem Tausch
@@ -281,15 +263,13 @@ Controller?) konnte sich also von einer SATA-Exception nicht erholen. Beim
 Dawicontrol (mit SiL-Chipsatz) klappte das, aber dass das Problem immernoch
 auftrat, war merkwürdig.
 </p>
-
 <p>
 Da auch verschiedene APIC-Modi nichts bewirkten (diese sind für dynamische
 IRQ-Zuteilung zuständig), entschied ich mich, die Hardware auszutauschen (also
 CPU, Mainboard, RAM). Mittlerweile läuft das System mit den neuen Komponenten
 stabil. Mehr zu den neuen Komponenten gibt’s in einem bald folgenden Artikel.
 </p>
-
-<p><a name="gehaeuse"><h1>Das Gehäuse (Yeong Yang W201)</h1></a>
+<p><a name="gehaeuse"><h1>Das Gehäuse (Yeong Yang W201)</h1></a></p>
 <p>
 Da ich mit Yeong Yang-Gehäusen auch bisher schon gute Erfahrungen gemacht hatte
 und die Testberichte sehr überzeugend klangen, bestellte ich mir das
@@ -297,8 +277,7 @@ zugegebenermaßen schwer zu bekommende W201 bei <a
 href="http://www.pc-planet.de/" target="_blank">pc-planet.de</a>. Es ist auf
 EATX-Boards ausgelegt, hat aber passende Löcher für normale ATX- und
 MATX-Boards.
-</p></p>
-
+</p>
 <p>
 Der Einbau von Netzteil, Mainboard und PCI-Karten klappte problemlos. Zu
 beachten ist, dass die beiden kleinen Lüfter direkt über den PCI-Karten erst
@@ -306,34 +285,29 @@ fest eingebaut werden sollten, wenn man sich sicher ist, dass mit den Karten
 soweit alles in Ordnung ist, da man die Lüfter vor jedem Kartentausch
 abschrauben muss ;-).
 </p>
-
 <p>
 Die Festplatten werden in separat kaufbaren Käfigen untergebracht, jeweils 5
 Stück pro Käfig. Diese sind so ausgelegt, dass die Festplatten so ausgerichtet
 sind, wie sie es in einem normalen Gehäuse (Tower) sind, wenn man das Gehäuse
 ins Rack einbaut (man könnte es auch aufrecht anbringen).
 </p>
-
 <p>
 Von diesen Käfigen kann man zwei Stück einbauen, somit hätte man also Platz für
 10 Festplatten. Außerdem sind noch zwei 5,25&quot;-Einschübe frei und das
 Gehäuse bietet noch eine etwas außergewöhnliche Befestigungsmöglichkeit auf dem
 vorderen Käfig (siehe Bild ;-)). Macht insgesamt 14 Festplatten.
 </p>
-
 <p>
 Die eingebauten Lüfter sind angenehm leise (für ’nen Server, also erwartet
 keinen Super-Silent-PC).
 </p>
-
 <p>
 Alles in allem bin ich mit dem Gehäuse sehr zufrieden, alles klappte
 problemlos, ich hab’ mich nicht am Gehäuse, sondern am Inhalt der PCI-Karten
 geschnitten ;-). <a href="/Galerie/Rackcase" title="Bildergalerie:
 Rackgehäuse">Bilder habe ich natürlich auch gemacht…</a>
 </p>
-
-<p><a name="installation"><h1>Installation</h1></a>
+<p><a name="installation"><h1>Installation</h1></a></p>
 <p>
 Ich habe die Live-CD Gentoo 2006.1 verwendet, es sollte mit neueren Versionen
 aber auch funktionieren.
@@ -342,15 +316,13 @@ aber auch funktionieren.
 Nach dem Booten in die Live-CD empfiehlt es sich, nachzusehen, ob alle
 Festplatten und (zumindest die wichtigsten) Geräte erkannt wurden. Somit kann
 man später Hardware-Fehler ausschließen, falls etwas nicht funktioniert.
-</p></p>
-
+</p>
 <p>
 Anschließend werden wir die Systemplatte (mit <code>fdisk</code>) formatieren,
 ich habe sie bei mir in 50 MB für den Kernel und initrd (viel zu groß, ich
 weiß), 2 GB Swap und den Rest (von 74 GB in diesem Fall) für <code>/</code>
 aufgeteilt.
 </p>
-
 <p>
 Die Festplatte ist bei mir am zweiten SATA-Port angeschlossen, die Devices sind
 jedoch umgedreht numeriert. Ob das am Treiber oder am Controller selbst liegt,
@@ -358,7 +330,6 @@ weiß ich nicht. Jedenfalls booten wir deshalb von <code>/dev/sdc</code>, statt
 von <code>/dev/sda</code> (der Controller nimmt einfach die erste Platte, die
 er findet).
 </p>
-
 <p>
 Wir erstellen dann die Dateisysteme für die jeweiligen Partitionen: ext2 für
 /boot, verschlüsseltes ext3 für / und das verschlüsselte Swap setzen wir später
@@ -370,7 +341,6 @@ auf.
 # cryptsetup luksOpen /dev/sdc3 root
 # mkfs.ext2 -j /dev/mapper/root
 </pre>
-
 <p>
 Dann führen wir eine ganz normale Gentoo-Installation durch: Wir laden das
 Stage-3-Archiv und Portage herunter und entpacken das ganze:
@@ -394,7 +364,6 @@ und /proc und /dev:
 # mount -t proc none /mnt/gentoo/proc
 # mount -o bind /dev /mnt/gentoo/dev
 </pre>
-
 <p>
 Dann wechseln wir in die neue Gentoo-Installation:
 </p>
@@ -415,34 +384,28 @@ gibt):
 <p>
 Danach setzen wir das Serverprofil:
 </p>
-
 <pre>
 # rm /etc/make.profile
 # ln -s /usr/portage/profiles/default-linux/x86/2006.1/server /etc/make.profile
 </pre>
-
 <p>
 Und passen die Einstellungen zum Kompilieren an unsere Plattform und Wünsche
 an:
 </p>
-
-<p><strong>/etc/make.conf</strong>:
+<p><strong>/etc/make.conf</strong>:</p>
 <pre>
-CFLAGS=&quot;-O2 -march=athlon-xp -pipe&quot;
-USE=&quot;-ldap -x11&quot;
-</pre></p>
-
+CFLAGS="-O2 -march=athlon-xp -pipe"
+USE="-ldap -x11"
+</pre>
 <p>
 Anschließend wählen wir noch die Locales:
 </p>
-
-<p><strong>/etc/locale.gen</strong>:
+<p><strong>/etc/locale.gen</strong>:</p>
 <pre>
 en_US ISO-8859-1
 de_DE ISO-8859-1
 de_DE@euro ISO-8859-15
-</pre></p>
-
+</pre>
 <p>
 …und generieren die selbigen:
 </p>
@@ -455,9 +418,7 @@ Noch kurz die Zeitzone setzen, dann geht's ans Kernelbacken:
 <pre>
 # cp /usr/share/zoneinfo/Europe/Berlin /etc/localtime
 </pre>
-
-<a name="kernel"><h2>Kernel kompilieren</h2></a>
-
+<p><a name="kernel"><h2>Kernel kompilieren</h2></a></p>
 <p>
 Zuerst lassen wir uns die letzten Kernel-Sources herunterladen und wechseln in das Verzeichnis derselbigen:
 </p>
@@ -465,7 +426,6 @@ Zuerst lassen wir uns die letzten Kernel-Sources herunterladen und wechseln in d
 # USE="-doc symlink" emerge gentoo-sources
 # cd /usr/src/linux
 </pre>
-
 <p>
 Dann konfigurieren wir den Kernel nach unseren Wünschen. Dabei ist zu beachten,
 dass <strong>unbedingt</strong> Treiber für den entsprechenden
@@ -477,7 +437,6 @@ Crypt-Target des Device-Mappers (<code>CONFIG_DM_CRYPT</code>) und die
 Crypto-Algorithmen (<code>CONFIG_CRYPTO, CONFIG_CRYPTO_CBC,
 CONFIG_CRYPTO_BLOWFISH, CONFIG_CRYPTO_SHA256</code>).
 </p>
-
 <p>
 Um den Kernel nun zu kompilieren, die ausgewählten Module (bei mir lediglich
 der TUN-treiber für OpenVPN, <code>CONFIG_TUN</code>) zu installieren und den
@@ -488,79 +447,66 @@ Befehl:
 # make &amp;&amp; make modules_install
 # cp arch/i386/boot/bzImage /boot/kernel-2.6.19-r5-stability
 </pre>
-
-<a name="grundeinstellungen"><h2>Grundeinstellungen</h2></a>
-
+<p><a name="grundeinstellungen"><h2>Grundeinstellungen</h2></a></p>
 <p>
 Nun sollten wir dem System noch klarmachen, welche (virtuellen) Laufwerke er
 wohin zu mounten hat bei Systemstart:
 </p>
-
-<p><strong>/etc/fstab</strong>:
+<p><strong>/etc/fstab</strong>:</p>
 <pre>
-/dev/sdc1       /boot       ext2    noauto,noatime      1   2
-/dev/mapper/root    /       ext3    noatime         0   1
-proc            /proc       proc    defaults        0   0
-shm         /dev/shm    tmpfs   nodev,nosuid,noexec 0   0
-</pre></p>
-
+/dev/sdc1		/boot		ext2	noauto,noatime		1	2
+/dev/mapper/root	/		ext3	noatime			0	1
+proc			/proc		proc	defaults		0	0
+shm			/dev/shm	tmpfs	nodev,nosuid,noexec	0	0
+</pre>
 <p>
 Dann setzen wir noch den Hostname:
 </p>
-
-<p><strong>/etc/conf.d/hostname</strong>:
+<p><strong>/etc/conf.d/hostname</strong>:</p>
 <pre>
-HOSTNAME=&quot;stability&quot;
-</pre></p>
-
+HOSTNAME="stability"
+</pre>
 <p>
 Und erledigen die Netzwerkkonfiguration:
 </p>
-
-<p><strong>/etc/conf.d/net</strong>:
+<p><strong>/etc/conf.d/net</strong>:</p>
 <pre>
-dns_servers_eth0=&quot;192.168.1.2 192.168.1.1 194.25.2.129&quot;
-dns_sortlist_eth0=&quot;192.168.1.0/24&quot;
-config_eth0=( &quot;192.168.1.5 netmask 255.255.255.0 brd 192.168.1.255&quot; )
-routes_eth0=( &quot;default gw 192.168.1.1&quot; )
-</pre></p>
-
+dns_servers_eth0="192.168.1.2 192.168.1.1 194.25.2.129"
+dns_sortlist_eth0="192.168.1.0/24"
+config_eth0=( "192.168.1.5 netmask 255.255.255.0 brd 192.168.1.255" )
+routes_eth0=( "default gw 192.168.1.1" )
+</pre>
 <p>
 Dieses Interface möchten wir beim Systemstart automatisch konfigurieren lassen:
 </p>
 <pre>
 # rc-update add net.eth0 default
 </pre>
-
 <p>
 Ein Root-Passwort sollten wir nicht vergessen:
 </p>
 <pre>
 # passwd
 </pre>
-
 <p>
 Falls alle Stränge reißen, möchten wir uns eventuell über Serielle Konsole anmelden:
 </p>
 <pre>
 # echo "tts/0" &gt;&gt; /etc/securetty
 </pre>
-
 <p>Zu guter letzt installieren wir noch ein paar benötigte Systemprogramme:
 <pre>
 # emerge syslog-ng vixie-cron slocate
 # rc-update add syslog-ng default
 # rc-update add vixie-cron default
 </pre>
-
-<a name="initrd"><h2>Initrd erstellen</h2></a>
+<p><a name="initrd"><h2>Initrd erstellen</h2></a></p>
 <p>
 Die Initrd ist eine Ramdisk (wie das rd im Namen erkennen lässt), welche nach
 Laden des Kernels und vor dem Laden von <code>init</code> ausgeführt wird. Wir
 brauchen eine initrd, damit wir die verschlüsselte Platte mounten können, denn
 das System soll ja davon booten.
 </p>
-
 <p>
 Auf dem neuen System ist übrigens noch kein <code>cryptsetup-luks</code>
 installiert, was wir nun nachholen sollten:
@@ -568,7 +514,6 @@ installiert, was wir nun nachholen sollten:
 <pre>
 # emerge cryptsetup-luks
 </pre>
-
 <p>
 Eine solche Ramdisk ist nichts anderes, als ein (Gzip-)komprimierte ext2-Image,
 welches wir mit den folgenden Befehlen erzeugen und mounten können:
@@ -580,7 +525,6 @@ welches wir mit den folgenden Befehlen erzeugen und mounten können:
 # mke2fs -F ./initrd
 # mount -o loop initrd ramdisk
 </pre>
-
 <p>
 Nun legen wir also in <code>/mnt/ramdisk</code> den Inhalt der Ramdisk ab – wir
 brauchen ein paar Programme und Bibliotheken, sowie das Initscript selbst:
@@ -591,7 +535,6 @@ brauchen ein paar Programme und Bibliotheken, sowie das Initscript selbst:
 # cp -a /sbin/{blockdev,pivot_root} ramdisk/sbin
 # ln -s bash ramdisk/bin/sh
 </pre>
-
 <p>
 Außerdem müssen wir die Device-Node der Console (fix) und der zu öffnenden
 Festplatte erstellen, welche wir mit <code>file /dev/sdc</code> herausfinden:
@@ -602,7 +545,6 @@ Festplatte erstellen, welche wir mit <code>file /dev/sdc</code> herausfinden:
 /dev/sdc3: block special (8/35)
 # mknod ramdisk/dev/sdc3 b 8 35
 </pre>
-
 <p>
 Für jedes der kopierten Programme brauchen wir noch die entsprechenden
 Libraries, welche man mit dem <code>ldd</code>-Befehl herausfinden kann:
@@ -612,74 +554,69 @@ cp /lib/{ld-2.4.so,libblkid.so.1.0,libc-2.4.so,libdevmapper.so.1.02} ramdisk/lib
 cp /lib/{libdl-2.4.so,libncurses.so.5.5,libuuid.so.1.2,libz.so.1} ramdisk/lib
 cp /lib/{ld-linux.so.2,libblkid.so.1,libc.so.6,libdl.so.2,libncurses.so.5,libuuid.so.1} ramdisk/lib
 </pre>
-
 <p>
 Anschließend erzeugen wir das eigentliche Script (stammt größtenteils aus dem
 Gentoo-Wiki, siehe Quellen):
 </p>
-
-<p><strong>ramdisk/sbin/init</strong>:
+<p><strong>ramdisk/sbin/init</strong>:</p>
 <pre>
-#!/bin/sh</p>
+#!/bin/sh
 
-<p>echo &quot;INITRD Loading :-)&quot;
+echo "INITRD Loading :-)"
 ROOT_DEV=/dev/sdc3
-ROOT_MAP=root</p>
+ROOT_MAP=root
 
-<p>export PATH=/bin:/sbin
+export PATH=/bin:/sbin
 mount -t proc proc /proc
-CMDLINE=<code>cat /proc/cmdline</code>
+CMDLINE=`cat /proc/cmdline`
 sh /sbin/devmap_mknod.sh
 if [ $? -ne 0 ]; then
         echo Creation of /dev/mapper/control failed
         exit 0
-fi</p>
+fi
 
-<p>echo &quot;Ok, let's have a look at the headers...&quot;
-cryptsetup luksDump ${ROOT_DEV}</p>
+echo "Ok, let's have a look at the headers..."
+cryptsetup luksDump ${ROOT_DEV}
 
-<p>count=0
+count=0
 sesam=1
 while [ ${sesam} -ne 0 ]; do
-        if [ &quot;$count&quot; = &quot;3&quot; ]; then
-                echo &quot;Hm, doesnt seem to work. Go play with the shell. Press Ctrl+D when done.&quot;
+        if [ "$count" = "3" ]; then
+                echo "Hm, doesnt seem to work. Go play with the shell. Press Ctrl+D when done."
                 bash
                 echo System halted
                 exit 0
-        fi</p>
+        fi
 
-<pre><code>    count=$(( $count + 1 ))
-    echo &quot;Enter passphrase:&quot;
-    read -s pass
-    echo
-    echo ${pass} | cryptsetup luksOpen ${ROOT_DEV} ${ROOT_MAP}
-    sesam=$?
-</code></pre>
-
-<p>done
-echo &quot;Mounting root...&quot;
+        count=$(( $count + 1 ))
+        echo "Enter passphrase:"
+        read -s pass
+        echo
+        echo ${pass} | cryptsetup luksOpen ${ROOT_DEV} ${ROOT_MAP}
+        sesam=$?
+done
+echo "Mounting root..."
 mount /dev/mapper/${ROOT_MAP} /mnt
 if [ $? -ne 0 ]; then
-        echo &quot;Mounting root failed&quot;
+        echo "Mounting root failed"
         cryptsetup luksClose ${ROOT_MAP}
         exit 0
-fi</p>
+fi
 
-<p>echo &quot;Booting...&quot;
+echo "Booting..."
 umount /proc
 cd /mnt
 mkdir initrd
 pivot_root . initrd
-echo &quot;Starting init&quot;
+echo "Starting init"
 exec chroot . /bin/sh &lt;&lt;- EOF &gt;/dev/console 2&gt;&amp;1
 umount initrd
 rm -rf initrd
 blockdev --flushbufs /dev/ram0
-echo &quot;Exec init ${CMDLINE}&quot;
+echo "Exec init ${CMDLINE}"
 exec /sbin/init ${CMDLINE}
 EOF
-</pre></p>
-
+</pre>
 <p>
 Im Gegensatz zu der Originalversion von Gentoo-Wiki gibt diese Version beim
 Boot die Header des zu mountenden Devices aus, wodurch man sieht, ob die
@@ -688,7 +625,6 @@ ist. Außerdem bekommt man nach drei erfolglosen Versuchen, das Passwort
 einzugeben, eine Shell. Diese Zeilen sollte man, nachdem das System
 ordnungsgemäß bootet, entfernen.
 </p>
-
 <p>
 Kleiner Tipp: Bei mir verursachte ein Passwort, welches Sonderzeichen wie
 Doppelpunkte und Klammern enthielt, Probleme. Die Platte ließ sich einfach
@@ -697,64 +633,54 @@ anderes gewählt. Man sollte auch darauf achten, dass das Tastaturlayout noch
 nicht umgestellt ist, das heißt, dass man mit dem Layout <code>en_US</code>
 tippt (vertauschte Position von y und z und der Sonderzeichen).
 </p>
-
 <p>
 Hier noch das Script um die device-mapper-Nodes anzulegen:
 </p>
-
-<p><strong>ramdisk/sbin/devmap_mknod.sh</strong>:
+<p><strong>ramdisk/sbin/devmap_mknod.sh</strong>:</p>
 <pre>
-#!/bin/sh</p>
+#!/bin/sh
 
-<h1 id="startup-script-to-create-the-device-mapper-control-device">Startup script to create the device-mapper control device</h1>
+# Startup script to create the device-mapper control device
+# on non-devfs systems.
+# Non-zero exit status indicates failure.
+DM_DIR="mapper"
+DM_NAME="device-mapper"
 
-<h1 id="on-non-devfs-systems">on non-devfs systems.</h1>
+set -e
 
-<h1 id="non-zero-exit-status-indicates-failure">Non-zero exit status indicates failure.</h1>
+DIR="/dev/$DM_DIR"
+CONTROL="$DIR/control"
 
-<p>DM_DIR=&quot;mapper&quot;
-DM_NAME=&quot;device-mapper&quot;</p>
-
-<p>set -e</p>
-
-<p>DIR=&quot;/dev/$DM_DIR&quot;
-CONTROL=&quot;$DIR/control&quot;</p>
-
-<h1 id="check-for-devfs-procfs">Check for devfs, procfs</h1>
-
-<p>if test -e /dev/.devfsd ; then
-        echo &quot;devfs detected: devmap_mknod.sh script not required.&quot;
+# Check for devfs, procfs
+if test -e /dev/.devfsd ; then
+        echo "devfs detected: devmap_mknod.sh script not required."
         exit
 fi
 if test ! -e /proc/devices ; then
-        echo &quot;procfs not found; please create $CONTROL manually.&quot;
+        echo "procfs not found; please create $CONTROL manually."
         exit 1
-fi</p>
+fi
+# Get major, minor, and mknod
+MAJOR=$(sed -n 's/^ *\([0-9]\+\) \+misc$/\1/p' /proc/devices)
+MINOR=$(sed -n "s/^ *\([0-9]\+\) \+$DM_NAME\$/\1/p" /proc/misc)
 
-<h1 id="get-major-minor-and-mknod">Get major, minor, and mknod</h1>
-
-<p>MAJOR=$(sed -n 's/^ *([0-9]+) +misc$/\1/p' /proc/devices)
-MINOR=$(sed -n &quot;s/^ *([0-9]+) +$DM_NAME\$/\1/p&quot; /proc/misc)</p>
-
-<p>if test -z &quot;$MAJOR&quot; -o -z &quot;$MINOR&quot; ; then
-        echo &quot;$DM_NAME kernel module not loaded: can't create $CONTROL.&quot;
+if test -z "$MAJOR" -o -z "$MINOR" ; then
+        echo "$DM_NAME kernel module not loaded: can't create $CONTROL."
         exit 1
-fi</p>
+fi
 
-<p>mkdir -p --mode=755 $DIR
-test -e $CONTROL &amp;&amp; rm -f $CONTROL</p>
+mkdir -p --mode=755 $DIR
+test -e $CONTROL && rm -f $CONTROL
 
-<p>echo &quot;Creating $CONTROL character device with major:$MAJOR minor:$MINOR.&quot;
+echo "Creating $CONTROL character device with major:$MAJOR minor:$MINOR."
 mknod --mode=600 $CONTROL c $MAJOR $MINOR
-</pre></p>
-
+</pre>
 <p>
 Dieser Schritt ist wichtig, sonst wird gar nichts ausgeführt:
 </p>
 <pre>
 # chmod 755 ramdisk/sbin/{init,devmap_mknod.sh}
 </pre>
-
 <p>
 So, das war’s. Nun unmounten wir den ramdisk-Ordner, packen die initrd mit
 <code>gzip</code> und kopieren sie in die <code>/boot</code>-Partition:
@@ -764,9 +690,7 @@ So, das war’s. Nun unmounten wir den ramdisk-Ordner, packen die initrd mit
 # gzip initrd
 # cp initrd.gz /boot/
 </pre>
-
-<a name="update_initrd"><h3>Update: Neue initrd</h3></a>
-
+<p><a name="update_initrd"><h3>Update: Neue initrd</h3></a></p>
 <p>
 Mittlerweile läuft eine neue <code>initrd</code>, welche den Schlüssel
 automatisch von einem anderen, vertrauenswürdigen Rechner via LAN lädt. Auf
@@ -776,9 +700,7 @@ PCI-Express-Grafikkarte übrig habe (und auf dem neuen Board keine
 PCI-Steckplätze mehr frei) und somit im Regelfall blind das Passwort eingeben
 müsste.
 </p>
-
 <p><a name="bootloader"><h2>Bootloader installieren</h2></a></p>
-
 <p>
 Als Bootloader verwende ich am liebsten GRUB, das hat keinen besonderen Grund –
 er funktioniert einfach und ich kenne mich einigermaßen damit aus :-). Also
@@ -787,32 +709,28 @@ rauf damit auf’s System:
 <pre>
 emerge grub
 </pre>
-
 <p>
 Die Konfigurationsdatei von GRUB ist <code>/boot/grub/menu.lst</code>. Dort
 bringen wir GRUB nun bei, welchen Kernel auf welcher Festplatte mit welcher
 Initrd er booten soll:
 </p>
-
-<p><strong>/boot/grub/menu.lst</strong>:
+<p><strong>/boot/grub/menu.lst</strong>:</p>
 <pre>
 default 0
-timeout 5</p>
+timeout 5
 
-<p>title=Gentoo Linux 2.6.19-r5-stability
+title=Gentoo Linux 2.6.19-r5-stability
 root (hd0,0)
 kernel /kernel-2.6.19-r5-stability root=/dev/ram0 ide0=0x1f0,0x3f6,14 rw
 initrd /initrd.gz
 boot
-</pre></p>
-
+</pre>
 <p>
 Die Nummern der Festplatte bekommt man übrigens per Tab-Completion in GRUB
 selbst heraus. Es macht also nichts, wenn hier (hd0,0) steht, obwohl die
 Festplatte eigentlich (hd1,2) wäre, wir können das vor dem ersten Boot nochmal
 prüfen und gegebenenfalls editieren.
 </p>
-
 <p>
 Wozu eigentlich die Angabe von ide0? Tja, anscheinend habe ich in meiner
 Kernelkonfiguration irgendetwas anders gemacht, als derjenige, der den Kernel
@@ -822,12 +740,10 @@ Die Werte sind übrigens Standardwerte, wie in
 <code>Documentation/ide.txt</code> nachzulesen ist. Wenn jemand ’nen Hinweis
 hat, wie man das Ändern kann, immer her damit :-).
 </p>
-
 <p>
 Nun installieren wir GRUB noch in den Master Boot Record der Festplatte und
 leiten dann den Reboot ein:
 </p>
-
 <pre>
 # grub-install /dev/sdc
 # exit
@@ -835,40 +751,32 @@ leiten dann den Reboot ein:
 # cryptsetup luksClose root
 # reboot
 </pre>
-
 <p><a name="nach_boot"><h2>Nach dem Boot</h2></a></p>
-
 <p>
 Je nach Lärmpegel des Servers werden wir nun den befreiendsten Schritt
 durchführen: SSHd für Remote-Zugriff installieren und gegebenenfalls den
 Rechner in ein anderes Zimmer tragen ;-):
 </p>
-
 <pre>
 # emerge openssh
 # rc-update add sshd default
 # /etc/init.d/sshd start
 </pre>
-
 <p>
 Dann werden wir eine Benutzerkennung und eine Gruppe anlegen, damit wir nicht
 immer als root arbeiten müssen:
 </p>
-
 <pre>
 # groupadd staff
 # useradd -m -u 101 -g staff -G cdrom,portage,usb,video,wheel -s /bin/bash michael -c "Michael Stapelberg"
 </pre>
-
 <p>
 Und wenn wir es uns gerade gemütlich machen, installieren wir doch auch gleich
 einen gescheiten Editor, allerdings ohne Perl/Python-Bindings:
 </p>
-
 <pre>
 USE="-perl -python" emerge vim
 </pre>
-
 <p>
 Jetzt formatieren wir die restlichen Festplatten mit
 <code>cryptsetup-luks</code> und ext3, setzen den reservierten Speicher auf 0
@@ -880,33 +788,27 @@ cryptsetup -c blowfish-cbc-essiv:sha256 -y -s 256 luksFormat /dev/sda
 cryptsetup -c blowfish-cbc-essiv:sha256 -y -s 256 luksFormat /dev/hda2
 cryptsetup -c blowfish-cbc-essiv:sha256 -y -s 256 luksFormat /dev/hdb2
 cryptsetup -c blowfish-cbc-essiv:sha256 -y -s 256 luksFormat /dev/hdc
-
-cryptsetup luksOpen /dev/sda backup
+<p>cryptsetup luksOpen /dev/sda backup
 cryptsetup luksOpen /dev/hda2 movies
 cryptsetup luksOpen /dev/hdb2 wii
-cryptsetup luksOpen /dev/hdc mp3
-
-mkfs.ext2 -j /dev/mapper/backup
+cryptsetup luksOpen /dev/hdc mp3</p>
+<p>mkfs.ext2 -j /dev/mapper/backup
 mkfs.ext2 -j /dev/mapper/movies
 mkfs.ext2 -j /dev/mapper/wii
-mkfs.ext2 -j /dev/mapper/mp3
-
-tune2fs -m 0 /dev/mapper/backup
+mkfs.ext2 -j /dev/mapper/mp3</p>
+<p>tune2fs -m 0 /dev/mapper/backup
 tune2fs -m 0 /dev/mapper/movies
 tune2fs -m 0 /dev/mapper/wii
-tune2fs -m 0 /dev/mapper/mp3
-
-mkdir /fs/Backup
+tune2fs -m 0 /dev/mapper/mp3</p>
+<p>mkdir /fs/Backup
 mkdir /fs/Movies
 mkdir /fs/Wii
-mkdir /fs/MP3
-
-mount /dev/mapper/backup /fs/Backup
+mkdir /fs/MP3</p>
+<p>mount /dev/mapper/backup /fs/Backup
 mount /dev/mapper/movies /fs/Movies
 mount /dev/mapper/wii /fs/Wii
 mount /dev/mapper/mp3 /fs/MP3
-</pre>
-
+</pre></p>
 <p>
 Außerdem richten wir das RAID-1 für die Homedirs ein:
 </p>
@@ -914,7 +816,6 @@ Außerdem richten wir das RAID-1 für die Homedirs ein:
 emerge mdadm
 mdadm --create --verbose /dev/md0 --level=1 --raid-devices=2 /dev/hda1 /dev/hdb1
 </pre>
-
 <p>
 Und formatieren/mounten dieses ebenfalls:
 </p>
@@ -924,46 +825,40 @@ cryptsetup luksOpen /dev/md0 home
 mkfs.ext2 -j /dev/mapper/home
 mount /dev/mapper/home /home
 </pre>
-
-<a name="automount"><h2>Script zum automatischen Mounten</h2></a>
+<p><a name="automount"><h2>Script zum automatischen Mounten</h2></a></p>
 <p>
 Damit wir nun nicht jedesmal nach dem Boot die ganzen Festplatten manuell
 mounten müssen, nutzen wir folgendes Script:
 </p>
-
-<p><strong>/root/mountHDDs.sh</strong>:
+<p><strong>/root/mountHDDs.sh</strong>:</p>
 <pre>
 #!/bin/sh
 status=1
 while [ ${status} -ne 0 ]; do
-    read -s pass
-    echo ${pass} | cryptsetup luksOpen /dev/sda backup
-    status=$?
-done</p>
-
-<h1 id="sobald-das-richtige-passwort-eingegeben-wurde-und-die-erste-festplatte-gemountet-wurde-folgen-die-anderen">Sobald das richtige Passwort eingegeben wurde und die erste Festplatte gemountet wurde, folgen die anderen</h1>
-
-<p>echo ${pass} | cryptsetup luksOpen /dev/hda2 movies
+	read -s pass
+	echo ${pass} | cryptsetup luksOpen /dev/sda backup
+	status=$?
+done
+# Sobald das richtige Passwort eingegeben wurde und die erste Festplatte gemountet wurde, folgen die anderen
+echo ${pass} | cryptsetup luksOpen /dev/hda2 movies
 echo ${pass} | cryptsetup luksOpen /dev/hdb2 wii
-echo ${pass} | cryptsetup luksOpen /dev/hdc mp3</p>
+echo ${pass} | cryptsetup luksOpen /dev/hdc mp3
 
-<p>mount /dev/mapper/backup /fs/Backup
+mount /dev/mapper/backup /fs/Backup
 mount /dev/mapper/movies /fs/Movies
 mount /dev/mapper/wii /fs/Wii
-mount /dev/mapper/mp3 /fs/MP3</p>
+mount /dev/mapper/mp3 /fs/MP3
 
-<p>mdadm -As /dev/md0
+mdadm -As /dev/md0
 echo ${pass} | cryptsetup luksOpen /dev/md0 home
 mount /dev/mapper/home /home
-</pre></p>
-
+</pre>
 <p>
 Ich gehe davon aus, dass für alle verschlüsselten Partitionen (außer der
 Root-Partition eventuell) das selbe Passwort verwendet wurde. Wer kann sich
 schon so viele ausreichend sichere Passwörter merken?
 </p>
-
-<p><a name="encrypted_swap"><h2>Encrypted swap</h2></a>
+<p><a name="encrypted_swap"><h2>Encrypted swap</h2></a></p>
 <p>
 Bei Gentoo befindet sich die Initialisierung der Swap-Partitionen in der Datei
 <code>/etc/init.d/localmount</code>. Dort ersetzen wir die Zeile
@@ -981,49 +876,44 @@ also zufällig. Das macht aber nichts, denn mit den Swap-Daten können wir nach
 einem Reboot eh nichts anfangen – vielleicht aber jemand anders, um
 nachzuweisen, dass bestimmte Dinge im RAM waren, also gehen wir lieber sicher,
 dass wirklich niemand etwas mehr damit anstellen kann :-).
-</p></p>
-
-<p><a name="anwendungen"><h2>Abschluss: Serveranwendungen installieren</h2></a>
+</p>
+<p><a name="anwendungen"><h2>Abschluss: Serveranwendungen installieren</h2></a></p>
 <p>
 So, der Server läuft. Jetzt erstmal zurücklehnen, Getränk und Konsumgut seiner
 Wahl konsumieren und entspannen. Danach folgt der etwas einfachere Teil: Die
 Installation von den benötigten Diensten.
-</p></p>
-
+</p>
 <p>
 Bei mir sind das <code>apache</code> (Webserver), <code>dhcpd</code>
 (DHCP-Server), <code>bind</code> (DNS-Server), <code>vsftpd</code>
 (FTP-Server), <code>mysql</code> (Datenbank) und <code>mt-daapd</code> (iTunes
 Musikserver).
 </p>
-
 <p>
 Die Übernahme der Konfigurationsdateien von Debian Linux lief weitestgehend
 problemlos, alles in allem war das die schnellste Serverinstallation, die ich
 je hatte ;-).
 </p>
-
 <p>
 Da dieser Teil sehr individuell ist, überlasse ich die genaue Konfiguration
 euch. Viel Spaß :-).
 </p>
-
-<p><h2>Quellen</h2>
+<h2>Quellen</h2>
 <p>
 Diese Seiten haben mir beim Installieren geholfen und sind einen Besuch wert:
 </p>
 <ul>
-    <li>
-    <a href="http://en.gentoo-wiki.com/wiki/DM-Crypt"
-    title="Gentoo-Wiki:DM-Crypt">
-    <a href="http://en.gentoo-wiki.com/wiki/DM-Crypt">http://en.gentoo-wiki.com/wiki/DM-Crypt</a></a>
-    </li>
-    <li>
-    <a href="http://www.gentoo.org/doc/de/handbook/handbook-x86.xml"
-    target="_blank" title="Gentoo
-    Handbuch"><a href="http://www.gentoo.org/doc/de/handbook/handbook-x86.xml">http://www.gentoo.org/doc/de/handbook/handbook-x86.xml</a></a>
-    </li>
-</ul></p>
+	<li>
+	<a href="http://en.gentoo-wiki.com/wiki/DM-Crypt"
+	title="Gentoo-Wiki:DM-Crypt">
+	http://en.gentoo-wiki.com/wiki/DM-Crypt</a>
+	</li>
+	<li>
+	<a href="http://www.gentoo.org/doc/de/handbook/handbook-x86.xml"
+	target="_blank" title="Gentoo
+	Handbuch">http://www.gentoo.org/doc/de/handbook/handbook-x86.xml</a>
+	</li>
+</ul>
 
 </div>
 
@@ -1032,16 +922,7 @@ Diese Seiten haben mir beim Installieren geholfen und sind einen Besuch wert:
   <div>
     <strong>Table Of Contents</strong>
 
-    <nav class="TableOfContents">
-<ul>
-<li><a href="#startup-script-to-create-the-device-mapper-control-device">Startup script to create the device-mapper control device</a></li>
-<li><a href="#on-non-devfs-systems">on non-devfs systems.</a></li>
-<li><a href="#non-zero-exit-status-indicates-failure">Non-zero exit status indicates failure.</a></li>
-<li><a href="#check-for-devfs-procfs">Check for devfs, procfs</a></li>
-<li><a href="#get-major-minor-and-mknod">Get major, minor, and mknod</a></li>
-<li><a href="#sobald-das-richtige-passwort-eingegeben-wurde-und-die-erste-festplatte-gemountet-wurde-folgen-die-anderen">Sobald das richtige Passwort eingegeben wurde und die erste Festplatte gemountet wurde, folgen die anderen</a></li>
-</ul>
-</nav>
+    <nav class="TableOfContents"></nav>
   </div>
 </div>
 

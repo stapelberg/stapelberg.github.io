@@ -205,175 +205,132 @@ This article walks you through diagnosing and working around this issue, in the 
   <details class="ms_toc_details">
     <summary>Table of contents</summary>
     <nav class="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#background">Background</a></li>
-<li><a href="#modemmanager">ModemManager</a></li>
-<li><a href="#problem-statement">Problem statement</a></li>
-<li><a href="#usb-analysis-with-wireshark">USB analysis with Wireshark</a></li>
-<li><a href="#linux-tty-echo-vs-chibios-shell-banner">Linux tty echo vs. ChibiOS shell banner</a></li>
-<li><a href="#flushing-in-screen">Flushing in Screen</a></li>
-<li><a href="#line-ending-conversion">Line ending conversion</a></li>
-<li><a href="#device-side-workaround-wait-until-opened">Device-side workaround: wait until opened</a></li>
-<li><a href="#screenshots-mac-and-windows">Screenshots: Mac and Windows</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#background">Background</a></li>
+    <li><a href="#modemmanager">ModemManager</a></li>
+    <li><a href="#problem-statement">Problem statement</a></li>
+    <li><a href="#usb-analysis-with-wireshark">USB analysis with Wireshark</a></li>
+    <li><a href="#linux-tty-echo-vs-chibios-shell-banner">Linux tty echo vs. ChibiOS shell banner</a></li>
+    <li><a href="#flushing-in-screen">Flushing in Screen</a></li>
+    <li><a href="#line-ending-conversion">Line ending conversion</a></li>
+    <li><a href="#device-side-workaround-wait-until-opened">Device-side workaround: wait until opened</a></li>
+    <li><a href="#screenshots-mac-and-windows">Screenshots: Mac and Windows</a></li>
+  </ul>
 </nav>
   </details>
-  
-
-<p>During my work on <a href="https://www.pjrc.com/store/teensy41.html">Teensy 4.1</a> support
+  <p>During my work on <a href="https://www.pjrc.com/store/teensy41.html">Teensy 4.1</a> support
 in <a href="https://en.wikipedia.org/wiki/ChibiOS/RT">ChibiOS</a> for the QMK keyboard
 firmware, I noticed that ChibiOS’s virtual serial device USB demo would
 sometimes print garbled output, and that I would never see the ChibiOS shell
 prompt.</p>
-
 <p>This article walks you through diagnosing and working around this issue, in the
 hope that it helps others who are working with micro controllers and USB virtual
 serial devices.</p>
-
 <h2 id="background">Background</h2>
-
 <p>Serial interfaces are often the easiest option when working with micro
 controllers to print text: you only connect <code>GND</code> and the micro controller’s
 serial <code>TX</code> pin to a USB-to-serial converter. The <code>RX</code> pin is only needed when
 you want to send text to the micro controller as well.</p>
-
 <p>While conceptually simple, the requirement for an extra piece of hardware
 (USB-to-serial adapter) is annoying. If your micro controller has a working USB
 interface and USB stack, a popular alternative is for the micro controller to
 provide a virtual serial device via USB.</p>
-
 <p>This way, you just need one USB cable between your micro controller and
 computer, reusing the same connection you already use for programming the
 device.</p>
-
 <p>A popular choice within this solution is to provide a device conforming to the
 USB Communications Device Class (CDC) standard, specifically its Abstract
 Control Model (ACM), which is typically used for modem hardware.</p>
-
 <p>On Linux, these devices show up as e.g. <code>/dev/ttyACM0</code>. In case you’re
 wondering: <code>/dev/ttyUSB0</code> device names are used by more specific drivers
 (vendor-specific). The blog post <a href="https://rfc1149.net/blog/2013/03/05/what-is-the-difference-between-devttyusbx-and-devttyacmx/">What is the difference between /dev/ttyUSB and
 /dev/ttyACM?</a>
 goes into a lot more detail.</p>
-
 <h2 id="modemmanager">ModemManager</h2>
-
 <p>One unfortunate side-effect of using a modem standard to provide a generic
 serial device is that modem-related software might mistake our micro controller
 for a modem.</p>
-
 <p>Use the following command to disable ModemManager until the next reboot, which
 otherwise might open and probe any new serial devices:</p>
-
-<pre><code>% sudo systemctl mask --runtime --now ModemManager
-</code></pre>
-
-<h2 id="problem-statement">Problem statement</h2>
-
+<pre tabindex="0"><code>% sudo systemctl mask --runtime --now ModemManager
+</code></pre><h2 id="problem-statement">Problem statement</h2>
 <p>With a regular, non-USB serial interface, you can send data at any time. If
 nobody is receiving the data on the other end, the micro controller doesn’t care
 and still writes serial data.</p>
-
 <p>When using the ChibiOS shell with a regular serial interface, this means that if
 you open the serial interface too late, you will not see the ChibiOS shell
 prompt. But, if you have the serial interface already opened when powering on
 your device, you will be greeted by ChibiOS’s shell prompt:</p>
-
-<pre><code>ChibiOS/RT Shell
+<pre tabindex="0"><code>ChibiOS/RT Shell
 ch&gt; 
-</code></pre>
-
-<p>With a USB serial, however, the host will not transfer data from the device
+</code></pre><p>With a USB serial, however, the host will not transfer data from the device
 until the serial interface is opened. This means that writes to the USB serial
 can block, whereas writes to the UART serial will not block but may go ignored
 if nobody is listening.</p>
-
 <p>So when I open the USB serial interface, I would expect to see the ChibiOS shell
 prompt like above. Instead, I would often not see any prompt at all, and I would
 even sometimes see garbled output like this:</p>
-
-<pre><code>cch&gt; biOS/RT She
-</code></pre>
-
-<h2 id="usb-analysis-with-wireshark">USB analysis with Wireshark</h2>
-
+<pre tabindex="0"><code>cch&gt; biOS/RT She
+</code></pre><h2 id="usb-analysis-with-wireshark">USB analysis with Wireshark</h2>
 <p><a href="https://en.wikipedia.org/wiki/Wireshark">Wireshark</a> allows us to analyze USB
 traffic in combination with the <code>usbmon</code> Linux kernel module.</p>
-
 <p>Looking through the captured packets, I noticed unexpected packets from the host
 (computer) to the device (micro controller), specifically containing the
 following bytes:</p>
-
 <ol>
 <li>hex <code>0xa</code> = ASCII <code>\n</code></li>
 <li>hex <code>0xd</code> = ASCII <code>\r</code></li>
 </ol>
-
 <p>Seeing any packets in this direction is unexpected, because I am only opening
 the serial interface <strong>for reading</strong>, and I am not consciously sending
 anything. So where do the packets come from?</p>
-
 <p>To verify I am not missing any nuance of the CDC protocol, I added debug
 statements to the ChibiOS shell to log any incoming data. The <code>\n\r</code> bytes
 indeed make it to the ChibiOS shell.</p>
-
 <p>When the shell receives a line break, it prints a new prompt. This seems to be
 the reason why I’m seeing garbled data: while the output is transferred to the
 host, line breaks are received, causing more data transfers. It’s as if somebody
 was hammering the return key really quickly.</p>
-
 <h2 id="linux-tty-echo-vs-chibios-shell-banner">Linux tty echo vs. ChibiOS shell banner</h2>
-
 <p>The unexpected <code>\n\r</code> bytes turn out to come from the Linux USB CDC ACM driver,
 or its interplay with the Linux tty driver, to be specific. The CDC ACM driver
 is a kind of tty driver, so it is built atop the Linux tty infrastructure, whose
 <a href="https://elixir.bootlin.com/linux/v5.11.16/source/drivers/tty/tty_io.c#L122">standard settings include various <code>ECHO</code>
 flags</a>.</p>
-
 <p>When echoing is enabled, the ChibiOS shell banner triggers echo characters,
 which in turn are interpreted as input to the shell, causing garbled output.</p>
-
 <p>So why is echoing enabled? Wouldn’t a terminal emulator turn off echoing first
 thing?</p>
-
 <p>Yes. But, when the CDC ACM driver receives the first data transfer via USB
 (already queued), the standard tty settings are still in effect, because the
 application did not yet have a chance to set its tty configuration up!</p>
-
 <p>This can be verified by running the following command on a Linux host:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">% stty -F /dev/ttyACM0 <span style="color:#40a070">115200</span> -echo -echoe -echok</code></pre></div>
-<p>Even though the command’s sole purpose is to configure the tty, its opening of
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">% stty -F /dev/ttyACM0 <span style="color:#40a070">115200</span> -echo -echoe -echok
+</code></pre></div><p>Even though the command’s sole purpose is to configure the tty, its opening of
 the device still causes the banner to print, and echoing to happen, and garbled
 output is the result.</p>
-
 <p>It turns out this is a somewhat common problem. Hence, the Linux USB CDC ACM
 driver <a href="https://elixir.bootlin.com/linux/v5.11.16/source/drivers/usb/class/cdc-acm.c#L1708">has a quirks
 table</a>,
 in which devices that print a banner select the <code>DISABLE_ECHO</code> quirk, which
 results in the CDC ACM driver turning off the echoing termios flag early:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020;font-weight:bold">static</span> <span style="color:#007020;font-weight:bold">const</span> <span style="color:#007020;font-weight:bold">struct</span> usb_device_id acm_ids[] <span style="color:#666">=</span> {
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020;font-weight:bold">static</span> <span style="color:#007020;font-weight:bold">const</span> <span style="color:#007020;font-weight:bold">struct</span> usb_device_id acm_ids[] <span style="color:#666">=</span> {
 	<span style="color:#60a0b0;font-style:italic">/* quirky and broken devices */</span>
 	{ USB_DEVICE(<span style="color:#40a070">0x0424</span>, <span style="color:#40a070">0x274e</span>), <span style="color:#60a0b0;font-style:italic">/* Microchip Technology, Inc. */</span>
 	  .driver_info <span style="color:#666">=</span> DISABLE_ECHO, }, <span style="color:#60a0b0;font-style:italic">/* DISABLE ECHO in termios flag */</span>
-<span style="color:#666">//</span> <span style="">…</span></code></pre></div>
-<p>So, a quick solution to turn off echoing early is to change your USB vendor and
+<span style="color:#60a0b0;font-style:italic">// …
+</span></code></pre></div><p>So, a quick solution to turn off echoing early is to change your USB vendor and
 product id (VID/PID) to an ID for which the Linux kernel applies the
 <code>DISABLE_ECHO</code> quirk, e.g.:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020">#define USB_DEVICE_VID 0x0424
-</span><span style="color:#007020">#define USB_DEVICE_PID 0x274e</span></code></pre></div>
-<h2 id="flushing-in-screen">Flushing in Screen</h2>
-
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020">#define USB_DEVICE_VID 0x0424
+</span><span style="color:#007020">#define USB_DEVICE_PID 0x274e
+</span></code></pre></div><h2 id="flushing-in-screen">Flushing in Screen</h2>
 <p>With tty echo disabled, I don’t see garbled output anymore, but still wouldn’t
 always see the ChibiOS shell prompt!</p>
-
 <p>This issue turned out to be specific to the terminal emulator program I’m
 using. For many years, I have been using
 <a href="https://en.wikipedia.org/wiki/GNU_Screen">Screen</a> for serial devices of any
 sort.</p>
-
 <p>I was surprised to learn during this investigation that Screen <a href="https://git.savannah.gnu.org/cgit/screen.git/tree/src/window.c?id=d7bd327fdf799c82f9a359365d461edb755056ea#n971">flushes any
 pending
 output</a>
@@ -381,20 +338,15 @@ when opening the device. This typically isn’t a problem because adapter-backed
 serial devices are opened once and then stay open. USB virtual serial devices
 however are only opened when used, and disappear when loading new program code
 onto your micro controller.</p>
-
 <p>I verified this is the problem by using <a href="https://manpages.debian.org/cat.1"><code>cat(1)</code></a>
  instead, with which I can indeed see the prompt:</p>
-
-<pre><code>% cat /dev/ttyACM0
+<pre tabindex="0"><code>% cat /dev/ttyACM0
 
 ChibiOS/RT Shell
                 
                 ch&gt; 
-</code></pre>
-
-<p>After commenting out the flush call in Screen’s sources, I could see the prompt
+</code></pre><p>After commenting out the flush call in Screen’s sources, I could see the prompt
 in Screen as well.</p>
-
 <aside class="admonition note">
   <div class="note-container">
     <div class="note-icon">
@@ -413,70 +365,52 @@ seems handy nevertheless.</div>
   </div>
 </aside>
 
-
 <h2 id="line-ending-conversion">Line ending conversion</h2>
-
 <p>Now that we no longer flush the prompt away, why is the spacing still incorrect,
 and where does it go wrong?</p>
-
-<pre><code>
+<pre tabindex="0"><code>
 ChibiOS/RT Shell
                 
                 ch&gt; 
-</code></pre>
-
-<p>If we use <a href="https://manpages.debian.org/strace.1"><code>strace(1)</code></a>
+</code></pre><p>If we use <a href="https://manpages.debian.org/strace.1"><code>strace(1)</code></a>
  to see what <a href="https://manpages.debian.org/screen.1"><code>screen(1)</code></a>
  or <a href="https://manpages.debian.org/cat.1"><code>cat(1)</code></a>
  read from
 the driver, we see:</p>
-
-<pre><code>797270 read(7, &quot;\n\nChibiOS/RT Shell\n\nch&gt; &quot;, 4096) = 24
-</code></pre>
-
-<p>We would have expected <code>&quot;\r\nChibiOS/RT Shell\r\nch&gt; &quot;</code> instead, meaning all
+<pre tabindex="0"><code>797270 read(7, &quot;\n\nChibiOS/RT Shell\n\nch&gt; &quot;, 4096) = 24
+</code></pre><p>We would have expected <code>&quot;\r\nChibiOS/RT Shell\r\nch&gt; &quot;</code> instead, meaning all
 Carriage Returns (<code>\r</code>) have been translated to Newlines (<code>\n</code>).</p>
-
 <p>This is again due to the <a href="https://elixir.bootlin.com/linux/v5.11.16/source/drivers/tty/tty_io.c#L122">Linux tty driver’s default termios
 settings</a>:
 <code>c_iflag</code> enables option <code>ICRNL</code> by default, which translates <code>CR</code> (Carriage
 Return) to <code>NL</code> (Newline).</p>
-
 <p>Unfortunately, contrary to the <code>DISABLE_ECHO</code> quirk, there is no corresponding
 quirk in the Linux ACM driver to turn off line ending conversion, so a fix would
 need a Linux kernel driver change!</p>
-
 <h2 id="device-side-workaround-wait-until-opened">Device-side workaround: wait until opened</h2>
-
 <p>At this point, we have covered a few problems that would need to be fixed:</p>
-
 <ol>
 <li>Change USB VID/PID to get the <code>DISABLE_ECHO</code> quirk in the driver.</li>
 <li>Recompile terminal emulator programs to remove flushing, if needed.</li>
 <li>Modify kernel driver to add quirk to disable Carriage Return (<code>\r</code>) conversion.</li>
 </ol>
-
 <p>Time for a quick reality check: this seems too hard and too long a time for all
 parts of the stack to be fixed. Is there an easier way, and why don’t others run
 into this problem? If only the device didn’t print its banner so early, that
 would circumvent all of the problems above, too!</p>
-
 <p>Luckily, the host actually notifies the device when a terminal emulator program
 opens the USB serial device by sending a <code>CDC_SET_CONTROL_LINE_STATE</code> request. I
 verified this behavior on Linux, Windows and macOS.</p>
-
 <p>So, let’s implement a workaround in our device code! We will delay starting the
 shell until:</p>
-
 <ol>
 <li>The USB serial device was opened (not just configured).</li>
 <li>An additional delay of 100ms has passed to give the terminal emulator
 application a chance to configure the serial device.</li>
 </ol>
-
 <p>In our <code>main.c</code> loop, we wait until USB is active, and until we receive the
 first <code>CDC_SET_CONTROL_LINE_STATE</code> request because the serial port was opened:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">  <span style="color:#007020;font-weight:bold">while</span> (<span style="color:#007020">true</span>) {
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">  <span style="color:#007020;font-weight:bold">while</span> (<span style="color:#007020">true</span>) {
     <span style="color:#007020;font-weight:bold">if</span> (SDU1.config<span style="color:#666">-&gt;</span>usbp<span style="color:#666">-&gt;</span>state <span style="color:#666">==</span> USB_ACTIVE) {
       chSemWait(<span style="color:#666">&amp;</span>scls);
       chThdSleepMilliseconds(<span style="color:#40a070">100</span>);
@@ -484,10 +418,10 @@ first <code>CDC_SET_CONTROL_LINE_STATE</code> request because the serial port wa
       thread_t <span style="color:#666">*</span>shelltp <span style="color:#666">=</span> chThdCreateFromHeap(<span style="color:#007020">NULL</span>, SHELL_WA_SIZE, <span style="color:#4070a0">&#34;shell&#34;</span>, NORMALPRIO <span style="color:#666">+</span> <span style="color:#40a070">1</span>, shellThread, (<span style="color:#902000">void</span> <span style="color:#666">*</span>)<span style="color:#666">&amp;</span>shell_cfg1);
       chThdWait(shelltp);
     }
-  }</code></pre></div>
-<p>And in our <code>usbcfg.c</code>, when receiving a <code>CDC_SET_CONTROL_LINE_STATE</code> request, we
+  }
+</code></pre></div><p>And in our <code>usbcfg.c</code>, when receiving a <code>CDC_SET_CONTROL_LINE_STATE</code> request, we
 will reset the semaphore to non-blockingly wake up all waiters:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020;font-weight:bold">extern</span> semaphore_t scls;
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020;font-weight:bold">extern</span> semaphore_t scls;
 
 <span style="color:#902000">bool</span> <span style="color:#06287e">requests_hook</span>(USBDriver <span style="color:#666">*</span>usbp) {
   <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">bool</span> result <span style="color:#666">=</span> sduRequestsHook(usbp);
@@ -500,11 +434,9 @@ will reset the semaphore to non-blockingly wake up all waiters:</p>
   }
 
   <span style="color:#007020;font-weight:bold">return</span> result;
-}</code></pre></div>
-<h2 id="screenshots-mac-and-windows">Screenshots: Mac and Windows</h2>
-
+}
+</code></pre></div><h2 id="screenshots-mac-and-windows">Screenshots: Mac and Windows</h2>
 <p>Aside from Linux, I also verified the workaround works on a Mac (with Screen):</p>
-
 
 
 
@@ -532,9 +464,7 @@ will reset the semaphore to non-blockingly wake up all waiters:</p>
 
 
 
-
 <p>…and that it works on Windows (with PuTTY):</p>
-
 
 
 
@@ -571,20 +501,17 @@ will reset the semaphore to non-blockingly wake up all waiters:</p>
     <strong>Table Of Contents</strong>
 
     <nav class="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#background">Background</a></li>
-<li><a href="#modemmanager">ModemManager</a></li>
-<li><a href="#problem-statement">Problem statement</a></li>
-<li><a href="#usb-analysis-with-wireshark">USB analysis with Wireshark</a></li>
-<li><a href="#linux-tty-echo-vs-chibios-shell-banner">Linux tty echo vs. ChibiOS shell banner</a></li>
-<li><a href="#flushing-in-screen">Flushing in Screen</a></li>
-<li><a href="#line-ending-conversion">Line ending conversion</a></li>
-<li><a href="#device-side-workaround-wait-until-opened">Device-side workaround: wait until opened</a></li>
-<li><a href="#screenshots-mac-and-windows">Screenshots: Mac and Windows</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#background">Background</a></li>
+    <li><a href="#modemmanager">ModemManager</a></li>
+    <li><a href="#problem-statement">Problem statement</a></li>
+    <li><a href="#usb-analysis-with-wireshark">USB analysis with Wireshark</a></li>
+    <li><a href="#linux-tty-echo-vs-chibios-shell-banner">Linux tty echo vs. ChibiOS shell banner</a></li>
+    <li><a href="#flushing-in-screen">Flushing in Screen</a></li>
+    <li><a href="#line-ending-conversion">Line ending conversion</a></li>
+    <li><a href="#device-side-workaround-wait-until-opened">Device-side workaround: wait until opened</a></li>
+    <li><a href="#screenshots-mac-and-windows">Screenshots: Mac and Windows</a></li>
+  </ul>
 </nav>
   </div>
 </div>

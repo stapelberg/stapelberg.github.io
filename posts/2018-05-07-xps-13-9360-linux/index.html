@@ -185,50 +185,37 @@
   
 </div>
 <div class="Artikel" id="content">
-  
-
-<h3 id="update-2021">Update (2021)</h3>
-
+  <h3 id="update-2021">Update (2021)</h3>
 <p><strong>Update (2021):</strong> After Dell didn’t update their Linux version for a while, I
 concluded it would be best to just install a standard Ubuntu Linux. All required
 drivers are upstreamed, and I never needed the Dell tools that come with their
 version.</p>
-
 <h3 id="disclaimer">Disclaimer</h3>
-
 <p>Warning: if you don’t understand one of the steps, don’t blindly follow them,
 but ask a friend for help instead! Be sure to have a known-working backup
 before messing with your system.</p>
-
 <h3 id="motivation">Motivation</h3>
-
 <p>I recently got a Dell XPS 13 9360 (2017), which of course I would like to use
 with Linux. I figured I’d give Dell’s Ubuntu version a try, as it is the closest
 I can get to a supported Linux offering on a modern laptop.</p>
-
 <p>Unfortunately, Dell doesn’t sell the XPS 9360 in its shop anymore (and I don’t
 like its successor due to the lack of USB A ports), so I had to resort to buying
 a version that comes with Windows.</p>
-
 <p>You can obtain the recovery image
 <code>dell-bto-xenial-dino2-mlk-A00-iso-20161021-0.iso</code> from
-<a href="http://www.dell.com/support/home/us/en/19/Drivers/OSISO/W764">http://www.dell.com/support/home/us/en/19/Drivers/OSISO/W764</a>, provided you have
+<a href="http://www.dell.com/support/home/us/en/19/Drivers/OSISO/W764,">http://www.dell.com/support/home/us/en/19/Drivers/OSISO/W764,</a> provided you have
 the system tag of an XPS 9360 that came with Linux — ask a friend if you
 accidentally purchased the Windows version. Tip: the service tag is the BIOS
 serial number, which is included in the output of
 <a href="https://manpages.debian.org/stretch/lshw/lshw.1.en"><code>lshw(1)</code></a> and similar
 tools.</p>
-
 <h3 id="making-the-image-bootable">Making the image bootable</h3>
-
 <p>I don’t understand why this image is not bootable by default. The device it was
 generated for never had a CD/DVD drive, so what good is using an ISO 9660 image?</p>
-
 <p>Anyway, to make the image bootable, I formatted a USB thumb drive with a FAT
 file system and installed GRUB in such a way that it will loopback-boot into the
 ISO image (this is option 2 from <a href="https://askubuntu.com/a/395880">https://askubuntu.com/a/395880</a>):</p>
-
-<pre><code>grub-mkimage -o bootx64.efi -p /efi/boot -O x86_64-efi \
+<pre tabindex="0"><code>grub-mkimage -o bootx64.efi -p /efi/boot -O x86_64-efi \
  fat iso9660 part_gpt part_msdos \
  normal boot linux configfile loopback chain \
  efifwsetup efi_gop efi_uga \
@@ -252,31 +239,21 @@ pmount /dev/sdc
 mkdir -p /media/sdc/efi/boot
 cp bootx64.efi *.iso grub.cfg /media/sdc/efi/boot
 pumount sdc
-</code></pre>
-
-<h3 id="making-the-installer-work">Making the installer work</h3>
-
+</code></pre><h3 id="making-the-installer-work">Making the installer work</h3>
 <p>To get the installer to work, I had to comment out the <code>self.genuine</code> checks in
 <code>/usr/lib/ubiquity/plugins/dell-{bootstrap,recovery}.py</code>, then start <code>ubiquity</code>
 from the terminal.</p>
-
 <h3 id="switch-to-luks-full-disk-encryption">Switch to LUKS full-disk encryption</h3>
-
 <p>Unfortunately, the recovery installation only offers you to encrypt your
 homedir, whereas I would like to encrypt my entire disk. Here are the steps I
 took to enable LUKS full-disk encryption.</p>
-
 <p>First, I copied the root file system’s data to my backup storage. Pay attention
 to copying the files as root, otherwise setuid and setgid bits might get lost.</p>
-
-<pre><code># mount /dev/mapper/nvme0n1p3 /mnt/root
+<pre tabindex="0"><code># mount /dev/mapper/nvme0n1p3 /mnt/root
 # rsync -aXx --relative --numeric-ids /mnt/root/ root@storage:xps/
 # umount /mnt/root
-</code></pre>
-
-<p>Then, I created a new boot partition, encrypted the root partition and re-created the file system:</p>
-
-<pre><code># cat &lt;&lt;'EOT' | sfdisk /dev/nvme0n1
+</code></pre><p>Then, I created a new boot partition, encrypted the root partition and re-created the file system:</p>
+<pre tabindex="0"><code># cat &lt;&lt;'EOT' | sfdisk /dev/nvme0n1
 label: gpt
 label-id: C64A87D1-CA61-4BF2-81E6-0216EE6BC4C0
 device: /dev/nvme0n1
@@ -293,20 +270,14 @@ EOT
 # cryptsetup luksFormat /dev/nvme0n1p4
 # cryptsetup luksOpen /dev/nvme0n1p4 nvme0n1p3_crypt
 # mkfs.ext4 /dev/mapper/nvme0n1p4_crypt
-</code></pre>
-
-<p>Next, I restored the data:</p>
-
-<pre><code># mount /dev/mapper/nvme0n1p4_crypt /mnt/root
+</code></pre><p>Next, I restored the data:</p>
+<pre tabindex="0"><code># mount /dev/mapper/nvme0n1p4_crypt /mnt/root
 # mount /dev/nvme0n1p3 /mnt/root/boot
 # mkdir /mnt/root/boot/efi
 # mount /dev/nvme0n1p1 /mnt/root/boot/efi
 # rsync -aXx --numeric-ids storage:xps/ /mnt/root
-</code></pre>
-
-<p>And finally, I fixed the boot partition:</p>
-
-<pre><code># mount -o bind /dev /mnt/root/dev
+</code></pre><p>And finally, I fixed the boot partition:</p>
+<pre tabindex="0"><code># mount -o bind /dev /mnt/root/dev
 # mount -t sysfs sysfs /mnt/root/sys
 # mount -t proc proc /mnt/root/proc
 # chroot /mnt/root /bin/bash
@@ -324,7 +295,6 @@ EOT
 
 # umount /mnt/root/{proc,sys,dev,boot/efi,boot,}
 </code></pre>
-
 </div>
 
       </div>

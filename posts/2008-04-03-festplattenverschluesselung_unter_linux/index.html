@@ -198,28 +198,25 @@
   <details class="ms_toc_details">
     <summary>Table of contents</summary>
     <nav class="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#1-das-system-vorbereiten">1) Das System vorbereiten</a>
-<ul>
-<li><a href="#1-1-module">1.1) Module</a></li>
-<li><a href="#1-2-hilfsprogramme">1.2) Hilfsprogramme</a></li>
-</ul></li>
-<li><a href="#2-komplette-partition-verschlüsseln">2.) Komplette Partition verschlüsseln</a>
-<ul>
-<li><a href="#2-1-die-partition-wieder-aushängen">2.1) Die Partition wieder aushängen</a></li>
-</ul></li>
-<li><a href="#3-einen-verschlüsselten-container-erstellen">3.) Einen verschlüsselten Container erstellen</a></li>
-<li><a href="#4-swapspace-verschlüsseln">4.) Swapspace verschlüsseln</a></li>
-<li><a href="#5-mögliche-fehlermeldungen">5.) Mögliche Fehlermeldungen</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#1-das-system-vorbereiten">1) Das System vorbereiten</a>
+      <ul>
+        <li><a href="#11-module">1.1) Module</a></li>
+        <li><a href="#12-hilfsprogramme">1.2) Hilfsprogramme</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-komplette-partition-verschlüsseln">2.) Komplette Partition verschlüsseln</a>
+      <ul>
+        <li><a href="#21-die-partition-wieder-aushängen">2.1) Die Partition wieder aushängen</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-einen-verschlüsselten-container-erstellen">3.) Einen verschlüsselten Container erstellen</a></li>
+    <li><a href="#4-swapspace-verschlüsseln">4.) Swapspace verschlüsseln</a></li>
+    <li><a href="#5-mögliche-fehlermeldungen">5.) Mögliche Fehlermeldungen</a></li>
+  </ul>
 </nav>
   </details>
-  
-
-<aside class="admonition note">
+  <aside class="admonition note">
   <div class="note-container">
     <div class="note-icon">
       <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
@@ -234,17 +231,13 @@
   </div>
 </aside>
 
-
 <p>
 Vorab: Ja, ich weiß, dass es schon genügend Anleitungen zu dem Thema gibt, aber
 ich möchte es sicherheitshalber noch mal mit allen Hürden, vor die ich gestellt
 wurde, aufschreiben.
 </p>
-
 <h2 id="1-das-system-vorbereiten">1) Das System vorbereiten</h2>
-
-<h3 id="1-1-module">1.1) Module</h3>
-
+<h3 id="11-module">1.1) Module</h3>
 <p>
 Zum Verschlüsseln brauchen wir die Module (oder die fest einkompilierte
 Kernelunterstützung) <code>dm_crypt</code>, <code>loop</code>,
@@ -252,7 +245,6 @@ Kernelunterstützung) <code>dm_crypt</code>, <code>loop</code>,
 und <code>sha256</code> (oder das entsprechende Modul des Hash-Algorithmus
 deiner Wahl).
 </p>
-
 <p>
 Diese Module werden bei den meisten aktuellen Linux-distributionen
 mitgeliefert, sind aber meist nicht aktiviert. Ob die Module geladen sind,
@@ -261,7 +253,6 @@ Unterstützung sieht man in <code>cat /proc/crypto</code>. Ein Modul lädt man
 mit <code>modprobe dm_crypt</code> (beziehungsweise mit dem entsprechenden
 Namen des Moduls natürlich.
 </p>
-
 <p>
 Der typische Ablauf sieht also so aus:
 </p>
@@ -270,24 +261,22 @@ Der typische Ablauf sieht also so aus:
 # lsmod | egrep "(^dm_crypt|^loop)"
 loop                   17288  4 
 dm_crypt               12424  1 </pre>
-
 <p>
 Wenn man jedoch seinen eigenen Kernel kompiliert hat und dabei die erwähnten
 Module außer Acht gelassen hat, kann man dies nachholen, indem man entweder im
 Menü von „make menuconfig” die Module auswählt, oder die Einstellungen direkt
 in der Datei <code>.config</code> bearbeiten.
 </p>
-
 <p>
 Dazu wechselt man in das Verzeichnis <code>/usr/src/linux</code> und öffnet die
 Datei <code>.config</code> mit einem Texteditor. Nun sucht man die folgenden
 Einstellungen:
 </p>
 <ul>
-    <li>CONFIG_DM_CRYPT</li>
-    <li>CONFIG_CRYPTO_SHA256</li>
-    <li>CONFIG_CRYPTO_BLOWFISH</li>
-    <li>CONFIG_BLK_DEV_LOOP</li>
+	<li>CONFIG_DM_CRYPT</li>
+	<li>CONFIG_CRYPTO_SHA256</li>
+	<li>CONFIG_CRYPTO_BLOWFISH</li>
+	<li>CONFIG_BLK_DEV_LOOP</li>
 </ul>
 <p>
 Sollte bei einem der Einträge ein „=y” dahinterstehen, ist er im Kernel fix
@@ -306,7 +295,6 @@ Hierzu benötigen wir die momentan verwendete Kernelversion, die man mit einem
 sich aus <code>/lib/modules/</code> und der Kernelversion zusammen, bie mir
 wäre das momentan <code>/lib/modules/2.6.15-25-386/</code>.
 </p>
-
 <p>
 Das Modul <code>dm_crypt</code> muss in den Modulordner
 <code>kernel/drivers/md/</code>, <code>loop</code> nach
@@ -316,12 +304,10 @@ Das Modul <code>dm_crypt</code> muss in den Modulordner
 <pre># cp drivers/md/dm_crypt.ko /lib/modules/2.6.15-25-386/kernel/drivers/md/
 # cp drivers/block/loop.ko /lib/modules/2.6.15-25-386/kernel/drivers/block/
 # cp crypto/*.ko /lib/modules/2.6.15-25-386/kernel/crypto</pre>
-
 <p>
 Nun müssen wir noch <code>depmod</code> ausführen, damit dem System die neuen
 Module bekannt werden und die Abhängigkeiten generiert werden.
 </p>
-
 <p>
 Jetzt laden wir die neuen Module mit <code>modprobe dm_crypt loop sha256
 blowfish</code>. Falls das geklappt hat, lassen wir die Module beim nächsten
@@ -331,9 +317,7 @@ verewigen. Dies kann man mit einem Texteditor oder mit dem Befehl <code>echo -e
 \n stehen für einen Zeilenumbruch, damit wir nur einen statt vier Befehle
 verwenden müssen.)
 </p>
-
-<h3 id="1-2-hilfsprogramme">1.2) Hilfsprogramme</h3>
-
+<h3 id="12-hilfsprogramme">1.2) Hilfsprogramme</h3>
 <p>
 Da das direkte Aufrufen von <code>dm_crypt</code> ein bisschen kompliziert ist,
 hat der Autor ein Programm namens „cryptsetup” geschrieben, welches den Zugriff
@@ -357,14 +341,11 @@ cryptsetup</code>) die LUKS-Erweiterung.
 <p>
 Dieses Paket muss für diese Anleitung installiert sein.
 </p>
-
 <h2 id="2-komplette-partition-verschlüsseln">2.) Komplette Partition verschlüsseln</h2>
-
 <p>
 Ich gehe in diesem Beispiel davon aus, dass die zu verschlüsselnde Partition
 <code>/dev/hda2</code> heißt.
 </p>
-
 <p>
 Damit eine eventulle kryptografische Analyse später so schwer wie möglich wird,
 beschreiben wir zuerst die komplette Festplatte mit Zufallswerten. Das geht am
@@ -372,7 +353,6 @@ einfachsten mit dem Programm <code>wipe</code>: <code>wipe -qk
 /dev/hda2</code>. Dadurch wird es schwieriger, für die Analyse relevante Daten
 zu finden.
 </p>
-
 <p>
 Anschließend erstellen wir mit folgendem Befehl das loopdevice:
 </p>
@@ -383,7 +363,6 @@ unterstützt wird, aber nicht – wie seine Alternative plain – gegen <a
 href="http://de.wikipedia.org/wiki/Wasserzeichenangriff" title="Wikipedia:
 Watermark-Attacke" target="_blank">Watermark-Attacken</a> anfällig ist.
 </p>
-
 <p>
 Cryptsetup fordert uns nun auf, in Großbuchstaben YES einzutippen und fragt uns
 anschließend nach einer Passphrase:
@@ -392,17 +371,14 @@ anschließend nach einer Passphrase:
 WARNING!
 ========
 Daten auf /dev/hda2 werden unwiderruflich überschrieben.
-
-Are you sure? (Type uppercase yes): YES
+<p>Are you sure? (Type uppercase yes): YES
 Enter LUKS passphrase:
-Verify passphrase:</pre>
-
+Verify passphrase:</pre></p>
 <p>
 Nun hat LUKS uns einen entsprechenden (durch die eben angegebene Option
 <code>-s 256</code> 256-Bit großen Schlüssel erzeugt) Schlüssel geschrieben und
 den Header auf die Partition geschrieben.
 </p>
-
 <p>
 Mit dem Befehl <code>cryptsetup luksOpen /dev/hda2 daten</code> öffnen wir die
 Partition nun mit dem Namen „daten” (der Name wird nur für den Devicemapper
@@ -410,7 +386,6 @@ verwendet). Diesen Schritt müssen wir auch in Zukunft ausführen (ob manuell
 oder über ein Startscript bleibt jedem selbst überlassen), wenn wir an die
 Daten wollen.
 </p>
-
 <p>
 Nach Eingabe der richtigen Passphrase sagt uns <code>cryptsetup</code>, dass
 alles in Ordnung ist:
@@ -419,7 +394,6 @@ alles in Ordnung ist:
 Enter LUKS passphrase:
 key slot 0 unlocked.
 Command successful.</pre>
-
 <p>
 Nun steht uns das loopdevice <code>/dev/mapper/daten</code> zur Verfügung, das
 wir wie eine ganz normale Festplatte verwenden können. Wir erzeugen uns also
@@ -427,8 +401,7 @@ mit <code>mkfs.ext3 /dev/mapper/daten</code> ein Dateisystem, erstellen einen
 Mountpoint mit <code>mkdir /mnt/daten</code> und hängen die Festplatte dann mit
 <code>mount /dev/mapper/daten /mnt/daten</code> dort ein:
 </p>
-
-<pre><code># mkfs.ext3 /dev/mapper/daten
+<pre tabindex="0"><code># mkfs.ext3 /dev/mapper/daten
 mke2fs 1.39 (29-May-2006)
 Dateisystem-Label=
 OS-Typ: Linux
@@ -454,21 +427,14 @@ je nachdem, was zuerst eintritt. Veränderbar mit tune2fs -c oder -t .
 
 # mkdir /mnt/daten
 # mount /dev/mapper/daten /mnt/daten
-</code></pre>
-
-<h3 id="2-1-die-partition-wieder-aushängen">2.1) Die Partition wieder aushängen</h3>
-
+</code></pre><h3 id="21-die-partition-wieder-aushängen">2.1) Die Partition wieder aushängen</h3>
 <p>
 Mit folgenden Befehlen hängt man die verschlüsselte Partition wieder aus dem
 Dateisystem aus und entfernt das Loopdevice:
 </p>
-
-<pre><code># umount /mnt/daten
+<pre tabindex="0"><code># umount /mnt/daten
 # cryptsetup luksClose daten
-</code></pre>
-
-<h2 id="3-einen-verschlüsselten-container-erstellen">3.) Einen verschlüsselten Container erstellen</h2>
-
+</code></pre><h2 id="3-einen-verschlüsselten-container-erstellen">3.) Einen verschlüsselten Container erstellen</h2>
 <p>
 Ein verschlüsselter Container hat verschiedene Vorteile gegenüber einer
 komplett verschlüsselten Partition. Zum einen kann man dadurch die
@@ -477,28 +443,23 @@ gleich für jeden Benutzer eine eigene Festplatte einbauen muss. Außerdem kann
 man den Container auf andere Systeme transportieren, oder natürlich auch – wenn
 er klein genug ist – auf CD-ROM sichern.
 </p>
-
 <p>
 Ein Container ist lediglich eine Datei, die dann über ein Loopdevice eingehängt
 wird, also genau wie vorhin…
 </p>
-
 <p>
 Mit folgendem Befehl schreiben wir uns eine 5GB große Datei, in der wir private
 Daten wie Bilder und Dokumente ablegen könnten:
 </p>
-
 <pre># dd if=/dev/urandom of=/home/michael/privat.crypt bs=1024 count=5242880
 5242880+0 records in
 5242880+0 records out</pre>
-
 <p>
 In die Datei werden also Zufallswerte aus <code>/dev/urandom</code> gelesen,
 davon 5242880 * 1024 Stück, also 5GB. In der Beispielausgabe fehlt eine Zeile,
 in der <code>dd</code> angibt, wieviel Bytes das nun waren und wielange das
 gedauert hat (Ich habe bei mir das System mit anderen Werten aufgesetzt…).
 </p>
-
 <p>
 Vor diese Datei klemmen wir nun das Loopdevice <code>/dev/loop0</code> (0-9
 stehen zur Verfügung):
@@ -507,8 +468,7 @@ stehen zur Verfügung):
 <p>
 Und schließlich verschlüsseln wir sie wie in Abschnitt 2:
 </p>
-
-<pre><code># cryptsetup -c blowfish-cbc-essiv:sha256 -y -s 256 luksFormat /dev/loop0
+<pre tabindex="0"><code># cryptsetup -c blowfish-cbc-essiv:sha256 -y -s 256 luksFormat /dev/loop0
 
 WARNING!
 ========
@@ -525,10 +485,7 @@ Command successful.
 # mkfs.ext3 /dev/mapper/privat
 # mkdir /home/michael/privat/
 # mount /dev/mapper/privat /home/michael/privat
-</code></pre>
-
-<h2 id="4-swapspace-verschlüsseln">4.) Swapspace verschlüsseln</h2>
-
+</code></pre><h2 id="4-swapspace-verschlüsseln">4.) Swapspace verschlüsseln</h2>
 <p>
 Hierfür müssen die Module wie unter Abschnitt erwähnt automatisch geladen werden.
 </p>
@@ -561,17 +518,15 @@ ersetzt werden. Wie die Swappartition heißt, findet man mit dem Befehl
 In der <code>/etc/fstab</code> muss „/dev/hda3” durch „/dev/mapper/swap”
 ersetzt werden.
 </p>
-
 <h2 id="5-mögliche-fehlermeldungen">5.) Mögliche Fehlermeldungen</h2>
-
-<p><pre>Failed to setup dm-crypt key mapping.
-Check kernel for support for the blowfish-cbc-essiv:sha256 cipher spec and verify
+<pre>Failed to setup dm-crypt key mapping.
+Check kernel for support for the blowfish-cbc-essiv:sha256 cipher spec and verify 
 that /dev/hda2 contains at least 258 sectors.
 Failed to write to key storage.</pre>
 <p>
 <strong>Lösung:</strong> Eines oder mehrere der benötigten Kernelmodule wurde
 nicht geladen, siehe Abschnitt 1.1.
-</p></p>
+</p>
 
 </div>
 
@@ -581,23 +536,22 @@ nicht geladen, siehe Abschnitt 1.1.
     <strong>Table Of Contents</strong>
 
     <nav class="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#1-das-system-vorbereiten">1) Das System vorbereiten</a>
-<ul>
-<li><a href="#1-1-module">1.1) Module</a></li>
-<li><a href="#1-2-hilfsprogramme">1.2) Hilfsprogramme</a></li>
-</ul></li>
-<li><a href="#2-komplette-partition-verschlüsseln">2.) Komplette Partition verschlüsseln</a>
-<ul>
-<li><a href="#2-1-die-partition-wieder-aushängen">2.1) Die Partition wieder aushängen</a></li>
-</ul></li>
-<li><a href="#3-einen-verschlüsselten-container-erstellen">3.) Einen verschlüsselten Container erstellen</a></li>
-<li><a href="#4-swapspace-verschlüsseln">4.) Swapspace verschlüsseln</a></li>
-<li><a href="#5-mögliche-fehlermeldungen">5.) Mögliche Fehlermeldungen</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#1-das-system-vorbereiten">1) Das System vorbereiten</a>
+      <ul>
+        <li><a href="#11-module">1.1) Module</a></li>
+        <li><a href="#12-hilfsprogramme">1.2) Hilfsprogramme</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-komplette-partition-verschlüsseln">2.) Komplette Partition verschlüsseln</a>
+      <ul>
+        <li><a href="#21-die-partition-wieder-aushängen">2.1) Die Partition wieder aushängen</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-einen-verschlüsselten-container-erstellen">3.) Einen verschlüsselten Container erstellen</a></li>
+    <li><a href="#4-swapspace-verschlüsseln">4.) Swapspace verschlüsseln</a></li>
+    <li><a href="#5-mögliche-fehlermeldungen">5.) Mögliche Fehlermeldungen</a></li>
+  </ul>
 </nav>
   </div>
 </div>

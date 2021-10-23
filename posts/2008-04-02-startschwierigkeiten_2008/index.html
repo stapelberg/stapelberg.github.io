@@ -197,7 +197,7 @@
   </style>
   <details class="ms_toc_details">
     <summary>Table of contents</summary>
-    
+    <nav class="TableOfContents"></nav>
   </details>
   <p>
 Analog zu meinem <a href="/Artikel/Startschwierigkeiten"
@@ -206,7 +206,6 @@ Startschwierigkeiten bei meinem letzten Rechner</a> werde ich hier die
 „kleinen” Problemchen festhalten, mit denen ich bei meinem neuen Rechner zu tun
 hatte.
 </p>
-
 <h1>Hardwarewahl</h1>
 <p>
 Erstes Kriterium bei der Auswahl meiner Hardware war, dass sie möglichst leise
@@ -215,20 +214,17 @@ Tätigkeiten auch ein sehr viel langsameres System ausreichen würde, liegt auf
 der CPU nicht so viel Gewichtung. Beim Speicher habe ich – dank günstigem
 DDR2-RAM – direkt 4 GB eingesteckt.
 </p>
-
 <p>
 Andere Kriterien, wie Gigabit-Ethernet, einen IDE-Kanal (zwei sind eine
 Seltenheit geworden) und einen PCI-Slot (viel mehr darf man leider nicht mehr
 erwarten…) bringt die Mehrzahl der Mainboards ohnehin mit.
 </p>
-
 <p>
 Was könnte leiser sein, als Notebook-Hardware im Desktop-Gehäuse? So fiel die
 Wahl also auf einen Sockel 479Y-Prozessor und -Mainboard. Dieser Sockel wird
 übrigens von manchen Herstellern (MSI unter Anderem) auch als „478 pack”
 bezeichnet, was dann beim Suchen doch etwas Verwirrung aufkommen lässt.
 </p>
-
 <p>
 Die CPU konnte ich günstig bei eBay kaufen, es ist eine Intel Core Duo T2400
 mit 1,83 GHz. Mit dem Board wollte ich eigentlich warten, bis auch diese etwas
@@ -237,15 +233,12 @@ Programm genommen werden, beeilte ich mich dann doch etwas ;-). Ich bestellte
 mir dann also eines der wenigen noch verfübaren Boards, ein MSI 945GT
 Speedster-A4V (9632-050).
 </p>
-
 <p>
 Aus meinem alten Rechner habe ich einige Teile übernommen, so zum Beispiel die
 GeForce 7600 GS-Grafikkarte, die Audigy 2 ZS-Soundkarte und die 250
 GB-Festplatte (dazu später mehr).
 </p>
-
 <h1>Der 945-GT-Chipsatz und Speicher</h1>
-
 <p>
 Der 945-GT-Chipsatz kann technisch nur ca. 3,25 GB RAM zur Verfügung stellen.
 Das liegt daran, dass bei 4 GB eingebautem RAM die oberen 750-1024 MB RAM dazu
@@ -255,7 +248,6 @@ dann aufgehoben wird. Hier kann also auch kein BIOS-Update Abhilfe schaffen.
 Und, ja, das Verhalten ist auch unter Linux so, falls jemand die Hoffnung
 hatte, dass das ein Windows-Problem sei ;-).
 </p>
-
 <p>
 Die Kombination von zwei 2 GB-RAM-Riegeln ist also nur begrenzt sinnvoll –
 einerseits sind sie billig und man könnte sie alleine aus dem Grund, dass man
@@ -263,9 +255,7 @@ Dual-Channel benutzen will, verwenden, andererseits „verliert” man natürlic
 bis zu 1 GB RAM (je nachdem, wieviele PCI-Karten man eingebaut hat und ob man
 eine Grafikkarte verwendet).
 </p>
-
 <h1>Sockel 478-Kühler auf Sockel 479</h1>
-
 <p>
 Da man liest, dass die Bohrlöcher bei Sockel 478 und Sockel 479 gleich sind
 (was auch stimmt), suchte ich mir einen möglichst leisen Sockel 478-Kühler
@@ -274,20 +264,16 @@ heraus. Das Problem bei einigen Kühlern ist jedoch, dass durch die Halterung
 aufliegt. Daher war ein wenig Handarbeit angebracht mit Feile und Zange und
 nach ein paar Stunden passte der Kühler dann haargenau ;-).
 </p>
-
 <h1>Blödeste Version eines PCI-Express-Befestigungs-Clip</h1>
-
-<p><div style="float: left"><a href="/Bilder/schalter_broken.jpg" title="Bild „PCI-E-Clip” öffnen" target="_blank"><img alt="Vorschau: PCI-E-Clip" src="/Bilder/schalter_broken_thumb.jpg" border="0" style="margin-right: 1em"></a><br><small><i>Abb.: PCI-E-Clip</i></small></div>
+<div style="float: left"><a href="/Bilder/schalter_broken.jpg" title="Bild „PCI-E-Clip” öffnen" target="_blank"><img alt="Vorschau: PCI-E-Clip" src="/Bilder/schalter_broken_thumb.jpg" border="0" style="margin-right: 1em"></a><br><small><i>Abb.: PCI-E-Clip</i></small></div>
 <p>
 Normalerweise bin ich einen gut erreichbaren, greifbaren PCI-E-Clip gewöhnt.
 Anders jedoch beim MSI-Mainboard: Über dem Clip ist direkt die Kühlerhalterung,
 untendrunter Kondensatoren. Den Clip selbst muss man mit einem Schraubenzieher
 nach unten drücken, aber das klappt erst, sobald der Kühler abmontiert ist…
 </p>
-<br style="clear: left"></p>
-
+<br style="clear: left">
 <h1>Fanless-Netzteile</h1>
-
 <p>
 Wer meint, dass man bei Fanless-Netzteilen doch eigentlich gar nicht so viel
 falsch machen könnte, hat sich getäuscht: Es gibt eine ganze Reihe an
@@ -300,7 +286,6 @@ href="http://foliovision.com/images/2007/08/zen-fanless-power-supply-big.jpg"
 title="Bild vom Billig-Fanless-Netzteil auf foliovision.com"
 target="_blank">Bild auf folivision.com</a>).
 </p>
-
 <p>
 Stattdessen habe ich mir dann ein Etasis EFN-560 (der Nachfolger und
 Ersatzmodell für das EFN-300) geleistet, welches auch lüfterlos ist und einen
@@ -311,23 +296,19 @@ ausführliche Anleitung liegt bei, die Verpackung ist leicht wiederzuverwenden
 (anders als viele andere Netzteil-Verpackungen, zum Beispiel die von BeQuiet!…)
 und das Netzteil selbst gibt keinen Ton von sich.
 </p>
-
 <p>
 <strong>Nachtrag vom 17.08.2011:</strong> Das Etasis EFN-560 ist mir vor
 wenigen Tagen (also nach etwas über 3 Jahren Dauerbetrieb) kaputt gegangen. Es
 hat einfach abgeschaltet und nun leuchtet nur noch die „Power Fault“-LED
 dauerhaft rot.
 </p>
-
 <h1>GeForce 7600 GS != GeForce 7600 GS</h1>
-
 <p>
 Da ich an meinem alten Rechner drei Monitore betrieb, brauchte ich zwei
 Dual-DVI-Grafikkarten. Die Erfahrungen mit der GeForce 7600 GS waren gut, also
 holte ich mir noch eine davon. Doch nur weil das Modell vermeintlich das selbe
 ist, heißt das nicht, dass man das selbe bekommt ;-).
 </p>
-
 <p>
 Die neuere GeForce 7600 GS erkennt nur einen angeschlossenen Monitor, und das
 auch nur, wenn er am linken DVI-Ausgang angeschlossen ist. Ich weiß nicht, ob
@@ -336,14 +317,11 @@ Erkennung der Monitore auf einem Ausgang einfach deaktiviert ist (weil er
 eventuell nur für VGA-Adapter herhalten soll)? Jedenfalls wird beim Booten auf
 beiden Monitoren ein Bild angezeigt, beim Start von X jedoch nur auf einem.
 </p>
-
 <p>
 Nachdem ich dann die alte GeForce 7600 GS (mit hübschem Kühler ;-)) einbaute,
 funktionierte es einwandfrei.
 </p>
-
 <h1>Gigabit-Ethernet</h1>
-
 <p>
 Auf dem MSI 945GT Speedster-A4V befindet sich ein Intel 82573L
 Gigabit-Ethernet-Chip, welcher mit dem e1000e-Treiber betrieben wird – oder
@@ -358,18 +336,15 @@ kerneltrap.org">einen anderen Patch</a> anwendet. Bleibt zu hoffen, dass diese
 bald in den Kernel übernommen werden, momentan (2.6.24.3) ist dies nicht der
 Fall.
 </p>
-
 <p>
 Außerdem muss man mit der Option <code>acpi=noirq</code> booten, sonst findet
 der Treiber die Karte anschließend nicht.
 </p>
-
 <p>
 <strong>Update:</strong> Ich hatte die Kernel-Option
 <code>CONFIG_PCI_MSI</code> vergessen, welche Message Signaled Interrupts
 aktiviert. Nach dem Aktivieren klappt es auch ohne <code>acpi=noirq</code>.
 </p>
-
 <p>
 Auch komisch: Wenn im BIOS die zweite Netzwerkkarte deaktiviert ist und eine
 PCI-Express-Grafikkarte eingesteckt ist, lässt sich nicht via PXE von der
@@ -377,181 +352,156 @@ ersten Netzwerkkarte booten. Wenn keine Grafikkarte eingebaut ist,
 funktioniert’s – und wenn man einfach die zweite Karte wieder aktiviert,
 klappt’s auch.
 </p>
-
 <h1>Links</h1>
-
 <ul>
-    <li><a href="http://www.hartware.de/review_548.html">Etasis EFN-560 Review auf hartware.de</a></li>
-    <li><a href="http://kerneltrap.org/mailarchive/linux-netdev/2007/10/31/374579">Patch, damit e1000e statt e1000 benutzt wird</a></li>
-    <li><a href="http://kerneltrap.org/mailarchive/linux-netdev/2007/10/31/374573">Patch gegen die hohen Pingzeiten</a></li>
+	<li><a href="http://www.hartware.de/review_548.html">Etasis EFN-560 Review auf hartware.de</a></li>
+	<li><a href="http://kerneltrap.org/mailarchive/linux-netdev/2007/10/31/374579">Patch, damit e1000e statt e1000 benutzt wird</a></li>
+	<li><a href="http://kerneltrap.org/mailarchive/linux-netdev/2007/10/31/374573">Patch gegen die hohen Pingzeiten</a></li>
 </ul>
-
-<p><h1>Anhang 1: lspci -v</h1>
+<h1>Anhang 1: lspci -v</h1>
 <pre>00:00.0 Host bridge: Intel Corporation Mobile 945GM/PM/GMS, 943/940GML and 945GT Express Memory Controller Hub (rev 03)
-    Subsystem: Micro-Star International Co., Ltd. Unknown device 6320
-    Flags: bus master, fast devsel, latency 0
-    Capabilities: &lt;access denied&gt;</p>
-
+	Subsystem: Micro-Star International Co., Ltd. Unknown device 6320
+	Flags: bus master, fast devsel, latency 0
+	Capabilities: &lt;access denied&gt;
 <p>00:01.0 PCI bridge: Intel Corporation Mobile 945GM/PM/GMS, 943/940GML and 945GT Express PCI Express Root Port (rev 03) (prog-if 00 [Normal decode])
-    Flags: bus master, fast devsel, latency 0
-    Bus: primary=00, secondary=01, subordinate=01, sec-latency=0
-    I/O behind bridge: 0000b000-0000bfff
-    Memory behind bridge: fa000000-fcffffff
-    Prefetchable memory behind bridge: 00000000d0000000-00000000dfffffff
-    Capabilities: &lt;access denied&gt;
-    Kernel driver in use: pcieport-driver</p>
-
+Flags: bus master, fast devsel, latency 0
+Bus: primary=00, secondary=01, subordinate=01, sec-latency=0
+I/O behind bridge: 0000b000-0000bfff
+Memory behind bridge: fa000000-fcffffff
+Prefetchable memory behind bridge: 00000000d0000000-00000000dfffffff
+Capabilities: &lt;access denied&gt;
+Kernel driver in use: pcieport-driver</p>
 <p>00:1b.0 Audio device: Intel Corporation 82801G (ICH7 Family) High Definition Audio Controller (rev 01)
-    Subsystem: Micro-Star International Co., Ltd. Unknown device 6320
-    Flags: bus master, fast devsel, latency 0, IRQ 10
-    Memory at fdff8000 (64-bit, non-prefetchable) [size=16K]
-    Capabilities: &lt;access denied&gt;</p>
-
+Subsystem: Micro-Star International Co., Ltd. Unknown device 6320
+Flags: bus master, fast devsel, latency 0, IRQ 10
+Memory at fdff8000 (64-bit, non-prefetchable) [size=16K]
+Capabilities: &lt;access denied&gt;</p>
 <p>00:1c.0 PCI bridge: Intel Corporation 82801G (ICH7 Family) PCI Express Port 1 (rev 01) (prog-if 00 [Normal decode])
-    Flags: bus master, fast devsel, latency 0
-    Bus: primary=00, secondary=02, subordinate=02, sec-latency=0
-    I/O behind bridge: 0000a000-0000afff
-    Memory behind bridge: fda00000-fdafffff
-    Prefetchable memory behind bridge: 00000000fd700000-00000000fd7fffff
-    Capabilities: &lt;access denied&gt;
-    Kernel driver in use: pcieport-driver</p>
-
+Flags: bus master, fast devsel, latency 0
+Bus: primary=00, secondary=02, subordinate=02, sec-latency=0
+I/O behind bridge: 0000a000-0000afff
+Memory behind bridge: fda00000-fdafffff
+Prefetchable memory behind bridge: 00000000fd700000-00000000fd7fffff
+Capabilities: &lt;access denied&gt;
+Kernel driver in use: pcieport-driver</p>
 <p>00:1c.4 PCI bridge: Intel Corporation 82801GR/GH/GHM (ICH7 Family) PCI Express Port 5 (rev 01) (prog-if 00 [Normal decode])
-    Flags: bus master, fast devsel, latency 0
-    Bus: primary=00, secondary=03, subordinate=03, sec-latency=0
-    I/O behind bridge: 0000e000-0000efff
-    Memory behind bridge: fde00000-fdefffff
-    Prefetchable memory behind bridge: 00000000fdd00000-00000000fddfffff
-    Capabilities: &lt;access denied&gt;
-    Kernel driver in use: pcieport-driver</p>
-
+Flags: bus master, fast devsel, latency 0
+Bus: primary=00, secondary=03, subordinate=03, sec-latency=0
+I/O behind bridge: 0000e000-0000efff
+Memory behind bridge: fde00000-fdefffff
+Prefetchable memory behind bridge: 00000000fdd00000-00000000fddfffff
+Capabilities: &lt;access denied&gt;
+Kernel driver in use: pcieport-driver</p>
 <p>00:1c.5 PCI bridge: Intel Corporation 82801GR/GH/GHM (ICH7 Family) PCI Express Port 6 (rev 01) (prog-if 00 [Normal decode])
-    Flags: bus master, fast devsel, latency 0
-    Bus: primary=00, secondary=04, subordinate=04, sec-latency=0
-    I/O behind bridge: 0000d000-0000dfff
-    Memory behind bridge: fdc00000-fdcfffff
-    Prefetchable memory behind bridge: 00000000fdb00000-00000000fdbfffff
-    Capabilities: &lt;access denied&gt;
-    Kernel driver in use: pcieport-driver</p>
-
+Flags: bus master, fast devsel, latency 0
+Bus: primary=00, secondary=04, subordinate=04, sec-latency=0
+I/O behind bridge: 0000d000-0000dfff
+Memory behind bridge: fdc00000-fdcfffff
+Prefetchable memory behind bridge: 00000000fdb00000-00000000fdbfffff
+Capabilities: &lt;access denied&gt;
+Kernel driver in use: pcieport-driver</p>
 <p>00:1d.0 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI Controller #1 (rev 01) (prog-if 00 [UHCI])
-    Subsystem: Micro-Star International Co., Ltd. Unknown device 6320
-    Flags: bus master, medium devsel, latency 0, IRQ 11
-    I/O ports at ff00 [size=32]
-    Kernel driver in use: uhci_hcd</p>
-
+Subsystem: Micro-Star International Co., Ltd. Unknown device 6320
+Flags: bus master, medium devsel, latency 0, IRQ 11
+I/O ports at ff00 [size=32]
+Kernel driver in use: uhci_hcd</p>
 <p>00:1d.1 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI Controller #2 (rev 01) (prog-if 00 [UHCI])
-    Subsystem: Micro-Star International Co., Ltd. Unknown device 6320
-    Flags: bus master, medium devsel, latency 0, IRQ 11
-    I/O ports at fe00 [size=32]
-    Kernel driver in use: uhci_hcd</p>
-
+Subsystem: Micro-Star International Co., Ltd. Unknown device 6320
+Flags: bus master, medium devsel, latency 0, IRQ 11
+I/O ports at fe00 [size=32]
+Kernel driver in use: uhci_hcd</p>
 <p>00:1d.2 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI Controller #3 (rev 01) (prog-if 00 [UHCI])
-    Subsystem: Micro-Star International Co., Ltd. Unknown device 6320
-    Flags: bus master, medium devsel, latency 0, IRQ 3
-    I/O ports at fd00 [size=32]
-    Kernel driver in use: uhci_hcd</p>
-
+Subsystem: Micro-Star International Co., Ltd. Unknown device 6320
+Flags: bus master, medium devsel, latency 0, IRQ 3
+I/O ports at fd00 [size=32]
+Kernel driver in use: uhci_hcd</p>
 <p>00:1d.3 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI Controller #4 (rev 01) (prog-if 00 [UHCI])
-    Subsystem: Micro-Star International Co., Ltd. Unknown device 6320
-    Flags: bus master, medium devsel, latency 0, IRQ 10
-    I/O ports at fc00 [size=32]
-    Kernel driver in use: uhci_hcd</p>
-
+Subsystem: Micro-Star International Co., Ltd. Unknown device 6320
+Flags: bus master, medium devsel, latency 0, IRQ 10
+I/O ports at fc00 [size=32]
+Kernel driver in use: uhci_hcd</p>
 <p>00:1d.7 USB Controller: Intel Corporation 82801G (ICH7 Family) USB2 EHCI Controller (rev 01) (prog-if 20 [EHCI])
-    Subsystem: Micro-Star International Co., Ltd. Unknown device 6320
-    Flags: bus master, medium devsel, latency 0, IRQ 11
-    Memory at fdfff000 (32-bit, non-prefetchable) [size=1K]
-    Capabilities: &lt;access denied&gt;
-    Kernel driver in use: ehci_hcd</p>
-
+Subsystem: Micro-Star International Co., Ltd. Unknown device 6320
+Flags: bus master, medium devsel, latency 0, IRQ 11
+Memory at fdfff000 (32-bit, non-prefetchable) [size=1K]
+Capabilities: &lt;access denied&gt;
+Kernel driver in use: ehci_hcd</p>
 <p>00:1e.0 PCI bridge: Intel Corporation 82801 PCI Bridge (rev e1) (prog-if 01 [Subtractive decode])
-    Flags: bus master, fast devsel, latency 0
-    Bus: primary=00, secondary=05, subordinate=05, sec-latency=32
-    I/O behind bridge: 0000c000-0000cfff
-    Memory behind bridge: fd900000-fd9fffff
-    Prefetchable memory behind bridge: 00000000fd800000-00000000fd8fffff
-    Capabilities: &lt;access denied&gt;</p>
-
+Flags: bus master, fast devsel, latency 0
+Bus: primary=00, secondary=05, subordinate=05, sec-latency=32
+I/O behind bridge: 0000c000-0000cfff
+Memory behind bridge: fd900000-fd9fffff
+Prefetchable memory behind bridge: 00000000fd800000-00000000fd8fffff
+Capabilities: &lt;access denied&gt;</p>
 <p>00:1f.0 ISA bridge: Intel Corporation 82801GB/GR (ICH7 Family) LPC Interface Bridge (rev 01)
-    Subsystem: Intel Corporation 82801GB/GR (ICH7 Family) LPC Interface Bridge
-    Flags: bus master, medium devsel, latency 0
-    Capabilities: &lt;access denied&gt;</p>
-
+Subsystem: Intel Corporation 82801GB/GR (ICH7 Family) LPC Interface Bridge
+Flags: bus master, medium devsel, latency 0
+Capabilities: &lt;access denied&gt;</p>
 <p>00:1f.1 IDE interface: Intel Corporation 82801G (ICH7 Family) IDE Controller (rev 01) (prog-if 8a [Master SecP PriP])
-    Subsystem: Micro-Star International Co., Ltd. Unknown device 6320
-    Flags: bus master, medium devsel, latency 0
-    I/O ports at 01f0 [size=8]
-    I/O ports at 03f4 [size=1]
-    I/O ports at 0170 [size=8]
-    I/O ports at 0374 [size=1]
-    I/O ports at fb00 [size=16]
-    Kernel driver in use: ata_piix</p>
-
+Subsystem: Micro-Star International Co., Ltd. Unknown device 6320
+Flags: bus master, medium devsel, latency 0
+I/O ports at 01f0 [size=8]
+I/O ports at 03f4 [size=1]
+I/O ports at 0170 [size=8]
+I/O ports at 0374 [size=1]
+I/O ports at fb00 [size=16]
+Kernel driver in use: ata_piix</p>
 <p>00:1f.3 SMBus: Intel Corporation 82801G (ICH7 Family) SMBus Controller (rev 01)
-    Subsystem: Micro-Star International Co., Ltd. Unknown device 6320
-    Flags: medium devsel, IRQ 11
-    I/O ports at 0500 [size=32]
-    Kernel driver in use: i801_smbus</p>
-
-<p>01:00.0 VGA compatible controller: nVidia Corporation G70 <a href="rev a1">GeForce 7600 GS</a> (prog-if 00 [VGA controller])
-    Subsystem: Micro-Star International Co., Ltd. NX7600GS-T2D256EH
-    Flags: bus master, fast devsel, latency 0, IRQ 10
-    Memory at fa000000 (32-bit, non-prefetchable) [size=16M]
-    Memory at d0000000 (64-bit, prefetchable) [size=256M]
-    Memory at fb000000 (64-bit, non-prefetchable) [size=16M]
-    I/O ports at bf00 [size=128]
-    [virtual] Expansion ROM at fc000000 [disabled] [size=128K]
-    Capabilities: &lt;access denied&gt;
-    Kernel driver in use: nvidia
-    Kernel modules: nvidia</p>
-
+Subsystem: Micro-Star International Co., Ltd. Unknown device 6320
+Flags: medium devsel, IRQ 11
+I/O ports at 0500 [size=32]
+Kernel driver in use: i801_smbus</p>
+<p>01:00.0 VGA compatible controller: nVidia Corporation G70 [GeForce 7600 GS] (rev a1) (prog-if 00 [VGA controller])
+Subsystem: Micro-Star International Co., Ltd. NX7600GS-T2D256EH
+Flags: bus master, fast devsel, latency 0, IRQ 10
+Memory at fa000000 (32-bit, non-prefetchable) [size=16M]
+Memory at d0000000 (64-bit, prefetchable) [size=256M]
+Memory at fb000000 (64-bit, non-prefetchable) [size=16M]
+I/O ports at bf00 [size=128]
+[virtual] Expansion ROM at fc000000 [disabled] [size=128K]
+Capabilities: &lt;access denied&gt;
+Kernel driver in use: nvidia
+Kernel modules: nvidia</p>
 <p>03:00.0 Ethernet controller: Intel Corporation 82573L Gigabit Ethernet Controller
-    Subsystem: Micro-Star International Co., Ltd. Unknown device 6410
-    Flags: bus master, fast devsel, latency 0, IRQ 10
-    Memory at fdee0000 (32-bit, non-prefetchable) [size=128K]
-    I/O ports at ef00 [size=32]
-    Capabilities: &lt;access denied&gt;
-    Kernel driver in use: e1000e</p>
-
+Subsystem: Micro-Star International Co., Ltd. Unknown device 6410
+Flags: bus master, fast devsel, latency 0, IRQ 10
+Memory at fdee0000 (32-bit, non-prefetchable) [size=128K]
+I/O ports at ef00 [size=32]
+Capabilities: &lt;access denied&gt;
+Kernel driver in use: e1000e</p>
 <p>04:00.0 Ethernet controller: Intel Corporation 82573L Gigabit Ethernet Controller
-    Subsystem: Micro-Star International Co., Ltd. Unknown device 6410
-    Flags: bus master, fast devsel, latency 0, IRQ 5
-    Memory at fdce0000 (32-bit, non-prefetchable) [size=128K]
-    I/O ports at df00 [size=32]
-    Capabilities: &lt;access denied&gt;
-    Kernel driver in use: e1000e</p>
-
+Subsystem: Micro-Star International Co., Ltd. Unknown device 6410
+Flags: bus master, fast devsel, latency 0, IRQ 5
+Memory at fdce0000 (32-bit, non-prefetchable) [size=128K]
+I/O ports at df00 [size=32]
+Capabilities: &lt;access denied&gt;
+Kernel driver in use: e1000e</p>
 <p>05:00.0 Multimedia audio controller: Creative Labs SB Audigy (rev 04)
-    Subsystem: Creative Labs SB Audigy 2 ZS (SB0350)
-    Flags: bus master, medium devsel, latency 64, IRQ 10
-    I/O ports at cf00 [size=64]
-    Capabilities: &lt;access denied&gt;
-    Kernel driver in use: EMU10K1_Audigy</p>
-
+Subsystem: Creative Labs SB Audigy 2 ZS (SB0350)
+Flags: bus master, medium devsel, latency 64, IRQ 10
+I/O ports at cf00 [size=64]
+Capabilities: &lt;access denied&gt;
+Kernel driver in use: EMU10K1_Audigy</p>
 <p>05:00.1 Input device controller: Creative Labs SB Audigy Game Port (rev 04)
-    Subsystem: Creative Labs SB Audigy MIDI/Game Port
-    Flags: bus master, medium devsel, latency 0
-    I/O ports at ce00 [size=8]
-    Capabilities: &lt;access denied&gt;</p>
-
+Subsystem: Creative Labs SB Audigy MIDI/Game Port
+Flags: bus master, medium devsel, latency 0
+I/O ports at ce00 [size=8]
+Capabilities: &lt;access denied&gt;</p>
 <p>05:00.2 FireWire (IEEE 1394): Creative Labs SB Audigy FireWire Port (rev 04) (prog-if 10 [OHCI])
-    Subsystem: Creative Labs SB Audigy FireWire Port
-    Flags: bus master, medium devsel, latency 64, IRQ 5
-    Memory at fd9ff000 (32-bit, non-prefetchable) [size=2K]
-    Memory at fd9f8000 (32-bit, non-prefetchable) [size=16K]
-    Capabilities: &lt;access denied&gt;
-    Kernel driver in use: ohci1394</p>
-
+Subsystem: Creative Labs SB Audigy FireWire Port
+Flags: bus master, medium devsel, latency 64, IRQ 5
+Memory at fd9ff000 (32-bit, non-prefetchable) [size=2K]
+Memory at fd9f8000 (32-bit, non-prefetchable) [size=16K]
+Capabilities: &lt;access denied&gt;
+Kernel driver in use: ohci1394</p>
 <p>05:04.0 FireWire (IEEE 1394): VIA Technologies, Inc. IEEE 1394 Host Controller (rev 80) (prog-if 10 [OHCI])
-    Subsystem: Unknown device 6320:1462
-    Flags: bus master, stepping, medium devsel, latency 64, IRQ 9
-    Memory at fd9fe000 (32-bit, non-prefetchable) [size=2K]
-    I/O ports at cd00 [size=128]
-    Capabilities: &lt;access denied&gt;
-    Kernel driver in use: ohci1394</pre></p>
-
-<p><h1>Anhang 2: lspci -t</h1>
+Subsystem: Unknown device 6320:1462
+Flags: bus master, stepping, medium devsel, latency 64, IRQ 9
+Memory at fd9fe000 (32-bit, non-prefetchable) [size=2K]
+I/O ports at cd00 [size=128]
+Capabilities: &lt;access denied&gt;
+Kernel driver in use: ohci1394</pre></p>
+<h1>Anhang 2: lspci -t</h1>
 <pre>-[0000:00]-+-00.0
            +-01.0-[0000:01]----00.0
            +-1b.0
@@ -566,12 +516,11 @@ klappt’s auch.
            +-1e.0-[0000:05]--+-00.0
            |                 +-00.1
            |                 +-00.2
-           |                 -04.0
+           |                 \-04.0
            +-1f.0
            +-1f.1
-           -1f.3</pre></p>
-
-<p><h1>Anhang 3: dmesg</h1>
+           \-1f.3</pre>
+<h1>Anhang 3: dmesg</h1>
 <pre>Linux version 2.6.24.3 (michael) (gcc version 4.1.2 (Gentoo 4.1.2 p1.0.2)) #7 Fri Mar 21 02:48:45 CET 2008
 BIOS-provided physical RAM map:
  BIOS-e820: 0000000000000000 - 0000000000090001 (usable)
@@ -618,7 +567,7 @@ ACPI: PM-Timer IO Port: 0x408
 ACPI: HPET id: 0x8086a201 base: 0xfed00000
 Allocating PCI resources starting at d0000000 (gap: cff00000:10100000)
 Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 845026
-Kernel command line: ip=dhcp root=/dev/nfs rw nfsroot=x.y.z.z:/diskless/ acpi=noirq BOOT_IMAGE=/bzImage
+Kernel command line: ip=dhcp root=/dev/nfs rw nfsroot=x.y.z.z:/diskless/ acpi=noirq BOOT_IMAGE=/bzImage 
 Enabling fast FPU save and restore... done.
 Enabling unmasked SIMD FPU exception support... done.
 Initializing CPU#0
@@ -663,15 +612,15 @@ ACPI: EC: Look up EC in DSDT
 ACPI: Interpreter enabled
 ACPI: (supports S0 S3 S5)
 ACPI: Using PIC for interrupt routing
-ACPI: PCI Root Bridge <a href="0000:00">PCI0</a>
+ACPI: PCI Root Bridge [PCI0] (0000:00)
 PCI quirk: region 0400-047f claimed by ICH6 ACPI/GPIO/TCO
 PCI quirk: region 0480-04bf claimed by ICH6 GPIO
 PCI: Transparent bridge - 0000:00:1e.0
-ACPI: PCI Interrupt Routing Table [_SB_.PCI0._PRT]
-ACPI: PCI Interrupt Routing Table [_SB_.PCI0.PEX0._PRT]
-ACPI: PCI Interrupt Routing Table [_SB_.PCI0.PEX4._PRT]
-ACPI: PCI Interrupt Routing Table [_SB_.PCI0.PEX5._PRT]
-ACPI: PCI Interrupt Routing Table [_SB_.PCI0.HUB0._PRT]
+ACPI: PCI Interrupt Routing Table [\_SB_.PCI0._PRT]
+ACPI: PCI Interrupt Routing Table [\_SB_.PCI0.PEX0._PRT]
+ACPI: PCI Interrupt Routing Table [\_SB_.PCI0.PEX4._PRT]
+ACPI: PCI Interrupt Routing Table [\_SB_.PCI0.PEX5._PRT]
+ACPI: PCI Interrupt Routing Table [\_SB_.PCI0.HUB0._PRT]
 Linux Plug and Play Support v0.97 (c) Adam Belay
 pnp: PnP ACPI init
 ACPI: bus type pnp registered
@@ -840,8 +789,8 @@ assign_interrupt_mode Found MSI capability
 Allocate Port Service[0000:00:1c.5:pcie00]
 Allocate Port Service[0000:00:1c.5:pcie02]
 Allocate Port Service[0000:00:1c.5:pcie03]
-ACPI: Fan <a href="on">FAN</a>
-ACPI: Thermal Zone <a href="40 C">THRM</a>
+ACPI: Fan [FAN] (on)
+ACPI: Thermal Zone [THRM] (40 C)
 Real Time Clock Driver v1.12ac
 hpet_resources: 0xfed00000 is busy
 intel_rng: FWH not detected
@@ -869,7 +818,7 @@ PCI: Setting latency timer of device 0000:04:00.0 to 64
 e100: Intel(R) PRO/100 Network Driver, 3.5.23-k4-NAPI
 e100: Copyright(c) 1999-2006 Intel Corporation
 tun: Universal TUN/TAP device driver, 1.6
-tun: (C) 1999-2004 Max Krasnyansky <a href="mailto:maxk@qualcomm.com">maxk@qualcomm.com</a>
+tun: (C) 1999-2004 Max Krasnyansky <maxk@qualcomm.com>
 console [netcon0] enabled
 netconsole: network logging started
 Uniform Multi-Platform E-IDE driver Revision: 7.00alpha2
@@ -949,7 +898,7 @@ PCI: Setting latency timer of device 0000:05:00.0 to 64
 Installing spdif_bug patch: Audigy 2 ZS [SB0350]
 usbcore: registered new interface driver snd-usb-audio
 ALSA device list:
-  #0: Audigy 2 ZS <a href="rev.4, serial:0x20021102">SB0350</a> at 0xcf00, irq 10
+  #0: Audigy 2 ZS [SB0350] (rev.4, serial:0x20021102) at 0xcf00, irq 10
 oprofile: using timer interrupt.
 TCP cubic registered
 NET: Registered protocol family 1
@@ -977,7 +926,7 @@ VFS: Mounted root (nfs filesystem).
 Freeing unused kernel memory: 216k freed
 nvidia: module license 'NVIDIA' taints kernel.
 PCI: Setting latency timer of device 0000:01:00.0 to 64
-NVRM: loading NVIDIA UNIX x86 Kernel Module  169.09  Fri Jan 11 14:38:28 PST 2008</pre></p>
+NVRM: loading NVIDIA UNIX x86 Kernel Module  169.09  Fri Jan 11 14:38:28 PST 2008</pre>
 
 </div>
 
@@ -986,7 +935,7 @@ NVRM: loading NVIDIA UNIX x86 Kernel Module  169.09  Fri Jan 11 14:38:28 PST 200
   <div>
     <strong>Table Of Contents</strong>
 
-    
+    <nav class="TableOfContents"></nav>
   </div>
 </div>
 

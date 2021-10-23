@@ -195,16 +195,13 @@
   identifizieren, gespeichert werden Vorname, Nachname, Straße, Hausnummer,
   Postleitzahl, Wohnort, Ablaufdatum- und Nummer des Personalausweises.
 </p>
-
 <h2>Aktivierung</h2>
-
 <p>
   Bis die Karte benutzt (und auch aufgeladen) werden kann, vergehen mindestens ein paar
   Minuten bis hin zu einem Tag. Falls du die Karte in einem T-Mobile-Laden kaufst, können
   die Mitarbeiter dir nicht sagen, wie lange die Karte noch braucht, bis sie benutzbar ist
   – bei ihnen wird angezeigt, dass die Karte bereits aktiv sei.
 </p>
-
 <p>
   Bei der ersten Verbindung wird man entweder auf www.t-mobile.de geleitet oder muss diese
   Seite manuell aufrufen, das weiß ich nicht, da dies der Mitarbeiter im T-Mobile-Laden
@@ -213,13 +210,11 @@
   Vermutlich schaltet diese Option einen transparenten Proxy ein, der Grafiken und
   Dateien zusätzlich komprimiert, sodass alles schneller geladen wird.
 </p>
-
 <h2>Hardware/Konfiguration</h2>
 <p>
   Ich benutze die SIM-Karte in einer Vodafone Mobile Connect UMTS-Expresscard (Qualcomm 3G,
   Merlin U630), mit der ich bereits die Fonic-Karte benutzte.
 </p>
-
 <p>
   Die Konfiguration (<a href="/Config/wvdial.conf">wvdial.conf, direkt herunterladen</a>)
   stammt von <a href="http://www.xxzz.de" target="_blank">SdK</a> und wurde nur unwesentlich
@@ -237,8 +232,7 @@ Init7 = AT+CGDCONT=3,"IP","internet.t-mobile","",0,0
 Dial Command = ATDT
 Phone = "*99***1#"
 Modem = /dev/ttyUSB0
- 
-Baud = 230400
+<p>Baud = 230400
 Stupid Mode = 1
 FlowControl = NOFLOW
 SetVolume = 0
@@ -250,15 +244,12 @@ Modem Type = Analog Modem
 Dial Attempts = 3
 Auto DNS = 0
 Check DNS = 0
-New PPPD = yes
- 
-[Dialer sig]
+New PPPD = yes</p>
+<p>[Dialer sig]
 Modem = /dev/ttyUSB0
 Init2 = AT+CSQ
-</pre>
-
+</pre></p>
 <h2>Fakten</h2>
-
 <ul>
   <li>
     Entgegen der Aussage einer Mitarbeiterin beim T-Mobile-Support (Kurzwahl 2202) funktioniert

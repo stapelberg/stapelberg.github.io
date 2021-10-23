@@ -205,42 +205,36 @@ I finally got the device working by interjecting my own micro controller between
   <details class="ms_toc_details">
     <summary>Table of contents</summary>
     <nav class="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#prerequisites">Prerequisites</a>
-<ul>
-<li><a href="#scs-receive-circuit">SCS receive circuit</a></li>
-<li><a href="#scs-transmit-circuit">SCS transmit circuit</a></li>
-<li><a href="#scs-lab-setup">SCS lab setup</a></li>
-<li><a href="#micro-controller-choice">Micro Controller choice</a></li>
-</ul></li>
-<li><a href="#signal-setup">Signal Setup</a></li>
-<li><a href="#micro-controller-firmware">Micro Controller firmware</a>
-<ul>
-<li><a href="#analog-comparator">Analog Comparator</a></li>
-<li><a href="#analog-comparator-modification">Analog Comparator Modification</a></li>
-<li><a href="#scs-rx-receive">SCS RX (receive)</a></li>
-<li><a href="#scs-tx-send">SCS TX (send)</a></li>
-</ul></li>
-<li><a href="#it-works">It works!</a></li>
-<li><a href="#how-is-the-nuki-opener">How is the Nuki Opener?</a></li>
-<li><a href="#appendix-project-journal">Appendix: Project Journal</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#prerequisites">Prerequisites</a>
+      <ul>
+        <li><a href="#scs-receive-circuit">SCS receive circuit</a></li>
+        <li><a href="#scs-transmit-circuit">SCS transmit circuit</a></li>
+        <li><a href="#scs-lab-setup">SCS lab setup</a></li>
+        <li><a href="#micro-controller-choice">Micro Controller choice</a></li>
+      </ul>
+    </li>
+    <li><a href="#signal-setup">Signal Setup</a></li>
+    <li><a href="#micro-controller-firmware">Micro Controller firmware</a>
+      <ul>
+        <li><a href="#analog-comparator">Analog Comparator</a></li>
+        <li><a href="#analog-comparator-modification">Analog Comparator Modification</a></li>
+        <li><a href="#scs-rx-receive">SCS RX (receive)</a></li>
+        <li><a href="#scs-tx-send">SCS TX (send)</a></li>
+      </ul>
+    </li>
+    <li><a href="#it-works">It works!</a></li>
+    <li><a href="#how-is-the-nuki-opener">How is the Nuki Opener?</a></li>
+    <li><a href="#appendix-project-journal">Appendix: Project Journal</a></li>
+  </ul>
 </nav>
   </details>
-  
-
-<p>I recently bought a <a href="https://nuki.io/en/opener/">Nuki Opener, which “turns your existing intercom into a
+  <p>I recently bought a <a href="https://nuki.io/en/opener/">Nuki Opener, which “turns your existing intercom into a
 smart door opener”</a>.</p>
-
 <p>Unfortunately, I have had a lot of trouble getting it to work.</p>
-
 <p>I finally got the device working by interjecting my own micro controller between
 the intercom bus and the Nuki Opener, then driving the Nuki Opener in its
 Analogue mode:</p>
-
 
 
 
@@ -268,9 +262,7 @@ Analogue mode:</p>
 
 
 
-
 <p>The rest of this article outlines how this setup works at a high level.</p>
-
 <aside class="admonition note">
   <div class="note-container">
     <div class="note-icon">
@@ -283,7 +275,6 @@ Analogue mode:</p>
 
     </div>
     <div class="admonition-content"><p><strong>Warning:</strong> The SCS bus’s voltage is dangerously high!</p>
-
 <p>I accidentally broke a Teensy and an intercom unit while working with the SCS
 bus, which is specified at 27 Vdc, but my measurements show 28 volts. Please be
 extra careful!</p>
@@ -291,27 +282,26 @@ extra careful!</p>
   </div>
 </aside>
 
-
 <h2 id="prerequisites">Prerequisites</h2>
-
 <p>For reliable interpretation and transmission of SCS bus data, we’ll need:</p>
-
 <ol>
-<li><p>SCS receive/transmit circuits. These can be prototyped on a breadboard if you
-have the required diodes, transistors, resistors and capacitors.</p></li>
-
-<li><p>A microcontroller with an Analog Comparator. If your microcontroller has one,
+<li>
+<p>SCS receive/transmit circuits. These can be prototyped on a breadboard if you
+have the required diodes, transistors, resistors and capacitors.</p>
+</li>
+<li>
+<p>A microcontroller with an Analog Comparator. If your microcontroller has one,
 you’ll find a corresponding section in the datasheet. This function is
 sometimes abbreviated to <code>CMP</code> or <code>AC</code>, or might be part of a larger
-Analog/Digital Converter (<code>ADC</code>).</p></li>
-
-<li><p>A UART (serial) decoder. Most microcontrollers have at least one UART, but if
+Analog/Digital Converter (<code>ADC</code>).</p>
+</li>
+<li>
+<p>A UART (serial) decoder. Most microcontrollers have at least one UART, but if
 you don’t have one available for whichever reason, you could use a software
-UART implementation, too.</p></li>
+UART implementation, too.</p>
+</li>
 </ol>
-
 <h3 id="scs-receive-circuit">SCS receive circuit</h3>
-
 
 
 
@@ -326,23 +316,16 @@ UART implementation, too.</p></li>
   loading="lazy"></a>
 
 
-
 <p>An R-C network, directly connected to the SCS bus, is used for incoming signal
 conditioning.</p>
-
 <p>The resistor values have been chosen to divide the voltage of the input signal
 from 28V down to approx. 2V, i.e. well within the 0-3.3V range for modern
 microcontroller GPIO pins.</p>
-
 <p>A zener diode limits the 28V level to 3.3V, which should be safe for most
 microcontrollers.</p>
-
 <p>Simulation: <a href="https://tinyurl.com/yxhrkejn">https://tinyurl.com/yxhrkejn</a></p>
-
-<p><br clear="all"></p>
-
+<br clear="all">
 <h3 id="scs-transmit-circuit">SCS transmit circuit</h3>
-
 
 
 
@@ -357,26 +340,17 @@ microcontrollers.</p>
   loading="lazy"></a>
 
 
-
 <p>We directly connect the gate of a mosfet transistor to a GPIO pin of our
 microcontroller, so that when the microcontroller drives the pin high, we use
 the 100Ω resistor to attach a load to the SCS bus.</p>
-
 <p>For comparison, the KNX bus, which is similar to the SCS bus, uses a 68Ω
 resistor here.</p>
-
 <p>Simulation: <a href="https://tinyurl.com/y6nv4yg7">https://tinyurl.com/y6nv4yg7</a></p>
-
-<p><br clear="all"></p>
-
+<br clear="all">
 <h3 id="scs-lab-setup">SCS lab setup</h3>
-
 <p>Use a lab power supply to generate 28V DC. I’m using the <a href="https://www.galaxus.ch/de/s1/product/velleman-labornetzgeraet-labornetzgeraet-5779537">Velleman LABPS3005SM</a> because it was in stock at Galaxus, but any power supply rated for at least 30V DC will do.</p>
-
 <p>As <a href="https://www.open-homeautomation.com/2016/05/11/a-minimal-knx-setup/">the DIY home automation blog entry “A minimal KNX setup”</a> describes, you’ll need to place a 47Ω resistor between the power line and your components.</p>
-
 <p>Afterwards, just connect your components to the bus. The supply/ground line of a <a href="https://en.wikipedia.org/wiki/Breadboard">breadboard</a> will work nicely.</p>
-
 
 
 
@@ -404,13 +378,10 @@ resistor here.</p>
 
 
 
-
 <h3 id="micro-controller-choice">Micro Controller choice</h3>
-
 <p>In this blog post, I’m using a <a href="https://www.pjrc.com/store/teensy40.html">Teensy
 4</a> development board that is widely
 available for ≈20 USD:</p>
-
 
 
 
@@ -438,25 +409,19 @@ available for ≈20 USD:</p>
 
 
 
-
 <p>With its 600 MHz, the Teensy 4 has enough sheer clock frequency to allow for
 sloppier coding while still achieving high quality input/output.</p>
-
 <p>The teensy tiny form factor (3.5 x 1.7 cm) works well for this project and will
 allow me to store the microcontroller in an existing intercom case.</p>
-
 <p>The <strong>biggest downside is that NXP’s own MCUXpresso IDE cannot target the
 Teensy 4</strong>!</p>
-
 <p>The only officially supported development environment for the Teensy 4 is
 Teensyduino, which is a board support package for the Arduino IDE. Having
 Arduino support is great, but let’s compare:</p>
-
 <p>I also have NXP’s <a href="https://www.nxp.com/design/development-boards/i-mx-evaluation-and-development-boards/mimxrt1060-evk-i-mx-rt1060-evaluation-kit:MIMXRT1060-EVK?&amp;&amp;tid=vanMIMXRT1060-EVK">MIMXRT1060-EVK eval
 kit</a>,
 which uses the same i.MX RT1060 micro controller family as the Teensy 4, but is
 much larger and comes with all the bells and whistles; notably:</p>
-
 <ol>
 <li>The MCUXpresso IDE works with the eval kit’s built-in debugger out of the box!
 Being able to inspect a stack trace, set breakpoints and look at register
@@ -467,20 +432,14 @@ hours of fumbling around.</li>
 <li>The NXP SDK contains a number of drivers and examples that are tested on the
 eval kit. That makes it really easy to get started!</li>
 </ol>
-
 <p>Each of these points is very attractive on their own, but together they make the
 whole experience so different!</p>
-
 <p>Being able to deploy to the Teensy from MCUXpresso would be a killer feature! So
 many NXP SDK examples would suddenly become available, filling the Teensy
 community’s gaps.</p>
-
 <h2 id="signal-setup">Signal Setup</h2>
-
 <p>On a high level, this is how we are going to connect the various signals:</p>
-
 <p>Step 1. We start with the SCS intercom bus signal (28V high, 22V low):</p>
-
 
 
 
@@ -508,9 +467,7 @@ community’s gaps.</p>
 
 
 
-
 <p>Step 2. Our SCS receive circuit takes the bus signal and divides it down to 2V:</p>
-
 
 
 
@@ -538,9 +495,7 @@ community’s gaps.</p>
 
 
 
-
 <p>Step 3. We convert the voltage-divided analog signal into a digital <code>SCSRXOUT</code> signal:</p>
-
 
 
 
@@ -568,9 +523,7 @@ community’s gaps.</p>
 
 
 
-
 <p>Step 4. We modify our <code>SCSRXOUT</code> signal so that it can be sampled at 50%:</p>
-
 
 
 
@@ -598,9 +551,7 @@ community’s gaps.</p>
 
 
 
-
 <p>Step 5. We decode the signal using our micro controller’s UART:</p>
-
 
 
 
@@ -628,32 +579,26 @@ community’s gaps.</p>
 
 
 
-
 <h2 id="micro-controller-firmware">Micro Controller firmware</h2>
-
 <p>Once I complete the next revision of the SCS interface PCB, I plan to release
 all design files, schematics, sources, etc. in full.</p>
-
 <p>Until then, the following sections describe how the most important parts work,
 but skip over the implementation-specific glue code that wires everything
 together.</p>
-
 <h3 id="analog-comparator">Analog Comparator</h3>
-
 <p>The Analog Comparator in our microcontroller lets us know whether a voltage is
 above or below a configured threshold voltage by raising an interrupt. A good
 threshold is 1.65V in my case.</p>
-
 <p>In response to the voltage change, we set GPIO pin 15 to a digital high (3.3V) or
 low (0V) level:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020;font-weight:bold">volatile</span> uint32_t cmpflags;
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020;font-weight:bold">volatile</span> <span style="color:#902000">uint32_t</span> cmpflags;
 
 <span style="color:#60a0b0;font-style:italic">// ISR (Interrupt Service Routine), called by the Analog Comparator:
 </span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#902000">void</span> <span style="color:#06287e">acmp1_isr</span>() {
   cmpflags <span style="color:#666">=</span> CMP1_SCR;
 
   { <span style="color:#60a0b0;font-style:italic">// clear interrupt status flags:
-</span><span style="color:#60a0b0;font-style:italic"></span>    uint8_t scr <span style="color:#666">=</span> (CMP1_SCR <span style="color:#666">&amp;</span> <span style="color:#666">~</span>(CMP_SCR_CFR_MASK <span style="color:#666">|</span> CMP_SCR_CFF_MASK));
+</span><span style="color:#60a0b0;font-style:italic"></span>    <span style="color:#902000">uint8_t</span> scr <span style="color:#666">=</span> (CMP1_SCR <span style="color:#666">&amp;</span> <span style="color:#666">~</span>(CMP_SCR_CFR_MASK <span style="color:#666">|</span> CMP_SCR_CFF_MASK));
     CMP1_SCR <span style="color:#666">=</span> scr <span style="color:#666">|</span> CMP_SCR_CFR_MASK <span style="color:#666">|</span> CMP_SCR_CFF_MASK;
   }
 
@@ -665,11 +610,10 @@ low (0V) level:</p>
   <span style="color:#007020;font-weight:bold">if</span> (cmpflags <span style="color:#666">&amp;</span> CMP_SCR_CFF_MASK) {
     digitalWrite(<span style="color:#40a070">15</span>, LOW);
   }
-}</code></pre></div>
-<p>This signal can easily be verified by attaching an oscilloscope probe each to
+}
+</code></pre></div><p>This signal can easily be verified by attaching an oscilloscope probe each to
 the <code>SCSRX</code> voltage-regulated bus signal input and to the <code>SCSRXOUT</code> GPIO pin
 output:</p>
-
 
 
 
@@ -697,40 +641,31 @@ output:</p>
 
 
 
-
 <h3 id="analog-comparator-modification">Analog Comparator Modification</h3>
-
 <p>There is one crucial difference between SCS and UART:</p>
-
 <p>To transmit a 0 (or start bit):</p>
-
 <ul>
 <li>SCS is low 34μs, then high 70μs</li>
 <li>UART is low the entire 104μs</li>
 </ul>
-
 <p>UART implementations typically sample at 50%, the middle of the bit period.</p>
-
 <p>For SCS, we would need to sample at 20%, because the signal returns to high so
 quickly.</p>
-
 <p>While setting a custom sample point is <em>possible</em> in
 e.g. <a href="https://sigrok.org/">sigrok</a>’s UART decoder, neither software nor hardware
 serial implementations on micro controllers typically support it.</p>
-
 <p>On a micro controller it is much easier to just modify the signal so that it can
 be sampled at 50%.</p>
-
 <p>In practical terms, this means modifying the <code>acmp1_isr</code> function to return to
 high later than the Analog Comparator indicates:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020;font-weight:bold">volatile</span> uint32_t cmpflags;
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020;font-weight:bold">volatile</span> <span style="color:#902000">uint32_t</span> cmpflags;
 
 <span style="color:#60a0b0;font-style:italic">// ISR (Interrupt Service Routine), called by the Analog Comparator:
 </span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#902000">void</span> <span style="color:#06287e">acmp1_isr</span>() {
   cmpflags <span style="color:#666">=</span> CMP1_SCR;
 
   { <span style="color:#60a0b0;font-style:italic">// clear interrupt status flags:
-</span><span style="color:#60a0b0;font-style:italic"></span>    uint8_t scr <span style="color:#666">=</span> (CMP1_SCR <span style="color:#666">&amp;</span> <span style="color:#666">~</span>(CMP_SCR_CFR_MASK <span style="color:#666">|</span> CMP_SCR_CFF_MASK));
+</span><span style="color:#60a0b0;font-style:italic"></span>    <span style="color:#902000">uint8_t</span> scr <span style="color:#666">=</span> (CMP1_SCR <span style="color:#666">&amp;</span> <span style="color:#666">~</span>(CMP_SCR_CFR_MASK <span style="color:#666">|</span> CMP_SCR_CFF_MASK));
     CMP1_SCR <span style="color:#666">=</span> scr <span style="color:#666">|</span> CMP_SCR_CFR_MASK <span style="color:#666">|</span> CMP_SCR_CFF_MASK;
   }
 
@@ -745,38 +680,35 @@ high later than the Analog Comparator indicates:</p>
   <span style="color:#007020;font-weight:bold">if</span> (cmpflags <span style="color:#666">&amp;</span> CMP_SCR_CFF_MASK) {
     digitalWrite(<span style="color:#40a070">15</span>, LOW);
   }
-}</code></pre></div>
-<p>You can now read this signal using your laptop and a USB-to-serial adapter!</p>
-
+}
+</code></pre></div><p>You can now read this signal using your laptop and a USB-to-serial adapter!</p>
 <p>On a micro controller, we now feed this signal back into a UART decoder. For
 prototyping, this can literally mean a jumper wire connecting the output GPIO
 pin with a serial RX pin. Some micro controllers also support internal wiring of
 peripherals, allowing you to get rid of that cable.</p>
-
 <h3 id="scs-rx-receive">SCS RX (receive)</h3>
-
 <p>With the SCS intercom bus signal bytes now available through the UART decoder,
 we can design a streaming SCS decoder. The decoder self-synchronizes and skips
 invalid SCS telegrams by checking their checksum. We start with a ring buffer
 and a convenience working copy:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">constexpr <span style="color:#902000">int</span> telegramLen <span style="color:#666">=</span> <span style="color:#40a070">7</span>;
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">constexpr <span style="color:#902000">int</span> telegramLen <span style="color:#666">=</span> <span style="color:#40a070">7</span>;
 
 <span style="color:#007020;font-weight:bold">typedef</span> <span style="color:#007020;font-weight:bold">struct</span> {
   <span style="color:#60a0b0;font-style:italic">// circular buffer for incoming bytes, indexed using cur
-</span><span style="color:#60a0b0;font-style:italic"></span>  uint8_t buf[telegramLen];
+</span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#902000">uint8_t</span> buf[telegramLen];
   <span style="color:#902000">int</span> cur;
 
-  uint8_t tbuf[telegramLen];
-} scsfilter;</code></pre></div>
-<p>Each byte we receive from the UART, we store in our ring buffer:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#902000">void</span> <span style="color:#06287e">sf_WriteByte</span>(scsfilter <span style="color:#666">*</span>sf, uint8_t b) {
+  <span style="color:#902000">uint8_t</span> tbuf[telegramLen];
+} scsfilter;
+</code></pre></div><p>Each byte we receive from the UART, we store in our ring buffer:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#902000">void</span> <span style="color:#06287e">sf_WriteByte</span>(scsfilter <span style="color:#666">*</span>sf, <span style="color:#902000">uint8_t</span> b) {
   sf<span style="color:#666">-&gt;</span>buf[sf<span style="color:#666">-&gt;</span>cur] <span style="color:#666">=</span> b;
   sf<span style="color:#666">-&gt;</span>cur <span style="color:#666">=</span> (sf<span style="color:#666">-&gt;</span>cur <span style="color:#666">+</span> <span style="color:#40a070">1</span>) <span style="color:#666">%</span> telegramLen;
-}</code></pre></div>
-<p>After every byte, we can check if the ring buffer decodes to a valid ring signal
+}
+</code></pre></div><p>After every byte, we can check if the ring buffer decodes to a valid ring signal
 SCS bus telegram:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#902000">bool</span> <span style="color:#06287e">sf_completeAndValid</span>(scsfilter <span style="color:#666">*</span>sf) {
-  <span style="color:#007020;font-weight:bold">const</span> uint8_t prev <span style="color:#666">=</span> sf<span style="color:#666">-&gt;</span>buf[(sf<span style="color:#666">-&gt;</span>cur<span style="color:#666">+</span>(telegramLen<span style="color:#666">-</span><span style="color:#40a070">1</span>))<span style="color:#666">%</span>telegramLen];
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#902000">bool</span> <span style="color:#06287e">sf_completeAndValid</span>(scsfilter <span style="color:#666">*</span>sf) {
+  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint8_t</span> prev <span style="color:#666">=</span> sf<span style="color:#666">-&gt;</span>buf[(sf<span style="color:#666">-&gt;</span>cur<span style="color:#666">+</span>(telegramLen<span style="color:#666">-</span><span style="color:#40a070">1</span>))<span style="color:#666">%</span>telegramLen];
   <span style="color:#007020;font-weight:bold">if</span> (prev <span style="color:#666">!=</span> <span style="color:#40a070">0xa3</span>) {
     <span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020">false</span>; <span style="color:#60a0b0;font-style:italic">// incomplete: previous byte not a telegram termination
 </span><span style="color:#60a0b0;font-style:italic"></span>  }
@@ -786,8 +718,8 @@ SCS bus telegram:</p>
     sf<span style="color:#666">-&gt;</span>tbuf[i] <span style="color:#666">=</span> sf<span style="color:#666">-&gt;</span>buf[(sf<span style="color:#666">-&gt;</span>cur<span style="color:#666">+</span>i)<span style="color:#666">%</span>telegramLen];
   }
 
-  <span style="color:#007020;font-weight:bold">const</span> uint8_t stored <span style="color:#666">=</span> sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">5</span>];
-  <span style="color:#007020;font-weight:bold">const</span> uint8_t computed <span style="color:#666">=</span> sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">1</span>] <span style="color:#666">^</span>
+  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint8_t</span> stored <span style="color:#666">=</span> sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">5</span>];
+  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint8_t</span> computed <span style="color:#666">=</span> sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">1</span>] <span style="color:#666">^</span>
     sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">2</span>] <span style="color:#666">^</span>
 	sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">3</span>] <span style="color:#666">^</span>
 	sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">4</span>];
@@ -812,29 +744,28 @@ SCS bus telegram:</p>
 </span><span style="color:#60a0b0;font-style:italic"></span>  }
 
   <span style="color:#007020;font-weight:bold">return</span> (<span style="color:#902000">int</span>)(sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">2</span>]); <span style="color:#60a0b0;font-style:italic">// apartment id
-</span><span style="color:#60a0b0;font-style:italic"></span>}</code></pre></div>
-<h3 id="scs-tx-send">SCS TX (send)</h3>
-
+</span><span style="color:#60a0b0;font-style:italic"></span>}
+</code></pre></div><h3 id="scs-tx-send">SCS TX (send)</h3>
 <p>Conceptually, writing serial data to a GPIO output from software is done with
 <a href="https://www.arduino.cc/en/Reference/SoftwareSerial">e.g. the Arduino SoftwareSerial
 library</a>, but there are
 plenty of implementations for different micro controllers. This technique is
 also sometimes called <a href="https://en.wikipedia.org/wiki/Bit_banging">“Bit banging”</a>.</p>
-
 <p>I started with the <a href="https://github.com/PaulStoffregen/SoftwareSerial/blob/63f9b1aae6564d301d7ba31261d1f2390e2a7359/SoftwareSerial.cpp#L218">the Teensy <code>SoftwareSerial::write</code>
 implementation</a>
 and modified it to:</p>
-
 <ol>
-<li><p>Invert the output to drive the <a href="#scs-transmit-circuit">SCS transmit circuit’s Mosfet
+<li>
+<p>Invert the output to drive the <a href="#scs-transmit-circuit">SCS transmit circuit’s Mosfet
 transistor</a> gate, i.e. low on idle and high on
-transmitting a 0 bit.</p></li>
-
-<li><p>Return to idle 70μs earlier than the signal would, i.e. after ≈34μs already.</p></li>
+transmitting a 0 bit.</p>
+</li>
+<li>
+<p>Return to idle 70μs earlier than the signal would, i.e. after ≈34μs already.</p>
+</li>
 </ol>
-
 <p>The modified <code>write</code> function looks like this:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020">#define V27 LOW
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020">#define V27 LOW
 </span><span style="color:#007020">#define V22 HIGH
 </span><span style="color:#007020"></span>
 <span style="color:#007020">#define scs0() do { \
@@ -842,12 +773,12 @@ transmitting a 0 bit.</p></li>
 </span><span style="color:#007020">  digitalWriteFast(11, V27); \
 </span><span style="color:#007020">} while (0)
 </span><span style="color:#007020"></span>
-size_t SCSSerial<span style="color:#666">::</span>write(uint8_t b)
+size_t SCSSerial<span style="color:#666">::</span>write(<span style="color:#902000">uint8_t</span> b)
 {
   elapsedMicros elapsed;
-  uint32_t target;
-  uint8_t mask;
-  uint32_t begin_cycle;
+  <span style="color:#902000">uint32_t</span> target;
+  <span style="color:#902000">uint8_t</span> mask;
+  <span style="color:#902000">uint32_t</span> begin_cycle;
 
   ARM_DEMCR <span style="color:#666">|=</span> ARM_DEMCR_TRCENA;
   ARM_DWT_CTRL <span style="color:#666">|=</span> ARM_DWT_CTRL_CYCCNTENA;
@@ -880,31 +811,23 @@ size_t SCSSerial<span style="color:#666">::</span>write(uint8_t b)
   scs0();
   <span style="color:#007020;font-weight:bold">while</span> (ARM_DWT_CYCCNT <span style="color:#666">-</span> begin_cycle <span style="color:#666">&lt;</span> target) ; <span style="color:#60a0b0;font-style:italic">// wait
 </span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#007020;font-weight:bold">return</span> <span style="color:#40a070">1</span>;
-}</code></pre></div>
-<h2 id="it-works">It works!</h2>
-
+}
+</code></pre></div><h2 id="it-works">It works!</h2>
 <p>With the approach described above, I now have a micro controller that recognizes
 doorbell rings for my apartment and ignores doorbell rings for my neighbors. The
 micro controller can unlock the door, too, and both features are available
 through the Nuki Opener.</p>
-
 <h2 id="how-is-the-nuki-opener">How is the Nuki Opener?</h2>
-
 <p>It took over 2 months before I saw the Nuki Opener working correctly for the
 first time.</p>
-
 <p>I really hope the Nuki developers can work with what I described above and
 improve their product’s reliability for all customers with an SCS intercom
 system!</p>
-
 <p>The device itself seems useful and usable, but time will tell how reliable it
 turns out in practice. I think I noticed push notifications when the door rang
 coming in rather late (many seconds later).</p>
-
 <p>I’ll keep an eye on this and explore the various Nuki APIs more.</p>
-
 <h2 id="appendix-project-journal">Appendix: Project Journal</h2>
-
 <ul>
 <li>2020-09-26: I buy a Nuki Opener (Nuki Opener #1), but despite connecting it correctly, it never successfully opens the door. I start learning about <a href="https://en.wikipedia.org/wiki/Bus_SCS">the SCS home automation bus system that our intercom uses</a>.</li>
 <li>2020-09-28: I publish an <a href="/posts/2020-09-28-nuki-scs-bticino-decoding/">SCS bus decoder for sigrok</a> and contact the Nuki Support.</li>
@@ -927,29 +850,28 @@ coming in rather late (many seconds later).</p>
     <strong>Table Of Contents</strong>
 
     <nav class="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#prerequisites">Prerequisites</a>
-<ul>
-<li><a href="#scs-receive-circuit">SCS receive circuit</a></li>
-<li><a href="#scs-transmit-circuit">SCS transmit circuit</a></li>
-<li><a href="#scs-lab-setup">SCS lab setup</a></li>
-<li><a href="#micro-controller-choice">Micro Controller choice</a></li>
-</ul></li>
-<li><a href="#signal-setup">Signal Setup</a></li>
-<li><a href="#micro-controller-firmware">Micro Controller firmware</a>
-<ul>
-<li><a href="#analog-comparator">Analog Comparator</a></li>
-<li><a href="#analog-comparator-modification">Analog Comparator Modification</a></li>
-<li><a href="#scs-rx-receive">SCS RX (receive)</a></li>
-<li><a href="#scs-tx-send">SCS TX (send)</a></li>
-</ul></li>
-<li><a href="#it-works">It works!</a></li>
-<li><a href="#how-is-the-nuki-opener">How is the Nuki Opener?</a></li>
-<li><a href="#appendix-project-journal">Appendix: Project Journal</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#prerequisites">Prerequisites</a>
+      <ul>
+        <li><a href="#scs-receive-circuit">SCS receive circuit</a></li>
+        <li><a href="#scs-transmit-circuit">SCS transmit circuit</a></li>
+        <li><a href="#scs-lab-setup">SCS lab setup</a></li>
+        <li><a href="#micro-controller-choice">Micro Controller choice</a></li>
+      </ul>
+    </li>
+    <li><a href="#signal-setup">Signal Setup</a></li>
+    <li><a href="#micro-controller-firmware">Micro Controller firmware</a>
+      <ul>
+        <li><a href="#analog-comparator">Analog Comparator</a></li>
+        <li><a href="#analog-comparator-modification">Analog Comparator Modification</a></li>
+        <li><a href="#scs-rx-receive">SCS RX (receive)</a></li>
+        <li><a href="#scs-tx-send">SCS TX (send)</a></li>
+      </ul>
+    </li>
+    <li><a href="#it-works">It works!</a></li>
+    <li><a href="#how-is-the-nuki-opener">How is the Nuki Opener?</a></li>
+    <li><a href="#appendix-project-journal">Appendix: Project Journal</a></li>
+  </ul>
 </nav>
   </div>
 </div>

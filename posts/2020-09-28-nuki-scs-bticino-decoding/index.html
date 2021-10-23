@@ -207,46 +207,34 @@ Recently, a friend made me aware of the Nuki Opener, which promises to make exis
   <details class="ms_toc_details">
     <summary>Table of contents</summary>
     <nav class="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#connecting-the-nuki-opener-to-the-bticino-344212">Connecting the Nuki Opener to the bTicino 344212</a></li>
-<li><a href="#configuring-the-nuki-opener">Configuring the Nuki Opener</a></li>
-<li><a href="#capturing-the-scs-bus-with-sigrok">Capturing the SCS bus with sigrok</a></li>
-<li><a href="#scs-bus-decoding-with-sigrok-voltage-levels">SCS bus decoding with sigrok: voltage levels</a></li>
-<li><a href="#scs-bus-decoding-with-sigrok-scs-decoder">SCS bus decoding with sigrok: SCS decoder</a></li>
-<li><a href="#scs-bus-decoding-with-sigrok-git-uart-scs-decoder">SCS bus decoding with sigrok git: UART+SCS decoder</a></li>
-<li><a href="#captured-scs-telegrams">Captured SCS telegrams</a></li>
-<li><a href="#further-reading">Further reading</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#connecting-the-nuki-opener-to-the-bticino-344212">Connecting the Nuki Opener to the bTicino 344212</a></li>
+    <li><a href="#configuring-the-nuki-opener">Configuring the Nuki Opener</a></li>
+    <li><a href="#capturing-the-scs-bus-with-sigrok">Capturing the SCS bus with sigrok</a></li>
+    <li><a href="#scs-bus-decoding-with-sigrok-voltage-levels">SCS bus decoding with sigrok: voltage levels</a></li>
+    <li><a href="#scs-bus-decoding-with-sigrok-scs-decoder">SCS bus decoding with sigrok: SCS decoder</a></li>
+    <li><a href="#scs-bus-decoding-with-sigrok-git-uartscs-decoder">SCS bus decoding with sigrok git: UART+SCS decoder</a></li>
+    <li><a href="#captured-scs-telegrams">Captured SCS telegrams</a></li>
+    <li><a href="#further-reading">Further reading</a></li>
+  </ul>
 </nav>
   </details>
-  
-
-<p>I have long been looking for a way to make my intercom a little more pleasant.</p>
-
+  <p>I have long been looking for a way to make my intercom a little more pleasant.</p>
 <p>Recently, a friend made me aware of the <a href="https://nuki.io/opener">Nuki Opener</a>,
 which promises to make existing intercom systems smart, and claims to be
 compatible with the specific intercom I have!</p>
-
 <p>So I got one and tried setting it up, but could not get it to work.</p>
-
 <p>This post documents how I have analyzed what goes over the intercom’s <a href="https://en.wikipedia.org/wiki/Bus_SCS">SCS
 bus</a>. Perhaps the technique is
 interesting, or perhaps you want to learn more about SCS :)</p>
-
 <p>Note that I have <strong>not yet used</strong> the Nuki Opener, so I can’t say anything about
 it yet. What I have seen so far makes a good impression, but it just does not
 seem to work at all with my intercom. I will update this article after working
 with the Nuki support to fix this.</p>
-
 <h2 id="connecting-the-nuki-opener-to-the-bticino-344212">Connecting the Nuki Opener to the bTicino 344212</h2>
-
 <p>First, I identified which wires are used for the bus: between BUS- and BUS+, the
 internet tells me that I would expect to measure ≈27V, and indeed a multimeter
 shows:</p>
-
 
 
 
@@ -274,12 +262,10 @@ shows:</p>
 
 
 
-
 <p>I then connected the Nuki Opener as described in <a href="https://developer.nuki.io/uploads/short-url/3naDfQDFbzh3Je7ytrNzRDscvFz.pdf">“Connect the Nuki Opener to an
 unknown
 intercom”</a>,
 Page 8, Bus intercoms → Basic setup without doorbell suppression:</p>
-
 <table>
 <thead>
 <tr>
@@ -288,20 +274,17 @@ Page 8, Bus intercoms → Basic setup without doorbell suppression:</p>
 <th>Signal</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>black</td>
 <td>BUS-</td>
 <td>GND</td>
 </tr>
-
 <tr>
 <td>red</td>
 <td>BUS+</td>
 <td>SCS (+27V)</td>
 </tr>
-
 <tr>
 <td>orange</td>
 <td>BUS+</td>
@@ -309,7 +292,6 @@ Page 8, Bus intercoms → Basic setup without doorbell suppression:</p>
 </tr>
 </tbody>
 </table>
-
 
 
 
@@ -337,48 +319,36 @@ Page 8, Bus intercoms → Basic setup without doorbell suppression:</p>
 
 
 
-
 <p>I had previously tried the enhanced setup with doorbell suppression, as the Nuki
 app recommends, but switched to the <strong>simplest setup possible</strong> when capturing
 the signal.</p>
-
 <h2 id="configuring-the-nuki-opener">Configuring the Nuki Opener</h2>
-
 <p>With the Nuki app, I configured the Opener either as:</p>
-
 <ul>
 <li>bTicino → 344212</li>
 <li>Generic → Bus (SCS)</li>
 <li>Unknown intercom</li>
 </ul>
-
 <p>Unfortunately, with all configurations:</p>
-
 <ol>
 <li>The app says it learned the door open signal successfully.</li>
 <li>The device/app does react to door rings.</li>
 <li>The device <strong>never successfully opens the door</strong>.</li>
 </ol>
-
 <h2 id="capturing-the-scs-bus-with-sigrok">Capturing the SCS bus with sigrok</h2>
-
 <p>The logic analyzer that I have at home only works with signals under 5V. As the
 SCS bus is running at 27V, I’m capturing the signal with my <a href="https://www.aliexpress.com/popular/hantek-6022be.html">Hantek 6022BE USB
 oscilloscope</a>.</p>
-
 <p><a href="https://sigrok.org/">sigrok</a> is a portable, cross-platform, free open source
 signal analysis software suite and <a href="https://sigrok.org/wiki/Hantek_6022BE">supports the Hantek
 6022BE</a> out of the box, provided you have
 at least version 0.1.4 of the the sigrok fx2lafw package installed.</p>
-
 <p>Check out <a href="https://sigrok.org/wiki/Getting_started_with_a_logic_analyzer">sigrok’s “Getting started with a logic
 analyzer”</a> if
 you’re new to sigrok!</p>
-
 <p>The Nuki Opener has 3 different pin headers you can use, depending on where you
 want to attach it on your wall. These are connected straight through, so I used
 them to conveniently grab BUS+ and BUS- just like the Nuki sees it:</p>
-
 
 
 
@@ -406,10 +376,8 @@ them to conveniently grab BUS+ and BUS- just like the Nuki sees it:</p>
 
 
 
-
 <p>I set the oscilloscope probe head to its 10X divider setting, so that I had the
 full value range available, then started sampling 5M samples at 500 kHz:</p>
-
 
 
 
@@ -437,27 +405,20 @@ full value range available, then started sampling 5M samples at 500 kHz:</p>
 
 
 
-
 <p>You can see 10s worth of signal. The three bursts are transmissions on the SCS
 bus.</p>
-
 <p>The labeling didn’t quite match for me: it shows e.g. 3.2V instead of 27V, but
 as long as the signal comes in clearly, it doesn’t matter if it is offset or
 scaled.</p>
-
 <h2 id="scs-bus-decoding-with-sigrok-voltage-levels">SCS bus decoding with sigrok: voltage levels</h2>
-
 <p>Let’s tell sigrok what voltage level corresponds to a low or high signal:</p>
-
 <ol>
 <li>left-click on channel <code>CH1</code></li>
 <li>set “conversion” to “to logic via threshold”</li>
 <li>set “conversion threshold” to 3.0V</li>
 </ol>
-
 <p>Now you’ll see not only the captured signal, but also the logical signal below
 in green:</p>
-
 
 
 
@@ -485,30 +446,23 @@ in green:</p>
 
 
 
-
 <h2 id="scs-bus-decoding-with-sigrok-scs-decoder">SCS bus decoding with sigrok: SCS decoder</h2>
-
 <p>Now that we have obtained a logical/digital signal (low/high), we can write a
 sigrok decoder for the SCS bus. See <a href="https://sigrok.org/wiki/Protocol_decoder_HOWTO">sigrok’s Protocol decoder
 HOWTO</a> for an introduction.</p>
-
 <p>In general, I strongly recommend investing into tooling, in particular when
 decoding protocols. Spending a few minutes to an hour at this stage will
 minimize mistakes and save lots of time later, and—when you contribute your
 tooling—enable others to do more interesting work!</p>
-
 <p>I found it easy to write a sigrok decoder, having never used their API
 before. It was quick to get something onto the screen, mistakes were easy to
 correct, and the whole process was nicely iterative.</p>
-
 <p>Until it is merged and released with a new version of <code>libsigrokdecode</code>, you can
 find <a href="https://github.com/stapelberg/libsigrokdecode/commit/7f12be634628d52222eb879f5b076c256ab8ba08">my SCS decoder on
 GitHub</a>.</p>
-
 <p>The decoder looks at every layer of an SCS telegram: the start/stop bits, the
 data bits, the value and the value’s logical position/function in the SCS
 telegram.</p>
-
 
 
 
@@ -536,9 +490,7 @@ telegram.</p>
 
 
 
-
 <p>Our SCS decoder displays the 3 bursts on the SCS bus when we ring the doorbell:</p>
-
 
 
 
@@ -563,7 +515,6 @@ telegram.</p>
   style="border: 1px solid #000"
   
   loading="lazy"></a>
-
 
 
 
@@ -609,7 +560,6 @@ telegram.</p>
 
 
 
-
 <a href="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-anlern-klingel-burst3.jpg"><img
   srcset="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-anlern-klingel-burst3_hua419f52baa7795a675e007bfe81705d1_1218910_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-anlern-klingel-burst3_hua419f52baa7795a675e007bfe81705d1_1218910_1800x0_resize_q75_box.jpg 3x"
   src="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-anlern-klingel-burst3_hua419f52baa7795a675e007bfe81705d1_1218910_600x0_resize_q75_box.jpg"
@@ -622,12 +572,9 @@ telegram.</p>
 
 
 
-
 <p>Only the middle burst sets a destination address of <code>0x3</code>, the configured number
 of my intercom system. I am not sure what the first and last burst indicate!</p>
-
 <p>The SCS bus activity when opening the door seems more clear:</p>
-
 
 
 
@@ -670,7 +617,6 @@ of my intercom system. I am not sure what the first and last burst indicate!</p>
 
 
 
-
 <a href="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-anlern-open-burst2.jpg"><img
   srcset="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-anlern-open-burst2_hua7c03685b3c05826c12f366402b5649a_1173245_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-anlern-open-burst2_hua7c03685b3c05826c12f366402b5649a_1173245_1800x0_resize_q75_box.jpg 3x"
   src="https://michael.stapelberg.ch/posts/2020-09-28-nuki-scs-bticino-decoding/2020-09-27-anlern-open-burst2_hua7c03685b3c05826c12f366402b5649a_1173245_600x0_resize_q75_box.jpg"
@@ -683,56 +629,41 @@ of my intercom system. I am not sure what the first and last burst indicate!</p>
 
 
 
-
 <p>These 2 bursts are sent one second apart, and only differ in the request
 parameter field: my guess is that <code>0xa4</code> means “start buzzing the door open” and
 <code>0xa0</code> means “stop buzzing the door open”.</p>
-
 <p>I’m not sure why all these bursts repeat their SCS telegrams 3 times. My
 understanding was that SCS telegrams are repeated only when they are not
 acknowledged, and I indeed see no acknowledgement telegrams in my captures. Does
 that mean something is wrong with our intercom and it only works due to
 retransmissions?</p>
-
-<h2 id="scs-bus-decoding-with-sigrok-git-uart-scs-decoder">SCS bus decoding with sigrok git: UART+SCS decoder</h2>
-
+<h2 id="scs-bus-decoding-with-sigrok-git-uartscs-decoder">SCS bus decoding with sigrok git: UART+SCS decoder</h2>
 <p>As <a href="https://sourceforge.net/p/sigrok/mailman/message/37118252/">Gerhard Sittig pointed
 out</a>, in the git
 version of libsigrokdecode, one can use the existing UART decoder to decode SCS:</p>
-
 <ol>
 <li>Set <code>Baud rate</code> to <code>9600</code></li>
 <li>Set <code>Sample point</code> to <code>20%</code></li>
 </ol>
-
 <p>This seems a little more robust than my cobbled-together SCS decoder from above :)</p>
-
 <p>In addition to the UART decoder, we can still use a custom SCS decoder to label
 individual bytes within an SCS telegram according to their function, and do CRC
 checks.</p>
-
 <h2 id="captured-scs-telegrams">Captured SCS telegrams</h2>
-
 <p>You can find my most recent captures in <a
 href="../../2020-09-27-rohdaten-klingel-rev2.zip">2020-09-27-rohdaten-klingel-rev2.zip</a>:</p>
-
 <ul>
 <li><code>2020-09-27-anlern-01-open-PUR-filtered.srzip</code> is the door buzzer</li>
 <li><code>2020-09-27-anlern-02-klingel-PUR-filtered.srzip</code> is the bell ringing</li>
 </ul>
-
 <p>To extract the interesting parts from the sigrok files, I:</p>
-
 <ol>
 <li>Click the <code>Show Cursors</code> icon in PulseView’s toolbar.</li>
 <li>Position the left and right cursor edges such that the signal of interest is selected.</li>
 <li>Click the drop-down next to the <code>Save</code> icon and select <code>Save Selected Range As</code>.</li>
 </ol>
-
 <h2 id="further-reading">Further reading</h2>
-
 <p>I used the following sources; please let me know of any others!</p>
-
 <ul>
 <li><a href="https://it.wikipedia.org/wiki/Bus_SCS">https://it.wikipedia.org/wiki/Bus_SCS</a></li>
 <li><a href="http://guidopic.altervista.org/alter/eibscsgt.html">http://guidopic.altervista.org/alter/eibscsgt.html</a></li>
@@ -747,19 +678,16 @@ href="../../2020-09-27-rohdaten-klingel-rev2.zip">2020-09-27-rohdaten-klingel-re
     <strong>Table Of Contents</strong>
 
     <nav class="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#connecting-the-nuki-opener-to-the-bticino-344212">Connecting the Nuki Opener to the bTicino 344212</a></li>
-<li><a href="#configuring-the-nuki-opener">Configuring the Nuki Opener</a></li>
-<li><a href="#capturing-the-scs-bus-with-sigrok">Capturing the SCS bus with sigrok</a></li>
-<li><a href="#scs-bus-decoding-with-sigrok-voltage-levels">SCS bus decoding with sigrok: voltage levels</a></li>
-<li><a href="#scs-bus-decoding-with-sigrok-scs-decoder">SCS bus decoding with sigrok: SCS decoder</a></li>
-<li><a href="#scs-bus-decoding-with-sigrok-git-uart-scs-decoder">SCS bus decoding with sigrok git: UART+SCS decoder</a></li>
-<li><a href="#captured-scs-telegrams">Captured SCS telegrams</a></li>
-<li><a href="#further-reading">Further reading</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#connecting-the-nuki-opener-to-the-bticino-344212">Connecting the Nuki Opener to the bTicino 344212</a></li>
+    <li><a href="#configuring-the-nuki-opener">Configuring the Nuki Opener</a></li>
+    <li><a href="#capturing-the-scs-bus-with-sigrok">Capturing the SCS bus with sigrok</a></li>
+    <li><a href="#scs-bus-decoding-with-sigrok-voltage-levels">SCS bus decoding with sigrok: voltage levels</a></li>
+    <li><a href="#scs-bus-decoding-with-sigrok-scs-decoder">SCS bus decoding with sigrok: SCS decoder</a></li>
+    <li><a href="#scs-bus-decoding-with-sigrok-git-uartscs-decoder">SCS bus decoding with sigrok git: UART+SCS decoder</a></li>
+    <li><a href="#captured-scs-telegrams">Captured SCS telegrams</a></li>
+    <li><a href="#further-reading">Further reading</a></li>
+  </ul>
 </nav>
   </div>
 </div>

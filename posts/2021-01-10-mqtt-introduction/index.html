@@ -204,74 +204,61 @@ Motivation Once you have a few IOT devices, an obvious question is how to networ
   <details class="ms_toc_details">
     <summary>Table of contents</summary>
     <nav class="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#motivation">Motivation</a></li>
-<li><a href="#step-1-set-up-an-mqtt-broker-server">Step 1. Set up an MQTT broker (server)</a>
-<ul>
-<li><a href="#mqtt-broker-setup-displaying-sending-test-messages">MQTT broker setup: displaying/sending test messages</a></li>
-</ul></li>
-<li><a href="#step-2-integrate-with-mqtt">Step 2. Integrate with MQTT</a>
-<ul>
-<li><a href="#best-practices-for-your-own-structure">Best practices for your own structure</a></li>
-<li><a href="#integration-shelly-devices-with-mqtt-built-in">Integration: Shelly devices with MQTT built-in</a></li>
-<li><a href="#integration-zigbee2mqtt-for-zigbee-devices">Integration: Zigbee2MQTT for Zigbee devices</a></li>
-<li><a href="#integration-esphome-for-micro-controllers-sensors">Integration: ESPHome for micro controllers + sensors</a></li>
-<li><a href="#integration-mongoose-os-for-micro-controllers">Integration: Mongoose OS for micro controllers</a></li>
-<li><a href="#integration-arduino-for-custom-micro-controller-firmware">Integration: Arduino for custom micro controller firmware</a></li>
-</ul></li>
-<li><a href="#integration-webhook-to-mqtt">Integration: Webhook to MQTT</a></li>
-<li><a href="#step-3-express-your-logic">Step 3. Express your logic</a>
-<ul>
-<li><a href="#regelwerk-control-loops-definition">regelwerk: control loops definition</a></li>
-<li><a href="#regelwerk-mqtt-dispatcher">regelwerk: MQTT dispatcher</a></li>
-<li><a href="#regelwerk-control-loop-example">regelwerk: control loop example</a></li>
-</ul></li>
-<li><a href="#conclusion">Conclusion</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#motivation">Motivation</a></li>
+    <li><a href="#step-1-set-up-an-mqtt-broker-server">Step 1. Set up an MQTT broker (server)</a>
+      <ul>
+        <li><a href="#mqtt-broker-setup-displayingsending-test-messages">MQTT broker setup: displaying/sending test messages</a></li>
+      </ul>
+    </li>
+    <li><a href="#step-2-integrate-with-mqtt">Step 2. Integrate with MQTT</a>
+      <ul>
+        <li><a href="#best-practices-for-your-own-structure">Best practices for your own structure</a></li>
+        <li><a href="#integration-shelly-devices-with-mqtt-built-in">Integration: Shelly devices with MQTT built-in</a></li>
+        <li><a href="#integration-zigbee2mqtt-for-zigbee-devices">Integration: Zigbee2MQTT for Zigbee devices</a></li>
+        <li><a href="#integration-esphome-for-micro-controllers--sensors">Integration: ESPHome for micro controllers + sensors</a></li>
+        <li><a href="#integration-mongoose-os-for-micro-controllers">Integration: Mongoose OS for micro controllers</a></li>
+        <li><a href="#integration-arduino-for-custom-micro-controller-firmware">Integration: Arduino for custom micro controller firmware</a></li>
+      </ul>
+    </li>
+    <li><a href="#integration-webhook-to-mqtt">Integration: Webhook to MQTT</a></li>
+    <li><a href="#step-3-express-your-logic">Step 3. Express your logic</a>
+      <ul>
+        <li><a href="#regelwerk-control-loops-definition">regelwerk: control loops definition</a></li>
+        <li><a href="#regelwerk-mqtt-dispatcher">regelwerk: MQTT dispatcher</a></li>
+        <li><a href="#regelwerk-control-loop-example">regelwerk: control loop example</a></li>
+      </ul>
+    </li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
 </nav>
   </details>
-  
-
-<p>While I had heard the abbreviation <a href="https://en.wikipedia.org/wiki/MQTT">MQTT</a>
+  <p>While I had heard the abbreviation <a href="https://en.wikipedia.org/wiki/MQTT">MQTT</a>
 many times, I never had a closer look at what MQTT is.</p>
-
 <p>Here are a few quick notes about using MQTT as <a href="https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern">Pub/Sub
 bus</a> in a home
 IOT network.</p>
-
 <h2 id="motivation">Motivation</h2>
-
 <p>Once you have a few <a href="https://en.wikipedia.org/wiki/Internet_of_things">IOT
 devices</a>, an obvious question
 is how to network them.</p>
-
 <p>If all your devices are from the same vendor, the vendor takes care of it.</p>
-
 <p>In my home, I have many different vendors/devices, such as (incomplete list):</p>
-
 <ul>
 <li><a href="https://nuki.io/en/opener/">Nuki Opener</a> Smart Intercom</li>
 <li><a href="https://www.itead.cc/sonoff-s26-wifi-smart-plug.html">Sonoff S26 Smart Plug</a> (WiFi-controlled socket outlet)</li>
 <li><a href="https://www.aqara.com/en/door_and_window_sensor.html">Aqara Door &amp; Window Sensors</a></li>
 <li><a href="https://en.wikipedia.org/wiki/IKEA#Smart_home">IKEA Home Smart</a> (formerly TRÅDFRI) Smart Lights</li>
 </ul>
-
 <p>Here is how I combine these devices:</p>
-
 <ul>
 <li>When I’m close to my home (geo-fencing), the Nuki Opener enables Ring To Open (RTO): when I ring the door bell, it opens the door for me.</li>
 <li>When I open the apartment door, the Smart Lights in the hallway turn on.</li>
 <li>When I’m home, my stereo speakers should be powered on so I can play music.</li>
 </ul>
-
 <p>A conceptually simple way to hook this up is to connect things directly: listen
 to the Aqara Door Sensor and instruct the Smart Lights to turn on, for example.</p>
-
 <p>But, connecting everything to an MQTT bus has a couple of advantages:</p>
-
 <ol>
 <li>Unification: everything is visible in one place, the same tools work for all
 devices.</li>
@@ -281,163 +268,119 @@ MQTT.</li>
 Assistant</a> or
 <a href="https://www.openhab.org/">openHAB</a></li>
 </ol>
-
 <h2 id="step-1-set-up-an-mqtt-broker-server">Step 1. Set up an MQTT broker (server)</h2>
-
 <p>A broker is what relays messages between publishers and subscribers. As an
 optimization, the most recent value of a topic can be retained, so that e.g. a
 subscriber does not need to wait for the next change to obtain the current
 state.</p>
-
 <p>The most popular choice for broker software seems to be
 <a href="https://mosquitto.org/">Mosquitto</a>, but since I like to run Go software on
-<a href="https://gokrazy.org/">https://gokrazy.org/</a>, I kept looking and found <a href="https://github.com/fhmq/hmq">https://github.com/fhmq/hmq</a>.</p>
-
+<a href="https://gokrazy.org/,">https://gokrazy.org/,</a> I kept looking and found <a href="https://github.com/fhmq/hmq">https://github.com/fhmq/hmq</a>.</p>
 <p>One downside of <code>hmq</code> might be that it does not seem to support persisting
 retained messages to disk. I’ll treat this as a feature for the time being,
 enforcing a fresh start on every daily reboot.</p>
-
 <p>To restrict hmq to only listen in my local network, I’m using <a href="https://github.com/gokrazy/tools/commit/fdd90fc6817876e08b352fae84f2a2794524ccc0">gokrazy’s flag
 file
 feature</a>:</p>
-
-<pre><code>mkdir -p flags/github.com/fhmq/hmq
+<pre tabindex="0"><code>mkdir -p flags/github.com/fhmq/hmq
 echo --host=10.0.0.217 &gt; flags/github.com/fhmq/hmq/flags.txt
-</code></pre>
-
-<p>Note that you’ll need <a href="https://github.com/fhmq/hmq/pull/105">https://github.com/fhmq/hmq/pull/105</a> in case your network
+</code></pre><p>Note that you’ll need <a href="https://github.com/fhmq/hmq/pull/105">https://github.com/fhmq/hmq/pull/105</a> in case your network
 does not come up quickly.</p>
-
-<h3 id="mqtt-broker-setup-displaying-sending-test-messages">MQTT broker setup: displaying/sending test messages</h3>
-
+<h3 id="mqtt-broker-setup-displayingsending-test-messages">MQTT broker setup: displaying/sending test messages</h3>
 <p>To display all messages going through your MQTT broker, subscribe using the
 <a href="https://mosquitto.org/">Mosquitto</a> tools:</p>
-
-<pre><code>% sudo pacman -S mosquitto
+<pre tabindex="0"><code>% sudo pacman -S mosquitto
 % mosquitto_sub --id &quot;${HOST}_all&quot; --host dr.lan --topic '#' --verbose
-</code></pre>
-
-<p>The <code>#</code> sign denotes an <a href="https://subscription.packtpub.com/book/application_development/9781787287815/1/ch01lvl1sec18/understanding-wildcards">MQTT
+</code></pre><p>The <code>#</code> sign denotes an <a href="https://subscription.packtpub.com/book/application_development/9781787287815/1/ch01lvl1sec18/understanding-wildcards">MQTT
 wildcard</a>,
 meaning subscribe to all topics in this case.</p>
-
 <p>Be sure to set a unique id for each <code>mosquitto_sub</code> command you run, so that you
 can see which subscribers are connected to your MQTT bus. Avoid id clashes,
 otherwise the subscribers will disconnect each other!</p>
-
 <p>Now, when you send a test message, you should see it:</p>
-
-<pre><code>% mosquitto_pub --host dr.lan --topic 'cmnd/tasmota_68462F/Power' -m 'ON'
-</code></pre>
-
-<p>Tip: If you have binary data on your MQTT bus, you can display it in hex with
+<pre tabindex="0"><code>% mosquitto_pub --host dr.lan --topic 'cmnd/tasmota_68462F/Power' -m 'ON'
+</code></pre><p>Tip: If you have binary data on your MQTT bus, you can display it in hex with
 timestamps:</p>
-
-<pre><code>% mosquitto_sub \
+<pre tabindex="0"><code>% mosquitto_sub \
   --id &quot;${HOST}_bell&quot; \
   --host dr.lan \
   --topic 'doorbell/#' \
   -F '@Y-@m-@dT@H:@M:@S@z : %t : %x'
-</code></pre>
-
-<h2 id="step-2-integrate-with-mqtt">Step 2. Integrate with MQTT</h2>
-
+</code></pre><h2 id="step-2-integrate-with-mqtt">Step 2. Integrate with MQTT</h2>
 <p>Now that communication via the bus works, what messages do we publish on which
 topics?</p>
-
 <p>MQTT only defines that topics are hierarchical; messages are arbitrary byte
 sequences.</p>
-
 <p>There are a few popular conventions for what to put onto MQTT:</p>
-
 <ul>
-<li><p><a href="https://homieiot.github.io/">The Homie convention</a></p></li>
-
-<li><p>Home Assistant has its own convention, but <a href="https://www.home-assistant.io/integrations/switch.mqtt/#full-configuration">allows full configuration</a>. Home Assistant does <a href="https://community.home-assistant.io/t/home-assistant-homie-compatibility/17135/8">not support the homie convention yet</a>.</p></li>
-
-<li><p>openHAB <a href="https://www.openhab.org/addons/bindings/mqtt.generic/">refers to Home Assistant and
-Homie</a>.</p></li>
+<li>
+<p><a href="https://homieiot.github.io/">The Homie convention</a></p>
+</li>
+<li>
+<p>Home Assistant has its own convention, but <a href="https://www.home-assistant.io/integrations/switch.mqtt/#full-configuration">allows full configuration</a>. Home Assistant does <a href="https://community.home-assistant.io/t/home-assistant-homie-compatibility/17135/8">not support the homie convention yet</a>.</p>
+</li>
+<li>
+<p>openHAB <a href="https://www.openhab.org/addons/bindings/mqtt.generic/">refers to Home Assistant and
+Homie</a>.</p>
+</li>
 </ul>
-
 <p>If you design everything yourself, Homie seems like a good option. If you plan to
 use Home Assistant or similar, stick to the Home Assistant convention.</p>
-
 <h3 id="best-practices-for-your-own-structure">Best practices for your own structure</h3>
-
 <p>In case you want/need to define your own topics, keep these tips in mind:</p>
-
 <ul>
 <li>devices publish their state on a single, retained topic
-
 <ul>
 <li>the topic name could be e.g. <code>stat/tasmota_68462F/POWER</code></li>
 <li>retaining the topic allows consumers to catch up after (re-)connecting to the bus</li>
-</ul></li>
+</ul>
+</li>
 <li>publish commands on a single, possibly-retained topic
-
 <ul>
 <li>e.g. publish <code>ON</code> to topic <code>cmnd/tasmota_68462F/Power</code></li>
 <li>publish the desired state: publish <code>ON</code> or <code>OFF</code> instead of <code>TOGGLE</code></li>
 <li>if you retain the topic and publish <code>TOGGLE</code> commands, your lights will mysteriously go off/on when they unexpectedly re-establish their MQTT connection</li>
-</ul></li>
 </ul>
-
+</li>
+</ul>
 <h3 id="integration-shelly-devices-with-mqtt-built-in">Integration: Shelly devices with MQTT built-in</h3>
-
 <p><a href="https://shelly.cloud/">Shelly</a> has a number of smart devices that come with
 MQTT out of the box! This sounds like the easiest solution if you’re starting
 from scratch.</p>
-
 <p>I haven’t used these devices personally, but I hear good things about them.</p>
-
 <h3 id="integration-zigbee2mqtt-for-zigbee-devices">Integration: Zigbee2MQTT for Zigbee devices</h3>
-
 <p><a href="https://www.zigbee2mqtt.io/">Zigbee2MQTT</a> supports well <a href="https://www.zigbee2mqtt.io/information/supported_devices.html">over 1000 Zigbee
 devices</a> and
 exposes them on the MQTT bus.</p>
-
 <p>For example, this is what you would use to connect your IKEA TRÅDFRI Smart
 Lights to MQTT.</p>
-
-<h3 id="integration-esphome-for-micro-controllers-sensors">Integration: ESPHome for micro controllers + sensors</h3>
-
+<h3 id="integration-esphome-for-micro-controllers--sensors">Integration: ESPHome for micro controllers + sensors</h3>
 <p>The <a href="https://esphome.io/">ESPHome</a> system is a ready-made solution to connect a
 wide array of sensors and devices to your home network via MQTT.</p>
-
 <p>If you want to use your own ESP-based micro controllers and sensors, this seems
 like the easiest way to get them programmed.</p>
-
 <h3 id="integration-mongoose-os-for-micro-controllers">Integration: Mongoose OS for micro controllers</h3>
-
 <p>Mongoose OS is an IOT firmware development framework, taking care of device
 management, Over-The-Air updates, and more.</p>
-
 <p><a href="https://mongoose-os.com/docs/mongoose-os/cloud/mqtt.md">Mongoose comes with MQTT
 support</a>, and with just
 a few lines you can build, flash and configure your device. Here’s an example
 for the NodeMCU (ESP8266-based):</p>
-
-<pre><code>% yay -S mos-bin
+<pre tabindex="0"><code>% yay -S mos-bin
 % mos clone https://github.com/mongoose-os-apps/demo-js app1
 % cd app1
 % mos --platform esp8266 build
 % mos --platform esp8266 --port /dev/ttyUSB1 flash
 % mos --port /dev/ttyUSB1 config-set mqtt.enable=true mqtt.server=dr.lan:1883
-</code></pre>
-
-<p>Pressing the button on the NodeMCU publishes a message to MQTT:</p>
-
-<pre><code>% mosquitto_sub --host dr.lan --topic devices/esp8266_F4B37C/events
+</code></pre><p>Pressing the button on the NodeMCU publishes a message to MQTT:</p>
+<pre tabindex="0"><code>% mosquitto_sub --host dr.lan --topic devices/esp8266_F4B37C/events
 {&quot;ram_free&quot;:31260,&quot;uptime&quot;:27.168680,&quot;btnCount&quot;:2,&quot;on&quot;:false}
-</code></pre>
-
-<h3 id="integration-arduino-for-custom-micro-controller-firmware">Integration: Arduino for custom micro controller firmware</h3>
-
+</code></pre><h3 id="integration-arduino-for-custom-micro-controller-firmware">Integration: Arduino for custom micro controller firmware</h3>
 <p>Arduino has an <a href="https://www.arduino.cc/reference/en/libraries/mqtt-client/">MQTT Client
 library</a>. If your
 microcontroller is networked, e.g. an ESP32 with WiFi, you can publish MQTT
 messages from your Arduino sketch:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020">#include</span> <span style="color:#007020">&lt;WiFi.h&gt;</span><span style="color:#007020">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020">#include</span> <span style="color:#007020">&lt;WiFi.h&gt;</span><span style="color:#007020">
 </span><span style="color:#007020">#include</span> <span style="color:#007020">&lt;PubSubClient.h&gt;</span><span style="color:#007020">
 </span><span style="color:#007020"></span>
 WiFiClient wificlient;
@@ -486,13 +429,12 @@ PubSubClient <span style="color:#06287e">client</span>(wificlient);
 
 <span style="color:#902000">void</span> <span style="color:#06287e">processEvent</span>(<span style="color:#902000">void</span> <span style="color:#666">*</span>buf, <span style="color:#902000">int</span> telegramLen) {
 	client.publish(<span style="color:#4070a0">&#34;doorbell/events/scs&#34;</span>, buf, telegramLen);
-}</code></pre></div>
-<h2 id="integration-webhook-to-mqtt">Integration: Webhook to MQTT</h2>
-
+}
+</code></pre></div><h2 id="integration-webhook-to-mqtt">Integration: Webhook to MQTT</h2>
 <p>The Nuki Opener doesn’t support MQTT out of the box, but the Nuki Bridge can
 send Webhook requests. In a few lines of Go, you can forward what the Nuki
 Bridge sends to MQTT:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">package</span> main
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">package</span> main
 
 <span style="color:#007020;font-weight:bold">import</span> (
 	<span style="color:#4070a0">&#34;fmt&#34;</span>
@@ -535,40 +477,32 @@ Bridge sends to MQTT:</p>
 	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">nukiBridge</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
 		log.<span style="color:#06287e">Fatal</span>(err)
 	}
-}</code></pre></div>
-<p>See <a href="https://developer.nuki.io/t/bridge-http-api/26">Nuki’s Bridge HTTP-API</a>
+}
+</code></pre></div><p>See <a href="https://developer.nuki.io/t/bridge-http-api/26">Nuki’s Bridge HTTP-API</a>
 document for details on how to configure your bridge to send webhook callbacks.</p>
-
 <h2 id="step-3-express-your-logic">Step 3. Express your logic</h2>
-
 <p><a href="https://www.home-assistant.io/">Home Assistant</a> and
 <a href="https://nodered.org/">Node-RED</a> are both popular options, but also large
 software packages.</p>
-
 <p>Personally, I find it more fun to express my logic directly in a full
 programming language (Go).</p>
-
 <p>I call the <a href="https://github.com/stapelberg/regelwerk">resulting program <code>regelwerk</code> (“collection of
 rules”)</a>. The program consists of:</p>
-
 <ol>
 <li>various control loops that progress independently from each other</li>
 <li>an MQTT message dispatcher feeding these control loops</li>
 <li>a debugging web interface to visualize state</li>
 </ol>
-
 <p>This architecture is by no means a new approach: as
 <a href="https://github.com/rs/moquette">moquette</a> describes it, this is to MQTT what
 <code>inetd</code> is to IP. I find <code>moquette</code>’s one-process-per-message model to be too
 heavyweight and clumsy to deploy to <a href="https://gokrazy.org">https://gokrazy.org</a>, so <code>regelwerk</code> is
 entirely in-process and a single, easy-to-deploy binary, both to computers for
 notifications, or to headless Raspberry Pis.</p>
-
 <h3 id="regelwerk-control-loops-definition">regelwerk: control loops definition</h3>
-
 <p><code>regelwerk</code> defines a control loop as a stateful function that accepts an event
 (from MQTT) and returns messages to publish to MQTT, if any:</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">type</span> controlLoop <span style="color:#007020;font-weight:bold">interface</span> {
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">type</span> controlLoop <span style="color:#007020;font-weight:bold">interface</span> {
 	sync.Locker
 
 	<span style="color:#06287e">StatusString</span>() <span style="color:#902000">string</span> <span style="color:#60a0b0;font-style:italic">// for human introspection
@@ -589,14 +523,13 @@ notifications, or to headless Raspberry Pis.</p>
 	Qos      <span style="color:#902000">byte</span>
 	Retained <span style="color:#902000">bool</span>
 	Payload  <span style="color:#007020;font-weight:bold">interface</span>{}
-}</code></pre></div>
-<h3 id="regelwerk-mqtt-dispatcher">regelwerk: MQTT dispatcher</h3>
-
+}
+</code></pre></div><h3 id="regelwerk-mqtt-dispatcher">regelwerk: MQTT dispatcher</h3>
 <p>Our MQTT message handler dispatches each incoming message to all control loops,
 in one goroutine per message and loop. With typical message volumes on a
 personal MQTT bus, this is a simple yet effective design that brings just enough
 isolation.</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">type</span> mqttMessageHandler <span style="color:#007020;font-weight:bold">struct</span> {
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">type</span> mqttMessageHandler <span style="color:#007020;font-weight:bold">struct</span> {
 	dryRun <span style="color:#902000">bool</span>
 	loops  []controlLoop
 }
@@ -630,22 +563,19 @@ isolation.</p>
 			<span style="color:#60a0b0;font-style:italic">// …input/output logging omitted for brevity…
 </span><span style="color:#60a0b0;font-style:italic"></span>		}()
 	}
-}</code></pre></div>
-<h3 id="regelwerk-control-loop-example">regelwerk: control loop example</h3>
-
+}
+</code></pre></div><h3 id="regelwerk-control-loop-example">regelwerk: control loop example</h3>
 <p>Now that we have the definition and dispatching out of the way, let’s take a
 look at an actual example control loop.</p>
-
 <p>This control loops looks at whether my PC is unlocked (in use) or whether my
 phone is home, and then turns off/on my stereo speakers accordingly.</p>
-
 <p>The inputs come from
 <a href="https://github.com/stapelberg/zkj-nas-tools/blob/master/runstatus/runstatus.go">runstatus</a>
 and
 <a href="https://github.com/rtr7/router7/blob/c30bf38438b3ba00ae13dff914f0ef4f05684250/cmd/dhcp4d/dhcp4d.go#L405-L433">dhcp4d</a>,
 the output goes to a Sonoff S26 Smart Power Plug running
 <a href="https://tasmota.github.io/docs/">Tasmota</a>.</p>
-<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">type</span> avrPowerLoop <span style="color:#007020;font-weight:bold">struct</span> {
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">type</span> avrPowerLoop <span style="color:#007020;font-weight:bold">struct</span> {
 	statusLoop <span style="color:#60a0b0;font-style:italic">// for l.statusf() debugging
 </span><span style="color:#60a0b0;font-style:italic"></span>
 	midnaUnlocked          <span style="color:#902000">bool</span>
@@ -697,18 +627,15 @@ the output goes to a Sonoff S26 Smart Power Plug running
 			Retained: <span style="color:#007020;font-weight:bold">true</span>,
 		},
 	}
-}</code></pre></div>
-<h2 id="conclusion">Conclusion</h2>
+}
 
+</code></pre></div><h2 id="conclusion">Conclusion</h2>
 <p>I like the Pub/Sub pattern for home automation, as it nicely uncouples all
 components.</p>
-
 <p>It’s a shame that standards such as <a href="https://homieiot.github.io/">The Homie
 convention</a> aren’t more widely supported, but it
 looks like software makes up for that via configuration options.</p>
-
 <p>There are plenty of existing integrations that should cover most needs.</p>
-
 <p>Ideally, more Smart Home and IOT vendors would add MQTT support out of the box,
 like <a href="https://shelly.cloud/">Shelly</a>.</p>
 
@@ -720,33 +647,33 @@ like <a href="https://shelly.cloud/">Shelly</a>.</p>
     <strong>Table Of Contents</strong>
 
     <nav class="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#motivation">Motivation</a></li>
-<li><a href="#step-1-set-up-an-mqtt-broker-server">Step 1. Set up an MQTT broker (server)</a>
-<ul>
-<li><a href="#mqtt-broker-setup-displaying-sending-test-messages">MQTT broker setup: displaying/sending test messages</a></li>
-</ul></li>
-<li><a href="#step-2-integrate-with-mqtt">Step 2. Integrate with MQTT</a>
-<ul>
-<li><a href="#best-practices-for-your-own-structure">Best practices for your own structure</a></li>
-<li><a href="#integration-shelly-devices-with-mqtt-built-in">Integration: Shelly devices with MQTT built-in</a></li>
-<li><a href="#integration-zigbee2mqtt-for-zigbee-devices">Integration: Zigbee2MQTT for Zigbee devices</a></li>
-<li><a href="#integration-esphome-for-micro-controllers-sensors">Integration: ESPHome for micro controllers + sensors</a></li>
-<li><a href="#integration-mongoose-os-for-micro-controllers">Integration: Mongoose OS for micro controllers</a></li>
-<li><a href="#integration-arduino-for-custom-micro-controller-firmware">Integration: Arduino for custom micro controller firmware</a></li>
-</ul></li>
-<li><a href="#integration-webhook-to-mqtt">Integration: Webhook to MQTT</a></li>
-<li><a href="#step-3-express-your-logic">Step 3. Express your logic</a>
-<ul>
-<li><a href="#regelwerk-control-loops-definition">regelwerk: control loops definition</a></li>
-<li><a href="#regelwerk-mqtt-dispatcher">regelwerk: MQTT dispatcher</a></li>
-<li><a href="#regelwerk-control-loop-example">regelwerk: control loop example</a></li>
-</ul></li>
-<li><a href="#conclusion">Conclusion</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#motivation">Motivation</a></li>
+    <li><a href="#step-1-set-up-an-mqtt-broker-server">Step 1. Set up an MQTT broker (server)</a>
+      <ul>
+        <li><a href="#mqtt-broker-setup-displayingsending-test-messages">MQTT broker setup: displaying/sending test messages</a></li>
+      </ul>
+    </li>
+    <li><a href="#step-2-integrate-with-mqtt">Step 2. Integrate with MQTT</a>
+      <ul>
+        <li><a href="#best-practices-for-your-own-structure">Best practices for your own structure</a></li>
+        <li><a href="#integration-shelly-devices-with-mqtt-built-in">Integration: Shelly devices with MQTT built-in</a></li>
+        <li><a href="#integration-zigbee2mqtt-for-zigbee-devices">Integration: Zigbee2MQTT for Zigbee devices</a></li>
+        <li><a href="#integration-esphome-for-micro-controllers--sensors">Integration: ESPHome for micro controllers + sensors</a></li>
+        <li><a href="#integration-mongoose-os-for-micro-controllers">Integration: Mongoose OS for micro controllers</a></li>
+        <li><a href="#integration-arduino-for-custom-micro-controller-firmware">Integration: Arduino for custom micro controller firmware</a></li>
+      </ul>
+    </li>
+    <li><a href="#integration-webhook-to-mqtt">Integration: Webhook to MQTT</a></li>
+    <li><a href="#step-3-express-your-logic">Step 3. Express your logic</a>
+      <ul>
+        <li><a href="#regelwerk-control-loops-definition">regelwerk: control loops definition</a></li>
+        <li><a href="#regelwerk-mqtt-dispatcher">regelwerk: MQTT dispatcher</a></li>
+        <li><a href="#regelwerk-control-loop-example">regelwerk: control loop example</a></li>
+      </ul>
+    </li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
 </nav>
   </div>
 </div>

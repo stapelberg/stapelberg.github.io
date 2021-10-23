@@ -197,7 +197,7 @@
   </style>
   <details class="ms_toc_details">
     <summary>Table of contents</summary>
-    
+    <nav class="TableOfContents"></nav>
   </details>
   <p>
 First of all, I know that there already are a gazillion of websites out there
@@ -206,9 +206,7 @@ in that it contains a few nifty tricks (tl;dr: force caching, selective GET
 parameter caching, iptables traffic redirection, monitoring nginx with
 collectd)…
 </p>
-
 <h3>The situation</h3>
-
 <p>
 There is this website, and it’s using apache with <code>mod_php</code>, running
 some rather badly engineered code which we cannot get rid of just now.
@@ -220,9 +218,7 @@ which requests a website using HTTP and displays the latency until it gets a
 response. The latency was ranging from 8 to 16 seconds and sometimes requests
 were not handled at all. This is clearly not acceptable for any user.
 </p>
-
 <h3>Analyzing the situation</h3>
-
 <p>
 To analyze the situation, I primarily looked at apache’s <a
 href="http://httpd.apache.org/docs/2.2/mod/mod_status.html">server status
@@ -238,7 +234,6 @@ allocated until the connection closes. Of course, you don’t just want to
 disable Keep-Alive entirely because it massively speeds up page load times when
 the page contains multiple assets like CSS, images, JavaScript…
 </p>
-
 <p>
 So enter <a href="http://nginx.org/">nginx</a>, a webserver optimized for
 handling <strong>a lot</strong> of concurrent connections with low CPU and
@@ -246,9 +241,7 @@ memory footprint. It would allow us to use apache’s 250 configured workers mor
 efficiently (handling actual requests, not staying blocked with Keep-Alive
 connections) and it could certainly help us with caching.
 </p>
-
 <h3>The problem</h3>
-
 <p>
 The way the PHP software was built, all of these very similar requests go to
 the same URL, but with different GET parameters. A request could go to
@@ -258,7 +251,6 @@ that it contains GET arguments, too), to make things worse, there also were
 user-specific GET parameters: These are different for each (or many) requests,
 but not relevant for caching the page.
 </p>
-
 <p>
 The configuration to deal with this is the first nifty trick. The idea is that
 we define a <code>location</code> block inside the nginx config which matches
@@ -266,7 +258,6 @@ we define a <code>location</code> block inside the nginx config which matches
 it will go to an easily cachable URL like <code>/query-cache/that</code> but
 ignores the "useless" parameter:
 </p>
-
 <pre>
 location ~ ^/query$ {
   if ($request_method = POST) {
@@ -281,7 +272,6 @@ location ~ ^/query$ {
   rewrite ^ /query-cache/$thing;
 }
 </pre>
-
 <p>
 Of course, <code>/query-cache</code> should not already be used for something
 else in the actual application. Users won’t do harm by visiting that URL
@@ -289,7 +279,6 @@ explicitly, but you want to avoid clashes. So, now we cache the hell out of
 that URL, even though the upstream software specifies that it should not be
 cached:
 </p>
-
 <pre>
 location /query-cache/ {
   # Save the cache-URI, but rewrite it back to the original URI so that
@@ -326,12 +315,10 @@ location /query-cache/ {
   proxy_cache_key $orig_uri;
 }
 </pre>
-
 <p>
 You can read at other sites on the web how to define the caching directives
 accordingly. Here is our configuration:
 </p>
-
 <pre>
 # inactive = 1440m -> data which is not accessed within one day gets kicked out
 # max_size = 500m -> 500 MB of files tops
@@ -344,22 +331,18 @@ upstream apache {
   keepalive 16;
 }
 </pre>
-
 <h3>Testing and diverting live traffic without downtime</h3>
-
 <p>
 Now we wanted to enable nginx without having to kill apache and start nginx.
 Instead, we wanted to see if it works as we expect (without any impact on real
 users) and then switch over with minimum effort. Also, having an easy way to
 revert the change in case anything goes wrong is a nice additional feature.
 </p>
-
 <p>
 So, we looked up our public IP address, let’s assume this is 1.2.3.4,
 configured nginx to listen on port 9191 and added the following iptables rule
 (the server is 192.168.0.1 in this example):
 </p>
-
 <pre>
 iptables -t nat -A PREROUTING \
     -p tcp --dport 80 \
@@ -367,7 +350,6 @@ iptables -t nat -A PREROUTING \
     -s 1.2.3.4 -d 192.168.0.1 \
     -j DNAT --to-destination 192.168.0.1:9191
 </pre>
-
 <p>
 This will divert all new TCP connections to port 80 on the server originating
 from 1.2.3.4, our public IP, to port 9191 on the server. We tested everything
@@ -375,26 +357,21 @@ and it was still working fine. Additionally, httping clearly showed that page
 loads for so-far uncached websites were taking quite a bit of time while
 subsequent loads of the same page were blazingly fast due to caching.
 </p>
-
 <p>
 After we were pretty sure we didn’t break anything, we replaced the rule above
 by the same one, but without the <code>-s 1.2.3.4</code> restriction, thus
 diverting the traffic for everyone.
 </p>
-
 <p>
 The nice way to revert this change in case something goes wrong is to simply
 delete the rule: <code>iptables -t nat -D PREROUTING 1</code>.
 </p>
-
 <p>
 Of course I’m aware that iptables has a certain cost attached to it, but for
 now this solution was very handy. In the future, you should of course migrate
 nginx to port 80 and eliminate iptables for even better performance.
 </p>
-
 <h3>Keeping an eye on nginx</h3>
-
 <p>
 After successfully making the change and seeing our server load go down
 massively, we wanted to look closer at nginx to be able to analyze further
@@ -403,7 +380,6 @@ similar to the apache server status page. You can enable it by simply
 configuring such a <code>location</code> (we only tested this with the nginx
 version from Debian testing, so you might need to upgrade):
 </p>
-
 <pre>
 location /nginx_status {
   stub_status on;
@@ -412,20 +388,16 @@ location /nginx_status {
   deny all;
 }
 </pre>
-
 <p>
 For generating all kinds of graphs about the server behaviour, we already use
 the excellent <a href="http://www.collectd.org/"><code>collectd</code></a> and
 it ships with an nginx plugin to get pretty graphs like this one:
 </p>
-
-<p><img src="/Bilder/nginx.png" alt="nginx req/s and connections graph" width="721" height="415"></p>
-
+<img src="/Bilder/nginx.png" alt="nginx req/s and connections graph" width="721" height="415">
 <p>
 All you need to do is load the nginx plugin and tell it the URL of your status
 page:
 </p>
-
 <pre>
 LoadPlugin nginx
 
@@ -433,14 +405,12 @@ LoadPlugin nginx
   URL "http://localhost:9191/nginx_status"
 &lt;/Plugin&gt;
 </pre>
-
 <p>
 See also <a
 href="http://bethesignal.org/blog/2009/07/22/watching-nginx-upstreams-with-collectd/">"Watching
 nginx upstreams with collectd"</a> for an article about an even more useful
 graph of the latency to the upstream backend.
 </p>
-
 <p>
 You can see that there are some hickups in this graph. Those are from the
 software running very long-running queries. We fixed most of them so far, but
@@ -454,7 +424,7 @@ that will be the topic of a different post, maybe.
   <div>
     <strong>Table Of Contents</strong>
 
-    
+    <nav class="TableOfContents"></nav>
   </div>
 </div>
 

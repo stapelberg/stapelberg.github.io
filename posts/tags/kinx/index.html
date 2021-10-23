@@ -96,7 +96,7 @@
   <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
   
   <link rel="stylesheet" href="/1.min.css" type="text/css">
-  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+  <link rel="alternate" href="https://michael.stapelberg.ch/posts/tags/kinx/feed.xml" type="application/atom+xml" title="ATOM feed for posts tagged kinx">
 </head>
 <body>
 
@@ -172,10 +172,203 @@
 </header>
 <main>
       <div>
-<h1 class="ms_title">kinX</h1>
+<h1 class="ms_title">Blog Posts tagged kinx
+  <a href="https://michael.stapelberg.ch/posts/tags/kinx/feed.xml">
+    <img src="/feed-icon.svg" style="width: .75em"
+	 alt="ATOM feed for posts tagged kinx"
+	 title="ATOM feed for posts tagged kinx">
+  </a>
+</h1>
 
 <div class="Artikel" id="content">
+  <p>
+  kinX is an umbrella term for my projects on keyboard input latency and
+  keyboard controllers.
+</p>
+
+<p>
+  Its artifacts are a drop-in keyboard controller replacement for the Kinesis
+  Advantage keyboard with &lt;0.33ms input latency, a drop-in USB hub replacement,
+  and a device for measuring processing latency.
+</p>
+
   
+    
+  <h2>2021-May</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/"><h3>Measure and reduce keyboard input latency with QMK on the Kinesis Advantage</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/kinx/">kinX</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<img src="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/endtoend_measure_featured_hu855bbe0a9c47ac557e5b09db74fa3b06_1237431_200x200_fit_q75_box.jpg" width="200" height="150"/>
+	
+	<p>
+	  Over the last few years, I worked on a few projects around keyboard input latency:
+In 2018, I introduced the kinX keyboard controller with 0.2ms of input latency.
+In 2020, I introduced the kinT keyboard controller, which works with a wide range of Teensy micro controllers, and both the old KB500 and the newer KB600 Kinesis Advantage models.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+  
+  <h2>2020-Jul</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2020-07-09-kint-kinesis-keyboard-controller/"><h3>Introducing the kinT kinesis keyboard controller</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/kinx/">kinX</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<img src="https://michael.stapelberg.ch/posts/2020-07-09-kint-kinesis-keyboard-controller/kint-pcb-3d-render-back-v2020-06-30_hu30a1e426a4c0be1e0484551f5906a1ac_928372_200x200_fit_box_3.png" width="200" height="163"/>
+	
+	<p>
+	  Back in 2013, I published a replacement controller for the Kinesis Advantage ergonomic keyboard. In the community, it is often referred to simply as the “stapelberg”, and became quite popular.
+Many people like to use the feature-rich QMK firmware, which supports my replacement controller out of the box.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-07-09-kint-kinesis-keyboard-controller/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+  
+  <h2>2018-Apr</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-latency-measurement/"><h3>kinX: latency measurement</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/kinx/">kinX</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  This post is part of a series of posts about the kinX project.
+Latency measurement End-to-end latency consists of 3 parts:
+ input latency (keyboard) processing latency (computer) output latency (monitor)  During the development of the kinX keyboard controller, I realized that measuring processing latency was quite simple with my hardware: I could start a timer when sending a key press HID report to the computer and measure the elapsed time when I would receive a reply from the computer.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-latency-measurement/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-usb-hub/"><h3>kinX: USB Hub</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/kinx/">kinX</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<img src="https://michael.stapelberg.ch/posts/2018-04-17-kinx-usb-hub/kinx-hub_hub171d3553dfb50fbddf8778151525534_430879_200x200_fit_q75_box.jpg" width="200" height="171"/>
+	
+	<p>
+	  This post is part of a series of posts about the kinX project.
+Motivation The Kinesis Advantage comes with a built-in 2-port USB hub. That hub uses a proprietary connector to interface with a PS/2 keyboard controller, so it cannot be used with a USB keyboard controller.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-usb-hub/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-keyboard-controller/"><h3>kinX: keyboard controller with &lt;0.33ms input latency</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/kinx/">kinX</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<img src="https://michael.stapelberg.ch/posts/2018-04-17-kinx-keyboard-controller/kinx-mk66f_huadaad7ed50f8d38b8cbe347b2c1948f3_1364992_200x200_fit_q75_box.jpg" width="200" height="156"/>
+	
+	<p>
+	  This post is part of a series of posts about the kinX project.
+Background 10 years ago I got a Kinesis Advantage keyboard. I wrote about the experience of learning to touch-type using the ergonomic NEO layout in my (German) post “Neo-Layout auf einer Kinesis-Tastatur”.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-keyboard-controller/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx/"><h3>kinX: overview</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/kinx/">kinX</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  The kinX project is described in a series of blog posts:
+  While not strictly a part of this series, “Hacking your own Kinesis keyboard controller” describes the first controller I built in 2013 (maybe interesting for context).
+  The first post introduces the kinX, a keyboard controller with merely 0.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+  
+
 </div>
 
       </div>

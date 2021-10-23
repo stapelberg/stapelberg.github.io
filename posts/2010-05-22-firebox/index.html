@@ -197,7 +197,7 @@
   </style>
   <details class="ms_toc_details">
     <summary>Table of contents</summary>
-    
+    <nav class="TableOfContents"></nav>
   </details>
   <p>
 Im <a href="http://www.raumzeitlabor.de/">RaumZeitLabor</a> tauchte letztens
@@ -207,15 +207,12 @@ gebrauchen: In ihr steckt ein größtenteils aus Standard-x86-Hardware
 bestehendes System mit Serieller Konsole, 6 Ethernet-Ports, 256 MB SDRAM und
 einem Celeron 1,2 GHz.
 </p>
-
 <p>
 Standardmäßig wird die Firebox von einer 64 MB-CF-Card betrieben, auf der ein
 Linux 2.0 (!) läuft. Allerdings läuft die Hardware auch unter Linux 2.6.33.3
 ohne Probleme :-).
 </p>
-
 <h2>VGA und PS/2</h2>
-
 <p>
 Um ins BIOS zu gelangen sind zwei Sachen nötig: ein VGA-Ausgang (nachdem man
 einmalig die Console Redirection aktiviert hat ist VGA nicht mehr nötig) und
@@ -226,13 +223,10 @@ zwar auf dem Mainboard vorhanden, wurde allerdings nur in Form einer
 Stiftleiste herausgeführt. Er ist mit <code>PKMB1</code> beschriftet und
 befindet sich auf dem Mainboard direkt beim LCD-Panel.
 </p>
-
 <p>
 Die Belegung habe ich in folgendem Bild festgehalten:
 </p>
 <img src="/Bilder/pkmb1-pinout.jpg" width="400" height="405">
-
-
 <p>
 Ich habe mir einen Adapter gelötet, indem ich den PS/2-Port eines sehr alten
 Mainboards entlötet habe und an ein Flachbandkabel passend angelötet habe. Da
@@ -240,9 +234,7 @@ ich nicht vorhabe, die Firebox häufig via PS/2 zu nutzen (schließlich hat man
 nach der Installation die Serielle Konsole zur Verfügung), habe ich mir nicht
 die Mühe gemacht, die Buchse im Gehäuse unterzubringen.
 </p>
-
 <h2>Installation via PXE-Boot und debootstrap</h2>
-
 <p>
 Am einfachsten ist es wohl (sofern man bereits eine PXE-Umgebung eingerichtet
 hat, ansonsten <a
@@ -253,7 +245,6 @@ debootstrap nutzen, um die CF-Card (oder eine IDE-Festplatte zu befüllen).
 Zunächst installieren wir also das Minimalsystem und wechseln dann via
 <code>chroot</code> in die neue Installation:
 </p>
-
 <pre>
 # debootstrap squeeze /mnt/sda1 http://ftp.de.debian.org/debian
 # mount -t proc proc /mnt/sda1/proc
@@ -262,12 +253,10 @@ Zunächst installieren wir also das Minimalsystem und wechseln dann via
 # cp /etc/hosts /mnt/sda1/etc/
 # chroot /mnt/sda1 /bin/bash
 </pre>
-
 <p>
 Nun setzen wir ein Passwort, konfigurieren die Mountpoints sowie apt und
 installieren ssh (damit wir uns später übers Netz einloggen können) und grub:
 </p>
-
 <pre>
 # passwd
 # cat > /etc/fstab
@@ -279,7 +268,6 @@ APT::Install-Suggests "false";
 APT::Default-Release "testing";
 # apt-get install ssh grub
 </pre>
-
 <p>
 Wenn grub installiert wird, fragt debconf nach der linux command line,
 woraufhin wir mit <code>libata.force=pio4 console=ttyS0,115200</code>
@@ -289,7 +277,6 @@ aber nicht vom Reader unterstützt werden), die console-Einstellung sorgt dafür
 dass die Ausgabe des Kernels beim Starten auf der seriellen Schnittstelle
 landet.
 </p>
-
 <p>
 Da der Debian-Kernel derzeit (linux-image 2.6.32-3-686) auch das alte
 IDE-Subsystem enthält und die gerade erwähnte libata-Option natürlich nur
@@ -304,12 +291,10 @@ href="http://t.zekjur.net/linux-headers-2.6.33.3-fb2_2.6.33.3-fb2-10.00.Custom_i
 Header-Paket</a>). Ich gehe davon aus, dass du ab jetzt einen Kernel auf dem
 System installiert hast.
 </p>
-
 <p>
 Als nächstes konfigurieren wir grub (er soll ebenfalls die serielle
 Schnittstelle nutzen) und installieren ihn in den MBR:
 </p>
-
 <pre>
 # cat > /etc/default/grub
 GRUB_DEFAULT=0
@@ -322,23 +307,19 @@ GRUB_SERIAL_COMMAND="serial --speed=115200 --unit=0 --word=8 --parity=no --stop=
 # grub-install /dev/sda
 # update-grub2
 </pre>
-
 <p>
 Damit wir uns nun auch über die serielle Schnittstelle einloggen können, muss
 in der <code>/etc/inittab</code> eine Zeile auskommentiert werden, welche
 folgendermaßen aussieht:
 </p>
-
 <pre>
 T0:23:respawn:/sbin/getty -L ttyS0 115200 vt100
 </pre>
-
 <p>
 Jetzt können wir das System neu starten und werden auf der seriellen
 Schnittstelle (z.B. mit <code>screen /dev/ttyUSB0 115200</code> nutzbar) vom
 frisch installierten Debian begrüßt.
 </p>
-
 <h2>lspci</h2>
 <pre>
 00:00.0 Host bridge: Intel Corporation 82815 815 Chipset Host Bridge and Memory Controller Hub (rev 04)
@@ -355,9 +336,7 @@ frisch installierten Debian begrüßt.
 02:0d.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL-8139/8139C/8139C+ (rev 20)
 02:0e.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL-8139/8139C/8139C+ (rev 20)
 </pre>
-
 <h2>/proc/cpuinfo</h2>
-
 <pre>
 processor       : 0
 vendor_id       : GenuineIntel
@@ -382,9 +361,7 @@ cache_alignment : 32
 address sizes   : 36 bits physical, 32 bits virtual
 power management:
 </pre>
-
 <h2>dmesg</h2>
-
 <pre>
 [    0.000000] Linux version 2.6.33.3-fb2 (root@firebox) (gcc version 4.4.3 20100108 (prerelease) (Debian 4.4.2-9) ) #2 SMP PREEMPT Sat May 8 19:31:53 UTC 2010
 [    0.000000] BIOS-provided physical RAM map:
@@ -714,7 +691,6 @@ power management:
 [   15.784515] external: link down
 [   15.787852] ADDRCONF(NETDEV_UP): external: link is not ready
 </pre>
-
 <h2>lm-sensors</h2>
 <p>
 Nachdem man das Modul <code>it87</code> geladen hat, bringt <code>sensors</code>
@@ -742,9 +718,7 @@ cpu0_vid:   +1.500 V
 <p>
 Hierbei ist <code>temp2</code> die CPU-Temperatur.
 </p>
-
 <h2>Links</h2>
-
 <ul>
 <li><a href="http://www.watchguard.com/docs/corporate/wg_coreDe-MFR_instructions.pdf">Demontage-Anleitung von WatchGuard</a></li>
 <li><a href="http://forum.pfsense.org/index.php?topic=7458.msg97032">Foren-Post mit der Pinbelegung (u.a.)</a></li>
@@ -757,7 +731,7 @@ Hierbei ist <code>temp2</code> die CPU-Temperatur.
   <div>
     <strong>Table Of Contents</strong>
 
-    
+    <nav class="TableOfContents"></nav>
   </div>
 </div>
 

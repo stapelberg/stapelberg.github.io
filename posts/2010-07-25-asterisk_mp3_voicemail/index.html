@@ -192,7 +192,6 @@ E-Mail-Client vor mir habe (<a href="http://sup.rubyforge.org/">sup</a>
 unterstützt leider noch keine verteilten Setups), sondern auch, wenn ich gerade
 nur mein Telefon greifbar habe, habe ich meine Konfiguration etwas geändert.
 </p>
-
 <p>
 Zunächst möchte ich natürlich die Nachricht sowohl in meinem eigentlichen
 E-Mail-Client archiviert haben als auch auf mein Telefon (für das ich ein
@@ -202,7 +201,6 @@ direkt <code>/usr/lib/dovecot/deliver -d michael -m daemons</code>. Damit die
 E-Mails an beide Nutzer ausgeliefert werden richtet man sich ein kleines
 Script ein, welches man im Asterisk als <code>mailcmd</code> konfiguriert:
 </p>
-
 <pre>
 #!/bin/sh
 
@@ -212,7 +210,6 @@ cat $TMPFILE | /usr/lib/dovecot/deliver -d michael -m daemons
 cat $TMPFILE | /usr/lib/dovecot/deliver -d pbx -m INBOX
 rm $TMPFILE
 </pre>
-
 <p>
 Die E-Mails werden nun auf meinem Telefon (<a
 href="http://en.wikipedia.org/wiki/Nokia_N900">Nokia N900</a>) passend
@@ -228,7 +225,6 @@ Nachrichten schnell in den Megabyte-Bereich wächst. Sofern man nur über UMTS
 online ist, will man große Datenmengen natürlich vermeiden, weswegen eine
 Umkodierung nach MP3 naheliegt. Das erledige ich mit folgendem Script:
 </p>
-
 <pre>
 #!/usr/bin/env perl
 # vim:ts=4:sw=4:expandtab
@@ -275,7 +271,6 @@ $entity->print(\*STDOUT);
 <p>
 (Direkter Download: <a href="/recode-voicemail/recode-voicemail.pl">recode-voicemail.pl</a>)
 </p>
-
 <p>
 Damit das Script funktioniert muss man unter Debian-Systemen die Pakete
 libmime-tools-perl, libipc-run-perl und ffmpeg installieren. ffmpeg sollte man
@@ -288,12 +283,10 @@ den MP3-Codec. Einen Testlauf kann man z.B. folgendermaßen durchführen:
 abspielbare MP3-Datei in <code>/tmp/out.mp3</code> haben, sonst stimmt etwas
 mit der ffmpeg-Installation nicht.
 </p>
-
 <p>
 Das Script zum Re-encodieren kann man nun in das obige Script zum Zustellen der
 Mail an beide Accounts einbinden:
 </p>
-
 <pre>
 #!/bin/sh
 

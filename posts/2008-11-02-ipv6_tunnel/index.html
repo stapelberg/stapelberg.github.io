@@ -192,47 +192,40 @@ go6.net) entweder langsam waren oder gelegentlich nicht erreichbar (das ist
 besucht, via IPv6 erreicht), habe ich mir meinen eigenen IPv6-Tunnel gebaut.
 Hier nun die Anleitung, wie das funktioniert:
 </p>
-
 <p>Mein Setup sieht wie folgt aus:</p>
-
 <table border="0" width="100%" bgcolor="#000000">
 <tr bgcolor="#FFFFFF">
-    <th>Prinzip</th>
-    <th>Mit Adressen</th>
+	<th>Prinzip</th>
+	<th>Mit Adressen</th>
 </tr>
 <tr bgcolor="#FFFFFF" style="text-align: center">
-    <td width="50%">
-        <img src="/Bilder/ipv6-tunnel.png" alt="IPv6-Tunnel-Prinzip" width="258" height="360">
-    </td>
-    <td>
-        <img src="/Bilder/ipv6-tunnel-addr.png" alt="IPv6 mit Adressen" width="376" height="424">
-    </td>
+	<td width="50%">
+		<img src="/Bilder/ipv6-tunnel.png" alt="IPv6-Tunnel-Prinzip" width="258" height="360">
+	</td>
+	<td>
+		<img src="/Bilder/ipv6-tunnel-addr.png" alt="IPv6 mit Adressen" width="376" height="424">
+	</td>
 </tr>
 </table>
-
 <p>
 Es gibt also, vereinfacht gesagt, eine virtuelle Maschine und einen
 Linux-Router, die einen IPv6-Tunnel aufbauen wollen. Die virtuelle Maschine und
 ihre dom0 laufen auf NetBSD, die Anleitung sollte jedoch mit kleinen
 Modifikationen auch für Linux gültig sein.
 </p>
-
 <h2>Voraussetzungen/Bezeichnungen</h2>
-
 <ul>
-    <li>Eine IP-Adresse, am besten eine dedizierte, als Endpunkt für den Tunnel.<br>
-    <strong>IPv4-Endpunkt</strong>: 999.11.22.33</li>
-    <li>Zwei /64-Subnetze für den Tunnel, eins als Transfernetz, eins zum benutzen. Effektiv brauchst du also ein eigenes /48.<br>
-    <strong>IPv6-Transfernetz</strong>: 2001:dead:beef:2323::/64<br>
-    <strong>IPv6-Subnetz</strong>: 2001:dead:beef:4242::/64</li>
-    <li>Entweder eine statische IPv4-Adresse auf beiden Seiten oder ein Script, welches die IPv4-Adresse auf der Gegenseite updated.<br>
-    <strong>Dynamische IPv4-Adresse</strong>: 888.11.22.33</li>
-    <li>Auf dem Endpunkt muss natives (oder anderweitig beschafftes) IPv6 vorhanden sein und funktionieren.</li>
-    <li><strong>domU/Tunnelendpunkt</strong>: 2001:cafe:babe::1</li>
+	<li>Eine IP-Adresse, am besten eine dedizierte, als Endpunkt für den Tunnel.<br>
+	<strong>IPv4-Endpunkt</strong>: 999.11.22.33</li>
+	<li>Zwei /64-Subnetze für den Tunnel, eins als Transfernetz, eins zum benutzen. Effektiv brauchst du also ein eigenes /48.<br>
+	<strong>IPv6-Transfernetz</strong>: 2001:dead:beef:2323::/64<br>
+	<strong>IPv6-Subnetz</strong>: 2001:dead:beef:4242::/64</li>
+	<li>Entweder eine statische IPv4-Adresse auf beiden Seiten oder ein Script, welches die IPv4-Adresse auf der Gegenseite updated.<br>
+	<strong>Dynamische IPv4-Adresse</strong>: 888.11.22.33</li>
+	<li>Auf dem Endpunkt muss natives (oder anderweitig beschafftes) IPv6 vorhanden sein und funktionieren.</li>
+	<li><strong>domU/Tunnelendpunkt</strong>: 2001:cafe:babe::1</li>
 </ul>
-
 <h2>Tunnelendpunkt konfigurieren</h2>
-
 <p>
 In der domU, wo der Tunnel laufen soll (in der dom0 soll
 <strong>nichts</strong> laufen aus Sicherheitsgründen), richten wir ihn
@@ -240,15 +233,11 @@ folgendermaßen ein:
 </p>
 <pre>
 # ifconfig xennet0 alias 999.11.22.33
-
-# ifconfig gif0 create
-# ifconfig gif0 tunnel 999.11.22.33 888.11.22.33
-# ifconfig gif0 inet6 2001:dead:beef:2323::1/64
-
-# route add -inet6 2001:dead:beef:4242:: 2001:dead:beef:2323::2</pre>
-
+<h1 id="ifconfig-gif0-create">ifconfig gif0 create</h1>
+<h1 id="ifconfig-gif0-tunnel-999112233-888112233">ifconfig gif0 tunnel 999.11.22.33 888.11.22.33</h1>
+<h1 id="ifconfig-gif0-inet6-2001deadbeef2323164">ifconfig gif0 inet6 2001:dead:beef:2323::1/64</h1>
+<h1 id="route-add--inet6-2001deadbeef4242-2001deadbeef23232pre">route add -inet6 2001:dead:beef:4242:: 2001:dead:beef:2323::2</pre></h1>
 <h3>Wenn du Xen benutzt…</h3>
-
 <p>
 Der dom0 müssen wir noch sagen, dass sie Pakete an das Transfernetz und
 das Subnetz durch die domU schicken soll:
@@ -257,19 +246,14 @@ das Subnetz durch die domU schicken soll:
 # route add -inet6 2001:dead:beef:2323:: 2001:cafe:babe::1
 # route add -inet6 2001:dead:beef:4242:: 2001:cafe:babe::1
 </pre>
-
 <h3>Wenn du Linux benutzt…</h3>
-
 <p>Es sollte mit folgenden Befehlen gehen (ungetestet):</p>
 <pre>
 # ip addr add 999.11.22.33 dev eth0
-
-# ip tunnel add v6 mode sit remote 888.11.22.33 local 999.11.22.33 ttl 255
-# ip -6 addr add 2001:dead:beef:2323::1/64 dev v6
-
-# ip -6 route add 2001:dead:beef:4242:: via 2001:dead:beef:2323::2
-</pre>
-
+<h1 id="ip-tunnel-add-v6-mode-sit-remote-888112233-local-999112233-ttl-255">ip tunnel add v6 mode sit remote 888.11.22.33 local 999.11.22.33 ttl 255</h1>
+<h1 id="ip--6-addr-add-2001deadbeef2323164-dev-v6">ip -6 addr add 2001:dead:beef:2323::1/64 dev v6</h1>
+<h1 id="ip--6-route-add-2001deadbeef4242-via-2001deadbeef23232">ip -6 route add 2001:dead:beef:4242:: via 2001:dead:beef:2323::2</h1>
+<p></pre></p>
 <h3>Wenn du eine dynamische IPv4-Adresse hast…</h3>
 <p>…brauchst du ein Script, welches folgendes nach einem Wechsel der IP-Adresse macht:</p>
 <pre>
@@ -277,18 +261,15 @@ das Subnetz durch die domU schicken soll:
 ssh root@domU 'ifconfig gif0 tunnel 999.11.22.33 $(echo ${SSH_CONNECTION} | cut -d \' \' -f 1)'
 </pre>
 <p>(Danke an Raphael für den Tipp mit ${SSH_CONNECTION}.</p>
-
 <h2>Tunnel daheim konfigurieren</h2>
 <p>Nun richten wir den Tunnel zuhause ein:</p>
 <pre>
 # ip tunnel add v6 mode sit remote 999.11.22.33 local 888.11.22.33 ttl 255
-
-# ip link set v6 up
-# ip -6 addr add 2001:dead:beef:2323::2/64 dev v6
-# ip -6 addr add 2001:dead:beef:4242::1/64 dev eth0
-# ip -6 route add default via 2001:dead:beef:2323::1 dev v6
-</pre>
-
+<h1 id="ip-link-set-v6-up">ip link set v6 up</h1>
+<h1 id="ip--6-addr-add-2001deadbeef2323264-dev-v6">ip -6 addr add 2001:dead:beef:2323::2/64 dev v6</h1>
+<h1 id="ip--6-addr-add-2001deadbeef4242164-dev-eth0">ip -6 addr add 2001:dead:beef:4242::1/64 dev eth0</h1>
+<h1 id="ip--6-route-add-default-via-2001deadbeef23231-dev-v6">ip -6 route add default via 2001:dead:beef:2323::1 dev v6</h1>
+<p></pre></p>
 <p>
 Außerdem soll der Linux-Rechner via <code>radvd</code> automatisch
 Adressen zuweisen, sodass IPv6 out-of-the-box funktioniert:
@@ -298,24 +279,21 @@ Adressen zuweisen, sodass IPv6 out-of-the-box funktioniert:
 # vi /etc/radvd.conf
 interface eth0
 {
-    AdvSendAdvert on;
-    prefix 2001:dead:beef:4242::/64
-    {
-        AdvOnLink on;
-        AdvAutonomous on;
-    };
+	AdvSendAdvert on;
+	prefix 2001:dead:beef:4242::/64
+	{
+		AdvOnLink on;
+		AdvAutonomous on;
+	};
 };
 # /etc/init.d/radvd start
 # rc-update add radvd default
 </pre>
-
 <p>
 Ab jetzt sollten alle IPv6-fähigen Geräte im Netz eine IPv6-Adresse
 bekommen haben und können IPv6 benutzen.
 </p>
-
 <h3>Wenn du NAT benutzt</h3>
-
 <p>
 Solltest du NAT benutzen und den Tunnel auf einem Rechner hinter deinem Router
 einrichten, musst du als Adresse für local statt der externen Adresse
@@ -333,33 +311,29 @@ Problem. Diese haben einfach nicht bedacht, dass man bestimmte Protokolle
 weiterleiten können wollte. Eventuell klappt es, wenn du den
 entsprechenden Rechner als DMZ einrichtest.
 </p>
-
 <h2>Packet filter</h2>
-
 <p>
 Auf jedem Router sollte ein Packet filter laufen, sofern dahinter potentiell
 leicht exploitbare Rechner sind. Für mein Netz trifft das gelegentlich zu,
 da manchmal andere Menschen komische Fenster-Betriebssysteme mitbringen. Also
 machen wir lieber mal alles dicht standardmäßig:
 </p>
-
 <pre>
 # Direkte Verbindungen zum Linux-Router (da laufen auch Dienste):
-    # Internes Netz darf auf alles zugreifen
-    ip6tables -A INPUT -s 2001:dead:beef:4242::/64 -j ACCEPT
-    # Rest ist dicht:
-    ip6tables -A INPUT -p tcp -m state --state NEW -j REJECT
+	# Internes Netz darf auf alles zugreifen
+	ip6tables -A INPUT -s 2001:dead:beef:4242::/64 -j ACCEPT
+	# Rest ist dicht:
+	ip6tables -A INPUT -p tcp -m state --state NEW -j REJECT
 
 # Verbindungen durch das Gateway:
-    # Aus dem internen Netz darf alles durch
-    ip6tables -A FORWARD -s 2001:dead:beef:4242::/64 -j ACCEPT
-    # identd ist freigeschaltet auf der Workstation:
-    ip6tables -A FORWARD -d 2001:dead:beef:4242:21d:33ff:fe6f:efe6/128 -p tcp --dport 113 -j ACCEPT
-    # Der Rest ist dicht:
-    ip6tables -A FORWARD -d 2001:dead:beef:4242::/64 -m state --state new -j REJECT
+	# Aus dem internen Netz darf alles durch
+	ip6tables -A FORWARD -s 2001:dead:beef:4242::/64 -j ACCEPT
+	# identd ist freigeschaltet auf der Workstation:
+	ip6tables -A FORWARD -d 2001:dead:beef:4242:21d:33ff:fe6f:efe6/128 -p tcp --dport 113 -j ACCEPT
+	# Der Rest ist dicht:
+	ip6tables -A FORWARD -d 2001:dead:beef:4242::/64 -m state --state new -j REJECT
 </pre>
-
-<p><h2>Fertig</h2>
+<h2>Fertig</h2>
 <pre>
 $ traceroute6 noc.sixxs.net
 traceroute to noc.sixxs.net (2001:838:1:1:210:dcff:fe20:7c7c) from 2001:dead:beef:4242:21d:33ff:fe6f:efe6, 30 hops max, 16 byte packets
@@ -377,13 +351,13 @@ traceroute to noc.sixxs.net (2001:838:1:1:210:dcff:fe20:7c7c) from 2001:dead:bee
 </pre>
 <p>Die einzelnen Hops dabei sind:</p>
 <ol>
-    <li>Linux-Router</li>
-    <li>Tunnelendpunkt</li>
-    <li>dom0</li>
-    <li>Transfernetz von vollmar</li>
-    <li>vollmars Netz</li>
-    <li>…</li>
-</ol></p>
+	<li>Linux-Router</li>
+	<li>Tunnelendpunkt</li>
+	<li>dom0</li>
+	<li>Transfernetz von vollmar</li>
+	<li>vollmars Netz</li>
+	<li>…</li>
+</ol>
 
 </div>
 

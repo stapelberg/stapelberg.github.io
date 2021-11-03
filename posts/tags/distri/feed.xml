@@ -951,11 +951,11 @@ and <a href="https://en.wikipedia.org/wiki/QEMU">qemu</a>, respectively).</p>
 up-to-date package list. For me, requiring a metadata update is the more common
 case, particularly on live systems or within Docker containers.</p>
 <p>All measurements were taken on an <code>Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz</code>
-running Docker 1.13.1 on Linux 4.19, backed by a Samsung 970 Pro NVMe drive
-boasting many hundreds of MB/s write performance. The machine is located in
-Zürich and connected to the Internet with a 1 Gigabit fiber connection, so the
-expected top download speed is ≈115 MB/s.</p>
-<p>See <a href="#appendix-c">Appendix C</a> for details on the measurement method and command
+running Docker 20.10.8 on Linux 5.13.10, backed by a Corsair Force MP600 NVMe
+drive boasting many hundreds of MB/s write performance. The machine is located
+in Zürich and connected to the Internet with a 1 Gigabit fiber connection, so
+the expected top download speed is ≈115 MB/s.</p>
+<p>See <a href="#appendix-d">Appendix D</a> for details on the measurement method and command
 outputs.</p>
 <h3 id="measurements">Measurements</h3>
 <p>Keep in mind that these are one-time measurements. They should be indicative of
@@ -1194,7 +1194,8 @@ triggers, not even in smaller Linux distributions.</p>
 <p>I think that space is really interesting, as it uses a minimal design to achieve
 significant real-world speed-ups.</p>
 <p>I have explored this idea in much more detail, and am happy to talk more about
-it in my post “Introducing the distri research linux distribution&quot;.</p>
+it in my post <a href="/posts/2019-08-17-introducing-distri/">distri: a Linux distribution to research fast package
+management</a>.</p>
 <h3 id="appendix-a-related-work">Appendix A: related work</h3>
 <p>There are a couple of recent developments going into the same direction:</p>
 <ul>
@@ -1203,7 +1204,7 @@ it in my post “Introducing the distri research linux distribution&quot;.</p>
 <li>The Haiku Operating System’s package manager <a href="https://en.wikipedia.org/wiki/Haiku_Depot">Haiku
 Depot</a> uses images</li>
 </ul>
-<h3 id="appendix-c">Appendix D: measurement details (2021)</h3>
+<h3 id="appendix-d">Appendix D: measurement details (2021)</h3>
 <h4 id="ack">ack</h4>
 <p>You can expand each of these:</p>
 <details>

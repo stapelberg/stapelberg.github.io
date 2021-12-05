@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Fixing the Logitech MX Ergo Trackball mouse buttons - Michael Stapelberg</title>
+
+  <meta property="og:site_name" content="Michael Stapelberg">
+  <meta property="og:title" content="Fixing the Logitech MX Ergo Trackball mouse buttons">
+  <meta property="og:description" content="The mouse I use daily for many hours is Logitech’s MX Ergo trackball and I generally consider it the best trackball one can currently buy.
+Unfortunately, after only a year or two of usage, the trackball’s mouse buttons no longer function correctly.">
+  
+  
+  
+  
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2021-12-05-logitech-mx-ergo-mouse-button-kailh/logitech-mx-ergo-kailh_hu25aa8b29bbc8203032e4b64c28800cde_1242226_200x200_fit_q75_box.jpg">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <meta name="description" content="The mouse I use daily for many hours is Logitech’s MX Ergo trackball and I generally consider it the best trackball one can currently buy.
+Unfortunately, after only a year or two of usage, the trackball’s mouse buttons no longer function correctly.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2021-12-05-logitech-mx-ergo-mouse-button-kailh/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div><h1 class="ms_title">Fixing the Logitech MX Ergo Trackball mouse buttons</h1>
+
+<div class="ms_meta">
+  <div id="ms_date">published 2021-12-05</div>
+  
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2021-12-05-logitech-mx-ergo-mouse-button-kailh/index.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
+</div>
+<div class="Artikel" id="content">
+  <p>The mouse I use daily for many hours is Logitech’s <a href="https://www.logitech.com/en-ch/products/mice/mx-ergo-wireless-trackball-mouse.910-005179.html">MX Ergo
+trackball</a>
+and I generally consider it the best trackball one can currently buy.</p>
+<p>Unfortunately, after only a year or two of usage, the trackball’s mouse buttons
+no longer function correctly. When clicking and dragging, they won’t hold down
+the selection reliably.</p>
+<p>The mouse buttons first broke in my private trackball, and later also the ones
+in my work one!</p>
+<p>After just buying a new one when the mouse buttons broke the first time, I
+figured this time I wanted to try and fix the trackball myself.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2021-12-05-logitech-mx-ergo-mouse-button-kailh/logitech-mx-ergo-kailh.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2021-12-05-logitech-mx-ergo-mouse-button-kailh/logitech-mx-ergo-kailh_hu25aa8b29bbc8203032e4b64c28800cde_1242226_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-12-05-logitech-mx-ergo-mouse-button-kailh/logitech-mx-ergo-kailh_hu25aa8b29bbc8203032e4b64c28800cde_1242226_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-12-05-logitech-mx-ergo-mouse-button-kailh/logitech-mx-ergo-kailh_hu25aa8b29bbc8203032e4b64c28800cde_1242226_600x0_resize_q75_box.jpg"
+  alt="Logitech MX Ergo and Kailh replacement switches" title="Logitech MX Ergo and Kailh replacement switches"
+  width="600"
+  height="338"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+<h2 id="video-recording">Video recording</h2>
+<p>In this 27 minute video, you can look over my shoulder as I swap out the
+worn-out Omron mouse buttons with Kailh replacement mouse buttons:</p>
+
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+  <iframe src="https://www.youtube.com/embed/TBaYEFkk2RU" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video"></iframe>
+</div>
+
+<p>The basic steps are:</p>
+<ol>
+<li>Unscrew the outside Torx screws.</li>
+<li>Unscrew the inside Philips screws.</li>
+<li>Remove the PCB from the case and fix it securely for desoldering.</li>
+<li>Desolder the switch: heat up all 3 pads as simultaneously as possible (add
+more solder → more flux!), then gently push down on the pins to make the
+switch fall out.</li>
+<li>Cleanly remove all remaining solder, then insert the replacement switch,
+double-check you aligned it will on the PCB, and solder it.</li>
+<li>Put everything back together.</li>
+</ol>
+<h2 id="replacement-switches-kailh-gm-80">Replacement switches: Kailh GM 8.0</h2>
+<p>The replacement mouse buttons I’m using are <a href="https://www.aliexpress.com/item/1005001286852407.html?spm=a2g0s.12269583.0.0.4a421ccfNFILvA">Kailh GM 8.0 from the Kailh
+Official Store on
+AliExpress</a>,
+which are advertised as “ultra high life”. Even if their life span is also only
+a few years, I bought enough of them to probably replace them another 2 to 3
+times per trackball.</p>
+<p>The Kailh mouse buttons behave very similarly to the original Omron mouse
+buttons. The click is very satisfying now, and reminds me of a brand-new
+Logitech MX Ergo trackball. I wouldn’t call the Kailh ones better than the Omron
+ones, but maybe others notice a difference?</p>
+<p>One interesting side note: I noticed that when wearing noise canceling
+headphones, it was very hard to tell the worn-out Omron mouse buttons from the
+Kailh mouse buttons. The difference really is mostly in the sound, not in the
+feel when pressing the button down!</p>
+<h2 id="why-is-the-mx-ergo-so-unreliable">Why is the MX Ergo so unreliable?</h2>
+<p>There is a <a href="https://www.youtube.com/watch?v=v5BhECVlKJA">1-hour video by Alex
+Kenis</a> saying that Logitech
+switched from 5V to 3.3V logic voltages, and this violates the minimum
+electrical condition for the Omron D2FC-F, which causes oxidation.</p>
+<p>Indeed, when I merely opened the switches and cleaned them up with a screw
+driver, this seemed to help. But, opening everything up is so fiddly that one
+might as well solder in new switches altogether :)</p>
+
+</div>
+
+      </div>
+
+    </main><div id="ms_footer">
+  © 2021 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

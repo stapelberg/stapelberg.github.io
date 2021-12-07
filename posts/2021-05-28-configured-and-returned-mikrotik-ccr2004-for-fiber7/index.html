@@ -179,7 +179,7 @@ This is possible thanks to the upgrade of their network infrastructure as part o
       <div><h1 class="ms_title">How I configured and then promptly returned a MikroTik CCR2004 router for Fiber7</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2021-05-28</div>
+  <div id="ms_date">published 2021-05-28, last modified 2021-12-07</div>
   
   
   <div id="ms_tags">
@@ -294,6 +294,8 @@ for the CCR2004 (ARM64):</p>
 <li>Use <code>/system package print</code> to display the current version.</li>
 <li>Upload <code>routeros-arm64-6.47.9.npk</code> using Webfig.</li>
 <li><code>/system reboot</code> and verify that <code>/system package print</code> shows <code>6.47.9</code> now.</li>
+<li><code>/system routerboard upgrade</code> to upgrade the firmware of the underlying chipsets, etc. Enter <code>y</code> at the prompt, wait for a response of &ldquo;echo: system,info,critical Firmware upgraded successfully, please reboot for changes to take effect&rdquo;</li>
+<li><code>/system reboot</code> again and verify that <code>/system routerboard print</code> has the line <code>current-firmware:6.47.9</code> now.</li>
 </ol>
 <h2 id="set-up-auth">Set up auth</h2>
 <p>Set a password to prevent others from logging into the router:</p>
@@ -389,9 +391,10 @@ maximum precaution to avoid any Port Security related issues with my provider’
 DHCP server:</p>
 <pre tabindex="0"><code>/interface ethernet set sfp28-1 mac-address=00:0d:fa:4c:0c:31
 </code></pre><h2 id="enable-dns-server">Enable DNS Server</h2>
-<p>By default, only the MikroTik itself can send DNS queries. Enable access for
-network clients:</p>
+<p>By default, the Mikrotik Router will not respond to DNS Queries, when enabling remote requests make sure to firewall the DNS server from responding to DNS Queries from the greater internet. Otherwise you will find yourself participating in DNS DDOS attacks.</p>
 <pre tabindex="0"><code>/ip dns set allow-remote-requests=yes
+/ip firewall filter add chain=input protocol=tcp port=53 in-interface=sfp28-1 action=drop
+/ip firewall filter add chain=input protocol=udp port=53 in-interface=sfp28-1 action=drop
 </code></pre><h2 id="enable-dhcpv4-server">Enable DHCPv4 Server</h2>
 <p>First, let’s bundle all SFP+ ports into a single bridge interface:</p>
 <pre tabindex="0"><code>/interface bridge add name=bridge1
@@ -445,13 +448,13 @@ Select pool of ip addresses given out by DHCP server
 addresses to give out: 10.0.0.2-10.0.0.240
 Select DNS servers
 
-dns servers: 10.0.0.1
+dns servers: 10.0.0.1,8.8.8.8
 Select lease time
 
 lease time: 20m
 </code></pre><h2 id="enable-ipv4-nat">Enable IPv4 NAT</h2>
 <p>We need NAT to route all IPv4 traffic over our single public IP address:</p>
-<pre tabindex="0"><code>/ip firewall nat add action=masquerade chain=srcnat out-interface=sfp28-1 to-addresses=0.0.0.0
+<pre tabindex="0"><code>/ip firewall nat add action=masquerade chain=srcnat out-interface=sfp28-1
 </code></pre><p>Disable NAT services for security, e.g. to mitigate against NAT slipstreaming
 attacks:</p>
 <pre tabindex="0"><code>/ip firewall service-port disable ftp,tftp,irc,h323,sip,pptp,udplite,dccp,sctp

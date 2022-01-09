@@ -176,7 +176,7 @@
 <h1 class="ms_title">Dell 8K4K monitor (Dell UP3218K) (2017)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2017-12-11, last modified 2020-08-25</div>
+  <div id="ms_date">published 2017-12-11, last modified 2022-01-09</div>
   
   
   <div>
@@ -213,6 +213,8 @@
         <li><a href="#scaling-compatibility">Scaling compatibility</a></li>
         <li><a href="#buzzing-noise">Buzzing noise</a></li>
         <li><a href="#wakeup-issues">Wakeup issues</a></li>
+        <li><a href="#conclusion">Conclusion</a></li>
+        <li><a href="#technical-details">Technical details</a></li>
       </ul>
     </li>
   </ul>
@@ -419,53 +421,50 @@ button in the evenings, and power it up in the mornings.</p>
 <p><strong>Update after 2+ years</strong>: I have now figured out that the monitor wakes up
 reliably after:</p>
 <ol>
-<li>Swapping the cables around at my Graphics Card, i.e. using output <code>DP-4</code> for
+<li>
+<p>Swapping the cables around at my Graphics Card, i.e. using output <code>DP-4</code> for
 the left monitor half and output <code>DP-0</code> for the right monitor half, not the
-other way around:
-<pre tabindex="0"><code></code></pre></li>
+other way around:</p>
+<pre tabindex="0"><code>xrandr \
+--output DP-4 --mode 3840x4320 --panning 0x0+0+0 \
+--output DP-0 --mode 3840x4320 --panning 0x0+3840+0 --right-of DP-4
+</code></pre></li>
+<li>
+<p>When powering on the monitor, waiting until it shows the dialog box “No
+signal on DP1”, and only then waking up my machine to generate a signal.</p>
+</li>
 </ol>
-<p>xrandr<br>
-&ndash;output DP-4 &ndash;mode 3840x4320 &ndash;panning 0x0+0+0<br>
-&ndash;output DP-0 &ndash;mode 3840x4320 &ndash;panning 0x0+3840+0 &ndash;right-of DP-4</p>
-<pre tabindex="0"><code>
-1. When powering on the monitor, waiting until it shows the dialog box “No
-signal on DP1”, and only then waking up my machine to generate a signal.
-
-When disconnecting and re-connecting the monitor to another machine,
-I found these steps the most reliable:
-
-1. Power off the monitor, then unplug the two DisplayPort cables.
-1. Plug in both cables, then power the monitor on again.
-\
+<p>When disconnecting and re-connecting the monitor to another machine,
+I found these steps the most reliable:</p>
+<ol>
+<li>Power off the monitor, then unplug the two DisplayPort cables.</li>
+<li>Plug in both cables, then power the monitor on again.
+<br>
 An easy mistake to make is to not push the DisplayPort connector in all the
 way. This issue usually manifests itself as the monitor still showing a picture
 (because the second cable likely is plugged in correctly), but the full
-resolution not being available.
-
-I have used these two steps twice a workday for weeks on end, and the monitor
-came up reliably every single time.
-
-### Conclusion
-
-For me, this monitor is worth it: I am okay with paying the hefty Research &amp;
+resolution not being available.</li>
+</ol>
+<p>I have used these two steps twice a workday for weeks on end, and the monitor
+came up reliably every single time.</p>
+<h3 id="conclusion">Conclusion</h3>
+<p>For me, this monitor is worth it: I am okay with paying the hefty Research &amp;
 Development tax that first-to-market products such as this monitor have. I like
 to think that I’m voting with my wallet to make sure vendors notice my interest
-in “Retina” displays.
-
-For most people, I would recommend to wait until the second or third generation
+in “Retina” displays.</p>
+<p>For most people, I would recommend to wait until the second or third generation
 of 8K monitors. By then, I expect most issues to be resolved, compatibility to
 not be a concern, and vendors focusing on extra features. Hopefully, we’ll
-eventually see matte 8K monitors with higher refresh rates than 60 Hz.
+eventually see matte 8K monitors with higher refresh rates than 60 Hz.</p>
+<h3 id="technical-details">Technical details</h3>
+<p>In the hope the following is useful (perhaps for debugging?) to anyone:</p>
+<ul>
+<li><a href="/dell-up3218k/edid.hex.txt">hex dump of the EDID data block</a></li>
+<li><a href="/dell-up3218k/edid-decode.txt">decoded EDID block</a></li>
+<li><a href="/dell-up3218k/xrandr--prop.txt"><code>xrandr --prop</code> output</a></li>
+<li><a href="/dell-up3218k/xorg.0.log">Xorg.0.log</a></li>
+</ul>
 
-### Technical details
-
-In the hope the following is useful (perhaps for debugging?) to anyone:
-
-* [hex dump of the EDID data block](/dell-up3218k/edid.hex.txt)
-* [decoded EDID block](/dell-up3218k/edid-decode.txt)
-* [`xrandr --prop` output](/dell-up3218k/xrandr--prop.txt)
-* [Xorg.0.log](/dell-up3218k/xorg.0.log)
-</code></pre>
 </div>
 
       </div>
@@ -485,6 +484,8 @@ In the hope the following is useful (perhaps for debugging?) to anyone:
         <li><a href="#scaling-compatibility">Scaling compatibility</a></li>
         <li><a href="#buzzing-noise">Buzzing noise</a></li>
         <li><a href="#wakeup-issues">Wakeup issues</a></li>
+        <li><a href="#conclusion">Conclusion</a></li>
+        <li><a href="#technical-details">Technical details</a></li>
       </ul>
     </li>
   </ul>

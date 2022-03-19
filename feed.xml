@@ -5,6 +5,898 @@
   <id>https://michael.stapelberg.ch/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[Smart Home components 🏠]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/"/>
+    <id>https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/</id>
+    <published>2022-03-19T14:51:20+01:00</published>
+    <content type="html"><![CDATA[<p>I have tried a bunch of different Smart Home products over the last few years
+and figured I would give an overview of which ones I liked, which ones I
+disliked, and how I would go about selecting good Smart Home products to buy.</p>
+<h2 id="smart-lights">Smart Lights</h2>
+<p>To me, the primary advantage of Smart Lights is the flexibility in where you
+place extra light switches, and the extra functions that become much easier with
+Smart Lights.</p>
+<p>For example, I have added an extra light switch in the bed and next to the
+couch, without having to have an electrician tear up the walls to add more
+wiring. An “all-off” button is super handy at the end of the day or when
+watching a movie.</p>
+<p>Other attractive use-cases include controlling lights based on time of the day,
+based on whether people are home, or based on a motion sensor.</p>
+<p>I used the RGB color light bulb version of all of the below systems. In
+practice, we typically don’t change the color much, but it is nice to be able to
+adjust the color and brightness to something that fits the respective room. And,
+every once in a while, scenes that use color are fun!</p>
+<h3 id="tradfri">Moved away from: IKEA TRÅDFRI 👎</h3>
+<div style="max-width: 250px; float: left; margin-right: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4166.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4166_hu855bbe0a9c47ac557e5b09db74fa3b06_700735_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4166_hu855bbe0a9c47ac557e5b09db74fa3b06_700735_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4166_hu855bbe0a9c47ac557e5b09db74fa3b06_700735_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="600"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<p>The first smart light system I used was IKEA TRÅDFRI. I figured as a system with
+a large user base, they would be inclined to improve it over time, and
+compatibility should be more likely than with other, smaller vendors.</p>
+<p>Unfortunately the system is pretty much unchanged from when I first bought it
+many years ago.</p>
+<p>You can easily find documentation about the API for using the TRÅDFRI gateway
+programmatically, but when I looked for available Go packages, I decided to
+use COAP and DTLS myself back in 2019 for lack of an attractive Go package.</p>
+<p>The <strong>light switches</strong> are good in terms of features, and easy to install: you
+can just remove the old switch and glue the TRÅDFRI switch over the existing
+switch.</p>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4620.JPG"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4620_hudd9dde466230b7da3c81dd3aa9f33f2d_584934_1200x0_resize_q75_box.JPG 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4620_hudd9dde466230b7da3c81dd3aa9f33f2d_584934_1800x0_resize_q75_box.JPG 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4620_hudd9dde466230b7da3c81dd3aa9f33f2d_584934_600x0_resize_q75_box.JPG"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4622.JPG"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4622_huacdef596d98276810695f10a2865fbf7_637307_1200x0_resize_q75_box.JPG 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4622_huacdef596d98276810695f10a2865fbf7_637307_1800x0_resize_q75_box.JPG 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4622_huacdef596d98276810695f10a2865fbf7_637307_600x0_resize_q75_box.JPG"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<p>The downside of the light switches is that they are flimsy: because the switch
+is magnetically held in place in its case, it can easily fall on the floor when
+you bump against it.</p>
+<p>Pairing the devices was always tricky for me. It got easier when I turned off
+all other ZigBee devices in my apartment before doing anything with IKEA
+devices.</p>
+<p>At multiple points, the devices lost their pairing. It might have been when they
+ran out of battery.</p>
+<p>The <strong>battery lifetime</strong> of the light switches was very poor — only about a year
+on average. They use the CR2032 form factor, which my charger does not support,
+so I couldn’t use rechargables.</p>
+<p>Swapping out the batteries and re-pairing the system every year or so quickly
+becomes tedious!</p>
+<h3 id="shellybulb">Moved away from: Shelly Bulb 👎</h3>
+<div style="max-width: 250px; float: left; margin-right: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4164.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4164_hu855bbe0a9c47ac557e5b09db74fa3b06_944949_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4164_hu855bbe0a9c47ac557e5b09db74fa3b06_944949_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4164_hu855bbe0a9c47ac557e5b09db74fa3b06_944949_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<p>Because I also bought some <a href="#shelly1l">Shelly 1L smart relays</a>, I figured I’d
+give the <a href="https://shelly.cloud/products/shelly-bulb-smart-home-automation-device/">Shelly
+Bulb</a> a
+try.</p>
+<p>Instead of ZigBee, the Shelly Bulbs use WiFi. This makes them easy to get into
+your home network and does not require a separate gateway.</p>
+<p>At 2 bulbs per room+hallway, and 2 buttons each, that sums up to having 16 extra
+devices in your WiFi network. This wasn’t a problem for me in practice, but
+depending on how stable your WiFi network is, it might be a concern.</p>
+<p>Notably, this also means your lights can’t be controlled while your WiFi is unavailable.</p>
+<p>In terms of physical <strong>light switches</strong>, you’ll need to use a separate product
+such as the Shelly Button. This is the weakest point of the system. The latency
+is noticeable, even when configuring a static IP address, which does make things
+better, but still not good. The Shelly Button is extremely simple, so dimming
+has to be emulated with double or triple-press actions.</p>
+<p>Given that one typically interacts with this system multiple times a day via its
+switches, I think it makes sense to chose a system that has good switches.</p>
+<p>On the plus side, the Shelly Button uses a rechargable battery that can be
+charged from a USB power bank, which is a concept I really like.</p>
+<h3 id="hue">Philips Hue 👍</h3>
+<p>After the Shelly Bulb, I figured I’d try Philips Hue. It’s by far the most
+expensive system of the ones I have tried, but also by far the most polished and
+user-friendly.</p>
+<div style="max-width: 150px; float: left; margin-right: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4514.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4514_hu465888e0cd6ad3d33b69ac3fd7c0d8d4_1137438_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4514_hu465888e0cd6ad3d33b69ac3fd7c0d8d4_1137438_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4514_hu465888e0cd6ad3d33b69ac3fd7c0d8d4_1137438_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<p>People recommended the <a href="https://www.feller.ch/de/Produktangebot/Funktaster">Feller Smart Light
+Control</a> switches, which use
+energy harvesting (from you clicking them!) and hence don’t require a battery.</p>
+<p>This makes it easy to place them anywhere, like next to the couch in the picture
+on the left.</p>
+<br style="clear: both">
+<p>Feller recommends extending existing installations by buying the next-larger
+mounting plate. Extending the box in the wall is not required, as no wires or
+in-wall space are needed. Drilling new holes for extra screws is required for
+stability, but that’s a lot more doable than extending the whole box. Here are
+some pictures before, during and after the installation:</p>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3883.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3883_hu8c0865dc8466fdff9a77d98bdf88cd59_1645691_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3883_hu8c0865dc8466fdff9a77d98bdf88cd59_1645691_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3883_hu8c0865dc8466fdff9a77d98bdf88cd59_1645691_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4146.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4146_hua9f69e9404f3c1ad473f50d53fe232bd_1584661_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4146_hua9f69e9404f3c1ad473f50d53fe232bd_1584661_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4146_hua9f69e9404f3c1ad473f50d53fe232bd_1584661_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4513_featured.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4513_featured_huefeda71fee31fb8bfc71d9a141c0606f_1702194_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4513_featured_huefeda71fee31fb8bfc71d9a141c0606f_1702194_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4513_featured_huefeda71fee31fb8bfc71d9a141c0606f_1702194_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<h3 id="shelly1l">Shelly 1L 👍</h3>
+<div style="max-width: 250px; float: left; margin-right: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4453.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4453_huf958f180f9b60d6df1711fc62ed8abfa_1239796_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4453_huf958f180f9b60d6df1711fc62ed8abfa_1239796_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4453_huf958f180f9b60d6df1711fc62ed8abfa_1239796_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<p>The Shelly 1L is a very interesting device. It goes behind your existing device
+into the wall and makes it smart!</p>
+<p>This allows you to make smart any existing lights that can’t easily be replaced
+by smart lights, for example a bathroom light built into the bathroom mirror
+cabinet.</p>
+<p>You can also make existing light switches smart if you like the ones you already
+have and can’t exchange them.</p>
+<p>Another use-case is to easily connect buttons or sensors into your network, for
+example door bells or door sensors.</p>
+<p>The Shelly 1L is special in that this specific model can be installed when all
+you have is a live wire (i.e. wiring for a light switch).</p>
+<p>One potential issue is that depending on the configuration and connected
+device’s power usage, the Shelly might emit a slight hum noise. So, don’t
+install one right next to your bed.</p>
+<p>Another limitation is that while the Shelly does work with both, light
+<strong>switches</strong> (changes state) and light <strong>buttons</strong> (generates an impulse), it
+can only distinguish between short and long press events when you use a light
+button. Newer light switches from Feller can be re-configured to function as a
+button, but if your model is too old you might need to replace a light switch
+with a button.</p>
+<p>One weird issue I ran into was that after installing a new bathroom mirror
+cabinet, the relay of the connected Shelly 1L would no longer function correctly
+— the light just remained on, even when turning it off via the Shelly. I read on
+the Shelly forum that this could be caused by running the Shelly upside-down,
+and indeed, after turning it around, it started to work again!</p>
+<h2 id="smart-heating">Smart Heating</h2>
+<p>Smart Heating systems are often advertised to save cost. I wanted to try it out,
+and was also interested in the temperature logging because my apartment is on
+the more humid side and I wanted some data to optimize the situation.</p>
+<h3 id="homematicheating">HomeMatic 😐</h3>
+<div style="max-width: 250px; float: left; margin-right: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3512.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3512_hu39bef23f314593ac5a570777d0269b05_1310266_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3512_hu39bef23f314593ac5a570777d0269b05_1310266_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3512_hu39bef23f314593ac5a570777d0269b05_1310266_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<p>I bought some HomeMatic temperature sensors and heating valve drives back
+in 2017. The hardware feels solid and was easy enough to install.</p>
+<p>One massive downside of the system was the poor software quality of their
+Central Control Unit (CCU2). The web interface was super slow, looked very
+dated, and the whole thing kept running out of memory every 2 weeks or so. It
+was so bad that I <a href="/posts/2017-04-16-homematic-reimplementation/">re-implemented my own CCU in
+Go</a>. I hear that by now, they
+have a new and better Control Unit version, though.</p>
+<p>So far, one valve drive has failed with error code F1; I replaced it with a new
+one.</p>
+<p>Turns out smart control of our heating does not seem to make any measurable
+difference. The rooms feel the same as before. No money is saved because the
+utility bill is divided equally among all tenants across the building (which
+seems to be standard in Switzerland), not billed for individual usage.</p>
+<p>So, overall, I would not install smart heating valve drives again. The
+temperature sensors I still keep an eye on from time to time, but there are
+cheaper options if you only need temperature!</p>
+<h2 id="smart-lock">Smart Lock</h2>
+<h3 id="nuki">Nuki 👍</h3>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4549.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4549_hu8716c73c1bc02c4025992cd5e8271b6a_1194122_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4549_hu8716c73c1bc02c4025992cd5e8271b6a_1194122_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4549_hu8716c73c1bc02c4025992cd5e8271b6a_1194122_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3691.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3691_hu5e11573d3decee60fb24009fdd50f085_1187917_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3691_hu5e11573d3decee60fb24009fdd50f085_1187917_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3691_hu5e11573d3decee60fb24009fdd50f085_1187917_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3484.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3484_hu6984d04b8d7e4c9d18665ea773d7a4fd_803023_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3484_hu6984d04b8d7e4c9d18665ea773d7a4fd_803023_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3484_hu6984d04b8d7e4c9d18665ea773d7a4fd_803023_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3780.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3780_hua8572cfd4bf6f6518e73ac8bea16411e_361388_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3780_hua8572cfd4bf6f6518e73ac8bea16411e_361388_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3780_hua8572cfd4bf6f6518e73ac8bea16411e_361388_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="603"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<p>During the pandemic, I was receiving packages at home and hence I was relying on
+my door bell much more than usual. Hence, I was looking for a way to make it
+smarter!</p>
+<p>The first device I got was the <a href="https://nuki.io/en/opener/">Nuki Opener</a>, a
+smart intercom system. It allows you to get notifications on your phone when the
+doorbell is rung, and to unlock the door from your phone.</p>
+<p>I got this device because it was specifically marketed as compatible with the
+BTicino intercom system our house uses. Unfortunately, this turned out to <a href="/posts/2020-11-30-scs-processing-microcontroller/">be
+incorrect</a>, so I ended up
+<a href="/posts/2021-03-13-smart-intercom-backpack/">building a hardware-modified intercom
+unit</a> that is connected to the Nuki
+Opener in analogue mode.</p>
+<p>Once it actually works, it’s a convenient system, and having your doorbell
+generate desktop notifications with sound is just super useful when wearing
+headphones! Strongly recommended.</p>
+<p>As you can see on the pictures, I’m powering the Nuki Opener via USB. It
+normally runs on batteries, but I want to minimize battery usage and swapping. A
+built-in rechargeable battery like in the Shelly devices would be a neat
+improvement to the Nuki Opener, so that the device could still work during power
+outages!</p>
+<p>After I had the Nuki Opener, I also added a <a href="https://nuki.io/en/smart-lock/">Nuki Smart
+Lock</a> so that we can not only open the house
+front door, but also the apartment door itself in case one of us forgets their
+key.</p>
+<p>The Nuki Smart Lock was easy to install and works great. It also shows with an
+elegant LED ring whether the door is currently locked or not, which I find
+handy.</p>
+<h2 id="motion-sensors">Motion Sensors</h2>
+<p>Not having to turn on lights myself is something I find convenient, in
+particular in the kitchen, but also in the bathroom. When carrying plates or
+glasses into the kitchen, it’s nice to have the lights turn on while my hands
+are full.</p>
+<h3 id="fellermotion">Moved away from: Feller Motion Sensors 😐</h3>
+<p>First I tried Feller’s Motion Sensors, because they physically fit well into the
+existing Feller light switch installation:</p>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4311.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4311_hu7e0f6fdb96f9d7ea63815e1348871123_1546321_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4311_hu7e0f6fdb96f9d7ea63815e1348871123_1546321_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4311_hu7e0f6fdb96f9d7ea63815e1348871123_1546321_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="600"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4407.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4407_hu855bbe0a9c47ac557e5b09db74fa3b06_1459219_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4407_hu855bbe0a9c47ac557e5b09db74fa3b06_1459219_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4407_hu855bbe0a9c47ac557e5b09db74fa3b06_1459219_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<p>But, their limitations made me move away from them quickly: while you can change
+one or two basic settings, you cannot, for example, disable the motion sensor
+after a certain time of day, or manually disable it for a certain time period.</p>
+<p>Also, because the device is installed in a fixed position (determined by where
+your light switch is), it isn’t necessarily in the best place to spot all the
+motion you want to detect.</p>
+<h3 id="shellymotion">Shelly Motion 👍</h3>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4552.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4552_hu933633299932c7881ce3078b048a8244_673846_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4552_hu933633299932c7881ce3078b048a8244_673846_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4552_hu933633299932c7881ce3078b048a8244_673846_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4550.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4550_hu8f211d5b79bcf88b6331bc02c9263d11_939504_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4550_hu8f211d5b79bcf88b6331bc02c9263d11_939504_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4550_hu8f211d5b79bcf88b6331bc02c9263d11_939504_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/shellymotion-webinterface.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/shellymotion-webinterface_hua3cd54dd2ab44c84582dd78906db0e26_937115_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/shellymotion-webinterface_hua3cd54dd2ab44c84582dd78906db0e26_937115_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/shellymotion-webinterface_hua3cd54dd2ab44c84582dd78906db0e26_937115_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="632"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<p>The <a href="https://shelly.cloud/shelly-motion-smart-home-automation-sensor/">Shelly
+Motion</a> Sensor
+seems like a good motion sensor to me! It has a number of useful settings and
+can easily trigger any REST API endpoint or can be used via MQTT.</p>
+<p>Like with the Shelly Button, this device has a built-in rechargeable battery
+that can be charged via USB. Depending on the location of the sensor, you can
+either attach a USB powerbank once a year, or remove the sensor from its fixture
+and charge it elsewhere.</p>
+<p>The positioning of the Shelly Motion can either be easy (as it was in my
+kitchen) or tricky to get right (in my bathroom). I don’t know if other motion
+sensors are better in terms of range.</p>
+<p>One thing to note is that the Shelly Motion only reports state changes (motion
+start or motion end), and no continuous events while motion is detected.</p>
+<p>For my kitchen, <a href="https://github.com/stapelberg/regelwerk/blob/8693602b899ae3bd682bea3b08289de782791483/motion.go#L94-L128">my regelwerk
+code</a>
+directly translates motion on/off into light on/off commands (to Philips Hue and
+Shelly 1L), with the exception that a long-press turns off all motion control
+for the next 10 minutes. The granularity of the Shelly Motion is to report after
+no motion for 1 minute, which works well for me for the kitchen.</p>
+<p>For my bathroom, I don’t want the lights to immediately turn off when no motion
+is detected anymore, to err on the side of not turning off the light while
+people are still using the bathroom and are just not seen by the motion
+sensor. To implement that, I found that using the Shelly 1L’s timer
+functionality works best. So, <a href="https://github.com/stapelberg/regelwerk/blob/511198c89bf27bb39b0ba03bd33fe44a1ab4b182/motion.go#L48-L104">in my
+configuration</a>,
+motion on means lights on, and motion off means lights on for 10 minutes, then
+off. Turning off the light manually disables that logic.</p>
+<p>Note that the Shelly Motion should really be mounted in the orientation
+recommended by the manual. When the motion sensor lays on the side (or is upside
+down), detection is much poorer.</p>
+<h2 id="smart-power-plug">Smart Power Plug</h2>
+<p>A smart plug is an easy way to turn off a power-hungry device while you’re away,
+to make a lamp smart, or to power on a connected device like a kettle to boil
+water for making a tea.</p>
+<p>My current use-cases are saving power for the stereo sound system connected to
+my PC, and saving power by <a href="https://github.com/gokrazy/bakery/commit/a32e6d0a12693d70ce0544617ff3e391480c4b5a">powering up the
+devices</a>
+in my <a href="https://gokrazy.org/platforms/">gokrazy Continuous Integration test
+environment</a> on-demand only.</p>
+<p>While there are tons of vendors selling smart plugs, the selection narrows
+considerably when you look for one with a <a href="https://en.wikipedia.org/wiki/SN_441011">Swiss power
+plug</a>.</p>
+<h3 id="homematicplug">HomeMatic 👎</h3>
+<div style="max-width: 250px; float: left; margin-right: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4548.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4548_hu18e4c1844f7b5756b8bbfa0d35983f2a_673862_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4548_hu18e4c1844f7b5756b8bbfa0d35983f2a_673862_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4548_hu18e4c1844f7b5756b8bbfa0d35983f2a_673862_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<p>The HomeMatic smart plug is expensive (55 CHF) and super bulky! As you can see,
+even if you connect it at the very end of a power strip, it still blocks the
+adjacent connector.</p>
+<p>Worse: the way it’s built (bulky side pointing away from the earth pin), I can’t
+even insert it into 2 of the 3 power strips you see on the picture.</p>
+<p>Somehow, even though it’s so bulky, the device feels flimsy at the same
+time. I’m never 100% sure if the plug is inserted fully and correctly, and it’s
+easy to accidentally turn off power when bumping against the smart plug with
+your foot.</p>
+<p>Because it’s a HomeMatic device, you need a working Central Control Unit (CCU)
+to control it programmatically. Conceptually, I prefer smart plugs that can be
+used with a REST or MQTT API.</p>
+<p>The only upside of this smart plug is that it can measure power. I occasionally
+use it for that.</p>
+<h3 id="sonoff">Sonoff 😐</h3>
+<div style="max-width: 250px; float: left; margin-right: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_1345.JPG"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_1345_hu8426f71a38f8a1ccbda71f33f5a21248_731883_1200x0_resize_q75_box.JPG 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_1345_hu8426f71a38f8a1ccbda71f33f5a21248_731883_1800x0_resize_q75_box.JPG 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_1345_hu8426f71a38f8a1ccbda71f33f5a21248_731883_600x0_resize_q75_box.JPG"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<p>The Sonoff S26 are much cheaper (≈12 USD when I bought mine) and come in a Swiss
+plug variant. Contrary to the HomeMatic ones, the Sonoff smart plugs are built
+“the right way around”, meaning I can plug them into many Swiss power
+strips. Unfortunately, they also block adjacent connectors, but at least not as
+many as the HomeMatic.</p>
+<p>The <a href="https://tasmota.github.io/docs/">Open Source firmware Tasmota</a> supports the
+Sonoff S26, but flashing them is a painful experience. You can’t do it over the
+air; you need to access rather small serial console pins inside the device.</p>
+<p>Once you have them flashed with Tasmota, the devices work great.</p>
+<p>One feature they lack is power measurement.</p>
+<p>I would love to find a smart plug with a Swiss plug, that supports power
+measurement, and that is compatible with Tasmota (or builtin MQTT support), but
+until that product comes along, the Sonoff S26 are what I’m going to use.</p>
+<h2 id="architecture-as-of-march-2022">Architecture as of March 2022</h2>
+<p>Here is an architecture diagram of the devices I’m currently using:</p>
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/2022-03-06-smart-home-architecture.svg"><img
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/2022-03-06-smart-home-architecture.svg"
+  
+  style="border: 1px solid #000; margin-right: 1rem"
+  
+  loading="lazy"></a>
+
+
+<p>To tie these different systems together, I use a Raspberry Pi running
+<a href="https://gokrazy.org/">gokrazy</a>, which in turn runs my
+<a href="/posts/2021-01-10-mqtt-introduction/">regelwerk</a> program. regelwerk only talks
+to MQTT, so all the different devices are connected to MQTT using small adapter
+programs such as my <a href="https://github.com/stapelberg/hue2mqtt">hue2mqtt</a> or
+<a href="https://github.com/stapelberg/shelly2mqtt">shelly2mqtt</a>.</p>
+<p>A more off-the-shelf solution would be to use <a href="https://nodered.org/">Node-RED</a>,
+if you want to do a little programming, or <a href="https://www.home-assistant.io/">Home
+Assistant</a> if you want to do barely any
+programming.</p>
+<h2 id="my-strategy-for-selecting-components">My strategy for selecting components</h2>
+<p>I don’t look for one vendor or one system that has components for
+everything. Instead, I chose the leading vendor in each domain. Compatibility
+between systems is generally poor, so I try to keep my compatibility
+requirements to a minimum.</p>
+<p>To programmatically interact with the devices, the best bet are devices that are
+designed to be developer-friendly (e.g. Shelly devices support MQTT) or at least
+have an official API with modules in my favorite programming language
+(e.g. Philips Hue). In terms of API, I expect to talk to a gateway device in my
+local network — I tried talking e.g. Zigbee directly but found it inconvenient
+due to poor software support, sparse documentation and strange compatibility
+issues.</p>
+<p>Direct device-to-device communication is nice from a reliability perspective,
+but on some battery-powered systems you pay for it with reduced battery
+runtime. For example, when using multiple light switches for the same room with
+IKEA TRÅDFRI, you pair one to the other, which also makes all signals go through
+it.</p>
+<p>If possible, I select devices that have an open firmware available. Ideally, I
+can keep using the vendor’s firmware, but if the vendor unexpectedly goes out of
+business, it’s handy to have an alternative firmware available. Also, if the
+devices require a cloud service to function, using open firmware typically
+allows using them in your local network.</p>
+<p>I have come to avoid WiFi where latency is important, e.g. between light
+switches and lights.</p>
+<p>I stopped looking at the price too much and instead look at the user
+experience. Smart home is about comfort and convenience, and if a product
+doesn’t delight in daily usage, why bother with it? Targeting the high end of
+mid-range devices seems like the sweet spot to me. Avoid anything more expensive
+than that, though — established players often re-brand third-party solutions and
+you only pay for the company name, not quality.</p>
+]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[My 2022 high-end Linux PC 🐧]]></title>
     <link href="https://michael.stapelberg.ch/posts/2022-01-15-high-end-linux-pc/"/>
     <id>https://michael.stapelberg.ch/posts/2022-01-15-high-end-linux-pc/</id>
@@ -5252,418 +6144,6 @@ Search</a>:</p>
 </table>
 <p>If you find any others, please point them to this post in case they are not
 using Debian Code Search’s OpenAPI yet.</p>
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[A quick introduction to MQTT for IOT]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2021-01-10-mqtt-introduction/"/>
-    <id>https://michael.stapelberg.ch/posts/2021-01-10-mqtt-introduction/</id>
-    <published>2021-01-10T15:26:00+01:00</published>
-    <content type="html"><![CDATA[<p>While I had heard the abbreviation <a href="https://en.wikipedia.org/wiki/MQTT">MQTT</a>
-many times, I never had a closer look at what MQTT is.</p>
-<p>Here are a few quick notes about using MQTT as <a href="https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern">Pub/Sub
-bus</a> in a home
-IOT network.</p>
-<h2 id="motivation">Motivation</h2>
-<p>Once you have a few <a href="https://en.wikipedia.org/wiki/Internet_of_things">IOT
-devices</a>, an obvious question
-is how to network them.</p>
-<p>If all your devices are from the same vendor, the vendor takes care of it.</p>
-<p>In my home, I have many different vendors/devices, such as (incomplete list):</p>
-<ul>
-<li><a href="https://nuki.io/en/opener/">Nuki Opener</a> Smart Intercom</li>
-<li><a href="https://www.itead.cc/sonoff-s26-wifi-smart-plug.html">Sonoff S26 Smart Plug</a> (WiFi-controlled socket outlet)</li>
-<li><a href="https://www.aqara.com/en/door_and_window_sensor.html">Aqara Door &amp; Window Sensors</a></li>
-<li><a href="https://en.wikipedia.org/wiki/IKEA#Smart_home">IKEA Home Smart</a> (formerly TRÅDFRI) Smart Lights</li>
-</ul>
-<p>Here is how I combine these devices:</p>
-<ul>
-<li>When I’m close to my home (geo-fencing), the Nuki Opener enables Ring To Open (RTO): when I ring the door bell, it opens the door for me.</li>
-<li>When I open the apartment door, the Smart Lights in the hallway turn on.</li>
-<li>When I’m home, my stereo speakers should be powered on so I can play music.</li>
-</ul>
-<p>A conceptually simple way to hook this up is to connect things directly: listen
-to the Aqara Door Sensor and instruct the Smart Lights to turn on, for example.</p>
-<p>But, connecting everything to an MQTT bus has a couple of advantages:</p>
-<ol>
-<li>Unification: everything is visible in one place, the same tools work for all
-devices.</li>
-<li>Your custom logic is uncoupled from vendor details: you can receive and send
-MQTT.</li>
-<li>Compatibility with existing software, such as <a href="https://www.home-assistant.io/">Home
-Assistant</a> or
-<a href="https://www.openhab.org/">openHAB</a></li>
-</ol>
-<h2 id="step-1-set-up-an-mqtt-broker-server">Step 1. Set up an MQTT broker (server)</h2>
-<p>A broker is what relays messages between publishers and subscribers. As an
-optimization, the most recent value of a topic can be retained, so that e.g. a
-subscriber does not need to wait for the next change to obtain the current
-state.</p>
-<p>The most popular choice for broker software seems to be
-<a href="https://mosquitto.org/">Mosquitto</a>, but since I like to run Go software on
-<a href="https://gokrazy.org/,">https://gokrazy.org/,</a> I kept looking and found <a href="https://github.com/fhmq/hmq">https://github.com/fhmq/hmq</a>.</p>
-<p>One downside of <code>hmq</code> might be that it does not seem to support persisting
-retained messages to disk. I’ll treat this as a feature for the time being,
-enforcing a fresh start on every daily reboot.</p>
-<p>To restrict hmq to only listen in my local network, I’m using <a href="https://github.com/gokrazy/tools/commit/fdd90fc6817876e08b352fae84f2a2794524ccc0">gokrazy’s flag
-file
-feature</a>:</p>
-<pre tabindex="0"><code>mkdir -p flags/github.com/fhmq/hmq
-echo --host=10.0.0.217 &gt; flags/github.com/fhmq/hmq/flags.txt
-</code></pre><p>Note that you’ll need <a href="https://github.com/fhmq/hmq/pull/105">https://github.com/fhmq/hmq/pull/105</a> in case your network
-does not come up quickly.</p>
-<h3 id="mqtt-broker-setup-displayingsending-test-messages">MQTT broker setup: displaying/sending test messages</h3>
-<p>To display all messages going through your MQTT broker, subscribe using the
-<a href="https://mosquitto.org/">Mosquitto</a> tools:</p>
-<pre tabindex="0"><code>% sudo pacman -S mosquitto
-% mosquitto_sub --id &quot;${HOST}_all&quot; --host dr.lan --topic '#' --verbose
-</code></pre><p>The <code>#</code> sign denotes an <a href="https://subscription.packtpub.com/book/application_development/9781787287815/1/ch01lvl1sec18/understanding-wildcards">MQTT
-wildcard</a>,
-meaning subscribe to all topics in this case.</p>
-<p>Be sure to set a unique id for each <code>mosquitto_sub</code> command you run, so that you
-can see which subscribers are connected to your MQTT bus. Avoid id clashes,
-otherwise the subscribers will disconnect each other!</p>
-<p>Now, when you send a test message, you should see it:</p>
-<pre tabindex="0"><code>% mosquitto_pub --host dr.lan --topic 'cmnd/tasmota_68462F/Power' -m 'ON'
-</code></pre><p>Tip: If you have binary data on your MQTT bus, you can display it in hex with
-timestamps:</p>
-<pre tabindex="0"><code>% mosquitto_sub \
-  --id &quot;${HOST}_bell&quot; \
-  --host dr.lan \
-  --topic 'doorbell/#' \
-  -F '@Y-@m-@dT@H:@M:@S@z : %t : %x'
-</code></pre><h2 id="step-2-integrate-with-mqtt">Step 2. Integrate with MQTT</h2>
-<p>Now that communication via the bus works, what messages do we publish on which
-topics?</p>
-<p>MQTT only defines that topics are hierarchical; messages are arbitrary byte
-sequences.</p>
-<p>There are a few popular conventions for what to put onto MQTT:</p>
-<ul>
-<li>
-<p><a href="https://homieiot.github.io/">The Homie convention</a></p>
-</li>
-<li>
-<p>Home Assistant has its own convention, but <a href="https://www.home-assistant.io/integrations/switch.mqtt/#full-configuration">allows full configuration</a>. Home Assistant does <a href="https://community.home-assistant.io/t/home-assistant-homie-compatibility/17135/8">not support the homie convention yet</a>.</p>
-</li>
-<li>
-<p>openHAB <a href="https://www.openhab.org/addons/bindings/mqtt.generic/">refers to Home Assistant and
-Homie</a>.</p>
-</li>
-</ul>
-<p>If you design everything yourself, Homie seems like a good option. If you plan to
-use Home Assistant or similar, stick to the Home Assistant convention.</p>
-<h3 id="best-practices-for-your-own-structure">Best practices for your own structure</h3>
-<p>In case you want/need to define your own topics, keep these tips in mind:</p>
-<ul>
-<li>devices publish their state on a single, retained topic
-<ul>
-<li>the topic name could be e.g. <code>stat/tasmota_68462F/POWER</code></li>
-<li>retaining the topic allows consumers to catch up after (re-)connecting to the bus</li>
-</ul>
-</li>
-<li>publish commands on a single, possibly-retained topic
-<ul>
-<li>e.g. publish <code>ON</code> to topic <code>cmnd/tasmota_68462F/Power</code></li>
-<li>publish the desired state: publish <code>ON</code> or <code>OFF</code> instead of <code>TOGGLE</code></li>
-<li>if you retain the topic and publish <code>TOGGLE</code> commands, your lights will mysteriously go off/on when they unexpectedly re-establish their MQTT connection</li>
-</ul>
-</li>
-</ul>
-<h3 id="integration-shelly-devices-with-mqtt-built-in">Integration: Shelly devices with MQTT built-in</h3>
-<p><a href="https://shelly.cloud/">Shelly</a> has a number of smart devices that come with
-MQTT out of the box! This sounds like the easiest solution if you’re starting
-from scratch.</p>
-<p>I haven’t used these devices personally, but I hear good things about them.</p>
-<h3 id="integration-zigbee2mqtt-for-zigbee-devices">Integration: Zigbee2MQTT for Zigbee devices</h3>
-<p><a href="https://www.zigbee2mqtt.io/">Zigbee2MQTT</a> supports well <a href="https://www.zigbee2mqtt.io/information/supported_devices.html">over 1000 Zigbee
-devices</a> and
-exposes them on the MQTT bus.</p>
-<p>For example, this is what you would use to connect your IKEA TRÅDFRI Smart
-Lights to MQTT.</p>
-<h3 id="integration-esphome-for-micro-controllers--sensors">Integration: ESPHome for micro controllers + sensors</h3>
-<p>The <a href="https://esphome.io/">ESPHome</a> system is a ready-made solution to connect a
-wide array of sensors and devices to your home network via MQTT.</p>
-<p>If you want to use your own ESP-based micro controllers and sensors, this seems
-like the easiest way to get them programmed.</p>
-<h3 id="integration-mongoose-os-for-micro-controllers">Integration: Mongoose OS for micro controllers</h3>
-<p>Mongoose OS is an IOT firmware development framework, taking care of device
-management, Over-The-Air updates, and more.</p>
-<p><a href="https://mongoose-os.com/docs/mongoose-os/cloud/mqtt.md">Mongoose comes with MQTT
-support</a>, and with just
-a few lines you can build, flash and configure your device. Here’s an example
-for the NodeMCU (ESP8266-based):</p>
-<pre tabindex="0"><code>% yay -S mos-bin
-% mos clone https://github.com/mongoose-os-apps/demo-js app1
-% cd app1
-% mos --platform esp8266 build
-% mos --platform esp8266 --port /dev/ttyUSB1 flash
-% mos --port /dev/ttyUSB1 config-set mqtt.enable=true mqtt.server=dr.lan:1883
-</code></pre><p>Pressing the button on the NodeMCU publishes a message to MQTT:</p>
-<pre tabindex="0"><code>% mosquitto_sub --host dr.lan --topic devices/esp8266_F4B37C/events
-{&quot;ram_free&quot;:31260,&quot;uptime&quot;:27.168680,&quot;btnCount&quot;:2,&quot;on&quot;:false}
-</code></pre><h3 id="integration-arduino-for-custom-micro-controller-firmware">Integration: Arduino for custom micro controller firmware</h3>
-<p>Arduino has an <a href="https://www.arduino.cc/reference/en/libraries/mqtt-client/">MQTT Client
-library</a>. If your
-microcontroller is networked, e.g. an ESP32 with WiFi, you can publish MQTT
-messages from your Arduino sketch:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020">#include</span> <span style="color:#007020">&lt;WiFi.h&gt;</span><span style="color:#007020">
-</span><span style="color:#007020">#include</span> <span style="color:#007020">&lt;PubSubClient.h&gt;</span><span style="color:#007020">
-</span><span style="color:#007020"></span>
-WiFiClient wificlient;
-PubSubClient <span style="color:#06287e">client</span>(wificlient);
-
-<span style="color:#902000">void</span> <span style="color:#06287e">callback</span>(<span style="color:#902000">char</span><span style="color:#666">*</span> topic, byte<span style="color:#666">*</span> payload, <span style="color:#902000">unsigned</span> <span style="color:#902000">int</span> length) {
-    Serial.print(<span style="color:#4070a0">&#34;Message arrived [&#34;</span>);
-    Serial.print(topic);
-    Serial.print(<span style="color:#4070a0">&#34;] &#34;</span>);
-    <span style="color:#007020;font-weight:bold">for</span> (<span style="color:#902000">int</span> i <span style="color:#666">=</span> <span style="color:#40a070">0</span>; i <span style="color:#666">&lt;</span> length; i<span style="color:#666">++</span>) {
-      Serial.print((<span style="color:#902000">char</span>)payload[i]);
-    }
-    Serial.println();
-  
-    <span style="color:#007020;font-weight:bold">if</span> (strcmp(topic, <span style="color:#4070a0">&#34;doorbell/cmd/unlock&#34;</span>) <span style="color:#666">==</span> <span style="color:#40a070">0</span>) {
-  		<span style="color:#60a0b0;font-style:italic">// …
-</span><span style="color:#60a0b0;font-style:italic"></span>    }
-}
-
-<span style="color:#902000">void</span> <span style="color:#06287e">taskmqtt</span>(<span style="color:#902000">void</span> <span style="color:#666">*</span>pvParameters) {
-	<span style="color:#007020;font-weight:bold">for</span> (;;) {
-		<span style="color:#007020;font-weight:bold">if</span> (<span style="color:#666">!</span>client.connected()) {
-			client.connect(<span style="color:#4070a0">&#34;doorbell&#34;</span> <span style="color:#60a0b0;font-style:italic">/* clientid */</span>);
-			client.subscribe(<span style="color:#4070a0">&#34;doorbell/cmd/unlock&#34;</span>);
-		}
-
-		<span style="color:#60a0b0;font-style:italic">// Poll PubSubClient for new messages and invoke the callback.
-</span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// Should be called as infrequent as one is willing to delay
-</span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// reacting to MQTT messages.
-</span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// Should not be called too frequently to avoid strain on
-</span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// the network hardware:
-</span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// https://github.com/knolleary/pubsubclient/issues/756#issuecomment-654335096
-</span><span style="color:#60a0b0;font-style:italic"></span>		client.loop();
-		vTaskDelay(pdMS_TO_TICKS(<span style="color:#40a070">100</span>));
-	}
-}
-
-<span style="color:#902000">void</span> <span style="color:#06287e">setup</span>() {
-	connectToWiFi(); <span style="color:#60a0b0;font-style:italic">// WiFi configuration omitted for brevity
-</span><span style="color:#60a0b0;font-style:italic"></span>
-	client.setServer(<span style="color:#4070a0">&#34;dr.lan&#34;</span>, <span style="color:#40a070">1883</span>);
-	client.setCallback(callback);
-
-	xTaskCreatePinnedToCore(taskmqtt, <span style="color:#4070a0">&#34;MQTT&#34;</span>, <span style="color:#40a070">2048</span>, <span style="color:#007020">NULL</span>, <span style="color:#40a070">1</span>, <span style="color:#007020">NULL</span>, PRO_CPU_NUM);
-}
-
-<span style="color:#902000">void</span> <span style="color:#06287e">processEvent</span>(<span style="color:#902000">void</span> <span style="color:#666">*</span>buf, <span style="color:#902000">int</span> telegramLen) {
-	client.publish(<span style="color:#4070a0">&#34;doorbell/events/scs&#34;</span>, buf, telegramLen);
-}
-</code></pre></div><h2 id="integration-webhook-to-mqtt">Integration: Webhook to MQTT</h2>
-<p>The Nuki Opener doesn’t support MQTT out of the box, but the Nuki Bridge can
-send Webhook requests. In a few lines of Go, you can forward what the Nuki
-Bridge sends to MQTT:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">package</span> main
-
-<span style="color:#007020;font-weight:bold">import</span> (
-	<span style="color:#4070a0">&#34;fmt&#34;</span>
-	<span style="color:#4070a0">&#34;io/ioutil&#34;</span>
-	<span style="color:#4070a0">&#34;log&#34;</span>
-	<span style="color:#4070a0">&#34;net/http&#34;</span>
-
-	mqtt <span style="color:#4070a0">&#34;github.com/eclipse/paho.mqtt.golang&#34;</span>
-)
-
-<span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">nukiBridge</span>() <span style="color:#902000">error</span> {
-	opts <span style="color:#666">:=</span> mqtt.<span style="color:#06287e">NewClientOptions</span>().<span style="color:#06287e">AddBroker</span>(<span style="color:#4070a0">&#34;tcp://dr.lan:1883&#34;</span>)
-	opts.<span style="color:#06287e">SetClientID</span>(<span style="color:#4070a0">&#34;nuki2mqtt&#34;</span>)
-	opts.<span style="color:#06287e">SetConnectRetry</span>(<span style="color:#007020;font-weight:bold">true</span>)
-	mqttClient <span style="color:#666">:=</span> mqtt.<span style="color:#06287e">NewClient</span>(opts)
-	<span style="color:#007020;font-weight:bold">if</span> token <span style="color:#666">:=</span> mqttClient.<span style="color:#06287e">Connect</span>(); token.<span style="color:#06287e">Wait</span>() <span style="color:#666">&amp;&amp;</span> token.<span style="color:#06287e">Error</span>() <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-		<span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;MQTT connection failed: %v&#34;</span>, token.<span style="color:#06287e">Error</span>())
-	}
-
-	mux <span style="color:#666">:=</span> http.<span style="color:#06287e">NewServeMux</span>()
-	mux.<span style="color:#06287e">HandleFunc</span>(<span style="color:#4070a0">&#34;/nuki&#34;</span>, <span style="color:#007020;font-weight:bold">func</span>(w http.ResponseWriter, r <span style="color:#666">*</span>http.Request) {
-		b, err <span style="color:#666">:=</span> ioutil.<span style="color:#06287e">ReadAll</span>(r.Body)
-		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-			log.<span style="color:#06287e">Print</span>(err)
-			http.<span style="color:#06287e">Error</span>(w, err.<span style="color:#06287e">Error</span>(), http.StatusInternalServerError)
-			<span style="color:#007020;font-weight:bold">return</span>
-		}
-
-		mqttClient.<span style="color:#06287e">Publish</span>(
-			<span style="color:#4070a0">&#34;zkj-nuki/webhook&#34;</span>, <span style="color:#60a0b0;font-style:italic">// topic
-</span><span style="color:#60a0b0;font-style:italic"></span>			<span style="color:#40a070">0</span>, <span style="color:#60a0b0;font-style:italic">// qos
-</span><span style="color:#60a0b0;font-style:italic"></span>			<span style="color:#007020;font-weight:bold">true</span>, <span style="color:#60a0b0;font-style:italic">// retained
-</span><span style="color:#60a0b0;font-style:italic"></span>			<span style="color:#007020">string</span>(b)) <span style="color:#60a0b0;font-style:italic">// payload
-</span><span style="color:#60a0b0;font-style:italic"></span>	})
-
-	<span style="color:#007020;font-weight:bold">return</span> http.<span style="color:#06287e">ListenAndServe</span>(<span style="color:#4070a0">&#34;:8319&#34;</span>, mux)
-}
-
-<span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
-	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">nukiBridge</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-		log.<span style="color:#06287e">Fatal</span>(err)
-	}
-}
-</code></pre></div><p>See <a href="https://developer.nuki.io/t/bridge-http-api/26">Nuki’s Bridge HTTP-API</a>
-document for details on how to configure your bridge to send webhook callbacks.</p>
-<h2 id="step-3-express-your-logic">Step 3. Express your logic</h2>
-<p><a href="https://www.home-assistant.io/">Home Assistant</a> and
-<a href="https://nodered.org/">Node-RED</a> are both popular options, but also large
-software packages.</p>
-<p>Personally, I find it more fun to express my logic directly in a full
-programming language (Go).</p>
-<p>I call the <a href="https://github.com/stapelberg/regelwerk">resulting program <code>regelwerk</code> (“collection of
-rules”)</a>. The program consists of:</p>
-<ol>
-<li>various control loops that progress independently from each other</li>
-<li>an MQTT message dispatcher feeding these control loops</li>
-<li>a debugging web interface to visualize state</li>
-</ol>
-<p>This architecture is by no means a new approach: as
-<a href="https://github.com/rs/moquette">moquette</a> describes it, this is to MQTT what
-<code>inetd</code> is to IP. I find <code>moquette</code>’s one-process-per-message model to be too
-heavyweight and clumsy to deploy to <a href="https://gokrazy.org">https://gokrazy.org</a>, so <code>regelwerk</code> is
-entirely in-process and a single, easy-to-deploy binary, both to computers for
-notifications, or to headless Raspberry Pis.</p>
-<h3 id="regelwerk-control-loops-definition">regelwerk: control loops definition</h3>
-<p><code>regelwerk</code> defines a control loop as a stateful function that accepts an event
-(from MQTT) and returns messages to publish to MQTT, if any:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">type</span> controlLoop <span style="color:#007020;font-weight:bold">interface</span> {
-	sync.Locker
-
-	<span style="color:#06287e">StatusString</span>() <span style="color:#902000">string</span> <span style="color:#60a0b0;font-style:italic">// for human introspection
-</span><span style="color:#60a0b0;font-style:italic"></span>
-	<span style="color:#06287e">ProcessEvent</span>(MQTTEvent) []MQTTPublish
-}
-
-<span style="color:#60a0b0;font-style:italic">// Like mqtt.Message, but with timestamp
-</span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">type</span> MQTTEvent <span style="color:#007020;font-weight:bold">struct</span> {
-	Timestamp time.Time
-	Topic     <span style="color:#902000">string</span>
-	Payload   <span style="color:#007020;font-weight:bold">interface</span>{}
-}
-
-<span style="color:#60a0b0;font-style:italic">// Parameters for mqtt.Client.Publish()
-</span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">type</span> MQTTPublish <span style="color:#007020;font-weight:bold">struct</span> {
-	Topic    <span style="color:#902000">string</span>
-	Qos      <span style="color:#902000">byte</span>
-	Retained <span style="color:#902000">bool</span>
-	Payload  <span style="color:#007020;font-weight:bold">interface</span>{}
-}
-</code></pre></div><h3 id="regelwerk-mqtt-dispatcher">regelwerk: MQTT dispatcher</h3>
-<p>Our MQTT message handler dispatches each incoming message to all control loops,
-in one goroutine per message and loop. With typical message volumes on a
-personal MQTT bus, this is a simple yet effective design that brings just enough
-isolation.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">type</span> mqttMessageHandler <span style="color:#007020;font-weight:bold">struct</span> {
-	dryRun <span style="color:#902000">bool</span>
-	loops  []controlLoop
-}
-
-<span style="color:#007020;font-weight:bold">func</span> (h <span style="color:#666">*</span>mqttMessageHandler) <span style="color:#06287e">handle</span>(client mqtt.Client, m mqtt.Message) {
-	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;received message %q on %q&#34;</span>, m.<span style="color:#06287e">Payload</span>(), m.<span style="color:#06287e">Topic</span>())
-	ev <span style="color:#666">:=</span> MQTTEvent{
-		Timestamp: time.<span style="color:#06287e">Now</span>(), <span style="color:#60a0b0;font-style:italic">// consistent for all loops
-</span><span style="color:#60a0b0;font-style:italic"></span>		Topic:     m.<span style="color:#06287e">Topic</span>(),
-		Payload:   m.<span style="color:#06287e">Payload</span>(),
-	}
-
-	<span style="color:#007020;font-weight:bold">for</span> _, l <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> h.loops {
-		l <span style="color:#666">:=</span> l <span style="color:#60a0b0;font-style:italic">// copy
-</span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#007020;font-weight:bold">go</span> <span style="color:#007020;font-weight:bold">func</span>() {
-			<span style="color:#60a0b0;font-style:italic">// For reliability, we call each loop in its own goroutine
-</span><span style="color:#60a0b0;font-style:italic"></span>			<span style="color:#60a0b0;font-style:italic">// (yes, one per message), so that when one loop gets stuck,
-</span><span style="color:#60a0b0;font-style:italic"></span>			<span style="color:#60a0b0;font-style:italic">// the others still make progress.
-</span><span style="color:#60a0b0;font-style:italic"></span>			l.<span style="color:#06287e">Lock</span>()
-			results <span style="color:#666">:=</span> l.<span style="color:#06287e">ProcessEvent</span>(ev)
-			l.<span style="color:#06287e">Unlock</span>()
-			<span style="color:#007020;font-weight:bold">if</span> <span style="color:#007020">len</span>(results) <span style="color:#666">==</span> <span style="color:#40a070">0</span> {
-				<span style="color:#007020;font-weight:bold">return</span>
-			}
-			<span style="color:#007020;font-weight:bold">for</span> _, r <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> results {
-				log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;publishing: %+v&#34;</span>, r)
-				<span style="color:#007020;font-weight:bold">if</span> !h.dryRun {
-					client.<span style="color:#06287e">Publish</span>(r.Topic, r.Qos, r.Retained, r.Payload)
-				}
-			}
-			<span style="color:#60a0b0;font-style:italic">// …input/output logging omitted for brevity…
-</span><span style="color:#60a0b0;font-style:italic"></span>		}()
-	}
-}
-</code></pre></div><h3 id="regelwerk-control-loop-example">regelwerk: control loop example</h3>
-<p>Now that we have the definition and dispatching out of the way, let’s take a
-look at an actual example control loop.</p>
-<p>This control loops looks at whether my PC is unlocked (in use) or whether my
-phone is home, and then turns off/on my stereo speakers accordingly.</p>
-<p>The inputs come from
-<a href="https://github.com/stapelberg/zkj-nas-tools/blob/master/runstatus/runstatus.go">runstatus</a>
-and
-<a href="https://github.com/rtr7/router7/blob/c30bf38438b3ba00ae13dff914f0ef4f05684250/cmd/dhcp4d/dhcp4d.go#L405-L433">dhcp4d</a>,
-the output goes to a Sonoff S26 Smart Power Plug running
-<a href="https://tasmota.github.io/docs/">Tasmota</a>.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">type</span> avrPowerLoop <span style="color:#007020;font-weight:bold">struct</span> {
-	statusLoop <span style="color:#60a0b0;font-style:italic">// for l.statusf() debugging
-</span><span style="color:#60a0b0;font-style:italic"></span>
-	midnaUnlocked          <span style="color:#902000">bool</span>
-	michaelPhoneExpiration time.Time
-}
-
-<span style="color:#007020;font-weight:bold">func</span> (l <span style="color:#666">*</span>avrPowerLoop) <span style="color:#06287e">ProcessEvent</span>(ev MQTTEvent) []MQTTPublish {
-	<span style="color:#60a0b0;font-style:italic">// Update loop state based on inputs:
-</span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">switch</span> ev.Topic {
-	<span style="color:#007020;font-weight:bold">case</span> <span style="color:#4070a0">&#34;runstatus/midna/i3lock&#34;</span>:
-		<span style="color:#007020;font-weight:bold">var</span> status <span style="color:#007020;font-weight:bold">struct</span> {
-			Running <span style="color:#902000">bool</span> <span style="color:#4070a0">`json:&#34;running&#34;`</span>
-		}
-		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> json.<span style="color:#06287e">Unmarshal</span>(ev.Payload.([]<span style="color:#902000">byte</span>), <span style="color:#666">&amp;</span>status); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-			l.<span style="color:#06287e">statusf</span>(<span style="color:#4070a0">&#34;unmarshaling runstatus: %v&#34;</span>, err)
-			<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
-		}
-		l.midnaUnlocked = !status.Running
-
-	<span style="color:#007020;font-weight:bold">case</span> <span style="color:#4070a0">&#34;router7/dhcp4d/lease/Michaels-iPhone&#34;</span>:
-		<span style="color:#007020;font-weight:bold">var</span> lease <span style="color:#007020;font-weight:bold">struct</span> {
-			Expiration time.Time <span style="color:#4070a0">`json:&#34;expiration&#34;`</span>
-		}
-		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> json.<span style="color:#06287e">Unmarshal</span>(ev.Payload.([]<span style="color:#902000">byte</span>), <span style="color:#666">&amp;</span>lease); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-			l.<span style="color:#06287e">statusf</span>(<span style="color:#4070a0">&#34;unmarshaling router7 lease: %v&#34;</span>, err)
-			<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
-		}
-		l.michaelPhoneExpiration = lease.Expiration
-
-	<span style="color:#007020;font-weight:bold">default</span>:
-		<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span> <span style="color:#60a0b0;font-style:italic">// event did not influence our state
-</span><span style="color:#60a0b0;font-style:italic"></span>	}
-
-	<span style="color:#60a0b0;font-style:italic">// Publish desired state changes:
-</span><span style="color:#60a0b0;font-style:italic"></span>	now <span style="color:#666">:=</span> ev.Timestamp
-	phoneHome <span style="color:#666">:=</span> l.michaelPhoneExpiration.<span style="color:#06287e">After</span>(now)
-	anyoneHome <span style="color:#666">:=</span> l.midnaUnlocked <span style="color:#666">||</span> (now.<span style="color:#06287e">Hour</span>() &gt; <span style="color:#40a070">8</span> <span style="color:#666">&amp;&amp;</span> phoneHome)
-	l.<span style="color:#06287e">statusf</span>(<span style="color:#4070a0">&#34;midnaUnlocked=%v || (now.Hour=%v &gt; 8 &amp;&amp; phoneHome=%v)&#34;</span>,
-		l.midnaUnlocked, now.<span style="color:#06287e">Hour</span>(), phoneHome)
-
-	payload <span style="color:#666">:=</span> <span style="color:#4070a0">&#34;OFF&#34;</span>
-	<span style="color:#007020;font-weight:bold">if</span> anyoneHome {
-		payload = <span style="color:#4070a0">&#34;ON&#34;</span>
-	}
-	<span style="color:#007020;font-weight:bold">return</span> []MQTTPublish{
-		{
-			Topic:    <span style="color:#4070a0">&#34;cmnd/tasmota_68462F/Power&#34;</span>,
-			Payload:  payload,
-			Retained: <span style="color:#007020;font-weight:bold">true</span>,
-		},
-	}
-}
-
-</code></pre></div><h2 id="conclusion">Conclusion</h2>
-<p>I like the Pub/Sub pattern for home automation, as it nicely uncouples all
-components.</p>
-<p>It’s a shame that standards such as <a href="https://homieiot.github.io/">The Homie
-convention</a> aren’t more widely supported, but it
-looks like software makes up for that via configuration options.</p>
-<p>There are plenty of existing integrations that should cover most needs.</p>
-<p>Ideally, more Smart Home and IOT vendors would add MQTT support out of the box,
-like <a href="https://shelly.cloud/">Shelly</a>.</p>
 ]]></content>
   </entry>
 </feed>

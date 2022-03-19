@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Smart Home components 🏠 - Michael Stapelberg</title>
+
+  <meta property="og:site_name" content="Michael Stapelberg">
+  <meta property="og:title" content="Smart Home components 🏠">
+  <meta property="og:description" content="I have tried a bunch of different Smart Home products over the last few years and figured I would give an overview of which ones I liked, which ones I disliked, and how I would go about selecting good Smart Home products to buy.">
+  
+  
+  
+  
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4513_featured_huefeda71fee31fb8bfc71d9a141c0606f_1702194_200x200_fit_q75_box.jpg">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <meta name="description" content="I have tried a bunch of different Smart Home products over the last few years and figured I would give an overview of which ones I liked, which ones I disliked, and how I would go about selecting good Smart Home products to buy.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div><h1 class="ms_title">Smart Home components 🏠</h1>
+
+<div class="ms_meta">
+  <div id="ms_date">published 2022-03-19</div>
+  
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2022-03-19-smart-home-components/index.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
+</div>
+<div class="Artikel" id="content">
+  <style type="text/css">
+    .TableOfContents > ul, .TableOfContents > ul > li > ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+    }
+    .TableOfContents li {
+	margin-bottom: 1rem;
+    }
+  </style>
+  <details class="ms_toc_details">
+    <summary>Table of contents</summary>
+    <nav class="TableOfContents">
+  <ul>
+    <li><a href="#smart-lights">Smart Lights</a>
+      <ul>
+        <li><a href="#tradfri">Moved away from: IKEA TRÅDFRI 👎</a></li>
+        <li><a href="#shellybulb">Moved away from: Shelly Bulb 👎</a></li>
+        <li><a href="#hue">Philips Hue 👍</a></li>
+        <li><a href="#shelly1l">Shelly 1L 👍</a></li>
+      </ul>
+    </li>
+    <li><a href="#smart-heating">Smart Heating</a>
+      <ul>
+        <li><a href="#homematicheating">HomeMatic 😐</a></li>
+      </ul>
+    </li>
+    <li><a href="#smart-lock">Smart Lock</a>
+      <ul>
+        <li><a href="#nuki">Nuki 👍</a></li>
+      </ul>
+    </li>
+    <li><a href="#motion-sensors">Motion Sensors</a>
+      <ul>
+        <li><a href="#fellermotion">Moved away from: Feller Motion Sensors 😐</a></li>
+        <li><a href="#shellymotion">Shelly Motion 👍</a></li>
+      </ul>
+    </li>
+    <li><a href="#smart-power-plug">Smart Power Plug</a>
+      <ul>
+        <li><a href="#homematicplug">HomeMatic 👎</a></li>
+        <li><a href="#sonoff">Sonoff 😐</a></li>
+      </ul>
+    </li>
+    <li><a href="#architecture-as-of-march-2022">Architecture as of March 2022</a></li>
+    <li><a href="#my-strategy-for-selecting-components">My strategy for selecting components</a></li>
+  </ul>
+</nav>
+  </details>
+  <p>I have tried a bunch of different Smart Home products over the last few years
+and figured I would give an overview of which ones I liked, which ones I
+disliked, and how I would go about selecting good Smart Home products to buy.</p>
+<h2 id="smart-lights">Smart Lights</h2>
+<p>To me, the primary advantage of Smart Lights is the flexibility in where you
+place extra light switches, and the extra functions that become much easier with
+Smart Lights.</p>
+<p>For example, I have added an extra light switch in the bed and next to the
+couch, without having to have an electrician tear up the walls to add more
+wiring. An “all-off” button is super handy at the end of the day or when
+watching a movie.</p>
+<p>Other attractive use-cases include controlling lights based on time of the day,
+based on whether people are home, or based on a motion sensor.</p>
+<p>I used the RGB color light bulb version of all of the below systems. In
+practice, we typically don’t change the color much, but it is nice to be able to
+adjust the color and brightness to something that fits the respective room. And,
+every once in a while, scenes that use color are fun!</p>
+<h3 id="tradfri">Moved away from: IKEA TRÅDFRI 👎</h3>
+<div style="max-width: 250px; float: left; margin-right: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4166.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4166_hu855bbe0a9c47ac557e5b09db74fa3b06_700735_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4166_hu855bbe0a9c47ac557e5b09db74fa3b06_700735_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4166_hu855bbe0a9c47ac557e5b09db74fa3b06_700735_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="600"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<p>The first smart light system I used was IKEA TRÅDFRI. I figured as a system with
+a large user base, they would be inclined to improve it over time, and
+compatibility should be more likely than with other, smaller vendors.</p>
+<p>Unfortunately the system is pretty much unchanged from when I first bought it
+many years ago.</p>
+<p>You can easily find documentation about the API for using the TRÅDFRI gateway
+programmatically, but when I looked for available Go packages, I decided to
+use COAP and DTLS myself back in 2019 for lack of an attractive Go package.</p>
+<p>The <strong>light switches</strong> are good in terms of features, and easy to install: you
+can just remove the old switch and glue the TRÅDFRI switch over the existing
+switch.</p>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4620.JPG"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4620_hudd9dde466230b7da3c81dd3aa9f33f2d_584934_1200x0_resize_q75_box.JPG 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4620_hudd9dde466230b7da3c81dd3aa9f33f2d_584934_1800x0_resize_q75_box.JPG 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4620_hudd9dde466230b7da3c81dd3aa9f33f2d_584934_600x0_resize_q75_box.JPG"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4622.JPG"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4622_huacdef596d98276810695f10a2865fbf7_637307_1200x0_resize_q75_box.JPG 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4622_huacdef596d98276810695f10a2865fbf7_637307_1800x0_resize_q75_box.JPG 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4622_huacdef596d98276810695f10a2865fbf7_637307_600x0_resize_q75_box.JPG"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<p>The downside of the light switches is that they are flimsy: because the switch
+is magnetically held in place in its case, it can easily fall on the floor when
+you bump against it.</p>
+<p>Pairing the devices was always tricky for me. It got easier when I turned off
+all other ZigBee devices in my apartment before doing anything with IKEA
+devices.</p>
+<p>At multiple points, the devices lost their pairing. It might have been when they
+ran out of battery.</p>
+<p>The <strong>battery lifetime</strong> of the light switches was very poor — only about a year
+on average. They use the CR2032 form factor, which my charger does not support,
+so I couldn’t use rechargables.</p>
+<p>Swapping out the batteries and re-pairing the system every year or so quickly
+becomes tedious!</p>
+<h3 id="shellybulb">Moved away from: Shelly Bulb 👎</h3>
+<div style="max-width: 250px; float: left; margin-right: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4164.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4164_hu855bbe0a9c47ac557e5b09db74fa3b06_944949_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4164_hu855bbe0a9c47ac557e5b09db74fa3b06_944949_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4164_hu855bbe0a9c47ac557e5b09db74fa3b06_944949_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<p>Because I also bought some <a href="#shelly1l">Shelly 1L smart relays</a>, I figured I’d
+give the <a href="https://shelly.cloud/products/shelly-bulb-smart-home-automation-device/">Shelly
+Bulb</a> a
+try.</p>
+<p>Instead of ZigBee, the Shelly Bulbs use WiFi. This makes them easy to get into
+your home network and does not require a separate gateway.</p>
+<p>At 2 bulbs per room+hallway, and 2 buttons each, that sums up to having 16 extra
+devices in your WiFi network. This wasn’t a problem for me in practice, but
+depending on how stable your WiFi network is, it might be a concern.</p>
+<p>Notably, this also means your lights can’t be controlled while your WiFi is unavailable.</p>
+<p>In terms of physical <strong>light switches</strong>, you’ll need to use a separate product
+such as the Shelly Button. This is the weakest point of the system. The latency
+is noticeable, even when configuring a static IP address, which does make things
+better, but still not good. The Shelly Button is extremely simple, so dimming
+has to be emulated with double or triple-press actions.</p>
+<p>Given that one typically interacts with this system multiple times a day via its
+switches, I think it makes sense to chose a system that has good switches.</p>
+<p>On the plus side, the Shelly Button uses a rechargable battery that can be
+charged from a USB power bank, which is a concept I really like.</p>
+<h3 id="hue">Philips Hue 👍</h3>
+<p>After the Shelly Bulb, I figured I’d try Philips Hue. It’s by far the most
+expensive system of the ones I have tried, but also by far the most polished and
+user-friendly.</p>
+<div style="max-width: 150px; float: left; margin-right: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4514.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4514_hu465888e0cd6ad3d33b69ac3fd7c0d8d4_1137438_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4514_hu465888e0cd6ad3d33b69ac3fd7c0d8d4_1137438_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4514_hu465888e0cd6ad3d33b69ac3fd7c0d8d4_1137438_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<p>People recommended the <a href="https://www.feller.ch/de/Produktangebot/Funktaster">Feller Smart Light
+Control</a> switches, which use
+energy harvesting (from you clicking them!) and hence don’t require a battery.</p>
+<p>This makes it easy to place them anywhere, like next to the couch in the picture
+on the left.</p>
+<br style="clear: both">
+<p>Feller recommends extending existing installations by buying the next-larger
+mounting plate. Extending the box in the wall is not required, as no wires or
+in-wall space are needed. Drilling new holes for extra screws is required for
+stability, but that’s a lot more doable than extending the whole box. Here are
+some pictures before, during and after the installation:</p>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3883.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3883_hu8c0865dc8466fdff9a77d98bdf88cd59_1645691_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3883_hu8c0865dc8466fdff9a77d98bdf88cd59_1645691_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3883_hu8c0865dc8466fdff9a77d98bdf88cd59_1645691_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4146.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4146_hua9f69e9404f3c1ad473f50d53fe232bd_1584661_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4146_hua9f69e9404f3c1ad473f50d53fe232bd_1584661_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4146_hua9f69e9404f3c1ad473f50d53fe232bd_1584661_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4513_featured.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4513_featured_huefeda71fee31fb8bfc71d9a141c0606f_1702194_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4513_featured_huefeda71fee31fb8bfc71d9a141c0606f_1702194_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4513_featured_huefeda71fee31fb8bfc71d9a141c0606f_1702194_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<h3 id="shelly1l">Shelly 1L 👍</h3>
+<div style="max-width: 250px; float: left; margin-right: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4453.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4453_huf958f180f9b60d6df1711fc62ed8abfa_1239796_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4453_huf958f180f9b60d6df1711fc62ed8abfa_1239796_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4453_huf958f180f9b60d6df1711fc62ed8abfa_1239796_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<p>The Shelly 1L is a very interesting device. It goes behind your existing device
+into the wall and makes it smart!</p>
+<p>This allows you to make smart any existing lights that can’t easily be replaced
+by smart lights, for example a bathroom light built into the bathroom mirror
+cabinet.</p>
+<p>You can also make existing light switches smart if you like the ones you already
+have and can’t exchange them.</p>
+<p>Another use-case is to easily connect buttons or sensors into your network, for
+example door bells or door sensors.</p>
+<p>The Shelly 1L is special in that this specific model can be installed when all
+you have is a live wire (i.e. wiring for a light switch).</p>
+<p>One potential issue is that depending on the configuration and connected
+device’s power usage, the Shelly might emit a slight hum noise. So, don’t
+install one right next to your bed.</p>
+<p>Another limitation is that while the Shelly does work with both, light
+<strong>switches</strong> (changes state) and light <strong>buttons</strong> (generates an impulse), it
+can only distinguish between short and long press events when you use a light
+button. Newer light switches from Feller can be re-configured to function as a
+button, but if your model is too old you might need to replace a light switch
+with a button.</p>
+<p>One weird issue I ran into was that after installing a new bathroom mirror
+cabinet, the relay of the connected Shelly 1L would no longer function correctly
+— the light just remained on, even when turning it off via the Shelly. I read on
+the Shelly forum that this could be caused by running the Shelly upside-down,
+and indeed, after turning it around, it started to work again!</p>
+<h2 id="smart-heating">Smart Heating</h2>
+<p>Smart Heating systems are often advertised to save cost. I wanted to try it out,
+and was also interested in the temperature logging because my apartment is on
+the more humid side and I wanted some data to optimize the situation.</p>
+<h3 id="homematicheating">HomeMatic 😐</h3>
+<div style="max-width: 250px; float: left; margin-right: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3512.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3512_hu39bef23f314593ac5a570777d0269b05_1310266_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3512_hu39bef23f314593ac5a570777d0269b05_1310266_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3512_hu39bef23f314593ac5a570777d0269b05_1310266_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<p>I bought some HomeMatic temperature sensors and heating valve drives back
+in 2017. The hardware feels solid and was easy enough to install.</p>
+<p>One massive downside of the system was the poor software quality of their
+Central Control Unit (CCU2). The web interface was super slow, looked very
+dated, and the whole thing kept running out of memory every 2 weeks or so. It
+was so bad that I <a href="/posts/2017-04-16-homematic-reimplementation/">re-implemented my own CCU in
+Go</a>. I hear that by now, they
+have a new and better Control Unit version, though.</p>
+<p>So far, one valve drive has failed with error code F1; I replaced it with a new
+one.</p>
+<p>Turns out smart control of our heating does not seem to make any measurable
+difference. The rooms feel the same as before. No money is saved because the
+utility bill is divided equally among all tenants across the building (which
+seems to be standard in Switzerland), not billed for individual usage.</p>
+<p>So, overall, I would not install smart heating valve drives again. The
+temperature sensors I still keep an eye on from time to time, but there are
+cheaper options if you only need temperature!</p>
+<h2 id="smart-lock">Smart Lock</h2>
+<h3 id="nuki">Nuki 👍</h3>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4549.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4549_hu8716c73c1bc02c4025992cd5e8271b6a_1194122_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4549_hu8716c73c1bc02c4025992cd5e8271b6a_1194122_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4549_hu8716c73c1bc02c4025992cd5e8271b6a_1194122_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3691.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3691_hu5e11573d3decee60fb24009fdd50f085_1187917_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3691_hu5e11573d3decee60fb24009fdd50f085_1187917_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3691_hu5e11573d3decee60fb24009fdd50f085_1187917_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3484.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3484_hu6984d04b8d7e4c9d18665ea773d7a4fd_803023_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3484_hu6984d04b8d7e4c9d18665ea773d7a4fd_803023_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3484_hu6984d04b8d7e4c9d18665ea773d7a4fd_803023_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3780.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3780_hua8572cfd4bf6f6518e73ac8bea16411e_361388_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3780_hua8572cfd4bf6f6518e73ac8bea16411e_361388_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_3780_hua8572cfd4bf6f6518e73ac8bea16411e_361388_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="603"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<p>During the pandemic, I was receiving packages at home and hence I was relying on
+my door bell much more than usual. Hence, I was looking for a way to make it
+smarter!</p>
+<p>The first device I got was the <a href="https://nuki.io/en/opener/">Nuki Opener</a>, a
+smart intercom system. It allows you to get notifications on your phone when the
+doorbell is rung, and to unlock the door from your phone.</p>
+<p>I got this device because it was specifically marketed as compatible with the
+BTicino intercom system our house uses. Unfortunately, this turned out to <a href="/posts/2020-11-30-scs-processing-microcontroller/">be
+incorrect</a>, so I ended up
+<a href="/posts/2021-03-13-smart-intercom-backpack/">building a hardware-modified intercom
+unit</a> that is connected to the Nuki
+Opener in analogue mode.</p>
+<p>Once it actually works, it’s a convenient system, and having your doorbell
+generate desktop notifications with sound is just super useful when wearing
+headphones! Strongly recommended.</p>
+<p>As you can see on the pictures, I’m powering the Nuki Opener via USB. It
+normally runs on batteries, but I want to minimize battery usage and swapping. A
+built-in rechargeable battery like in the Shelly devices would be a neat
+improvement to the Nuki Opener, so that the device could still work during power
+outages!</p>
+<p>After I had the Nuki Opener, I also added a <a href="https://nuki.io/en/smart-lock/">Nuki Smart
+Lock</a> so that we can not only open the house
+front door, but also the apartment door itself in case one of us forgets their
+key.</p>
+<p>The Nuki Smart Lock was easy to install and works great. It also shows with an
+elegant LED ring whether the door is currently locked or not, which I find
+handy.</p>
+<h2 id="motion-sensors">Motion Sensors</h2>
+<p>Not having to turn on lights myself is something I find convenient, in
+particular in the kitchen, but also in the bathroom. When carrying plates or
+glasses into the kitchen, it’s nice to have the lights turn on while my hands
+are full.</p>
+<h3 id="fellermotion">Moved away from: Feller Motion Sensors 😐</h3>
+<p>First I tried Feller’s Motion Sensors, because they physically fit well into the
+existing Feller light switch installation:</p>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4311.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4311_hu7e0f6fdb96f9d7ea63815e1348871123_1546321_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4311_hu7e0f6fdb96f9d7ea63815e1348871123_1546321_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4311_hu7e0f6fdb96f9d7ea63815e1348871123_1546321_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="600"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4407.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4407_hu855bbe0a9c47ac557e5b09db74fa3b06_1459219_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4407_hu855bbe0a9c47ac557e5b09db74fa3b06_1459219_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4407_hu855bbe0a9c47ac557e5b09db74fa3b06_1459219_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<p>But, their limitations made me move away from them quickly: while you can change
+one or two basic settings, you cannot, for example, disable the motion sensor
+after a certain time of day, or manually disable it for a certain time period.</p>
+<p>Also, because the device is installed in a fixed position (determined by where
+your light switch is), it isn’t necessarily in the best place to spot all the
+motion you want to detect.</p>
+<h3 id="shellymotion">Shelly Motion 👍</h3>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4552.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4552_hu933633299932c7881ce3078b048a8244_673846_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4552_hu933633299932c7881ce3078b048a8244_673846_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4552_hu933633299932c7881ce3078b048a8244_673846_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4550.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4550_hu8f211d5b79bcf88b6331bc02c9263d11_939504_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4550_hu8f211d5b79bcf88b6331bc02c9263d11_939504_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4550_hu8f211d5b79bcf88b6331bc02c9263d11_939504_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/shellymotion-webinterface.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/shellymotion-webinterface_hua3cd54dd2ab44c84582dd78906db0e26_937115_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/shellymotion-webinterface_hua3cd54dd2ab44c84582dd78906db0e26_937115_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/shellymotion-webinterface_hua3cd54dd2ab44c84582dd78906db0e26_937115_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="632"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<p>The <a href="https://shelly.cloud/shelly-motion-smart-home-automation-sensor/">Shelly
+Motion</a> Sensor
+seems like a good motion sensor to me! It has a number of useful settings and
+can easily trigger any REST API endpoint or can be used via MQTT.</p>
+<p>Like with the Shelly Button, this device has a built-in rechargeable battery
+that can be charged via USB. Depending on the location of the sensor, you can
+either attach a USB powerbank once a year, or remove the sensor from its fixture
+and charge it elsewhere.</p>
+<p>The positioning of the Shelly Motion can either be easy (as it was in my
+kitchen) or tricky to get right (in my bathroom). I don’t know if other motion
+sensors are better in terms of range.</p>
+<p>One thing to note is that the Shelly Motion only reports state changes (motion
+start or motion end), and no continuous events while motion is detected.</p>
+<p>For my kitchen, <a href="https://github.com/stapelberg/regelwerk/blob/8693602b899ae3bd682bea3b08289de782791483/motion.go#L94-L128">my regelwerk
+code</a>
+directly translates motion on/off into light on/off commands (to Philips Hue and
+Shelly 1L), with the exception that a long-press turns off all motion control
+for the next 10 minutes. The granularity of the Shelly Motion is to report after
+no motion for 1 minute, which works well for me for the kitchen.</p>
+<p>For my bathroom, I don’t want the lights to immediately turn off when no motion
+is detected anymore, to err on the side of not turning off the light while
+people are still using the bathroom and are just not seen by the motion
+sensor. To implement that, I found that using the Shelly 1L’s timer
+functionality works best. So, <a href="https://github.com/stapelberg/regelwerk/blob/511198c89bf27bb39b0ba03bd33fe44a1ab4b182/motion.go#L48-L104">in my
+configuration</a>,
+motion on means lights on, and motion off means lights on for 10 minutes, then
+off. Turning off the light manually disables that logic.</p>
+<p>Note that the Shelly Motion should really be mounted in the orientation
+recommended by the manual. When the motion sensor lays on the side (or is upside
+down), detection is much poorer.</p>
+<h2 id="smart-power-plug">Smart Power Plug</h2>
+<p>A smart plug is an easy way to turn off a power-hungry device while you’re away,
+to make a lamp smart, or to power on a connected device like a kettle to boil
+water for making a tea.</p>
+<p>My current use-cases are saving power for the stereo sound system connected to
+my PC, and saving power by <a href="https://github.com/gokrazy/bakery/commit/a32e6d0a12693d70ce0544617ff3e391480c4b5a">powering up the
+devices</a>
+in my <a href="https://gokrazy.org/platforms/">gokrazy Continuous Integration test
+environment</a> on-demand only.</p>
+<p>While there are tons of vendors selling smart plugs, the selection narrows
+considerably when you look for one with a <a href="https://en.wikipedia.org/wiki/SN_441011">Swiss power
+plug</a>.</p>
+<h3 id="homematicplug">HomeMatic 👎</h3>
+<div style="max-width: 250px; float: left; margin-right: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4548.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4548_hu18e4c1844f7b5756b8bbfa0d35983f2a_673862_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4548_hu18e4c1844f7b5756b8bbfa0d35983f2a_673862_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_4548_hu18e4c1844f7b5756b8bbfa0d35983f2a_673862_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<p>The HomeMatic smart plug is expensive (55 CHF) and super bulky! As you can see,
+even if you connect it at the very end of a power strip, it still blocks the
+adjacent connector.</p>
+<p>Worse: the way it’s built (bulky side pointing away from the earth pin), I can’t
+even insert it into 2 of the 3 power strips you see on the picture.</p>
+<p>Somehow, even though it’s so bulky, the device feels flimsy at the same
+time. I’m never 100% sure if the plug is inserted fully and correctly, and it’s
+easy to accidentally turn off power when bumping against the smart plug with
+your foot.</p>
+<p>Because it’s a HomeMatic device, you need a working Central Control Unit (CCU)
+to control it programmatically. Conceptually, I prefer smart plugs that can be
+used with a REST or MQTT API.</p>
+<p>The only upside of this smart plug is that it can measure power. I occasionally
+use it for that.</p>
+<h3 id="sonoff">Sonoff 😐</h3>
+<div style="max-width: 250px; float: left; margin-right: 1em">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_1345.JPG"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_1345_hu8426f71a38f8a1ccbda71f33f5a21248_731883_1200x0_resize_q75_box.JPG 2x,https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_1345_hu8426f71a38f8a1ccbda71f33f5a21248_731883_1800x0_resize_q75_box.JPG 3x"
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/IMG_1345_hu8426f71a38f8a1ccbda71f33f5a21248_731883_600x0_resize_q75_box.JPG"
+  
+  width="600"
+  height="800"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+</div>
+<p>The Sonoff S26 are much cheaper (≈12 USD when I bought mine) and come in a Swiss
+plug variant. Contrary to the HomeMatic ones, the Sonoff smart plugs are built
+“the right way around”, meaning I can plug them into many Swiss power
+strips. Unfortunately, they also block adjacent connectors, but at least not as
+many as the HomeMatic.</p>
+<p>The <a href="https://tasmota.github.io/docs/">Open Source firmware Tasmota</a> supports the
+Sonoff S26, but flashing them is a painful experience. You can’t do it over the
+air; you need to access rather small serial console pins inside the device.</p>
+<p>Once you have them flashed with Tasmota, the devices work great.</p>
+<p>One feature they lack is power measurement.</p>
+<p>I would love to find a smart plug with a Swiss plug, that supports power
+measurement, and that is compatible with Tasmota (or builtin MQTT support), but
+until that product comes along, the Sonoff S26 are what I’m going to use.</p>
+<h2 id="architecture-as-of-march-2022">Architecture as of March 2022</h2>
+<p>Here is an architecture diagram of the devices I’m currently using:</p>
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/2022-03-06-smart-home-architecture.svg"><img
+  src="https://michael.stapelberg.ch/posts/2022-03-19-smart-home-components/2022-03-06-smart-home-architecture.svg"
+  
+  style="border: 1px solid #000; margin-right: 1rem"
+  
+  loading="lazy"></a>
+
+
+<p>To tie these different systems together, I use a Raspberry Pi running
+<a href="https://gokrazy.org/">gokrazy</a>, which in turn runs my
+<a href="/posts/2021-01-10-mqtt-introduction/">regelwerk</a> program. regelwerk only talks
+to MQTT, so all the different devices are connected to MQTT using small adapter
+programs such as my <a href="https://github.com/stapelberg/hue2mqtt">hue2mqtt</a> or
+<a href="https://github.com/stapelberg/shelly2mqtt">shelly2mqtt</a>.</p>
+<p>A more off-the-shelf solution would be to use <a href="https://nodered.org/">Node-RED</a>,
+if you want to do a little programming, or <a href="https://www.home-assistant.io/">Home
+Assistant</a> if you want to do barely any
+programming.</p>
+<h2 id="my-strategy-for-selecting-components">My strategy for selecting components</h2>
+<p>I don’t look for one vendor or one system that has components for
+everything. Instead, I chose the leading vendor in each domain. Compatibility
+between systems is generally poor, so I try to keep my compatibility
+requirements to a minimum.</p>
+<p>To programmatically interact with the devices, the best bet are devices that are
+designed to be developer-friendly (e.g. Shelly devices support MQTT) or at least
+have an official API with modules in my favorite programming language
+(e.g. Philips Hue). In terms of API, I expect to talk to a gateway device in my
+local network — I tried talking e.g. Zigbee directly but found it inconvenient
+due to poor software support, sparse documentation and strange compatibility
+issues.</p>
+<p>Direct device-to-device communication is nice from a reliability perspective,
+but on some battery-powered systems you pay for it with reduced battery
+runtime. For example, when using multiple light switches for the same room with
+IKEA TRÅDFRI, you pair one to the other, which also makes all signals go through
+it.</p>
+<p>If possible, I select devices that have an open firmware available. Ideally, I
+can keep using the vendor’s firmware, but if the vendor unexpectedly goes out of
+business, it’s handy to have an alternative firmware available. Also, if the
+devices require a cloud service to function, using open firmware typically
+allows using them in your local network.</p>
+<p>I have come to avoid WiFi where latency is important, e.g. between light
+switches and lights.</p>
+<p>I stopped looking at the price too much and instead look at the user
+experience. Smart home is about comfort and convenience, and if a product
+doesn’t delight in daily usage, why bother with it? Targeting the high end of
+mid-range devices seems like the sweet spot to me. Avoid anything more expensive
+than that, though — established players often re-brand third-party solutions and
+you only pay for the company name, not quality.</p>
+
+</div>
+
+      </div>
+<div id="ms_toc">
+  <div>
+    <strong>Table Of Contents</strong>
+
+    <nav class="TableOfContents">
+  <ul>
+    <li><a href="#smart-lights">Smart Lights</a>
+      <ul>
+        <li><a href="#tradfri">Moved away from: IKEA TRÅDFRI 👎</a></li>
+        <li><a href="#shellybulb">Moved away from: Shelly Bulb 👎</a></li>
+        <li><a href="#hue">Philips Hue 👍</a></li>
+        <li><a href="#shelly1l">Shelly 1L 👍</a></li>
+      </ul>
+    </li>
+    <li><a href="#smart-heating">Smart Heating</a>
+      <ul>
+        <li><a href="#homematicheating">HomeMatic 😐</a></li>
+      </ul>
+    </li>
+    <li><a href="#smart-lock">Smart Lock</a>
+      <ul>
+        <li><a href="#nuki">Nuki 👍</a></li>
+      </ul>
+    </li>
+    <li><a href="#motion-sensors">Motion Sensors</a>
+      <ul>
+        <li><a href="#fellermotion">Moved away from: Feller Motion Sensors 😐</a></li>
+        <li><a href="#shellymotion">Shelly Motion 👍</a></li>
+      </ul>
+    </li>
+    <li><a href="#smart-power-plug">Smart Power Plug</a>
+      <ul>
+        <li><a href="#homematicplug">HomeMatic 👎</a></li>
+        <li><a href="#sonoff">Sonoff 😐</a></li>
+      </ul>
+    </li>
+    <li><a href="#architecture-as-of-march-2022">Architecture as of March 2022</a></li>
+    <li><a href="#my-strategy-for-selecting-components">My strategy for selecting components</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+
+    </main><div id="ms_footer">
+  © 2022 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

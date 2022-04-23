@@ -307,7 +307,7 @@ edge# systemctl disable networking
 </code></pre><p>Also, I cleared the MOTD, placed <code>/tmp</code> on <code>tmpfs</code> and configured my usual
 environment:</p>
 <pre tabindex="0"><code>edge# echo &gt; /etc/motd
-edge# echo 'tmpfs /tmp tmpfs defaults 0 0' &gt;&gt; /etc/fstab
+edge# echo &#39;tmpfs /tmp tmpfs defaults 0 0&#39; &gt;&gt; /etc/fstab
 edge# wget -qO- https://d.zekjur.net | bash -s
 </code></pre><p>I also installed a few troubleshooting tools which came in handy later:</p>
 <pre tabindex="0"><code>edge# apt install tcpdump net-tools strace
@@ -315,7 +315,7 @@ edge# wget -qO- https://d.zekjur.net | bash -s
 <p>I had to learn the hard way that Linux imposes a rate-limit on outgoing ICMP
 packets by default. This manifests itself as spurious timeouts in the
 <code>traceroute</code> output. To ease debugging, I disabled the rate limit entirely:</p>
-<pre tabindex="0"><code>edge# cat &gt;&gt; /etc/sysctl.conf &lt;&lt;'EOT'
+<pre tabindex="0"><code>edge# cat &gt;&gt; /etc/sysctl.conf &lt;&lt;&#39;EOT&#39;
 net.ipv4.icmp_ratelimit=0
 net.ipv6.icmp.ratelimit=0
 EOT
@@ -326,7 +326,7 @@ whether <code>enp0s3</code> is the interface for an uplink or the LAN, so I assi
 names <code>uplink0</code>, <code>uplink1</code> and <code>lan0</code> to the apu2c4’s interfaces.</p>
 <p>To rename network interfaces, I created a corresponding <code>.link</code> file, had the
 initramfs pick it up, and rebooted:</p>
-<pre tabindex="0"><code>edge# cat &gt;/etc/systemd/network/10-uplink0.link &lt;&lt;'EOT'
+<pre tabindex="0"><code>edge# cat &gt;/etc/systemd/network/10-uplink0.link &lt;&lt;&#39;EOT&#39;
 [Match]
 MACAddress=00:0d:b9:49:db:18
 
@@ -349,7 +349,7 @@ because we needed to use static addresses in the tunnel setup anyway.</p>
 <p>Note that we placed a default route in route table 110. Later on, we used
 <a href="https://manpages.debian.org/stretch/iptables/iptables.8.en.html"><code>iptables(8)</code></a>
 to make traffic use either of these two default routes.</p>
-<pre tabindex="0"><code>edge# cat &gt; /etc/systemd/network/uplink0.network &lt;&lt;'EOT'
+<pre tabindex="0"><code>edge# cat &gt; /etc/systemd/network/uplink0.network &lt;&lt;&#39;EOT&#39;
 [Match]
 Name=uplink0
 
@@ -361,7 +361,7 @@ IPForward=ipv4
 Gateway=192.168.178.1
 Table=110
 EOT
-</code></pre><pre tabindex="0"><code>edge# cat &gt; /etc/systemd/network/uplink1.network &lt;&lt;'EOT'
+</code></pre><pre tabindex="0"><code>edge# cat &gt; /etc/systemd/network/uplink1.network &lt;&lt;&#39;EOT&#39;
 [Match]
 Name=uplink1
 
@@ -446,8 +446,8 @@ you need an offset of at least 1.</p>
 <p>For debugging, it is helpful to exempt the IP addresses we use on the tunnels
 themselves, otherwise we might not be able to ping an endpoint which is actually
 reachable:</p>
-<pre tabindex="0"><code>edge# iptables -t mangle -A PREROUTING -s 10.17.0.0/24 -d 10.170.0.0/24 -m comment --comment &quot;for debugging&quot; -j MARK --set-mark 10
-edge# iptables -t mangle -A PREROUTING -s 10.17.0.0/24 -d 10.171.0.0/24 -m comment --comment &quot;for debugging&quot; -j MARK --set-mark 11
+<pre tabindex="0"><code>edge# iptables -t mangle -A PREROUTING -s 10.17.0.0/24 -d 10.170.0.0/24 -m comment --comment &#34;for debugging&#34; -j MARK --set-mark 10
+edge# iptables -t mangle -A PREROUTING -s 10.17.0.0/24 -d 10.171.0.0/24 -m comment --comment &#34;for debugging&#34; -j MARK --set-mark 11
 </code></pre><p>Now, we need to add a routing policy to select the correct default route based
 on the firewall mark:</p>
 <pre tabindex="0"><code>edge# ip -4 rule add fwmark 10 table 10
@@ -474,10 +474,10 @@ edge# iptables -t mangle -A OUTPUT -d 203.0.113.1/32 -p udp --dport 1716 -j MARK
 </code></pre><h4 id="connectivity-to-the-access-points">Connectivity to the access points</h4>
 <p>By clearing the firewall mark, we ensure traffic doesn’t get sent through our
 tunnel:</p>
-<pre tabindex="0"><code>edge# iptables -t mangle -A PREROUTING -s 10.17.0.0/24 -d 192.168.178.250 -j MARK --set-mark 0 -m comment --comment &quot;for debugging&quot;
-edge# iptables -t mangle -A PREROUTING -s 10.17.0.0/24 -d 192.168.178.251 -j MARK --set-mark 0 -m comment --comment &quot;for debugging&quot;
-edge# iptables -t mangle -A PREROUTING -s 10.17.0.0/24 -d 192.168.178.252 -j MARK --set-mark 0 -m comment --comment &quot;for debugging&quot;
-edge# iptables -t mangle -A PREROUTING -s 10.17.0.0/24 -d 192.168.178.253 -j MARK --set-mark 0 -m comment --comment &quot;for debugging&quot;
+<pre tabindex="0"><code>edge# iptables -t mangle -A PREROUTING -s 10.17.0.0/24 -d 192.168.178.250 -j MARK --set-mark 0 -m comment --comment &#34;for debugging&#34;
+edge# iptables -t mangle -A PREROUTING -s 10.17.0.0/24 -d 192.168.178.251 -j MARK --set-mark 0 -m comment --comment &#34;for debugging&#34;
+edge# iptables -t mangle -A PREROUTING -s 10.17.0.0/24 -d 192.168.178.252 -j MARK --set-mark 0 -m comment --comment &#34;for debugging&#34;
+edge# iptables -t mangle -A PREROUTING -s 10.17.0.0/24 -d 192.168.178.253 -j MARK --set-mark 0 -m comment --comment &#34;for debugging&#34;
 </code></pre><p>Also, since the access points are all in the same subnet, we need to tell Linux
 on which interface to send the packets, otherwise packets might egress on the
 wrong link:</p>
@@ -509,10 +509,10 @@ edge# ip6tables -t mangle -A PREROUTING -j prerouting_override
 #	./uplink.sh 1  # use only uplink1
 #	./uplink.sh    # use both uplinks again
 
-if [ &quot;$1&quot; = &quot;0&quot; ]; then
+if [ &#34;$1&#34; = &#34;0&#34; ]; then
 	# Use only uplink0
 	MARK=10
-elif [ &quot;$1&quot; = &quot;1&quot; ]; then
+elif [ &#34;$1&#34; = &#34;1&#34; ]; then
 	# Use only uplink1
 	MARK=11
 else
@@ -520,17 +520,17 @@ else
 	iptables -t mangle -F prerouting_override
 	ip6tables -t mangle -F prerouting_override
 	ip -4 rule del to 8.8.8.8/32
-	ip -4 rule add to 8.8.8.8/32 lookup &quot;110&quot;
+	ip -4 rule add to 8.8.8.8/32 lookup &#34;110&#34;
 	exit 0
 fi
 
 iptables -t mangle -F prerouting_override
-iptables -t mangle -A prerouting_override -s 10.17.0.0/24 -j MARK --set-mark &quot;${MARK}&quot;
+iptables -t mangle -A prerouting_override -s 10.17.0.0/24 -j MARK --set-mark &#34;${MARK}&#34;
 ip6tables -t mangle -F prerouting_override
-ip6tables -t mangle -A prerouting_override -j MARK --set-mark &quot;${MARK}&quot;
+ip6tables -t mangle -A prerouting_override -j MARK --set-mark &#34;${MARK}&#34;
 
 ip -4 rule del to 8.8.8.8/32
-ip -4 rule add to 8.8.8.8/32 lookup &quot;1${MARK}&quot;
+ip -4 rule add to 8.8.8.8/32 lookup &#34;1${MARK}&#34;
 </code></pre><h3 id="mss-clamping">MSS clamping</h3>
 <p>Because Path MTU discovery is often broken on the internet, it’s best practice
 to limit the Maximum Segment Size (MSS) of each TCP connection, achieving the
@@ -569,7 +569,7 @@ shaped the downstream traffic (i.e. made the tunnel endpoint shape traffic).</p>
 which worked beautifully and was way quicker to configure than the bigger ISC
 servers:</p>
 <pre tabindex="0"><code>edge# apt install dnsmasq
-edge# cat &gt; /etc/dnsmasq.d/rgb2r &lt;&lt;'EOT'
+edge# cat &gt; /etc/dnsmasq.d/rgb2r &lt;&lt;&#39;EOT&#39;
 interface=lan0
 dhcp-range=10.17.0.10,10.17.0.250,30m
 dhcp-range=::,constructor:lan0,ra-only

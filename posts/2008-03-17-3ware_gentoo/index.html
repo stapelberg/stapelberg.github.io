@@ -261,9 +261,9 @@ benutze ich folgendes Script:
 if [ &ldquo;${REALDEV}&rdquo; != &quot;&quot; ]
 then
 ebegin &ldquo;Tuning 3WARE-Controller (/dev/${REALDEV})&rdquo;
-echo 64 &gt; /sys/block/${REALDEV}/queue/max_sectors_kb &amp;&amp;<br>
-echo 512 &gt; /sys/block/${REALDEV}/queue/nr_requests &amp;&amp;<br>
-echo deadline &gt; /sys/block/${REALDEV}/queue/scheduler &amp;&amp;<br>
+echo 64 &gt; /sys/block/${REALDEV}/queue/max_sectors_kb &amp;&amp; <br>
+echo 512 &gt; /sys/block/${REALDEV}/queue/nr_requests &amp;&amp; <br>
+echo deadline &gt; /sys/block/${REALDEV}/queue/scheduler &amp;&amp; <br>
 blockdev &ndash;setra 16384 /dev/disk/by-id/scsi-1AMCC_W51517585EC0DB000531
 eend $?
 else

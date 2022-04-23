@@ -87,11 +87,11 @@ Listening:
 <p>Let’s locate the Caps Lock key’s corresponding row and column in our keyboard matrix!</p>
 <p>We can make QMK show which keys are recognized after each scan by adding to
 <code>keyboards/kinesis/keymaps/stapelberg/keymap.c</code> the following code:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#902000">void</span> <span style="color:#06287e">keyboard_post_init_user</span>() {
-  debug_config.enable <span style="color:#666">=</span> <span style="color:#007020">true</span>;
-  debug_config.matrix <span style="color:#666">=</span> <span style="color:#007020">true</span>;
-}
-</code></pre></div><p>Now we’ll see in the <code>hid_listen</code> output which key is active when pressing Caps Lock:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#902000">void</span> <span style="color:#06287e">keyboard_post_init_user</span>() {
+</span></span><span style="display:flex;"><span>  debug_config.enable <span style="color:#666">=</span> <span style="color:#007020">true</span>;
+</span></span><span style="display:flex;"><span>  debug_config.matrix <span style="color:#666">=</span> <span style="color:#007020">true</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Now we’ll see in the <code>hid_listen</code> output which key is active when pressing Caps Lock:</p>
 <pre tabindex="0"><code>r/c 01234567
 00: 00100000
 01: 00000000
@@ -165,23 +165,23 @@ Caps Lock LED pin after the next matrix scan has completed.</p>
 if we immediately update the Caps Lock LED pin. We can do this in
 <code>set_led_transfer_cb</code> in <code>tmk_core/protocol/chibios/usb_main.c</code>, which is called
 from the USB interrupt handler:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020">#include</span> <span style="color:#007020">&#34;gpio.h&#34;</span><span style="color:#007020">
-</span><span style="color:#007020"></span>
-<span style="color:#007020;font-weight:bold">static</span> <span style="color:#902000">void</span> <span style="color:#06287e">set_led_transfer_cb</span>(USBDriver <span style="color:#666">*</span>usbp) {
-    <span style="color:#007020;font-weight:bold">if</span> (usbp<span style="color:#666">-&gt;</span>setup[<span style="color:#40a070">6</span>] <span style="color:#666">==</span> <span style="color:#40a070">2</span>) { <span style="color:#60a0b0;font-style:italic">/* LSB(wLength) */</span>
-        <span style="color:#902000">uint8_t</span> report_id <span style="color:#666">=</span> set_report_buf[<span style="color:#40a070">0</span>];
-        <span style="color:#007020;font-weight:bold">if</span> ((report_id <span style="color:#666">==</span> REPORT_ID_KEYBOARD) <span style="color:#666">||</span> (report_id <span style="color:#666">==</span> REPORT_ID_NKRO)) {
-            keyboard_led_state <span style="color:#666">=</span> set_report_buf[<span style="color:#40a070">1</span>];
-        }
-    } <span style="color:#007020;font-weight:bold">else</span> {
-        keyboard_led_state <span style="color:#666">=</span> set_report_buf[<span style="color:#40a070">0</span>];
-    }
-<span style="display:block;width:100%;background-color:#d8d8d8">    <span style="color:#007020;font-weight:bold">if</span> ((keyboard_led_state <span style="color:#666">&amp;</span> <span style="color:#40a070">2</span>) <span style="color:#666">!=</span> <span style="color:#40a070">0</span>) {
-</span><span style="display:block;width:100%;background-color:#d8d8d8">      writePinLow(C7); <span style="color:#60a0b0;font-style:italic">// turn on CAPS_LOCK LED
-</span></span><span style="display:block;width:100%;background-color:#d8d8d8"><span style="color:#60a0b0;font-style:italic"></span>    } <span style="color:#007020;font-weight:bold">else</span> {
-</span><span style="display:block;width:100%;background-color:#d8d8d8">      writePinHigh(C7); <span style="color:#60a0b0;font-style:italic">// turn off CAPS_LOCK LED
-</span></span><span style="display:block;width:100%;background-color:#d8d8d8"><span style="color:#60a0b0;font-style:italic"></span>    }
-</span>}</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#include</span> <span style="color:#007020">&#34;gpio.h&#34;</span><span style="color:#007020">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">static</span> <span style="color:#902000">void</span> <span style="color:#06287e">set_led_transfer_cb</span>(USBDriver <span style="color:#666">*</span>usbp) {
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> (usbp<span style="color:#666">-&gt;</span>setup[<span style="color:#40a070">6</span>] <span style="color:#666">==</span> <span style="color:#40a070">2</span>) { <span style="color:#60a0b0;font-style:italic">/* LSB(wLength) */</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#902000">uint8_t</span> report_id <span style="color:#666">=</span> set_report_buf[<span style="color:#40a070">0</span>];
+</span></span><span style="display:flex;"><span>        <span style="color:#007020;font-weight:bold">if</span> ((report_id <span style="color:#666">==</span> REPORT_ID_KEYBOARD) <span style="color:#666">||</span> (report_id <span style="color:#666">==</span> REPORT_ID_NKRO)) {
+</span></span><span style="display:flex;"><span>            keyboard_led_state <span style="color:#666">=</span> set_report_buf[<span style="color:#40a070">1</span>];
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    } <span style="color:#007020;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>        keyboard_led_state <span style="color:#666">=</span> set_report_buf[<span style="color:#40a070">0</span>];
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    <span style="color:#007020;font-weight:bold">if</span> ((keyboard_led_state <span style="color:#666">&amp;</span> <span style="color:#40a070">2</span>) <span style="color:#666">!=</span> <span style="color:#40a070">0</span>) {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>      writePinLow(C7); <span style="color:#60a0b0;font-style:italic">// turn on CAPS_LOCK LED
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#60a0b0;font-style:italic"></span>    } <span style="color:#007020;font-weight:bold">else</span> {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>      writePinHigh(C7); <span style="color:#60a0b0;font-style:italic">// turn off CAPS_LOCK LED
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#60a0b0;font-style:italic"></span>    }
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
 <h3 id="host-side-linux">Host side (Linux)</h3>
 <p>On the USB host, i.e. the Linux computer, I switch to a <a href="https://en.wikipedia.org/wiki/Virtual_console">Virtual Terminal
 (VT)</a> by stopping my login
@@ -193,7 +193,7 @@ userspace.</p>
 <p>We can verify this by collecting stack traces with <a href="https://manpages.debian.org/bpftrace.8"><code>bpftrace(8)</code></a>
  when the kernel executes the <a href="https://elixir.bootlin.com/linux/v5.12/source/drivers/tty/vt/keyboard.c#L1521"><code>kbd_event</code> function in
 <code>drivers/tty/vt</code></a>:</p>
-<pre tabindex="0"><code>% sudo bpftrace -e 'kprobe:kbd_event { @[kstack] = count(); }'
+<pre tabindex="0"><code>% sudo bpftrace -e &#39;kprobe:kbd_event { @[kstack] = count(); }&#39;
 </code></pre><p>After pressing Caps Lock and cancelling the <code>bpftrace</code> process, you should see a
 stack trace.</p>
 <p>I then measured the baseline end-to-end latency, using <a href="https://github.com/kinx-project/measure-fw">my <code>measure-fw</code>
@@ -219,65 +219,65 @@ sketch</a>, with the Arduino IDE
 configured for:</p>
 <p>Teensy 4.0 (USB Type: Serial, CPU Speed: 600 MHz, Optimize: Faster)</p>
 <p>Here’s how we set up the pins in the measurement driver Teensy 4.0:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#902000">void</span> <span style="color:#06287e">setup</span>() {
-  Serial.begin(<span style="color:#40a070">9600</span>);
-
-  <span style="color:#60a0b0;font-style:italic">// Connected to kinT pin 15, COL_2
-</span><span style="color:#60a0b0;font-style:italic"></span>  pinMode(<span style="color:#40a070">11</span>, OUTPUT);
-  digitalWrite(<span style="color:#40a070">11</span>, HIGH);
-
-  <span style="color:#60a0b0;font-style:italic">// Connected to kinT pin 8, ROW_EQL.
-</span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#60a0b0;font-style:italic">// Pin 11 will be high/low in accordance with pin 10
-</span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#60a0b0;font-style:italic">// to simulate a key-press, and always high (unpressed)
-</span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#60a0b0;font-style:italic">// otherwise.
-</span><span style="color:#60a0b0;font-style:italic"></span>  pinMode(<span style="color:#40a070">10</span>, INPUT_PULLDOWN);
-  attachInterrupt(digitalPinToInterrupt(<span style="color:#40a070">10</span>), onScan, CHANGE);
-
-  <span style="color:#60a0b0;font-style:italic">// Connected to the kinT LED_CAPS_LOCK output:
-</span><span style="color:#60a0b0;font-style:italic"></span>  pinMode(<span style="color:#40a070">12</span>, INPUT_PULLDOWN);
-  attachInterrupt(digitalPinToInterrupt(<span style="color:#40a070">12</span>), onCapsLockLED, CHANGE);
-}
-</code></pre></div><p>In order to make a key read as pressed, we need to connect the column with the
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#902000">void</span> <span style="color:#06287e">setup</span>() {
+</span></span><span style="display:flex;"><span>  Serial.begin(<span style="color:#40a070">9600</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">// Connected to kinT pin 15, COL_2
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  pinMode(<span style="color:#40a070">11</span>, OUTPUT);
+</span></span><span style="display:flex;"><span>  digitalWrite(<span style="color:#40a070">11</span>, HIGH);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">// Connected to kinT pin 8, ROW_EQL.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#60a0b0;font-style:italic">// Pin 11 will be high/low in accordance with pin 10
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#60a0b0;font-style:italic">// to simulate a key-press, and always high (unpressed)
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#60a0b0;font-style:italic">// otherwise.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  pinMode(<span style="color:#40a070">10</span>, INPUT_PULLDOWN);
+</span></span><span style="display:flex;"><span>  attachInterrupt(digitalPinToInterrupt(<span style="color:#40a070">10</span>), onScan, CHANGE);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">// Connected to the kinT LED_CAPS_LOCK output:
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  pinMode(<span style="color:#40a070">12</span>, INPUT_PULLDOWN);
+</span></span><span style="display:flex;"><span>  attachInterrupt(digitalPinToInterrupt(<span style="color:#40a070">12</span>), onCapsLockLED, CHANGE);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>In order to make a key read as pressed, we need to connect the column with the
 row in the keyboard matrix, but only when the column is scanned. We do that in
 the interrupt handler like so:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#902000">bool</span> simulate_press <span style="color:#666">=</span> <span style="color:#007020">false</span>;
-
-<span style="color:#902000">void</span> <span style="color:#06287e">onScan</span>() {
-  <span style="color:#007020;font-weight:bold">if</span> (simulate_press) {
-    <span style="color:#60a0b0;font-style:italic">// connect row scan signal with column read
-</span><span style="color:#60a0b0;font-style:italic"></span>    digitalWrite(<span style="color:#40a070">11</span>, digitalRead(<span style="color:#40a070">10</span>));
-  } <span style="color:#007020;font-weight:bold">else</span> {
-    <span style="color:#60a0b0;font-style:italic">// always read not pressed otherwise
-</span><span style="color:#60a0b0;font-style:italic"></span>    digitalWrite(<span style="color:#40a070">11</span>, HIGH);
-  }
-}
-</code></pre></div><p>In our text interface, we can now start a measurement like so:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">caps_lock_on_to_off <span style="color:#666">=</span> capsLockOn();
-Serial.printf(<span style="color:#4070a0">&#34;# Caps Lock key pressed (transition: %s)</span><span style="color:#4070a0;font-weight:bold">\r\n</span><span style="color:#4070a0">&#34;</span>,
-  caps_lock_on_to_off <span style="color:#666">?</span> <span style="color:#4070a0">&#34;on to off&#34;</span> <span style="color:#666">:</span> <span style="color:#4070a0">&#34;off to on&#34;</span>);
-simulate_press <span style="color:#666">=</span> <span style="color:#007020">true</span>;
-t0 <span style="color:#666">=</span> ARM_DWT_CYCCNT;
-emt0 <span style="color:#666">=</span> <span style="color:#40a070">0</span>;
-eut0 <span style="color:#666">=</span> <span style="color:#40a070">0</span>;
-</code></pre></div><p>The next keyboard matrix scan will detect the key as pressed, send the HID
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#902000">bool</span> simulate_press <span style="color:#666">=</span> <span style="color:#007020">false</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#902000">void</span> <span style="color:#06287e">onScan</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">if</span> (simulate_press) {
+</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic">// connect row scan signal with column read
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    digitalWrite(<span style="color:#40a070">11</span>, digitalRead(<span style="color:#40a070">10</span>));
+</span></span><span style="display:flex;"><span>  } <span style="color:#007020;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic">// always read not pressed otherwise
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    digitalWrite(<span style="color:#40a070">11</span>, HIGH);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>In our text interface, we can now start a measurement like so:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>caps_lock_on_to_off <span style="color:#666">=</span> capsLockOn();
+</span></span><span style="display:flex;"><span>Serial.printf(<span style="color:#4070a0">&#34;# Caps Lock key pressed (transition: %s)</span><span style="color:#4070a0;font-weight:bold">\r\n</span><span style="color:#4070a0">&#34;</span>,
+</span></span><span style="display:flex;"><span>  caps_lock_on_to_off <span style="color:#666">?</span> <span style="color:#4070a0">&#34;on to off&#34;</span> <span style="color:#666">:</span> <span style="color:#4070a0">&#34;off to on&#34;</span>);
+</span></span><span style="display:flex;"><span>simulate_press <span style="color:#666">=</span> <span style="color:#007020">true</span>;
+</span></span><span style="display:flex;"><span>t0 <span style="color:#666">=</span> ARM_DWT_CYCCNT;
+</span></span><span style="display:flex;"><span>emt0 <span style="color:#666">=</span> <span style="color:#40a070">0</span>;
+</span></span><span style="display:flex;"><span>eut0 <span style="color:#666">=</span> <span style="color:#40a070">0</span>;
+</span></span></code></pre></div><p>The next keyboard matrix scan will detect the key as pressed, send the HID
 report to the OS, and when the OS responds with its HID report containing the
 Caps Lock LED status, our Caps Lock LED interrupt handler is called to finish
 the measurement:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#902000">void</span> <span style="color:#06287e">onCapsLockLED</span>() {
-  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint32_t</span> t1 <span style="color:#666">=</span> ARM_DWT_CYCCNT;
-  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint32_t</span> elapsed_millis <span style="color:#666">=</span> emt0;
-  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint32_t</span> elapsed_micros <span style="color:#666">=</span> eut0;
-  <span style="color:#902000">uint32_t</span> elapsed_nanos <span style="color:#666">=</span> (t1 <span style="color:#666">-</span> t0) <span style="color:#666">/</span> cycles_per_ns;
-
-  Serial.printf(<span style="color:#4070a0">&#34;# Caps Lock LED (pin 12) is now %s</span><span style="color:#4070a0;font-weight:bold">\r\n</span><span style="color:#4070a0">&#34;</span>, capsLockOn() <span style="color:#666">?</span> <span style="color:#4070a0">&#34;on&#34;</span> <span style="color:#666">:</span> <span style="color:#4070a0">&#34;off&#34;</span>);
-  Serial.printf(<span style="color:#4070a0">&#34;# %u ms == %u us</span><span style="color:#4070a0;font-weight:bold">\r\n</span><span style="color:#4070a0">&#34;</span>, elapsed_millis, elapsed_micros);
-  Serial.printf(<span style="color:#4070a0">&#34;BenchmarkKeypressToLEDReport 1 %u ns/op</span><span style="color:#4070a0;font-weight:bold">\r\n</span><span style="color:#4070a0">&#34;</span>, elapsed_nanos);
-  Serial.printf(<span style="color:#4070a0">&#34;</span><span style="color:#4070a0;font-weight:bold">\r\n</span><span style="color:#4070a0">&#34;</span>);
-}
-</code></pre></div><h3 id="running-measurements">Running measurements</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#902000">void</span> <span style="color:#06287e">onCapsLockLED</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint32_t</span> t1 <span style="color:#666">=</span> ARM_DWT_CYCCNT;
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint32_t</span> elapsed_millis <span style="color:#666">=</span> emt0;
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint32_t</span> elapsed_micros <span style="color:#666">=</span> eut0;
+</span></span><span style="display:flex;"><span>  <span style="color:#902000">uint32_t</span> elapsed_nanos <span style="color:#666">=</span> (t1 <span style="color:#666">-</span> t0) <span style="color:#666">/</span> cycles_per_ns;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  Serial.printf(<span style="color:#4070a0">&#34;# Caps Lock LED (pin 12) is now %s</span><span style="color:#4070a0;font-weight:bold">\r\n</span><span style="color:#4070a0">&#34;</span>, capsLockOn() <span style="color:#666">?</span> <span style="color:#4070a0">&#34;on&#34;</span> <span style="color:#666">:</span> <span style="color:#4070a0">&#34;off&#34;</span>);
+</span></span><span style="display:flex;"><span>  Serial.printf(<span style="color:#4070a0">&#34;# %u ms == %u us</span><span style="color:#4070a0;font-weight:bold">\r\n</span><span style="color:#4070a0">&#34;</span>, elapsed_millis, elapsed_micros);
+</span></span><span style="display:flex;"><span>  Serial.printf(<span style="color:#4070a0">&#34;BenchmarkKeypressToLEDReport 1 %u ns/op</span><span style="color:#4070a0;font-weight:bold">\r\n</span><span style="color:#4070a0">&#34;</span>, elapsed_nanos);
+</span></span><span style="display:flex;"><span>  Serial.printf(<span style="color:#4070a0">&#34;</span><span style="color:#4070a0;font-weight:bold">\r\n</span><span style="color:#4070a0">&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="running-measurements">Running measurements</h3>
 <p>Connect the Teensy 4.0 to your computer and open its USB serial console:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">% screen /dev/ttyACM0 <span style="color:#40a070">115200</span>
-</code></pre></div><p>You should be greeted by a welcome message:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% screen /dev/ttyACM0 <span style="color:#40a070">115200</span>
+</span></span></code></pre></div><p>You should be greeted by a welcome message:</p>
 <pre tabindex="0"><code># kinT latency measurement driver
 #   t  - trigger measurement
 </code></pre><p>To save your measurements to file, use <code>C-a H</code> in <code>screen</code> to make it write to
@@ -300,10 +300,10 @@ scan-to-scan delay:</p>
 <p>We can verify this approach by making QMK self-report its scan rate. Enable the
 matrix scan rate debug option in <code>keyboards/kinesis/keymaps/stapelberg/config.h</code>
 like so:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020">#pragma once
-</span><span style="color:#007020"></span>
-<span style="color:#007020">#define DEBUG_MATRIX_SCAN_RATE
-</span></code></pre></div><p>Using <code>hid_listen</code> we can now see the following QMK debug messages:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#pragma once
+</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>
+</span></span><span style="display:flex;"><span><span style="color:#007020">#define DEBUG_MATRIX_SCAN_RATE
+</span></span></span></code></pre></div><p>Using <code>hid_listen</code> we can now see the following QMK debug messages:</p>
 <pre tabindex="0"><code>% sudo hid_listen
 Waiting for new device:..
 Listening:
@@ -315,13 +315,13 @@ scan:</p>
 <pre tabindex="0"><code>1000000 μs / 2367 scans/second = 422μs
 </code></pre><p>Yet another way of verifying the approach is by short-circuiting an end-to-end
 measurement with a one-line change in our QMK keyboard code:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#902000">bool</span> <span style="color:#06287e">process_action_kb</span>(keyrecord_t <span style="color:#666">*</span>record) {
-<span style="color:#007020">#define LED_CAPS_LOCK LINE_PIN12
-</span><span style="color:#007020">#define ledTurnOn writePinLow
-</span><span style="color:#007020"></span>  ledTurnOn(LED_CAPS_LOCK);
-  <span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020">true</span>;
-}
-</code></pre></div><p>Repeating the measurements, this gives us:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#902000">bool</span> <span style="color:#06287e">process_action_kb</span>(keyrecord_t <span style="color:#666">*</span>record) {
+</span></span><span style="display:flex;"><span><span style="color:#007020">#define LED_CAPS_LOCK LINE_PIN12
+</span></span></span><span style="display:flex;"><span><span style="color:#007020">#define ledTurnOn writePinLow
+</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>  ledTurnOn(LED_CAPS_LOCK);
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020">true</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Repeating the measurements, this gives us:</p>
 <pre tabindex="0"><code>% benchstat screenlog.0     
 name                 time/op
 KeypressToLEDReport  693µs ±26%
@@ -557,8 +557,8 @@ alternate setting with <code>bInterval=1</code> and one with <code>bInterval=10<
 T:  Bus=01 Lev=02 Prnt=09 Port=02 Cnt=02 Dev#= 53 Spd=480  MxCh= 0
 D:  Ver= 2.00 Cls=00(&gt;ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
 P:  Vendor=1209 ProdID=345c Rev= 0.01
-S:  Manufacturer=&quot;https://github.com/stapelberg&quot;
-S:  Product=&quot;kinT (kint41)&quot;
+S:  Manufacturer=&#34;https://github.com/stapelberg&#34;
+S:  Product=&#34;kinT (kint41)&#34;
 C:* #Ifs= 3 Cfg#= 1 Atr=a0 MxPwr=500mA
 I:* If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=01 Driver=usbhid
 E:  Ad=81(I) Atr=03(Int.) MxPS=   8 Ivl=125us
@@ -648,25 +648,25 @@ tick</a>.</p>
 <p>Instead, I found it easier to implement short delays by busy-looping until the
 ARM Cycle Counter Register (<code>CYCCNT</code>) indicates enough time has passed. Here’s
 an example from <code>keyboards/kinesis/kint41/kint41.c</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#60a0b0;font-style:italic">// delay_inline sleeps for |cycles| (e.g. sleeping for F_CPU will sleep 1s).
-</span><span style="color:#60a0b0;font-style:italic">//
-</span><span style="color:#60a0b0;font-style:italic">// delay_inline assumes the cycle counter has already been initialized and
-</span><span style="color:#60a0b0;font-style:italic">// should not be modified, i.e. is safe to call during keyboard matrix scan.
-</span><span style="color:#60a0b0;font-style:italic">//
-</span><span style="color:#60a0b0;font-style:italic">// ChibiOS enables the cycle counter in chcore_v7m.c.
-</span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">static</span> <span style="color:#902000">void</span> <span style="color:#06287e">delay_inline</span>(<span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint32_t</span> cycles) {
-  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint32_t</span> start <span style="color:#666">=</span> DWT<span style="color:#666">-&gt;</span>CYCCNT;
-  <span style="color:#007020;font-weight:bold">while</span> ((DWT<span style="color:#666">-&gt;</span>CYCCNT <span style="color:#666">-</span> start) <span style="color:#666">&lt;</span> cycles) {
-    <span style="color:#60a0b0;font-style:italic">// busy-loop until time has passed
-</span><span style="color:#60a0b0;font-style:italic"></span>  }
-}
-
-<span style="color:#902000">void</span> <span style="color:#06287e">matrix_output_unselect_delay</span>(<span style="color:#902000">void</span>) {
-  <span style="color:#60a0b0;font-style:italic">// 600 cycles at 0.6 cycles/ns == 1μs
-</span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint32_t</span> cycles_per_us <span style="color:#666">=</span> <span style="color:#40a070">600</span>;
-  delay_inline(<span style="color:#40a070">10</span> <span style="color:#666">*</span> cycles_per_us);
-}
-</code></pre></div><p>Of course, the cycles/ns value is specific to the frequency at which your micro
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// delay_inline sleeps for |cycles| (e.g. sleeping for F_CPU will sleep 1s).
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">//
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// delay_inline assumes the cycle counter has already been initialized and
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// should not be modified, i.e. is safe to call during keyboard matrix scan.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">//
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// ChibiOS enables the cycle counter in chcore_v7m.c.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">static</span> <span style="color:#902000">void</span> <span style="color:#06287e">delay_inline</span>(<span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint32_t</span> cycles) {
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint32_t</span> start <span style="color:#666">=</span> DWT<span style="color:#666">-&gt;</span>CYCCNT;
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">while</span> ((DWT<span style="color:#666">-&gt;</span>CYCCNT <span style="color:#666">-</span> start) <span style="color:#666">&lt;</span> cycles) {
+</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic">// busy-loop until time has passed
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#902000">void</span> <span style="color:#06287e">matrix_output_unselect_delay</span>(<span style="color:#902000">void</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">// 600 cycles at 0.6 cycles/ns == 1μs
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint32_t</span> cycles_per_us <span style="color:#666">=</span> <span style="color:#40a070">600</span>;
+</span></span><span style="display:flex;"><span>  delay_inline(<span style="color:#40a070">10</span> <span style="color:#666">*</span> cycles_per_us);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Of course, the cycles/ns value is specific to the frequency at which your micro
 controller runs, so this code needs to be adjusted for each platform.</p>
 <h2 id="results">Results</h2>
 <p>With the QMK keyboard firmware configured for lowest input latency, how do the
@@ -805,24 +805,24 @@ even 10ms of injected input latency.</p>
 <p>You can also verify the USB polling interval on the device side. In the SOF
 (Start Of Frame) interrupt in <code>tmk_core/protocol/chibios/usb_main.c</code>, we can
 print the cycle delta to the previous SOF callback, every second:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020">#include</span> <span style="color:#007020">&#34;timer.h&#34;</span><span style="color:#007020">
-</span><span style="color:#007020"></span>
-<span style="color:#007020;font-weight:bold">static</span> <span style="color:#902000">uint32_t</span> last_sof <span style="color:#666">=</span> <span style="color:#40a070">0</span>;
-<span style="color:#007020;font-weight:bold">static</span> <span style="color:#902000">uint32_t</span> sof_timer <span style="color:#666">=</span> <span style="color:#40a070">0</span>;
-<span style="color:#902000">void</span> <span style="color:#06287e">kbd_sof_cb</span>(USBDriver <span style="color:#666">*</span>usbp) {
-  (<span style="color:#902000">void</span>)usbp;
-
-  <span style="color:#902000">uint32_t</span> now <span style="color:#666">=</span> DWT<span style="color:#666">-&gt;</span>CYCCNT;
-  <span style="color:#902000">uint32_t</span> delta <span style="color:#666">=</span> now <span style="color:#666">-</span> last_sof;
-  last_sof <span style="color:#666">=</span> now;
-
-  <span style="color:#902000">uint32_t</span> timer_now <span style="color:#666">=</span> timer_read32();
-  <span style="color:#007020;font-weight:bold">if</span> (TIMER_DIFF_32(timer_now, sof_timer) <span style="color:#666">&gt;</span> <span style="color:#40a070">1000</span>) {
-    sof_timer <span style="color:#666">=</span> timer_now;
-    dprintf(<span style="color:#4070a0">&#34;sof delta: %u cycles&#34;</span>, delta);
-  }
-}
-</code></pre></div><p>Using <code>hid_listen</code>, we expect to see ≈75000 cycles of delta, which
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#include</span> <span style="color:#007020">&#34;timer.h&#34;</span><span style="color:#007020">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">static</span> <span style="color:#902000">uint32_t</span> last_sof <span style="color:#666">=</span> <span style="color:#40a070">0</span>;
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">static</span> <span style="color:#902000">uint32_t</span> sof_timer <span style="color:#666">=</span> <span style="color:#40a070">0</span>;
+</span></span><span style="display:flex;"><span><span style="color:#902000">void</span> <span style="color:#06287e">kbd_sof_cb</span>(USBDriver <span style="color:#666">*</span>usbp) {
+</span></span><span style="display:flex;"><span>  (<span style="color:#902000">void</span>)usbp;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#902000">uint32_t</span> now <span style="color:#666">=</span> DWT<span style="color:#666">-&gt;</span>CYCCNT;
+</span></span><span style="display:flex;"><span>  <span style="color:#902000">uint32_t</span> delta <span style="color:#666">=</span> now <span style="color:#666">-</span> last_sof;
+</span></span><span style="display:flex;"><span>  last_sof <span style="color:#666">=</span> now;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#902000">uint32_t</span> timer_now <span style="color:#666">=</span> timer_read32();
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">if</span> (TIMER_DIFF_32(timer_now, sof_timer) <span style="color:#666">&gt;</span> <span style="color:#40a070">1000</span>) {
+</span></span><span style="display:flex;"><span>    sof_timer <span style="color:#666">=</span> timer_now;
+</span></span><span style="display:flex;"><span>    dprintf(<span style="color:#4070a0">&#34;sof delta: %u cycles&#34;</span>, delta);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Using <code>hid_listen</code>, we expect to see ≈75000 cycles of delta, which
 corresponds to the 125μs microframe latency of USB 2.0 High Speed with
 <code>bInterval=1</code> in the USB device descriptor:</p>
 <p>125μs * 1000 * 0.6 cycles/ns = 75000 cycles</p>

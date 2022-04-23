@@ -217,41 +217,41 @@ guide until I had dex serving the example config.</p>
 <li>Configure GitLab’s redirect URI.</li>
 </ol>
 <p>Here is a diff:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff"><span style="color:#a00000">--- /proc/self/fd/11	2017-10-21 15:01:49.005587935 +0200
-</span><span style="color:#a00000"></span><span style="color:#00a000">+++ /tmp/config-dev.yaml	2017-10-21 15:01:47.121632025 +0200
-</span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -1,7 +1,7 @@
-</span><span style="color:#800080;font-weight:bold"></span> # The base path of dex and the external name of the OpenID Connect service.
- # This is the canonical URL that all clients MUST use to refer to dex. If a
- # path is provided, dex&#39;s HTTP service will listen at a non-root URL.
-<span style="color:#a00000">-issuer: http://127.0.0.1:5556/dex
-</span><span style="color:#a00000"></span><span style="color:#00a000">+issuer: https://dex.example.net:5554/dex
-</span><span style="color:#00a000"></span> 
- # The storage configuration determines where dex stores its state. Supported
- # options include SQL flavors and Kubernetes third party resources.
-<span style="color:#800080;font-weight:bold">@@ -14,11 +14,9 @@
-</span><span style="color:#800080;font-weight:bold"></span> 
- # Configuration for the HTTP endpoints.
- web:
-<span style="color:#a00000">-  http: 0.0.0.0:5556
-</span><span style="color:#a00000">-  # Uncomment for HTTPS options.
-</span><span style="color:#a00000">-  # https: 127.0.0.1:5554
-</span><span style="color:#a00000">-  # tlsCert: /etc/dex/tls.crt
-</span><span style="color:#a00000">-  # tlsKey: /etc/dex/tls.key
-</span><span style="color:#a00000"></span><span style="color:#00a000">+  https: dex.example.net:5554
-</span><span style="color:#00a000">+  tlsCert: /etc/letsencrypt/live/dex.example.net/fullchain.pem
-</span><span style="color:#00a000">+  tlsKey: /etc/letsencrypt/live/dex.example.net/privkey.pem
-</span><span style="color:#00a000"></span> 
- # Uncomment this block to enable the gRPC API. This values MUST be different
- # from the HTTP endpoints.
-<span style="color:#800080;font-weight:bold">@@ -50,7 +48,7 @@
-</span><span style="color:#800080;font-weight:bold"></span> staticClients:
- - id: example-app
-   redirectURIs:
-<span style="color:#a00000">-  - &#39;http://127.0.0.1:5555/callback&#39;
-</span><span style="color:#a00000"></span><span style="color:#00a000">+  - &#39;http://gitlab.example.net/users/auth/mydex/callback&#39;
-</span><span style="color:#00a000"></span>   name: &#39;Example App&#39;
-   secret: ZXhhbXBsZS1hcHAtc2VjcmV0
-</code></pre></div><h3 id="step-2-configure-gitlab">Step 2: configure GitLab</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#a00000">--- /proc/self/fd/11	2017-10-21 15:01:49.005587935 +0200
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ /tmp/config-dev.yaml	2017-10-21 15:01:47.121632025 +0200
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -1,7 +1,7 @@
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span> # The base path of dex and the external name of the OpenID Connect service.
+</span></span><span style="display:flex;"><span> # This is the canonical URL that all clients MUST use to refer to dex. If a
+</span></span><span style="display:flex;"><span> # path is provided, dex&#39;s HTTP service will listen at a non-root URL.
+</span></span><span style="display:flex;"><span><span style="color:#a00000">-issuer: http://127.0.0.1:5556/dex
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+issuer: https://dex.example.net:5554/dex
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 
+</span></span><span style="display:flex;"><span> # The storage configuration determines where dex stores its state. Supported
+</span></span><span style="display:flex;"><span> # options include SQL flavors and Kubernetes third party resources.
+</span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -14,11 +14,9 @@
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span> 
+</span></span><span style="display:flex;"><span> # Configuration for the HTTP endpoints.
+</span></span><span style="display:flex;"><span> web:
+</span></span><span style="display:flex;"><span><span style="color:#a00000">-  http: 0.0.0.0:5556
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">-  # Uncomment for HTTPS options.
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">-  # https: 127.0.0.1:5554
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">-  # tlsCert: /etc/dex/tls.crt
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">-  # tlsKey: /etc/dex/tls.key
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+  https: dex.example.net:5554
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+  tlsCert: /etc/letsencrypt/live/dex.example.net/fullchain.pem
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+  tlsKey: /etc/letsencrypt/live/dex.example.net/privkey.pem
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 
+</span></span><span style="display:flex;"><span> # Uncomment this block to enable the gRPC API. This values MUST be different
+</span></span><span style="display:flex;"><span> # from the HTTP endpoints.
+</span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -50,7 +48,7 @@
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span> staticClients:
+</span></span><span style="display:flex;"><span> - id: example-app
+</span></span><span style="display:flex;"><span>   redirectURIs:
+</span></span><span style="display:flex;"><span><span style="color:#a00000">-  - &#39;http://127.0.0.1:5555/callback&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+  - &#39;http://gitlab.example.net/users/auth/mydex/callback&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>   name: &#39;Example App&#39;
+</span></span><span style="display:flex;"><span>   secret: ZXhhbXBsZS1hcHAtc2VjcmV0
+</span></span></code></pre></div><h3 id="step-2-configure-gitlab">Step 2: configure GitLab</h3>
 <p>First, I followed <a href="https://docs.gitlab.com/omnibus/docker/">GitLab Docker
 images</a> to get GitLab running in
 Docker.</p>
@@ -259,20 +259,20 @@ Docker.</p>
 <a href="https://hub.docker.com/r/computersciencehouse/gitlab-ce-oidc/">computersciencehouse/gitlab-ce-oidc</a>,
 which is based on the official image, but adds OpenID Connect support.</p>
 <p>I added the following config to <code>/srv/gitlab/config/gitlab.rb</code>:</p>
-<pre tabindex="0"><code>gitlab_rails['omniauth_enabled'] = true
+<pre tabindex="0"><code>gitlab_rails[&#39;omniauth_enabled&#39;] = true
 
 # Must match the args.name (!) of our configured omniauth provider:
-gitlab_rails['omniauth_allow_single_sign_on'] = ['mydex']
+gitlab_rails[&#39;omniauth_allow_single_sign_on&#39;] = [&#39;mydex&#39;]
 
 # By default, third-party authentication results in a newly created
 # user which needs to be unblocked by an admin. Disable this
 # additional safety mechanism and directly create users:
-gitlab_rails['omniauth_block_auto_created_users'] = false
+gitlab_rails[&#39;omniauth_block_auto_created_users&#39;] = false
 
-gitlab_rails['omniauth_providers'] = [
+gitlab_rails[&#39;omniauth_providers&#39;] = [
   {
-    name: 'openid_connect',  # identifies the omniauth gem to use
-    label: 'OIDC',
+    name: &#39;openid_connect&#39;,  # identifies the omniauth gem to use
+    label: &#39;OIDC&#39;,
     args: {
       # The name shows up in the GitLab UI in title-case, i.e. “Mydex”,
       # and must match the name in client_options.redirect_uri below
@@ -281,74 +281,73 @@ gitlab_rails['omniauth_providers'] = [
       # NOTE that if you change the name after users have already
       # signed up through the provider, you will need to update the
       # “identities” PostgreSQL table accordingly:
-      # echo &quot;UPDATE identities SET provider = 'newdex' WHERE \
-      #   provider = 'mydex';&quot; | gitlab-psql gitlabhq_production
-      'name':          'mydex',
+      # echo &#34;UPDATE identities SET provider = &#39;newdex&#39; WHERE \
+      #   provider = &#39;mydex&#39;;&#34; | gitlab-psql gitlabhq_production
+      &#39;name&#39;:          &#39;mydex&#39;,
 
       # Scope must contain “email”.
-      'scope':         ['openid', 'profile', 'email'],
+      &#39;scope&#39;:         [&#39;openid&#39;, &#39;profile&#39;, &#39;email&#39;],
 
       # Discover all endpoints from the issuer, specifically from
       # https://dex.example.net:5554/dex/.well-known/openid-configuration
-      'discovery':     true,
+      &#39;discovery&#39;:     true,
 
       # Must match the issuer configured in dex:
       # Note that http:// URLs did not work in my tests; use https://
-      'issuer':        'https://dex.example.net:5554/dex',
+      &#39;issuer&#39;:        &#39;https://dex.example.net:5554/dex&#39;,
 
-      'client_options': {
+      &#39;client_options&#39;: {
         # identifier, secret and redirect_uri must match a
 	# configured client in dex.
-        'identifier':   'example-app',
-        'secret':       'ZXhhbXBsZS1hcHAtc2VjcmV0',
-        'redirect_uri': 'https://gitlab.example.net/users/auth/mydex/callback'
+        &#39;identifier&#39;:   &#39;example-app&#39;,
+        &#39;secret&#39;:       &#39;ZXhhbXBsZS1hcHAtc2VjcmV0&#39;,
+        &#39;redirect_uri&#39;: &#39;https://gitlab.example.net/users/auth/mydex/callback&#39;
       }
     }
   }
 ]
-
 </code></pre><h3 id="step-3-patch-omniauth-openid-connect">Step 3: patch omniauth-openid-connect</h3>
 <p>Until <a href="https://github.com/coreos/dex/issues/376">dex issue #376</a> is fixed, the
 following patch for the omniauth-openid-connect gem is required:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff"><span style="color:#a00000">--- /opt/gitlab/embedded/lib/ruby/gems/2.3.0/gems/omniauth-openid-connect-0.2.3/lib/omniauth/strategies/openid_connect.rb.orig	2017-10-21 12:31:50.777602847 +0000
-</span><span style="color:#a00000"></span><span style="color:#00a000">+++ /opt/gitlab/embedded/lib/ruby/gems/2.3.0/gems/omniauth-openid-connect-0.2.3/lib/omniauth/strategies/openid_connect.rb	2017-10-21 12:34:20.063308560 +0000
-</span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -42,24 +42,13 @@
-</span><span style="color:#800080;font-weight:bold"></span>       option :send_nonce, true
-       option :client_auth_method
- 
-<span style="color:#a00000">-      uid { user_info.sub }
-</span><span style="color:#a00000">-
-</span><span style="color:#a00000"></span><span style="color:#00a000">+      uid { @email }
-</span><span style="color:#00a000"></span>       info do
-<span style="color:#a00000">-        {
-</span><span style="color:#a00000">-          name: user_info.name,
-</span><span style="color:#a00000">-          email: user_info.email,
-</span><span style="color:#a00000">-          nickname: user_info.preferred_username,
-</span><span style="color:#a00000">-          first_name: user_info.given_name,
-</span><span style="color:#a00000">-          last_name: user_info.family_name,
-</span><span style="color:#a00000">-          gender: user_info.gender,
-</span><span style="color:#a00000">-          image: user_info.picture,
-</span><span style="color:#a00000">-          phone: user_info.phone_number,
-</span><span style="color:#a00000">-          urls: { website: user_info.website }
-</span><span style="color:#a00000">-        }
-</span><span style="color:#a00000"></span><span style="color:#00a000">+        { email: @email }
-</span><span style="color:#00a000"></span>       end
- 
-       extra do
-<span style="color:#a00000">-        {raw_info: user_info.raw_attributes}
-</span><span style="color:#a00000"></span><span style="color:#00a000">+        {raw_info: {}}
-</span><span style="color:#00a000"></span>       end
- 
-       credentials do
-<span style="color:#800080;font-weight:bold">@@ -165,6 +154,7 @@
-</span><span style="color:#800080;font-weight:bold"></span>               client_id: client_options.identifier,
-               nonce: stored_nonce
-           )
-<span style="color:#00a000">+          @email = _id_token.raw_attributes[&#39;email&#39;]
-</span><span style="color:#00a000"></span>           _access_token
-         }.call()
-       end
-</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#a00000">--- /opt/gitlab/embedded/lib/ruby/gems/2.3.0/gems/omniauth-openid-connect-0.2.3/lib/omniauth/strategies/openid_connect.rb.orig	2017-10-21 12:31:50.777602847 +0000
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ /opt/gitlab/embedded/lib/ruby/gems/2.3.0/gems/omniauth-openid-connect-0.2.3/lib/omniauth/strategies/openid_connect.rb	2017-10-21 12:34:20.063308560 +0000
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -42,24 +42,13 @@
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>       option :send_nonce, true
+</span></span><span style="display:flex;"><span>       option :client_auth_method
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span><span style="color:#a00000">-      uid { user_info.sub }
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">-
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+      uid { @email }
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>       info do
+</span></span><span style="display:flex;"><span><span style="color:#a00000">-        {
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">-          name: user_info.name,
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">-          email: user_info.email,
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">-          nickname: user_info.preferred_username,
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">-          first_name: user_info.given_name,
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">-          last_name: user_info.family_name,
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">-          gender: user_info.gender,
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">-          image: user_info.picture,
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">-          phone: user_info.phone_number,
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">-          urls: { website: user_info.website }
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">-        }
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+        { email: @email }
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>       end
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>       extra do
+</span></span><span style="display:flex;"><span><span style="color:#a00000">-        {raw_info: user_info.raw_attributes}
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+        {raw_info: {}}
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>       end
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>       credentials do
+</span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -165,6 +154,7 @@
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>               client_id: client_options.identifier,
+</span></span><span style="display:flex;"><span>               nonce: stored_nonce
+</span></span><span style="display:flex;"><span>           )
+</span></span><span style="display:flex;"><span><span style="color:#00a000">+          @email = _id_token.raw_attributes[&#39;email&#39;]
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>           _access_token
+</span></span><span style="display:flex;"><span>         }.call()
+</span></span><span style="display:flex;"><span>       end
+</span></span></code></pre></div>
 </div>
 
       </div>

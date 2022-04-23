@@ -238,15 +238,15 @@ zugreifen.
 Nachdem wir uns eingeloggt haben, sollte die Ausgabe in etwa so aussehen:
 </p>
 <pre tabindex="0"><code>$ ssh wrt
-The authenticity of host '192.168.1.1 (192.168.1.1)' can't be established.
+The authenticity of host &#39;192.168.1.1 (192.168.1.1)&#39; can&#39;t be established.
 RSA key fingerprint is f9:92:ab:la:34:le:64:lu:40:nu:3f:rd:bc:er:41:ma.
 Are you sure you want to continue connecting (yes/no)? yes
-Warning: Permanently added '192.168.1.1' (RSA) to the list of known hosts.
-root@192.168.1.1's password: 
+Warning: Permanently added &#39;192.168.1.1&#39; (RSA) to the list of known hosts.
+root@192.168.1.1&#39;s password: 
 
 
 BusyBox v1.00 (2005.11.23-21:46+0000) Built-in shell (ash)
-Enter 'help' for a list of built-in commands.
+Enter &#39;help&#39; for a list of built-in commands.
 
   _______                     ________        __
  |       |.-----.-----.-----.|  |  |  |.----.|  |_
@@ -279,7 +279,7 @@ iptables -t nat -F prerouting_rule
 iptables -t nat -F postrouting_rule
 
 ### BIG FAT DISCLAIMER
-### The &quot;-i $WAN&quot; literally means packets that came in over the $WAN interface;
+### The &#34;-i $WAN&#34; literally means packets that came in over the $WAN interface;
 ### this WILL NOT MATCH packets sent from the LAN to the WAN address.
 
 ### Allow SSH on the WAN interface
@@ -326,8 +326,8 @@ ist. Wir legen uns also zwei Variablen an (direkt am Anfang der Datei):
 
 WAN=$(nvram get wan_ifname)
 LAN=$(nvram get lan_ifname)
-PRE_STR=&quot;iptables -t nat -A prerouting_rule -i $WAN -p tcp -j DNAT&quot;
-FOR_STR=&quot;iptables -A forwarding_rule -i $WAN -p tcp -j ACCEPT&quot;
+PRE_STR=&#34;iptables -t nat -A prerouting_rule -i $WAN -p tcp -j DNAT&#34;
+FOR_STR=&#34;iptables -A forwarding_rule -i $WAN -p tcp -j ACCEPT&#34;
 </code></pre><p>Nun können wir eine Portweiterleitung so anlegen:</p>
 <pre tabindex="0"><code>$PRE_STR --dport &lt;PORT&gt; --to &lt;IP&gt;
 $FOR_STR --dport &lt;PORT&gt; -d &lt;IP&gt;
@@ -356,8 +356,8 @@ Eine komplett fertige /etc/firewall.user sieht dann zum Beispiel so aus (die
 
 WAN=$(nvram get wan_ifname)
 LAN=$(nvram get lan_ifname)
-PRE_STR=&quot;iptables -t nat -A prerouting_rule -i $WAN -p tcp -j DNAT&quot;
-FOR_STR=&quot;iptables -A forwarding_rule -i $WAN -p tcp -j ACCEPT&quot;
+PRE_STR=&#34;iptables -t nat -A prerouting_rule -i $WAN -p tcp -j DNAT&#34;
+FOR_STR=&#34;iptables -A forwarding_rule -i $WAN -p tcp -j ACCEPT&#34;
 
 iptables -F input_rule
 iptables -F output_rule
@@ -366,7 +366,7 @@ iptables -t nat -F prerouting_rule
 iptables -t nat -F postrouting_rule
 
 ### BIG FAT DISCLAIMER
-### The &quot;-i $WAN&quot; literally means packets that came in over the $WAN interface;
+### The &#34;-i $WAN&#34; literally means packets that came in over the $WAN interface;
 ### this WILL NOT MATCH packets sent from the LAN to the WAN address.
 
 ### Allow SSH on the WAN interface

@@ -60,69 +60,69 @@ before closing the pipe, so that the parent program knows where to connect to.</
 <h4 id="parent-program">Parent Program</h4>
 <p>So, how do we go about readiness notifications in Go? We create a new pipe and
 specify the write end in the <code>ExtraFiles</code> field of <code>(os/exec).Cmd</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">r, w, err <span style="color:#666">:=</span> os.<span style="color:#06287e">Pipe</span>()
-<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-  <span style="color:#007020;font-weight:bold">return</span> err
-}
-
-child <span style="color:#666">:=</span> exec.<span style="color:#06287e">Command</span>(<span style="color:#4070a0">&#34;child&#34;</span>)
-child.Stderr = os.Stderr
-child.ExtraFiles = []<span style="color:#666">*</span>os.File{w}
-</code></pre></div><p>It is good practice to explicitly specify the file descriptor number that we
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>r, w, err <span style="color:#666">:=</span> os.<span style="color:#06287e">Pipe</span>()
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>child <span style="color:#666">:=</span> exec.<span style="color:#06287e">Command</span>(<span style="color:#4070a0">&#34;child&#34;</span>)
+</span></span><span style="display:flex;"><span>child.Stderr = os.Stderr
+</span></span><span style="display:flex;"><span>child.ExtraFiles = []<span style="color:#666">*</span>os.File{w}
+</span></span></code></pre></div><p>It is good practice to explicitly specify the file descriptor number that we
 passed via some sort of signaling, so that the child program does not need to be
 modified when we add new file descriptors in the parent, and also because this
 behavior is usually opt-in.</p>
 <p>In this case, we’ll do that via an environment variable and start the child
 program:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#60a0b0;font-style:italic">// Go dup2()’s ExtraFiles to file descriptor 3 and counting.
-</span><span style="color:#60a0b0;font-style:italic">// File descriptors 0, 1, 2 are stdin, stdout and stderr.
-</span><span style="color:#60a0b0;font-style:italic"></span>child.Env = <span style="color:#007020">append</span>(os.<span style="color:#06287e">Environ</span>(), <span style="color:#4070a0">&#34;CHILD_READY_FD=3&#34;</span>)
-
-<span style="color:#60a0b0;font-style:italic">// Note child.Start(), not child.Run():
-</span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> child.<span style="color:#06287e">Start</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-  <span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;%v: %v&#34;</span>, child.Args, err)
-}
-</code></pre></div><p>At this point, both the parent and the child process have a file descriptor
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Go dup2()’s ExtraFiles to file descriptor 3 and counting.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// File descriptors 0, 1, 2 are stdin, stdout and stderr.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>child.Env = <span style="color:#007020">append</span>(os.<span style="color:#06287e">Environ</span>(), <span style="color:#4070a0">&#34;CHILD_READY_FD=3&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Note child.Start(), not child.Run():
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> child.<span style="color:#06287e">Start</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;%v: %v&#34;</span>, child.Args, err)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>At this point, both the parent and the child process have a file descriptor
 referencing the write end of the pipe. Since the pipe will only be closed once
 <em>all</em> processes have closed the write end, we need to close the write end in the
 parent program:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#60a0b0;font-style:italic">// Close the write end of the pipe in the parent:
-</span><span style="color:#60a0b0;font-style:italic"></span>w.<span style="color:#06287e">Close</span>()
-</code></pre></div><p>Now, we can blockingly read from the pipe, and know that once the read call
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Close the write end of the pipe in the parent:
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>w.<span style="color:#06287e">Close</span>()
+</span></span></code></pre></div><p>Now, we can blockingly read from the pipe, and know that once the read call
 returns, the child program is ready to receive requests:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#60a0b0;font-style:italic">// Avoid hanging forever in case the child program never becomes ready;
-</span><span style="color:#60a0b0;font-style:italic">// this is easier to diagnose than an unspecified CI/CD test timeout.
-</span><span style="color:#60a0b0;font-style:italic">// This timeout should be much much longer than initialization takes.
-</span><span style="color:#60a0b0;font-style:italic"></span>r.<span style="color:#06287e">SetReadDeadline</span>(time.<span style="color:#06287e">Now</span>().<span style="color:#06287e">Add</span>(<span style="color:#40a070">1</span> <span style="color:#666">*</span> time.Minute))
-<span style="color:#007020;font-weight:bold">if</span> _, err <span style="color:#666">:=</span> ioutil.<span style="color:#06287e">ReadAll</span>(r); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-  <span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;awaiting readiness: %v&#34;</span>, err)
-}
-
-<span style="color:#60a0b0;font-style:italic">// …send requests…
-</span><span style="color:#60a0b0;font-style:italic"></span>
-<span style="color:#60a0b0;font-style:italic">// …tear down child program…
-</span></code></pre></div><h4 id="child-program">Child Program</h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Avoid hanging forever in case the child program never becomes ready;
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// this is easier to diagnose than an unspecified CI/CD test timeout.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// This timeout should be much much longer than initialization takes.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>r.<span style="color:#06287e">SetReadDeadline</span>(time.<span style="color:#06287e">Now</span>().<span style="color:#06287e">Add</span>(<span style="color:#40a070">1</span> <span style="color:#666">*</span> time.Minute))
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> _, err <span style="color:#666">:=</span> ioutil.<span style="color:#06287e">ReadAll</span>(r); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;awaiting readiness: %v&#34;</span>, err)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// …send requests…
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// …tear down child program…
+</span></span></span></code></pre></div><h4 id="child-program">Child Program</h4>
 <p>In the child program, we need to recognize that the parent program requests a
 readiness notification, and ensure our signaling doesn’t leak to child programs
 of the child program:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">var</span> readyFile <span style="color:#666">*</span>os.File
-
-<span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">init</span>() {
-  <span style="color:#007020;font-weight:bold">if</span> fd, err <span style="color:#666">:=</span> strconv.<span style="color:#06287e">Atoi</span>(os.<span style="color:#06287e">Getenv</span>(<span style="color:#4070a0">&#34;CHILD_READY_FD&#34;</span>)); err <span style="color:#666">==</span> <span style="color:#007020;font-weight:bold">nil</span> {
-    readyFile = os.<span style="color:#06287e">NewFile</span>(<span style="color:#007020">uintptr</span>(fd), <span style="color:#4070a0">&#34;readyfd&#34;</span>)
-    os.<span style="color:#06287e">Unsetenv</span>(<span style="color:#4070a0">&#34;CHILD_READY_FD&#34;</span>)
-  }
-}
-
-<span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
-  <span style="color:#60a0b0;font-style:italic">// …initialize…
-</span><span style="color:#60a0b0;font-style:italic"></span>
-  <span style="color:#007020;font-weight:bold">if</span> readyFile <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-    readyFile.<span style="color:#06287e">Close</span>() <span style="color:#60a0b0;font-style:italic">// signal readiness
-</span><span style="color:#60a0b0;font-style:italic"></span>    readyFile = <span style="color:#007020;font-weight:bold">nil</span>   <span style="color:#60a0b0;font-style:italic">// just to be prudent
-</span><span style="color:#60a0b0;font-style:italic"></span>  }
-}
-</code></pre></div><h3 id="conclusion">Conclusion</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">var</span> readyFile <span style="color:#666">*</span>os.File
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">init</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">if</span> fd, err <span style="color:#666">:=</span> strconv.<span style="color:#06287e">Atoi</span>(os.<span style="color:#06287e">Getenv</span>(<span style="color:#4070a0">&#34;CHILD_READY_FD&#34;</span>)); err <span style="color:#666">==</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>    readyFile = os.<span style="color:#06287e">NewFile</span>(<span style="color:#007020">uintptr</span>(fd), <span style="color:#4070a0">&#34;readyfd&#34;</span>)
+</span></span><span style="display:flex;"><span>    os.<span style="color:#06287e">Unsetenv</span>(<span style="color:#4070a0">&#34;CHILD_READY_FD&#34;</span>)
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">// …initialize…
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">if</span> readyFile <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>    readyFile.<span style="color:#06287e">Close</span>() <span style="color:#60a0b0;font-style:italic">// signal readiness
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    readyFile = <span style="color:#007020;font-weight:bold">nil</span>   <span style="color:#60a0b0;font-style:italic">// just to be prudent
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="conclusion">Conclusion</h3>
 <p>Depending on what you’re communicating from the child to the parent, and how
 your system is architected, it might be a good idea to use <a href="http://0pointer.de/blog/projects/socket-activation.html">systemd socket
 activation</a> (<a href="https://vincent.bernat.ch/en/blog/2018-systemd-golang-socket-activation">socket
@@ -404,7 +404,7 @@ people prototype is often immensely useful to me, so I’m sharing my notes here
 </code></pre><p>In distri’s <code>Makefile</code>, I append these flags to the <code>QEMU</code> invocation:</p>
 <pre tabindex="0"><code>-kernel /tmp/kernel \
 -initrd /tmp/initrd \
--append &quot;root=/dev/mapper/cryptroot1 rdinit=/sh ro console=ttyS0,115200 rd.luks=1 rd.luks.uuid=63051f8a-54b9-4996-b94f-3cf105af2900 rd.luks.name=63051f8a-54b9-4996-b94f-3cf105af2900=cryptroot1 rd.vconsole.keymap=neo rd.vconsole.font=latarcyrheb-sun32 init=/init systemd.setenv=PATH=/bin rw vga=836&quot;
+-append &#34;root=/dev/mapper/cryptroot1 rdinit=/sh ro console=ttyS0,115200 rd.luks=1 rd.luks.uuid=63051f8a-54b9-4996-b94f-3cf105af2900 rd.luks.name=63051f8a-54b9-4996-b94f-3cf105af2900=cryptroot1 rd.vconsole.keymap=neo rd.vconsole.font=latarcyrheb-sun32 init=/init systemd.setenv=PATH=/bin rw vga=836&#34;
 </code></pre><p>The <code>vga=</code> mode parameter is required for loading font <code>latarcyrheb-sun32</code>.</p>
 <p>Once in the <code>busybox</code> shell, I manually prepared the required mount points and
 kernel modules:</p>
@@ -417,7 +417,7 @@ mount -t devtmpfs dev /dev
 modprobe virtio_pci
 modprobe virtio_scsi
 </code></pre><p>As a next step, I copied <code>cryptsetup</code> and dependencies into the initramfs directory:</p>
-<pre tabindex="0"><code>% for f in /ro/cryptsetup-amd64-2.0.4-6/lib/*; do full=$(readlink -f $f); rel=$(echo $full | sed 's,^/,,g'); mkdir -p $(dirname $rel); install $full $rel; done
+<pre tabindex="0"><code>% for f in /ro/cryptsetup-amd64-2.0.4-6/lib/*; do full=$(readlink -f $f); rel=$(echo $full | sed &#39;s,^/,,g&#39;); mkdir -p $(dirname $rel); install $full $rel; done
 % ln -s ld-2.27.so ro/glibc-amd64-2.27-3/out/lib/ld-linux-x86-64.so.2
 % cp /ro/glibc-amd64-2.27-3/out/lib/ld-2.27.so ro/glibc-amd64-2.27-3/out/lib/ld-2.27.so
 % cp -r /ro/cryptsetup-amd64-2.0.4-6/lib ro/cryptsetup-amd64-2.0.4-6/
@@ -1501,15 +1501,15 @@ Go’s data structures such as slices.
 <p>
 To make sure we’re on the same page, let’s consider this simple example:
 </p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">package</span> main
-<span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;fmt&#34;</span>
-<span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
-    list <span style="color:#666">:=</span> []<span style="color:#902000">int</span>{<span style="color:#40a070">23</span>, <span style="color:#40a070">42</span>, <span style="color:#40a070">17</span>}
-    <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> list {
-        fmt.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;index %d: value %d\n&#34;</span>, idx, val)
-    }
-}
-</code></pre></div><p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span> main
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+</span></span><span style="display:flex;"><span>    list <span style="color:#666">:=</span> []<span style="color:#902000">int</span>{<span style="color:#40a070">23</span>, <span style="color:#40a070">42</span>, <span style="color:#40a070">17</span>}
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> list {
+</span></span><span style="display:flex;"><span>        fmt.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;index %d: value %d\n&#34;</span>, idx, val)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>
 The output of that program is:
 </p>
 <pre>
@@ -1522,62 +1522,62 @@ index 2: value 17
 Let’s assume that we want to multiply all these numbers by 2. In Go, that’s
 pretty simple:
 </p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">package</span> main
-<span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;fmt&#34;</span>
-
-<span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">multiply</span>(input []<span style="color:#902000">int</span>) []<span style="color:#902000">int</span> {
-    <span style="color:#60a0b0;font-style:italic">// Create an output list with the same size
-</span><span style="color:#60a0b0;font-style:italic"></span>    output <span style="color:#666">:=</span> <span style="color:#007020">make</span>([]<span style="color:#902000">int</span>, <span style="color:#007020">len</span>(input))
-    <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> input {
-        output[idx] = val <span style="color:#666">*</span> <span style="color:#40a070">2</span>
-    }
-    <span style="color:#007020;font-weight:bold">return</span> output
-}
-
-<span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
-    list <span style="color:#666">:=</span> []<span style="color:#902000">int</span>{<span style="color:#40a070">23</span>, <span style="color:#40a070">42</span>, <span style="color:#40a070">17</span>}
-    list = <span style="color:#06287e">multiply</span>(list)
-    <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> list {
-        fmt.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;index %d: value %d\n&#34;</span>, idx, val)
-    }
-}
-</code></pre></div><p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span> main
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">multiply</span>(input []<span style="color:#902000">int</span>) []<span style="color:#902000">int</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic">// Create an output list with the same size
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    output <span style="color:#666">:=</span> <span style="color:#007020">make</span>([]<span style="color:#902000">int</span>, <span style="color:#007020">len</span>(input))
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> input {
+</span></span><span style="display:flex;"><span>        output[idx] = val <span style="color:#666">*</span> <span style="color:#40a070">2</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">return</span> output
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+</span></span><span style="display:flex;"><span>    list <span style="color:#666">:=</span> []<span style="color:#902000">int</span>{<span style="color:#40a070">23</span>, <span style="color:#40a070">42</span>, <span style="color:#40a070">17</span>}
+</span></span><span style="display:flex;"><span>    list = <span style="color:#06287e">multiply</span>(list)
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> list {
+</span></span><span style="display:flex;"><span>        fmt.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;index %d: value %d\n&#34;</span>, idx, val)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>
 Now let’s see how we would do that in C with cgo. Note that we switch to using
 <code>uint32</code> instead of <code>int</code> because that makes the point
 I’m trying to make easier to convey.
 </p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">package</span> main
-<span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;fmt&#34;</span>
-
-<span style="color:#60a0b0;font-style:italic">/*
-</span><span style="color:#60a0b0;font-style:italic">// Note the -std=gnu99. Using -std=c99 will not work.
-</span><span style="color:#60a0b0;font-style:italic">#cgo CFLAGS: -std=gnu99
-</span><span style="color:#60a0b0;font-style:italic">#include &lt;stdint.h&gt;
-</span><span style="color:#60a0b0;font-style:italic">
-</span><span style="color:#60a0b0;font-style:italic">void cMultiply(int len, uint32_t *input, uint32_t *output) {
-</span><span style="color:#60a0b0;font-style:italic">    for (int i = 0; i &lt; len; i++) {
-</span><span style="color:#60a0b0;font-style:italic">        output[i] = input[i] * 2;
-</span><span style="color:#60a0b0;font-style:italic">    }
-</span><span style="color:#60a0b0;font-style:italic">}
-</span><span style="color:#60a0b0;font-style:italic">*/</span>
-<span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;C&#34;</span>
-
-<span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">multiply</span>(input []<span style="color:#902000">uint32</span>) []<span style="color:#902000">uint32</span> {
-    output <span style="color:#666">:=</span> <span style="color:#007020">make</span>([]<span style="color:#902000">uint32</span>, <span style="color:#007020">len</span>(input))
-    C.<span style="color:#06287e">cMultiply</span>(C.<span style="color:#007020">int</span>(<span style="color:#007020">len</span>(input)),
-        (<span style="color:#666">*</span>C.uint32_t)(<span style="color:#666">&amp;</span>input[<span style="color:#40a070">0</span>]),
-	(<span style="color:#666">*</span>C.uint32_t)(<span style="color:#666">&amp;</span>output[<span style="color:#40a070">0</span>]))
-    <span style="color:#007020;font-weight:bold">return</span> output
-}
-
-<span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
-    list <span style="color:#666">:=</span> []<span style="color:#902000">uint32</span>{<span style="color:#40a070">23</span>, <span style="color:#40a070">42</span>, <span style="color:#40a070">17</span>}
-    list = <span style="color:#06287e">multiply</span>(list)
-    <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> list {
-        fmt.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;index %d: value %d\n&#34;</span>, idx, val)
-    }
-}
-</code></pre></div><p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span> main
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">/*
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Note the -std=gnu99. Using -std=c99 will not work.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">#cgo CFLAGS: -std=gnu99
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">#include &lt;stdint.h&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">void cMultiply(int len, uint32_t *input, uint32_t *output) {
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">    for (int i = 0; i &lt; len; i++) {
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">        output[i] = input[i] * 2;
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">    }
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">}
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">*/</span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;C&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">multiply</span>(input []<span style="color:#902000">uint32</span>) []<span style="color:#902000">uint32</span> {
+</span></span><span style="display:flex;"><span>    output <span style="color:#666">:=</span> <span style="color:#007020">make</span>([]<span style="color:#902000">uint32</span>, <span style="color:#007020">len</span>(input))
+</span></span><span style="display:flex;"><span>    C.<span style="color:#06287e">cMultiply</span>(C.<span style="color:#007020">int</span>(<span style="color:#007020">len</span>(input)),
+</span></span><span style="display:flex;"><span>        (<span style="color:#666">*</span>C.uint32_t)(<span style="color:#666">&amp;</span>input[<span style="color:#40a070">0</span>]),
+</span></span><span style="display:flex;"><span>	(<span style="color:#666">*</span>C.uint32_t)(<span style="color:#666">&amp;</span>output[<span style="color:#40a070">0</span>]))
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">return</span> output
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+</span></span><span style="display:flex;"><span>    list <span style="color:#666">:=</span> []<span style="color:#902000">uint32</span>{<span style="color:#40a070">23</span>, <span style="color:#40a070">42</span>, <span style="color:#40a070">17</span>}
+</span></span><span style="display:flex;"><span>    list = <span style="color:#06287e">multiply</span>(list)
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> list {
+</span></span><span style="display:flex;"><span>        fmt.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;index %d: value %d\n&#34;</span>, idx, val)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>
 As you can see, we need to convert the Go types into C types, which can be done
 by simply type-casting them. Also, we need to manually implement the array
 calling convention which is normally done by the C compiler: We pass a pointer

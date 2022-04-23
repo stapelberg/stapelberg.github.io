@@ -235,7 +235,7 @@ never need the debug symbols.</p>
 <p>Unfortunately, obtaining debug symbols when you do need them is unreasonably hard.</p>
 <p>We begin by configuring an additional apt repository which contains
 automatically generated debug packages:</p>
-<pre tabindex="0"><code>raspi# cat &gt;&gt;/etc/apt/sources.list.d/debug.list &lt;&lt;'EOT'
+<pre tabindex="0"><code>raspi# cat &gt;&gt;/etc/apt/sources.list.d/debug.list &lt;&lt;&#39;EOT&#39;
 deb http://deb.debian.org/debian-debug buster-debug main contrib non-free
 EOT
 raspi# apt update
@@ -267,7 +267,7 @@ system.</p>
 defaults to the installed version.</p>
 <p>Before we can extract any sources, we need to configure yet another apt
 repository:</p>
-<pre tabindex="0"><code>raspi# cat &gt;&gt;/etc/apt/sources.list.d/source.list &lt;&lt;'EOT'
+<pre tabindex="0"><code>raspi# cat &gt;&gt;/etc/apt/sources.list.d/source.list &lt;&lt;&#39;EOT&#39;
 deb-src http://deb.debian.org/debian buster main contrib non-free
 EOT
 raspi# apt update

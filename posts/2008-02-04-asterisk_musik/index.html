@@ -205,7 +205,7 @@ kleines Script, welches den Status behält:</p>
 
 while test $# -ge 2
 do
-	eval _$1='$2'
+	eval _$1=&#39;$2&#39;
 	shift
 	shift
 done
@@ -264,9 +264,9 @@ momentanen Song an und merkt sich, dass er eingegriffen hat, indem er
 # This should be called on an incoming call from asterisk
 
 playstatus=$(wget -qO- http://192.168.1.23:2424/status)
-[ $playstatus = &quot;playing&quot; ] &amp;&amp; {
+[ $playstatus = &#34;playing&#34; ] &amp;&amp; {
 	touch /tmp/call_broke_song
-	echo -e &quot;foo\nplayer-pause&quot; | nc -q0 192.168.1.23 2525
+	echo -e &#34;foo\nplayer-pause&#34; | nc -q0 192.168.1.23 2525
 }
 
 exit 0
@@ -284,8 +284,8 @@ fort.
 [ -f /tmp/call_broke_song ] &amp;&amp; {
 	rm /tmp/call_broke_song
 	playstatus=$(wget -qO- http://192.168.1.23:2424/status)
-	[ $playstatus = &quot;paused&quot; ] &amp;&amp; {
-		echo -e &quot;foo\nplayer-pause&quot; | nc -q0 192.168.1.23 2525
+	[ $playstatus = &#34;paused&#34; ] &amp;&amp; {
+		echo -e &#34;foo\nplayer-pause&#34; | nc -q0 192.168.1.23 2525
 	}
 }
 
@@ -326,7 +326,7 @@ weiter – außer man definiert den Dialplan für die Extension <code>h</code> (
 exten =&amp;gt; 23,1,System(/home/michael/.pbx/cmus-incoming.sh)
 exten =&amp;gt; 23,2,Dial(SIP/23,30,gj)
 exten =&amp;gt; 23,3,System(/home/michael/.pbx/cmus-hangup.sh)
-exten =&amp;gt; 23,4,GotoIf($[ ${DIALSTATUS} = &quot;NOANSWER&quot; ]?103)
+exten =&amp;gt; 23,4,GotoIf($[ ${DIALSTATUS} = &#34;NOANSWER&#34; ]?103)
 exten =&amp;gt; 23,5,Hangup()
 
 exten =&amp;gt; 23,103,System(/home/michael/.pbx/cmus-hangup.sh)

@@ -260,7 +260,7 @@ echo &ldquo;Keine Parameter angegeben, Syntax: ${0} &lt;Eingangsdatei&gt; &lt;Au
 exit 0
 fi</p>
 <p>echo &ldquo;Konvertiere ${1} für PDAs in Datei ${2}&hellip;&rdquo;
-${MENC_PATH} &ldquo;${1}&rdquo; -ovc lavc -lavcopts vcodec=mpeg4:vbitrate=224 -ffourcc divx -srate 22050<br>
+${MENC_PATH} &ldquo;${1}&rdquo; -ovc lavc -lavcopts vcodec=mpeg4:vbitrate=224 -ffourcc divx -srate 22050 <br>
 -af resample=22050,volnorm -vf crop=480:288 -oac mp3lame -lameopts cbr:br=32 -o &ldquo;${2}&rdquo;
 </pre></p>
 <h3>Abspielen auf dem PDA</h3>

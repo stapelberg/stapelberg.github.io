@@ -309,7 +309,7 @@ something…</p>
 <p>As <a href="https://wiki.archlinux.org/index.php/Lenovo_ThinkPad_X1_Extreme_(Gen_2)#Touchpad">mentioned on the
 ArchWiki</a>,
 I also had to adjust the sensitivity like so:</p>
-<pre tabindex="0"><code>% xinput set-prop 'SynPS/2 Synaptics TouchPad' 'libinput Accel Speed' 0.5
+<pre tabindex="0"><code>% xinput set-prop &#39;SynPS/2 Synaptics TouchPad&#39; &#39;libinput Accel Speed&#39; 0.5
 </code></pre><h3 id="display">Display</h3>
 <p>I have high demands regarding displays: since 2013, every device of mine has a
 hi-dpi display.</p>
@@ -418,11 +418,11 @@ SSH sessions to the machine breaking.</p>
 <pre tabindex="0"><code>% echo blacklist nouveau | sudo tee /etc/modprobe.d/blacklist.conf 
 </code></pre><p>Without the nVidia driver, the GPU will not go into powersave mode, so I remove
 it from the PCI bus entirely to save power:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#007020">#!/bin/zsh
-</span><span style="color:#007020"></span>
-sudo tee /sys/bus/pci/devices/0000<span style="color:#4070a0;font-weight:bold">\:</span>01<span style="color:#4070a0;font-weight:bold">\:</span>00.0/remove <span style="color:#666">&lt;&lt;&lt;</span><span style="color:#40a070">1</span>
-sudo tee /sys/bus/pci/devices/0000<span style="color:#4070a0;font-weight:bold">\:</span>01<span style="color:#4070a0;font-weight:bold">\:</span>00.1/remove <span style="color:#666">&lt;&lt;&lt;</span><span style="color:#40a070">1</span>
-</code></pre></div><p>You can only re-awaken the GPU with a reboot.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#007020">#!/bin/zsh
+</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>
+</span></span><span style="display:flex;"><span>sudo tee /sys/bus/pci/devices/0000<span style="color:#4070a0;font-weight:bold">\:</span>01<span style="color:#4070a0;font-weight:bold">\:</span>00.0/remove <span style="color:#666">&lt;&lt;&lt;</span><span style="color:#40a070">1</span>
+</span></span><span style="display:flex;"><span>sudo tee /sys/bus/pci/devices/0000<span style="color:#4070a0;font-weight:bold">\:</span>01<span style="color:#4070a0;font-weight:bold">\:</span>00.1/remove <span style="color:#666">&lt;&lt;&lt;</span><span style="color:#40a070">1</span>
+</span></span></code></pre></div><p>You can only re-awaken the GPU with a reboot.</p>
 <p>Obviously this isn’t a great setup — I would prefer to be able to actually use
 the GPU. If you have any tips or a better experience, please let me know.</p>
 <p>Also note that the HDMI port will be unusable if you go this route, as the HDMI

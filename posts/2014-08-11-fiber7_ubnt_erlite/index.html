@@ -457,7 +457,7 @@ sla-len 0;
 };
 };
 EOT</p>
-<p>sed -i &rsquo;s/eth0/eth1/g' /etc/default/wide-dhcpv6-client</p>
+<p>sed -i &rsquo;s/eth0/eth1/g&rsquo; /etc/default/wide-dhcpv6-client</p>
 <p>cat &gt;/config/scripts/post-config.d/dhcpv6.sh &laquo;&lsquo;EOT&rsquo;
 #!/bin/sh
 /etc/init.d/wide-dhcpv6-client start

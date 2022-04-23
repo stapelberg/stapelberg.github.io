@@ -455,9 +455,9 @@ Description=cgit
 After=docker.service
 <p>[Service]
 Restart=always
-ExecStart=/usr/bin/docker run<br>
--v /media/state/_CUSTOM/git:/git:ro<br>
--p 4242:80<br>
+ExecStart=/usr/bin/docker run <br>
+-v /media/state/_CUSTOM/git:/git:ro <br>
+-p 4242:80 <br>
 d0.zekjur.net:5000/cgit</p>
 <p>[Install]
 WantedBy=local.target
@@ -486,7 +486,7 @@ FROM tianon/debian:sid
 RUN apt-get dist-upgrade -y
 RUN apt-get install -y nginx-extras</p>
 <p>EXPOSE 80
-ENTRYPOINT [&quot;/usr/sbin/nginx&quot;, &ldquo;-g&rdquo;, &ldquo;daemon off;&quot;]
+ENTRYPOINT [&quot;/usr/sbin/nginx&quot;, &ldquo;-g&rdquo;, &ldquo;daemon off;&rdquo;]
 EOT
 home $ docker build -t=stapelberg/nginx .
 home $ docker tag stapelberg/nginx d0.zekjur.net:5000/nginx

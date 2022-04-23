@@ -248,29 +248,29 @@ Fall, dadurch wird @INC mit diesem Pfad erweitert.</p>
 <p><strong>/home/michael/Perl/DemoApp/Proj/App/Services.pm</strong>:</p>
 <pre tabindex="0"><code>package Proj::App::Services;
 
-use base 'CGI::Application';
+use base &#39;CGI::Application&#39;;
 
 sub setup {
 	my $self = shift;
 
 	$self-&gt;run_modes(
-		'list' =&gt; 'list',
-		'add' =&gt; 'add'
+		&#39;list&#39; =&gt; &#39;list&#39;,
+		&#39;add&#39; =&gt; &#39;add&#39;
 	);
-	$self-&gt;mode_param('rm');
-	$self-&gt;start_mode('list');
+	$self-&gt;mode_param(&#39;rm&#39;);
+	$self-&gt;start_mode(&#39;list&#39;);
 }
 
 sub list {
 	my $self = shift;
 
-	return &quot;Liste&quot;;
+	return &#34;Liste&#34;;
 }
 
 sub add {
 	my $self = shift;
 
-	return &quot;Hinzufügen&quot;;
+	return &#34;Hinzufügen&#34;;
 }
 
 1;
@@ -290,9 +290,9 @@ Ausgabe der HTTP-Header und der Website.</p>
 <h2 id="angabe-des-runmodes">Angabe des Runmodes</h2>
 <p>In den eigenen HTML-Ausgaben kann man dann den Runmode einfach als normalen
 CGI-Parameter anhängen, zum Beispiel so:</p>
-<pre tabindex="0"><code>&lt;a href=&quot;http://localhost/app/app_services?rm=add&quot;&gt;Neuen Datensatz hinzufügen&lt;/a&gt;
+<pre tabindex="0"><code>&lt;a href=&#34;http://localhost/app/app_services?rm=add&#34;&gt;Neuen Datensatz hinzufügen&lt;/a&gt;
 </code></pre><p>Hierbei sind natürlich noch weitere Parameter möglich:</p>
-<pre tabindex="0"><code>&lt;a href=&quot;http://localhost/app/app_services?rm=edit&amp;amp;id=23&quot;&gt;Datensatz 23 bearbeiten&lt;/a&gt;
+<pre tabindex="0"><code>&lt;a href=&#34;http://localhost/app/app_services?rm=edit&amp;amp;id=23&#34;&gt;Datensatz 23 bearbeiten&lt;/a&gt;
 </code></pre><p>Mit ein bisschen <a
 href="http://httpd.apache.org/docs/2.0/mod/mod_rewrite.html" target="_blank"
 title="httpd.apache.org: mod_rewrite"><code>mod_rewrite</code>

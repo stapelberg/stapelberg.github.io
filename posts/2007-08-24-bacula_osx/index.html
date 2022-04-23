@@ -323,7 +323,7 @@ target="_blank" title="explanatorygap.net">explanatorygap.net</a> gefunden. Es
 muss auf dem USB-Stick (oder -Festplatte) gespeichert werden.
 </p>
 <p><strong>rd.sh</strong>:</p>
-<pre tabindex="0"><code>echo &quot;Creating RAM Disk for $1&quot;
+<pre tabindex="0"><code>echo &#34;Creating RAM Disk for $1&#34;
 dev=`hdik -drivekey system-image=yes -nomount ram://2048 `
 if [ $? -eq 0 ] ; then
 	newfs $dev

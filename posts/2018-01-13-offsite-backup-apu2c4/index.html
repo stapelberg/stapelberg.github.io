@@ -282,7 +282,7 @@ port forwardings only:</p>
   - name: apu2c4
     system: true
     ssh-authorized-keys:
-      - &quot;restrict,command=\&quot;/bin/false\&quot;,port-forwarding ssh-rsa AAAA…== root@stapelberg-apu2c4&quot;
+      - &#34;restrict,command=\&#34;/bin/false\&#34;,port-forwarding ssh-rsa AAAA…== root@stapelberg-apu2c4&#34;
 </code></pre><p>On the apu2c4, I installed the <code>autossh</code> Debian package (see the
 <a href="https://manpages.debian.org/stretch/autossh/autossh.1"><code>autossh(1)</code></a> manpage
 for details) and created the systemd unit file
@@ -296,7 +296,7 @@ Wants=network-online.target
 Restart=always
 StartLimitIntervalSec=0
 Environment=AUTOSSH_GATETIME=0
-ExecStart=/usr/bin/autossh -M 0 -N -o &quot;ServerAliveInterval 60&quot; -o &quot;ServerAliveCountMax 3&quot; -o &quot;ExitOnForwardFailure yes&quot; apu2c4@nas.example.net -R 2200:localhost:22
+ExecStart=/usr/bin/autossh -M 0 -N -o &#34;ServerAliveInterval 60&#34; -o &#34;ServerAliveCountMax 3&#34; -o &#34;ExitOnForwardFailure yes&#34; apu2c4@nas.example.net -R 2200:localhost:22
 
 [Install]
 WantedBy=multi-user.target
@@ -336,9 +336,9 @@ set -e
 /bin/ssh apu2c4 mount /dev/mapper/offline_crypt /mnt/offsite
 
 # step 1: update everything but /backups
-echo &quot;$(date +'%c') syncing NAS data&quot;
+echo &#34;$(date +&#39;%c&#39;) syncing NAS data&#34;
 
-(cd /srv &amp;&amp; /usr/bin/rsync --filter 'exclude /backup' -e ssh -ax --relative --numeric-ids ./ apu2c4:/mnt/offsite)
+(cd /srv &amp;&amp; /usr/bin/rsync --filter &#39;exclude /backup&#39; -e ssh -ax --relative --numeric-ids ./ apu2c4:/mnt/offsite)
 
 # step 2: copy the latest backup
 hosts=$(ls /srv/backup/)
@@ -346,15 +346,15 @@ for host in $hosts
 do
   latestremote=$(ls /srv/backup/${host}/ | tail -1)
   latestlocal=$(/bin/ssh apu2c4 ls /mnt/offsite/backup/${host} | tail -1)
-  if [ &quot;$latestlocal&quot; != &quot;$latestremote&quot; ]
+  if [ &#34;$latestlocal&#34; != &#34;$latestremote&#34; ]
   then
-    echo &quot;$(date +'%c') syncing $host (offline: ${latestlocal}, NAS: ${latestremote})&quot;
+    echo &#34;$(date +&#39;%c&#39;) syncing $host (offline: ${latestlocal}, NAS: ${latestremote})&#34;
     /bin/ssh apu2c4 mkdir -p /mnt/offsite/backup/${host}
     (cd /srv &amp;&amp; /usr/bin/rsync -e ssh -ax --numeric-ids ./backup/${host}/${latestremote}/ apu2c4:/mnt/offsite/backup/${host}/${latestremote} --link-dest=../${latestlocal})
 
     # step 3: delete all previous backups
-    echo &quot;$(date +'%c') deleting everything but ${latestremote} for host ${host}&quot;
-    ssh apu2c4 &quot;find /mnt/offsite/backup/${host} \! \( -path \&quot;/mnt/offsite/backup/${host}/${latestremote}/*\&quot; -or -path \&quot;/mnt/offsite/backup/${host}/${latestremote}\&quot; -or -path \&quot;/mnt/offsite/backup/${host}\&quot; \) -delete&quot;
+    echo &#34;$(date +&#39;%c&#39;) deleting everything but ${latestremote} for host ${host}&#34;
+    ssh apu2c4 &#34;find /mnt/offsite/backup/${host} \! \( -path \&#34;/mnt/offsite/backup/${host}/${latestremote}/*\&#34; -or -path \&#34;/mnt/offsite/backup/${host}/${latestremote}\&#34; -or -path \&#34;/mnt/offsite/backup/${host}\&#34; \) -delete&#34;
   fi
 done
 

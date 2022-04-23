@@ -307,8 +307,8 @@ thing?</p>
 (already queued), the standard tty settings are still in effect, because the
 application did not yet have a chance to set its tty configuration up!</p>
 <p>This can be verified by running the following command on a Linux host:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">% stty -F /dev/ttyACM0 <span style="color:#40a070">115200</span> -echo -echoe -echok
-</code></pre></div><p>Even though the command’s sole purpose is to configure the tty, its opening of
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% stty -F /dev/ttyACM0 <span style="color:#40a070">115200</span> -echo -echoe -echok
+</span></span></code></pre></div><p>Even though the command’s sole purpose is to configure the tty, its opening of
 the device still causes the banner to print, and echoing to happen, and garbled
 output is the result.</p>
 <p>It turns out this is a somewhat common problem. Hence, the Linux USB CDC ACM
@@ -316,17 +316,17 @@ driver <a href="https://elixir.bootlin.com/linux/v5.11.16/source/drivers/usb/cla
 table</a>,
 in which devices that print a banner select the <code>DISABLE_ECHO</code> quirk, which
 results in the CDC ACM driver turning off the echoing termios flag early:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020;font-weight:bold">static</span> <span style="color:#007020;font-weight:bold">const</span> <span style="color:#007020;font-weight:bold">struct</span> usb_device_id acm_ids[] <span style="color:#666">=</span> {
-	<span style="color:#60a0b0;font-style:italic">/* quirky and broken devices */</span>
-	{ USB_DEVICE(<span style="color:#40a070">0x0424</span>, <span style="color:#40a070">0x274e</span>), <span style="color:#60a0b0;font-style:italic">/* Microchip Technology, Inc. */</span>
-	  .driver_info <span style="color:#666">=</span> DISABLE_ECHO, }, <span style="color:#60a0b0;font-style:italic">/* DISABLE ECHO in termios flag */</span>
-<span style="color:#60a0b0;font-style:italic">// …
-</span></code></pre></div><p>So, a quick solution to turn off echoing early is to change your USB vendor and
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">static</span> <span style="color:#007020;font-weight:bold">const</span> <span style="color:#007020;font-weight:bold">struct</span> usb_device_id acm_ids[] <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">/* quirky and broken devices */</span>
+</span></span><span style="display:flex;"><span>	{ USB_DEVICE(<span style="color:#40a070">0x0424</span>, <span style="color:#40a070">0x274e</span>), <span style="color:#60a0b0;font-style:italic">/* Microchip Technology, Inc. */</span>
+</span></span><span style="display:flex;"><span>	  .driver_info <span style="color:#666">=</span> DISABLE_ECHO, }, <span style="color:#60a0b0;font-style:italic">/* DISABLE ECHO in termios flag */</span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// …
+</span></span></span></code></pre></div><p>So, a quick solution to turn off echoing early is to change your USB vendor and
 product id (VID/PID) to an ID for which the Linux kernel applies the
 <code>DISABLE_ECHO</code> quirk, e.g.:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020">#define USB_DEVICE_VID 0x0424
-</span><span style="color:#007020">#define USB_DEVICE_PID 0x274e
-</span></code></pre></div><h2 id="flushing-in-screen">Flushing in Screen</h2>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#define USB_DEVICE_VID 0x0424
+</span></span></span><span style="display:flex;"><span><span style="color:#007020">#define USB_DEVICE_PID 0x274e
+</span></span></span></code></pre></div><h2 id="flushing-in-screen">Flushing in Screen</h2>
 <p>With tty echo disabled, I don’t see garbled output anymore, but still wouldn’t
 always see the ChibiOS shell prompt!</p>
 <p>This issue turned out to be specific to the terminal emulator program I’m
@@ -379,7 +379,7 @@ ChibiOS/RT Shell
  or <a href="https://manpages.debian.org/cat.1"><code>cat(1)</code></a>
  read from
 the driver, we see:</p>
-<pre tabindex="0"><code>797270 read(7, &quot;\n\nChibiOS/RT Shell\n\nch&gt; &quot;, 4096) = 24
+<pre tabindex="0"><code>797270 read(7, &#34;\n\nChibiOS/RT Shell\n\nch&gt; &#34;, 4096) = 24
 </code></pre><p>We would have expected <code>&quot;\r\nChibiOS/RT Shell\r\nch&gt; &quot;</code> instead, meaning all
 Carriage Returns (<code>\r</code>) have been translated to Newlines (<code>\n</code>).</p>
 <p>This is again due to the <a href="https://elixir.bootlin.com/linux/v5.11.16/source/drivers/tty/tty_io.c#L122">Linux tty driver’s default termios
@@ -412,32 +412,32 @@ application a chance to configure the serial device.</li>
 </ol>
 <p>In our <code>main.c</code> loop, we wait until USB is active, and until we receive the
 first <code>CDC_SET_CONTROL_LINE_STATE</code> request because the serial port was opened:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">  <span style="color:#007020;font-weight:bold">while</span> (<span style="color:#007020">true</span>) {
-    <span style="color:#007020;font-weight:bold">if</span> (SDU1.config<span style="color:#666">-&gt;</span>usbp<span style="color:#666">-&gt;</span>state <span style="color:#666">==</span> USB_ACTIVE) {
-      chSemWait(<span style="color:#666">&amp;</span>scls);
-      chThdSleepMilliseconds(<span style="color:#40a070">100</span>);
-
-      thread_t <span style="color:#666">*</span>shelltp <span style="color:#666">=</span> chThdCreateFromHeap(<span style="color:#007020">NULL</span>, SHELL_WA_SIZE, <span style="color:#4070a0">&#34;shell&#34;</span>, NORMALPRIO <span style="color:#666">+</span> <span style="color:#40a070">1</span>, shellThread, (<span style="color:#902000">void</span> <span style="color:#666">*</span>)<span style="color:#666">&amp;</span>shell_cfg1);
-      chThdWait(shelltp);
-    }
-  }
-</code></pre></div><p>And in our <code>usbcfg.c</code>, when receiving a <code>CDC_SET_CONTROL_LINE_STATE</code> request, we
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">while</span> (<span style="color:#007020">true</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> (SDU1.config<span style="color:#666">-&gt;</span>usbp<span style="color:#666">-&gt;</span>state <span style="color:#666">==</span> USB_ACTIVE) {
+</span></span><span style="display:flex;"><span>      chSemWait(<span style="color:#666">&amp;</span>scls);
+</span></span><span style="display:flex;"><span>      chThdSleepMilliseconds(<span style="color:#40a070">100</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      thread_t <span style="color:#666">*</span>shelltp <span style="color:#666">=</span> chThdCreateFromHeap(<span style="color:#007020">NULL</span>, SHELL_WA_SIZE, <span style="color:#4070a0">&#34;shell&#34;</span>, NORMALPRIO <span style="color:#666">+</span> <span style="color:#40a070">1</span>, shellThread, (<span style="color:#902000">void</span> <span style="color:#666">*</span>)<span style="color:#666">&amp;</span>shell_cfg1);
+</span></span><span style="display:flex;"><span>      chThdWait(shelltp);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span></code></pre></div><p>And in our <code>usbcfg.c</code>, when receiving a <code>CDC_SET_CONTROL_LINE_STATE</code> request, we
 will reset the semaphore to non-blockingly wake up all waiters:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020;font-weight:bold">extern</span> semaphore_t scls;
-
-<span style="color:#902000">bool</span> <span style="color:#06287e">requests_hook</span>(USBDriver <span style="color:#666">*</span>usbp) {
-  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">bool</span> result <span style="color:#666">=</span> sduRequestsHook(usbp);
-
-  <span style="color:#007020;font-weight:bold">if</span> ((usbp<span style="color:#666">-&gt;</span>setup[<span style="color:#40a070">0</span>] <span style="color:#666">&amp;</span> USB_RTYPE_TYPE_MASK) <span style="color:#666">==</span> USB_RTYPE_TYPE_CLASS <span style="color:#666">&amp;&amp;</span>
-      usbp<span style="color:#666">-&gt;</span>setup[<span style="color:#40a070">1</span>] <span style="color:#666">==</span> CDC_SET_CONTROL_LINE_STATE) {
-    osalSysLockFromISR();
-    chSemResetI(<span style="color:#666">&amp;</span>scls, <span style="color:#40a070">0</span>);
-    osalSysUnlockFromISR();
-  }
-
-  <span style="color:#007020;font-weight:bold">return</span> result;
-}
-</code></pre></div><h2 id="screenshots-mac-and-windows">Screenshots: Mac and Windows</h2>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">extern</span> semaphore_t scls;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#902000">bool</span> <span style="color:#06287e">requests_hook</span>(USBDriver <span style="color:#666">*</span>usbp) {
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">bool</span> result <span style="color:#666">=</span> sduRequestsHook(usbp);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">if</span> ((usbp<span style="color:#666">-&gt;</span>setup[<span style="color:#40a070">0</span>] <span style="color:#666">&amp;</span> USB_RTYPE_TYPE_MASK) <span style="color:#666">==</span> USB_RTYPE_TYPE_CLASS <span style="color:#666">&amp;&amp;</span>
+</span></span><span style="display:flex;"><span>      usbp<span style="color:#666">-&gt;</span>setup[<span style="color:#40a070">1</span>] <span style="color:#666">==</span> CDC_SET_CONTROL_LINE_STATE) {
+</span></span><span style="display:flex;"><span>    osalSysLockFromISR();
+</span></span><span style="display:flex;"><span>    chSemResetI(<span style="color:#666">&amp;</span>scls, <span style="color:#40a070">0</span>);
+</span></span><span style="display:flex;"><span>    osalSysUnlockFromISR();
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">return</span> result;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="screenshots-mac-and-windows">Screenshots: Mac and Windows</h2>
 <p>Aside from Linux, I also verified the workaround works on a Mac (with Screen):</p>
 
 

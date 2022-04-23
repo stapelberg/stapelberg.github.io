@@ -247,18 +247,18 @@ if [ -f $FLAG ]; then
 fi
 
 if [ ! -f $FLAG ]; then
-        ping -c 1 &quot;$1&quot; &gt; /dev/null 2&gt;&amp;1
-        if [ &quot;$?&quot; = &quot;0&quot; ]; then
+        ping -c 1 &#34;$1&#34; &gt; /dev/null 2&gt;&amp;1
+        if [ &#34;$?&#34; = &#34;0&#34; ]; then
                 ./mount_it ${1}
         fi
 else
-        ping -c 1 &quot;$1&quot; &gt; /dev/null 2&gt;&amp;1
-        if [ &quot;$?&quot; = &quot;0&quot; ]; then
+        ping -c 1 &#34;$1&#34; &gt; /dev/null 2&gt;&amp;1
+        if [ &#34;$?&#34; = &#34;0&#34; ]; then
                 ./mount_it ${1}
                 cd /tmp
                 rm $FLAG
         else
-                echo &quot;off&quot;
+                echo &#34;off&#34;
         fi
 
 fi
@@ -270,10 +270,10 @@ touch $FLAG
 
 AMOUNT=`mount | grep //${1}/${MOUNTPOINT} | wc -l`
 # TODO: An dieser Stelle muss man den Mountpoint (=Freigabenname) anpassen
-MOUNTPOINT=&quot;Schuelerdateien&quot;
+MOUNTPOINT=&#34;Schuelerdateien&#34;
 
 if [ ${AMOUNT} -gt 1 ]; then
-        echo &quot;This share is already mounted many times, unmounting and remounting...&quot;
+        echo &#34;This share is already mounted many times, unmounting and remounting...&#34;
         i=${AMOUNT}
         while [ ${i} -gt 0 ]; do
                 i=$((i-1))
@@ -281,12 +281,12 @@ if [ ${AMOUNT} -gt 1 ]; then
         done
         mount //${1}/${MOUNTPOINT}
 elif [ ${AMOUNT} -gt 0 ]; then
-        echo &quot;Mount is already mounted one time, not mounting...&quot;
+        echo &#34;Mount is already mounted one time, not mounting...&#34;
 else
-        echo &quot;Not mounted, mounting...&quot;
+        echo &#34;Not mounted, mounting...&#34;
         mount //${1}/${MOUNTPOINT}
 fi
-echo &quot;Mounts now: `mount | grep //${1}/${MOUNTPOINT} | wc -l`&quot;
+echo &#34;Mounts now: `mount | grep //${1}/${MOUNTPOINT} | wc -l`&#34;
 </code></pre><p>
 Die Dateien sollten beide im selben Verzeichnis liegen, ansonsten muss der Pfad
 angepasst werden.

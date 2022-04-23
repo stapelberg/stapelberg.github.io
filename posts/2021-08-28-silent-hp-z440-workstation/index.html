@@ -333,7 +333,7 @@ result in no slow-down during my typical usage.</p>
 <p>I followed <a href="https://db.tannercrook.com/limiting-nvidia-gpu-in-linux/">this blog post to limit my GPU to PowerMizer level
 1</a>, i.e. I added
 <code>/etc/modprobe.d/nvidia-power-save.conf</code> with the following contents:</p>
-<pre tabindex="0"><code>options nvidia NVreg_RegistryDwords=&quot;OverrideMaxPerf=0x2&quot;
+<pre tabindex="0"><code>options nvidia NVreg_RegistryDwords=&#34;OverrideMaxPerf=0x2&#34;
 </code></pre><p>…followed by a rebuild of my initramfs (<code>update-initramfs -u</code>) and a <code>reboot</code>.</p>
 <p>This way, the fans don’t typically need to spin up as the GPU stays below its
 temperature limit.</p>

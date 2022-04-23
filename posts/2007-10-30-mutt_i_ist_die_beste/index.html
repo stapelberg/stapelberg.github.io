@@ -481,12 +481,12 @@ So, das war’s auch schon. Nun müssen wir nur noch <code>procmail</code> selbs
 einrichten, die Konfiguration für einen IMAP-Server unterscheidet sich leicht
 von der obigen.
 </p>
-<pre tabindex="0"><code>DELIVERMAIL=&quot;/usr/sbin/cyrdeliver&quot;
-LOGFILE=&quot;/var/log/mail/procmail.log&quot;
-DEFAULT=&quot;$DELIVERMAIL -e -a $LOGNAME -m user.$LOGNAME&quot;
-PRIVAT=&quot;$DELIVERMAIL -e -a $LOGNAME -m user.$LOGNAME.privat&quot;
-FIRMA=&quot;$DELIVERMAIL -e -a $LOGNAME -m user.$LOGNAME.firma&quot;
-FREUNDE=&quot;$DELIVERMAIL -e -a $LOGNAME -m user.$LOGNAME.freunde&quot;
+<pre tabindex="0"><code>DELIVERMAIL=&#34;/usr/sbin/cyrdeliver&#34;
+LOGFILE=&#34;/var/log/mail/procmail.log&#34;
+DEFAULT=&#34;$DELIVERMAIL -e -a $LOGNAME -m user.$LOGNAME&#34;
+PRIVAT=&#34;$DELIVERMAIL -e -a $LOGNAME -m user.$LOGNAME.privat&#34;
+FIRMA=&#34;$DELIVERMAIL -e -a $LOGNAME -m user.$LOGNAME.firma&#34;
+FREUNDE=&#34;$DELIVERMAIL -e -a $LOGNAME -m user.$LOGNAME.freunde&#34;
 VERBOSE=off
 
 :0 w
@@ -684,14 +684,14 @@ color quoted9    blue           black
 #
 #     object     foreground backg.   RegExp
 #
-color header     green      black  &quot;^(Subject):&quot;
-color header     red        black  &quot;^(From|X-Mailer|To|Cc|Reply-To|Date):&quot;
-color body       black      white    &quot;((ftp|http|https)://|(file|mailto|news):|www\\.)[-a-z0-9_.:]*
-[a-z0-9](/[^][{} \t\n\r\&quot;&amp;lt;&amp;gt;()]*[^][{} \t\n\r\&quot;&amp;lt;&amp;gt;().,:!])?/?&quot;
-color body       green      black  &quot;((;|:|8\\:|\\=)(-|=|~|_|-'|%|&amp;lt;|)(\\)|Q|P|\\)%))&quot;
-color body       cyan       black  &quot;[-a-z_0-9.+]+@[-a-z_0-9.]+&quot;
-color body       red        black  &quot;(^| )\\*[-a-z0-9*]+\\*[,.?]?[ \n]&quot;
-color body       green      black  &quot;(^| )_[-a-z0-9_]+_[,.?]?[ \n]&quot;
+color header     green      black  &#34;^(Subject):&#34;
+color header     red        black  &#34;^(From|X-Mailer|To|Cc|Reply-To|Date):&#34;
+color body       black      white    &#34;((ftp|http|https)://|(file|mailto|news):|www\\.)[-a-z0-9_.:]*
+[a-z0-9](/[^][{} \t\n\r\&#34;&amp;lt;&amp;gt;()]*[^][{} \t\n\r\&#34;&amp;lt;&amp;gt;().,:!])?/?&#34;
+color body       green      black  &#34;((;|:|8\\:|\\=)(-|=|~|_|-&#39;|%|&amp;lt;|)(\\)|Q|P|\\)%))&#34;
+color body       cyan       black  &#34;[-a-z_0-9.+]+@[-a-z_0-9.]+&#34;
+color body       red        black  &#34;(^| )\\*[-a-z0-9*]+\\*[,.?]?[ \n]&#34;
+color body       green      black  &#34;(^| )_[-a-z0-9_]+_[,.?]?[ \n]&#34;
 color index      blue       black  ~F           # geflagged Nachrichte
 color index      red        black  ~N           # Neue Nachrichten
 color index      magenta    black  ~T           # getaggte Nachrichten

@@ -207,15 +207,15 @@ Go’s data structures such as slices.
 <p>
 To make sure we’re on the same page, let’s consider this simple example:
 </p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">package</span> main
-<span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;fmt&#34;</span>
-<span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
-    list <span style="color:#666">:=</span> []<span style="color:#902000">int</span>{<span style="color:#40a070">23</span>, <span style="color:#40a070">42</span>, <span style="color:#40a070">17</span>}
-    <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> list {
-        fmt.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;index %d: value %d\n&#34;</span>, idx, val)
-    }
-}
-</code></pre></div><p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span> main
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+</span></span><span style="display:flex;"><span>    list <span style="color:#666">:=</span> []<span style="color:#902000">int</span>{<span style="color:#40a070">23</span>, <span style="color:#40a070">42</span>, <span style="color:#40a070">17</span>}
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> list {
+</span></span><span style="display:flex;"><span>        fmt.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;index %d: value %d\n&#34;</span>, idx, val)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>
 The output of that program is:
 </p>
 <pre>
@@ -228,62 +228,62 @@ index 2: value 17
 Let’s assume that we want to multiply all these numbers by 2. In Go, that’s
 pretty simple:
 </p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">package</span> main
-<span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;fmt&#34;</span>
-
-<span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">multiply</span>(input []<span style="color:#902000">int</span>) []<span style="color:#902000">int</span> {
-    <span style="color:#60a0b0;font-style:italic">// Create an output list with the same size
-</span><span style="color:#60a0b0;font-style:italic"></span>    output <span style="color:#666">:=</span> <span style="color:#007020">make</span>([]<span style="color:#902000">int</span>, <span style="color:#007020">len</span>(input))
-    <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> input {
-        output[idx] = val <span style="color:#666">*</span> <span style="color:#40a070">2</span>
-    }
-    <span style="color:#007020;font-weight:bold">return</span> output
-}
-
-<span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
-    list <span style="color:#666">:=</span> []<span style="color:#902000">int</span>{<span style="color:#40a070">23</span>, <span style="color:#40a070">42</span>, <span style="color:#40a070">17</span>}
-    list = <span style="color:#06287e">multiply</span>(list)
-    <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> list {
-        fmt.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;index %d: value %d\n&#34;</span>, idx, val)
-    }
-}
-</code></pre></div><p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span> main
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">multiply</span>(input []<span style="color:#902000">int</span>) []<span style="color:#902000">int</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic">// Create an output list with the same size
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    output <span style="color:#666">:=</span> <span style="color:#007020">make</span>([]<span style="color:#902000">int</span>, <span style="color:#007020">len</span>(input))
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> input {
+</span></span><span style="display:flex;"><span>        output[idx] = val <span style="color:#666">*</span> <span style="color:#40a070">2</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">return</span> output
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+</span></span><span style="display:flex;"><span>    list <span style="color:#666">:=</span> []<span style="color:#902000">int</span>{<span style="color:#40a070">23</span>, <span style="color:#40a070">42</span>, <span style="color:#40a070">17</span>}
+</span></span><span style="display:flex;"><span>    list = <span style="color:#06287e">multiply</span>(list)
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> list {
+</span></span><span style="display:flex;"><span>        fmt.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;index %d: value %d\n&#34;</span>, idx, val)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>
 Now let’s see how we would do that in C with cgo. Note that we switch to using
 <code>uint32</code> instead of <code>int</code> because that makes the point
 I’m trying to make easier to convey.
 </p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#007020;font-weight:bold">package</span> main
-<span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;fmt&#34;</span>
-
-<span style="color:#60a0b0;font-style:italic">/*
-</span><span style="color:#60a0b0;font-style:italic">// Note the -std=gnu99. Using -std=c99 will not work.
-</span><span style="color:#60a0b0;font-style:italic">#cgo CFLAGS: -std=gnu99
-</span><span style="color:#60a0b0;font-style:italic">#include &lt;stdint.h&gt;
-</span><span style="color:#60a0b0;font-style:italic">
-</span><span style="color:#60a0b0;font-style:italic">void cMultiply(int len, uint32_t *input, uint32_t *output) {
-</span><span style="color:#60a0b0;font-style:italic">    for (int i = 0; i &lt; len; i++) {
-</span><span style="color:#60a0b0;font-style:italic">        output[i] = input[i] * 2;
-</span><span style="color:#60a0b0;font-style:italic">    }
-</span><span style="color:#60a0b0;font-style:italic">}
-</span><span style="color:#60a0b0;font-style:italic">*/</span>
-<span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;C&#34;</span>
-
-<span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">multiply</span>(input []<span style="color:#902000">uint32</span>) []<span style="color:#902000">uint32</span> {
-    output <span style="color:#666">:=</span> <span style="color:#007020">make</span>([]<span style="color:#902000">uint32</span>, <span style="color:#007020">len</span>(input))
-    C.<span style="color:#06287e">cMultiply</span>(C.<span style="color:#007020">int</span>(<span style="color:#007020">len</span>(input)),
-        (<span style="color:#666">*</span>C.uint32_t)(<span style="color:#666">&amp;</span>input[<span style="color:#40a070">0</span>]),
-	(<span style="color:#666">*</span>C.uint32_t)(<span style="color:#666">&amp;</span>output[<span style="color:#40a070">0</span>]))
-    <span style="color:#007020;font-weight:bold">return</span> output
-}
-
-<span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
-    list <span style="color:#666">:=</span> []<span style="color:#902000">uint32</span>{<span style="color:#40a070">23</span>, <span style="color:#40a070">42</span>, <span style="color:#40a070">17</span>}
-    list = <span style="color:#06287e">multiply</span>(list)
-    <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> list {
-        fmt.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;index %d: value %d\n&#34;</span>, idx, val)
-    }
-}
-</code></pre></div><p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span> main
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">/*
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Note the -std=gnu99. Using -std=c99 will not work.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">#cgo CFLAGS: -std=gnu99
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">#include &lt;stdint.h&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">void cMultiply(int len, uint32_t *input, uint32_t *output) {
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">    for (int i = 0; i &lt; len; i++) {
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">        output[i] = input[i] * 2;
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">    }
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">}
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">*/</span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;C&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">multiply</span>(input []<span style="color:#902000">uint32</span>) []<span style="color:#902000">uint32</span> {
+</span></span><span style="display:flex;"><span>    output <span style="color:#666">:=</span> <span style="color:#007020">make</span>([]<span style="color:#902000">uint32</span>, <span style="color:#007020">len</span>(input))
+</span></span><span style="display:flex;"><span>    C.<span style="color:#06287e">cMultiply</span>(C.<span style="color:#007020">int</span>(<span style="color:#007020">len</span>(input)),
+</span></span><span style="display:flex;"><span>        (<span style="color:#666">*</span>C.uint32_t)(<span style="color:#666">&amp;</span>input[<span style="color:#40a070">0</span>]),
+</span></span><span style="display:flex;"><span>	(<span style="color:#666">*</span>C.uint32_t)(<span style="color:#666">&amp;</span>output[<span style="color:#40a070">0</span>]))
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">return</span> output
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+</span></span><span style="display:flex;"><span>    list <span style="color:#666">:=</span> []<span style="color:#902000">uint32</span>{<span style="color:#40a070">23</span>, <span style="color:#40a070">42</span>, <span style="color:#40a070">17</span>}
+</span></span><span style="display:flex;"><span>    list = <span style="color:#06287e">multiply</span>(list)
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> list {
+</span></span><span style="display:flex;"><span>        fmt.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;index %d: value %d\n&#34;</span>, idx, val)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>
 As you can see, we need to convert the Go types into C types, which can be done
 by simply type-casting them. Also, we need to manually implement the array
 calling convention which is normally done by the C compiler: We pass a pointer

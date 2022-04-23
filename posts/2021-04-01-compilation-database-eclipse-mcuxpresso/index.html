@@ -237,32 +237,32 @@ up with <code>arguments</code> by default.</p>
 files</a>,
 which is a bit inconvenient with Eclipse.</p>
 <p>So, let’s put the extra commands into a <code>commandbear.sh</code> script:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#007020">#!/bin/sh
-</span><span style="color:#007020"></span>
-<span style="color:#007020">set</span> -eux
-
-intercept --output commands.json -- <span style="color:#4070a0">&#34;</span><span style="color:#bb60d5">$@</span><span style="color:#4070a0">&#34;</span>
-citnames <span style="color:#4070a0;font-weight:bold">\
-</span><span style="color:#4070a0;font-weight:bold"></span>  --input commands.json <span style="color:#4070a0;font-weight:bold">\
-</span><span style="color:#4070a0;font-weight:bold"></span>  --output compile_commands.json <span style="color:#4070a0;font-weight:bold">\
-</span><span style="color:#4070a0;font-weight:bold"></span>  --config config.json
-</code></pre></div><p>The <code>&quot;command_as_array&quot;: false</code> option goes into <code>config.json</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#007020">#!/bin/sh
+</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>
+</span></span><span style="display:flex;"><span><span style="color:#007020">set</span> -eux
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>intercept --output commands.json -- <span style="color:#4070a0">&#34;</span><span style="color:#bb60d5">$@</span><span style="color:#4070a0">&#34;</span>
+</span></span><span style="display:flex;"><span>citnames <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  --input commands.json <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  --output compile_commands.json <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  --config config.json
+</span></span></code></pre></div><p>The <code>&quot;command_as_array&quot;: false</code> option goes into <code>config.json</code>:</p>
 <pre tabindex="0"><code>{
-  &quot;compilation&quot;: {
+  &#34;compilation&#34;: {
   },
-  &quot;output&quot;: {
-    &quot;content&quot;: {
-      &quot;include_only_existing_source&quot;: true
+  &#34;output&#34;: {
+    &#34;content&#34;: {
+      &#34;include_only_existing_source&#34;: true
     },
-    &quot;format&quot;: {
-      &quot;command_as_array&quot;: false,
-      &quot;drop_output_field&quot;: false
+    &#34;format&#34;: {
+      &#34;command_as_array&#34;: false,
+      &#34;drop_output_field&#34;: false
     }
   }
 }
 </code></pre><p>Don’t forget to make the script executable:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">chmod +x commandbear.sh
-</code></pre></div><p>Then configure Eclipse to use the <code>commandbear.sh</code> script to build:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>chmod +x commandbear.sh
+</span></span></code></pre></div><p>Then configure Eclipse to use the <code>commandbear.sh</code> script to build:</p>
 <ol>
 <li>Open Project Properties by right-clicking your project in the Project
 Explorer panel.</li>

@@ -495,63 +495,63 @@ combinations of SFP modules (SFP-10G-BX in SFP1, SFP-10G-T in SFP2):</p>
 <p>After booting with the Mellanox ConnectX3 in a PCIe slot, the card should show
 up in <a href="https://manpages.debian.org/dmesg.8"><code>dmesg(8)</code></a>
 :</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">mlx4_core: Mellanox ConnectX core driver v4.0-0
-mlx4_core: Initializing 0000:03:00.0
-mlx4_core 0000:03:00.0: DMFS high rate steer mode is: disabled performance optimized steering
-<span style="display:block;width:100%;background-color:#d8d8d8">mlx4_core 0000:03:00.0: 31.504 Gb/s available PCIe bandwidth (8.0 GT/s PCIe x4 link)
-</span>mlx4_en: Mellanox ConnectX HCA Ethernet driver v4.0-0
-mlx4_en 0000:03:00.0: Activating port:1
-mlx4_en: 0000:03:00.0: Port 1: Using 16 TX rings
-mlx4_en: 0000:03:00.0: Port 1: Using 16 RX rings
-mlx4_en: 0000:03:00.0: Port 1: Initializing port
-mlx4_en 0000:03:00.0: registered PHC clock
-mlx4_core 0000:03:00.0 enp3s0: renamed from eth0
-&lt;mlx4_ib&gt; mlx4_ib_add: mlx4_ib: Mellanox ConnectX InfiniBand driver v4.0-0
-&lt;mlx4_ib&gt; mlx4_ib_add: counter index 1 for port 1 allocated 1
-mlx4_en: enp3s0: Steering Mode 1
-mlx4_en: enp3s0: Link Up</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>mlx4_core: Mellanox ConnectX core driver v4.0-0
+</span></span><span style="display:flex;"><span>mlx4_core: Initializing 0000:03:00.0
+</span></span><span style="display:flex;"><span>mlx4_core 0000:03:00.0: DMFS high rate steer mode is: disabled performance optimized steering
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>mlx4_core 0000:03:00.0: 31.504 Gb/s available PCIe bandwidth (8.0 GT/s PCIe x4 link)
+</span></span><span style="display:flex;"><span>mlx4_en: Mellanox ConnectX HCA Ethernet driver v4.0-0
+</span></span><span style="display:flex;"><span>mlx4_en 0000:03:00.0: Activating port:1
+</span></span><span style="display:flex;"><span>mlx4_en: 0000:03:00.0: Port 1: Using 16 TX rings
+</span></span><span style="display:flex;"><span>mlx4_en: 0000:03:00.0: Port 1: Using 16 RX rings
+</span></span><span style="display:flex;"><span>mlx4_en: 0000:03:00.0: Port 1: Initializing port
+</span></span><span style="display:flex;"><span>mlx4_en 0000:03:00.0: registered PHC clock
+</span></span><span style="display:flex;"><span>mlx4_core 0000:03:00.0 enp3s0: renamed from eth0
+</span></span><span style="display:flex;"><span>&lt;mlx4_ib&gt; mlx4_ib_add: mlx4_ib: Mellanox ConnectX InfiniBand driver v4.0-0
+</span></span><span style="display:flex;"><span>&lt;mlx4_ib&gt; mlx4_ib_add: counter index 1 for port 1 allocated 1
+</span></span><span style="display:flex;"><span>mlx4_en: enp3s0: Steering Mode 1
+</span></span><span style="display:flex;"><span>mlx4_en: enp3s0: Link Up</span></span></code></pre></div>
 <p>Another way to verify the device is running at maximum speed on the computer’s
 PCIe bus, is to ensure <code>LnkSta</code> matches <code>LnkCap</code> in the <a href="https://manpages.debian.org/lspci.8"><code>lspci(8)</code></a>
  output:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">% sudo lspci -vv
-03:00.0 Ethernet controller: Mellanox Technologies MT27500 Family [ConnectX-3]
-	Subsystem: Mellanox Technologies Device 0055
-[…]
-	Capabilities: [60] Express (v2) Endpoint, MSI 00
-[…]
-<span style="display:block;width:100%;background-color:#d8d8d8">		LnkCap:	Port #8, Speed 8GT/s, Width x4, ASPM L0s, Exit Latency L0s unlimited
-</span>			ClockPM- Surprise- LLActRep- BwNot- ASPMOptComp+
-		LnkCtl:	ASPM Disabled; RCB 64 bytes, Disabled- CommClk+
-			ExtSynch- ClockPM- AutWidDis- BWInt- AutBWInt-
-<span style="display:block;width:100%;background-color:#d8d8d8">		LnkSta:	Speed 8GT/s (ok), Width x4 (ok)
-</span>			TrErr- Train- SlotClk+ DLActive- BWMgmt- ABWMgmt-
-[…]</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% sudo lspci -vv
+</span></span><span style="display:flex;"><span>03:00.0 Ethernet controller: Mellanox Technologies MT27500 Family [ConnectX-3]
+</span></span><span style="display:flex;"><span>	Subsystem: Mellanox Technologies Device 0055
+</span></span><span style="display:flex;"><span>[…]
+</span></span><span style="display:flex;"><span>	Capabilities: [60] Express (v2) Endpoint, MSI 00
+</span></span><span style="display:flex;"><span>[…]
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>		LnkCap:	Port #8, Speed 8GT/s, Width x4, ASPM L0s, Exit Latency L0s unlimited
+</span></span><span style="display:flex;"><span>			ClockPM- Surprise- LLActRep- BwNot- ASPMOptComp+
+</span></span><span style="display:flex;"><span>		LnkCtl:	ASPM Disabled; RCB 64 bytes, Disabled- CommClk+
+</span></span><span style="display:flex;"><span>			ExtSynch- ClockPM- AutWidDis- BWInt- AutBWInt-
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>		LnkSta:	Speed 8GT/s (ok), Width x4 (ok)
+</span></span><span style="display:flex;"><span>			TrErr- Train- SlotClk+ DLActive- BWMgmt- ABWMgmt-
+</span></span><span style="display:flex;"><span>[…]</span></span></code></pre></div>
 <p>You can verify your network link is running at 10 Gbit/s using <a href="https://manpages.debian.org/ethtool.8"><code>ethtool(8)</code></a>
 :</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">% sudo ethtool enp3s0
-Settings for enp3s0:
-	Supported ports: [ FIBRE ]
-	Supported link modes:   1000baseKX/Full
-	                        10000baseKR/Full
-	Supported pause frame use: Symmetric Receive-only
-	Supports auto-negotiation: No
-	Supported FEC modes: Not reported
-	Advertised link modes:  1000baseKX/Full
-	                        10000baseKR/Full
-	Advertised pause frame use: Symmetric
-	Advertised auto-negotiation: No
-	Advertised FEC modes: Not reported
-<span style="display:block;width:100%;background-color:#d8d8d8">	Speed: 10000Mb/s
-</span>	Duplex: Full
-	Auto-negotiation: off
-	Port: Direct Attach Copper
-	PHYAD: 0
-	Transceiver: internal
-	Supports Wake-on: d
-	Wake-on: d
-        Current message level: 0x00000014 (20)
-                               link ifdown
-	Link detected: yes</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% sudo ethtool enp3s0
+</span></span><span style="display:flex;"><span>Settings for enp3s0:
+</span></span><span style="display:flex;"><span>	Supported ports: [ FIBRE ]
+</span></span><span style="display:flex;"><span>	Supported link modes:   1000baseKX/Full
+</span></span><span style="display:flex;"><span>	                        10000baseKR/Full
+</span></span><span style="display:flex;"><span>	Supported pause frame use: Symmetric Receive-only
+</span></span><span style="display:flex;"><span>	Supports auto-negotiation: No
+</span></span><span style="display:flex;"><span>	Supported FEC modes: Not reported
+</span></span><span style="display:flex;"><span>	Advertised link modes:  1000baseKX/Full
+</span></span><span style="display:flex;"><span>	                        10000baseKR/Full
+</span></span><span style="display:flex;"><span>	Advertised pause frame use: Symmetric
+</span></span><span style="display:flex;"><span>	Advertised auto-negotiation: No
+</span></span><span style="display:flex;"><span>	Advertised FEC modes: Not reported
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	Speed: 10000Mb/s
+</span></span><span style="display:flex;"><span>	Duplex: Full
+</span></span><span style="display:flex;"><span>	Auto-negotiation: off
+</span></span><span style="display:flex;"><span>	Port: Direct Attach Copper
+</span></span><span style="display:flex;"><span>	PHYAD: 0
+</span></span><span style="display:flex;"><span>	Transceiver: internal
+</span></span><span style="display:flex;"><span>	Supports Wake-on: d
+</span></span><span style="display:flex;"><span>	Wake-on: d
+</span></span><span style="display:flex;"><span>        Current message level: 0x00000014 (20)
+</span></span><span style="display:flex;"><span>                               link ifdown
+</span></span><span style="display:flex;"><span>	Link detected: yes</span></span></code></pre></div>
 <h2 id="benchmarking-batch-transfers">Benchmarking batch transfers</h2>
 <p>As mentioned in the introduction, routing 10 Gbit/s is out of scope in this
 article. If you’re interested in routing performance, check out Andree Toonk’s
@@ -665,24 +665,24 @@ Intel X550-T2 that I previously used.</p>
 <p>After booting with the Intel X550-T2 in a PCIe slot, the card should show up in
 <a href="https://manpages.debian.org/dmesg.8"><code>dmesg(8)</code></a>
 :</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">ixgbe: Intel(R) 10 Gigabit PCI Express Network Driver
-ixgbe 0000:03:00.0: Multiqueue Enabled: Rx Queue count = 16, Tx Queue count = 16 XDP Queue count = 0
-<span style="display:block;width:100%;background-color:#d8d8d8">ixgbe 0000:03:00.0: 31.504 Gb/s available PCIe bandwidth (8.0 GT/s PCIe x4 link)
-</span>ixgbe 0000:03:00.0: MAC: 4, PHY: 0, PBA No: H86377-006
-ixgbe 0000:03:00.0: Intel(R) 10 Gigabit Network Connection
-libphy: ixgbe-mdio: probed
-ixgbe 0000:03:00.1: Multiqueue Enabled: Rx Queue count = 16, Tx Queue count = 16 XDP Queue count = 0
-<span style="display:block;width:100%;background-color:#d8d8d8">ixgbe 0000:03:00.1: 31.504 Gb/s available PCIe bandwidth (8.0 GT/s PCIe x4 link)
-</span>ixgbe 0000:03:00.1: MAC: 4, PHY: 0, PBA No: H86377-006
-tun: Universal TUN/TAP device driver, 1.6
-ixgbe 0000:03:00.1: Intel(R) 10 Gigabit Network Connection
-libphy: ixgbe-mdio: probed
-ixgbe 0000:03:00.0 enp3s0f0: renamed from eth0
-ixgbe 0000:03:00.1 enp3s0f1: renamed from eth1
-pps pps0: new PPS source ptp1
-ixgbe 0000:03:00.0: registered PHC device on enp3s0f0
-pps pps1: new PPS source ptp2
-ixgbe 0000:03:00.1: registered PHC device on enp3s0f1</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>ixgbe: Intel(R) 10 Gigabit PCI Express Network Driver
+</span></span><span style="display:flex;"><span>ixgbe 0000:03:00.0: Multiqueue Enabled: Rx Queue count = 16, Tx Queue count = 16 XDP Queue count = 0
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>ixgbe 0000:03:00.0: 31.504 Gb/s available PCIe bandwidth (8.0 GT/s PCIe x4 link)
+</span></span><span style="display:flex;"><span>ixgbe 0000:03:00.0: MAC: 4, PHY: 0, PBA No: H86377-006
+</span></span><span style="display:flex;"><span>ixgbe 0000:03:00.0: Intel(R) 10 Gigabit Network Connection
+</span></span><span style="display:flex;"><span>libphy: ixgbe-mdio: probed
+</span></span><span style="display:flex;"><span>ixgbe 0000:03:00.1: Multiqueue Enabled: Rx Queue count = 16, Tx Queue count = 16 XDP Queue count = 0
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>ixgbe 0000:03:00.1: 31.504 Gb/s available PCIe bandwidth (8.0 GT/s PCIe x4 link)
+</span></span><span style="display:flex;"><span>ixgbe 0000:03:00.1: MAC: 4, PHY: 0, PBA No: H86377-006
+</span></span><span style="display:flex;"><span>tun: Universal TUN/TAP device driver, 1.6
+</span></span><span style="display:flex;"><span>ixgbe 0000:03:00.1: Intel(R) 10 Gigabit Network Connection
+</span></span><span style="display:flex;"><span>libphy: ixgbe-mdio: probed
+</span></span><span style="display:flex;"><span>ixgbe 0000:03:00.0 enp3s0f0: renamed from eth0
+</span></span><span style="display:flex;"><span>ixgbe 0000:03:00.1 enp3s0f1: renamed from eth1
+</span></span><span style="display:flex;"><span>pps pps0: new PPS source ptp1
+</span></span><span style="display:flex;"><span>ixgbe 0000:03:00.0: registered PHC device on enp3s0f0
+</span></span><span style="display:flex;"><span>pps pps1: new PPS source ptp2
+</span></span><span style="display:flex;"><span>ixgbe 0000:03:00.1: registered PHC device on enp3s0f1</span></span></code></pre></div>
 <p>I think if you only use 1 of the card’s 2 network ports, you might not hit any
 bottlenecks even when running the card only at <a href="https://en.wikipedia.org/wiki/PCI_Express#History_and_revisions">PCIe 3.0 ×2 link
 speed</a>, but I
@@ -690,51 +690,51 @@ haven’t verified this!</p>
 <p>Another way to verify the device is running at maximum speed on the computer’s
 PCIe bus, is to ensure <code>LnkSta</code> matches <code>LnkCap</code> in the <a href="https://manpages.debian.org/lspci.8"><code>lspci(8)</code></a>
  output:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">% sudo lspci -vv
-[…]
-03:00.0 Ethernet controller: Intel Corporation Ethernet Controller 10G X550T (rev 01)
-        Subsystem: Intel Corporation Ethernet Converged Network Adapter X550-T2
-[…]
-        Capabilities: [a0] Express (v2) Endpoint, MSI 00
-[…]
-<span style="display:block;width:100%;background-color:#d8d8d8">                LnkCap: Port #0, Speed 8GT/s, Width x4, ASPM L0s L1, Exit Latency L0s &lt;2us, L1 &lt;16us
-</span>                        ClockPM- Surprise- LLActRep- BwNot- ASPMOptComp+
-                LnkCtl: ASPM Disabled; RCB 64 bytes, Disabled- CommClk+
-                        ExtSynch- ClockPM- AutWidDis- BWInt- AutBWInt-
-<span style="display:block;width:100%;background-color:#d8d8d8">                LnkSta: Speed 8GT/s (ok), Width x4 (ok)
-</span>                        TrErr- Train- SlotClk+ DLActive- BWMgmt- ABWMgmt-
-[…]</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% sudo lspci -vv
+</span></span><span style="display:flex;"><span>[…]
+</span></span><span style="display:flex;"><span>03:00.0 Ethernet controller: Intel Corporation Ethernet Controller 10G X550T (rev 01)
+</span></span><span style="display:flex;"><span>        Subsystem: Intel Corporation Ethernet Converged Network Adapter X550-T2
+</span></span><span style="display:flex;"><span>[…]
+</span></span><span style="display:flex;"><span>        Capabilities: [a0] Express (v2) Endpoint, MSI 00
+</span></span><span style="display:flex;"><span>[…]
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>                LnkCap: Port #0, Speed 8GT/s, Width x4, ASPM L0s L1, Exit Latency L0s &lt;2us, L1 &lt;16us
+</span></span><span style="display:flex;"><span>                        ClockPM- Surprise- LLActRep- BwNot- ASPMOptComp+
+</span></span><span style="display:flex;"><span>                LnkCtl: ASPM Disabled; RCB 64 bytes, Disabled- CommClk+
+</span></span><span style="display:flex;"><span>                        ExtSynch- ClockPM- AutWidDis- BWInt- AutBWInt-
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>                LnkSta: Speed 8GT/s (ok), Width x4 (ok)
+</span></span><span style="display:flex;"><span>                        TrErr- Train- SlotClk+ DLActive- BWMgmt- ABWMgmt-
+</span></span><span style="display:flex;"><span>[…]</span></span></code></pre></div>
 <p>You can verify your network link is running at 10 Gbit/s using <a href="https://manpages.debian.org/ethtool.8"><code>ethtool(8)</code></a>
 :</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">% sudo ethtool enp3s0f1 
-Settings for enp3s0f1:
-	Supported ports: [ TP ]
-	Supported link modes:   100baseT/Full
-	                        1000baseT/Full
-<span style="display:block;width:100%;background-color:#d8d8d8">	                        10000baseT/Full
-</span>	                        2500baseT/Full
-	                        5000baseT/Full
-	Supported pause frame use: Symmetric
-	Supports auto-negotiation: Yes
-	Supported FEC modes: Not reported
-	Advertised link modes:  100baseT/Full
-	                        1000baseT/Full
-	                        10000baseT/Full
-	Advertised pause frame use: Symmetric
-	Advertised auto-negotiation: Yes
-	Advertised FEC modes: Not reported
-<span style="display:block;width:100%;background-color:#d8d8d8">	Speed: 10000Mb/s
-</span>	Duplex: Full
-	Auto-negotiation: on
-	Port: Twisted Pair
-	PHYAD: 0
-	Transceiver: internal
-	MDI-X: Unknown
-	Supports Wake-on: d
-	Wake-on: d
-        Current message level: 0x00000007 (7)
-                               drv probe link
-	Link detected: yes</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% sudo ethtool enp3s0f1 
+</span></span><span style="display:flex;"><span>Settings for enp3s0f1:
+</span></span><span style="display:flex;"><span>	Supported ports: [ TP ]
+</span></span><span style="display:flex;"><span>	Supported link modes:   100baseT/Full
+</span></span><span style="display:flex;"><span>	                        1000baseT/Full
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	                        10000baseT/Full
+</span></span><span style="display:flex;"><span>	                        2500baseT/Full
+</span></span><span style="display:flex;"><span>	                        5000baseT/Full
+</span></span><span style="display:flex;"><span>	Supported pause frame use: Symmetric
+</span></span><span style="display:flex;"><span>	Supports auto-negotiation: Yes
+</span></span><span style="display:flex;"><span>	Supported FEC modes: Not reported
+</span></span><span style="display:flex;"><span>	Advertised link modes:  100baseT/Full
+</span></span><span style="display:flex;"><span>	                        1000baseT/Full
+</span></span><span style="display:flex;"><span>	                        10000baseT/Full
+</span></span><span style="display:flex;"><span>	Advertised pause frame use: Symmetric
+</span></span><span style="display:flex;"><span>	Advertised auto-negotiation: Yes
+</span></span><span style="display:flex;"><span>	Advertised FEC modes: Not reported
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	Speed: 10000Mb/s
+</span></span><span style="display:flex;"><span>	Duplex: Full
+</span></span><span style="display:flex;"><span>	Auto-negotiation: on
+</span></span><span style="display:flex;"><span>	Port: Twisted Pair
+</span></span><span style="display:flex;"><span>	PHYAD: 0
+</span></span><span style="display:flex;"><span>	Transceiver: internal
+</span></span><span style="display:flex;"><span>	MDI-X: Unknown
+</span></span><span style="display:flex;"><span>	Supports Wake-on: d
+</span></span><span style="display:flex;"><span>	Wake-on: d
+</span></span><span style="display:flex;"><span>        Current message level: 0x00000007 (7)
+</span></span><span style="display:flex;"><span>                               drv probe link
+</span></span><span style="display:flex;"><span>	Link detected: yes</span></span></code></pre></div>
 <h2 id="appendix-c-bios-update-for-mellanox-connectx-3">Appendix C: BIOS update for Mellanox ConnectX-3</h2>
 <p>On my Supermicro X11SSZ-QF mainboard, the Mellanox ConnectX-3 would not
 establish a link. The Mellanox Linux kernel driver logged a number of errors:</p>

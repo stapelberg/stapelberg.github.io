@@ -554,14 +554,14 @@ echo -e &ldquo;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&m
 <h1 id="delete-the-tempfiles">Delete the tempfiles</h1>
 <p>rm -f &ldquo;${TMP_VID}&rdquo; &ldquo;${TMP_AUD}&rdquo; &ldquo;${TMP_AUD}.ogg&rdquo;</p>
 <h1 id="encode-video">Encode video</h1>
-<p>${MENCODER} -really-quiet -ovc x264 -x264encopts<br>
-bitrate=${X264_BITRATE}:subq=6:partitions=all:8x8dct:me=umh:frameref=5:bframes=3:b_pyramid:weight_b:pass=1<br>
+<p>${MENCODER} -really-quiet -ovc x264 -x264encopts <br>
+bitrate=${X264_BITRATE}:subq=6:partitions=all:8x8dct:me=umh:frameref=5:bframes=3:b_pyramid:weight_b:pass=1 <br>
 -oac copy -of rawvideo -o &ldquo;${TMP_VID}&rdquo; &ldquo;${SRC_VID}&rdquo; 1&gt;&amp;- || {
 echo -e &ldquo;\nError: mencoder could not encode the file. Check the printed errors&rdquo;
 exit 2
 }
-${MENCODER} -really-quiet -ovc x264 -x264encopts<br>
-bitrate=${X264_BITRATE}:subq=6:partitions=all:8x8dct:me=umh:frameref=5:bframes=3:b_pyramid:weight_b:pass=2<br>
+${MENCODER} -really-quiet -ovc x264 -x264encopts <br>
+bitrate=${X264_BITRATE}:subq=6:partitions=all:8x8dct:me=umh:frameref=5:bframes=3:b_pyramid:weight_b:pass=2 <br>
 -oac copy -of rawvideo -o &ldquo;${TMP_VID}&rdquo; &ldquo;${SRC_VID}&rdquo; 1&gt;&amp;- || {
 echo -e &ldquo;\nError: mencoder could not encode the file. Check the printed errors&rdquo;
 exit 2

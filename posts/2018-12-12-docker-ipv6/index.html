@@ -200,8 +200,8 @@ article. Let’s say that my provider gives me a routed IPv6 subnet
 <p>The Docker daemon defaults to IPv4-only. To enable IPv6, create the
 configuration file <code>/etc/docker/daemon.json</code> with the following content:</p>
 <pre tabindex="0"><code>{
-  &quot;ipv6&quot;: true,
-  &quot;fixed-cidr-v6&quot;: &quot;2001:db8:13b:330:ffff::/80&quot;
+  &#34;ipv6&#34;: true,
+  &#34;fixed-cidr-v6&#34;: &#34;2001:db8:13b:330:ffff::/80&#34;
 }
 </code></pre><p>After restarting the Docker daemon, containers will now get IPv6 addresses based
 on their MAC address, which is picked sequentially from the range
@@ -211,8 +211,8 @@ start will use the IPv6 address <code>2001:db8:13b:330:ffff:0242:ac11:0002</code
 <p>When publishing port 80 of a webserver, notice the remote address when accessing
 the port via IPv4 and IPv6:</p>
 <pre tabindex="0"><code>% docker run -p 80:80 nginx
-198.51.100.7 - - [12/Dec/2018:07:38:19 +0000] &quot;GET / HTTP/1.1&quot; 200 612
-172.17.0.1 - - [12/Dec/2018:07:38:40 +0000] &quot;GET / HTTP/1.1&quot; 200 612
+198.51.100.7 - - [12/Dec/2018:07:38:19 +0000] &#34;GET / HTTP/1.1&#34; 200 612
+172.17.0.1 - - [12/Dec/2018:07:38:40 +0000] &#34;GET / HTTP/1.1&#34; 200 612
 </code></pre><p>The first request (IPv4) has the correct remote address, but not the second one
 (IPv6). This is because Docker publishes ports with
 <a href="https://en.wikipedia.org/wiki/Network_address_translation">NAT</a> for IPv4, and a
@@ -226,7 +226,7 @@ name anymore, so you will need lots of static, host-specific configuration.</p>
 container’s IPv6 address directly:</p>
 <pre tabindex="0"><code>% docker run --publish 203.0.113.1:80:80 --name nginx nginx
 </code></pre><p>You can obtain the container’s IPv6 address using:</p>
-<pre tabindex="0"><code>% docker inspect -f '{{.NetworkSettings.GlobalIPv6Address}}' nginx
+<pre tabindex="0"><code>% docker inspect -f &#39;{{.NetworkSettings.GlobalIPv6Address}}&#39; nginx
 </code></pre><h3 id="static-ipv6-addresses">Static IPv6 addresses</h3>
 <p>Above, I explained that we need to use the container’s IPv6 address directly,
 and that the address is derived from the MAC address, which is chosen

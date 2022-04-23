@@ -217,7 +217,7 @@ in UNIX pipes).</p>
 <p>Instead of clumsily running <code>dpipe</code> in a separate window, I encapsulated the
 necessary steps in a little Go program I call <code>cpu</code>. The reverse sshfs principle
 looks like this in Go:</p>
-<pre tabindex="0"><code>sftp := exec.Command(&quot;/usr/lib/openssh/sftp-server&quot;)
+<pre tabindex="0"><code>sftp := exec.Command(&#34;/usr/lib/openssh/sftp-server&#34;)
 stdin, _ := sftp.StdinPipe()
 stdout, _ := sftp.StdoutPipe()
 session.Stdin = stdout
@@ -225,11 +225,11 @@ session.Stdout = stdin
 sftp.Stderr = os.Stderr
 session.Stderr = os.Stderr
 const (
-	host = &quot;&quot;
-	src  = &quot;/&quot;
-	mnt  = &quot;/mnt&quot;
+	host = &#34;&#34;
+	src  = &#34;/&#34;
+	mnt  = &#34;/mnt&#34;
 )
-session.Start(fmt.Sprintf(&quot;sshfs %s:%s %s -o slave&quot;, host, src, mnt))
+session.Start(fmt.Sprintf(&#34;sshfs %s:%s %s -o slave&#34;, host, src, mnt))
 sftp.Start()
 </code></pre><p>Here’s how the tool looks in action:</p>
 <script src="https://asciinema.org/a/Q1BWLcdtIMOE5SCHOzu1eqcOE.js" id="asciicast-Q1BWLcdtIMOE5SCHOzu1eqcOE" async></script>
@@ -266,21 +266,21 @@ point to <code>/home/michael/go/bin/porterbox-aarch64</code>, followed by <code>
 
 set -e
 
-remote=&quot;$1&quot;
+remote=&#34;$1&#34;
 shift
-wd=&quot;$1&quot;
+wd=&#34;$1&#34;
 shift
 
 # Ensure the executable (usually within /tmp) is available:
-exedir=$(dirname &quot;$1&quot;)
-mkdir -p &quot;$exedir&quot;
-mount --rbind &quot;$remote$exedir&quot; &quot;$exedir&quot;
+exedir=$(dirname &#34;$1&#34;)
+mkdir -p &#34;$exedir&#34;
+mount --rbind &#34;$remote$exedir&#34; &#34;$exedir&#34;
 
 # Ensure /home is available:
-mount --rbind &quot;$remote/home&quot; /home
+mount --rbind &#34;$remote/home&#34; /home
 
-cd &quot;$wd&quot;
-&quot;$@&quot;
+cd &#34;$wd&#34;
+&#34;$@&#34;
 </code></pre><h3 id="demo">demo</h3>
 <p>This is what all of the above looks like in action:</p>
 <script src="https://asciinema.org/a/Mjb66iHIbBfGuK5lEMnLt0UzS.js" id="asciicast-Mjb66iHIbBfGuK5lEMnLt0UzS" async></script>

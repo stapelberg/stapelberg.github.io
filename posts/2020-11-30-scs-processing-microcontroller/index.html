@@ -591,27 +591,27 @@ above or below a configured threshold voltage by raising an interrupt. A good
 threshold is 1.65V in my case.</p>
 <p>In response to the voltage change, we set GPIO pin 15 to a digital high (3.3V) or
 low (0V) level:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020;font-weight:bold">volatile</span> <span style="color:#902000">uint32_t</span> cmpflags;
-
-<span style="color:#60a0b0;font-style:italic">// ISR (Interrupt Service Routine), called by the Analog Comparator:
-</span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#902000">void</span> <span style="color:#06287e">acmp1_isr</span>() {
-  cmpflags <span style="color:#666">=</span> CMP1_SCR;
-
-  { <span style="color:#60a0b0;font-style:italic">// clear interrupt status flags:
-</span><span style="color:#60a0b0;font-style:italic"></span>    <span style="color:#902000">uint8_t</span> scr <span style="color:#666">=</span> (CMP1_SCR <span style="color:#666">&amp;</span> <span style="color:#666">~</span>(CMP_SCR_CFR_MASK <span style="color:#666">|</span> CMP_SCR_CFF_MASK));
-    CMP1_SCR <span style="color:#666">=</span> scr <span style="color:#666">|</span> CMP_SCR_CFR_MASK <span style="color:#666">|</span> CMP_SCR_CFF_MASK;
-  }
-
-  <span style="color:#007020;font-weight:bold">if</span> (cmpflags <span style="color:#666">&amp;</span> CMP_SCR_CFR_MASK) {
-    <span style="color:#60a0b0;font-style:italic">// See below! This line will be modified:
-</span><span style="color:#60a0b0;font-style:italic"></span>    digitalWrite(<span style="color:#40a070">15</span>, HIGH);
-  }
-
-  <span style="color:#007020;font-weight:bold">if</span> (cmpflags <span style="color:#666">&amp;</span> CMP_SCR_CFF_MASK) {
-    digitalWrite(<span style="color:#40a070">15</span>, LOW);
-  }
-}
-</code></pre></div><p>This signal can easily be verified by attaching an oscilloscope probe each to
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">volatile</span> <span style="color:#902000">uint32_t</span> cmpflags;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// ISR (Interrupt Service Routine), called by the Analog Comparator:
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#902000">void</span> <span style="color:#06287e">acmp1_isr</span>() {
+</span></span><span style="display:flex;"><span>  cmpflags <span style="color:#666">=</span> CMP1_SCR;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  { <span style="color:#60a0b0;font-style:italic">// clear interrupt status flags:
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    <span style="color:#902000">uint8_t</span> scr <span style="color:#666">=</span> (CMP1_SCR <span style="color:#666">&amp;</span> <span style="color:#666">~</span>(CMP_SCR_CFR_MASK <span style="color:#666">|</span> CMP_SCR_CFF_MASK));
+</span></span><span style="display:flex;"><span>    CMP1_SCR <span style="color:#666">=</span> scr <span style="color:#666">|</span> CMP_SCR_CFR_MASK <span style="color:#666">|</span> CMP_SCR_CFF_MASK;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">if</span> (cmpflags <span style="color:#666">&amp;</span> CMP_SCR_CFR_MASK) {
+</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic">// See below! This line will be modified:
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    digitalWrite(<span style="color:#40a070">15</span>, HIGH);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">if</span> (cmpflags <span style="color:#666">&amp;</span> CMP_SCR_CFF_MASK) {
+</span></span><span style="display:flex;"><span>    digitalWrite(<span style="color:#40a070">15</span>, LOW);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This signal can easily be verified by attaching an oscilloscope probe each to
 the <code>SCSRX</code> voltage-regulated bus signal input and to the <code>SCSRXOUT</code> GPIO pin
 output:</p>
 
@@ -658,30 +658,30 @@ serial implementations on micro controllers typically support it.</p>
 be sampled at 50%.</p>
 <p>In practical terms, this means modifying the <code>acmp1_isr</code> function to return to
 high later than the Analog Comparator indicates:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020;font-weight:bold">volatile</span> <span style="color:#902000">uint32_t</span> cmpflags;
-
-<span style="color:#60a0b0;font-style:italic">// ISR (Interrupt Service Routine), called by the Analog Comparator:
-</span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#902000">void</span> <span style="color:#06287e">acmp1_isr</span>() {
-  cmpflags <span style="color:#666">=</span> CMP1_SCR;
-
-  { <span style="color:#60a0b0;font-style:italic">// clear interrupt status flags:
-</span><span style="color:#60a0b0;font-style:italic"></span>    <span style="color:#902000">uint8_t</span> scr <span style="color:#666">=</span> (CMP1_SCR <span style="color:#666">&amp;</span> <span style="color:#666">~</span>(CMP_SCR_CFR_MASK <span style="color:#666">|</span> CMP_SCR_CFF_MASK));
-    CMP1_SCR <span style="color:#666">=</span> scr <span style="color:#666">|</span> CMP_SCR_CFR_MASK <span style="color:#666">|</span> CMP_SCR_CFF_MASK;
-  }
-
-  <span style="color:#007020;font-weight:bold">if</span> (cmpflags <span style="color:#666">&amp;</span> CMP_SCR_CFR_MASK) {
-    <span style="color:#60a0b0;font-style:italic">// Instead of setting our output pin high immediately,
-</span><span style="color:#60a0b0;font-style:italic"></span>    <span style="color:#60a0b0;font-style:italic">// we delay going up by approx. 40us,
-</span><span style="color:#60a0b0;font-style:italic"></span>    <span style="color:#60a0b0;font-style:italic">// turning the SCS signal into a UART signal:
-</span><span style="color:#60a0b0;font-style:italic"></span>    delayMicroseconds(<span style="color:#40a070">40</span>);
-    digitalWrite(<span style="color:#40a070">15</span>, HIGH);
-  }
-
-  <span style="color:#007020;font-weight:bold">if</span> (cmpflags <span style="color:#666">&amp;</span> CMP_SCR_CFF_MASK) {
-    digitalWrite(<span style="color:#40a070">15</span>, LOW);
-  }
-}
-</code></pre></div><p>You can now read this signal using your laptop and a USB-to-serial adapter!</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">volatile</span> <span style="color:#902000">uint32_t</span> cmpflags;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// ISR (Interrupt Service Routine), called by the Analog Comparator:
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#902000">void</span> <span style="color:#06287e">acmp1_isr</span>() {
+</span></span><span style="display:flex;"><span>  cmpflags <span style="color:#666">=</span> CMP1_SCR;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  { <span style="color:#60a0b0;font-style:italic">// clear interrupt status flags:
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    <span style="color:#902000">uint8_t</span> scr <span style="color:#666">=</span> (CMP1_SCR <span style="color:#666">&amp;</span> <span style="color:#666">~</span>(CMP_SCR_CFR_MASK <span style="color:#666">|</span> CMP_SCR_CFF_MASK));
+</span></span><span style="display:flex;"><span>    CMP1_SCR <span style="color:#666">=</span> scr <span style="color:#666">|</span> CMP_SCR_CFR_MASK <span style="color:#666">|</span> CMP_SCR_CFF_MASK;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">if</span> (cmpflags <span style="color:#666">&amp;</span> CMP_SCR_CFR_MASK) {
+</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic">// Instead of setting our output pin high immediately,
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    <span style="color:#60a0b0;font-style:italic">// we delay going up by approx. 40us,
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    <span style="color:#60a0b0;font-style:italic">// turning the SCS signal into a UART signal:
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    delayMicroseconds(<span style="color:#40a070">40</span>);
+</span></span><span style="display:flex;"><span>    digitalWrite(<span style="color:#40a070">15</span>, HIGH);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">if</span> (cmpflags <span style="color:#666">&amp;</span> CMP_SCR_CFF_MASK) {
+</span></span><span style="display:flex;"><span>    digitalWrite(<span style="color:#40a070">15</span>, LOW);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>You can now read this signal using your laptop and a USB-to-serial adapter!</p>
 <p>On a micro controller, we now feed this signal back into a UART decoder. For
 prototyping, this can literally mean a jumper wire connecting the output GPIO
 pin with a serial RX pin. Some micro controllers also support internal wiring of
@@ -691,61 +691,61 @@ peripherals, allowing you to get rid of that cable.</p>
 we can design a streaming SCS decoder. The decoder self-synchronizes and skips
 invalid SCS telegrams by checking their checksum. We start with a ring buffer
 and a convenience working copy:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">constexpr <span style="color:#902000">int</span> telegramLen <span style="color:#666">=</span> <span style="color:#40a070">7</span>;
-
-<span style="color:#007020;font-weight:bold">typedef</span> <span style="color:#007020;font-weight:bold">struct</span> {
-  <span style="color:#60a0b0;font-style:italic">// circular buffer for incoming bytes, indexed using cur
-</span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#902000">uint8_t</span> buf[telegramLen];
-  <span style="color:#902000">int</span> cur;
-
-  <span style="color:#902000">uint8_t</span> tbuf[telegramLen];
-} scsfilter;
-</code></pre></div><p>Each byte we receive from the UART, we store in our ring buffer:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#902000">void</span> <span style="color:#06287e">sf_WriteByte</span>(scsfilter <span style="color:#666">*</span>sf, <span style="color:#902000">uint8_t</span> b) {
-  sf<span style="color:#666">-&gt;</span>buf[sf<span style="color:#666">-&gt;</span>cur] <span style="color:#666">=</span> b;
-  sf<span style="color:#666">-&gt;</span>cur <span style="color:#666">=</span> (sf<span style="color:#666">-&gt;</span>cur <span style="color:#666">+</span> <span style="color:#40a070">1</span>) <span style="color:#666">%</span> telegramLen;
-}
-</code></pre></div><p>After every byte, we can check if the ring buffer decodes to a valid ring signal
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>constexpr <span style="color:#902000">int</span> telegramLen <span style="color:#666">=</span> <span style="color:#40a070">7</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">typedef</span> <span style="color:#007020;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">// circular buffer for incoming bytes, indexed using cur
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#902000">uint8_t</span> buf[telegramLen];
+</span></span><span style="display:flex;"><span>  <span style="color:#902000">int</span> cur;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#902000">uint8_t</span> tbuf[telegramLen];
+</span></span><span style="display:flex;"><span>} scsfilter;
+</span></span></code></pre></div><p>Each byte we receive from the UART, we store in our ring buffer:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#902000">void</span> <span style="color:#06287e">sf_WriteByte</span>(scsfilter <span style="color:#666">*</span>sf, <span style="color:#902000">uint8_t</span> b) {
+</span></span><span style="display:flex;"><span>  sf<span style="color:#666">-&gt;</span>buf[sf<span style="color:#666">-&gt;</span>cur] <span style="color:#666">=</span> b;
+</span></span><span style="display:flex;"><span>  sf<span style="color:#666">-&gt;</span>cur <span style="color:#666">=</span> (sf<span style="color:#666">-&gt;</span>cur <span style="color:#666">+</span> <span style="color:#40a070">1</span>) <span style="color:#666">%</span> telegramLen;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>After every byte, we can check if the ring buffer decodes to a valid ring signal
 SCS bus telegram:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#902000">bool</span> <span style="color:#06287e">sf_completeAndValid</span>(scsfilter <span style="color:#666">*</span>sf) {
-  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint8_t</span> prev <span style="color:#666">=</span> sf<span style="color:#666">-&gt;</span>buf[(sf<span style="color:#666">-&gt;</span>cur<span style="color:#666">+</span>(telegramLen<span style="color:#666">-</span><span style="color:#40a070">1</span>))<span style="color:#666">%</span>telegramLen];
-  <span style="color:#007020;font-weight:bold">if</span> (prev <span style="color:#666">!=</span> <span style="color:#40a070">0xa3</span>) {
-    <span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020">false</span>; <span style="color:#60a0b0;font-style:italic">// incomplete: previous byte not a telegram termination
-</span><span style="color:#60a0b0;font-style:italic"></span>  }
-
-  <span style="color:#60a0b0;font-style:italic">// Copy the whole telegram into tbuf; makes working with it easier:
-</span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#007020;font-weight:bold">for</span> (<span style="color:#902000">int</span> i <span style="color:#666">=</span> <span style="color:#40a070">0</span>; i <span style="color:#666">&lt;</span> telegramLen; i<span style="color:#666">++</span>) {
-    sf<span style="color:#666">-&gt;</span>tbuf[i] <span style="color:#666">=</span> sf<span style="color:#666">-&gt;</span>buf[(sf<span style="color:#666">-&gt;</span>cur<span style="color:#666">+</span>i)<span style="color:#666">%</span>telegramLen];
-  }
-
-  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint8_t</span> stored <span style="color:#666">=</span> sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">5</span>];
-  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint8_t</span> computed <span style="color:#666">=</span> sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">1</span>] <span style="color:#666">^</span>
-    sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">2</span>] <span style="color:#666">^</span>
-	sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">3</span>] <span style="color:#666">^</span>
-	sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">4</span>];
-  <span style="color:#007020;font-weight:bold">if</span> (stored <span style="color:#666">!=</span> computed) {
-    <span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020">false</span>; <span style="color:#60a0b0;font-style:italic">// corrupt? checksum mismatch
-</span><span style="color:#60a0b0;font-style:italic"></span>  }
-
-  <span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020">true</span>;
-}
-
-<span style="color:#902000">int</span> <span style="color:#06287e">sf_ringForApartment</span>(scsfilter <span style="color:#666">*</span>sf) {
-  <span style="color:#007020;font-weight:bold">if</span> (<span style="color:#666">!</span>sf_completeAndValid(sf)) {
-    <span style="color:#007020;font-weight:bold">return</span> <span style="color:#666">-</span><span style="color:#40a070">1</span>;
-  }
-
-  <span style="color:#007020;font-weight:bold">if</span> (sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">3</span>] <span style="color:#666">!=</span> <span style="color:#40a070">0x60</span>) {
-    <span style="color:#007020;font-weight:bold">return</span> <span style="color:#666">-</span><span style="color:#40a070">1</span>; <span style="color:#60a0b0;font-style:italic">// not a ring command
-</span><span style="color:#60a0b0;font-style:italic"></span>  }
-
-  <span style="color:#007020;font-weight:bold">if</span> (sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">1</span>] <span style="color:#666">!=</span> <span style="color:#40a070">0x91</span>) {
-    <span style="color:#007020;font-weight:bold">return</span> <span style="color:#666">-</span><span style="color:#40a070">1</span>; <span style="color:#60a0b0;font-style:italic">// not sent by the intercom house station
-</span><span style="color:#60a0b0;font-style:italic"></span>  }
-
-  <span style="color:#007020;font-weight:bold">return</span> (<span style="color:#902000">int</span>)(sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">2</span>]); <span style="color:#60a0b0;font-style:italic">// apartment id
-</span><span style="color:#60a0b0;font-style:italic"></span>}
-</code></pre></div><h3 id="scs-tx-send">SCS TX (send)</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#902000">bool</span> <span style="color:#06287e">sf_completeAndValid</span>(scsfilter <span style="color:#666">*</span>sf) {
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint8_t</span> prev <span style="color:#666">=</span> sf<span style="color:#666">-&gt;</span>buf[(sf<span style="color:#666">-&gt;</span>cur<span style="color:#666">+</span>(telegramLen<span style="color:#666">-</span><span style="color:#40a070">1</span>))<span style="color:#666">%</span>telegramLen];
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">if</span> (prev <span style="color:#666">!=</span> <span style="color:#40a070">0xa3</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020">false</span>; <span style="color:#60a0b0;font-style:italic">// incomplete: previous byte not a telegram termination
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">// Copy the whole telegram into tbuf; makes working with it easier:
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#007020;font-weight:bold">for</span> (<span style="color:#902000">int</span> i <span style="color:#666">=</span> <span style="color:#40a070">0</span>; i <span style="color:#666">&lt;</span> telegramLen; i<span style="color:#666">++</span>) {
+</span></span><span style="display:flex;"><span>    sf<span style="color:#666">-&gt;</span>tbuf[i] <span style="color:#666">=</span> sf<span style="color:#666">-&gt;</span>buf[(sf<span style="color:#666">-&gt;</span>cur<span style="color:#666">+</span>i)<span style="color:#666">%</span>telegramLen];
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint8_t</span> stored <span style="color:#666">=</span> sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">5</span>];
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint8_t</span> computed <span style="color:#666">=</span> sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">1</span>] <span style="color:#666">^</span>
+</span></span><span style="display:flex;"><span>    sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">2</span>] <span style="color:#666">^</span>
+</span></span><span style="display:flex;"><span>	sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">3</span>] <span style="color:#666">^</span>
+</span></span><span style="display:flex;"><span>	sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">4</span>];
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">if</span> (stored <span style="color:#666">!=</span> computed) {
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020">false</span>; <span style="color:#60a0b0;font-style:italic">// corrupt? checksum mismatch
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020">true</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#902000">int</span> <span style="color:#06287e">sf_ringForApartment</span>(scsfilter <span style="color:#666">*</span>sf) {
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">if</span> (<span style="color:#666">!</span>sf_completeAndValid(sf)) {
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">return</span> <span style="color:#666">-</span><span style="color:#40a070">1</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">if</span> (sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">3</span>] <span style="color:#666">!=</span> <span style="color:#40a070">0x60</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">return</span> <span style="color:#666">-</span><span style="color:#40a070">1</span>; <span style="color:#60a0b0;font-style:italic">// not a ring command
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">if</span> (sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">1</span>] <span style="color:#666">!=</span> <span style="color:#40a070">0x91</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">return</span> <span style="color:#666">-</span><span style="color:#40a070">1</span>; <span style="color:#60a0b0;font-style:italic">// not sent by the intercom house station
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">return</span> (<span style="color:#902000">int</span>)(sf<span style="color:#666">-&gt;</span>tbuf[<span style="color:#40a070">2</span>]); <span style="color:#60a0b0;font-style:italic">// apartment id
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>}
+</span></span></code></pre></div><h3 id="scs-tx-send">SCS TX (send)</h3>
 <p>Conceptually, writing serial data to a GPIO output from software is done with
 <a href="https://www.arduino.cc/en/Reference/SoftwareSerial">e.g. the Arduino SoftwareSerial
 library</a>, but there are
@@ -765,54 +765,54 @@ transmitting a 0 bit.</p>
 </li>
 </ol>
 <p>The modified <code>write</code> function looks like this:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#007020">#define V27 LOW
-</span><span style="color:#007020">#define V22 HIGH
-</span><span style="color:#007020"></span>
-<span style="color:#007020">#define scs0() do { \
-</span><span style="color:#007020">  while (ARM_DWT_CYCCNT - begin_cycle &lt; (target-43750</span><span style="color:#60a0b0;font-style:italic">/*70us*/</span><span style="color:#007020">)) ; \
-</span><span style="color:#007020">  digitalWriteFast(11, V27); \
-</span><span style="color:#007020">} while (0)
-</span><span style="color:#007020"></span>
-size_t SCSSerial<span style="color:#666">::</span>write(<span style="color:#902000">uint8_t</span> b)
-{
-  elapsedMicros elapsed;
-  <span style="color:#902000">uint32_t</span> target;
-  <span style="color:#902000">uint8_t</span> mask;
-  <span style="color:#902000">uint32_t</span> begin_cycle;
-
-  ARM_DEMCR <span style="color:#666">|=</span> ARM_DEMCR_TRCENA;
-  ARM_DWT_CTRL <span style="color:#666">|=</span> ARM_DWT_CTRL_CYCCNTENA;
-  ARM_DWT_CYCCNT <span style="color:#666">=</span> <span style="color:#40a070">0</span>;
-
-  <span style="color:#60a0b0;font-style:italic">// start bit
-</span><span style="color:#60a0b0;font-style:italic"></span>  target <span style="color:#666">=</span> cycles_per_bit;
-  noInterrupts();
-  begin_cycle <span style="color:#666">=</span> ARM_DWT_CYCCNT;
-  digitalWriteFast(<span style="color:#40a070">11</span>, V22);
-  scs0();
-  wait_for_target(begin_cycle, target);
-
-  <span style="color:#60a0b0;font-style:italic">// 8 data bits
-</span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#007020;font-weight:bold">for</span> (mask <span style="color:#666">=</span> <span style="color:#40a070">1</span>; mask; mask <span style="color:#666">&lt;&lt;=</span> <span style="color:#40a070">1</span>) {
-    <span style="color:#007020;font-weight:bold">if</span> (b<span style="color:#666">&amp;</span>mask) {
-      digitalWriteFast(<span style="color:#40a070">11</span>, V27);
-    } <span style="color:#007020;font-weight:bold">else</span> {
-      digitalWriteFast(<span style="color:#40a070">11</span>, V22);
-    }
-    target <span style="color:#666">+=</span> cycles_per_bit;
-    scs0();
-    wait_for_target(begin_cycle, target);
-  }
-
-  <span style="color:#60a0b0;font-style:italic">// stop bit
-</span><span style="color:#60a0b0;font-style:italic"></span>  digitalWriteFast(<span style="color:#40a070">11</span>, V27);
-  interrupts();
-  target <span style="color:#666">+=</span> cycles_per_bit;
-  scs0();
-  <span style="color:#007020;font-weight:bold">while</span> (ARM_DWT_CYCCNT <span style="color:#666">-</span> begin_cycle <span style="color:#666">&lt;</span> target) ; <span style="color:#60a0b0;font-style:italic">// wait
-</span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#007020;font-weight:bold">return</span> <span style="color:#40a070">1</span>;
-}
-</code></pre></div><h2 id="it-works">It works!</h2>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#define V27 LOW
+</span></span></span><span style="display:flex;"><span><span style="color:#007020">#define V22 HIGH
+</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>
+</span></span><span style="display:flex;"><span><span style="color:#007020">#define scs0() do { \
+</span></span></span><span style="display:flex;"><span><span style="color:#007020">  while (ARM_DWT_CYCCNT - begin_cycle &lt; (target-43750</span><span style="color:#60a0b0;font-style:italic">/*70us*/</span><span style="color:#007020">)) ; \
+</span></span></span><span style="display:flex;"><span><span style="color:#007020">  digitalWriteFast(11, V27); \
+</span></span></span><span style="display:flex;"><span><span style="color:#007020">} while (0)
+</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>
+</span></span><span style="display:flex;"><span>size_t SCSSerial<span style="color:#666">::</span>write(<span style="color:#902000">uint8_t</span> b)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  elapsedMicros elapsed;
+</span></span><span style="display:flex;"><span>  <span style="color:#902000">uint32_t</span> target;
+</span></span><span style="display:flex;"><span>  <span style="color:#902000">uint8_t</span> mask;
+</span></span><span style="display:flex;"><span>  <span style="color:#902000">uint32_t</span> begin_cycle;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  ARM_DEMCR <span style="color:#666">|=</span> ARM_DEMCR_TRCENA;
+</span></span><span style="display:flex;"><span>  ARM_DWT_CTRL <span style="color:#666">|=</span> ARM_DWT_CTRL_CYCCNTENA;
+</span></span><span style="display:flex;"><span>  ARM_DWT_CYCCNT <span style="color:#666">=</span> <span style="color:#40a070">0</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">// start bit
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  target <span style="color:#666">=</span> cycles_per_bit;
+</span></span><span style="display:flex;"><span>  noInterrupts();
+</span></span><span style="display:flex;"><span>  begin_cycle <span style="color:#666">=</span> ARM_DWT_CYCCNT;
+</span></span><span style="display:flex;"><span>  digitalWriteFast(<span style="color:#40a070">11</span>, V22);
+</span></span><span style="display:flex;"><span>  scs0();
+</span></span><span style="display:flex;"><span>  wait_for_target(begin_cycle, target);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">// 8 data bits
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#007020;font-weight:bold">for</span> (mask <span style="color:#666">=</span> <span style="color:#40a070">1</span>; mask; mask <span style="color:#666">&lt;&lt;=</span> <span style="color:#40a070">1</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> (b<span style="color:#666">&amp;</span>mask) {
+</span></span><span style="display:flex;"><span>      digitalWriteFast(<span style="color:#40a070">11</span>, V27);
+</span></span><span style="display:flex;"><span>    } <span style="color:#007020;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>      digitalWriteFast(<span style="color:#40a070">11</span>, V22);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    target <span style="color:#666">+=</span> cycles_per_bit;
+</span></span><span style="display:flex;"><span>    scs0();
+</span></span><span style="display:flex;"><span>    wait_for_target(begin_cycle, target);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">// stop bit
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  digitalWriteFast(<span style="color:#40a070">11</span>, V27);
+</span></span><span style="display:flex;"><span>  interrupts();
+</span></span><span style="display:flex;"><span>  target <span style="color:#666">+=</span> cycles_per_bit;
+</span></span><span style="display:flex;"><span>  scs0();
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">while</span> (ARM_DWT_CYCCNT <span style="color:#666">-</span> begin_cycle <span style="color:#666">&lt;</span> target) ; <span style="color:#60a0b0;font-style:italic">// wait
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#007020;font-weight:bold">return</span> <span style="color:#40a070">1</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="it-works">It works!</h2>
 <p>With the approach described above, I now have a micro controller that recognizes
 doorbell rings for my apartment and ignores doorbell rings for my neighbors. The
 micro controller can unlock the door, too, and both features are available

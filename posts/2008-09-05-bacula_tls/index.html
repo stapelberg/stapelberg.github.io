@@ -254,11 +254,11 @@ beiden anderen Daemons spielen entsprechend mit.
 <pre tabindex="0"><code>Director {
         Name = fs-dir
         DIRport = 9101
-        QueryFile = &quot;/usr/libexec/bacula/query.sql&quot;
-        WorkingDirectory = &quot;/var/lib/bacula&quot;
-        PidDirectory = &quot;/var/run&quot;
+        QueryFile = &#34;/usr/libexec/bacula/query.sql&#34;
+        WorkingDirectory = &#34;/var/lib/bacula&#34;
+        PidDirectory = &#34;/var/run&#34;
         Maximum Concurrent Jobs = 4
-        Password = &quot;&quot;
+        Password = &#34;&#34;
         Messages = Daemon
 
         &lt;strong&gt;TLS Enable = yes
@@ -273,7 +273,7 @@ beiden anderen Daemons spielen entsprechend mit.
         Address = ipv6.server.de
         FDPort = 9102 
         Catalog = MyCatalog
-        Password = &quot;&quot;
+        Password = &#34;&#34;
         File Retention = 2 weeks
         Job Retention = 2 weeks
         AutoPrune = yes
@@ -293,8 +293,8 @@ man in der Storage-Resource <code>TLS Require</code> auf yes setzen.
         SDAddresses = {
       		ipv6 = { addr = 2001:xx:yy:zz; port = 9103; }
 	}
-        WorkingDirectory = &quot;/var/lib/bacula&quot;
-        Pid Directory = &quot;/var/run&quot;
+        WorkingDirectory = &#34;/var/lib/bacula&#34;
+        Pid Directory = &#34;/var/run&#34;
         Maximum Concurrent Jobs = 20
 
         &lt;strong&gt;TLS Enable = yes
@@ -307,7 +307,7 @@ man in der Storage-Resource <code>TLS Require</code> auf yes setzen.
 </code></pre><h3>File Daemon (bacula-fd.conf)</h3>
 <pre tabindex="0"><code>Director {
   Name = fs-dir
-  Password = &quot;&quot;
+  Password = &#34;&#34;
 
   &lt;strong&gt;TLS Enable = yes
   TLS Require = yes

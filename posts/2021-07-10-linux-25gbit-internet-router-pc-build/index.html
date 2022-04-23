@@ -437,11 +437,11 @@ hardware!</p>
 
 <ul>
 <li>
-<p>(347 CHF) PCIe 3.0 x8 Dual-Port 25G SFP28 Ethernet Network Card (Intel XXV710)<br>
+<p>(347 CHF) PCIe 3.0 x8 Dual-Port 25G SFP28 Ethernet Network Card (Intel XXV710) <br>
 <a href="https://www.fs.com/de/products/75603.html">FS.COM XXV710AM2-F2 #75603</a></p>
 </li>
 <li>
-<p>(329 CHF) PCIe 3.0 x8 Quad-Port 10G SFP+ Ethernet Network Card (Intel XL710-BM1)<br>
+<p>(329 CHF) PCIe 3.0 x8 Quad-Port 10G SFP+ Ethernet Network Card (Intel XL710-BM1) <br>
 <a href="https://www.fs.com/de/products/75602.html">FS.COM FTXL710BM1-F4 #75602</a></p>
 </li>
 </ul>
@@ -933,20 +933,20 @@ which might be an interesting alternative.</p>
 <h2 id="asrock-b550-taichi-mainboard-uefi-setup">ASRock B550 Taichi Mainboard UEFI Setup</h2>
 <p>To enable PCIe Bifurcation for our two PCIe 3.0 x8 card setup:</p>
 <ol>
-<li>Set <code>Advanced &gt; AMD PBS &gt; PCIe/GFX Lanes Configuration</code><br>
+<li>Set <code>Advanced &gt; AMD PBS &gt; PCIe/GFX Lanes Configuration</code> <br>
 to <code>x8x8</code>.</li>
 </ol>
 <p>To always turn on the PC after power is lost:</p>
 <ol>
-<li>Set <code>Advanced &gt; Onboard Devices Configuration &gt; Restore On AC Power Loss</code><br>
+<li>Set <code>Advanced &gt; Onboard Devices Configuration &gt; Restore On AC Power Loss</code> <br>
 to <code>Power On</code>.</li>
 </ol>
 <p>To PXE boot (via UEFI) on the onboard ethernet port (management), but disable
 slow option roms for PXE boot on the FS.COM network cards:</p>
 <ol>
-<li>Set <code>Boot &gt; Boot From Onboard LAN</code><br>
+<li>Set <code>Boot &gt; Boot From Onboard LAN</code> <br>
 to <code>Enabled</code>.</li>
-<li>Set <code>Boot &gt; CSM (Compatibility Support Module) &gt; Launch PXE OpROM Policy</code><br>
+<li>Set <code>Boot &gt; CSM (Compatibility Support Module) &gt; Launch PXE OpROM Policy</code> <br>
 to <code>UEFI only</code>.</li>
 </ol>
 <h2 id="fan-controller-setup">Fan Controller Setup</h2>

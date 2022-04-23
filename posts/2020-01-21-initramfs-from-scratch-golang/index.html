@@ -499,7 +499,7 @@ people prototype is often immensely useful to me, so I’m sharing my notes here
 </code></pre><p>In distri’s <code>Makefile</code>, I append these flags to the <code>QEMU</code> invocation:</p>
 <pre tabindex="0"><code>-kernel /tmp/kernel \
 -initrd /tmp/initrd \
--append &quot;root=/dev/mapper/cryptroot1 rdinit=/sh ro console=ttyS0,115200 rd.luks=1 rd.luks.uuid=63051f8a-54b9-4996-b94f-3cf105af2900 rd.luks.name=63051f8a-54b9-4996-b94f-3cf105af2900=cryptroot1 rd.vconsole.keymap=neo rd.vconsole.font=latarcyrheb-sun32 init=/init systemd.setenv=PATH=/bin rw vga=836&quot;
+-append &#34;root=/dev/mapper/cryptroot1 rdinit=/sh ro console=ttyS0,115200 rd.luks=1 rd.luks.uuid=63051f8a-54b9-4996-b94f-3cf105af2900 rd.luks.name=63051f8a-54b9-4996-b94f-3cf105af2900=cryptroot1 rd.vconsole.keymap=neo rd.vconsole.font=latarcyrheb-sun32 init=/init systemd.setenv=PATH=/bin rw vga=836&#34;
 </code></pre><p>The <code>vga=</code> mode parameter is required for loading font <code>latarcyrheb-sun32</code>.</p>
 <p>Once in the <code>busybox</code> shell, I manually prepared the required mount points and
 kernel modules:</p>
@@ -512,7 +512,7 @@ mount -t devtmpfs dev /dev
 modprobe virtio_pci
 modprobe virtio_scsi
 </code></pre><p>As a next step, I copied <code>cryptsetup</code> and dependencies into the initramfs directory:</p>
-<pre tabindex="0"><code>% for f in /ro/cryptsetup-amd64-2.0.4-6/lib/*; do full=$(readlink -f $f); rel=$(echo $full | sed 's,^/,,g'); mkdir -p $(dirname $rel); install $full $rel; done
+<pre tabindex="0"><code>% for f in /ro/cryptsetup-amd64-2.0.4-6/lib/*; do full=$(readlink -f $f); rel=$(echo $full | sed &#39;s,^/,,g&#39;); mkdir -p $(dirname $rel); install $full $rel; done
 % ln -s ld-2.27.so ro/glibc-amd64-2.27-3/out/lib/ld-linux-x86-64.so.2
 % cp /ro/glibc-amd64-2.27-3/out/lib/ld-2.27.so ro/glibc-amd64-2.27-3/out/lib/ld-2.27.so
 % cp -r /ro/cryptsetup-amd64-2.0.4-6/lib ro/cryptsetup-amd64-2.0.4-6/

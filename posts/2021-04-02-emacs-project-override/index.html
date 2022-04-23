@@ -203,21 +203,21 @@ project-based commands in a parent directory that contains multiple Git
 repositories.</p>
 <p>Luckily, we can provide our own entry to the <code>project-find-functions</code> hook, and
 look for a <code>.project.el</code> file in the parent directories:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elisp" data-lang="elisp"><span style="color:#60a0b0;font-style:italic">;; Returns the parent directory containing a .project.el file, if any,</span>
-<span style="color:#60a0b0;font-style:italic">;; to override the standard project.el detection logic when needed.</span>
-(<span style="color:#007020">defun</span> <span style="color:#bb60d5">zkj-project-override</span> (<span style="color:#bb60d5">dir</span>)
-  (<span style="color:#007020">let</span> ((<span style="color:#bb60d5">override</span> (<span style="color:#bb60d5">locate-dominating-file</span> <span style="color:#bb60d5">dir</span> <span style="color:#4070a0">&#34;.project.el&#34;</span>)))
-    (<span style="color:#007020">if</span> <span style="color:#bb60d5">override</span>
-      (<span style="color:#06287e">cons</span> <span style="color:#517918">&#39;vc</span> <span style="color:#bb60d5">override</span>)
-      <span style="color:#60add5">nil</span>)))
-
-(<span style="color:#007020">use-package</span> <span style="color:#bb60d5">project</span>
-  <span style="color:#60a0b0;font-style:italic">;; Cannot use :hook because &#39;project-find-functions does not end in -hook</span>
-  <span style="color:#60a0b0;font-style:italic">;; Cannot use :init (must use :config) because otherwise</span>
-  <span style="color:#60a0b0;font-style:italic">;; project-find-functions is not yet initialized.</span>
-  <span style="color:#007020">:config</span>
-  (<span style="color:#bb60d5">add-hook</span> <span style="color:#517918">&#39;project-find-functions</span> <span style="color:#06287e">#&#39;</span><span style="color:#bb60d5">zkj-project-override</span>))
-</code></pre></div><p>Now, we can use <code>touch .project.el</code> in any directory to make <code>project.el</code>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-elisp" data-lang="elisp"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">;; Returns the parent directory containing a .project.el file, if any,</span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">;; to override the standard project.el detection logic when needed.</span>
+</span></span><span style="display:flex;"><span>(<span style="color:#007020">defun</span> <span style="color:#bb60d5">zkj-project-override</span> (<span style="color:#bb60d5">dir</span>)
+</span></span><span style="display:flex;"><span>  (<span style="color:#007020">let</span> ((<span style="color:#bb60d5">override</span> (<span style="color:#bb60d5">locate-dominating-file</span> <span style="color:#bb60d5">dir</span> <span style="color:#4070a0">&#34;.project.el&#34;</span>)))
+</span></span><span style="display:flex;"><span>    (<span style="color:#007020">if</span> <span style="color:#bb60d5">override</span>
+</span></span><span style="display:flex;"><span>      (<span style="color:#06287e">cons</span> <span style="color:#517918">&#39;vc</span> <span style="color:#bb60d5">override</span>)
+</span></span><span style="display:flex;"><span>      <span style="color:#60add5">nil</span>)))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>(<span style="color:#007020">use-package</span> <span style="color:#bb60d5">project</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">;; Cannot use :hook because &#39;project-find-functions does not end in -hook</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">;; Cannot use :init (must use :config) because otherwise</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">;; project-find-functions is not yet initialized.</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#007020">:config</span>
+</span></span><span style="display:flex;"><span>  (<span style="color:#bb60d5">add-hook</span> <span style="color:#517918">&#39;project-find-functions</span> <span style="color:#06287e">#&#39;</span><span style="color:#bb60d5">zkj-project-override</span>))
+</span></span></code></pre></div><p>Now, we can use <code>touch .project.el</code> in any directory to make <code>project.el</code>
 recognize the directory as project root!</p>
 <p>By the way, in case you are unfamiliar, the configuration above uses
 <a href="https://github.com/jwiegley/use-package"><code>use-package</code></a>, which is a great way

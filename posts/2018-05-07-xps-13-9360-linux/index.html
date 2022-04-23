@@ -203,7 +203,7 @@ like its successor due to the lack of USB A ports), so I had to resort to buying
 a version that comes with Windows.</p>
 <p>You can obtain the recovery image
 <code>dell-bto-xenial-dino2-mlk-A00-iso-20161021-0.iso</code> from
-<a href="http://www.dell.com/support/home/us/en/19/Drivers/OSISO/W764,">http://www.dell.com/support/home/us/en/19/Drivers/OSISO/W764,</a> provided you have
+<a href="http://www.dell.com/support/home/us/en/19/Drivers/OSISO/W764">http://www.dell.com/support/home/us/en/19/Drivers/OSISO/W764</a>, provided you have
 the system tag of an XPS 9360 that came with Linux — ask a friend if you
 accidentally purchased the Windows version. Tip: the service tag is the BIOS
 serial number, which is included in the output of
@@ -222,12 +222,12 @@ ISO image (this is option 2 from <a href="https://askubuntu.com/a/395880">https:
  ls search search_label search_fs_uuid search_fs_file \
  gfxterm gfxterm_background gfxterm_menu test all_video loadenv \
  exfat ext2 ntfs btrfs hfsplus udf
-cat &gt;grub.cfg &lt;&lt;'EOT'
+cat &gt;grub.cfg &lt;&lt;&#39;EOT&#39;
 set timeout=3
 set color_highlight=black/light-magenta
 
-menuentry 'Ubuntu ISO' {
-        set isofile=&quot;/efi/boot/dell-bto-xenial-dino2-mlk-A00-iso-20161021-0.iso&quot;
+menuentry &#39;Ubuntu ISO&#39; {
+        set isofile=&#34;/efi/boot/dell-bto-xenial-dino2-mlk-A00-iso-20161021-0.iso&#34;
         loopback loop $isofile
         linux (loop)/casper/vmlinuz.efi boot=casper iso-scan/filename=$isofile noprompt noeject quiet splash persistent --
         initrd (loop)/casper/initrd.lz
@@ -253,7 +253,7 @@ to copying the files as root, otherwise setuid and setgid bits might get lost.</
 # rsync -aXx --relative --numeric-ids /mnt/root/ root@storage:xps/
 # umount /mnt/root
 </code></pre><p>Then, I created a new boot partition, encrypted the root partition and re-created the file system:</p>
-<pre tabindex="0"><code># cat &lt;&lt;'EOT' | sfdisk /dev/nvme0n1
+<pre tabindex="0"><code># cat &lt;&lt;&#39;EOT&#39; | sfdisk /dev/nvme0n1
 label: gpt
 label-id: C64A87D1-CA61-4BF2-81E6-0216EE6BC4C0
 device: /dev/nvme0n1
@@ -261,8 +261,8 @@ unit: sectors
 first-lba: 34
 last-lba: 2000409230
 
-/dev/nvme0n1p1 : start=          34, size=      488248, type=C12A7328-F81F-11D2-BA4B-00A0C93EC93B, name=&quot;EFI System Partition&quot;
-/dev/nvme0n1p2 : start=      488282, size=     5380681, type=EBD0A0A2-B9E5-4433-87C0-68B6B72699C7, name=&quot;fat32&quot;
+/dev/nvme0n1p1 : start=          34, size=      488248, type=C12A7328-F81F-11D2-BA4B-00A0C93EC93B, name=&#34;EFI System Partition&#34;
+/dev/nvme0n1p2 : start=      488282, size=     5380681, type=EBD0A0A2-B9E5-4433-87C0-68B6B72699C7, name=&#34;fat32&#34;
 /dev/nvme0n1p3 : start=     5869568, size=     2097152, type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
 /dev/nvme0n1p4 : start=     7966720, size=  1992442511, type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
 EOT

@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>25 Gbit/s HTTP and HTTPS download speeds - Michael Stapelberg</title>
+
+  <meta property="og:site_name" content="Michael Stapelberg">
+  <meta property="og:title" content="25 Gbit/s HTTP and HTTPS download speeds">
+  <meta property="og:description" content="Now that I recently upgraded my internet connection to 25 Gbit/s, I was curious how hard or easy it is to download files via HTTP and HTTPS over a 25 Gbit/s link. I don’t have another 25 Gbit/s connected machine other than my router, so I decided to build a little lab for tests like these 🧑‍🔬">
+  
+  
+  
+  
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0204_hue1ce97509a6d1573a4d6789b4fcce12c_1559726_200x200_fit_q75_box.jpg">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <meta name="description" content="Now that I recently upgraded my internet connection to 25 Gbit/s, I was curious how hard or easy it is to download files via HTTP and HTTPS over a 25 Gbit/s link. I don’t have another 25 Gbit/s connected machine other than my router, so I decided to build a little lab for tests like these 🧑‍🔬">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div><h1 class="ms_title">25 Gbit/s HTTP and HTTPS download speeds</h1>
+
+<div class="ms_meta">
+  <div id="ms_date">published 2022-05-14</div>
+  
+  
+  <div id="ms_tags">
+  
+  in tag
+  
+  
+  <span class="ms_tag"><a href="/posts/tags/fiber/">fiber</a></span>
+  
+  </div>
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2022-05-14-http-and-https-download-25gbit/index.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
+</div>
+<div class="Artikel" id="content">
+  <p>Now that I <a href="/posts/2022-04-23-fiber7-25gbit-upgrade/">recently upgraded my internet connection to 25
+Gbit/s</a>, I was curious how hard or
+easy it is to download files via HTTP and HTTPS over a 25 Gbit/s link. I don’t
+have another 25 Gbit/s connected machine other than my router, so I decided to
+build a little lab for tests like these 🧑‍🔬</p>
+<h2 id="hardware-and-software-setup">Hardware and Software setup</h2>
+<p>I found a Mellanox ConnectX-4 Lx for the comparatively low price of 204 CHF on
+digitec:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0209.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0209_hu855bbe0a9c47ac557e5b09db74fa3b06_1118443_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0209_hu855bbe0a9c47ac557e5b09db74fa3b06_1118443_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0209_hu855bbe0a9c47ac557e5b09db74fa3b06_1118443_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="480"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+<p>To connect it to my router, I ordered a MikroTik XS+DA0003 SFP28/SFP+ Direct
+Attach Cable (DAC) with it. I installed the network card into my old workstation
+(on the right) and connected it with the 25 Gbit/s DAC to router7 (on the left):</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0204.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0204_hue1ce97509a6d1573a4d6789b4fcce12c_1559726_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0204_hue1ce97509a6d1573a4d6789b4fcce12c_1559726_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0204_hue1ce97509a6d1573a4d6789b4fcce12c_1559726_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+<h3 id="25-gbits-router-left">25 Gbit/s router (left)</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Model</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mainboard</td>
+<td>ASRock B550 Taichi</td>
+</tr>
+<tr>
+<td>CPU</td>
+<td>AMD Ryzen 5 5600X 6-Core Processor</td>
+</tr>
+<tr>
+<td>Network card</td>
+<td><a href="https://www.fs.com/de/products/75603.html">Intel XXV710</a></td>
+</tr>
+<tr>
+<td>Linux</td>
+<td>Linux 5.17.4 (<a href="https://router7.org">router7</a>)<br>curl 7.83.0 from debian bookworm<br>Go <code>net/http</code> from Go 1.18</td>
+</tr>
+</tbody>
+</table>
+<p>router7 comes with <a href="https://en.wikipedia.org/wiki/TCP_congestion_control#TCP_BBR">TCP
+BBR</a> enabled by
+default.</p>
+<h3 id="old-workstation-right">Old workstation (right)</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Model</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mainboard</td>
+<td>ASUS PRIME Z370-A</td>
+</tr>
+<tr>
+<td>CPU</td>
+<td>Intel i9-9900K CPU @ 3.60GHz</td>
+</tr>
+<tr>
+<td>Network card</td>
+<td>Mellanox ConnectX-4</td>
+</tr>
+<tr>
+<td>Linux</td>
+<td>5.17.5 (Arch Linux)<br>nginx 1.21.6<br>caddy 2.4.3</td>
+</tr>
+</tbody>
+</table>
+<h2 id="test-preparation">Test preparation</h2>
+<p>Before taking any measurements, I do one full download so that the file contents
+are entirely in the Linux page cache, and the measurements therefore no longer
+contain the speed of the disk.</p>
+<p><code>big.img</code> in the tests below refers to the 35 GB test file I’m downloading,
+which consists of distri-disk.img repeated 5 times.</p>
+<h2 id="http">T1: HTTP download speed (unencrypted)</h2>
+<h3 id="http1">T1.1: Single TCP connection</h3>
+<p>The simplest test is using just a single TCP connection, for example:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -v -o /dev/null http://oldmidna:8080/distri/tmp/big.img
+</span></span><span style="display:flex;"><span>./httpget25 http://oldmidna:8080/distri/tmp/big.img
+</span></span></code></pre></div><table>
+<thead>
+<tr>
+<th>Client</th>
+<th>Server</th>
+<th>Gbit/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>curl</strong></td>
+<td><strong>nginx</strong></td>
+<td><strong>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
+
+</strong></td>
+</tr>
+<tr>
+<td>curl</td>
+<td>caddy</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
+
+</td>
+</tr>
+<tr>
+<td>Go</td>
+<td>nginx</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (20em / 10)); background-color: blue; color: white">20</div></div>
+
+</td>
+</tr>
+<tr>
+<td>Go</td>
+<td>caddy</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (20.2em / 10)); background-color: blue; color: white">20.2</div></div>
+
+</td>
+</tr>
+</tbody>
+</table>
+<p>curl can saturate a 25 Gbit/s link without any trouble.</p>
+<p>The Go <code>net/http</code> package is slower and comes in at 20 Gbit/s.</p>
+<h3 id="http4">T1.2: Multiple TCP connections</h3>
+<p>Running 4 of these downloads concurrently is a reliable and easy way to saturate
+a 25 Gbit/s link:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">for</span> i in <span style="color:#007020;font-weight:bold">$(</span>seq <span style="color:#40a070">0</span> 4<span style="color:#007020;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">do</span>
+</span></span><span style="display:flex;"><span>  curl -v -o /dev/null http://oldmidna:8080/distri/tmp/big.img &amp;
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">done</span>
+</span></span></code></pre></div><table>
+<thead>
+<tr>
+<th>Client</th>
+<th>Server</th>
+<th>Gbit/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>curl</td>
+<td>nginx</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
+
+</td>
+</tr>
+<tr>
+<td>curl</td>
+<td>caddy</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
+
+</td>
+</tr>
+<tr>
+<td>Go</td>
+<td>nginx</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
+
+</td>
+</tr>
+<tr>
+<td>Go</td>
+<td>caddy</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
+
+</td>
+</tr>
+</tbody>
+</table>
+<h2 id="https">T2: HTTPS download speed (encrypted)</h2>
+<p>At link speeds this high, enabling TLS slashes bandwidth in half or worse.</p>
+<p>Using 4 TCP connections allows saturating a 25 Gbit/s link.</p>
+<p>Caddy uses more CPU to serve files compared to nginx.</p>
+<h3 id="https1">T2.1: Single TCP connection</h3>
+<p>This test works the same as T1.1, but with a HTTPS URL:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -v -o /dev/null --insecure https://oldmidna:8443/distri/tmp/big.img
+</span></span><span style="display:flex;"><span>./httpget25 https://oldmidna:8443/distri/tmp/big.img
+</span></span></code></pre></div><table>
+<thead>
+<tr>
+<th>Client</th>
+<th>Server</th>
+<th>Gbit/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>curl</td>
+<td>nginx</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (8em / 10)); background-color: blue; color: white">8</div></div>
+
+</td>
+</tr>
+<tr>
+<td>curl</td>
+<td>caddy</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (7.5em / 10)); background-color: blue; color: white">7.5</div></div>
+
+</td>
+</tr>
+<tr>
+<td><strong>Go</strong></td>
+<td><strong>nginx</strong></td>
+<td><strong>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (12em / 10)); background-color: blue; color: white">12</div></div>
+
+</strong></td>
+</tr>
+<tr>
+<td>Go</td>
+<td>caddy</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (7.2em / 10)); background-color: blue; color: white">7.2</div></div>
+
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="https4">T2.2: Multiple TCP connections</h3>
+<p>This test works the same as T1.2, but with a HTTPS URL:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">for</span> i in <span style="color:#007020;font-weight:bold">$(</span>seq <span style="color:#40a070">0</span> 4<span style="color:#007020;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">do</span>
+</span></span><span style="display:flex;"><span>  curl -v -o /dev/null --insecure https://oldmidna:8443/distri/tmp/big.img &amp;
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">done</span>
+</span></span></code></pre></div><p>Curiously, the Go <code>net/http</code> client downloading from caddy cannot saturate a 25
+Gbit/s link.</p>
+<table>
+<thead>
+<tr>
+<th>Client</th>
+<th>Server</th>
+<th>Gbit/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>curl</td>
+<td>nginx</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
+
+</td>
+</tr>
+<tr>
+<td>curl</td>
+<td>caddy</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
+
+</td>
+</tr>
+<tr>
+<td>Go</td>
+<td>nginx</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
+
+</td>
+</tr>
+<tr>
+<td>Go</td>
+<td>caddy</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (21.6em / 10)); background-color: blue; color: white">21.6</div></div>
+
+</td>
+</tr>
+</tbody>
+</table>
+<h2 id="httpsktls">T3: HTTPS with Kernel TLS (KTLS)</h2>
+<p>Linux 4.13 got support for Kernel TLS back in 2017.</p>
+<p>nginx 1.21.4 introduced support for Kernel TLS, and they have a <a href="https://www.nginx.com/blog/improving-nginx-performance-with-kernel-tls/">blog post on
+how to configure
+it</a>.</p>
+<p>In terms of download speeds, there is no difference with or without KTLS. But,
+enabling KTLS noticeably reduces CPU usage, from ≈10% to a steady 2%.</p>
+<p>For even newer network cards such as the Mellanox ConnectX-6, the kernel can
+even offload TLS onto the network card!</p>
+<h3 id="httpsktls1">T3.1: Single TCP connection</h3>
+<table>
+<thead>
+<tr>
+<th>Client</th>
+<th>Server</th>
+<th>Gbit/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>curl</td>
+<td>nginx</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (8em / 10)); background-color: blue; color: white">8</div></div>
+
+</td>
+</tr>
+<tr>
+<td><strong>Go</strong></td>
+<td><strong>nginx</strong></td>
+<td><strong>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (12em / 10)); background-color: blue; color: white">12</div></div>
+
+</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="httpsktls4">T3.2: Multiple TCP connections</h3>
+<table>
+<thead>
+<tr>
+<th>Client</th>
+<th>Server</th>
+<th>Gbit/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>curl</td>
+<td>nginx</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
+
+</td>
+</tr>
+<tr>
+<td>Go</td>
+<td>nginx</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
+
+</td>
+</tr>
+</tbody>
+</table>
+<h2 id="conclusions">Conclusions</h2>
+<p>When downloading from nginx with 1 TCP connection, with TLS encryption enabled
+(HTTPS), the Go <code>net/http</code> client is faster than curl!</p>
+<p>Caddy is slightly slower than nginx, which manifests itself in slower speeds
+with curl and even slower speeds with Go’s <code>net/http</code>.</p>
+<p>To max out 25 Gbit/s, even when using TLS encryption, just use 3 or more
+connections in parallel. This helps with HTTP and HTTPS, with any combination of
+client and server.</p>
+<h2 id="appendix">Appendix</h2>
+<details>
+<summary>Go <code>net/http</code> test program <code>httpget25.go</code></summary>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span> main
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;crypto/tls&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;flag&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;io&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;io/ioutil&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;log&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;net/http&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">httpget25</span>() <span style="color:#902000">error</span> {
+</span></span><span style="display:flex;"><span>	http.DefaultTransport.(<span style="color:#666">*</span>http.Transport).TLSClientConfig = <span style="color:#666">&amp;</span>tls.Config{InsecureSkipVerify: <span style="color:#007020;font-weight:bold">true</span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">for</span> _, arg <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> flag.<span style="color:#06287e">Args</span>() {
+</span></span><span style="display:flex;"><span>		resp, err <span style="color:#666">:=</span> http.<span style="color:#06287e">Get</span>(arg)
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> resp.StatusCode <span style="color:#666">!=</span> http.StatusOK {
+</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;unexpected HTTP status code: want %v, got %v&#34;</span>, http.StatusOK, resp.Status)
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		io.<span style="color:#06287e">Copy</span>(ioutil.Discard, resp.Body)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+</span></span><span style="display:flex;"><span>	flag.<span style="color:#06287e">Parse</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">httpget25</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Fatal</span>(err)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div></details>
+<details>
+<summary>Caddy config file <code>Caddyfile</code></summary>
+<pre tabindex="0"><code>{
+  local_certs
+  http_port 8080
+  https_port 8443
+}
+
+http://oldmidna:8080 {
+  file_server browse
+}
+
+https://oldmidna:8443 {
+  file_server browse
+}
+</code></pre></details>
+<details>
+<summary>nginx installation instructions</summary>
+<pre tabindex="0"><code>mkdir -p ~/lab25
+cd ~/lab25
+
+wget https://nginx.org/download/nginx-1.21.6.tar.gz
+tar tf nginx-1.21.6.tar.gz
+
+wget https://www.openssl.org/source/openssl-3.0.3.tar.gz
+tar xf openssl-3.0.3.tar.gz
+
+cd nginx-1.21.6
+./configure --with-http_ssl_module --with-http_v2_module --with-openssl=$HOME/lab25/openssl-3.0.3 --with-openssl-opt=enable-ktls
+make -j8
+cd objs
+./nginx -c nginx.conf -p $HOME/lab25
+</code></pre></details>
+<details>
+<summary>nginx config file <code>nginx.conf</code></summary>
+<pre tabindex="0"><code>worker_processes  auto;
+
+pid        logs/nginx.pid;
+
+daemon off;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    access_log /home/michael/lab25/logs/access.log  combined;
+
+    sendfile        on;
+    sendfile_max_chunk 2m;
+
+    keepalive_timeout  65;
+
+    server {
+        listen       8080;
+        listen [::]:8080;
+        server_name  localhost;
+
+        root /srv/repo.distr1.org/;
+
+        location / {
+            index index.html index.htm;
+        }
+
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root /usr/share/nginx/html;
+        }
+
+        location /distri {
+            autoindex on;
+        }
+    }
+
+    server {
+        listen 8443 ssl;
+        listen [::]:8443 ssl;
+        server_name localhost;
+
+        ssl_certificate nginx-ecc-p256.pem;
+        ssl_certificate_key nginx-ecc-p256.key;
+
+        #ssl_conf_command Options KTLS;
+
+        ssl_buffer_size 32768;
+        ssl_protocols TLSv1.3;
+
+        root /srv/repo.distr1.org/;
+
+        location / {
+            index index.html index.htm;
+        }
+
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root /usr/share/nginx/html;
+        }
+
+        location /distri {
+            autoindex on;
+        }
+    }
+}
+</code></pre></details>
+
+</div>
+
+      </div>
+
+    </main><div id="ms_footer">
+  © 2022 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

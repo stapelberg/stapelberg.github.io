@@ -5,6 +5,561 @@
   <id>https://michael.stapelberg.ch/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[25 Gbit/s HTTP and HTTPS download speeds]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/"/>
+    <id>https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/</id>
+    <published>2022-05-14T16:18:00+02:00</published>
+    <content type="html"><![CDATA[<p>Now that I <a href="/posts/2022-04-23-fiber7-25gbit-upgrade/">recently upgraded my internet connection to 25
+Gbit/s</a>, I was curious how hard or
+easy it is to download files via HTTP and HTTPS over a 25 Gbit/s link. I don’t
+have another 25 Gbit/s connected machine other than my router, so I decided to
+build a little lab for tests like these 🧑‍🔬</p>
+<h2 id="hardware-and-software-setup">Hardware and Software setup</h2>
+<p>I found a Mellanox ConnectX-4 Lx for the comparatively low price of 204 CHF on
+digitec:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0209.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0209_hu855bbe0a9c47ac557e5b09db74fa3b06_1118443_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0209_hu855bbe0a9c47ac557e5b09db74fa3b06_1118443_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0209_hu855bbe0a9c47ac557e5b09db74fa3b06_1118443_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="480"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+<p>To connect it to my router, I ordered a MikroTik XS+DA0003 SFP28/SFP+ Direct
+Attach Cable (DAC) with it. I installed the network card into my old workstation
+(on the right) and connected it with the 25 Gbit/s DAC to router7 (on the left):</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0204.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0204_hue1ce97509a6d1573a4d6789b4fcce12c_1559726_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0204_hue1ce97509a6d1573a4d6789b4fcce12c_1559726_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0204_hue1ce97509a6d1573a4d6789b4fcce12c_1559726_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+<h3 id="25-gbits-router-left">25 Gbit/s router (left)</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Model</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mainboard</td>
+<td>ASRock B550 Taichi</td>
+</tr>
+<tr>
+<td>CPU</td>
+<td>AMD Ryzen 5 5600X 6-Core Processor</td>
+</tr>
+<tr>
+<td>Network card</td>
+<td><a href="https://www.fs.com/de/products/75603.html">Intel XXV710</a></td>
+</tr>
+<tr>
+<td>Linux</td>
+<td>Linux 5.17.4 (<a href="https://router7.org">router7</a>)<br>curl 7.83.0 from debian bookworm<br>Go <code>net/http</code> from Go 1.18</td>
+</tr>
+</tbody>
+</table>
+<p>router7 comes with <a href="https://en.wikipedia.org/wiki/TCP_congestion_control#TCP_BBR">TCP
+BBR</a> enabled by
+default.</p>
+<h3 id="old-workstation-right">Old workstation (right)</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Model</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mainboard</td>
+<td>ASUS PRIME Z370-A</td>
+</tr>
+<tr>
+<td>CPU</td>
+<td>Intel i9-9900K CPU @ 3.60GHz</td>
+</tr>
+<tr>
+<td>Network card</td>
+<td>Mellanox ConnectX-4</td>
+</tr>
+<tr>
+<td>Linux</td>
+<td>5.17.5 (Arch Linux)<br>nginx 1.21.6<br>caddy 2.4.3</td>
+</tr>
+</tbody>
+</table>
+<h2 id="test-preparation">Test preparation</h2>
+<p>Before taking any measurements, I do one full download so that the file contents
+are entirely in the Linux page cache, and the measurements therefore no longer
+contain the speed of the disk.</p>
+<p><code>big.img</code> in the tests below refers to the 35 GB test file I’m downloading,
+which consists of distri-disk.img repeated 5 times.</p>
+<h2 id="http">T1: HTTP download speed (unencrypted)</h2>
+<h3 id="http1">T1.1: Single TCP connection</h3>
+<p>The simplest test is using just a single TCP connection, for example:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -v -o /dev/null http://oldmidna:8080/distri/tmp/big.img
+</span></span><span style="display:flex;"><span>./httpget25 http://oldmidna:8080/distri/tmp/big.img
+</span></span></code></pre></div><table>
+<thead>
+<tr>
+<th>Client</th>
+<th>Server</th>
+<th>Gbit/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>curl</strong></td>
+<td><strong>nginx</strong></td>
+<td><strong>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
+
+</strong></td>
+</tr>
+<tr>
+<td>curl</td>
+<td>caddy</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
+
+</td>
+</tr>
+<tr>
+<td>Go</td>
+<td>nginx</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (20em / 10)); background-color: blue; color: white">20</div></div>
+
+</td>
+</tr>
+<tr>
+<td>Go</td>
+<td>caddy</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (20.2em / 10)); background-color: blue; color: white">20.2</div></div>
+
+</td>
+</tr>
+</tbody>
+</table>
+<p>curl can saturate a 25 Gbit/s link without any trouble.</p>
+<p>The Go <code>net/http</code> package is slower and comes in at 20 Gbit/s.</p>
+<h3 id="http4">T1.2: Multiple TCP connections</h3>
+<p>Running 4 of these downloads concurrently is a reliable and easy way to saturate
+a 25 Gbit/s link:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">for</span> i in <span style="color:#007020;font-weight:bold">$(</span>seq <span style="color:#40a070">0</span> 4<span style="color:#007020;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">do</span>
+</span></span><span style="display:flex;"><span>  curl -v -o /dev/null http://oldmidna:8080/distri/tmp/big.img &amp;
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">done</span>
+</span></span></code></pre></div><table>
+<thead>
+<tr>
+<th>Client</th>
+<th>Server</th>
+<th>Gbit/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>curl</td>
+<td>nginx</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
+
+</td>
+</tr>
+<tr>
+<td>curl</td>
+<td>caddy</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
+
+</td>
+</tr>
+<tr>
+<td>Go</td>
+<td>nginx</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
+
+</td>
+</tr>
+<tr>
+<td>Go</td>
+<td>caddy</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
+
+</td>
+</tr>
+</tbody>
+</table>
+<h2 id="https">T2: HTTPS download speed (encrypted)</h2>
+<p>At link speeds this high, enabling TLS slashes bandwidth in half or worse.</p>
+<p>Using 4 TCP connections allows saturating a 25 Gbit/s link.</p>
+<p>Caddy uses more CPU to serve files compared to nginx.</p>
+<h3 id="https1">T2.1: Single TCP connection</h3>
+<p>This test works the same as T1.1, but with a HTTPS URL:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -v -o /dev/null --insecure https://oldmidna:8443/distri/tmp/big.img
+</span></span><span style="display:flex;"><span>./httpget25 https://oldmidna:8443/distri/tmp/big.img
+</span></span></code></pre></div><table>
+<thead>
+<tr>
+<th>Client</th>
+<th>Server</th>
+<th>Gbit/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>curl</td>
+<td>nginx</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (8em / 10)); background-color: blue; color: white">8</div></div>
+
+</td>
+</tr>
+<tr>
+<td>curl</td>
+<td>caddy</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (7.5em / 10)); background-color: blue; color: white">7.5</div></div>
+
+</td>
+</tr>
+<tr>
+<td><strong>Go</strong></td>
+<td><strong>nginx</strong></td>
+<td><strong>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (12em / 10)); background-color: blue; color: white">12</div></div>
+
+</strong></td>
+</tr>
+<tr>
+<td>Go</td>
+<td>caddy</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (7.2em / 10)); background-color: blue; color: white">7.2</div></div>
+
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="https4">T2.2: Multiple TCP connections</h3>
+<p>This test works the same as T1.2, but with a HTTPS URL:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">for</span> i in <span style="color:#007020;font-weight:bold">$(</span>seq <span style="color:#40a070">0</span> 4<span style="color:#007020;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">do</span>
+</span></span><span style="display:flex;"><span>  curl -v -o /dev/null --insecure https://oldmidna:8443/distri/tmp/big.img &amp;
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">done</span>
+</span></span></code></pre></div><p>Curiously, the Go <code>net/http</code> client downloading from caddy cannot saturate a 25
+Gbit/s link.</p>
+<table>
+<thead>
+<tr>
+<th>Client</th>
+<th>Server</th>
+<th>Gbit/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>curl</td>
+<td>nginx</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
+
+</td>
+</tr>
+<tr>
+<td>curl</td>
+<td>caddy</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
+
+</td>
+</tr>
+<tr>
+<td>Go</td>
+<td>nginx</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
+
+</td>
+</tr>
+<tr>
+<td>Go</td>
+<td>caddy</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (21.6em / 10)); background-color: blue; color: white">21.6</div></div>
+
+</td>
+</tr>
+</tbody>
+</table>
+<h2 id="httpsktls">T3: HTTPS with Kernel TLS (KTLS)</h2>
+<p>Linux 4.13 got support for Kernel TLS back in 2017.</p>
+<p>nginx 1.21.4 introduced support for Kernel TLS, and they have a <a href="https://www.nginx.com/blog/improving-nginx-performance-with-kernel-tls/">blog post on
+how to configure
+it</a>.</p>
+<p>In terms of download speeds, there is no difference with or without KTLS. But,
+enabling KTLS noticeably reduces CPU usage, from ≈10% to a steady 2%.</p>
+<p>For even newer network cards such as the Mellanox ConnectX-6, the kernel can
+even offload TLS onto the network card!</p>
+<h3 id="httpsktls1">T3.1: Single TCP connection</h3>
+<table>
+<thead>
+<tr>
+<th>Client</th>
+<th>Server</th>
+<th>Gbit/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>curl</td>
+<td>nginx</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (8em / 10)); background-color: blue; color: white">8</div></div>
+
+</td>
+</tr>
+<tr>
+<td><strong>Go</strong></td>
+<td><strong>nginx</strong></td>
+<td><strong>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (12em / 10)); background-color: blue; color: white">12</div></div>
+
+</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="httpsktls4">T3.2: Multiple TCP connections</h3>
+<table>
+<thead>
+<tr>
+<th>Client</th>
+<th>Server</th>
+<th>Gbit/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>curl</td>
+<td>nginx</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
+
+</td>
+</tr>
+<tr>
+<td>Go</td>
+<td>nginx</td>
+<td>
+<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
+
+</td>
+</tr>
+</tbody>
+</table>
+<h2 id="conclusions">Conclusions</h2>
+<p>When downloading from nginx with 1 TCP connection, with TLS encryption enabled
+(HTTPS), the Go <code>net/http</code> client is faster than curl!</p>
+<p>Caddy is slightly slower than nginx, which manifests itself in slower speeds
+with curl and even slower speeds with Go’s <code>net/http</code>.</p>
+<p>To max out 25 Gbit/s, even when using TLS encryption, just use 3 or more
+connections in parallel. This helps with HTTP and HTTPS, with any combination of
+client and server.</p>
+<h2 id="appendix">Appendix</h2>
+<details>
+<summary>Go <code>net/http</code> test program <code>httpget25.go</code></summary>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span> main
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;crypto/tls&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;flag&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;io&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;io/ioutil&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;log&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;net/http&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">httpget25</span>() <span style="color:#902000">error</span> {
+</span></span><span style="display:flex;"><span>	http.DefaultTransport.(<span style="color:#666">*</span>http.Transport).TLSClientConfig = <span style="color:#666">&amp;</span>tls.Config{InsecureSkipVerify: <span style="color:#007020;font-weight:bold">true</span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">for</span> _, arg <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> flag.<span style="color:#06287e">Args</span>() {
+</span></span><span style="display:flex;"><span>		resp, err <span style="color:#666">:=</span> http.<span style="color:#06287e">Get</span>(arg)
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> resp.StatusCode <span style="color:#666">!=</span> http.StatusOK {
+</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;unexpected HTTP status code: want %v, got %v&#34;</span>, http.StatusOK, resp.Status)
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		io.<span style="color:#06287e">Copy</span>(ioutil.Discard, resp.Body)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+</span></span><span style="display:flex;"><span>	flag.<span style="color:#06287e">Parse</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">httpget25</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Fatal</span>(err)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div></details>
+<details>
+<summary>Caddy config file <code>Caddyfile</code></summary>
+<pre tabindex="0"><code>{
+  local_certs
+  http_port 8080
+  https_port 8443
+}
+
+http://oldmidna:8080 {
+  file_server browse
+}
+
+https://oldmidna:8443 {
+  file_server browse
+}
+</code></pre></details>
+<details>
+<summary>nginx installation instructions</summary>
+<pre tabindex="0"><code>mkdir -p ~/lab25
+cd ~/lab25
+
+wget https://nginx.org/download/nginx-1.21.6.tar.gz
+tar tf nginx-1.21.6.tar.gz
+
+wget https://www.openssl.org/source/openssl-3.0.3.tar.gz
+tar xf openssl-3.0.3.tar.gz
+
+cd nginx-1.21.6
+./configure --with-http_ssl_module --with-http_v2_module --with-openssl=$HOME/lab25/openssl-3.0.3 --with-openssl-opt=enable-ktls
+make -j8
+cd objs
+./nginx -c nginx.conf -p $HOME/lab25
+</code></pre></details>
+<details>
+<summary>nginx config file <code>nginx.conf</code></summary>
+<pre tabindex="0"><code>worker_processes  auto;
+
+pid        logs/nginx.pid;
+
+daemon off;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    access_log /home/michael/lab25/logs/access.log  combined;
+
+    sendfile        on;
+    sendfile_max_chunk 2m;
+
+    keepalive_timeout  65;
+
+    server {
+        listen       8080;
+        listen [::]:8080;
+        server_name  localhost;
+
+        root /srv/repo.distr1.org/;
+
+        location / {
+            index index.html index.htm;
+        }
+
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root /usr/share/nginx/html;
+        }
+
+        location /distri {
+            autoindex on;
+        }
+    }
+
+    server {
+        listen 8443 ssl;
+        listen [::]:8443 ssl;
+        server_name localhost;
+
+        ssl_certificate nginx-ecc-p256.pem;
+        ssl_certificate_key nginx-ecc-p256.key;
+
+        #ssl_conf_command Options KTLS;
+
+        ssl_buffer_size 32768;
+        ssl_protocols TLSv1.3;
+
+        root /srv/repo.distr1.org/;
+
+        location / {
+            index index.html index.htm;
+        }
+
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root /usr/share/nginx/html;
+        }
+
+        location /distri {
+            autoindex on;
+        }
+    }
+}
+</code></pre></details>
+]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[My upgrade to 25 Gbit/s Fiber To The Home]]></title>
     <link href="https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/"/>
     <id>https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/</id>
@@ -5809,664 +6364,6 @@ endure watching the slow algorithm for a few seconds:</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>NXP, please release a new MCUXpresso IDE with a more recent CDT version!</p>
 <p>The improvements in the newer version would make the setup so much simpler.</p>
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[Make your intercom smarter with an MQTT backpack]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/"/>
-    <id>https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/</id>
-    <published>2021-03-13T16:54:00+01:00</published>
-    <content type="html"><![CDATA[<p>I bought the cheapest compatible BTicino intercom device (BT 344232 for 32 €)
-that I could find on eBay, then soldered in 4 wires and added microcontrollers
-to make it smart. It now connects to my <a href="https://nuki.io/en/opener/">Nuki Opener Smart Intercom IOT
-device</a>, and to <a href="/posts/2021-01-10-mqtt-introduction/">my local MQTT Pub/Sub
-bus</a> (why not?).</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hub733b3134fea4b189ea38881ff1c39d2_1378037_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hub733b3134fea4b189ea38881ff1c39d2_1378037_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hub733b3134fea4b189ea38881ff1c39d2_1378037_600x0_resize_q75_box.jpg"
-  alt="modified BTicino" title="modified BTicino"
-  width="600"
-  height="800"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-<h2 id="background">Background</h2>
-<p>In my <a href="/posts/2020-11-30-scs-processing-microcontroller/">last post about the BTicino intercom from
-November</a>, I described how to
-use a Teensy microcontroller to reliably interpret SCS bus signals and drive a
-Nuki Opener (Smart Intercom).</p>
-<p>Originally, I had hoped the Nuki developers would be able to fix their device
-based on my SCS bus research, but they don’t seem to be interested. Instead,
-their support actually suggested I run my microcontroller workaround
-indefinitely!</p>
-<p>Hence, I decided to work on the next revision to clean up my setup in terms of
-cable clutter. I also figured: if I already need to run my own microcontroller,
-I also want to connect it to my local <a href="/posts/2021-01-10-mqtt-introduction/">MQTT Pub/Sub
-bus</a> for maximum flexibility.</p>
-<p>Unfortunately, the Teensy microcontroller lacks built-in WiFi, or any kind of
-networking.</p>
-<p>I switched to an ESP32-based microcontroller, but powering those from the SCS
-bus seems like a bad idea: they draw a lot of power, and building small
-high-quality power supplies is hard.</p>
-<p>This made me scrap <a href="https://twitter.com/zekjur/status/1331646748989788160">my previous plans to make my own SCS send/receive
-hardware</a>.</p>
-<p>Instead, I wondered what the easiest yet most reliable approach might be to make
-this intercom unit smart. Instead of building my own SCS hardware, could I use
-the intercom unit itself to send the door unlock signal, and could I obtain the
-unit’s already-decoded SCS bus signal?</p>
-<h2 id="finding-the-signals">Finding the signals</h2>
-<p>Based on my previous research, I roughly knew what to expect: closest to the bus
-terminals, there will be some components that filter the bus signal and convert
-the 27V into a lower voltage. Connected to that power supply is a
-microcontroller which deals with all user interface.</p>
-<p>To learn more about the components, I first identified all <a href="https://en.wikipedia.org/wiki/Integrated_circuit">ICs (Integrated
-Circuits)</a> based on their
-labeling. The following are relevant:</p>
-<ul>
-<li><a href="https://www.ti.com/lit/ds/symlink/lm393-n.pdf">TI LM393</a>: Dual Comparators</li>
-<li><a href="https://www.ti.com/lit/ds/symlink/lp2951-q1.pdf">TI LP2951</a>: Adjustable Micropower Voltage Regulators, 5V output</li>
-<li><a href="http://ww1.microchip.com/downloads/en/devicedoc/41202c.pdf">Microchip PIC16F684</a>: 8-bit microcontroller</li>
-</ul>
-<p>I connected my development intercom unit to <a href="/posts/2020-11-30-scs-processing-microcontroller/#scs-lab-setup">my SCS bus lab
-setup</a> and used
-my oscilloscope to confirm expected signal levels based on the pinout from the
-IC datasheets.</p>
-<p>I settled on the following 4 relatively easily accessible signals and soldered
-jumper wires to them:</p>
-<ul>
-<li><code>5V</code> and <code>GND</code>: 5V, 100mA. Our QT Py microcontroller uses 7mA.</li>
-<li><code>OPEN5V</code>: activates the button which unlocks the door</li>
-<li><code>SCSRX5V</code>: converted SCS signal</li>
-</ul>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/signals.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/signals_huad180b5f717872783fbf44350a70ae1a_718323_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/signals_huad180b5f717872783fbf44350a70ae1a_718323_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/signals_huad180b5f717872783fbf44350a70ae1a_718323_600x0_resize_q75_box.jpg"
-  alt="BTicino signals" title="BTicino signals"
-  width="600"
-  height="631"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-<h2 id="converting-the-signals">Converting the signals</h2>
-<p>Because the BTicino intercom units runs at 5V, but more modern microcontrollers
-run at 3.3V, we need to convert between the two voltages:</p>
-<ol>
-<li>
-<p>We need to convert a 3.3V signal to <code>OPEN5V</code> to trigger opening the door.</p>
-</li>
-<li>
-<p>We need to convert <code>SCSRX5V</code> signal to 3.3V so that I can use an ESP32
-microcontroller to read the signal and place it on MQTT.</p>
-</li>
-</ol>
-<p>Here’s the corresponding schematic:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/schematic.png"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/schematic_hucc6cb59bde9ea030d5dc2bcd00b21a79_47323_1200x0_resize_box_3.png 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/schematic_hucc6cb59bde9ea030d5dc2bcd00b21a79_47323_1800x0_resize_box_3.png 3x"
-  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/schematic_hucc6cb59bde9ea030d5dc2bcd00b21a79_47323_600x0_resize_box_3.png"
-  alt="schematic" title="schematic"
-  width="600"
-  height="564"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-<h2 id="microcontroller-selection">Microcontroller selection</h2>
-<p>I eventually decided to task a dedicated microcontroller with the signal
-conversion, instead of having the WiFi-enabled microcontroller do everything,
-for multiple reasons:</p>
-<ul>
-<li>
-<p>Reliability. It turns out that using a hardware analog comparator results in a
-much higher signal quality than continuously sampling an ADC yourself, even
-when using the ESP32’s <a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/ulp.html">ULP (Ultra Low Power)
-co-processor</a>
-to do the sampling.</p>
-</li>
-<li>
-<p>Easy implementation. Converting an SCS signal to a serial signal is literally
-<a href="/posts/2020-11-30-scs-processing-microcontroller/#analog-comparator-modification">a single <code>delayMicroseconds(20);</code> call in the right
-place</a>. Having
-a whole microcontroller for only this task eliminates any concurrency
-concerns. I have not had to debug or change the software even once in the last
-few months.</p>
-</li>
-<li>
-<p>Easy debugging/introspection. I can connect a standard USB-to-serial adapter
-and verify the signal is read correctly. This quickly narrows down issues on
-either side of the serial interface. Issues with the microcontroller side can
-be reproduced by sending serial data.</p>
-</li>
-</ul>
-<p>Here are the 2 microcontrollers I’m using in this project, plus the Teensy I
-used previously:</p>
-<table>
-<thead>
-<tr>
-<th>Microcontroller</th>
-<th>WiFi</th>
-<th>Analog Comparator</th>
-<th>Price</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="https://www.pjrc.com/store/teensy40.html">Teensy 4.0</a></td>
-<td>no</td>
-<td>yes</td>
-<td>19 USD</td>
-</tr>
-<tr>
-<td><a href="https://www.adafruit.com/product/4600">Adafruit QT Py</a></td>
-<td>no</td>
-<td>yes</td>
-<td>6 USD</td>
-</tr>
-<tr>
-<td><a href="https://www.tinypico.com/">TinyPICO</a></td>
-<td>yes</td>
-<td>no</td>
-<td>20 USD</td>
-</tr>
-</tbody>
-</table>
-<p>If ESP32 boards such as the TinyPICO had a hardware Analog Comparator, I would
-likely use just one microcontroller, but keep the serial interface on a GPIO for
-easy debugging.</p>
-<h3 id="why-the-adafruit-qt-py">Why the Adafruit QT Py?</h3>
-<p>The minimal function we need for our signal conversion device is to convert an
-SCS signal (5V) to a serial signal (3.3V). For this conversion, we need a
-hardware analog comparator and an output GPIO that we can drive independently,
-so that we can modify the signal.</p>
-<p>Additionally, the device should use as little power as possible so that it can
-comfortably fit in the left-over energy budget of the intercom unit’s power
-supply.</p>
-<p>The smallest microcontroller I know of that comes with a hardware analog
-comparator is the <a href="https://www.adafruit.com/product/4600">Adafruit QT Py</a>. It’s
-a 32-bit Cortex M0+ (SAMD21) that can be programmed using the Arduino IDE, or
-MicroPython (hence the name).</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/qtpy.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/qtpy_hud5b1d29bf03dbaef00ea80c4fff123ac_742679_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/qtpy_hud5b1d29bf03dbaef00ea80c4fff123ac_742679_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/qtpy_hud5b1d29bf03dbaef00ea80c4fff123ac_742679_600x0_resize_q75_box.jpg"
-  alt="Adafruit QT Py" title="Adafruit QT Py"
-  width="600"
-  height="378"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-<p>There are other SAMD21 boards with the same form factor, such as the <a href="https://wiki.seeedstudio.com/Seeeduino-XIAO/">Seeeduino
-XIAO</a>.</p>
-<h3 id="why-the-tinypico-esp32-board">Why the TinyPICO ESP32 board?</h3>
-<p>When looking for a WiFi-enabled microcontroller, definitely go with something
-ESP32-based!</p>
-<p>The community around the Espressif ESP32 (and its predecessor ESP8266) is
-definitely one of its biggest pluses: there are tons of Arduino sketches,
-troubleshooting tips, YouTube videos, reference documentation, forum posts, and
-so on.</p>
-<p>The ESPs have been around since ≈2014, so many (largely-compatible) boards are
-available. In fact, I started this project on an <a href="https://m5stack.com/collections/m5-core/products/basic-core-iot-development-kit">M5Stack ESP32 Basic Core IoT
-Development
-Kit</a>,
-deployed it on an <a href="https://www.adafruit.com/product/4172">Adafruit HUZZAH32 Breakout
-Board</a> and ultimately ported it to the
-<a href="https://www.tinypico.com/">TinyPICO</a>. Porting between the different
-microcontrollers was really smooth: the only adjustments were pin numbers and
-dropping in a TinyPICO helper library for its RGB LED, which I chose to use as a
-power LED.</p>
-<p>I chose the TinyPICO ESP32 board specifically for its small form factor and
-convenience:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-comparison.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-comparison_hu6f8a665b92c49e3c59fd49dc9db9188f_1416694_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-comparison_hu6f8a665b92c49e3c59fd49dc9db9188f_1416694_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-comparison_hu6f8a665b92c49e3c59fd49dc9db9188f_1416694_600x0_resize_q75_box.jpg"
-  alt="TinyPICO comparison with Adafruit Huzzah32 and Teensy 4.0" title="TinyPICO comparison with Adafruit Huzzah32 and Teensy 4.0"
-  width="600"
-  height="415"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-<p>The TinyPICO is only 18mm × 32mm, slightly smaller than the Teensy 4.0’s 18mm × 35mm.</p>
-<p>In comparison, the <a href="https://www.adafruit.com/product/4172">Adafruit HUZZAH32 breakout
-board</a> is gigantic with its 25mm ×
-44mm. And that’s without the extra USB-to-serial adapter (FT232H in the picture
-above) you need for programming, serial console and powering the board!</p>
-<p>The TinyPICO does not need an extra adapter. You can plug it in and program it
-immediately, just like the Teensy!</p>
-<p>I’d like it if the next revision of the TinyPICO switched from Micro USB to USB
-C.</p>
-<p>If the TinyPICO is not for you (or unavailable), search for other boards that
-contain the ESP32-PICO-D4 chip. For example, <a href="https://www.dfrobot.com/product-1941.html">DFRobot’s
-ESP32-PICO-KIT</a> or <a href="https://www.amazon.de/Espressif-ESP32-ESP32-PICO-KIT-Board-ESP32-PICO-D4/dp/B07J1YMB8R">Espressif’s own
-ESP32-PICO-KIT</a>.</p>
-<h2 id="prototype">Prototype</h2>
-<p>After testing everything on a breadboard, I soldered a horizontal pin header
-onto the QT Py, connected it to my Sparkfun level shifter board and soldered the
-remaining voltage divider components “flying”. The result barely fit into the
-case, but worked flawlessly for weeks:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/prototype.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/prototype_hu9e7bb0ca740035a832123149efe1ff0b_1457519_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/prototype_hu9e7bb0ca740035a832123149efe1ff0b_1457519_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/prototype_hu9e7bb0ca740035a832123149efe1ff0b_1457519_600x0_resize_q75_box.jpg"
-  alt="prototype" title="prototype"
-  width="600"
-  height="527"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-<h2 id="backpack-pcb-for-the-qt-py">Backpack PCB for the QT Py</h2>
-<p>After verifying this prototype works well in practice, I miniaturized it into a
-“backpack” PCB.</p>
-<p>The backpack contains all the same parts as the prototype, but with fewer bulky
-wires and connectors, and using only SMD parts. The build you see below uses
-0602 SMD parts, but if I made another revision I would probably chose the larger
-0805 parts for easier soldering.</p>
-<aside class="admonition note">
-  <div class="note-container">
-    <div class="note-icon" style="width: 20px; height: 20px">
-      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
-    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
-    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
-        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
-    </g>
-</svg>
-
-    </div>
-    <div class="admonition-content">If you only wanted to drive the Nuki Opener (without any networking), you could
-easily do that from the QT Py itself and skip the TinyPICO.</div>
-  </div>
-</aside>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack_hu6792fa18b3c27ff7621846a3ddcd41b1_1436932_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack_hu6792fa18b3c27ff7621846a3ddcd41b1_1436932_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack_hu6792fa18b3c27ff7621846a3ddcd41b1_1436932_600x0_resize_q75_box.jpg"
-  alt="QT Py with backpack" title="QT Py with backpack"
-  width="600"
-  height="462"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack-pcb.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack-pcb_hu7c3948370bbbb36c4b0624284e90cf21_991666_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack-pcb_hu7c3948370bbbb36c4b0624284e90cf21_991666_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack-pcb_hu7c3948370bbbb36c4b0624284e90cf21_991666_600x0_resize_q75_box.jpg"
-  alt="QT Py with backpack PCB" title="QT Py with backpack PCB"
-  width="600"
-  height="346"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-<h2 id="assembly">Assembly</h2>
-<p>To save some space in the intercom unit case, I decided to solder the jumper
-wires directly onto the TinyPICO instead of using a pin header. I could have
-gone one step further by cutting the wires at length and soldering them directly
-on both ends, without any connectors, but I wanted to be able to easily unplug
-and re-combine the parts of this project.</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-wires.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-wires_hu0ea0facd5de8df5b7e0832eec5ec06a2_2526440_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-wires_hu0ea0facd5de8df5b7e0832eec5ec06a2_2526440_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-wires_hu0ea0facd5de8df5b7e0832eec5ec06a2_2526440_600x0_resize_q75_box.jpg"
-  alt="wires soldered directly into the TinyPICO" title="wires soldered directly into the TinyPICO"
-  width="600"
-  height="678"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-<p>From top to bottom, I made the following connections:</p>
-<table>
-<thead>
-<tr>
-<th>Pin</th>
-<th>Color</th>
-<th>Function</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>25</td>
-<td><span style="background-color: #ff4136; padding: 0 .5em 0 .5em">red</span></td>
-<td><code>SCSRX_3V3</code></td>
-</tr>
-<tr>
-<td>27</td>
-<td><span style="background-color: #2ecc40; padding: 0 .5em 0 .5em">green</span></td>
-<td><code>OPEN_3V3</code></td>
-</tr>
-<tr>
-<td>15</td>
-<td><span style="background-color: #0074d9; color: white; padding: 0 .5em 0 .5em">blue</span></td>
-<td>Nuki Opener blue cable</td>
-</tr>
-<tr>
-<td>14</td>
-<td><span style="background-color: #ffdc00; padding: 0 .5em 0 .5em">yellow</span></td>
-<td>Nuki Opener yellow cable</td>
-</tr>
-<tr>
-<td>4</td>
-<td><span style="background-color: #b10dc9; color: white; padding: 0 .5em 0 .5em">purple</span></td>
-<td>floor ring button pushed</td>
-</tr>
-<tr>
-<td>3V3</td>
-<td><span style="background-color: white; padding: 0 .5em 0 .5em">white</span></td>
-<td>3.3V for the floor ring button</td>
-</tr>
-<tr>
-<td>5V</td>
-<td><span style="background-color: #ff851b; padding: 0 .5em 0 .5em">orange</span></td>
-<td>power for the TinyPICO</td>
-</tr>
-<tr>
-<td>GND</td>
-<td><span style="background-color: brown; color: white; padding: 0 .5em 0 .5em">brown</span></td>
-<td>ground for the TinyPICO</td>
-</tr>
-<tr>
-<td>GND</td>
-<td><span style="background-color: brown; color: white; padding: 0 .5em 0 .5em">brown</span></td>
-<td>ground to the QT Py</td>
-</tr>
-<tr>
-<td>GND</td>
-<td><span style="background-color: brown; color: white; padding: 0 .5em 0 .5em">brown</span></td>
-<td>ground to the Nuki Opener</td>
-</tr>
-</tbody>
-</table>
-<p>The TinyPICO USB port is still usable for updating the software and serial console
-debugging.</p>
-<p>Here’s the TinyPICO connected to the QT Py inside the intercom unit:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hub733b3134fea4b189ea38881ff1c39d2_1378037_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hub733b3134fea4b189ea38881ff1c39d2_1378037_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hub733b3134fea4b189ea38881ff1c39d2_1378037_600x0_resize_q75_box.jpg"
-  alt="modified BTicino" title="modified BTicino"
-  width="600"
-  height="800"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-<p>The QT Py is powered by the intercom unit’s supply, and the TinyPICO I’m
-powering with an external USB power supply and a cut-open USB cable. This allows
-me to route the jumper wires through the intercom unit’s hole in the back,
-through which a USB plug doesn’t fit:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/final-installation.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/final-installation_hu026d112f6291a36ec32cbedad99b0fdb_1989526_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/final-installation_hu026d112f6291a36ec32cbedad99b0fdb_1989526_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/final-installation_hu026d112f6291a36ec32cbedad99b0fdb_1989526_600x0_resize_q75_box.jpg"
-  alt="final installation" title="final installation"
-  width="600"
-  height="800"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-<h2 id="software--artifacts">Software / Artifacts</h2>
-<p>You can find the Arduino sketches and KiCad files for this project at
-<a href="https://github.com/stapelberg/intercom-backpack">https://github.com/stapelberg/intercom-backpack</a></p>
-<p>For debugging, I found it useful to publish every single byte received from the
-SCS bus on the <code>doorbell/debug/scsrx</code> MQTT topic. Full SCS telegrams are
-published to <code>doorbell/events/scs</code>, so by observing both, you can verify that
-retransmission suppression and SCS decoding work correctly.</p>
-<p>Similarly, signaling a doorbell ring to the Nuki Opener can be debugged by
-sending a message to MQTT topic <code>doorbell/debug/cmd/ring</code>.</p>
-<p>Initially, it wasn’t clear to me whether the WiFi library would maintain the
-connection indefinitely. After observing my microcontroller eventually
-disappearing from my network, I added the <code>taskreconnect</code> FreeRTOS task, and
-things have been stable since.</p>
-<h2 id="nuki-opener-verdict">Nuki Opener: verdict</h2>
-<p>I now have a Nuki Opener running next to my own microcontroller, so I can see
-how well it works.</p>
-<h3 id="setup">setup</h3>
-<p>Setting up the Nuki is the worst part: their colorful cable is super flimsy and
-loose, often losing contact. They should definitely switch to a cable with a
-mechanical lock.</p>
-<p>The software part of the setup is okay, but the compatibility with the SCS bus
-is poor: I couldn’t get the device to work at all (see my initial post), and had
-to resort to using my own microcontroller to drive the Nuki in analogue mode.</p>
-<p>I’m disappointed that the Nuki developers aren’t interested in improving their
-device’s compatibility and reliability with the SCS bus. They seem to
-capture/replay the entire signal (including re-transmissions) instead of
-actually decoding the signal.</p>
-<h3 id="in-my-day-to-day">in my day-to-day</h3>
-<p>The push notifications I get on my iPhone from the Nuki are often
-delayed. Usually the delay is a few seconds, but sometimes notifications arrive
-hours later or just don’t arrive at all!</p>
-<p>While the push notifications are sent from a Nuki server and hence need the
-internet to function, the Nuki Bridge (translating Bluetooth Low Energey from
-the Nuki Opener to WiFi) allows configuring notifications in the local network
-via web hooks.</p>
-<p>The Nuki Bridge’s notifications are much more reliable in my experience.</p>
-<p>People sometimes ask why I use the Nuki Opener at all, given that I have some
-infrastructure of my own, too. While opening the door and receiving
-notifications is something I can do without the Nuki, too, I don’t want to spend
-my spare time re-implementing the Nuki app (on multiple platforms) with its geo
-fencing, friend invitations, ring to open, etc. In addition, the Nuki Opener
-physical device has a nice ring sound and large push button to open the door,
-both of which are convenient.</p>
-<h2 id="conclusion">Conclusion</h2>
-<p>My intercom is now much smarter! Doorbell notifications make their way to my
-various devices via MQTT, and I can conveniently open the door from any device,
-as opposed to rushing to the intercom unit in the hallway.</p>
-<p>Compared to the previous proof-of-concepts and development installations, I feel
-more confident in the current solution because it re-uses the intercom unit for
-the nitty-gritty SCS bus communication details.</p>
-<p>The overall strategy should be widely applicable regardless of the specific
-intercom vendor/unit you have. Be sure to buy your own unit (don’t solder into
-your landlord’s intercom unit!) and test in a separate lab setup first, of
-course!</p>
-<h2 id="appendix-a-troubleshooting">Appendix A: Troubleshooting</h2>
-<p>To debug the problem of ring detection no longer working, check:</p>
-<ul>
-<li>Is the ESP32 still working?
-<ul>
-<li><code>ping doorbelltp</code></li>
-<li><code>mosquitto_pub -h dr -t 'doorbell/debug/cmd/ring' -m '3'</code> should signal a
-ring to the Nuki Opener and result in events on the MQTT bus</li>
-</ul>
-</li>
-<li>Is the QT Py still working?
-<ul>
-<li>Its power LED should be off. If the LED is on, the QT Py is in the bootloader.</li>
-<li>Unplug and replug the <code>+5V</code> wire to the QT Py, see if that fixes it.</li>
-<li>Connect a USB-to-serial adapter and see if triggering a door open results in SCS bytes on the serial interface.</li>
-<li>See if ringing the bell results in SCS bytes on the serial interface. If no, re-solder cable to <code>SCSRX5V</code>.</li>
-</ul>
-</li>
-</ul>
-<p>To debug the problem of door opening no longer working, check:</p>
-<ul>
-<li>Does it work when triggering it via the button on the BTicino? If yes, re-solder cable to <code>OPEN5V</code>.</li>
-</ul>
 ]]></content>
   </entry>
 </feed>

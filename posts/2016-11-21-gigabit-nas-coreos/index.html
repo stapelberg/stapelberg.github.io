@@ -176,7 +176,7 @@
 <h1 class="ms_title">Gigabit NAS (running CoreOS) (2016)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2016-11-21, last modified 2018-03-18</div>
+  <div id="ms_date">published 2016-11-21, last modified 2022-05-29</div>
   
   
   <div>
@@ -200,7 +200,27 @@
   </style>
   <details class="ms_toc_details">
     <summary>Table of contents</summary>
-    <nav class="TableOfContents"></nav>
+    <nav class="TableOfContents">
+  <ul>
+    <li><a href="#what-did-not-work-well">What did not work well</a></li>
+    <li><a href="#what-i-would-like-to-improve">What I would like to improve</a></li>
+    <li><a href="#what-i-can-get-rid-of">What I can get rid of</a></li>
+    <li><a href="#what-worked-well">What worked well</a></li>
+    <li><a href="#the-new-hardware">The new hardware</a>
+      <ul>
+        <li><a href="#full-disk-encryption-performance">Full-disk encryption performance</a></li>
+        <li><a href="#network-performance">Network performance</a></li>
+        <li><a href="#end-to-end-throughput">End-to-end throughput</a></li>
+      </ul>
+    </li>
+    <li><a href="#the-new-software-setup">The new software setup</a>
+      <ul>
+        <li><a href="#dockerfiles-rrsync-and-samba">Dockerfiles: rrsync and samba</a></li>
+        <li><a href="#appendix-a-cloud-config">Appendix A: cloud-config</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
   </details>
   <p>
 tl;dr: I upgraded from a qnap TS-119P to a custom HTPC-like network storage
@@ -254,7 +274,7 @@ relevant for this article, as I’m keeping the software largely the same (aside
 from the surrounding operating system).
 </li>
 </ul>
-<h2>What did not work well</h2>
+<h2 id="what-did-not-work-well">What did not work well</h2>
 <p>
 Even a well-supported embedded device like the qnap TS-119P requires too much
 effort to be set up:
@@ -309,7 +329,7 @@ modifications</strong> as possible and which <strong>automatically updates
 itself</strong>.
 </li>
 </ol>
-<h2>What I would like to improve</h2>
+<h2 id="what-i-would-like-to-improve">What I would like to improve</h2>
 <p>
 One continuous pain point was how slow the qnap TS-119P was with regards to
 writing data to disk. The slowness was largely caused by full-disk encryption.
@@ -329,7 +349,7 @@ The take-away is that any new solution should be as quick as my workstation and
 network, i.e. it should be able to <strong>write files to disk with gigabit
 speed</strong>.
 </p>
-<h2>What I can get rid of</h2>
+<h2 id="what-i-can-get-rid-of">What I can get rid of</h2>
 <p>
 While <a
 href="https://github.com/stapelberg/zkj-nas-tools/tree/master/dramaqueen">dramaqueen</a>
@@ -343,14 +363,14 @@ watching movies while on vacation or business trips somewhere. Hence, my
 storage solution needs to be running 24/7 — no more automated shutdowns and
 wake-up procedures.
 </p>
-<h2>What worked well</h2>
+<h2 id="what-worked-well">What worked well</h2>
 <p>
 Reducing the scope drastically in terms of software setup complexity paid off.
 If it weren’t for that, I probably would not have been able to complete this
 upgrade within a few mornings/evenings and would likely have pushed this
 project out for a long time.
 </p>
-<h2>The new hardware</h2>
+<h2 id="the-new-hardware">The new hardware</h2>
 <p>
 I researched the following components back in March, but then put the project
 on hold due to time constraints and to allow myself some more time to think
@@ -435,7 +455,7 @@ and I’m done.
 Further, any linux distribution can easily be installed from a bootable USB
 drive, without the need for any custom tools or ports.
 </p>
-<h3>Full-disk encryption performance</h3>
+<h3 id="full-disk-encryption-performance">Full-disk encryption performance</h3>
 <pre>
 # cryptsetup benchmark
 # Tests are approximate using memory only (no storage IO).
@@ -450,7 +470,7 @@ PBKDF2-whirlpool   84891 iterations per second
      aes-xts   256b   850.8 MiB/s   843.9 MiB/s
      aes-xts   512b   725.0 MiB/s   740.6 MiB/s
 </pre>
-<h3>Network performance</h3>
+<h3 id="network-performance">Network performance</h3>
 <p>
 As the old qnap TS-119P would only sustain gigabit performance using IPv4 (with
 TCP checksum offloading), I was naturally relieved to see that the new solution
@@ -474,7 +494,7 @@ ran the following tests inside a docker container (<code>docker run --net=host
 The CPU was >90% idle using <code>netcat-traditional</code>.<br>
 The CPU was >70% idle using <code>netcat-openbsd</code>.
 </p>
-<h3>End-to-end throughput</h3>
+<h3 id="end-to-end-throughput">End-to-end throughput</h3>
 <p>
 Reading/writing to a disk which uses cryptsetup-luks full-disk encryption with
 the <code>aes-cbc-essiv:sha256</code> cipher, these are the resulting speeds:
@@ -500,7 +520,7 @@ Writing works at almost gigabit throughput:
 During rsync+ssh backups, the CPU is never 100% maxed out, and data is sent to
 the NAS at 65 MB/s.
 </p>
-<h2>The new software setup</h2>
+<h2 id="the-new-software-setup">The new software setup</h2>
 <p>
 Given that I wanted to use a software setup which has as few non-standard
 modifications as possible and automatically updates itself, I was curious to
@@ -538,7 +558,7 @@ midna $ scp cloud-config.storage.yaml core@10.252:/tmp/
 storage $ sudo cp /tmp/cloud-config.storage.yaml /var/lib/coreos-install/user_data
 storage $ sudo coreos-cloudinit --from-file=/var/lib/coreos-install/user_data
 </pre>
-<h3>Dockerfiles: rrsync and samba</h3>
+<h3 id="dockerfiles-rrsync-and-samba">Dockerfiles: rrsync and samba</h3>
 <p>
 Since neither rsync nor samba directly provide Docker containers, I had to whip
 up the following small Dockerfiles which install the latest versions from
@@ -555,184 +575,179 @@ that the Docker hub rebuilds the images when necessary, and the updates are
 picked up either manually when time-critical, or automatically by virtue of
 CoreOS rebooting to update itself.
 </p>
-<pre>
-FROM debian:jessie
-RUN apt-get update \
-  && apt-get install -y rsync \
-  && gunzip -c /usr/share/doc/rsync/scripts/rrsync.gz > /usr/bin/rrsync \
-  && chmod +x /usr/bin/rrsync
-ENTRYPOINT ["/usr/bin/rrsync"]
-</pre>
-<pre>
-FROM debian:jessie
-RUN apt-get update && apt-get install -y samba
-ADD smb.conf /etc/samba/smb.conf
-EXPOSE 137 138 139 445
-CMD ["/usr/sbin/smbd", "-FS"]
-</pre>
-<h3>Appendix A: cloud-config</h3>
-<pre>
-#cloud-config
-<p>hostname: &ldquo;storage&rdquo;</p>
-<p>ssh_authorized_keys:</p>
-<ul>
-<li>ssh-rsa AAAAB… michael@midna</li>
-</ul>
-<p>write_files:</p>
-<ul>
-<li>path: /etc/ssl/certs/r.zekjur.net.crt
-content: |
-&mdash;&ndash;BEGIN CERTIFICATE&mdash;&ndash;
-MIIDYjCCAko…
-&mdash;&ndash;END CERTIFICATE&mdash;&ndash;</li>
-<li>path: /var/lib/ip6tables/rules-save
-permissions: 0644
-owner: root:root
-content: |
-<h1 id="generated-by-ip6tables-save-v1414-on-fri-aug-26-195751-2016">Generated by ip6tables-save v1.4.14 on Fri Aug 26 19:57:51 2016</h1>
-*filter
-:INPUT DROP [0:0]
-:FORWARD ACCEPT [0:0]
-:OUTPUT ACCEPT [0:0]
--A INPUT -p ipv6-icmp -m comment &ndash;comment &ldquo;IPv6 needs ICMPv6 to work&rdquo; -j ACCEPT
--A INPUT -m state &ndash;state RELATED,ESTABLISHED -m comment &ndash;comment &ldquo;Allow packets for outgoing connections&rdquo; -j ACCEPT
--A INPUT -s fe80::/10 -d fe80::/10 -m comment &ndash;comment &ldquo;Allow link-local traffic&rdquo; -j ACCEPT
--A INPUT -s 2001:db8::/32 -m comment &ndash;comment &ldquo;local traffic&rdquo; -j ACCEPT
--A INPUT -p tcp -m tcp &ndash;dport 22 -m comment &ndash;comment &ldquo;SSH&rdquo; -j ACCEPT
-COMMIT
-<h1 id="completed-on-fri-aug-26-195751-2016">Completed on Fri Aug 26 19:57:51 2016</h1>
-</li>
-<li>path: /root/.ssh/authorized_keys
-permissions: 0600
-owner: root:root
-content: |
-command=&quot;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/midna:/srv/backup/midna stapelberg/rsync /srv/backup/midna&quot; ssh-rsa AAAAB… root@midna
-command=&quot;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/scan2drive:/srv/backup/scan2drive stapelberg/rsync /srv/backup/scan2drive&quot; ssh-rsa AAAAB… root@scan2drive
-command=&quot;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/alp.zekjur.net:/srv/backup/alp.zekjur.net stapelberg/rsync /srv/backup/alp.zekjur.net&quot; ssh-rsa AAAAB… root@alp</li>
-</ul>
-<p>coreos:
-update:
-reboot-strategy: &ldquo;reboot&rdquo;
-locksmith:
-window_start: 01:00 # UTC, i.e. 02:00 CET or 03:00 CEST
-window_length: 2h  # i.e. until 03:00 CET or 04:00 CEST
-units:
-- name: ip6tables-restore.service
-enable: true</p>
-<pre><code>- name: 00-enp2s0.network
-  runtime: true
-  content: |
-    [Match]
-    Name=enp2s0
-
-    [Network]
-    DNS=10.0.0.1
-    Address=10.0.0.252/24
-    Gateway=10.0.0.1
-    IPv6Token=0:0:0:0:10::252
-
-- name: systemd-networkd-wait-online.service
-  command: start
-  drop-ins:
-    - name: &quot;10-interface.conf&quot;
-      content: |
-        [Service]
-        ExecStart=
-        ExecStart=/usr/lib/systemd/systemd-networkd-wait-online \
-      --interface=enp2s0
-
-- name: unlock.service
-  command: start
-  content: |
-    [Unit]
-    Description=unlock hard drive
-    Wants=network.target
-    After=systemd-networkd-wait-online.service
-    Before=samba.service
-    
-    [Service]
-    Type=oneshot
-    RemainAfterExit=yes
-    # Wait until the host is actually reachable.
-    ExecStart=/bin/sh -c &quot;c=0; while [ $c -lt 5 ]; do \
-    /bin/ping6 -n -c 1 r.zekjur.net &amp;&amp; break; \
-    c=$((c+1)); \
-    sleep 1; \
-  done&quot;
-    ExecStart=/bin/sh -c &quot;(echo -n my_local_secret &amp;&amp; \
-  wget \
-    --retry-connrefused \
-    --ca-directory=/dev/null \
-    --ca-certificate=/etc/ssl/certs/r.zekjur.net.crt \
-    -qO- https://r.zekjur.net/sdb2_crypt) \
-  | /sbin/cryptsetup --key-file=- luksOpen /dev/sdb2 sdb2_crypt&quot;
-    ExecStart=/bin/mount /dev/mapper/sdb2_crypt /srv
-
-- name: samba.service
-  command: start
-  content: |
-    [Unit]
-    Description=samba server
-    After=docker.service srv.mount
-    Requires=docker.service srv.mount
-
-    [Service]
-    Restart=always
-    StartLimitInterval=0
-
-    # Always pull the latest version (bleeding edge).
-    ExecStartPre=-/usr/bin/docker pull stapelberg/samba:latest
-
-    # Set up samba users (cannot be done in the (public) Dockerfile
-    # because users/passwords are sensitive information).
-    ExecStartPre=-/usr/bin/docker kill smb
-    ExecStartPre=-/usr/bin/docker rm smb
-    ExecStartPre=-/usr/bin/docker rm smb-prep
-    ExecStartPre=/usr/bin/docker run --name smb-prep stapelberg/samba \
-  adduser --quiet --disabled-password --gecos &quot;&quot; --uid 29901 michael
-    ExecStartPre=/usr/bin/docker commit smb-prep smb-prepared
-    ExecStartPre=/usr/bin/docker rm smb-prep
-    ExecStartPre=/usr/bin/docker run --name smb-prep smb-prepared \
-  /bin/sh -c &quot;echo my_password | tee - | smbpasswd -a -s michael&quot;
-    ExecStartPre=/usr/bin/docker commit smb-prep smb-prepared
-
-    ExecStart=/usr/bin/docker run \
-      -p 137:137 \
-      -p 138:138 \
-      -p 139:139 \
-      -p 445:445 \
-      --tmpfs=/run \
-      -v /srv/data:/srv/data \
-      --name smb \
-      -t \
-      smb-prepared \
-        /usr/sbin/smbd -FS
-
-- name: emby.service
-  command: start
-  content: |
-    [Unit]
-    Description=emby
-    After=docker.service srv.mount
-    Requires=docker.service srv.mount
-
-    [Service]
-    Restart=always
-    StartLimitInterval=0
-
-    # Always pull the latest version (bleeding edge).
-    ExecStartPre=-/usr/bin/docker pull emby/embyserver
-
-    ExecStart=/usr/bin/docker run \
-      --rm \
-      --net=host \
-      -v /srv/data/movies:/srv/data/movies:ro \
-      -v /srv/data/series:/srv/data/series:ro \
-      -v /srv/emby:/config \
-      emby/embyserver
-</code></pre>
-<p></pre></p>
-
+<p>rrsync:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">FROM</span><span style="color:#4070a0"> debian:jessie</span><span style="">
+</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">RUN</span> apt-get update <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  <span style="color:#666">&amp;&amp;</span> apt-get install -y rsync <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  <span style="color:#666">&amp;&amp;</span> gunzip -c /usr/share/doc/rsync/scripts/rrsync.gz &gt; /usr/bin/rrsync <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  <span style="color:#666">&amp;&amp;</span> chmod +x /usr/bin/rrsync<span style="">
+</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">ENTRYPOINT</span> [<span style="color:#4070a0">&#34;/usr/bin/rrsync&#34;</span>]<span style="">
+</span></span></span></code></pre></div><p>samba:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">FROM</span><span style="color:#4070a0"> debian:jessie</span><span style="">
+</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">RUN</span> apt-get update <span style="color:#666">&amp;&amp;</span> apt-get install -y samba<span style="">
+</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">ADD</span> smb.conf /etc/samba/smb.conf<span style="">
+</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">EXPOSE</span><span style="color:#4070a0"> 137 138 139 445</span><span style="">
+</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">CMD</span> [<span style="color:#4070a0">&#34;/usr/sbin/smbd&#34;</span>, <span style="color:#4070a0">&#34;-FS&#34;</span>]<span style="">
+</span></span></span></code></pre></div><h3 id="appendix-a-cloud-config">Appendix A: cloud-config</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">#cloud-config</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">hostname</span>:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;storage&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">ssh_authorized_keys</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- ssh-rsa AAAAB… michael@midna<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">write_files</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">path</span>:<span style="color:#bbb"> </span>/etc/ssl/certs/r.zekjur.net.crt<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      -----BEGIN CERTIFICATE-----
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      MIIDYjCCAko…
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      -----END CERTIFICATE-----</span><span style="color:#bbb">      
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">path</span>:<span style="color:#bbb"> </span>/var/lib/ip6tables/rules-save<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">permissions</span>:<span style="color:#bbb"> </span><span style="color:#40a070">0644</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">owner</span>:<span style="color:#bbb"> </span>root:root<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      # Generated by ip6tables-save v1.4.14 on Fri Aug 26 19:57:51 2016
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      *filter
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      :INPUT DROP [0:0]
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      :FORWARD ACCEPT [0:0]
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      :OUTPUT ACCEPT [0:0]
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      -A INPUT -p ipv6-icmp -m comment --comment &#34;IPv6 needs ICMPv6 to work&#34; -j ACCEPT
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      -A INPUT -m state --state RELATED,ESTABLISHED -m comment --comment &#34;Allow packets for outgoing connections&#34; -j ACCEPT
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      -A INPUT -s fe80::/10 -d fe80::/10 -m comment --comment &#34;Allow link-local traffic&#34; -j ACCEPT
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      -A INPUT -s 2001:db8::/32 -m comment --comment &#34;local traffic&#34; -j ACCEPT
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      -A INPUT -p tcp -m tcp --dport 22 -m comment --comment &#34;SSH&#34; -j ACCEPT
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      COMMIT
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      # Completed on Fri Aug 26 19:57:51 2016</span><span style="color:#bbb">      
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">path</span>:<span style="color:#bbb"> </span>/root/.ssh/authorized_keys<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">permissions</span>:<span style="color:#bbb"> </span><span style="color:#40a070">0600</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">owner</span>:<span style="color:#bbb"> </span>root:root<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      command=&#34;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/midna:/srv/backup/midna stapelberg/rsync /srv/backup/midna&#34; ssh-rsa AAAAB… root@midna
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      command=&#34;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/scan2drive:/srv/backup/scan2drive stapelberg/rsync /srv/backup/scan2drive&#34; ssh-rsa AAAAB… root@scan2drive
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      command=&#34;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/alp.zekjur.net:/srv/backup/alp.zekjur.net stapelberg/rsync /srv/backup/alp.zekjur.net&#34; ssh-rsa AAAAB… root@alp</span><span style="color:#bbb">      
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">coreos</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">update</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">reboot-strategy</span>:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;reboot&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">locksmith</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">window_start</span>:<span style="color:#bbb"> </span><span style="color:#40a070">01</span>:<span style="color:#40a070">00</span><span style="color:#bbb"> </span><span style="color:#60a0b0;font-style:italic"># UTC, i.e. 02:00 CET or 03:00 CEST</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">window_length</span>:<span style="color:#bbb"> </span>2h <span style="color:#bbb"> </span><span style="color:#60a0b0;font-style:italic"># i.e. until 03:00 CET or 04:00 CEST</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">units</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>ip6tables-restore.service<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">enable</span>:<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">true</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span><span style="color:#40a070">00</span>-enp2s0.network<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">runtime</span>:<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">true</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        [Match]
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Name=enp2s0
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        [Network]
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        DNS=10.0.0.1
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Address=10.0.0.252/24
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Gateway=10.0.0.1
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        IPv6Token=0:0:0:0:10::252</span><span style="color:#bbb">        
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>systemd-networkd-wait-online.service<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">command</span>:<span style="color:#bbb"> </span>start<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">drop-ins</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;10-interface.conf&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">          </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">            [Service]
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">            ExecStart=
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">            ExecStart=/usr/lib/systemd/systemd-networkd-wait-online \</span><span style="color:#bbb">            
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	      </span>--interface=enp2s0<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>unlock.service<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">command</span>:<span style="color:#bbb"> </span>start<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        [Unit]
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Description=unlock hard drive
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Wants=network.target
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        After=systemd-networkd-wait-online.service
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Before=samba.service
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        [Service]
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Type=oneshot
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        RemainAfterExit=yes
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        # Wait until the host is actually reachable.
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStart=/bin/sh -c &#34;c=0; while [ $c -lt 5 ]; do \</span><span style="color:#bbb">        
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	    </span>/bin/ping6 -n -c 1 r.zekjur.net &amp;&amp; break; \<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	    </span>c=$((c+1)); \<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	    </span>sleep 1; \<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	  </span>done&#34;<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>ExecStart=/bin/sh -c &#34;(echo -n my_local_secret &amp;&amp; \<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	  </span>wget \<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	    </span>--retry-connrefused \<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	    </span>--ca-directory=/dev/null \<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	    </span>--ca-certificate=/etc/ssl/certs/r.zekjur.net.crt \<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	    </span>-qO- https://r.zekjur.net/sdb2_crypt) \<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	  </span>| /sbin/cryptsetup --key-file=- luksOpen /dev/sdb2 sdb2_crypt&#34;<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>ExecStart=/bin/mount /dev/mapper/sdb2_crypt /srv<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>samba.service<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">command</span>:<span style="color:#bbb"> </span>start<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        [Unit]
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Description=samba server
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        After=docker.service srv.mount
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Requires=docker.service srv.mount
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        [Service]
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Restart=always
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        StartLimitInterval=0
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        # Always pull the latest version (bleeding edge).
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=-/usr/bin/docker pull stapelberg/samba:latest
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        # Set up samba users (cannot be done in the (public) Dockerfile
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        # because users/passwords are sensitive information).
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=-/usr/bin/docker kill smb
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=-/usr/bin/docker rm smb
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=-/usr/bin/docker rm smb-prep
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=/usr/bin/docker run --name smb-prep stapelberg/samba \</span><span style="color:#bbb">        
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	  </span>adduser --quiet --disabled-password --gecos &#34;&#34; --uid 29901 michael<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>ExecStartPre=/usr/bin/docker commit smb-prep smb-prepared<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>ExecStartPre=/usr/bin/docker rm smb-prep<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>ExecStartPre=/usr/bin/docker run --name smb-prep smb-prepared \<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	  </span>/bin/sh -c &#34;echo my_password | tee - | smbpasswd -a -s michael&#34;<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>ExecStartPre=/usr/bin/docker commit smb-prep smb-prepared<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>ExecStart=/usr/bin/docker run \<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>-p 137:137 \<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>-p 138:138 \<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>-p 139:139 \<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>-p 445:445 \<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>--tmpfs=/run \<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>-v /srv/data:/srv/data \<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>--name smb \<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>-t \<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>smb-prepared \<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">            </span>/usr/sbin/smbd -FS<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>emby.service<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">command</span>:<span style="color:#bbb"> </span>start<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        [Unit]
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Description=emby
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        After=docker.service srv.mount
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Requires=docker.service srv.mount
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        [Service]
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Restart=always
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        StartLimitInterval=0
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        # Always pull the latest version (bleeding edge).
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=-/usr/bin/docker pull emby/embyserver
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStart=/usr/bin/docker run \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          --rm \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          --net=host \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          -v /srv/data/movies:/srv/data/movies:ro \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          -v /srv/data/series:/srv/data/series:ro \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          -v /srv/emby:/config \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          emby/embyserver</span><span style="color:#bbb">        
+</span></span></span></code></pre></div>
 </div>
 
       </div>
@@ -740,7 +755,27 @@ enable: true</p>
   <div>
     <strong>Table Of Contents</strong>
 
-    <nav class="TableOfContents"></nav>
+    <nav class="TableOfContents">
+  <ul>
+    <li><a href="#what-did-not-work-well">What did not work well</a></li>
+    <li><a href="#what-i-would-like-to-improve">What I would like to improve</a></li>
+    <li><a href="#what-i-can-get-rid-of">What I can get rid of</a></li>
+    <li><a href="#what-worked-well">What worked well</a></li>
+    <li><a href="#the-new-hardware">The new hardware</a>
+      <ul>
+        <li><a href="#full-disk-encryption-performance">Full-disk encryption performance</a></li>
+        <li><a href="#network-performance">Network performance</a></li>
+        <li><a href="#end-to-end-throughput">End-to-end throughput</a></li>
+      </ul>
+    </li>
+    <li><a href="#the-new-software-setup">The new software setup</a>
+      <ul>
+        <li><a href="#dockerfiles-rrsync-and-samba">Dockerfiles: rrsync and samba</a></li>
+        <li><a href="#appendix-a-cloud-config">Appendix A: cloud-config</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
   </div>
 </div>
 

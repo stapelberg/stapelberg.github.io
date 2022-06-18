@@ -1,0 +1,240 @@
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Michael Stapelbergs Website: posts tagged rsync</title>
+  <link href="https://michael.stapelberg.ch/posts/tags/rsync/feed.xml" rel="self"/>
+  <link href="https://michael.stapelberg.ch/posts/tags/rsync/"/>
+
+
+  <id>https://michael.stapelberg.ch/posts/tags/rsync/</id>
+  <generator>Hugo -- gohugo.io</generator>
+  <entry>
+    <title type="html"><![CDATA[rsync, article 1: Scenarios]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2022-06-18-rsync-article-1-scenarios/"/>
+    <id>https://michael.stapelberg.ch/posts/2022-06-18-rsync-article-1-scenarios/</id>
+    <published>2022-06-18T15:04:00+02:00</published>
+    <content type="html"><![CDATA[<p>This post is the first article in a series of blog posts about rsync, <a href="../2022-06-11-rsync-overview/">see the
+Series Overview</a>.</p>
+<p>To motivate why it makes sense to look at rsync, I present three scenarios for
+which I have come to appreciate rsync: <a href="#dokuwiki-transfers-using-rsync">DokuWiki
+transfers</a>, <a href="#software-deployment-using-rsync">Software
+deployment</a> and
+<a href="#backups-using-rsync">Backups</a>.</p>
+<h2 id="dokuwiki-transfers-using-rsync">Scenario: DokuWiki transfers using rsync</h2>
+<p>Recently, I set up a couple of tools for a website that is built on DokuWiki,
+such as a dead link checker and a statistics program. To avoid overloading the
+live website (and possibly causing spurious requests that interfere with
+statistics), I decided it would be best to run a separate copy of the DokuWiki
+installation locally. This requires synchronizing:</p>
+<ol>
+<li>The PHP source code files of DokuWiki itself (including plugins and configuration)</li>
+<li>One text file per wiki page, and all uploaded media files</li>
+</ol>
+<p>A DokuWiki installation is exactly the kind of file tree that <a href="https://manpages.debian.org/scp.1"><code>scp(1)</code></a>
+ cannot efficiently transfer (too many small files),
+but <a href="https://manpages.debian.org/rsync.1"><code>rsync(1)</code></a>
+ can! The <code>rsync</code> transfer only takes a few seconds, no matter if
+it’s a full download (can be simpler for batch jobs) or an incremental
+synchronization (more efficient for regular synchronizations like backups).</p>
+<h2 id="software-deployment-using-rsync">Scenario: Software deployment using rsync</h2>
+<p>For smaller projects where I don’t publish new versions through Docker, I
+instead use a shell script to transfer and run my software on the server.</p>
+<p><code>rsync</code> is a great fit here, as it transfers many small files (static assets and
+templates) efficiently, only transfers the binaries that actually changed, and
+doesn’t mind if the binary file it’s uploading is currently running (contrary to
+<a href="https://manpages.debian.org/scp.1"><code>scp(1)</code></a>
+, for example).</p>
+<p>To illustrate how such a script could look like, here’s my push script for
+<a href="https://codesearch.debian.net/">Debian Code Search</a>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#007020">#!/bin/zsh
+</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span><span style="color:#007020">set</span> -ex
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Asynchronously transfer assets while compiling:</span>
+</span></span><span style="display:flex;"><span><span style="color:#666">(</span>
+</span></span><span style="display:flex;"><span>    ssh root@dcs <span style="color:#4070a0">&#39;for i in $(seq 0 5); do mkdir -p /srv/dcs/shard${i}/{src,idx}; done&#39;</span>
+</span></span><span style="display:flex;"><span>    ssh root@dcs <span style="color:#4070a0">&#34;adduser --disabled-password --gecos &#39;Debian Code Search&#39; dcs || true&#34;</span>
+</span></span><span style="display:flex;"><span>    rsync -r systemd/ root@dcs:/etc/systemd/system/ &amp;
+</span></span><span style="display:flex;"><span>    rsync -r cmd/dcs-web/templates/ root@dcs:/srv/dcs/templates/ &amp;
+</span></span><span style="display:flex;"><span>    rsync -r static/ root@dcs:/srv/dcs/static/ &amp;
+</span></span><span style="display:flex;"><span>    <span style="color:#007020">wait</span>
+</span></span><span style="display:flex;"><span><span style="color:#666">)</span> &amp;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Compile a new Debian Code Search version:</span>
+</span></span><span style="display:flex;"><span><span style="color:#bb60d5">tmp</span><span style="color:#666">=</span><span style="color:#007020;font-weight:bold">$(</span>mktemp -d<span style="color:#007020;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>mkdir <span style="color:#bb60d5">$tmp</span>/bin
+</span></span><span style="display:flex;"><span><span style="color:#bb60d5">GOBIN</span><span style="color:#666">=</span><span style="color:#bb60d5">$tmp</span>/bin <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span><span style="color:#bb60d5">GOAMD64</span><span style="color:#666">=</span>v3 <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  go install <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  -ldflags <span style="color:#4070a0">&#39;-X github.com/Debian/dcs/cmd/dcs-web/common.Version=$version&#39;</span> <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  github.com/Debian/dcs/cmd/...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Transfer the Debian Code Search binaries:</span>
+</span></span><span style="display:flex;"><span>rsync <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  <span style="color:#bb60d5">$tmp</span>/bin/dcs-<span style="color:#666">{</span>web,source-backend,package-importer,compute-ranking,feeder<span style="color:#666">}</span> <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  <span style="color:#bb60d5">$tmp</span>/bin/dcs <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  root@dcs:/srv/dcs/bin/
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Wait for the asynchronous asset transfer to complete:</span>
+</span></span><span style="display:flex;"><span><span style="color:#007020">wait</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Restart Debian Code Search on the server:</span>
+</span></span><span style="display:flex;"><span><span style="color:#bb60d5">UNITS</span><span style="color:#666">=(</span>dcs-package-importer.service dcs-source-backend.service dcs-compute-ranking.timer dcs-web.service<span style="color:#666">)</span>
+</span></span><span style="display:flex;"><span>ssh root@dcs systemctl daemon-reload <span style="color:#4070a0;font-weight:bold">\&amp;\&amp;</span> <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  systemctl <span style="color:#007020">enable</span> <span style="color:#70a0d0;font-style:italic">${</span><span style="color:#bb60d5">UNITS</span><span style="color:#70a0d0;font-style:italic">}</span> <span style="color:#4070a0;font-weight:bold">\;</span> <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  systemctl reset-failed <span style="color:#70a0d0;font-style:italic">${</span><span style="color:#bb60d5">UNITS</span><span style="color:#70a0d0;font-style:italic">}</span> <span style="color:#4070a0;font-weight:bold">\;</span> <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  systemctl restart <span style="color:#70a0d0;font-style:italic">${</span><span style="color:#bb60d5">UNITS</span><span style="color:#70a0d0;font-style:italic">}</span> <span style="color:#4070a0;font-weight:bold">\;</span> <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  systemctl reload nginx
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>rm -rf <span style="color:#4070a0">&#34;</span><span style="color:#70a0d0;font-style:italic">${</span><span style="color:#bb60d5">tmp</span>?<span style="color:#70a0d0;font-style:italic">}</span><span style="color:#4070a0">&#34;</span>
+</span></span></code></pre></div><h2 id="backups-using-rsync">Scenario: Backups using rsync</h2>
+<p>The first backup system I used was
+<a href="https://en.wikipedia.org/wiki/Bacula">bacula</a>, which Wikipedia describes as an
+enterprise-level backup system. That certainly matches my impression, both in
+positive and negative ways: while bacula is very powerful, some seemingly common
+operations turn out quite complicated in bacula. Restoring a single file or
+directory tree from a backup was always more effort than I thought
+reasonable. For some reason, I often had to restore backup catalogs before I was
+able to access the backup contents (I don’t remember the exact details).</p>
+<p>When moving apartment last time, I used the opportunity to change my backup
+strategy. Instead of using complicated custom software with its own volume file
+format (like bacula), I wanted backed-up files to be usable on the file system
+level with standard tools like <code>rm</code>, <code>ls</code>, <code>cp</code>, etc.</p>
+<p>Working with files in a regular file system makes day-to-day usage easier, and
+also ensures that when my network storage hardware dies, I can just plug the
+hard disk into any PC, boot a Linux live system, and recover my data.</p>
+<p>To back up machines onto my <a href="/posts/2019-10-23-nas/">network storage PC</a>’s file
+system, I ended up with a <a href="https://github.com/stapelberg/zkj-nas-tools/blob/85e445a284c89590d595a52e16cb6dd652b1388e/dornroeschen/backup-remote.pl">hand-written rsync wrapper
+script</a>
+that copies the full file system of each machine into dated directory trees:</p>
+<pre tabindex="0"><code>storage2# ls -l backup/midna/2022-05-27
+bin   boot  etc  home  lib  lib64  media  opt
+proc  root  run  sbin  sys  tmp    usr    var
+
+storage2# ls -l backup/midna/2022-05-27/home/michael/configfiles/zshrc
+-rw-r--r--. 7 1000 1000 14554 May  9 19:37 backup/midna/2022-05-27/home/michael/configfiles/zshrc
+</code></pre><p>To revert my <code>~/.zshrc</code> to an older version, I can <a href="https://manpages.debian.org/scp.1"><code>scp(1)</code></a>
+ the file:</p>
+<pre tabindex="0"><code>midna% scp storage2:/srv/backup/midna/2022-05-27/home/michael/configfiles/zshrc ~/configfiles/zshrc
+</code></pre><p>To compare a whole older source tree, I can mount it using <a href="https://manpages.debian.org/sshfs.1"><code>sshfs(1)</code></a>
+:</p>
+<pre tabindex="0"><code>midna% mkdir /tmp/2022-05-27-i3
+midna% sshfs storage2:/srv/backup/midna/2022-05-27/$HOME/i3 /tmp/2022-05-27-i3
+midna% diff -ur /tmp/2022-05-27-i3 ~/i3/
+</code></pre><h3 id="incremental-backups">Incremental backups</h3>
+<p>Of course, the idea is not to transfer the full machine contents every day, as
+that would quickly fill up my network storage’s 16 TB disk! Instead, we can use
+rsync’s <code>--link-dest</code> option to elegantly deduplicate files using file system
+hard links:</p>
+<pre tabindex="0"><code>backup/midna/2022-05-26
+backup/midna/2022-05-27 # rsync --link-dest=2022-05-26
+</code></pre><p>To check the de-duplication level, we can use <a href="https://manpages.debian.org/du.1"><code>du(1)</code></a>
+,
+first on a single directory:</p>
+<pre tabindex="0"><code>storage2# du -hs 2022-05-27 
+113G	2022-05-27
+</code></pre><p>…and then on two subsequent directories:</p>
+<pre tabindex="0"><code>storage2# du -hs 2022-05-25 2022-05-27
+112G	2022-05-25
+7.3G	2022-05-27
+</code></pre><p>As you can see, the 2022-05-27 backup took 7.3 GB of disk space, and 104.7 GB
+were re-used from the previous backup(s).</p>
+<p>To print all files which have changed since the last backup, we can use:</p>
+<pre tabindex="0"><code>storage2# find 2022-05-27 -type f -links 1 -print
+</code></pre><h3 id="limitation-file-system-compatibility">Limitation: file system compatibility</h3>
+<p>A significant limitation of backups at the file level is that the destination
+file system (network storage) needs to support all the file system features used
+on the machines you are backing up.</p>
+<p>For example, if you use <a href="https://help.ubuntu.com/community/FilePermissionsACLs">POSIX
+ACLs</a> or <a href="https://wiki.archlinux.org/title/File_permissions_and_attributes#Extended_attributes">Extended
+attributes</a>
+(possibly for <a href="https://wiki.archlinux.org/title/Capabilities">Capabilities</a> or
+<a href="https://wiki.archlinux.org/title/SELinux">SELinux</a>), you need to ensure that
+your backup file system has these features enabled, and that you are using <a href="https://manpages.debian.org/rsync.1"><code>rsync(1)</code></a>
+’s <code>--xattrs</code> (or <code>-X</code> for short) option.</p>
+<p>This can turn from a pitfall into a dealbreaker as soon as multiple operating
+systems are involved. For example, the <code>rsync</code> version on macOS has
+<a href="https://github.com/apple-oss-distributions/rsync/blob/aa4e500aa53b9417014c718a5ff0e29215f08e48/rsync/generator.c#L1447">Apple-specific
+code</a>
+to work with Apple <a href="https://en.wikipedia.org/wiki/Resource_fork">resource forks</a>
+and other extended attributes. It’s not clear to me whether macOS <code>rsync</code> can
+send files to Linux <code>rsync</code>, restore them, and end up with the same system state.</p>
+<p>Luckily, I am only interested in backing up Linux systems, or merely home
+directories of non-Linux systems, where no extended attributes are used.</p>
+<h3 id="downside-slow-bulk-operations-disk-usage-deletion">Downside: slow bulk operations (disk usage, deletion)</h3>
+<p>The biggest downside of this architecture is that working with the directory
+trees in bulk can be very slow, especially when using a hard disk instead of an
+SSD. For example, deleting old backups can easily take many hours to multiple
+days (!). Sure, you can just let the <code>rm</code> command run in the background, but
+it’s annoying nevertheless.</p>
+<p>Even merely calculating the disk space usage of each directory tree is a
+painfully slow operation. I tried using stateful disk usage tools like
+<a href="http://duc.zevv.nl/">duc</a>, but it <a href="https://github.com/zevv/duc/issues/240">didn’t work
+reliably</a> on my backups.</p>
+<p>In practice, I found that for tracking down large files, using <a href="https://manpages.debian.org/ncdu.1"><code>ncdu(1)</code></a>
+ on any recent backup typically quickly shows the
+large file. In one case, I found <code>var/lib/postgresql</code> to consume many
+gigabytes. I excluded it in favor of using <a href="https://manpages.debian.org/pg_dump.1"><code>pg_dump(1)</code></a>
+, which resulted in much smaller backups!</p>
+<p>Unfortunately, even when using an SSD, determining which files take up most
+space of a full backup takes a few minutes:</p>
+<pre tabindex="0"><code>storage2# time du -hs backup/midna/2022-06-09
+742G	backup/midna/2022-06-09
+
+real	8m0.202s
+user	0m11.651s
+sys	2m0.731s
+</code></pre><h3 id="backup-transport-ssh-and-scheduling">Backup transport (SSH) and scheduling</h3>
+<p>To transfer data via <code>rsync</code> from the backup host to my network storage, I’m
+using SSH.</p>
+<p>Each machine’s SSH access is restricted in my network storage’s SSH <a href="https://manpages.debian.org/authorized_keys.5"><code>authorized_keys(5)</code></a>
+ config file to not allow arbitrary
+commands, but to perform just a specific operation. The only allowed operation
+in my case is running <code>rrsync</code> (“restricted rsync”) in a container whose file
+system only contains the backup host’s sub directory, e.g. .<code>websrv.zekjur.net</code>:</p>
+<pre tabindex="0"><code>command=&#34;/bin/docker run --log-driver none -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/websrv.zekjur.net:/srv/backup/websrv.zekjur.net stapelberg/docker-rsync /srv/backup/websrv.zekjur.net&#34;,no-port-forwarding,no-X11-forwarding ssh-ed25519 AAAAC3…
+</code></pre><p>(The <a href="/posts/2016-11-21-gigabit-nas-coreos/#dockerfiles-rrsync-and-samba">corresponding <code>Dockerfile</code> can be found in my Gigabit NAS
+article</a>.)</p>
+<p>To trigger such an SSH-protected <code>rsync</code> transfer remotely, I’m using a small
+custom scheduling program called
+<a href="https://github.com/stapelberg/zkj-nas-tools/tree/master/dornroeschen">dornröschen</a>. The
+program arranges for all involved machines to be powered on (using
+<a href="https://en.wikipedia.org/wiki/Wake-on-LAN">Wake-on-LAN</a>) and then starts
+<code>rsync</code> via <em>another operation-restricted SSH connection</em>.</p>
+<p>You could easily replace this with a cron job if you don’t care about WOL.</p>
+<p>The architecture looks like this:</p>
+<p><img src="2022-05-29-backup-architecture.svg" alt="backup architecture"></p>
+<p>The operation-restricted SSH connection on each backup host is configured in
+SSH’s <a href="https://manpages.debian.org/authorized_keys.5"><code>authorized_keys(5)</code></a>
+ config file:</p>
+<pre tabindex="0"><code>command=&#34;/root/backup-remote.pl&#34;,no-port-forwarding,no-X11-forwarding ssh-ed25519 AAAAC3…
+</code></pre><h2 id="next-up">Next up</h2>
+<p>The second article in this series is “rsync, article 2: Surroundings” (To be
+published). Now that we know what to use rsync for, how can we best integrate
+rsync into monitoring and alerting, and on which operating systems does it work?</p>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[rsync: Series Overview]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2022-06-18-rsync-overview/"/>
+    <id>https://michael.stapelberg.ch/posts/2022-06-18-rsync-overview/</id>
+    <published>2022-06-18T15:00:00+02:00</published>
+    <content type="html"><![CDATA[<p>For many years, I was only a casual user of
+<a href="https://en.wikipedia.org/wiki/Rsync">rsync</a> and used it mostly for one-off file
+transfers.</p>
+<p>Over time, I found rsync useful in more and more cases, and would recommend
+every computer user put this great tool into their toolbox 🛠 🧰 !</p>
+<p>I’m publishing a series of blog posts about rsync:</p>
+<ul>
+<li><a href="../2022-06-12-rsync-article-1-scenarios/">rsync, article 1: Scenarios</a>. To
+motivate why it makes sense to look at rsync, I present three scenarios for
+which I have come to appreciate rsync: DokuWiki transfers, Software deployment
+and Backups.</li>
+<li>rsync, article 2: Surroundings (To be published). Now that we know what to use
+rsync for, how can we best integrate rsync into monitoring and alerting, and
+on which operating systems does it work?</li>
+<li>rsync, article 3: How does rsync work? (To be published). With rsync up and
+running, it’s time to take a peek under the hood of rsync to better understand
+how it works.</li>
+<li>rsync, article 4: My own rsync implementation (To be published.)</li>
+</ul>
+]]></content>
+  </entry>
+</feed>

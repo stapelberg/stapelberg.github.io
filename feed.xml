@@ -5,6 +5,237 @@
   <id>https://michael.stapelberg.ch/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[rsync, article 1: Scenarios]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2022-06-18-rsync-article-1-scenarios/"/>
+    <id>https://michael.stapelberg.ch/posts/2022-06-18-rsync-article-1-scenarios/</id>
+    <published>2022-06-18T15:04:00+02:00</published>
+    <content type="html"><![CDATA[<p>This post is the first article in a series of blog posts about rsync, <a href="../2022-06-11-rsync-overview/">see the
+Series Overview</a>.</p>
+<p>To motivate why it makes sense to look at rsync, I present three scenarios for
+which I have come to appreciate rsync: <a href="#dokuwiki-transfers-using-rsync">DokuWiki
+transfers</a>, <a href="#software-deployment-using-rsync">Software
+deployment</a> and
+<a href="#backups-using-rsync">Backups</a>.</p>
+<h2 id="dokuwiki-transfers-using-rsync">Scenario: DokuWiki transfers using rsync</h2>
+<p>Recently, I set up a couple of tools for a website that is built on DokuWiki,
+such as a dead link checker and a statistics program. To avoid overloading the
+live website (and possibly causing spurious requests that interfere with
+statistics), I decided it would be best to run a separate copy of the DokuWiki
+installation locally. This requires synchronizing:</p>
+<ol>
+<li>The PHP source code files of DokuWiki itself (including plugins and configuration)</li>
+<li>One text file per wiki page, and all uploaded media files</li>
+</ol>
+<p>A DokuWiki installation is exactly the kind of file tree that <a href="https://manpages.debian.org/scp.1"><code>scp(1)</code></a>
+ cannot efficiently transfer (too many small files),
+but <a href="https://manpages.debian.org/rsync.1"><code>rsync(1)</code></a>
+ can! The <code>rsync</code> transfer only takes a few seconds, no matter if
+it’s a full download (can be simpler for batch jobs) or an incremental
+synchronization (more efficient for regular synchronizations like backups).</p>
+<h2 id="software-deployment-using-rsync">Scenario: Software deployment using rsync</h2>
+<p>For smaller projects where I don’t publish new versions through Docker, I
+instead use a shell script to transfer and run my software on the server.</p>
+<p><code>rsync</code> is a great fit here, as it transfers many small files (static assets and
+templates) efficiently, only transfers the binaries that actually changed, and
+doesn’t mind if the binary file it’s uploading is currently running (contrary to
+<a href="https://manpages.debian.org/scp.1"><code>scp(1)</code></a>
+, for example).</p>
+<p>To illustrate how such a script could look like, here’s my push script for
+<a href="https://codesearch.debian.net/">Debian Code Search</a>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#007020">#!/bin/zsh
+</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span><span style="color:#007020">set</span> -ex
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Asynchronously transfer assets while compiling:</span>
+</span></span><span style="display:flex;"><span><span style="color:#666">(</span>
+</span></span><span style="display:flex;"><span>    ssh root@dcs <span style="color:#4070a0">&#39;for i in $(seq 0 5); do mkdir -p /srv/dcs/shard${i}/{src,idx}; done&#39;</span>
+</span></span><span style="display:flex;"><span>    ssh root@dcs <span style="color:#4070a0">&#34;adduser --disabled-password --gecos &#39;Debian Code Search&#39; dcs || true&#34;</span>
+</span></span><span style="display:flex;"><span>    rsync -r systemd/ root@dcs:/etc/systemd/system/ &amp;
+</span></span><span style="display:flex;"><span>    rsync -r cmd/dcs-web/templates/ root@dcs:/srv/dcs/templates/ &amp;
+</span></span><span style="display:flex;"><span>    rsync -r static/ root@dcs:/srv/dcs/static/ &amp;
+</span></span><span style="display:flex;"><span>    <span style="color:#007020">wait</span>
+</span></span><span style="display:flex;"><span><span style="color:#666">)</span> &amp;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Compile a new Debian Code Search version:</span>
+</span></span><span style="display:flex;"><span><span style="color:#bb60d5">tmp</span><span style="color:#666">=</span><span style="color:#007020;font-weight:bold">$(</span>mktemp -d<span style="color:#007020;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>mkdir <span style="color:#bb60d5">$tmp</span>/bin
+</span></span><span style="display:flex;"><span><span style="color:#bb60d5">GOBIN</span><span style="color:#666">=</span><span style="color:#bb60d5">$tmp</span>/bin <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span><span style="color:#bb60d5">GOAMD64</span><span style="color:#666">=</span>v3 <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  go install <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  -ldflags <span style="color:#4070a0">&#39;-X github.com/Debian/dcs/cmd/dcs-web/common.Version=$version&#39;</span> <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  github.com/Debian/dcs/cmd/...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Transfer the Debian Code Search binaries:</span>
+</span></span><span style="display:flex;"><span>rsync <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  <span style="color:#bb60d5">$tmp</span>/bin/dcs-<span style="color:#666">{</span>web,source-backend,package-importer,compute-ranking,feeder<span style="color:#666">}</span> <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  <span style="color:#bb60d5">$tmp</span>/bin/dcs <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  root@dcs:/srv/dcs/bin/
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Wait for the asynchronous asset transfer to complete:</span>
+</span></span><span style="display:flex;"><span><span style="color:#007020">wait</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Restart Debian Code Search on the server:</span>
+</span></span><span style="display:flex;"><span><span style="color:#bb60d5">UNITS</span><span style="color:#666">=(</span>dcs-package-importer.service dcs-source-backend.service dcs-compute-ranking.timer dcs-web.service<span style="color:#666">)</span>
+</span></span><span style="display:flex;"><span>ssh root@dcs systemctl daemon-reload <span style="color:#4070a0;font-weight:bold">\&amp;\&amp;</span> <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  systemctl <span style="color:#007020">enable</span> <span style="color:#70a0d0;font-style:italic">${</span><span style="color:#bb60d5">UNITS</span><span style="color:#70a0d0;font-style:italic">}</span> <span style="color:#4070a0;font-weight:bold">\;</span> <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  systemctl reset-failed <span style="color:#70a0d0;font-style:italic">${</span><span style="color:#bb60d5">UNITS</span><span style="color:#70a0d0;font-style:italic">}</span> <span style="color:#4070a0;font-weight:bold">\;</span> <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  systemctl restart <span style="color:#70a0d0;font-style:italic">${</span><span style="color:#bb60d5">UNITS</span><span style="color:#70a0d0;font-style:italic">}</span> <span style="color:#4070a0;font-weight:bold">\;</span> <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  systemctl reload nginx
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>rm -rf <span style="color:#4070a0">&#34;</span><span style="color:#70a0d0;font-style:italic">${</span><span style="color:#bb60d5">tmp</span>?<span style="color:#70a0d0;font-style:italic">}</span><span style="color:#4070a0">&#34;</span>
+</span></span></code></pre></div><h2 id="backups-using-rsync">Scenario: Backups using rsync</h2>
+<p>The first backup system I used was
+<a href="https://en.wikipedia.org/wiki/Bacula">bacula</a>, which Wikipedia describes as an
+enterprise-level backup system. That certainly matches my impression, both in
+positive and negative ways: while bacula is very powerful, some seemingly common
+operations turn out quite complicated in bacula. Restoring a single file or
+directory tree from a backup was always more effort than I thought
+reasonable. For some reason, I often had to restore backup catalogs before I was
+able to access the backup contents (I don’t remember the exact details).</p>
+<p>When moving apartment last time, I used the opportunity to change my backup
+strategy. Instead of using complicated custom software with its own volume file
+format (like bacula), I wanted backed-up files to be usable on the file system
+level with standard tools like <code>rm</code>, <code>ls</code>, <code>cp</code>, etc.</p>
+<p>Working with files in a regular file system makes day-to-day usage easier, and
+also ensures that when my network storage hardware dies, I can just plug the
+hard disk into any PC, boot a Linux live system, and recover my data.</p>
+<p>To back up machines onto my <a href="/posts/2019-10-23-nas/">network storage PC</a>’s file
+system, I ended up with a <a href="https://github.com/stapelberg/zkj-nas-tools/blob/85e445a284c89590d595a52e16cb6dd652b1388e/dornroeschen/backup-remote.pl">hand-written rsync wrapper
+script</a>
+that copies the full file system of each machine into dated directory trees:</p>
+<pre tabindex="0"><code>storage2# ls -l backup/midna/2022-05-27
+bin   boot  etc  home  lib  lib64  media  opt
+proc  root  run  sbin  sys  tmp    usr    var
+
+storage2# ls -l backup/midna/2022-05-27/home/michael/configfiles/zshrc
+-rw-r--r--. 7 1000 1000 14554 May  9 19:37 backup/midna/2022-05-27/home/michael/configfiles/zshrc
+</code></pre><p>To revert my <code>~/.zshrc</code> to an older version, I can <a href="https://manpages.debian.org/scp.1"><code>scp(1)</code></a>
+ the file:</p>
+<pre tabindex="0"><code>midna% scp storage2:/srv/backup/midna/2022-05-27/home/michael/configfiles/zshrc ~/configfiles/zshrc
+</code></pre><p>To compare a whole older source tree, I can mount it using <a href="https://manpages.debian.org/sshfs.1"><code>sshfs(1)</code></a>
+:</p>
+<pre tabindex="0"><code>midna% mkdir /tmp/2022-05-27-i3
+midna% sshfs storage2:/srv/backup/midna/2022-05-27/$HOME/i3 /tmp/2022-05-27-i3
+midna% diff -ur /tmp/2022-05-27-i3 ~/i3/
+</code></pre><h3 id="incremental-backups">Incremental backups</h3>
+<p>Of course, the idea is not to transfer the full machine contents every day, as
+that would quickly fill up my network storage’s 16 TB disk! Instead, we can use
+rsync’s <code>--link-dest</code> option to elegantly deduplicate files using file system
+hard links:</p>
+<pre tabindex="0"><code>backup/midna/2022-05-26
+backup/midna/2022-05-27 # rsync --link-dest=2022-05-26
+</code></pre><p>To check the de-duplication level, we can use <a href="https://manpages.debian.org/du.1"><code>du(1)</code></a>
+,
+first on a single directory:</p>
+<pre tabindex="0"><code>storage2# du -hs 2022-05-27 
+113G	2022-05-27
+</code></pre><p>…and then on two subsequent directories:</p>
+<pre tabindex="0"><code>storage2# du -hs 2022-05-25 2022-05-27
+112G	2022-05-25
+7.3G	2022-05-27
+</code></pre><p>As you can see, the 2022-05-27 backup took 7.3 GB of disk space, and 104.7 GB
+were re-used from the previous backup(s).</p>
+<p>To print all files which have changed since the last backup, we can use:</p>
+<pre tabindex="0"><code>storage2# find 2022-05-27 -type f -links 1 -print
+</code></pre><h3 id="limitation-file-system-compatibility">Limitation: file system compatibility</h3>
+<p>A significant limitation of backups at the file level is that the destination
+file system (network storage) needs to support all the file system features used
+on the machines you are backing up.</p>
+<p>For example, if you use <a href="https://help.ubuntu.com/community/FilePermissionsACLs">POSIX
+ACLs</a> or <a href="https://wiki.archlinux.org/title/File_permissions_and_attributes#Extended_attributes">Extended
+attributes</a>
+(possibly for <a href="https://wiki.archlinux.org/title/Capabilities">Capabilities</a> or
+<a href="https://wiki.archlinux.org/title/SELinux">SELinux</a>), you need to ensure that
+your backup file system has these features enabled, and that you are using <a href="https://manpages.debian.org/rsync.1"><code>rsync(1)</code></a>
+’s <code>--xattrs</code> (or <code>-X</code> for short) option.</p>
+<p>This can turn from a pitfall into a dealbreaker as soon as multiple operating
+systems are involved. For example, the <code>rsync</code> version on macOS has
+<a href="https://github.com/apple-oss-distributions/rsync/blob/aa4e500aa53b9417014c718a5ff0e29215f08e48/rsync/generator.c#L1447">Apple-specific
+code</a>
+to work with Apple <a href="https://en.wikipedia.org/wiki/Resource_fork">resource forks</a>
+and other extended attributes. It’s not clear to me whether macOS <code>rsync</code> can
+send files to Linux <code>rsync</code>, restore them, and end up with the same system state.</p>
+<p>Luckily, I am only interested in backing up Linux systems, or merely home
+directories of non-Linux systems, where no extended attributes are used.</p>
+<h3 id="downside-slow-bulk-operations-disk-usage-deletion">Downside: slow bulk operations (disk usage, deletion)</h3>
+<p>The biggest downside of this architecture is that working with the directory
+trees in bulk can be very slow, especially when using a hard disk instead of an
+SSD. For example, deleting old backups can easily take many hours to multiple
+days (!). Sure, you can just let the <code>rm</code> command run in the background, but
+it’s annoying nevertheless.</p>
+<p>Even merely calculating the disk space usage of each directory tree is a
+painfully slow operation. I tried using stateful disk usage tools like
+<a href="http://duc.zevv.nl/">duc</a>, but it <a href="https://github.com/zevv/duc/issues/240">didn’t work
+reliably</a> on my backups.</p>
+<p>In practice, I found that for tracking down large files, using <a href="https://manpages.debian.org/ncdu.1"><code>ncdu(1)</code></a>
+ on any recent backup typically quickly shows the
+large file. In one case, I found <code>var/lib/postgresql</code> to consume many
+gigabytes. I excluded it in favor of using <a href="https://manpages.debian.org/pg_dump.1"><code>pg_dump(1)</code></a>
+, which resulted in much smaller backups!</p>
+<p>Unfortunately, even when using an SSD, determining which files take up most
+space of a full backup takes a few minutes:</p>
+<pre tabindex="0"><code>storage2# time du -hs backup/midna/2022-06-09
+742G	backup/midna/2022-06-09
+
+real	8m0.202s
+user	0m11.651s
+sys	2m0.731s
+</code></pre><h3 id="backup-transport-ssh-and-scheduling">Backup transport (SSH) and scheduling</h3>
+<p>To transfer data via <code>rsync</code> from the backup host to my network storage, I’m
+using SSH.</p>
+<p>Each machine’s SSH access is restricted in my network storage’s SSH <a href="https://manpages.debian.org/authorized_keys.5"><code>authorized_keys(5)</code></a>
+ config file to not allow arbitrary
+commands, but to perform just a specific operation. The only allowed operation
+in my case is running <code>rrsync</code> (“restricted rsync”) in a container whose file
+system only contains the backup host’s sub directory, e.g. .<code>websrv.zekjur.net</code>:</p>
+<pre tabindex="0"><code>command=&#34;/bin/docker run --log-driver none -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/websrv.zekjur.net:/srv/backup/websrv.zekjur.net stapelberg/docker-rsync /srv/backup/websrv.zekjur.net&#34;,no-port-forwarding,no-X11-forwarding ssh-ed25519 AAAAC3…
+</code></pre><p>(The <a href="/posts/2016-11-21-gigabit-nas-coreos/#dockerfiles-rrsync-and-samba">corresponding <code>Dockerfile</code> can be found in my Gigabit NAS
+article</a>.)</p>
+<p>To trigger such an SSH-protected <code>rsync</code> transfer remotely, I’m using a small
+custom scheduling program called
+<a href="https://github.com/stapelberg/zkj-nas-tools/tree/master/dornroeschen">dornröschen</a>. The
+program arranges for all involved machines to be powered on (using
+<a href="https://en.wikipedia.org/wiki/Wake-on-LAN">Wake-on-LAN</a>) and then starts
+<code>rsync</code> via <em>another operation-restricted SSH connection</em>.</p>
+<p>You could easily replace this with a cron job if you don’t care about WOL.</p>
+<p>The architecture looks like this:</p>
+<p><img src="2022-05-29-backup-architecture.svg" alt="backup architecture"></p>
+<p>The operation-restricted SSH connection on each backup host is configured in
+SSH’s <a href="https://manpages.debian.org/authorized_keys.5"><code>authorized_keys(5)</code></a>
+ config file:</p>
+<pre tabindex="0"><code>command=&#34;/root/backup-remote.pl&#34;,no-port-forwarding,no-X11-forwarding ssh-ed25519 AAAAC3…
+</code></pre><h2 id="next-up">Next up</h2>
+<p>The second article in this series is “rsync, article 2: Surroundings” (To be
+published). Now that we know what to use rsync for, how can we best integrate
+rsync into monitoring and alerting, and on which operating systems does it work?</p>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[rsync: Series Overview]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2022-06-18-rsync-overview/"/>
+    <id>https://michael.stapelberg.ch/posts/2022-06-18-rsync-overview/</id>
+    <published>2022-06-18T15:00:00+02:00</published>
+    <content type="html"><![CDATA[<p>For many years, I was only a casual user of
+<a href="https://en.wikipedia.org/wiki/Rsync">rsync</a> and used it mostly for one-off file
+transfers.</p>
+<p>Over time, I found rsync useful in more and more cases, and would recommend
+every computer user put this great tool into their toolbox 🛠 🧰 !</p>
+<p>I’m publishing a series of blog posts about rsync:</p>
+<ul>
+<li><a href="../2022-06-12-rsync-article-1-scenarios/">rsync, article 1: Scenarios</a>. To
+motivate why it makes sense to look at rsync, I present three scenarios for
+which I have come to appreciate rsync: DokuWiki transfers, Software deployment
+and Backups.</li>
+<li>rsync, article 2: Surroundings (To be published). Now that we know what to use
+rsync for, how can we best integrate rsync into monitoring and alerting, and
+on which operating systems does it work?</li>
+<li>rsync, article 3: How does rsync work? (To be published). With rsync up and
+running, it’s time to take a peek under the hood of rsync to better understand
+how it works.</li>
+<li>rsync, article 4: My own rsync implementation (To be published.)</li>
+</ul>
+]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[25 Gbit/s HTTP and HTTPS download speeds]]></title>
     <link href="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/"/>
     <id>https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/</id>
@@ -6062,308 +6293,6 @@ will reset the semaphore to non-blockingly wake up all waiters:</p>
 
 
 
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[Emacs: overriding the project.el project directory]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2021-04-02-emacs-project-override/"/>
-    <id>https://michael.stapelberg.ch/posts/2021-04-02-emacs-project-override/</id>
-    <published>2021-04-02T14:08:23+02:00</published>
-    <content type="html"><![CDATA[<p>I recently learnt about the Emacs package <code>project.el</code>, which is used to figure
-out which files and directories belong to the same project. This is <a href="https://github.com/joaotavora/eglot/blob/2fbcab293e11e1502a0128ca5f59de0ea7888a75/eglot.el#L738">used under
-the covers by
-<code>Eglot</code></a>,
-for example.</p>
-<p>In practice, a project is recognized by looking for Git repositories, which is a
-decent first approximation that often just works.</p>
-<p>But what if the detection fails? For example, maybe you want to anchor your
-project-based commands in a parent directory that contains multiple Git
-repositories.</p>
-<p>Luckily, we can provide our own entry to the <code>project-find-functions</code> hook, and
-look for a <code>.project.el</code> file in the parent directories:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-elisp" data-lang="elisp"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">;; Returns the parent directory containing a .project.el file, if any,</span>
-</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">;; to override the standard project.el detection logic when needed.</span>
-</span></span><span style="display:flex;"><span>(<span style="color:#007020">defun</span> <span style="color:#bb60d5">zkj-project-override</span> (<span style="color:#bb60d5">dir</span>)
-</span></span><span style="display:flex;"><span>  (<span style="color:#007020">let</span> ((<span style="color:#bb60d5">override</span> (<span style="color:#bb60d5">locate-dominating-file</span> <span style="color:#bb60d5">dir</span> <span style="color:#4070a0">&#34;.project.el&#34;</span>)))
-</span></span><span style="display:flex;"><span>    (<span style="color:#007020">if</span> <span style="color:#bb60d5">override</span>
-</span></span><span style="display:flex;"><span>      (<span style="color:#06287e">cons</span> <span style="color:#517918">&#39;vc</span> <span style="color:#bb60d5">override</span>)
-</span></span><span style="display:flex;"><span>      <span style="color:#60add5">nil</span>)))
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>(<span style="color:#007020">use-package</span> <span style="color:#bb60d5">project</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">;; Cannot use :hook because &#39;project-find-functions does not end in -hook</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">;; Cannot use :init (must use :config) because otherwise</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">;; project-find-functions is not yet initialized.</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#007020">:config</span>
-</span></span><span style="display:flex;"><span>  (<span style="color:#bb60d5">add-hook</span> <span style="color:#517918">&#39;project-find-functions</span> <span style="color:#06287e">#&#39;</span><span style="color:#bb60d5">zkj-project-override</span>))
-</span></span></code></pre></div><p>Now, we can use <code>touch .project.el</code> in any directory to make <code>project.el</code>
-recognize the directory as project root!</p>
-<p>By the way, in case you are unfamiliar, the configuration above uses
-<a href="https://github.com/jwiegley/use-package"><code>use-package</code></a>, which is a great way
-to (lazily, i.e. quickly!) load and configure Emacs packages.</p>
-<aside class="admonition note">
-  <div class="note-container">
-    <div class="note-icon" style="width: 20px; height: 20px">
-      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
-    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
-    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
-        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
-    </g>
-</svg>
-
-    </div>
-    <div class="admonition-content"><strong>Tip:</strong> With <a href="https://www.reddit.com/r/emacs/comments/jt8csn/fzf_from_project_root/">a few lines of
-code</a>,
-you can anchor helpful project-wide tools such as <code>fzf</code> (fuzzy finder) or <code>ag</code>
-(Ack Grep) in the <code>project.el</code> root, too!</div>
-  </div>
-</aside>
-
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[Eclipse: Enabling Compilation Database (CDB, compile_commands.json) in NXP MCUXpresso v11.3]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/"/>
-    <id>https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/</id>
-    <published>2021-04-01T11:59:23+02:00</published>
-    <content type="html"><![CDATA[<p>NXP’s Eclipse-based MCUXpresso IDE is the easiest way to make full use of the
-hardware debugging features of modern NXP micro controllers such as the <a href="https://www.nxp.com/products/processors-and-microcontrollers/arm-microcontrollers/i-mx-rt-crossover-mcus/i-mx-rt1060-crossover-mcu-with-arm-cortex-m7-core:i.MX-RT1060">i.MX
-RT1060</a>
-found on the <a href="https://www.nxp.com/design/development-boards/i-mx-evaluation-and-development-boards/mimxrt1060-evk-i-mx-rt1060-evaluation-kit:MIMXRT1060-EVK">NXP i.MX RT1060 Evaluation Kit
-(<code>MIMXRT1060-EVK</code>)</a>,
-which I use for Teensy 4 development.</p>
-<p>For projects that are fully under your control, such as imported SDK examples,
-or anything you created within Eclipse, you wouldn’t necessarily need
-Compilation Database support.</p>
-<p>When working with projects of type <code>Makefile Project with Existing Code</code>,
-however, Eclipse doesn’t know about preprocessor definition flags and include
-directories, unless you would manually duplicate them. In large and
-fast-changing projects, this is not an option.</p>
-<p>The lack of compiler configuration knowledge (defines and include directories)
-breaks various C/C++ tooling features, such as Macro Expansion or the <code>Open Declaration</code> feature, both of which are an essential tool in my toolbelt, and
-particularly useful in large code bases such as micro controller projects with
-various SDKs etc.</p>
-<p>In some configurations, Eclipse might be able to parse GCC build output, but
-when I was working with the <a href="https://qmk.fm/">QMK keyboard firmware</a>, I couldn’t
-get the QMK makefiles to print commands that Eclipse would understand, not even
-with <code>VERBOSE=true</code>.</p>
-<p>Luckily, there is a solution! <a href="https://wiki.eclipse.org/CDT/User/NewIn910#Build">Eclipse CDT 9.10 introduced Compilation Database
-support</a> in 2019. MCUXpresso
-v11.3.0 ships with CDT 9.11.1.202006011430, meaning it does contain Compilation
-Database support.</p>
-<p>In case you want to check which version your installed IDE has, open <code>Help</code> →
-<code>About MCUXpresso IDE</code>, click <code>Installation Details</code>, open the <code>Features</code> tab,
-then locate the <code>Eclipse CDT</code>, <code>C/C++ Development Platform</code> line.</p>
-<p>For comparison, Eclipse IDE 2021-03 contains 10.2.0.202103011047, if you want to
-verify that the issues I reference below are indeed fixed.</p>
-<h2 id="bug-command-vs-arguments">Bug: command vs. arguments</h2>
-<p>Before we can enable Compilation Database support, we need to ensure we have a
-compatible <code>compile_commands.json</code> database file. Eclipse CDT’s Compilation
-Database support before version CDT 10 suffered from <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=563006">Bug
-563006</a>: it only
-understood the <code>command</code> JSON property, not the <code>arguments</code> property.</p>
-<p>Depending on your build system, this isn’t a problem. For example, Meson/ninja’s
-<code>compile_commands.json</code> uses <code>command</code> and will work fine.</p>
-<p>But, when using Make with <a href="https://github.com/rizsotto/Bear">Bear</a>, you will end
-up with <code>arguments</code> by default.</p>
-<p>Bear 3.0 allows generating a <code>compile_commands.json</code> Compilation Database with
-<code>command</code>, but <a href="https://github.com/rizsotto/Bear/issues/196#issuecomment-691748584">requires multiple commands and config
-files</a>,
-which is a bit inconvenient with Eclipse.</p>
-<p>So, let’s put the extra commands into a <code>commandbear.sh</code> script:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#007020">#!/bin/sh
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>
-</span></span><span style="display:flex;"><span><span style="color:#007020">set</span> -eux
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>intercept --output commands.json -- <span style="color:#4070a0">&#34;</span><span style="color:#bb60d5">$@</span><span style="color:#4070a0">&#34;</span>
-</span></span><span style="display:flex;"><span>citnames <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  --input commands.json <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  --output compile_commands.json <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  --config config.json
-</span></span></code></pre></div><p>The <code>&quot;command_as_array&quot;: false</code> option goes into <code>config.json</code>:</p>
-<pre tabindex="0"><code>{
-  &#34;compilation&#34;: {
-  },
-  &#34;output&#34;: {
-    &#34;content&#34;: {
-      &#34;include_only_existing_source&#34;: true
-    },
-    &#34;format&#34;: {
-      &#34;command_as_array&#34;: false,
-      &#34;drop_output_field&#34;: false
-    }
-  }
-}
-</code></pre><p>Don’t forget to make the script executable:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>chmod +x commandbear.sh
-</span></span></code></pre></div><p>Then configure Eclipse to use the <code>commandbear.sh</code> script to build:</p>
-<ol>
-<li>Open Project Properties by right-clicking your project in the Project
-Explorer panel.</li>
-<li>Select <code>C/C++ Build</code> and open the <code>Builder Settings</code> tab</li>
-<li>In the <code>Builder</code> group, set the <code>Build command</code> text field to:
-<code>${workspace_loc:/qmk_firmware}/commandbear.sh make -j16</code></li>
-</ol>
-<p>Verify your build is working by selecting <code>Project</code> → <code>Clean…</code> and triggering a
-build.</p>
-<h2 id="enabling-compilation-database-support">Enabling Compilation Database support</h2>
-<ol>
-<li>Open Project Properties by right-clicking your project in the Project
-Explorer panel.</li>
-<li>Expand <code>C/C++ General</code>, select <code>Preprocessor Include Paths, Macros etc.</code> and
-open the <code>Providers</code> tab.</li>
-<li>Untick everything but:
-<ul>
-<li>MCU GCC Built-in Compiler Parser</li>
-<li>MCU GCC Build Output Parser</li>
-<li>Compilation Database Parser</li>
-</ul>
-</li>
-<li>Select <code>Compilation Database Parser</code>, click <code>Apply</code> to make the Compilation
-Database text field editable.</li>
-<li>Put a full path to your compile_commands.json file into the text field,
-e.g. <code>/home/michael/kinx/workspace/qmk_firmware/compile_commands.json</code>. Note
-that variables will not be expanded! Support for using variables was added
-later in <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=559186">Bug 559186</a>.</li>
-<li>Select <code>MCU GCC Build Output Parser</code> as <code>Build parser</code>.</li>
-<li>Tick the <code>Exclude files not in the Compilation Database</code> checkbox.</li>
-<li>Click <code>Apply and Close</code>.</li>
-</ol>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-1.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-1_hu2472da729552826bf692ea90f41fcb42_1282459_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-1_hu2472da729552826bf692ea90f41fcb42_1282459_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-1_hu2472da729552826bf692ea90f41fcb42_1282459_600x0_resize_q75_box.jpg"
-  alt="Compilation Database Parser settings" title="Compilation Database Parser settings"
-  width="600"
-  height="562"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-<p>You will know Compilation Database support works when its progress view shows
-up:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-2.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-2_hu3785c06d044add2745f30f8a2a36e111_353949_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-2_hu3785c06d044add2745f30f8a2a36e111_353949_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-2_hu3785c06d044add2745f30f8a2a36e111_353949_600x0_resize_q75_box.jpg"
-  alt="Compilation Database progress" title="Compilation Database progress"
-  width="600"
-  height="179"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-<p>If you have an incompatible or empty <code>compile_commands.json</code>, nothing visible
-will happen (no progress indicator or error messages).</p>
-<p>After indexing completes, you should see:</p>
-<ol>
-<li>Files that were not used as greyed out in the <code>Project Explorer</code></li>
-<li><code>Open Declaration</code> in the context menu of a selected identifier (or <code>F3</code>)
-should jump to the correct file. For example, my test sequence for this
-feature in the QMK repository is:
-<ul>
-<li>in <code>tmk_core/protocol/chibios/main.c</code>, open <code>init_usb_driver</code></li>
-<li>open <code>usbStart</code>, should bring up <code>lib/chibios</code> git submodule</li>
-<li>open <code>usb_lld_start</code>, should bring up <code>MIMXRT1062</code> port</li>
-</ul>
-</li>
-<li>Macros expanded correctly, e.g. <code>MIMXRT1062_USB_USE_USB1</code> in the following
-example</li>
-</ol>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-6.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-6_hu9efc4b93b6aefec1d634e69f8dd62cd0_914059_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-6_hu9efc4b93b6aefec1d634e69f8dd62cd0_914059_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-6_hu9efc4b93b6aefec1d634e69f8dd62cd0_914059_600x0_resize_q75_box.jpg"
-  alt="Compilation Database in effect: files greyed out and macros expanded" title="Compilation Database in effect: files greyed out and macros expanded"
-  width="600"
-  height="301"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-<h2 id="slow-file-exclusion-in-projects-with-many-files">Slow file exclusion in projects with many files</h2>
-<p><a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=565457">Bug 565457</a> explains an
-optimization in the algorithm used to generate the list of excluded paths, which
-I would summarize as “use whole directories instead of individual files”.</p>
-<p>This optimization was introduced later, so in MCUXpresso v11.3, we still have to
-endure watching the slow algorithm for a few seconds:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-4.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-4_hu3785c06d044add2745f30f8a2a36e111_391538_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-4_hu3785c06d044add2745f30f8a2a36e111_391538_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-4_hu3785c06d044add2745f30f8a2a36e111_391538_600x0_resize_q75_box.jpg"
-  alt="Compilation Database exclusion slow" title="Compilation Database exclusion slow"
-  width="600"
-  height="179"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-<h2 id="conclusion">Conclusion</h2>
-<p>NXP, please release a new MCUXpresso IDE with a more recent CDT version!</p>
-<p>The improvements in the newer version would make the setup so much simpler.</p>
 ]]></content>
   </entry>
 </feed>

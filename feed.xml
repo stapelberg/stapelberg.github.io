@@ -6,6 +6,406 @@
   <id>https://michael.stapelberg.ch/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[rsync, article 3: How does rsync work?]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/"/>
+    <id>https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/</id>
+    <published>2022-07-02T14:30:10+02:00</published>
+    <content type="html"><![CDATA[<p>This post is the third article in a series of blog posts about rsync, <a href="../2022-06-18-rsync-overview/">see the
+Series Overview</a>.</p>
+<p>With rsync up and running, it’s time to take a peek under the hood of rsync to
+better understand how it works.</p>
+<h2 id="howdoesrsyncwork">How does rsync work?</h2>
+<p>When talking about the rsync protocol, we need to distinguish between:</p>
+<ul>
+<li>protocol-level roles: “sender” and “receiver”</li>
+<li>TCP roles: “client” and “server”</li>
+</ul>
+<p>All roles can be mixed and matched: both rsync clients (or servers!) can
+either send or receive.</p>
+<p>Now that you know the terminology, let’s take a high-level look at the rsync
+protocol. We’ll look at protocol version 27, which is older but simpler, and
+which is the most widely supported protocol version, implemented by <code>openrsync</code>
+and other third-party implementations:</p>
+<p><img src="2022-05-29-rsync-logical-view.svg" alt="rsync architecture"></p>
+<p>The rsync protocol can be divided into two phases:</p>
+<ol>
+<li>
+<p>In the first phase, the sender walks the local file tree to generate and send
+the <em>file list</em> to the receiver. The file list must be transferred in full,
+because both sides sort it by filename (later rsync protocol versions
+eliminate this synchronous sorting step).</p>
+</li>
+<li>
+<p>In the second phase, concurrently:</p>
+<ul>
+<li>The receiver compares and requests each file in the file list. The
+receiver requests the full file when it didn’t exist on disk yet, or it
+will send checksums for the rsync <em>hash search</em> algorithm when the file
+already existed.</li>
+<li>The receiver receives file data from the sender. The sender answers the
+requests with just enough data to reconstruct the current file contents
+based on what’s already on the receiver.</li>
+</ul>
+</li>
+</ol>
+<p>The architecture makes it easy to implement the second phase in 3 separate
+processes, each of which sending to the network as fast as possible using heavy
+pipelining. This results in utilizing the available hardware resources (I/O,
+CPU, network) on sender and receiver to the fullest.</p>
+<h3 id="observing-rsyncs-transfer-phases">Observing rsync’s transfer phases</h3>
+<p>When starting an rsync transfer, looking at the resource usage of both
+machines allows us to confirm our understanding of the rsync architecture, and
+to pin-point any bottlenecks:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hua2f50278895cfbee4dc18c7ea60b6d4a_2093260_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hua2f50278895cfbee4dc18c7ea60b6d4a_2093260_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hua2f50278895cfbee4dc18c7ea60b6d4a_2093260_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="331"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+<ol>
+<li>phase: The rsync sender needs 17 seconds to walk the file system and send
+the file list. The rsync receiver reads from the network and writes into RAM
+during that time.
+<ul>
+<li>This phase is random I/O (querying file system metadata) for the sender.</li>
+</ul>
+</li>
+<li>phase: Afterwards, the rsync sender reads from disk and sends to the
+network. The rsync receiver receives from the network and writes to disk.
+<ul>
+<li>The receiver does roughly the same amount of random I/O as the sender did
+in phase 1, as it needs to create directories and request missing files.</li>
+<li>The sender does sequential disk reads and possibly checksum calculation, if
+the file(s) existed on the receiver side.</li>
+</ul>
+</li>
+</ol>
+<p>(Again, the above was captured using rsync protocol version 27, later rsync
+protocol versions don’t synchronize after completing phase 1, but instead
+interleave the phases more.)</p>
+<h3 id="rsync-hash-search">rsync hash search</h3>
+<p>Up until now, we have described the rsync protocol at a high level. Let’s zoom
+into the hash search step, which is what many people might associate with the
+term “rsync algorithm”.</p>
+<p>When a file exists on both sides, rsync sender and receiver, the receiver first
+divides the file into blocks. The block size is a rounded square root of the
+file’s length. The receiver then sends the checksums of all blocks to the
+sender. In response, the sender finds matching blocks in the file and sends only
+the data needed to reconstruct the file on the receiver side.</p>
+<p>Specifically, the sender goes through <strong>each byte</strong> of the file and tries to
+match existing receiver content. To make this less computationally expensive,
+rsync combines two checksums.</p>
+<p>rsync first calculates what it calls the
+<a href="https://github.com/WayneD/rsync/blob/0ac7ebceef70417355f25daf9e2fd94e84c49749/checksum.c#L182-L203">“sum1”</a>,
+or “fast signature”. This is a small checksum (two <code>uint16</code>) that can be
+calculated with minimal effort for a rolling window over the file data. tridge
+rsync comes with <a href="https://github.com/WayneD/rsync/blob/v3.2.4/simd-checksum-x86_64.cpp">SIMD
+implementations</a>
+to further speed this up where possible.</p>
+<p>Only if the sum1 matches will
+<a href="https://github.com/WayneD/rsync/blob/0ac7ebceef70417355f25daf9e2fd94e84c49749/checksum.c#L205-L300">“sum2”</a>
+(or “strong signature”) be calculated, a 16-byte MD4 hash. Newer protocol
+versions allow negotiating the hash algorithm and support the much faster xxhash
+algorithms.</p>
+<p>If sum2 matches, the block is considered equal on both sides.</p>
+<p>Hence, the best case for rsync is when a file has either not changed at all, or
+shares as many full blocks of content as possible with the old contents.</p>
+<h2 id="changing-data-sets">Changing data sets</h2>
+<p>Now that we know how rsync works on the file level, let’s take a step back to
+the data set level.</p>
+<p>The easiest situation is when you transfer a data set that is not currently
+changing. But what happens when the data set changes while your rsync transfer
+is running? Here are two examples.</p>
+<p><a href="https://github.com/Debian/debiman">debiman</a>, the manpage generator powering
+<a href="https://manpages.debian.org/">manpages.debian.org</a> is running on a Debian VM on
+which an rsync job periodically transfers the static manpage archive to
+different static web servers across the world. The rsync job and debiman are
+not sequenced in any way. Instead, debiman is careful to only ever <a href="https://github.com/Debian/debiman/blob/79b8abe8573daaaf15e4cf40e85daf309e00d454/internal/write/atomically.go#L23">atomically
+swap out
+files</a>
+in its output directory, or add new files before it swaps out an updated index.</p>
+<p>The second example, the <a href="https://en.wikipedia.org/wiki/PostgreSQL">PostgreSQL</a>
+database management system, is the opposite situation: instead of having full
+control over how files are laid out, here I don’t have control over how files
+are written (this generalizes to any situation where the model of only ever
+replacing files is not feasible). The data files which my Postgres installation
+keeps on disk are not great to synchronize using rsync: they are large and
+frequently change. Instead, I now exempt them from my rsync transfer and use <a href="https://manpages.debian.org/pg_dump.1"><code>pg_dump(1)</code></a>
+ to create a snapshot of my databases instead.</p>
+<p>To confirm rsync’s behavior regarding changing data sets in detail, I <a href="#confirmation-hack">modified
+rsync to ask for confirmation</a> between generating the file
+list and transferring the files. Here’s what I found:</p>
+<ul>
+<li>If files are added after rsync has transferred the file list, the new files
+will just not be part of the transfer.</li>
+<li>If a file vanishes between generating the file list and transfering the file,
+rsync exits with status code 24, which <a href="https://manpages.debian.org/bullseye/rsync/rsync.1.en.html#EXIT_VALUES">its manpage documents as “Partial
+transfer due to vanished source
+files”</a>. My
+<code>rsyncprom</code> monitoring wrapper <a href="https://github.com/stapelberg/rsyncprom/commit/bbf82934093b938d054d460a7f9764234d30bc17">offers a flag to treat exit code 24 like exit
+code
+0</a>,
+because depending on the data set, vanishing files are expected.</li>
+<li>If a file’s contents change (no matter whether the file grows, shrinks, or is
+modified in-place) between generating the file list and the actual file
+transfer, that’s not a problem — rsync will transfer the file contents as it
+reads them once the transfer starts. Note that this might be an inconsistent
+view of the data, depending on the application.
+<ul>
+<li>Ideally, don’t ever modify files within a data set that is rsynced. Instead,
+atomically move complete files into the data set.</li>
+</ul>
+</li>
+</ul>
+<p>Another way of phrasing the above is that data consistency is not something that
+rsync can in any way guarantee. It’s up to you to either live with the
+inconsistency (often a good-enough strategy!), or to add an extra step that
+ensures the data set you feed to rsync is consistent.</p>
+<h2 id="next-up">Next up</h2>
+<p>The fourth article in this series is rsync, article 4: My own rsync
+implementation (To be published.)</p>
+<h2 id="confirmation-hack">Appendix A: rsync confirmation hack</h2>
+<p>For verifying rsync’s behavior with regards to changing data sets, I checked
+out the following version:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% git clone https://github.com/WayneD/rsync/ rsync-changing-data-sets
+</span></span><span style="display:flex;"><span>% <span style="color:#007020">cd</span> rsync-changing-data-sets
+</span></span><span style="display:flex;"><span>% git checkout v3.2.4
+</span></span><span style="display:flex;"><span>% ./configure
+</span></span><span style="display:flex;"><span>% make
+</span></span></code></pre></div><p>Then, I modified <code>flist.c</code> to add a confirmation step between sending the file
+list and doing the actual file transfers:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/flist.c w/flist.c
+</span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">index 1ba306bc..98981f34 100644
+</span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold"></span><span style="color:#a00000">--- i/flist.c
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ w/flist.c
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -20,6 +20,8 @@
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>  * with this program; if not, visit the http://fsf.org website.
+</span></span><span style="display:flex;"><span>  */
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span><span style="color:#00a000">+#include &lt;stdio.h&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> #include &#34;rsync.h&#34;
+</span></span><span style="display:flex;"><span> #include &#34;ifuncs.h&#34;
+</span></span><span style="display:flex;"><span> #include &#34;rounding.h&#34;
+</span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -2516,6 +2518,17 @@ struct file_list *send_file_list(int f, int argc, char *argv[])
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span> 	if (DEBUG_GTE(FLIST, 2))
+</span></span><span style="display:flex;"><span> 		rprintf(FINFO, &#34;send_file_list done\n&#34;);
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span><span style="color:#00a000">+	char *line = NULL;
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	size_t llen = 0;
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	ssize_t nread;
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	printf(&#34;file list sent. enter &#39;yes&#39; to continue: &#34;);
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	while ((nread = getline(&amp;line, &amp;llen, stdin)) != -1) {
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	  if (nread == strlen(&#34;yes\n&#34;) &amp;&amp; strcasecmp(line, &#34;yes\n&#34;) == 0) {
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	    break;
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	  }
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	  printf(&#34;enter &#39;yes&#39; to continue: &#34;);
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	}
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 	if (inc_recurse) {
+</span></span><span style="display:flex;"><span> 		send_dir_depth = 1;
+</span></span><span style="display:flex;"><span> 		add_dirs_to_tree(-1, flist, stats.num_dirs);
+</span></span></code></pre></div><p>My rsync invocation is:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>./rsync -av --debug<span style="color:#666">=</span>all4 --protocol<span style="color:#666">=</span><span style="color:#40a070">27</span> ~/i3/src /tmp/DEST/
+</span></span></code></pre></div><p>It’s necessary to use an older protocol version to make rsync generate a full
+file list before starting the transfer. Later protocol versions interleave these
+parts of the protocol.</p>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[rsync, article 2: Surroundings]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/"/>
+    <id>https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/</id>
+    <published>2022-07-02T14:30:00+02:00</published>
+    <content type="html"><![CDATA[<p>This post is the second article in a series of blog posts about rsync, <a href="../2022-06-18-rsync-overview/">see the
+Series Overview</a>.</p>
+<p>Now that we know what to use rsync for, how can we best integrate rsync into
+monitoring and alerting, and on which operating systems does it work?</p>
+<h2 id="monitoring-and-alerting-for-rsync-jobs-using-prometheus">Monitoring and alerting for rsync jobs using Prometheus</h2>
+<p>Once you have one or two important <code>rsync</code> jobs, it might make sense to alert
+when your job has not completed as expected.</p>
+<p>I’m using <a href="https://prometheus.io/">Prometheus</a> for all my monitoring and alerting.</p>
+<p>Because Prometheus <em>pulls</em> metrics from its (typically always-running) targets,
+we need an extra component: the <a href="https://prometheus.io/docs/practices/pushing/">Prometheus
+Pushgateway</a>. The Pushgateway
+stores metrics pushed by short-lived jobs like <code>rsync</code> transfers and makes them
+available to subsequent Prometheus pulls.</p>
+<p>To integrate <code>rsync</code> with the Prometheus Pushgateway, I wrote
+<a href="https://github.com/stapelberg/rsyncprom"><code>rsyncprom</code></a>, a small tool that wraps
+<code>rsync</code>, or parses rsync output supplied by you. Once <code>rsync</code> completes,
+<code>rsyncprom</code> pushes the rsync exit code and parsed statistics about the transfer
+to your Pushgateway.</p>
+<h3 id="prometheus-server-side-setup">Prometheus server-side setup</h3>
+<p>First, I set up the Prometheus Pushgateway (via Docker and systemd) on my
+server.</p>
+<p>Then, in my <code>prometheus.conf</code> file, I instruct Prometheus to pull data from my
+Pushgateway:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># prometheus.conf</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">rule_files</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>- backups.rules.yml<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">scrape_configs</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#60a0b0;font-style:italic"># […]</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>- <span style="color:#062873;font-weight:bold">job_name</span>:<span style="color:#bbb"> </span>pushgateway<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">honor_labels</span>:<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">true</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">static_configs</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">targets</span>:<span style="color:#bbb"> </span>[<span style="color:#4070a0">&#39;pushgateway:9091&#39;</span>]<span style="color:#bbb">
+</span></span></span></code></pre></div><p>Finally, in <code>backups.rules.yml</code>, I configure an alert on the time series <code>rsync_exit_code</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># backups.rules.yml</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">groups</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>backups.rules<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">rules</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">alert</span>:<span style="color:#bbb"> </span>RsyncFailing<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">expr</span>:<span style="color:#bbb"> </span>rsync_exit_code{job=&#34;rsync&#34;} &gt; 0<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">for</span>:<span style="color:#bbb"> </span>1m<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">labels</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">job</span>:<span style="color:#bbb"> </span>rsync<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">annotations</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">description</span>:<span style="color:#bbb"> </span>rsync {{ $labels.instance }} is failing<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">summary</span>:<span style="color:#bbb"> </span>rsync {{ $labels.instance }} is failing<span style="color:#bbb">
+</span></span></span></code></pre></div><p>This alert will fire any time an rsync job monitored via <code>rsyncprom</code> exits with
+a non-zero exit code.</p>
+<h3 id="rsync-client-side-setup">rsync client-side setup</h3>
+<p>On each machine that runs <code>rsync</code> jobs I want to monitor, I first install
+<code>rsyncprom</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>go install github.com/stapelberg/rsyncprom/cmd/rsync-prom@latest
+</span></span></code></pre></div><p>Then, I just wrap <code>rsync</code> transfers where it’s most convenient, for example in
+my <a href="https://manpages.debian.org/crontab.5"><code>crontab(5)</code></a>
+:</p>
+<pre tabindex="0"><code class="language-crontab" data-lang="crontab"># crontab -e
+9 9 * * * /home/michael/go/bin/rsync-prom --job=&#34;cron&#34; --instance=&#34;gphotos-sync@midna&#34; -- /home/michael/gphotos-sync/sync.sh
+</code></pre><p>The same wrapper technique works in <a href="https://github.com/stapelberg/rsyncprom#setup-example-systemd">shell scripts or systemd service
+files</a>.</p>
+<p>You can also provide <code>rsync</code> output <a href="https://github.com/stapelberg/zkj-nas-tools/blob/02d46d718df60c413844d9218f6dd702ad94e5f1/dornroeschen/sshutil.go#L134-L139">from Go
+code</a>
+(this example runs <code>rsync</code> via SSH).</p>
+<h3 id="monitoring-architecture">Monitoring architecture</h3>
+<p>Here’s how the whole setup looks like architecturally:</p>
+<p><img src="2022-05-29-rsync-prom-architecture.svg" alt="rsync-prom architecture"></p>
+<p>The rsync scheduler runs on a Raspberry Pi running
+<a href="https://gokrazy.org/">gokrazy</a>. The scheduler invokes the <code>rsync</code> job to back
+up <em>websrv.zekjur.net</em> via SSH and sends the output to Prometheus, which is
+running on a (different) server at an ISP.</p>
+<h3 id="monitoring-dashboard">Monitoring dashboard</h3>
+<p>The grafana dashboard looks like this in action:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu49255cbd0611171ac9ea093d82565708_603964_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu49255cbd0611171ac9ea093d82565708_603964_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu49255cbd0611171ac9ea093d82565708_603964_600x0_resize_q75_box.jpg"
+  alt="rsync grafana dashboard" title="rsync grafana dashboard"
+  width="600"
+  height="469"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+<ul>
+<li>The top left table shows the most recent rsync exit code, green means 0 (success).</li>
+<li>The top right graph shows rsync runtime (wall-clock time) over time. Long
+runtime can have any number of bottlenecks as the reason: network connections,
+storage devices, slow CPUs.</li>
+<li>The bottom left graph shows rsync dataset size over time. This allows you to
+quickly pinpoint transfers that are filling your disk up.</li>
+<li>The bottom right graph shows transferred bytes per rsync over time. The higher
+the value, the higher the amount of change in your data set between
+synchronization runs.</li>
+</ul>
+<h2 id="rsync-operating-system-availability">rsync operating system availability</h2>
+<p>Now that we have learnt about a couple of typical use-cases, where can you use
+<code>rsync</code> to implement these use-cases? The answer is: in most environments, as
+<code>rsync</code> is widely available on different Linux and BSD versions.</p>
+<p>Macs come with <code>rsync</code> available by default (but it’s an old, patched version),
+and OpenBSD comes with a BSD-licensed implementation called
+<a href="https://www.openrsync.org/">openrsync</a> by default.</p>
+<p>On Windows, you can use the <a href="https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux">Windows Subsystem for
+Linux</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Operating System</th>
+<th>Implementation</th>
+<th>Version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FreeBSD 13.1 (ports)</td>
+<td>tridge</td>
+<td><a href="https://www.freebsd.org/cgi/man.cgi?query=rsync&amp;manpath=FreeBSD+13.1-RELEASE+and+Ports">3.2.3</a></td>
+</tr>
+<tr>
+<td>OpenBSD 7.1</td>
+<td>openrsync</td>
+<td>(7.1)</td>
+</tr>
+<tr>
+<td>OpenBSD 7.1 (ports)</td>
+<td>tridge</td>
+<td><a href="https://openports.se/net/rsync">3.2.4</a></td>
+</tr>
+<tr>
+<td>NetBSD 9.2 (pkgsrc)</td>
+<td>tridge</td>
+<td><a href="https://ftp.netbsd.org/pub/pkgsrc/current/pkgsrc/net/rsync/index.html">3.2.4</a></td>
+</tr>
+<tr>
+<td>Linux</td>
+<td>tridge</td>
+<td><a href="https://repology.org/project/rsync/versions">repology</a></td>
+</tr>
+<tr>
+<td>macOS</td>
+<td>tridge</td>
+<td><a href="https://www.unix.com/man-page/osx/1/rsync/">2.6.9</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="next-up">Next Up</h2>
+<p>The third article in this series is <a href="../2022-07-02-rsync-how-does-it-work/">rsync, article 3: How does rsync
+work?</a>. With rsync up and running, it’s
+time to take a peek under the hood of rsync to better understand how it works.</p>
+]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[rsync, article 1: Scenarios]]></title>
     <link href="https://michael.stapelberg.ch/posts/2022-06-18-rsync-article-1-scenarios/"/>
     <id>https://michael.stapelberg.ch/posts/2022-06-18-rsync-article-1-scenarios/</id>
@@ -205,9 +605,10 @@ SSH’s <a href="https://manpages.debian.org/authorized_keys.5"><code>authorized
  config file:</p>
 <pre tabindex="0"><code>command=&#34;/root/backup-remote.pl&#34;,no-port-forwarding,no-X11-forwarding ssh-ed25519 AAAAC3…
 </code></pre><h2 id="next-up">Next up</h2>
-<p>The second article in this series is “rsync, article 2: Surroundings” (To be
-published). Now that we know what to use rsync for, how can we best integrate
-rsync into monitoring and alerting, and on which operating systems does it work?</p>
+<p>The second article in this series is <a href="../2022-07-02-rsync-surroundings/">rsync, article 2:
+Surroundings</a>. Now that we know what to use
+rsync for, how can we best integrate rsync into monitoring and alerting, and on
+which operating systems does it work?</p>
 ]]></content>
   </entry>
   <entry>
@@ -226,12 +627,12 @@ every computer user put this great tool into their toolbox 🛠 🧰 !</p>
 motivate why it makes sense to look at rsync, I present three scenarios for
 which I have come to appreciate rsync: DokuWiki transfers, Software deployment
 and Backups.</li>
-<li>rsync, article 2: Surroundings (To be published). Now that we know what to use
-rsync for, how can we best integrate rsync into monitoring and alerting, and
-on which operating systems does it work?</li>
-<li>rsync, article 3: How does rsync work? (To be published). With rsync up and
-running, it’s time to take a peek under the hood of rsync to better understand
-how it works.</li>
+<li><a href="../2022-07-02-rsync-surroundings/">rsync, article 2: Surroundings</a>. Now that
+we know what to use rsync for, how can we best integrate rsync into monitoring
+and alerting, and on which operating systems does it work?</li>
+<li><a href="../2022-07-02-rsync-how-does-it-work">rsync, article 3: How does rsync
+work?</a>. With rsync up and running, it’s
+time to take a peek under the hood of rsync to better understand how it works.</li>
 <li>rsync, article 4: My own rsync implementation (To be published.)</li>
 </ul>
 ]]></content>
@@ -5191,1109 +5592,6 @@ kernel: mlx4_core 0000:01:00.0: Multiple PFs not yet supported - Skipping PF
 kernel: mlx4_core 0000:01:00.0: mlx4_pci_resume: mlx4_load_one failed, err=-22
 kernel: pcieport 0000:00:1c.0: AER: device recovery successful
 </code></pre><p>What helped was to update the X11SSZ-QF BIOS to the latest version.</p>
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[Measure and reduce keyboard input latency with QMK on the Kinesis Advantage]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/"/>
-    <id>https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/</id>
-    <published>2021-05-08T15:57:00+02:00</published>
-    <content type="html"><![CDATA[<p>Over the last few years, I worked on a few projects around keyboard input latency:</p>
-<p>In 2018, I introduced the <a href="/posts/2018-04-17-kinx/">kinX keyboard controller with 0.2ms of input
-latency</a>.</p>
-<p>In 2020, I introduced the <a href="/posts/2020-07-09-kint-kinesis-keyboard-controller/">kinT keyboard
-controller</a>, which works
-with a wide range of Teensy micro controllers, and both the old KB500 and the
-newer KB600 Kinesis Advantage models.</p>
-<p>While the 2018 kinX controller had built-in latency measurement, I was starting
-from scratch with the kinT design, where I wanted to use the QMK keyboard
-firmware instead of my own firmware.</p>
-<p>That got me thinking: instead of adjusting the firmware to self-report latency
-numbers, is there a way we can do latency measurements externally, ideally
-without software changes?</p>
-<p>This article walks you through how to set up a measurement environment for your
-keyboard controller’s input latency, be it original or self-built. I’ll use a
-Kinesis Advantage keyboard, but this approach should generalize to all
-keyboards.</p>
-<p>I will explain a few common causes for extra keyboard input latency and show you
-how to fix them in the QMK keyboard firmware.</p>
-<h2 id="measurement-setup">Measurement setup</h2>
-<p>The idea is to connect a <a href="https://www.pjrc.com/store/teensy40.html">Teensy 4.0</a>
-(or similar), which simulates pressing the Caps Lock key and measures the
-duration until the keypress resulted in a Caps Lock LED change.</p>
-<p>We use the Caps Lock key because it is one of the few keys that results in an
-LED change.</p>
-<p>Here you can see the Teensy 4.0 connected to the <a href="https://github.com/kinx-project/kint/">kinT
-controller</a>, connected to a laptop:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/endtoend_measure_featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/endtoend_measure_featured_hu855bbe0a9c47ac557e5b09db74fa3b06_1237431_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/endtoend_measure_featured_hu855bbe0a9c47ac557e5b09db74fa3b06_1237431_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/endtoend_measure_featured_hu855bbe0a9c47ac557e5b09db74fa3b06_1237431_600x0_resize_q75_box.jpg"
-  alt="measurement setup" title="measurement setup"
-  width="600"
-  height="450"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-<h3 id="enable-the-debug-console-in-qmk">Enable the debug console in QMK</h3>
-<p>Let’s get our QMK working copy ready for development! I like to work in a
-separate QMK working copy per project:</p>
-<pre tabindex="0"><code>% docker run -it -v $PWD:/usr/src archlinux
-# pacman -Sy &amp;&amp; pacman -S qmk make which diffutils python-hidapi python-pyusb
-# cd /usr/src
-# qmk clone -b develop qmk/qmk_firmware $PWD/qmk-input-latency
-# cd qmk-input-latency
-</code></pre><p>I compile the firmware for my keyboard like so:</p>
-<pre tabindex="0"><code># make kinesis/kint36:stapelberg
-</code></pre><p>To enable the debug console, I need to edit my QMK keymap <code>stapelberg</code> by
-updating <code>keyboards/kinesis/keymaps/stapelberg/rules.mk</code> to contain:</p>
-<pre tabindex="0"><code>CONSOLE_ENABLE = yes
-</code></pre><p>After compiling and flashing the firmware, the <code>hid_listen</code> tool will detect the
-device and listen for QMK debug messages:</p>
-<pre tabindex="0"><code>% sudo hid_listen
-Waiting for device:...
-Listening:
-</code></pre><h3 id="finding-the-pins">Finding the pins</h3>
-<p>Let’s locate the Caps Lock key’s corresponding row and column in our keyboard matrix!</p>
-<p>We can make QMK show which keys are recognized after each scan by adding to
-<code>keyboards/kinesis/keymaps/stapelberg/keymap.c</code> the following code:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#902000">void</span> <span style="color:#06287e">keyboard_post_init_user</span>() {
-</span></span><span style="display:flex;"><span>  debug_config.enable <span style="color:#666">=</span> <span style="color:#007020">true</span>;
-</span></span><span style="display:flex;"><span>  debug_config.matrix <span style="color:#666">=</span> <span style="color:#007020">true</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>Now we’ll see in the <code>hid_listen</code> output which key is active when pressing Caps Lock:</p>
-<pre tabindex="0"><code>r/c 01234567
-00: 00100000
-01: 00000000
-[…]
-</code></pre><p>For our kinT controller, Caps Lock is on QMK matrix row 0, column 2.</p>
-<p>In the <a href="https://github.com/kinx-project/kint/blob/master/schematic-v2021-04-25.pdf">kinT
-schematic</a>,
-the corresponding signals are <code>ROW_EQL</code> and <code>COL_2</code>.</p>
-<p>To hook up the Teensy 4.0 latency measurement driver, I am making the following
-GPIO connections to the kint36, kint41 or kint2pp (with voltage converter!)
-keyboard controllers:</p>
-<table>
-<thead>
-<tr>
-<th>driver 4.0</th>
-<th>signal</th>
-<th>kint36, kint41</th>
-<th>kint2pp (5V!)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>GND</td>
-<td><code>GND</code></td>
-<td>GND</td>
-<td>GND</td>
-</tr>
-<tr>
-<td>pin 10</td>
-<td><code>ROW_EQL</code></td>
-<td>pin 8</td>
-<td>D7</td>
-</tr>
-<tr>
-<td>pin 11</td>
-<td><code>COL_2</code></td>
-<td>pin 15</td>
-<td>F7</td>
-</tr>
-<tr>
-<td>pin 12</td>
-<td><code>LED_CAPS_LOCK</code></td>
-<td>pin 12</td>
-<td>C1</td>
-</tr>
-</tbody>
-</table>
-<aside class="admonition note">
-  <div class="note-container">
-    <div class="note-icon" style="width: 20px; height: 20px">
-      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
-    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
-    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
-        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
-    </g>
-</svg>
-
-    </div>
-    <div class="admonition-content"><strong>Note:</strong> Unfortunately, the signals are not available on the Teensy 4.x dev kit
-<a href="https://www.nxp.com/design/development-boards/i-mx-evaluation-and-development-boards/mimxrt1060-evk-i-mx-rt1060-evaluation-kit:MIMXRT1060-EVK">NXP i.MX RT1060 Evaluation Kit
-(<code>MIMXRT1060-EVK</code>)</a>. Here,
-pin 8 (<code>B1_00</code>) is used for the LVDI interface instead.</div>
-  </div>
-</aside>
-
-<h3 id="eagercaps">Eager Caps Lock LED</h3>
-<p>When the host signals to the keyboard that Caps Lock is now turned on, the QMK
-firmware first updates a flag in the USB interrupt handler, but only updates the
-Caps Lock LED pin after the next matrix scan has completed.</p>
-<p>This is fine in normal usage, but our measurement readings will get more precise
-if we immediately update the Caps Lock LED pin. We can do this in
-<code>set_led_transfer_cb</code> in <code>tmk_core/protocol/chibios/usb_main.c</code>, which is called
-from the USB interrupt handler:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#include</span> <span style="color:#007020">&#34;gpio.h&#34;</span><span style="color:#007020">
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">static</span> <span style="color:#902000">void</span> <span style="color:#06287e">set_led_transfer_cb</span>(USBDriver <span style="color:#666">*</span>usbp) {
-</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> (usbp<span style="color:#666">-&gt;</span>setup[<span style="color:#40a070">6</span>] <span style="color:#666">==</span> <span style="color:#40a070">2</span>) { <span style="color:#60a0b0;font-style:italic">/* LSB(wLength) */</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#902000">uint8_t</span> report_id <span style="color:#666">=</span> set_report_buf[<span style="color:#40a070">0</span>];
-</span></span><span style="display:flex;"><span>        <span style="color:#007020;font-weight:bold">if</span> ((report_id <span style="color:#666">==</span> REPORT_ID_KEYBOARD) <span style="color:#666">||</span> (report_id <span style="color:#666">==</span> REPORT_ID_NKRO)) {
-</span></span><span style="display:flex;"><span>            keyboard_led_state <span style="color:#666">=</span> set_report_buf[<span style="color:#40a070">1</span>];
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>    } <span style="color:#007020;font-weight:bold">else</span> {
-</span></span><span style="display:flex;"><span>        keyboard_led_state <span style="color:#666">=</span> set_report_buf[<span style="color:#40a070">0</span>];
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>    <span style="color:#007020;font-weight:bold">if</span> ((keyboard_led_state <span style="color:#666">&amp;</span> <span style="color:#40a070">2</span>) <span style="color:#666">!=</span> <span style="color:#40a070">0</span>) {
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>      writePinLow(C7); <span style="color:#60a0b0;font-style:italic">// turn on CAPS_LOCK LED
-</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#60a0b0;font-style:italic"></span>    } <span style="color:#007020;font-weight:bold">else</span> {
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>      writePinHigh(C7); <span style="color:#60a0b0;font-style:italic">// turn off CAPS_LOCK LED
-</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#60a0b0;font-style:italic"></span>    }
-</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
-<h3 id="host-side-linux">Host side (Linux)</h3>
-<p>On the USB host, i.e. the Linux computer, I switch to a <a href="https://en.wikipedia.org/wiki/Virtual_console">Virtual Terminal
-(VT)</a> by stopping my login
-manager (killing my current graphical session!):</p>
-<pre tabindex="0"><code>% sudo systemctl stop gdm
-</code></pre><p>With the Virtual Terminal active, we know that the Caps Lock key press will be
-handled entirely in kernel driver code without having to round-trip to
-userspace.</p>
-<p>We can verify this by collecting stack traces with <a href="https://manpages.debian.org/bpftrace.8"><code>bpftrace(8)</code></a>
- when the kernel executes the <a href="https://elixir.bootlin.com/linux/v5.12/source/drivers/tty/vt/keyboard.c#L1521"><code>kbd_event</code> function in
-<code>drivers/tty/vt</code></a>:</p>
-<pre tabindex="0"><code>% sudo bpftrace -e &#39;kprobe:kbd_event { @[kstack] = count(); }&#39;
-</code></pre><p>After pressing Caps Lock and cancelling the <code>bpftrace</code> process, you should see a
-stack trace.</p>
-<p>I then measured the baseline end-to-end latency, using <a href="https://github.com/kinx-project/measure-fw">my <code>measure-fw</code>
-firmware</a> running on the FRDM-K66F
-eval kit, a cheap and widely available USB 2.0 High Speed device. The firmware
-measures the latency between a button press and the USB HID report for the Caps
-Lock LED, but without any additional matrix scanning delay or similar:</p>
-<pre tabindex="0"><code>% cat /dev/ttyACM0
-sof=74 μs	report=393 μs
-sof=42 μs	report=512 μs
-sof=19 μs	report=512 μs
-sof=39 μs	report=488 μs
-sof=20 μs	report=518 μs
-sof=90 μs	report=181 μs
-sof=42 μs	report=389 μs
-sof=7 μs	report=319 μs
-</code></pre><p>This is the quickest reaction we can get out of this computer. Anything on top
-(e.g. X11, application) will be slower, so this measurement establishes a lower
-bound.</p>
-<h3 id="code-to-simulate-key-presses-and-take-measurements">Code to simulate key presses and take measurements</h3>
-<p>I’m running the <a href="https://github.com/kinx-project/latencydriver">latencydriver Arduino
-sketch</a>, with the Arduino IDE
-configured for:</p>
-<p>Teensy 4.0 (USB Type: Serial, CPU Speed: 600 MHz, Optimize: Faster)</p>
-<p>Here’s how we set up the pins in the measurement driver Teensy 4.0:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#902000">void</span> <span style="color:#06287e">setup</span>() {
-</span></span><span style="display:flex;"><span>  Serial.begin(<span style="color:#40a070">9600</span>);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">// Connected to kinT pin 15, COL_2
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  pinMode(<span style="color:#40a070">11</span>, OUTPUT);
-</span></span><span style="display:flex;"><span>  digitalWrite(<span style="color:#40a070">11</span>, HIGH);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">// Connected to kinT pin 8, ROW_EQL.
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#60a0b0;font-style:italic">// Pin 11 will be high/low in accordance with pin 10
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#60a0b0;font-style:italic">// to simulate a key-press, and always high (unpressed)
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#60a0b0;font-style:italic">// otherwise.
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  pinMode(<span style="color:#40a070">10</span>, INPUT_PULLDOWN);
-</span></span><span style="display:flex;"><span>  attachInterrupt(digitalPinToInterrupt(<span style="color:#40a070">10</span>), onScan, CHANGE);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">// Connected to the kinT LED_CAPS_LOCK output:
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  pinMode(<span style="color:#40a070">12</span>, INPUT_PULLDOWN);
-</span></span><span style="display:flex;"><span>  attachInterrupt(digitalPinToInterrupt(<span style="color:#40a070">12</span>), onCapsLockLED, CHANGE);
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>In order to make a key read as pressed, we need to connect the column with the
-row in the keyboard matrix, but only when the column is scanned. We do that in
-the interrupt handler like so:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#902000">bool</span> simulate_press <span style="color:#666">=</span> <span style="color:#007020">false</span>;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#902000">void</span> <span style="color:#06287e">onScan</span>() {
-</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">if</span> (simulate_press) {
-</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic">// connect row scan signal with column read
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    digitalWrite(<span style="color:#40a070">11</span>, digitalRead(<span style="color:#40a070">10</span>));
-</span></span><span style="display:flex;"><span>  } <span style="color:#007020;font-weight:bold">else</span> {
-</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic">// always read not pressed otherwise
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    digitalWrite(<span style="color:#40a070">11</span>, HIGH);
-</span></span><span style="display:flex;"><span>  }
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>In our text interface, we can now start a measurement like so:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>caps_lock_on_to_off <span style="color:#666">=</span> capsLockOn();
-</span></span><span style="display:flex;"><span>Serial.printf(<span style="color:#4070a0">&#34;# Caps Lock key pressed (transition: %s)</span><span style="color:#4070a0;font-weight:bold">\r\n</span><span style="color:#4070a0">&#34;</span>,
-</span></span><span style="display:flex;"><span>  caps_lock_on_to_off <span style="color:#666">?</span> <span style="color:#4070a0">&#34;on to off&#34;</span> <span style="color:#666">:</span> <span style="color:#4070a0">&#34;off to on&#34;</span>);
-</span></span><span style="display:flex;"><span>simulate_press <span style="color:#666">=</span> <span style="color:#007020">true</span>;
-</span></span><span style="display:flex;"><span>t0 <span style="color:#666">=</span> ARM_DWT_CYCCNT;
-</span></span><span style="display:flex;"><span>emt0 <span style="color:#666">=</span> <span style="color:#40a070">0</span>;
-</span></span><span style="display:flex;"><span>eut0 <span style="color:#666">=</span> <span style="color:#40a070">0</span>;
-</span></span></code></pre></div><p>The next keyboard matrix scan will detect the key as pressed, send the HID
-report to the OS, and when the OS responds with its HID report containing the
-Caps Lock LED status, our Caps Lock LED interrupt handler is called to finish
-the measurement:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#902000">void</span> <span style="color:#06287e">onCapsLockLED</span>() {
-</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint32_t</span> t1 <span style="color:#666">=</span> ARM_DWT_CYCCNT;
-</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint32_t</span> elapsed_millis <span style="color:#666">=</span> emt0;
-</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint32_t</span> elapsed_micros <span style="color:#666">=</span> eut0;
-</span></span><span style="display:flex;"><span>  <span style="color:#902000">uint32_t</span> elapsed_nanos <span style="color:#666">=</span> (t1 <span style="color:#666">-</span> t0) <span style="color:#666">/</span> cycles_per_ns;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  Serial.printf(<span style="color:#4070a0">&#34;# Caps Lock LED (pin 12) is now %s</span><span style="color:#4070a0;font-weight:bold">\r\n</span><span style="color:#4070a0">&#34;</span>, capsLockOn() <span style="color:#666">?</span> <span style="color:#4070a0">&#34;on&#34;</span> <span style="color:#666">:</span> <span style="color:#4070a0">&#34;off&#34;</span>);
-</span></span><span style="display:flex;"><span>  Serial.printf(<span style="color:#4070a0">&#34;# %u ms == %u us</span><span style="color:#4070a0;font-weight:bold">\r\n</span><span style="color:#4070a0">&#34;</span>, elapsed_millis, elapsed_micros);
-</span></span><span style="display:flex;"><span>  Serial.printf(<span style="color:#4070a0">&#34;BenchmarkKeypressToLEDReport 1 %u ns/op</span><span style="color:#4070a0;font-weight:bold">\r\n</span><span style="color:#4070a0">&#34;</span>, elapsed_nanos);
-</span></span><span style="display:flex;"><span>  Serial.printf(<span style="color:#4070a0">&#34;</span><span style="color:#4070a0;font-weight:bold">\r\n</span><span style="color:#4070a0">&#34;</span>);
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="running-measurements">Running measurements</h3>
-<p>Connect the Teensy 4.0 to your computer and open its USB serial console:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% screen /dev/ttyACM0 <span style="color:#40a070">115200</span>
-</span></span></code></pre></div><p>You should be greeted by a welcome message:</p>
-<pre tabindex="0"><code># kinT latency measurement driver
-#   t  - trigger measurement
-</code></pre><p>To save your measurements to file, use <code>C-a H</code> in <code>screen</code> to make it write to
-file <code>screenlog.0</code>.</p>
-<p>Press <code>t</code> a few times to trigger a few measurements and close <code>screen</code> using
-<code>C-a k</code>.</p>
-<p>You can summarize the measurements using
-<a href="https://pkg.go.dev/golang.org/x/perf/cmd/benchstat"><code>benchstat</code></a>:</p>
-<pre tabindex="0"><code>% benchstat screenlog.0
-name                 time/op
-KeypressToLEDReport  1.82ms ±20%
-</code></pre><h3 id="scantoscandelay">Scan-to-scan delay</h3>
-<p>The measurement output on the USB serial console also contains the matrix
-scan-to-scan delay:</p>
-<pre tabindex="0"><code># scan-to-scan delay: 422475 ns
-</code></pre><p>Each keyboard matrix scan turns on each row one-by-one, then reads all the columns.</p>
-<p>This means that in each matrix scan, <code>ROW_EQL</code> will be set high once, then low again.</p>
-<p>The Teensy 4.0 measures scan-to-scan delay by timing the activations of
-<code>ROW_EQL</code>.</p>
-<p>We can verify this approach by making QMK self-report its scan rate. Enable the
-matrix scan rate debug option in <code>keyboards/kinesis/keymaps/stapelberg/config.h</code>
-like so:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#pragma once
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>
-</span></span><span style="display:flex;"><span><span style="color:#007020">#define DEBUG_MATRIX_SCAN_RATE
-</span></span></span></code></pre></div><p>Using <code>hid_listen</code> we can now see the following QMK debug messages:</p>
-<pre tabindex="0"><code>% sudo hid_listen
-Waiting for new device:..
-Listening:
-matrix scan frequency: 2300
-matrix scan frequency: 2367
-matrix scan frequency: 2367
-</code></pre><p>A matrix scan rate/frequency of 2367 scans per second corresponds to 422μs per
-scan:</p>
-<pre tabindex="0"><code>1000000 μs / 2367 scans/second = 422μs
-</code></pre><p>Yet another way of verifying the approach is by short-circuiting an end-to-end
-measurement with a one-line change in our QMK keyboard code:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#902000">bool</span> <span style="color:#06287e">process_action_kb</span>(keyrecord_t <span style="color:#666">*</span>record) {
-</span></span><span style="display:flex;"><span><span style="color:#007020">#define LED_CAPS_LOCK LINE_PIN12
-</span></span></span><span style="display:flex;"><span><span style="color:#007020">#define ledTurnOn writePinLow
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>  ledTurnOn(LED_CAPS_LOCK);
-</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020">true</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>Repeating the measurements, this gives us:</p>
-<pre tabindex="0"><code>% benchstat screenlog.0     
-name                 time/op
-KeypressToLEDReport  693µs ±26%
-</code></pre><p>This value is between [0, 2 * 422μs] because a key might be pressed
-after it was already scanned by the in-progress matrix scan, meaning it will
-need to wait until the next scan completed (!) before it can be registered as
-pressed.</p>
-<h2 id="measurement-harness">Measurement harness</h2>
-<p>Now that we have our general measurement environment all set up, it’s time to
-connect our Teensy 4.0 to a few different keyboard controllers!</p>
-<h3 id="kint36-kint41-gpio">kint36, kint41: GPIO</h3>
-<p>If you have an un-soldered micro controller you want to measure, setup is easy:
-just connect all GPIOs to the Teensy 4.0 latency test driver directly! I’m using
-this for the <code>kint36</code> and <code>kint41</code>:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kint41_gpio_measure.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kint41_gpio_measure_hu855bbe0a9c47ac557e5b09db74fa3b06_607037_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kint41_gpio_measure_hu855bbe0a9c47ac557e5b09db74fa3b06_607037_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kint41_gpio_measure_hu855bbe0a9c47ac557e5b09db74fa3b06_607037_600x0_resize_q75_box.jpg"
-  alt="GPIO measurement" title="GPIO measurement"
-  width="600"
-  height="329"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-<p>(build in <code>/home/michael/kinx/kintpp/rebased</code>, last results in <code>screenlog-kint36-eager-caps.0</code>)</p>
-<h3 id="kint2pp-5v">kint2pp: 5V</h3>
-<p>Because the Teensy++ uses 5V logic levels, we need to convert the levels from/to
-3.3V. This is easily done using e.g. the <a href="https://www.sparkfun.com/products/12009">SparkFun Logic Level Converter
-(Bi-Directional)</a> on a breadboard:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kint2pp_levelshifter.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kint2pp_levelshifter_hua983c5221b9326c29ab4450c04cd6d00_1691385_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kint2pp_levelshifter_hua983c5221b9326c29ab4450c04cd6d00_1691385_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kint2pp_levelshifter_hua983c5221b9326c29ab4450c04cd6d00_1691385_600x0_resize_q75_box.jpg"
-  alt="kint2pp with level shifter" title="kint2pp with level shifter"
-  width="600"
-  height="800"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-<h3 id="kinx-fpc">kinX: FPC</h3>
-<p>But what if you have a design where the micro controller doesn’t come
-standalone, only soldered to a keyboard controller board, such as my earlier
-kinX controller?</p>
-<p>You can use a spare FPC connector (<a href="https://octopart.com/39-53-2135-molex-7670149?r=sp">Molex
-39-53-2135</a>) and solder
-jumper wires to the pins for <code>COL_2</code> and <code>ROW_EQL</code>. For Caps Lock and Ground,
-I soldered jumper wires to the board:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kinx_fpc_measure.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kinx_fpc_measure_hu855bbe0a9c47ac557e5b09db74fa3b06_1315352_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kinx_fpc_measure_hu855bbe0a9c47ac557e5b09db74fa3b06_1315352_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kinx_fpc_measure_hu855bbe0a9c47ac557e5b09db74fa3b06_1315352_600x0_resize_q75_box.jpg"
-  alt="kinX measurement" title="kinX measurement"
-  width="600"
-  height="450"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-<aside class="admonition note">
-  <div class="note-container">
-    <div class="note-icon" style="width: 20px; height: 20px">
-      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
-    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
-    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
-        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
-    </g>
-</svg>
-
-    </div>
-    <div class="admonition-content"><strong>Note:</strong> The
-<a href="https://github.com/kinx-project/adapter-use-kb600-with-kb500-controller">adapter-use-kb600-with-kb500-controller</a>
-unfortunately cannot be used for this purpose: the required pins are connected
-to the ground plane.</div>
-  </div>
-</aside>
-
-<h3 id="original-kinesis-controller">Original Kinesis controller</h3>
-<p>But what if you don’t want to solder jumper wires directly to the board?</p>
-<p>The least invasive method is to connect the FPC connector break-out, and hold
-probe heads onto the contacts while doing your measurements:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kinesis_original_measure.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kinesis_original_measure_hu855bbe0a9c47ac557e5b09db74fa3b06_944081_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kinesis_original_measure_hu855bbe0a9c47ac557e5b09db74fa3b06_944081_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kinesis_original_measure_hu855bbe0a9c47ac557e5b09db74fa3b06_944081_600x0_resize_q75_box.jpg"
-  alt="kinesis original controller measurement" title="kinesis original controller measurement"
-  width="600"
-  height="450"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-<h2 id="qmk-input-latency">QMK input latency</h2>
-<p>Now that the measurement hardware is set up, we can go through the code.</p>
-<p>The following sections each cover one possible contributor to input latency.</p>
-<h3 id="eagerdebounce">Eager debounce</h3>
-<p>Key switches don’t generate a clean signal when pressed, instead they show a
-ripple effect. Getting rid of this ripple is called
-<a href="https://en.wiktionary.org/wiki/debounce">debouncing</a>, and every keyboard
-firmware does it.</p>
-<p>See <a href="https://beta.docs.qmk.fm/using-qmk/software-features/feature_debounce_type">QMK’s documentation on the Debounce
-API</a>
-for a good explanation of the differences between the different debounce approaches.</p>
-<p>QMK’s default debounce algorithm <code>sym_defer_g</code> is chosen very cautiously. I
-don’t know what the criteria are specifically for which types of key switches
-suffer from noise and therefore need the <code>sym_defer_g</code> algorithm, but I know
-that Cherry MX key switches with diodes like used in the Kinesis Advantage don’t
-have noise and hence can use the other debounce algorithms, too.</p>
-<p>While the default <code>sym_defer_g</code> debounce algorithm is robust, it also adds 5ms
-of input latency:</p>
-<pre tabindex="0"><code>% benchstat screenlog-kint36.0
-name                 time/op
-KeypressToLEDReport  7.61ms ± 8%
-</code></pre><p>For lower input latency, we need an <code>eager</code> algorithm. Specifically, I am
-chosing the <code>sym_eager_pk</code> debounce algorithm by adding to my
-<code>keyboards/kinesis/kint36/rules.mk</code>:</p>
-<pre tabindex="0"><code>DEBOUNCE_TYPE = sym_eager_pk
-</code></pre><p>Now, the extra 5ms are gone:</p>
-<pre tabindex="0"><code>% benchstat screenlog-kint36-eager.0
-name                 time/op
-KeypressToLEDReport  2.12ms ±16%
-</code></pre><p>Example change: <a href="https://github.com/qmk/qmk_firmware/pull/12626">https://github.com/qmk/qmk_firmware/pull/12626</a></p>
-<h3 id="quickusbpolling">Quicker USB polling interval</h3>
-<p>The USB host (computer) divides time into fixed-length segments called frames:</p>
-<ul>
-<li>USB Full Speed (USB 1.0) uses frames that are 1ms each.</li>
-<li>USB High Speed (USB 2.0) introduces micro frames, which are 125μs.</li>
-</ul>
-<p>Each USB device specifies in its device descriptor how frequently (in frames)
-the device should be polled. The <a href="https://en.wikipedia.org/wiki/USB_(Communications)#Transaction_latency">quickest polling
-rate</a>
-for USB 1.0 is 1 frame, meaning the device can send data after at most
-1ms. Similarly, for USB 2.0, it’s 1 micro frame, i.e. send data every 125μs.</p>
-<p>Of course, a quicker polling rate also means occupying resources on the USB bus
-which are then no longer available to other devices. On larger USB hubs, this
-might mean fewer devices can be used concurrently. The specifics of this
-limitation depend on a lot of other factors, too. The polling rate plays a role,
-in combination with the max. packet size and the number of endpoints.</p>
-<p>Note that we are only talking about concurrent device usage, not about hogging
-bandwidth: the bulk transfers that USB mass storage devices use are not any
-slower in my tests. I achieve about 37 MiB/s with or without the kint41 USB 2.0
-High Speed controller with <code>bInterval=1</code> present.</p>
-<p>Even connecting two kint41 controllers at the same time still leaves enough
-resources to use a Logitech C920 webcam in its most bandwidth-intensive pixel
-format and resolution. The same cannot be said for e.g. NXP’s LPC-Link2 debug
-probe.</p>
-<aside class="admonition note">
-  <div class="note-container">
-    <div class="note-icon" style="width: 20px; height: 20px">
-      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
-    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
-    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
-        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
-    </g>
-</svg>
-
-    </div>
-    <div class="admonition-content"><strong>Open question:</strong> Would declaring multiple alternate settings in our USB device
-descriptor dynamically reduce resource usage? Our keyboard could offer one
-alternate setting with <code>bInterval=1</code> and one with <code>bInterval=10</code>.</div>
-  </div>
-</aside>
-
-<p>To display the configured interval, the Linux kernel provides a debug pseudo file:</p>
-<pre tabindex="0"><code>% sudo cat /sys/kernel/debug/usb/devices
-
-[…]
-T:  Bus=01 Lev=02 Prnt=09 Port=02 Cnt=02 Dev#= 53 Spd=480  MxCh= 0
-D:  Ver= 2.00 Cls=00(&gt;ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=1209 ProdID=345c Rev= 0.01
-S:  Manufacturer=&#34;https://github.com/stapelberg&#34;
-S:  Product=&#34;kinT (kint41)&#34;
-C:* #Ifs= 3 Cfg#= 1 Atr=a0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=01 Driver=usbhid
-E:  Ad=81(I) Atr=03(Int.) MxPS=   8 Ivl=125us
-I:* If#= 1 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=00 Prot=00 Driver=usbhid
-E:  Ad=82(I) Atr=03(Int.) MxPS=  32 Ivl=125us
-I:* If#= 2 Alt= 0 #EPs= 2 Cls=03(HID  ) Sub=00 Prot=00 Driver=usbhid
-E:  Ad=83(I) Atr=03(Int.) MxPS=  32 Ivl=125us
-E:  Ad=04(O) Atr=03(Int.) MxPS=  32 Ivl=125us
-[…]
-</code></pre><p>Alternatively, you can display the USB device descriptor using e.g. <code>sudo lsusb -v -d 1209:345c</code> and interpret the <code>bInterval</code> setting yourself.</p>
-<p>The above shows the best case: a USB 2.0 High Speed device (<code>Spd=480</code>) with
-<code>bInterval=1</code> in its device descriptor (<code>Iv=125us</code>).</p>
-<p>The original Kinesis Advantage 2 keyboard controller (KB600) uses USB 2.0, but
-in Full Speed mode (<code>Spd=12</code>), i.e. no faster than USB 1.1. In addition, they
-specify <code>bInterval=10</code>, which results in a 10ms polling interval (<code>Ivl=10ms</code>):</p>
-<pre tabindex="0"><code>T:  Bus=01 Lev=02 Prnt=09 Port=02 Cnt=02 Dev#= 52 Spd=12   MxCh= 0
-D:  Ver= 2.00 Cls=00(&gt;ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=29ea ProdID=0102 Rev= 1.00
-S:  Manufacturer=Kinesis
-S:  Product=Advantage2 Keyboard
-C:* #Ifs= 3 Cfg#= 1 Atr=a0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=02 Driver=usbhid
-E:  Ad=83(I) Atr=03(Int.) MxPS=   8 Ivl=10ms
-I:* If#= 1 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=01 Driver=usbhid
-E:  Ad=84(I) Atr=03(Int.) MxPS=   8 Ivl=2ms
-I:* If#= 2 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=00 Prot=00 Driver=usbhid
-E:  Ad=85(I) Atr=03(Int.) MxPS=   8 Ivl=2ms
-</code></pre><p>My recommendation:</p>
-<ul>
-<li>With USB 1.1 Full Speed, definitely specify <code>bInterval=1</code>. I’m not aware of
-any downsides.</li>
-<li>With USB 2.0 High Speed, I also think <code>bInterval=1</code> is a good choice, but I am
-less certain. If you run into trouble, reduce to <code>bInterval=3</code> and send me a
-message :)</li>
-</ul>
-<p>For details on measuring, see <a href="#appendixb">Appendix B: USB polling interval (device
-side)</a>.</p>
-<p>Example change: <a href="https://github.com/qmk/qmk_firmware/pull/12625">https://github.com/qmk/qmk_firmware/pull/12625</a></p>
-<h3 id="fastmatrixscan">Faster matrix scan</h3>
-<p>The purpose of a keyboard controller is reporting pressed keys after scanning
-the key matrix. The more scans a keyboard controller can do per second, the
-faster it can react to your key press.</p>
-<p>How many scans your controller does depends on multiple factors:</p>
-<ul>
-<li>
-<p>The clock speed of your micro controller. It’s worth checking if your micro
-controller model supports running at faster clock speeds, or upgrading your
-keyboard to a faster model to begin with. There is a point of diminishing
-returns, which I would guess is at ≈100 MHz. Comparing e.g. the kint36 at 120
-MHz vs. 180 MHz, the difference in scan-to-scan is 5μs.</p>
-</li>
-<li>
-<p>How much other code your firmware runs aside from matrix scanning. If you
-enable any non-standard QMK features, or even self-written code, it’s worth
-disabling and measuring.</p>
-</li>
-<li>
-<p>Whether you run scans back-to-back or e.g. synchronized with USB
-start-of-frame interrupts. QMK runs scans back-to-back, so this point is only
-relevant for other firmwares.</p>
-</li>
-<li>
-<p>How long you need to sleep to let the signal settle. Reducing your sleep times
-results in more scans per second, but if you don’t sleep long enough, you’ll
-see ghost key presses. See also the next section about Shorter sleeps.</p>
-</li>
-</ul>
-<p>For details on measuring, see the <a href="#scantoscandelay">Scan-to-scan delay section</a>
-above.</p>
-<p>I also tried configuring the GPIOs to be faster to see if that would reduce the
-required unselect delay, but unfortunately there was no difference between the
-default setting and the fastest setting: drive strength 6 (<code>DSE=6</code>), fast
-slew rate (<code>SRE=1</code>), 200 MHz (<code>SPEED=3</code>).</p>
-<h3 id="shortsleeps">Shorter sleeps</h3>
-<p>QMK calls <a href="https://www.chibios.org/dokuwiki/doku.php?id=chibios:documentation:books:rt:kernel_threading#delays_api">ChibiOS’s <code>chThdSleepMicroseconds</code>
-function</a>
-in its matrix scanning code. This function unfortunately has a rather long
-shortest sleep duration of 1 ChibiOS tick: if you tell it to sleep less than
-100μs, it will still sleep at least 100μs!</p>
-<p>This is a problem on controllers such as the kint41, where we want to sleep for
-only 10μs.</p>
-<p>The length of a ChibiOS tick is determined by how the ARM SysTick timer is set
-up on the specific micro controller you’re using. While the SysTick timer itself
-could be configured to fire more frequently, it is not advisable to shorten
-ChibiOS ticks: <code>chSysTimerHandlerI()</code> <a href="http://forum.chibios.org/viewtopic.php?t=3712#p27851">must be executable in less than one
-tick</a>.</p>
-<p>Instead, I found it easier to implement short delays by busy-looping until the
-ARM Cycle Counter Register (<code>CYCCNT</code>) indicates enough time has passed. Here’s
-an example from <code>keyboards/kinesis/kint41/kint41.c</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// delay_inline sleeps for |cycles| (e.g. sleeping for F_CPU will sleep 1s).
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">//
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// delay_inline assumes the cycle counter has already been initialized and
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// should not be modified, i.e. is safe to call during keyboard matrix scan.
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">//
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// ChibiOS enables the cycle counter in chcore_v7m.c.
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">static</span> <span style="color:#902000">void</span> <span style="color:#06287e">delay_inline</span>(<span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint32_t</span> cycles) {
-</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint32_t</span> start <span style="color:#666">=</span> DWT<span style="color:#666">-&gt;</span>CYCCNT;
-</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">while</span> ((DWT<span style="color:#666">-&gt;</span>CYCCNT <span style="color:#666">-</span> start) <span style="color:#666">&lt;</span> cycles) {
-</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic">// busy-loop until time has passed
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  }
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#902000">void</span> <span style="color:#06287e">matrix_output_unselect_delay</span>(<span style="color:#902000">void</span>) {
-</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">// 600 cycles at 0.6 cycles/ns == 1μs
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">uint32_t</span> cycles_per_us <span style="color:#666">=</span> <span style="color:#40a070">600</span>;
-</span></span><span style="display:flex;"><span>  delay_inline(<span style="color:#40a070">10</span> <span style="color:#666">*</span> cycles_per_us);
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>Of course, the cycles/ns value is specific to the frequency at which your micro
-controller runs, so this code needs to be adjusted for each platform.</p>
-<h2 id="results">Results</h2>
-<p>With the QMK keyboard firmware configured for lowest input latency, how do the
-different Kinesis keyboard controller compare? Here are my measurements:</p>
-<table>
-<thead>
-<tr>
-<th>model</th>
-<th>CPU speed</th>
-<th>USB poll interval</th>
-<th>scan-to-scan</th>
-<th>scan rate</th>
-<th>caps-to-report</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>kint41</td>
-<td>600 MHz</td>
-<td>125μs</td>
-<td>181μs</td>
-<td>5456 scans/s</td>
-<td>930µs ±17%</td>
-</tr>
-<tr>
-<td>kinX</td>
-<td>120 MHz</td>
-<td>125μs</td>
-<td>213μs</td>
-<td>4694 scans/s</td>
-<td>953µs ±15%</td>
-</tr>
-<tr>
-<td>kint36</td>
-<td>180 MHz</td>
-<td>1000μs</td>
-<td>444μs</td>
-<td>2252 scans/s</td>
-<td>1.97ms ±15%</td>
-</tr>
-<tr>
-<td>kint2pp</td>
-<td>16 MHz</td>
-<td>1000μs</td>
-<td>926μs</td>
-<td>1078 scans/s</td>
-<td>3.27ms ±32%</td>
-</tr>
-<tr>
-<td>original</td>
-<td>60 MHz</td>
-<td>10000μs</td>
-<td>1936μs</td>
-<td>516 scans/s</td>
-<td>13.6ms ±21%</td>
-</tr>
-</tbody>
-</table>
-<p>The changes required to obtain these results are included since QMK 0.12.38
-(2021-04-20).</p>
-<p><a href="https://github.com/kinx-project/kint/issues/5">kint41 support is being added</a>
-with all required changes to begin with, but still in progress.</p>
-<p>The following sections go into detail about the results.</p>
-<h3 id="kint41">kint41</h3>
-<p>I am glad that the most recent Teensy 4.1 micro controller takes the lead! The
-kinX controller achieved similar numbers, but was quite difficult to build, so
-few people ended up using it.</p>
-<p>The key improvement compared to the Teensy 3.6 is the now-available USB 2.0 High
-Speed, and the powerful clock speed of 600 MHz allows for an even faster matrix
-scan rate.</p>
-<h3 id="kinx">kinX</h3>
-<p>In my <a href="/posts/2018-04-17-kinx-keyboard-controller/">previous article about the kinX
-controller</a>, I measured the kinX
-scan delay as ≈100μs. During my work on this article, I learnt that the ≈100μs
-figure was misleading: the measurement code turned off interrupts to measure
-only the scan function. While that is technically correct, it is not a useful
-measure, as in practice, <a href="https://github.com/kinx-project/mk66f-fw/commit/cae21f3d13331061bcd8c9d411adbb0d7d8c0ae4">interrupts should not be
-disabled</a>,
-and the scanning function is interrupted frequently enough that it comes in at
-≈208μs.</p>
-<p>I also fixed the USB polling interval in the kinX firmware, which <a href="https://github.com/kinx-project/mk66f-fw/commit/b40ae0287ed3b042886e29621dbeecefba1c148b">wasn’t set to
-<code>bInterval=1</code></a>.</p>
-<h3 id="original-kinesis">Original Kinesis</h3>
-<p>The original keyboard controller that the Kinesis Advantage 2 (KB600) keyboard
-comes with uses <a href="https://www.microchip.com/wwwproducts/en/AT32UC3B0256#datasheet-toggle">an AT32UC3B0256 micro
-controller</a>
-which is clocked at 60 MHz, but the measured input latency is much higher than
-even the slowest kint controller (kint2pp at 16 MHz). What gives?</p>
-<p>Here’s what we can deduce without access to their firmware:</p>
-<ol>
-<li>They seem to be using an <a href="#eagerdebounce">eager debounce algorithm</a> (good!),
-otherwise we would observe even higher latency.</li>
-<li>Their <a href="#quickusbpolling">USB polling interval</a> setting (<code>bInterval=10</code>) is
-excessively high, even more so because they are using USB Full Speed with
-longer USB frames. I would recommend they change it to <code>bInterval=1</code> for up
-to 10ms less input latency!</li>
-<li>The matrix scan rate is twice as slow as with my kint2pp. I can’t say for
-sure why this is. Perhaps their firmware does a lot of other things between
-matrix scans.</li>
-</ol>
-<p>Note that we could not apply the <a href="#eagercaps">Eager Caps Lock LED</a> firmware
-change to the original controller, which is why the measurement variance is
-±21%. This variance includes ± 1.9ms for finishing a matrix scan before updating
-the LED state.</p>
-<h2 id="conclusion">Conclusion</h2>
-<p>After analyzing the different controllers in my measurement environment, I think
-the following factors play the largest role in keyboard input latency, ordered
-by importance:</p>
-<ol>
-<li>Does the firmware use an <a href="#eagerdebounce">eager debounce algorithm</a>?</li>
-<li>Does the device specify a <a href="#quickusbpolling">quick USB polling rate (<code>bInterval</code>
-setting)</a>?</li>
-<li>Is the matrix scan frequency in the expected range, or are there unexpected
-slow-downs?</li>
-</ol>
-<p>Hopefully, this article gives you all the tools you need to measure and reduce
-keyboard input latency of your own keyboard controller!</p>
-<h2 id="appendix-a-isitsnappy">Appendix A: isitsnappy</h2>
-<p>The iPhone app <a href="https://isitsnappy.com/">Is It Snappy?</a> records video using the
-iPhone’s 240 fps camera and allows you to mark the frame that starts
-respectively ends the measurement.</p>
-<p>The app does a good job of making this otherwise tedious process of navigating a
-video frame by frame much more pleasant.</p>
-<p>However, for measuring keyboard input latency, I think this approach is futile:</p>
-<ul>
-<li>The resolution is too imprecise. At 240 fps, that means each frame represents
-4.6ms of time, which is already higher than the input latency of our slowest
-micro controller.</li>
-<li>Visually deciding whether a key switch is pressed or not pressed, at
-frame-perfect precision, seems impossible to me.</li>
-</ul>
-<p>I believe the app can work, provided the latency you want to measure is really
-high. But with the devices covered in this article, the app couldn’t measure
-even 10ms of injected input latency.</p>
-<h2 id="appendixb">Appendix B: USB polling interval (device side)</h2>
-<p>You can also verify the USB polling interval on the device side. In the SOF
-(Start Of Frame) interrupt in <code>tmk_core/protocol/chibios/usb_main.c</code>, we can
-print the cycle delta to the previous SOF callback, every second:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#include</span> <span style="color:#007020">&#34;timer.h&#34;</span><span style="color:#007020">
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">static</span> <span style="color:#902000">uint32_t</span> last_sof <span style="color:#666">=</span> <span style="color:#40a070">0</span>;
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">static</span> <span style="color:#902000">uint32_t</span> sof_timer <span style="color:#666">=</span> <span style="color:#40a070">0</span>;
-</span></span><span style="display:flex;"><span><span style="color:#902000">void</span> <span style="color:#06287e">kbd_sof_cb</span>(USBDriver <span style="color:#666">*</span>usbp) {
-</span></span><span style="display:flex;"><span>  (<span style="color:#902000">void</span>)usbp;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#902000">uint32_t</span> now <span style="color:#666">=</span> DWT<span style="color:#666">-&gt;</span>CYCCNT;
-</span></span><span style="display:flex;"><span>  <span style="color:#902000">uint32_t</span> delta <span style="color:#666">=</span> now <span style="color:#666">-</span> last_sof;
-</span></span><span style="display:flex;"><span>  last_sof <span style="color:#666">=</span> now;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#902000">uint32_t</span> timer_now <span style="color:#666">=</span> timer_read32();
-</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">if</span> (TIMER_DIFF_32(timer_now, sof_timer) <span style="color:#666">&gt;</span> <span style="color:#40a070">1000</span>) {
-</span></span><span style="display:flex;"><span>    sof_timer <span style="color:#666">=</span> timer_now;
-</span></span><span style="display:flex;"><span>    dprintf(<span style="color:#4070a0">&#34;sof delta: %u cycles&#34;</span>, delta);
-</span></span><span style="display:flex;"><span>  }
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>Using <code>hid_listen</code>, we expect to see ≈75000 cycles of delta, which
-corresponds to the 125μs microframe latency of USB 2.0 High Speed with
-<code>bInterval=1</code> in the USB device descriptor:</p>
-<p>125μs * 1000 * 0.6 cycles/ns = 75000 cycles</p>
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[Linux and USB virtual serial devices (CDC ACM)]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/"/>
-    <id>https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/</id>
-    <published>2021-04-27T08:18:00+02:00</published>
-    <content type="html"><![CDATA[<p>During my work on <a href="https://www.pjrc.com/store/teensy41.html">Teensy 4.1</a> support
-in <a href="https://en.wikipedia.org/wiki/ChibiOS/RT">ChibiOS</a> for the QMK keyboard
-firmware, I noticed that ChibiOS’s virtual serial device USB demo would
-sometimes print garbled output, and that I would never see the ChibiOS shell
-prompt.</p>
-<p>This article walks you through diagnosing and working around this issue, in the
-hope that it helps others who are working with micro controllers and USB virtual
-serial devices.</p>
-<h2 id="background">Background</h2>
-<p>Serial interfaces are often the easiest option when working with micro
-controllers to print text: you only connect <code>GND</code> and the micro controller’s
-serial <code>TX</code> pin to a USB-to-serial converter. The <code>RX</code> pin is only needed when
-you want to send text to the micro controller as well.</p>
-<p>While conceptually simple, the requirement for an extra piece of hardware
-(USB-to-serial adapter) is annoying. If your micro controller has a working USB
-interface and USB stack, a popular alternative is for the micro controller to
-provide a virtual serial device via USB.</p>
-<p>This way, you just need one USB cable between your micro controller and
-computer, reusing the same connection you already use for programming the
-device.</p>
-<p>A popular choice within this solution is to provide a device conforming to the
-USB Communications Device Class (CDC) standard, specifically its Abstract
-Control Model (ACM), which is typically used for modem hardware.</p>
-<p>On Linux, these devices show up as e.g. <code>/dev/ttyACM0</code>. In case you’re
-wondering: <code>/dev/ttyUSB0</code> device names are used by more specific drivers
-(vendor-specific). The blog post <a href="https://rfc1149.net/blog/2013/03/05/what-is-the-difference-between-devttyusbx-and-devttyacmx/">What is the difference between /dev/ttyUSB and
-/dev/ttyACM?</a>
-goes into a lot more detail.</p>
-<h2 id="modemmanager">ModemManager</h2>
-<p>One unfortunate side-effect of using a modem standard to provide a generic
-serial device is that modem-related software might mistake our micro controller
-for a modem.</p>
-<p>Use the following command to disable ModemManager until the next reboot, which
-otherwise might open and probe any new serial devices:</p>
-<pre tabindex="0"><code>% sudo systemctl mask --runtime --now ModemManager
-</code></pre><h2 id="problem-statement">Problem statement</h2>
-<p>With a regular, non-USB serial interface, you can send data at any time. If
-nobody is receiving the data on the other end, the micro controller doesn’t care
-and still writes serial data.</p>
-<p>When using the ChibiOS shell with a regular serial interface, this means that if
-you open the serial interface too late, you will not see the ChibiOS shell
-prompt. But, if you have the serial interface already opened when powering on
-your device, you will be greeted by ChibiOS’s shell prompt:</p>
-<pre tabindex="0"><code>ChibiOS/RT Shell
-ch&gt; 
-</code></pre><p>With a USB serial, however, the host will not transfer data from the device
-until the serial interface is opened. This means that writes to the USB serial
-can block, whereas writes to the UART serial will not block but may go ignored
-if nobody is listening.</p>
-<p>So when I open the USB serial interface, I would expect to see the ChibiOS shell
-prompt like above. Instead, I would often not see any prompt at all, and I would
-even sometimes see garbled output like this:</p>
-<pre tabindex="0"><code>cch&gt; biOS/RT She
-</code></pre><h2 id="usb-analysis-with-wireshark">USB analysis with Wireshark</h2>
-<p><a href="https://en.wikipedia.org/wiki/Wireshark">Wireshark</a> allows us to analyze USB
-traffic in combination with the <code>usbmon</code> Linux kernel module.</p>
-<p>Looking through the captured packets, I noticed unexpected packets from the host
-(computer) to the device (micro controller), specifically containing the
-following bytes:</p>
-<ol>
-<li>hex <code>0xa</code> = ASCII <code>\n</code></li>
-<li>hex <code>0xd</code> = ASCII <code>\r</code></li>
-</ol>
-<p>Seeing any packets in this direction is unexpected, because I am only opening
-the serial interface <strong>for reading</strong>, and I am not consciously sending
-anything. So where do the packets come from?</p>
-<p>To verify I am not missing any nuance of the CDC protocol, I added debug
-statements to the ChibiOS shell to log any incoming data. The <code>\n\r</code> bytes
-indeed make it to the ChibiOS shell.</p>
-<p>When the shell receives a line break, it prints a new prompt. This seems to be
-the reason why I’m seeing garbled data: while the output is transferred to the
-host, line breaks are received, causing more data transfers. It’s as if somebody
-was hammering the return key really quickly.</p>
-<h2 id="linux-tty-echo-vs-chibios-shell-banner">Linux tty echo vs. ChibiOS shell banner</h2>
-<p>The unexpected <code>\n\r</code> bytes turn out to come from the Linux USB CDC ACM driver,
-or its interplay with the Linux tty driver, to be specific. The CDC ACM driver
-is a kind of tty driver, so it is built atop the Linux tty infrastructure, whose
-<a href="https://elixir.bootlin.com/linux/v5.11.16/source/drivers/tty/tty_io.c#L122">standard settings include various <code>ECHO</code>
-flags</a>.</p>
-<p>When echoing is enabled, the ChibiOS shell banner triggers echo characters,
-which in turn are interpreted as input to the shell, causing garbled output.</p>
-<p>So why is echoing enabled? Wouldn’t a terminal emulator turn off echoing first
-thing?</p>
-<p>Yes. But, when the CDC ACM driver receives the first data transfer via USB
-(already queued), the standard tty settings are still in effect, because the
-application did not yet have a chance to set its tty configuration up!</p>
-<p>This can be verified by running the following command on a Linux host:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% stty -F /dev/ttyACM0 <span style="color:#40a070">115200</span> -echo -echoe -echok
-</span></span></code></pre></div><p>Even though the command’s sole purpose is to configure the tty, its opening of
-the device still causes the banner to print, and echoing to happen, and garbled
-output is the result.</p>
-<p>It turns out this is a somewhat common problem. Hence, the Linux USB CDC ACM
-driver <a href="https://elixir.bootlin.com/linux/v5.11.16/source/drivers/usb/class/cdc-acm.c#L1708">has a quirks
-table</a>,
-in which devices that print a banner select the <code>DISABLE_ECHO</code> quirk, which
-results in the CDC ACM driver turning off the echoing termios flag early:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">static</span> <span style="color:#007020;font-weight:bold">const</span> <span style="color:#007020;font-weight:bold">struct</span> usb_device_id acm_ids[] <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">/* quirky and broken devices */</span>
-</span></span><span style="display:flex;"><span>	{ USB_DEVICE(<span style="color:#40a070">0x0424</span>, <span style="color:#40a070">0x274e</span>), <span style="color:#60a0b0;font-style:italic">/* Microchip Technology, Inc. */</span>
-</span></span><span style="display:flex;"><span>	  .driver_info <span style="color:#666">=</span> DISABLE_ECHO, }, <span style="color:#60a0b0;font-style:italic">/* DISABLE ECHO in termios flag */</span>
-</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// …
-</span></span></span></code></pre></div><p>So, a quick solution to turn off echoing early is to change your USB vendor and
-product id (VID/PID) to an ID for which the Linux kernel applies the
-<code>DISABLE_ECHO</code> quirk, e.g.:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#define USB_DEVICE_VID 0x0424
-</span></span></span><span style="display:flex;"><span><span style="color:#007020">#define USB_DEVICE_PID 0x274e
-</span></span></span></code></pre></div><h2 id="flushing-in-screen">Flushing in Screen</h2>
-<p>With tty echo disabled, I don’t see garbled output anymore, but still wouldn’t
-always see the ChibiOS shell prompt!</p>
-<p>This issue turned out to be specific to the terminal emulator program I’m
-using. For many years, I have been using
-<a href="https://en.wikipedia.org/wiki/GNU_Screen">Screen</a> for serial devices of any
-sort.</p>
-<p>I was surprised to learn during this investigation that Screen <a href="https://git.savannah.gnu.org/cgit/screen.git/tree/src/window.c?id=d7bd327fdf799c82f9a359365d461edb755056ea#n971">flushes any
-pending
-output</a>
-when opening the device. This typically isn’t a problem because adapter-backed
-serial devices are opened once and then stay open. USB virtual serial devices
-however are only opened when used, and disappear when loading new program code
-onto your micro controller.</p>
-<p>I verified this is the problem by using <a href="https://manpages.debian.org/cat.1"><code>cat(1)</code></a>
- instead, with which I can indeed see the prompt:</p>
-<pre tabindex="0"><code>% cat /dev/ttyACM0
-
-ChibiOS/RT Shell
-                
-                ch&gt; 
-</code></pre><p>After commenting out the flush call in Screen’s sources, I could see the prompt
-in Screen as well.</p>
-<aside class="admonition note">
-  <div class="note-container">
-    <div class="note-icon" style="width: 20px; height: 20px">
-      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
-    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
-    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
-        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
-    </g>
-</svg>
-
-    </div>
-    <div class="admonition-content"><strong>Tip:</strong> During the review phase of this article,
-<a href="https://github.com/tio/tio/">tio</a> was pointed out to me as a terminal program
-which automatically reconnects. This won’t help with the problem at hand, but
-seems handy nevertheless.</div>
-  </div>
-</aside>
-
-<h2 id="line-ending-conversion">Line ending conversion</h2>
-<p>Now that we no longer flush the prompt away, why is the spacing still incorrect,
-and where does it go wrong?</p>
-<pre tabindex="0"><code>
-ChibiOS/RT Shell
-                
-                ch&gt; 
-</code></pre><p>If we use <a href="https://manpages.debian.org/strace.1"><code>strace(1)</code></a>
- to see what <a href="https://manpages.debian.org/screen.1"><code>screen(1)</code></a>
- or <a href="https://manpages.debian.org/cat.1"><code>cat(1)</code></a>
- read from
-the driver, we see:</p>
-<pre tabindex="0"><code>797270 read(7, &#34;\n\nChibiOS/RT Shell\n\nch&gt; &#34;, 4096) = 24
-</code></pre><p>We would have expected <code>&quot;\r\nChibiOS/RT Shell\r\nch&gt; &quot;</code> instead, meaning all
-Carriage Returns (<code>\r</code>) have been translated to Newlines (<code>\n</code>).</p>
-<p>This is again due to the <a href="https://elixir.bootlin.com/linux/v5.11.16/source/drivers/tty/tty_io.c#L122">Linux tty driver’s default termios
-settings</a>:
-<code>c_iflag</code> enables option <code>ICRNL</code> by default, which translates <code>CR</code> (Carriage
-Return) to <code>NL</code> (Newline).</p>
-<p>Unfortunately, contrary to the <code>DISABLE_ECHO</code> quirk, there is no corresponding
-quirk in the Linux ACM driver to turn off line ending conversion, so a fix would
-need a Linux kernel driver change!</p>
-<h2 id="device-side-workaround-wait-until-opened">Device-side workaround: wait until opened</h2>
-<p>At this point, we have covered a few problems that would need to be fixed:</p>
-<ol>
-<li>Change USB VID/PID to get the <code>DISABLE_ECHO</code> quirk in the driver.</li>
-<li>Recompile terminal emulator programs to remove flushing, if needed.</li>
-<li>Modify kernel driver to add quirk to disable Carriage Return (<code>\r</code>) conversion.</li>
-</ol>
-<p>Time for a quick reality check: this seems too hard and too long a time for all
-parts of the stack to be fixed. Is there an easier way, and why don’t others run
-into this problem? If only the device didn’t print its banner so early, that
-would circumvent all of the problems above, too!</p>
-<p>Luckily, the host actually notifies the device when a terminal emulator program
-opens the USB serial device by sending a <code>CDC_SET_CONTROL_LINE_STATE</code> request. I
-verified this behavior on Linux, Windows and macOS.</p>
-<p>So, let’s implement a workaround in our device code! We will delay starting the
-shell until:</p>
-<ol>
-<li>The USB serial device was opened (not just configured).</li>
-<li>An additional delay of 100ms has passed to give the terminal emulator
-application a chance to configure the serial device.</li>
-</ol>
-<p>In our <code>main.c</code> loop, we wait until USB is active, and until we receive the
-first <code>CDC_SET_CONTROL_LINE_STATE</code> request because the serial port was opened:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">while</span> (<span style="color:#007020">true</span>) {
-</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> (SDU1.config<span style="color:#666">-&gt;</span>usbp<span style="color:#666">-&gt;</span>state <span style="color:#666">==</span> USB_ACTIVE) {
-</span></span><span style="display:flex;"><span>      chSemWait(<span style="color:#666">&amp;</span>scls);
-</span></span><span style="display:flex;"><span>      chThdSleepMilliseconds(<span style="color:#40a070">100</span>);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>      thread_t <span style="color:#666">*</span>shelltp <span style="color:#666">=</span> chThdCreateFromHeap(<span style="color:#007020">NULL</span>, SHELL_WA_SIZE, <span style="color:#4070a0">&#34;shell&#34;</span>, NORMALPRIO <span style="color:#666">+</span> <span style="color:#40a070">1</span>, shellThread, (<span style="color:#902000">void</span> <span style="color:#666">*</span>)<span style="color:#666">&amp;</span>shell_cfg1);
-</span></span><span style="display:flex;"><span>      chThdWait(shelltp);
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>  }
-</span></span></code></pre></div><p>And in our <code>usbcfg.c</code>, when receiving a <code>CDC_SET_CONTROL_LINE_STATE</code> request, we
-will reset the semaphore to non-blockingly wake up all waiters:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">extern</span> semaphore_t scls;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#902000">bool</span> <span style="color:#06287e">requests_hook</span>(USBDriver <span style="color:#666">*</span>usbp) {
-</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">bool</span> result <span style="color:#666">=</span> sduRequestsHook(usbp);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">if</span> ((usbp<span style="color:#666">-&gt;</span>setup[<span style="color:#40a070">0</span>] <span style="color:#666">&amp;</span> USB_RTYPE_TYPE_MASK) <span style="color:#666">==</span> USB_RTYPE_TYPE_CLASS <span style="color:#666">&amp;&amp;</span>
-</span></span><span style="display:flex;"><span>      usbp<span style="color:#666">-&gt;</span>setup[<span style="color:#40a070">1</span>] <span style="color:#666">==</span> CDC_SET_CONTROL_LINE_STATE) {
-</span></span><span style="display:flex;"><span>    osalSysLockFromISR();
-</span></span><span style="display:flex;"><span>    chSemResetI(<span style="color:#666">&amp;</span>scls, <span style="color:#40a070">0</span>);
-</span></span><span style="display:flex;"><span>    osalSysUnlockFromISR();
-</span></span><span style="display:flex;"><span>  }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">return</span> result;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h2 id="screenshots-mac-and-windows">Screenshots: Mac and Windows</h2>
-<p>Aside from Linux, I also verified the workaround works on a Mac (with Screen):</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-mac.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-mac_hua212d00f133d3e078e4a79add9443e49_282377_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-mac_hua212d00f133d3e078e4a79add9443e49_282377_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-mac_hua212d00f133d3e078e4a79add9443e49_282377_600x0_resize_q75_box.jpg"
-  alt="USB virtual serial device on macOS" title="USB virtual serial device on macOS"
-  width="600"
-  height="671"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-<p>…and that it works on Windows (with PuTTY):</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-windows10.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-windows10_hu799653fda6c3be4562e44d8be91712f4_279174_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-windows10_hu799653fda6c3be4562e44d8be91712f4_279174_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-windows10_hu799653fda6c3be4562e44d8be91712f4_279174_600x0_resize_q75_box.jpg"
-  alt="USB virtual serial device on Windows 10" title="USB virtual serial device on Windows 10"
-  width="600"
-  height="338"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
 ]]></content>
   </entry>
 </feed>

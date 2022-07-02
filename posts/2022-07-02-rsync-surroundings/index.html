@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>rsync, article 2: Surroundings - Michael Stapelberg</title>
+
+  <meta property="og:site_name" content="Michael Stapelberg">
+  <meta property="og:title" content="rsync, article 2: Surroundings">
+  <meta property="og:description" content="This post is the second article in a series of blog posts about rsync, see the Series Overview.
+Now that we know what to use rsync for, how can we best integrate rsync into monitoring and alerting, and on which operating systems does it work?">
+  
+  
+  
+  
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu49255cbd0611171ac9ea093d82565708_603964_200x200_fit_q75_box.jpg">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <meta name="description" content="This post is the second article in a series of blog posts about rsync, see the Series Overview.
+Now that we know what to use rsync for, how can we best integrate rsync into monitoring and alerting, and on which operating systems does it work?">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div><h1 class="ms_title">rsync, article 2: Surroundings</h1>
+
+<div class="ms_meta">
+  <div id="ms_date">published 2022-07-02</div>
+  
+  
+  <div id="ms_tags">
+  
+  in tag
+  
+  
+  <span class="ms_tag"><a href="/posts/tags/rsync/">rsync</a></span>
+  
+  </div>
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2022-07-02-rsync-surroundings/index.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
+</div>
+<div class="Artikel" id="content">
+  <p>This post is the second article in a series of blog posts about rsync, <a href="../2022-06-18-rsync-overview/">see the
+Series Overview</a>.</p>
+<p>Now that we know what to use rsync for, how can we best integrate rsync into
+monitoring and alerting, and on which operating systems does it work?</p>
+<h2 id="monitoring-and-alerting-for-rsync-jobs-using-prometheus">Monitoring and alerting for rsync jobs using Prometheus</h2>
+<p>Once you have one or two important <code>rsync</code> jobs, it might make sense to alert
+when your job has not completed as expected.</p>
+<p>I’m using <a href="https://prometheus.io/">Prometheus</a> for all my monitoring and alerting.</p>
+<p>Because Prometheus <em>pulls</em> metrics from its (typically always-running) targets,
+we need an extra component: the <a href="https://prometheus.io/docs/practices/pushing/">Prometheus
+Pushgateway</a>. The Pushgateway
+stores metrics pushed by short-lived jobs like <code>rsync</code> transfers and makes them
+available to subsequent Prometheus pulls.</p>
+<p>To integrate <code>rsync</code> with the Prometheus Pushgateway, I wrote
+<a href="https://github.com/stapelberg/rsyncprom"><code>rsyncprom</code></a>, a small tool that wraps
+<code>rsync</code>, or parses rsync output supplied by you. Once <code>rsync</code> completes,
+<code>rsyncprom</code> pushes the rsync exit code and parsed statistics about the transfer
+to your Pushgateway.</p>
+<h3 id="prometheus-server-side-setup">Prometheus server-side setup</h3>
+<p>First, I set up the Prometheus Pushgateway (via Docker and systemd) on my
+server.</p>
+<p>Then, in my <code>prometheus.conf</code> file, I instruct Prometheus to pull data from my
+Pushgateway:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># prometheus.conf</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">rule_files</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>- backups.rules.yml<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">scrape_configs</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#60a0b0;font-style:italic"># […]</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>- <span style="color:#062873;font-weight:bold">job_name</span>:<span style="color:#bbb"> </span>pushgateway<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">honor_labels</span>:<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">true</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">static_configs</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">targets</span>:<span style="color:#bbb"> </span>[<span style="color:#4070a0">&#39;pushgateway:9091&#39;</span>]<span style="color:#bbb">
+</span></span></span></code></pre></div><p>Finally, in <code>backups.rules.yml</code>, I configure an alert on the time series <code>rsync_exit_code</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># backups.rules.yml</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">groups</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>backups.rules<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">rules</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">alert</span>:<span style="color:#bbb"> </span>RsyncFailing<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">expr</span>:<span style="color:#bbb"> </span>rsync_exit_code{job=&#34;rsync&#34;} &gt; 0<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">for</span>:<span style="color:#bbb"> </span>1m<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">labels</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">job</span>:<span style="color:#bbb"> </span>rsync<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">annotations</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">description</span>:<span style="color:#bbb"> </span>rsync {{ $labels.instance }} is failing<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">summary</span>:<span style="color:#bbb"> </span>rsync {{ $labels.instance }} is failing<span style="color:#bbb">
+</span></span></span></code></pre></div><p>This alert will fire any time an rsync job monitored via <code>rsyncprom</code> exits with
+a non-zero exit code.</p>
+<h3 id="rsync-client-side-setup">rsync client-side setup</h3>
+<p>On each machine that runs <code>rsync</code> jobs I want to monitor, I first install
+<code>rsyncprom</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>go install github.com/stapelberg/rsyncprom/cmd/rsync-prom@latest
+</span></span></code></pre></div><p>Then, I just wrap <code>rsync</code> transfers where it’s most convenient, for example in
+my <a href="https://manpages.debian.org/crontab.5"><code>crontab(5)</code></a>
+:</p>
+<pre tabindex="0"><code class="language-crontab" data-lang="crontab"># crontab -e
+9 9 * * * /home/michael/go/bin/rsync-prom --job=&#34;cron&#34; --instance=&#34;gphotos-sync@midna&#34; -- /home/michael/gphotos-sync/sync.sh
+</code></pre><p>The same wrapper technique works in <a href="https://github.com/stapelberg/rsyncprom#setup-example-systemd">shell scripts or systemd service
+files</a>.</p>
+<p>You can also provide <code>rsync</code> output <a href="https://github.com/stapelberg/zkj-nas-tools/blob/02d46d718df60c413844d9218f6dd702ad94e5f1/dornroeschen/sshutil.go#L134-L139">from Go
+code</a>
+(this example runs <code>rsync</code> via SSH).</p>
+<h3 id="monitoring-architecture">Monitoring architecture</h3>
+<p>Here’s how the whole setup looks like architecturally:</p>
+<p><img src="2022-05-29-rsync-prom-architecture.svg" alt="rsync-prom architecture"></p>
+<p>The rsync scheduler runs on a Raspberry Pi running
+<a href="https://gokrazy.org/">gokrazy</a>. The scheduler invokes the <code>rsync</code> job to back
+up <em>websrv.zekjur.net</em> via SSH and sends the output to Prometheus, which is
+running on a (different) server at an ISP.</p>
+<h3 id="monitoring-dashboard">Monitoring dashboard</h3>
+<p>The grafana dashboard looks like this in action:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu49255cbd0611171ac9ea093d82565708_603964_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu49255cbd0611171ac9ea093d82565708_603964_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu49255cbd0611171ac9ea093d82565708_603964_600x0_resize_q75_box.jpg"
+  alt="rsync grafana dashboard" title="rsync grafana dashboard"
+  width="600"
+  height="469"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+<ul>
+<li>The top left table shows the most recent rsync exit code, green means 0 (success).</li>
+<li>The top right graph shows rsync runtime (wall-clock time) over time. Long
+runtime can have any number of bottlenecks as the reason: network connections,
+storage devices, slow CPUs.</li>
+<li>The bottom left graph shows rsync dataset size over time. This allows you to
+quickly pinpoint transfers that are filling your disk up.</li>
+<li>The bottom right graph shows transferred bytes per rsync over time. The higher
+the value, the higher the amount of change in your data set between
+synchronization runs.</li>
+</ul>
+<h2 id="rsync-operating-system-availability">rsync operating system availability</h2>
+<p>Now that we have learnt about a couple of typical use-cases, where can you use
+<code>rsync</code> to implement these use-cases? The answer is: in most environments, as
+<code>rsync</code> is widely available on different Linux and BSD versions.</p>
+<p>Macs come with <code>rsync</code> available by default (but it’s an old, patched version),
+and OpenBSD comes with a BSD-licensed implementation called
+<a href="https://www.openrsync.org/">openrsync</a> by default.</p>
+<p>On Windows, you can use the <a href="https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux">Windows Subsystem for
+Linux</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Operating System</th>
+<th>Implementation</th>
+<th>Version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FreeBSD 13.1 (ports)</td>
+<td>tridge</td>
+<td><a href="https://www.freebsd.org/cgi/man.cgi?query=rsync&amp;manpath=FreeBSD+13.1-RELEASE+and+Ports">3.2.3</a></td>
+</tr>
+<tr>
+<td>OpenBSD 7.1</td>
+<td>openrsync</td>
+<td>(7.1)</td>
+</tr>
+<tr>
+<td>OpenBSD 7.1 (ports)</td>
+<td>tridge</td>
+<td><a href="https://openports.se/net/rsync">3.2.4</a></td>
+</tr>
+<tr>
+<td>NetBSD 9.2 (pkgsrc)</td>
+<td>tridge</td>
+<td><a href="https://ftp.netbsd.org/pub/pkgsrc/current/pkgsrc/net/rsync/index.html">3.2.4</a></td>
+</tr>
+<tr>
+<td>Linux</td>
+<td>tridge</td>
+<td><a href="https://repology.org/project/rsync/versions">repology</a></td>
+</tr>
+<tr>
+<td>macOS</td>
+<td>tridge</td>
+<td><a href="https://www.unix.com/man-page/osx/1/rsync/">2.6.9</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="next-up">Next Up</h2>
+<p>The third article in this series is <a href="../2022-07-02-rsync-how-does-it-work/">rsync, article 3: How does rsync
+work?</a>. With rsync up and running, it’s
+time to take a peek under the hood of rsync to better understand how it works.</p>
+
+</div>
+
+      </div>
+
+    </main><div id="ms_footer">
+  © 2022 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

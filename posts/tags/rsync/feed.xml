@@ -8,6 +8,406 @@
   <id>https://michael.stapelberg.ch/posts/tags/rsync/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[rsync, article 3: How does rsync work?]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/"/>
+    <id>https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/</id>
+    <published>2022-07-02T14:30:10+02:00</published>
+    <content type="html"><![CDATA[<p>This post is the third article in a series of blog posts about rsync, <a href="../2022-06-18-rsync-overview/">see the
+Series Overview</a>.</p>
+<p>With rsync up and running, it’s time to take a peek under the hood of rsync to
+better understand how it works.</p>
+<h2 id="howdoesrsyncwork">How does rsync work?</h2>
+<p>When talking about the rsync protocol, we need to distinguish between:</p>
+<ul>
+<li>protocol-level roles: “sender” and “receiver”</li>
+<li>TCP roles: “client” and “server”</li>
+</ul>
+<p>All roles can be mixed and matched: both rsync clients (or servers!) can
+either send or receive.</p>
+<p>Now that you know the terminology, let’s take a high-level look at the rsync
+protocol. We’ll look at protocol version 27, which is older but simpler, and
+which is the most widely supported protocol version, implemented by <code>openrsync</code>
+and other third-party implementations:</p>
+<p><img src="2022-05-29-rsync-logical-view.svg" alt="rsync architecture"></p>
+<p>The rsync protocol can be divided into two phases:</p>
+<ol>
+<li>
+<p>In the first phase, the sender walks the local file tree to generate and send
+the <em>file list</em> to the receiver. The file list must be transferred in full,
+because both sides sort it by filename (later rsync protocol versions
+eliminate this synchronous sorting step).</p>
+</li>
+<li>
+<p>In the second phase, concurrently:</p>
+<ul>
+<li>The receiver compares and requests each file in the file list. The
+receiver requests the full file when it didn’t exist on disk yet, or it
+will send checksums for the rsync <em>hash search</em> algorithm when the file
+already existed.</li>
+<li>The receiver receives file data from the sender. The sender answers the
+requests with just enough data to reconstruct the current file contents
+based on what’s already on the receiver.</li>
+</ul>
+</li>
+</ol>
+<p>The architecture makes it easy to implement the second phase in 3 separate
+processes, each of which sending to the network as fast as possible using heavy
+pipelining. This results in utilizing the available hardware resources (I/O,
+CPU, network) on sender and receiver to the fullest.</p>
+<h3 id="observing-rsyncs-transfer-phases">Observing rsync’s transfer phases</h3>
+<p>When starting an rsync transfer, looking at the resource usage of both
+machines allows us to confirm our understanding of the rsync architecture, and
+to pin-point any bottlenecks:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hua2f50278895cfbee4dc18c7ea60b6d4a_2093260_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hua2f50278895cfbee4dc18c7ea60b6d4a_2093260_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hua2f50278895cfbee4dc18c7ea60b6d4a_2093260_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="331"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+<ol>
+<li>phase: The rsync sender needs 17 seconds to walk the file system and send
+the file list. The rsync receiver reads from the network and writes into RAM
+during that time.
+<ul>
+<li>This phase is random I/O (querying file system metadata) for the sender.</li>
+</ul>
+</li>
+<li>phase: Afterwards, the rsync sender reads from disk and sends to the
+network. The rsync receiver receives from the network and writes to disk.
+<ul>
+<li>The receiver does roughly the same amount of random I/O as the sender did
+in phase 1, as it needs to create directories and request missing files.</li>
+<li>The sender does sequential disk reads and possibly checksum calculation, if
+the file(s) existed on the receiver side.</li>
+</ul>
+</li>
+</ol>
+<p>(Again, the above was captured using rsync protocol version 27, later rsync
+protocol versions don’t synchronize after completing phase 1, but instead
+interleave the phases more.)</p>
+<h3 id="rsync-hash-search">rsync hash search</h3>
+<p>Up until now, we have described the rsync protocol at a high level. Let’s zoom
+into the hash search step, which is what many people might associate with the
+term “rsync algorithm”.</p>
+<p>When a file exists on both sides, rsync sender and receiver, the receiver first
+divides the file into blocks. The block size is a rounded square root of the
+file’s length. The receiver then sends the checksums of all blocks to the
+sender. In response, the sender finds matching blocks in the file and sends only
+the data needed to reconstruct the file on the receiver side.</p>
+<p>Specifically, the sender goes through <strong>each byte</strong> of the file and tries to
+match existing receiver content. To make this less computationally expensive,
+rsync combines two checksums.</p>
+<p>rsync first calculates what it calls the
+<a href="https://github.com/WayneD/rsync/blob/0ac7ebceef70417355f25daf9e2fd94e84c49749/checksum.c#L182-L203">“sum1”</a>,
+or “fast signature”. This is a small checksum (two <code>uint16</code>) that can be
+calculated with minimal effort for a rolling window over the file data. tridge
+rsync comes with <a href="https://github.com/WayneD/rsync/blob/v3.2.4/simd-checksum-x86_64.cpp">SIMD
+implementations</a>
+to further speed this up where possible.</p>
+<p>Only if the sum1 matches will
+<a href="https://github.com/WayneD/rsync/blob/0ac7ebceef70417355f25daf9e2fd94e84c49749/checksum.c#L205-L300">“sum2”</a>
+(or “strong signature”) be calculated, a 16-byte MD4 hash. Newer protocol
+versions allow negotiating the hash algorithm and support the much faster xxhash
+algorithms.</p>
+<p>If sum2 matches, the block is considered equal on both sides.</p>
+<p>Hence, the best case for rsync is when a file has either not changed at all, or
+shares as many full blocks of content as possible with the old contents.</p>
+<h2 id="changing-data-sets">Changing data sets</h2>
+<p>Now that we know how rsync works on the file level, let’s take a step back to
+the data set level.</p>
+<p>The easiest situation is when you transfer a data set that is not currently
+changing. But what happens when the data set changes while your rsync transfer
+is running? Here are two examples.</p>
+<p><a href="https://github.com/Debian/debiman">debiman</a>, the manpage generator powering
+<a href="https://manpages.debian.org/">manpages.debian.org</a> is running on a Debian VM on
+which an rsync job periodically transfers the static manpage archive to
+different static web servers across the world. The rsync job and debiman are
+not sequenced in any way. Instead, debiman is careful to only ever <a href="https://github.com/Debian/debiman/blob/79b8abe8573daaaf15e4cf40e85daf309e00d454/internal/write/atomically.go#L23">atomically
+swap out
+files</a>
+in its output directory, or add new files before it swaps out an updated index.</p>
+<p>The second example, the <a href="https://en.wikipedia.org/wiki/PostgreSQL">PostgreSQL</a>
+database management system, is the opposite situation: instead of having full
+control over how files are laid out, here I don’t have control over how files
+are written (this generalizes to any situation where the model of only ever
+replacing files is not feasible). The data files which my Postgres installation
+keeps on disk are not great to synchronize using rsync: they are large and
+frequently change. Instead, I now exempt them from my rsync transfer and use <a href="https://manpages.debian.org/pg_dump.1"><code>pg_dump(1)</code></a>
+ to create a snapshot of my databases instead.</p>
+<p>To confirm rsync’s behavior regarding changing data sets in detail, I <a href="#confirmation-hack">modified
+rsync to ask for confirmation</a> between generating the file
+list and transferring the files. Here’s what I found:</p>
+<ul>
+<li>If files are added after rsync has transferred the file list, the new files
+will just not be part of the transfer.</li>
+<li>If a file vanishes between generating the file list and transfering the file,
+rsync exits with status code 24, which <a href="https://manpages.debian.org/bullseye/rsync/rsync.1.en.html#EXIT_VALUES">its manpage documents as “Partial
+transfer due to vanished source
+files”</a>. My
+<code>rsyncprom</code> monitoring wrapper <a href="https://github.com/stapelberg/rsyncprom/commit/bbf82934093b938d054d460a7f9764234d30bc17">offers a flag to treat exit code 24 like exit
+code
+0</a>,
+because depending on the data set, vanishing files are expected.</li>
+<li>If a file’s contents change (no matter whether the file grows, shrinks, or is
+modified in-place) between generating the file list and the actual file
+transfer, that’s not a problem — rsync will transfer the file contents as it
+reads them once the transfer starts. Note that this might be an inconsistent
+view of the data, depending on the application.
+<ul>
+<li>Ideally, don’t ever modify files within a data set that is rsynced. Instead,
+atomically move complete files into the data set.</li>
+</ul>
+</li>
+</ul>
+<p>Another way of phrasing the above is that data consistency is not something that
+rsync can in any way guarantee. It’s up to you to either live with the
+inconsistency (often a good-enough strategy!), or to add an extra step that
+ensures the data set you feed to rsync is consistent.</p>
+<h2 id="next-up">Next up</h2>
+<p>The fourth article in this series is rsync, article 4: My own rsync
+implementation (To be published.)</p>
+<h2 id="confirmation-hack">Appendix A: rsync confirmation hack</h2>
+<p>For verifying rsync’s behavior with regards to changing data sets, I checked
+out the following version:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% git clone https://github.com/WayneD/rsync/ rsync-changing-data-sets
+</span></span><span style="display:flex;"><span>% <span style="color:#007020">cd</span> rsync-changing-data-sets
+</span></span><span style="display:flex;"><span>% git checkout v3.2.4
+</span></span><span style="display:flex;"><span>% ./configure
+</span></span><span style="display:flex;"><span>% make
+</span></span></code></pre></div><p>Then, I modified <code>flist.c</code> to add a confirmation step between sending the file
+list and doing the actual file transfers:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/flist.c w/flist.c
+</span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">index 1ba306bc..98981f34 100644
+</span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold"></span><span style="color:#a00000">--- i/flist.c
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ w/flist.c
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -20,6 +20,8 @@
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>  * with this program; if not, visit the http://fsf.org website.
+</span></span><span style="display:flex;"><span>  */
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span><span style="color:#00a000">+#include &lt;stdio.h&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> #include &#34;rsync.h&#34;
+</span></span><span style="display:flex;"><span> #include &#34;ifuncs.h&#34;
+</span></span><span style="display:flex;"><span> #include &#34;rounding.h&#34;
+</span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -2516,6 +2518,17 @@ struct file_list *send_file_list(int f, int argc, char *argv[])
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span> 	if (DEBUG_GTE(FLIST, 2))
+</span></span><span style="display:flex;"><span> 		rprintf(FINFO, &#34;send_file_list done\n&#34;);
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span><span style="color:#00a000">+	char *line = NULL;
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	size_t llen = 0;
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	ssize_t nread;
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	printf(&#34;file list sent. enter &#39;yes&#39; to continue: &#34;);
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	while ((nread = getline(&amp;line, &amp;llen, stdin)) != -1) {
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	  if (nread == strlen(&#34;yes\n&#34;) &amp;&amp; strcasecmp(line, &#34;yes\n&#34;) == 0) {
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	    break;
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	  }
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	  printf(&#34;enter &#39;yes&#39; to continue: &#34;);
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	}
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 	if (inc_recurse) {
+</span></span><span style="display:flex;"><span> 		send_dir_depth = 1;
+</span></span><span style="display:flex;"><span> 		add_dirs_to_tree(-1, flist, stats.num_dirs);
+</span></span></code></pre></div><p>My rsync invocation is:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>./rsync -av --debug<span style="color:#666">=</span>all4 --protocol<span style="color:#666">=</span><span style="color:#40a070">27</span> ~/i3/src /tmp/DEST/
+</span></span></code></pre></div><p>It’s necessary to use an older protocol version to make rsync generate a full
+file list before starting the transfer. Later protocol versions interleave these
+parts of the protocol.</p>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[rsync, article 2: Surroundings]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/"/>
+    <id>https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/</id>
+    <published>2022-07-02T14:30:00+02:00</published>
+    <content type="html"><![CDATA[<p>This post is the second article in a series of blog posts about rsync, <a href="../2022-06-18-rsync-overview/">see the
+Series Overview</a>.</p>
+<p>Now that we know what to use rsync for, how can we best integrate rsync into
+monitoring and alerting, and on which operating systems does it work?</p>
+<h2 id="monitoring-and-alerting-for-rsync-jobs-using-prometheus">Monitoring and alerting for rsync jobs using Prometheus</h2>
+<p>Once you have one or two important <code>rsync</code> jobs, it might make sense to alert
+when your job has not completed as expected.</p>
+<p>I’m using <a href="https://prometheus.io/">Prometheus</a> for all my monitoring and alerting.</p>
+<p>Because Prometheus <em>pulls</em> metrics from its (typically always-running) targets,
+we need an extra component: the <a href="https://prometheus.io/docs/practices/pushing/">Prometheus
+Pushgateway</a>. The Pushgateway
+stores metrics pushed by short-lived jobs like <code>rsync</code> transfers and makes them
+available to subsequent Prometheus pulls.</p>
+<p>To integrate <code>rsync</code> with the Prometheus Pushgateway, I wrote
+<a href="https://github.com/stapelberg/rsyncprom"><code>rsyncprom</code></a>, a small tool that wraps
+<code>rsync</code>, or parses rsync output supplied by you. Once <code>rsync</code> completes,
+<code>rsyncprom</code> pushes the rsync exit code and parsed statistics about the transfer
+to your Pushgateway.</p>
+<h3 id="prometheus-server-side-setup">Prometheus server-side setup</h3>
+<p>First, I set up the Prometheus Pushgateway (via Docker and systemd) on my
+server.</p>
+<p>Then, in my <code>prometheus.conf</code> file, I instruct Prometheus to pull data from my
+Pushgateway:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># prometheus.conf</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">rule_files</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>- backups.rules.yml<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">scrape_configs</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#60a0b0;font-style:italic"># […]</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>- <span style="color:#062873;font-weight:bold">job_name</span>:<span style="color:#bbb"> </span>pushgateway<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">honor_labels</span>:<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">true</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">static_configs</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">targets</span>:<span style="color:#bbb"> </span>[<span style="color:#4070a0">&#39;pushgateway:9091&#39;</span>]<span style="color:#bbb">
+</span></span></span></code></pre></div><p>Finally, in <code>backups.rules.yml</code>, I configure an alert on the time series <code>rsync_exit_code</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># backups.rules.yml</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">groups</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>backups.rules<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">rules</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">alert</span>:<span style="color:#bbb"> </span>RsyncFailing<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">expr</span>:<span style="color:#bbb"> </span>rsync_exit_code{job=&#34;rsync&#34;} &gt; 0<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">for</span>:<span style="color:#bbb"> </span>1m<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">labels</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">job</span>:<span style="color:#bbb"> </span>rsync<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">annotations</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">description</span>:<span style="color:#bbb"> </span>rsync {{ $labels.instance }} is failing<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">summary</span>:<span style="color:#bbb"> </span>rsync {{ $labels.instance }} is failing<span style="color:#bbb">
+</span></span></span></code></pre></div><p>This alert will fire any time an rsync job monitored via <code>rsyncprom</code> exits with
+a non-zero exit code.</p>
+<h3 id="rsync-client-side-setup">rsync client-side setup</h3>
+<p>On each machine that runs <code>rsync</code> jobs I want to monitor, I first install
+<code>rsyncprom</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>go install github.com/stapelberg/rsyncprom/cmd/rsync-prom@latest
+</span></span></code></pre></div><p>Then, I just wrap <code>rsync</code> transfers where it’s most convenient, for example in
+my <a href="https://manpages.debian.org/crontab.5"><code>crontab(5)</code></a>
+:</p>
+<pre tabindex="0"><code class="language-crontab" data-lang="crontab"># crontab -e
+9 9 * * * /home/michael/go/bin/rsync-prom --job=&#34;cron&#34; --instance=&#34;gphotos-sync@midna&#34; -- /home/michael/gphotos-sync/sync.sh
+</code></pre><p>The same wrapper technique works in <a href="https://github.com/stapelberg/rsyncprom#setup-example-systemd">shell scripts or systemd service
+files</a>.</p>
+<p>You can also provide <code>rsync</code> output <a href="https://github.com/stapelberg/zkj-nas-tools/blob/02d46d718df60c413844d9218f6dd702ad94e5f1/dornroeschen/sshutil.go#L134-L139">from Go
+code</a>
+(this example runs <code>rsync</code> via SSH).</p>
+<h3 id="monitoring-architecture">Monitoring architecture</h3>
+<p>Here’s how the whole setup looks like architecturally:</p>
+<p><img src="2022-05-29-rsync-prom-architecture.svg" alt="rsync-prom architecture"></p>
+<p>The rsync scheduler runs on a Raspberry Pi running
+<a href="https://gokrazy.org/">gokrazy</a>. The scheduler invokes the <code>rsync</code> job to back
+up <em>websrv.zekjur.net</em> via SSH and sends the output to Prometheus, which is
+running on a (different) server at an ISP.</p>
+<h3 id="monitoring-dashboard">Monitoring dashboard</h3>
+<p>The grafana dashboard looks like this in action:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu49255cbd0611171ac9ea093d82565708_603964_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu49255cbd0611171ac9ea093d82565708_603964_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu49255cbd0611171ac9ea093d82565708_603964_600x0_resize_q75_box.jpg"
+  alt="rsync grafana dashboard" title="rsync grafana dashboard"
+  width="600"
+  height="469"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+<ul>
+<li>The top left table shows the most recent rsync exit code, green means 0 (success).</li>
+<li>The top right graph shows rsync runtime (wall-clock time) over time. Long
+runtime can have any number of bottlenecks as the reason: network connections,
+storage devices, slow CPUs.</li>
+<li>The bottom left graph shows rsync dataset size over time. This allows you to
+quickly pinpoint transfers that are filling your disk up.</li>
+<li>The bottom right graph shows transferred bytes per rsync over time. The higher
+the value, the higher the amount of change in your data set between
+synchronization runs.</li>
+</ul>
+<h2 id="rsync-operating-system-availability">rsync operating system availability</h2>
+<p>Now that we have learnt about a couple of typical use-cases, where can you use
+<code>rsync</code> to implement these use-cases? The answer is: in most environments, as
+<code>rsync</code> is widely available on different Linux and BSD versions.</p>
+<p>Macs come with <code>rsync</code> available by default (but it’s an old, patched version),
+and OpenBSD comes with a BSD-licensed implementation called
+<a href="https://www.openrsync.org/">openrsync</a> by default.</p>
+<p>On Windows, you can use the <a href="https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux">Windows Subsystem for
+Linux</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Operating System</th>
+<th>Implementation</th>
+<th>Version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FreeBSD 13.1 (ports)</td>
+<td>tridge</td>
+<td><a href="https://www.freebsd.org/cgi/man.cgi?query=rsync&amp;manpath=FreeBSD+13.1-RELEASE+and+Ports">3.2.3</a></td>
+</tr>
+<tr>
+<td>OpenBSD 7.1</td>
+<td>openrsync</td>
+<td>(7.1)</td>
+</tr>
+<tr>
+<td>OpenBSD 7.1 (ports)</td>
+<td>tridge</td>
+<td><a href="https://openports.se/net/rsync">3.2.4</a></td>
+</tr>
+<tr>
+<td>NetBSD 9.2 (pkgsrc)</td>
+<td>tridge</td>
+<td><a href="https://ftp.netbsd.org/pub/pkgsrc/current/pkgsrc/net/rsync/index.html">3.2.4</a></td>
+</tr>
+<tr>
+<td>Linux</td>
+<td>tridge</td>
+<td><a href="https://repology.org/project/rsync/versions">repology</a></td>
+</tr>
+<tr>
+<td>macOS</td>
+<td>tridge</td>
+<td><a href="https://www.unix.com/man-page/osx/1/rsync/">2.6.9</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="next-up">Next Up</h2>
+<p>The third article in this series is <a href="../2022-07-02-rsync-how-does-it-work/">rsync, article 3: How does rsync
+work?</a>. With rsync up and running, it’s
+time to take a peek under the hood of rsync to better understand how it works.</p>
+]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[rsync, article 1: Scenarios]]></title>
     <link href="https://michael.stapelberg.ch/posts/2022-06-18-rsync-article-1-scenarios/"/>
     <id>https://michael.stapelberg.ch/posts/2022-06-18-rsync-article-1-scenarios/</id>
@@ -207,9 +607,10 @@ SSH’s <a href="https://manpages.debian.org/authorized_keys.5"><code>authorized
  config file:</p>
 <pre tabindex="0"><code>command=&#34;/root/backup-remote.pl&#34;,no-port-forwarding,no-X11-forwarding ssh-ed25519 AAAAC3…
 </code></pre><h2 id="next-up">Next up</h2>
-<p>The second article in this series is “rsync, article 2: Surroundings” (To be
-published). Now that we know what to use rsync for, how can we best integrate
-rsync into monitoring and alerting, and on which operating systems does it work?</p>
+<p>The second article in this series is <a href="../2022-07-02-rsync-surroundings/">rsync, article 2:
+Surroundings</a>. Now that we know what to use
+rsync for, how can we best integrate rsync into monitoring and alerting, and on
+which operating systems does it work?</p>
 ]]></content>
   </entry>
   <entry>
@@ -228,12 +629,12 @@ every computer user put this great tool into their toolbox 🛠 🧰 !</p>
 motivate why it makes sense to look at rsync, I present three scenarios for
 which I have come to appreciate rsync: DokuWiki transfers, Software deployment
 and Backups.</li>
-<li>rsync, article 2: Surroundings (To be published). Now that we know what to use
-rsync for, how can we best integrate rsync into monitoring and alerting, and
-on which operating systems does it work?</li>
-<li>rsync, article 3: How does rsync work? (To be published). With rsync up and
-running, it’s time to take a peek under the hood of rsync to better understand
-how it works.</li>
+<li><a href="../2022-07-02-rsync-surroundings/">rsync, article 2: Surroundings</a>. Now that
+we know what to use rsync for, how can we best integrate rsync into monitoring
+and alerting, and on which operating systems does it work?</li>
+<li><a href="../2022-07-02-rsync-how-does-it-work">rsync, article 3: How does rsync
+work?</a>. With rsync up and running, it’s
+time to take a peek under the hood of rsync to better understand how it works.</li>
 <li>rsync, article 4: My own rsync implementation (To be published.)</li>
 </ul>
 ]]></content>

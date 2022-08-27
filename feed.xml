@@ -6,6 +6,412 @@
   <id>https://michael.stapelberg.ch/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[DIY out of band management: remote console server]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/"/>
+    <id>https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/</id>
+    <published>2022-08-27T14:40:00+02:00</published>
+    <content type="html"><![CDATA[<p>For the guest WiFi at an event that eventually fell through, we wanted to tunnel
+all the traffic through my internet connection via my home router.</p>
+<p>Because the event is located in another country, many hours of travel away,
+there are a couple of scenarios where remote control of my home router can be a
+life-saver. For example, should my home router crash, remotely turning power off
+and on again gets the event back online.</p>
+<p>But, power-cycling a machine is a pretty big hammer. For some cases, like
+locking yourself out with a configuration mistake, a more precise tool like a
+remote serial console might be nicer.</p>
+<p>In this article, I’ll present two cheap and pragmatic DIY out-of-band management
+solutions that I have experimented with in the last couple of weeks and wanted
+to share:</p>
+<ul>
+<li><a href="#power-only">Variant 1: Remote Power Management only</a></li>
+<li><a href="#remote-console">Variant 2: a full Remote Console Server</a></li>
+</ul>
+<p>You can easily start with the first variant and upgrade it into the second
+variant later.</p>
+<h2 id="power-only">Variant 1: Remote Power Management</h2>
+<h3 id="architecture-diagram">Architecture Diagram</h3>
+<p>Here is the architecture of the system at a glance. The right-hand side is the
+existing router I want to control, the left-hand side shows the out of band
+management system:</p>
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/2022-07-02-power-mgmt-architecture.svg"><img
+  src="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/2022-07-02-power-mgmt-architecture.svg"
+  
+  style="border: 1px solid #000; margin-right: 1rem"
+  
+  loading="lazy"></a>
+
+
+<p>Let’s go through the hardware components from top to bottom.</p>
+<h3 id="hardware-4g-wifi-router-out-of-band-network">Hardware: 4G WiFi Router (Out Of Band Network)</h3>
+<p>The easiest way to have another network connection for projects like this one is
+the <a href="https://www.digitec.ch/en/s1/product/digitec-iot-test-sim-card-data-flat-30-days-unlimited-10-mbits-sim-card-11689214?supplier=406802">digitec iot
+subscription</a>. They
+offer various different options, and their cheapest one, a 0.4 Mbps flatrate for
+4 CHF per month, is sufficient for our use-case.</p>
+<p>A convenient way of making the digitec iot subscription available to other
+devices is to use a mobile WiFi router such as the <a href="https://www.digitec.ch/en/s1/product/tp-link-m7350-routers-5615329?supplier=406802">TP-Link M7350 4G/LTE Mobile
+Wi-Fi
+router</a>
+(68 CHF). You can power it via USB, and it has a built-in battery that will last
+for a few hours.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0484.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0484_hu855bbe0a9c47ac557e5b09db74fa3b06_1361683_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0484_hu855bbe0a9c47ac557e5b09db74fa3b06_1361683_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0484_hu855bbe0a9c47ac557e5b09db74fa3b06_1361683_600x0_resize_q75_box.jpg"
+  alt="TP-Link M7350 4G/LTE Mobile Wi-Fi router connected to digitec iot" title="TP-Link M7350 4G/LTE Mobile Wi-Fi router connected to digitec iot"
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+<p>By default, the device turns itself off after a while when it thinks it is
+unused, which is undesired for us — if the smart plug drops out of the WiFi, we
+don’t want the whole system to go offline. You can turn off this behavior in the
+web interface under <code>Advanced → Power Saving → Power Saving Mode</code>.</p>
+<h3 id="hardware-wifi-smart-plug">Hardware: WiFi Smart Plug</h3>
+<p>With the out of band network connection established, all you need to remotely
+toggle power is a smart plug such as the <a href="https://itead.cc/product/sonoff-s26-wifi-smart-plug/">Sonoff S26 WiFi Smart
+Plug</a>.</p>
+<p>The simplest setup is to connect the Smart Plug to the 4G router via WiFi, and
+control it using Sonoff’s mobile app via Sonoff’s cloud.</p>
+<h4 id="non-cloud-solution">Non-cloud solution</h4>
+<p>Alternatively, if you want to avoid the Sonoff cloud, the device comes with a
+“DIY mode”, but <a href="https://twitter.com/zekjur/status/1321949087160258562">the DIY mode wouldn’t work reliably for
+me</a> when I tried
+it. Instead, I flashed the <a href="https://tasmota.github.io/docs/">Open Source Tasmota
+firmware</a> and connected it to a self-hosted
+MQTT server via the internet.</p>
+<p>Of course, now your self-hosted MQTT server is a single point of failure, but
+perhaps you prefer that over the Sonoff cloud being a single point of failure.</p>
+<h2 id="remote-console">Variant 2: Remote Console Server</h2>
+<p>Turning power off and on remotely is a great start, but what if you need actual
+remote access to a system? In my case, I’m using a <a href="https://en.wikipedia.org/wiki/Serial_port">serial
+port</a> to see log messages and run a
+shell on my router. This is also called a “serial console”, and any device that
+allows accessing a serial console without sitting physically in front of the
+serial port is called a “remote console server”.</p>
+<p>Commercially available remote console servers typically offer lots of ports (up
+to 48) and cost lots of money (many thousand dollars or equivalent), because
+their target application is to be installed in a rack full of machines in a lab
+or data center. A few years ago, I built
+<a href="https://freetserv.github.io/">freetserv</a>, an open source, open hardware
+solution for this problem.</p>
+<p>For the use-case at hand, we only need a single serial console, so we’ll do it
+with a Raspberry Pi.</p>
+<h3 id="architecture-diagram-1">Architecture Diagram</h3>
+<p>The architecture for this variant looks similar to the other variant, but adds
+the <em>consrv</em> Raspberry Pi Zero 2 W and a USB-to-serial adapter:</p>
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/2022-06-19-consrv_architecture.svg"><img
+  src="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/2022-06-19-consrv_architecture.svg"
+  
+  style="border: 1px solid #000; margin-right: 1rem"
+  
+  loading="lazy"></a>
+
+
+<h3 id="hardware-raspberry-pi-zero-2-w">Hardware: Raspberry Pi Zero 2 W</h3>
+<p>We’ll use a <a href="https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/">Raspberry Pi Zero 2
+W</a> as our console
+server. While the device is a little slower than a Raspberry Pi 3 B, it is still
+plenty fast enough for providing a serial console, and it only consumes 0.8W of
+power (see <a href="https://gokrazy.org/platforms/">gokrazy → Supported platforms</a> for
+a comparison):</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured_hu855bbe0a9c47ac557e5b09db74fa3b06_860347_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured_hu855bbe0a9c47ac557e5b09db74fa3b06_860347_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured_hu855bbe0a9c47ac557e5b09db74fa3b06_860347_600x0_resize_q75_box.jpg"
+  alt="Raspberry Pi Zero 2 W with USB hub, ethernet and serial" title="Raspberry Pi Zero 2 W with USB hub, ethernet and serial"
+  width="600"
+  height="600"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+<p>If the Pi Zero 2 W is not available, you can try using any other <a href="https://gokrazy.org/platforms/">Raspberry Pi
+supported by gokrazy</a>, or even an older Pi Zero
+with the <a href="https://gokrazy.org/platforms/#community-supported-raspberry-pi-os-32-bit-kernelfirmware">community-supported Pi OS 32-bit
+kernel</a>
+(I didn’t test that).</p>
+<p>Our Pi will have at least two tasks:</p>
+<ol>
+<li>With a USB-to-serial adapter, the Pi will provide a serial console.</li>
+<li>The Pi will run <a href="https://tailscale.com/">Tailscale</a> mesh networking, which
+will transparently use either the wired network or fail over to the Out Of
+Band network. Tailscale also frees us from setting up port forwardings,
+dynamic DNS or anything like that.</li>
+<li>Optionally, the Pi can run a local MQTT server if you want to avoid the
+Sonoff cloud.</li>
+</ol>
+<h3 id="hardware-usb-to-serial-adapter">Hardware: USB-to-serial adapter</h3>
+<p>You can use any USB-to-serial adapter supported by Linux. Personally, I like the
+<a href="https://www.adafruit.com/product/2264">Adafruit FT232H adapter</a>, which I like
+to <a href="https://twitter.com/zekjur/status/1256879027266224128">re-program with FTDI’s FT_Prog so that it has a unique serial
+number</a>.</p>
+<p>In my router, I plugged in an <a href="https://twitter.com/zekjur/status/1443461234930634755">Longshine LCS-6321M serial PCIe
+card</a> to add a serial
+port. Before you ask: no, <a href="https://twitter.com/zekjur/status/1439612800561819649">using USB serial consoles for the kernel
+console</a> does not cut it.</p>
+<h3 id="hardware-usb-ethernet-adapter">Hardware: USB ethernet adapter</h3>
+<p>Because we not only want this Raspberry Pi to be available via the Out Of Band
+network (via WiFi), but also on the regular home network, we need a USB ethernet
+adapter.</p>
+<p>Originally I was going to use the Waveshare ETH-USB-HUB-BOX: Ethernet / USB HUB
+BOX for Raspberry Pi Zero Series, but it <a href="https://twitter.com/zekjur/status/1538582804224782337">turned out to be
+unreliable</a>.</p>
+<p>Instead, I’m now connecting a USB hub (as the Pi Zero 2 W has only one USB
+port), a <a href="https://www.linksys.com/support-product?sku=USB3GIG">Linksys USB3GIG</a>
+network adapter I had lying around, and my USB-to-serial adapter.</p>
+<h3 id="gokrazy-setup">gokrazy setup</h3>
+<p>Just like in the <a href="https://gokrazy.org/quickstart/">gokrazy quickstart</a>, we’re
+going to create a directory for this gokrazy instance:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#bb60d5">INSTANCE</span><span style="color:#666">=</span>gokrazy/consrv
+</span></span><span style="display:flex;"><span>mkdir -p ~/<span style="color:#70a0d0;font-style:italic">${</span><span style="color:#bb60d5">INSTANCE</span>?<span style="color:#70a0d0;font-style:italic">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#007020">cd</span> ~/<span style="color:#70a0d0;font-style:italic">${</span><span style="color:#bb60d5">INSTANCE</span>?<span style="color:#70a0d0;font-style:italic">}</span>
+</span></span><span style="display:flex;"><span>go mod init consrv
+</span></span></code></pre></div><p>You could now directly run <code>gokr-packer</code>, but personally, I like putting the
+<code>gokr-packer</code> command into a
+<a href="https://en.wikipedia.org/wiki/Make_(software)#Makefile"><code>Makefile</code></a> right away:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-makefile" data-lang="makefile"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># The consrv hostname resolves to the device’s Tailscale IP address,
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># once Tailscale is set up.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#bb60d5">PACKER</span> <span style="color:#666">:=</span> gokr-packer -hostname<span style="color:#666">=</span>consrv
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#bb60d5">PKGS</span> <span style="color:#666">:=</span> <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/gokrazy/breakglass <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/gokrazy/timestamps <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/gokrazy/serial-busybox <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/gokrazy/stat/cmd/gokr-webstat <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/gokrazy/stat/cmd/gokr-stat <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/gokrazy/mkfs <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/gokrazy/wifi <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	tailscale.com/cmd/tailscaled <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	tailscale.com/cmd/tailscale <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/mdlayher/consrv/cmd/consrv
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#06287e">all</span><span style="color:#666">:</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#06287e">.PHONY</span><span style="color:#666">:</span> update overwrite
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#06287e">update</span><span style="color:#666">:</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#70a0d0;font-style:italic">${</span><span style="color:#bb60d5">PACKER</span><span style="color:#70a0d0;font-style:italic">}</span> -update<span style="color:#666">=</span>yes <span style="color:#70a0d0;font-style:italic">${</span><span style="color:#bb60d5">PKGS</span><span style="color:#70a0d0;font-style:italic">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#06287e">overwrite</span><span style="color:#666">:</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#70a0d0;font-style:italic">${</span><span style="color:#bb60d5">PACKER</span><span style="color:#70a0d0;font-style:italic">}</span> -overwrite<span style="color:#666">=</span>/dev/sdx <span style="color:#70a0d0;font-style:italic">${</span><span style="color:#bb60d5">PKGS</span><span style="color:#70a0d0;font-style:italic">}</span>
+</span></span></code></pre></div><p>For the initial install, plug the SD card into your computer, put its device
+name into the <code>overwrite</code> target, and run <code>make overwrite</code>.</p>
+<p>For subsequent changes, you can use <code>make update</code>.</p>
+<h3 id="tailscale">Tailscale</h3>
+<p>Tailscale is a peer-to-peer mesh VPN, meaning we can use it to connect to our
+<code>consrv</code> Raspberry Pi from anywhere in the world, without having to set up port
+forwardings, dynamic DNS, or similar.</p>
+<p>As an added bonus, Tailscale also transparently fails over between connections,
+so while the fast ethernet/fiber connection works, Tailscale uses that,
+otherwise it uses the Out Of Band network.</p>
+<p>Follow <a href="https://gokrazy.org/packages/tailscale/">the gokrazy guide on Tailscale</a>
+to include the device in your Tailscale mesh VPN.</p>
+<h3 id="wifi-internet-connection-and-dual-homing">WiFi internet connection and dual homing</h3>
+<p>Setup WiFi:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>mkdir -p extrafiles/github.com/gokrazy/wifi/etc
+</span></span><span style="display:flex;"><span>cat <span style="color:#4070a0">&#39;{&#34;ssid&#34;: &#34;oob&#34;, &#34;psk&#34;: &#34;secret&#34;}&#39;</span> <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  &gt; extrafiles/github.com/gokrazy/wifi/etc/wifi.json
+</span></span></code></pre></div><p><code>consrv</code> should use the Out Of Band mobile uplink to reach the internet. At the
+same time, it should still be usable from my home network, too, to make gokrazy
+updates go quickly.</p>
+<p>We accomplish this using route priorities.</p>
+<p>I arranged for the WiFi interface to have higher route priority (5) than the
+ethernet interface (typically 1, but 11 in our setup thanks to the
+<code>-extra_route_priority=10</code> flag):</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>mkdir -p flags/github.com/gokrazy/gokrazy/cmd/dhcp
+</span></span><span style="display:flex;"><span><span style="color:#007020">echo</span> <span style="color:#4070a0">&#39;-extra_route_priority=10&#39;</span> <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  &gt; flags/github.com/gokrazy/gokrazy/cmd/dhcp/flags.txt
+</span></span><span style="display:flex;"><span>make update
+</span></span></code></pre></div><p>Now, <code>tailscale netcheck</code> shows an IPv4 address belonging to Sunrise, the mobile
+network provider behind the digitec iot subscription.</p>
+<h3 id="the-consrv-console-server">The consrv Console Server</h3>
+<p><a href="https://github.com/mdlayher/consrv"><code>consrv</code></a> is an SSH serial console server
+written in Go that Matt Layher and I developed. If you’re curious, you can watch
+the two of us creating it in this twitch stream recording:</p>
+
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+  <iframe src="https://www.youtube-nocookie.com/embed/1g46ei9aBH0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video"></iframe>
+</div>
+
+<p>The installation of <code>consrv</code> consists of two steps.</p>
+<p>Step 1 is done: we already included <code>consrv</code> in the <code>Makefile</code> earlier in
+<a href="#gokrazy-setup">gokrazy setup</a>.</p>
+<p>So, we only need to configure the desired serial ports in <code>consrv.toml</code> (in
+<a href="https://gokrazy.org/userguide/package-config/#extrafiles">gokrazy extrafiles</a>):</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>mkdir -p extrafiles/github.com/mdlayher/consrv/cmd/consrv/etc/consrv
+</span></span><span style="display:flex;"><span>cat &gt; extrafiles/github.com/mdlayher/consrv/cmd/consrv/etc/consrv/consrv.toml <span style="color:#4070a0">&lt;&lt;&#39;EOT&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">[server]
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">address = &#34;:2222&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">[[devices]]
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">serial = &#34;01716A92&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">name = &#34;router7&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">baud = 115200
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">logtostdout = true
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">[[identities]]
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">name = &#34;michael&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">public_key = &#34;ssh-ed25519 AAAAC3… michael@midna&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">EOT</span>
+</span></span></code></pre></div><p>Run <code>make update</code> to deploy the configuration to your device.</p>
+<p>If everything is set up correctly, we can now start a serial console session via
+SSH:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>midna% ssh -p 2222 router7@consrv.lan
+</span></span><span style="display:flex;"><span>Warning: Permanently added &#39;[consrv.lan]:2222&#39; (ED25519) to the list of known hosts.
+</span></span><span style="display:flex;"><span>consrv&gt; opened serial connection &#34;router7&#34;: path: &#34;/dev/ttyUSB0&#34;, serial: &#34;01716A92&#34;, baud: 115200
+</span></span><span style="display:flex;"><span>2022/06/19 20:50:47 dns.go:175: probe results: [{upstream: [2001:4860:4860::8888]:53, rtt: 999.665µs} {upstream: [2001:4860:4860::8844]:53, rtt: 2.041079ms} {upstream: 8.8.8.8:53, rtt: 2.073279ms} {upstream: 8.8.4.4:53, rtt: 16.200959ms}]
+</span></span><span style="display:flex;"><span>[…]
+</span></span></code></pre></div><p>I’m using the <code>logtostdout</code> option to make <code>consrv</code> continuously read the serial
+port and send it to <code>stdout</code>, which gokrazy in turn <a href="https://gokrazy.org/userguide/remotesyslog/">sends via remote
+syslog</a> to the <a href="https://github.com/gokrazy/syslogd">gokrazy syslog
+daemon</a>, running on another machine. You
+could also run it on the same machine if you want to log to file.</p>
+<aside class="admonition note">
+  <div class="note-container">
+    <div class="note-icon" style="width: 20px; height: 20px">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+    </div>
+    <div class="admonition-content">There is an <a href="https://github.com/mdlayher/consrv/issues/3">open issue in
+<code>consrv</code></a> regarding the failure
+mode when a serial adapter disappears. Currently, <code>consrv</code> hangs until you try
+to send something, then must be restarted. A workaround is available in the
+GitHub issue.</div>
+  </div>
+</aside>
+
+<h3 id="controlling-tasmota-from-breakglass">Controlling Tasmota from breakglass</h3>
+<p>You can use <a href="https://github.com/gokrazy/breakglass"><code>breakglass</code></a> to
+interactively log into your gokrazy installation.</p>
+<p>If you flashed your Smart Plug with Tasmota, you can easily turn power on from a
+breakglass shell by directly calling Tasmota’s HTTP API with <code>curl</code>:</p>
+<pre tabindex="0"><code>% breakglass consrv
+consrv# curl -v -X POST --data &#39;cmnd=power on&#39; http://tasmota_68462f-1583/cm
+</code></pre><p>The original Sonoff firmware offers a DIY mode which should also offer an HTTP
+API, but the <a href="https://twitter.com/zekjur/status/1321949087160258562">DIY mode did not work in my
+tests</a>. Hence, I’m only
+describing how to do it with Tasmota.</p>
+<h3 id="optional-local-mqtt-server">Optional: Local MQTT Server</h3>
+<p>Personally, I like having the Smart Plug available both on the local network
+(via Tasmota’s HTTP API) and via the internet with an external MQTT server. That
+way, even if either option fails, I still have a way to toggle power remotely.</p>
+<p>But, maybe you want to obtain usage stats by listening to MQTT or similar, and
+you don’t want to use an extra server for this. In that situation, you can
+easily run a local MQTT server on your Pi.</p>
+<p>In the gokrazy <code>Makefile</code>, add
+<a href="https://github.com/fhmq/hmq"><code>github.com/fhmq/hmq</code></a> to the list of packages to
+install, and configure Tasmota to connect to <code>consrv</code> on port 1883.</p>
+<p>To check that everything is working, use <code>mosquitto_sub</code> from another machine:</p>
+<pre tabindex="0"><code>midna% mosquitto_sub --verbose -h consrv.monkey-turtle.ts.net -t &#39;#&#39;
+</code></pre><h2 id="conclusion">Conclusion</h2>
+<p>digitec’s IOT mobile internet subscription makes remote power management
+delightfully easy with a smart plug and 4G WiFi router, and affordable
+enough. The subscription is flexible enough that you can decide to only book it
+while you’re traveling.</p>
+<p>We can elevate the whole setup in functionality (but also complexity) by
+combining Tailscale, consrv and gokrazy, running on a Raspberry Pi Zero 2 W, and
+connecting a USB-to-serial adapter.</p>
+<p>If you need more features than that, check out the next step on the feature and
+complexity ladder: <a href="https://pikvm.org/">PiKVM</a> or
+<a href="https://tinypilotkvm.com/">TinyPilot</a>. See also <a href="https://www.jeffgeerling.com/blog/2021/raspberry-pi-kvms-compared-tinypilot-and-pi-kvm-v3">this comparison by Jeff
+Geerling</a>.</p>
+<h2 id="appendix-a-unstable-apple-usb-ethernet-adapter">Appendix A: Unstable Apple USB ethernet adapter</h2>
+<p>The first USB ethernet adapter I tried was the <a href="https://www.artcomputer.ch/b2c_en/apple-usb-ethernet-adapter-a00004961/">Apple USB Ethernet
+Adapter</a>.</p>
+<p>Unfortunately, after a few days of uptime, I experienced the following kernel
+driver crash (with the <code>asix</code> Linux driver), and the link remained down until I
+rebooted.</p>
+<p>I then switched to a <a href="https://www.linksys.com/support-product?sku=USB3GIG">Linksys
+USB3GIG</a> network adapter
+(supported by the <code>r8152</code> Linux driver) and did not see any problems with that
+so far.</p>
+<details>
+<summary>kernel crash message (in dmesg)</summary>
+<pre tabindex="0"><code>dwc2 3f980000.usb: dwc2_hc_chhltd_intr_dma: Channel 5 - ChHltd set, but reason is unknown
+dwc2 3f980000.usb: hcint 0x00000002, intsts 0x04600009
+dwc2 3f980000.usb: dwc2_update_urb_state_abn(): trimming xfer length
+asix 1-1.4:1.0 eth0: Failed to read reg index 0x0000: -71
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 7588 at drivers/net/phy/phy.c:942 phy_error+0x10/0x58
+Modules linked in: brcmfmac brcmutil
+CPU: 1 PID: 7588 Comm: kworker/u8:2 Not tainted 5.18.3 #1
+Hardware name: Raspberry Pi Zero 2 W Rev 1.0 (DT)
+Workqueue: events_power_efficient phy_state_machine
+pstate: 80000005 (Nzcv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+pc : phy_error+0x10/0x58
+lr : phy_state_machine+0x258/0x2b0
+sp : ffff800009fe3d40
+x29: ffff800009fe3d40 x28: 0000000000000000 x27: ffff6c7ac300c078
+x26: ffff6c7ac300c000 x25: ffff6c7ac4390000 x24: 00000000ffffffb9
+x23: 0000000000000004 x22: ffff6c7ac4019cd8 x21: ffff6c7ac4019800
+x20: ffffce5c97f6f000 x19: ffff6c7ac4019800 x18: 0000000000000010
+x17: 0000000400000000 x16: 0000000000000000 x15: 0000000000001007
+x14: ffff800009fe3810 x13: 00000000ffffffea x12: 00000000fffff007
+x11: fffffffffffe0290 x10: fffffffffffe0240 x9 : ffffce5c988e1018
+x8 : c0000000fffff007 x7 : 00000000000000a8 x6 : ffffce5c98889280
+x5 : 0000000000000268 x4 : ffff6c7acf392b80 x3 : ffff6c7ac4019cd8
+x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff6c7ac4019800
+Call trace:
+ phy_error+0x10/0x58
+ phy_state_machine+0x258/0x2b0
+ process_one_work+0x1e4/0x348
+ worker_thread+0x48/0x418
+ kthread+0xf4/0x110
+ ret_from_fork+0x10/0x20
+---[ end trace 0000000000000000 ]---
+asix 1-1.4:1.0 eth0: Link is Down
+</code></pre></details>
+]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[rsync, article 3: How does rsync work?]]></title>
     <link href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/"/>
     <id>https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/</id>
@@ -5055,543 +5461,5 @@ set allowed-interface-list=none
 /tool mac-server ping
 set enabled=no
 </code></pre>]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[Home network 10 Gbit/s upgrade]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/"/>
-    <id>https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/</id>
-    <published>2021-05-16T17:33:16+02:00</published>
-    <content type="html"><![CDATA[<p>After <a href="/posts/2020-08-09-fiber-link-home-network/">adding a fiber link to my home
-network</a>, I am upgrading that link
-from 1 Gbit/s to 10 Gbit/s.</p>
-<p>As a reminder, conceptually the fiber link is built using two media converters
-from/to ethernet:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-08-04-media-converters.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-08-04-media-converters_hu863a0a53ff58eb79e087ca8992fd5d37_416326_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-08-04-media-converters_hu863a0a53ff58eb79e087ca8992fd5d37_416326_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-08-04-media-converters_hu863a0a53ff58eb79e087ca8992fd5d37_416326_600x0_resize_q75_box.jpg"
-  alt="0.9mm thin fiber cables" title="0.9mm thin fiber cables"
-  width="600"
-  height="217"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-<p>Schematically, this is what’s connected to both ends:</p>
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2021-05-15-bottleneck-1g.svg"><img
-  src="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2021-05-15-bottleneck-1g.svg"
-  alt="1 Gbit/s bottleneck" title="1 Gbit/s bottleneck"
-  style="border: 1px solid #000; margin-right: 1rem"
-  
-  loading="lazy"></a>
-
-
-<p>All links are 1 Gbit/s, so it’s easy to see that, for example, transfers between
-chuchi↔router7 and storage2↔midna cannot both use 1 Gbit/s at the same time.</p>
-<p>This upgrade serves 2 purposes:</p>
-<ol>
-<li>
-<p><strong>Raise the floor to 1 Gbit/s end-to-end</strong>: Ensure that serving large files
-(e.g. distri Linux images and packages) does no longer impact, and is no
-longer impacted by, other bandwidth flows that also use this transfer link in
-my home network, e.g. daily backups.</p>
-</li>
-<li>
-<p><strong>Raise the ceiling to 10 Gbit/s</strong>: Make it possible to selectively upgrade
-Linux PCs on either end of the link to 10 Gbit/s peak bandwidth.</p>
-</li>
-</ol>
-<p>Note that the internet uplink remains untouched at 1 Gbit/s — only transfers
-within the home network can happen at 10 Gbit/s.</p>
-<h2 id="replacing-the-media-converters-with-mikrotik-switches">Replacing the media converters with Mikrotik switches</h2>
-<p>We first replace both media converters and switches with a <a href="https://mikrotik.com/product/crs305_1g_4s_in">Mikrotik
-CRS305-1G-4S+IN</a>.</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-07-30-mikrotiks-featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-07-30-mikrotiks-featured_hu0957e5d484a34f5f279de33468b78758_1267758_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-07-30-mikrotiks-featured_hu0957e5d484a34f5f279de33468b78758_1267758_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-07-30-mikrotiks-featured_hu0957e5d484a34f5f279de33468b78758_1267758_600x0_resize_q75_box.jpg"
-  alt="Mikrotik CRS305-1G-4S&#43;IN" title="Mikrotik CRS305-1G-4S&#43;IN"
-  width="600"
-  height="411"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-<p>This device <a href="https://www.digitec.ch/de/s1/product/mikrotik-crs305-1g-4sin-5ports-switch-9876046">costs 149 CHF on digitec</a> and comes with 5 ports:</p>
-<ul>
-<li>1 × RJ45 Ethernet port for management, can be used as a regular 1 Gbit/s port.</li>
-<li>4 × SFP+ ports</li>
-</ul>
-<p>Each SFP+ port can be used with either an RJ-45 Ethernet or a fiber SFP+ module,
-but beware! As <a href="https://twitter.com/Nexus2kSwiss/status/1394395280120897544">Nexus2kSwiss points out on
-twitter</a>, the
-Mikrotik supports <strong>at most 2 RJ-45 SFPs at a time</strong>!</p>
-<h2 id="fiber-module-upgrade">Fiber module upgrade</h2>
-<p>I’m using 10 Gbit/s fiber SFP+ modules for the fiber link between my kitchen and
-living room.</p>
-<p>To make use of the 10 Gbit/s link between the switches, all devices that should
-get their guaranteed 1 Gbit/s end-to-end connection need to be connected
-directly to a Mikrotik switch.</p>
-<p>I’m connecting the PCs to the switch using Direct Attach Cables (DAC) where
-possible. The advantage of DAC cables over RJ45 SFP+ modules is their lower
-power usage and heat.</p>
-<p>The resulting list of SFP modules used in the two Mikrotik switches looks like
-so:</p>
-<table>
-<thead>
-<tr>
-<th>Mikrotik 1 SFP</th>
-<th>speed</th>
-<th></th>
-<th>speed</th>
-<th>Mikrotik 2 SFP</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>chuchi</td>
-<td>10 Gbit/s DAC</td>
-<td></td>
-<td>10 Gbit/s DAC</td>
-<td>midna</td>
-</tr>
-<tr>
-<td>storage2</td>
-<td>1 Gbit/s  RJ45</td>
-<td></td>
-<td>1 Gbit/s RJ45</td>
-<td>router7</td>
-</tr>
-<tr>
-<td></td>
-<td>10 Gbit/s BiDi</td>
-<td>⬅ BiDi fiber link ➡</td>
-<td>10 Gbit/s BiDi</td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<h2 id="hardware-sourcing">Hardware sourcing</h2>
-<p>The total cost of this upgrade is 676 CHF, with the biggest chunk spent on the
-Mellanox ConnectX-3 network cards and MikroTik switches.</p>
-<h3 id="fs-fiber-store-order">FS (Fiber Store) order</h3>
-<p><a href="https://www.FS.COM">FS.COM</a> was my go-to source for anything
-fiber-related. Everything they have is very affordable, and products in stock at
-their German warehouse arrive in Switzerland (and presumably other European
-countries, too) within the same week.</p>
-<table>
-<thead>
-<tr>
-<th>num</th>
-<th>price</th>
-<th>name</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1 ×</td>
-<td>34 CHF</td>
-<td><a href="https://www.fs.com/de/products/74681.html">Generic Compatible 10GBASE-BX BiDi SFP+ 1270nm-TX/1330nm-RX 10km DOM Transceiver Module, FS P/N: SFP-10G-BX #74681</a></td>
-</tr>
-<tr>
-<td>1 ×</td>
-<td>34 CHF</td>
-<td><a href="https://www.fs.com/de/products/74682.html">Generic Compatible 10GBASE-BX BiDi SFP+ 1330nm-TX/1270nm-RX 10km DOM Transceiver Module, FS P/N: SFP-10G-BX #74682</a></td>
-</tr>
-<tr>
-<td>2 ×</td>
-<td>14 CHF</td>
-<td><a href="https://www.fs.com/de/products/74621.html">3m Generic Compatible 10G SFP+ Passive Direct Attach Copper Twinax Cable</a></td>
-</tr>
-<tr>
-<td>0 ×</td>
-<td>56 CHF</td>
-<td><del><a href="https://www.fs.com/de/products/74680.html">SFP+ Transceiver Modul - Generisch kompatibel 10GBASE-T SFP+ Kupfer RJ-45 30m, FS P/N: SFP-10G-T #74680</a></del></td>
-</tr>
-</tbody>
-</table>
-<h3 id="digitec-order">digitec order</h3>
-<p>There are a few items that <a href="https://www.FS.COM">FS.COM</a> doesn’t stock. These I
-bought at <a href="https://www.digitec.ch/">digitec</a>, a big and popular electronics
-store in Switzerland. My thinking is that if products are available at digitec,
-they most likely are available at your preferred big electronics store, too.</p>
-<table>
-<thead>
-<tr>
-<th>num</th>
-<th>price</th>
-<th>name</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>2 ×</td>
-<td>149 CHF</td>
-<td><a href="https://www.digitec.ch/de/s1/product/mikrotik-crs305-1g-4sin-5ports-switch-9876046">Mikrotik CRS305-1G-4S+IN</a> switch</td>
-</tr>
-</tbody>
-</table>
-<h3 id="misc-order">misc order</h3>
-<p>The Mellanox cards are not as widely available as I’d like.</p>
-<p>I’m waiting for an FS.COM card to arrive, which might be a better choice.</p>
-<table>
-<thead>
-<tr>
-<th>num</th>
-<th>price</th>
-<th>name</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>2 ×</td>
-<td>129 EUR</td>
-<td><a href="https://www.heise.de/preisvergleich/nvidia-mellanox-connectx-3-en-10g-mcx311a-xcat-a2508412.html">Mellanox ConnectX-3 MCX311A-XCAT</a></td>
-</tr>
-</tbody>
-</table>
-<h2 id="mikrotik-switch-setup">Mikrotik switch setup</h2>
-<p>I want to use my switches only as switches, not for any routing or other layer 3
-features that might reduce bandwidth, so I first reboot the <a href="https://mikrotik.com/product/crs305_1g_4s_in">MikroTik
-CRS305-1G-4S+</a> into SwOS:</p>
-<ol>
-<li>
-<p>In the web interface menu, navigate to <em>System → Routerboard →
-Settings</em>, open the <em>Boot OS</em> drop-down and select option
-<em>SwOS</em>.</p>
-</li>
-<li>
-<p>In the web interface menu, navigate to <em>System → Reboot</em>.</p>
-</li>
-<li>
-<p>After the device rebooted, change the hostname which was reset to <code>MikroTik</code>.</p>
-</li>
-</ol>
-<p>Next, upgrade the firmware to 2.12 to fix a weird issue with certain
-combinations of SFP modules (SFP-10G-BX in SFP1, SFP-10G-T in SFP2):</p>
-<ol>
-<li>In the SwOS web interface, select the <em>Upgrade</em> tab, then click
-<em>Download &amp; Upgrade</em>.</li>
-</ol>
-<h2 id="network-card-setup-linux">Network card setup (Linux)</h2>
-<p>After booting with the Mellanox ConnectX3 in a PCIe slot, the card should show
-up in <a href="https://manpages.debian.org/dmesg.8"><code>dmesg(8)</code></a>
-:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>mlx4_core: Mellanox ConnectX core driver v4.0-0
-</span></span><span style="display:flex;"><span>mlx4_core: Initializing 0000:03:00.0
-</span></span><span style="display:flex;"><span>mlx4_core 0000:03:00.0: DMFS high rate steer mode is: disabled performance optimized steering
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>mlx4_core 0000:03:00.0: 31.504 Gb/s available PCIe bandwidth (8.0 GT/s PCIe x4 link)
-</span></span><span style="display:flex;"><span>mlx4_en: Mellanox ConnectX HCA Ethernet driver v4.0-0
-</span></span><span style="display:flex;"><span>mlx4_en 0000:03:00.0: Activating port:1
-</span></span><span style="display:flex;"><span>mlx4_en: 0000:03:00.0: Port 1: Using 16 TX rings
-</span></span><span style="display:flex;"><span>mlx4_en: 0000:03:00.0: Port 1: Using 16 RX rings
-</span></span><span style="display:flex;"><span>mlx4_en: 0000:03:00.0: Port 1: Initializing port
-</span></span><span style="display:flex;"><span>mlx4_en 0000:03:00.0: registered PHC clock
-</span></span><span style="display:flex;"><span>mlx4_core 0000:03:00.0 enp3s0: renamed from eth0
-</span></span><span style="display:flex;"><span>&lt;mlx4_ib&gt; mlx4_ib_add: mlx4_ib: Mellanox ConnectX InfiniBand driver v4.0-0
-</span></span><span style="display:flex;"><span>&lt;mlx4_ib&gt; mlx4_ib_add: counter index 1 for port 1 allocated 1
-</span></span><span style="display:flex;"><span>mlx4_en: enp3s0: Steering Mode 1
-</span></span><span style="display:flex;"><span>mlx4_en: enp3s0: Link Up</span></span></code></pre></div>
-<p>Another way to verify the device is running at maximum speed on the computer’s
-PCIe bus, is to ensure <code>LnkSta</code> matches <code>LnkCap</code> in the <a href="https://manpages.debian.org/lspci.8"><code>lspci(8)</code></a>
- output:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% sudo lspci -vv
-</span></span><span style="display:flex;"><span>03:00.0 Ethernet controller: Mellanox Technologies MT27500 Family [ConnectX-3]
-</span></span><span style="display:flex;"><span>	Subsystem: Mellanox Technologies Device 0055
-</span></span><span style="display:flex;"><span>[…]
-</span></span><span style="display:flex;"><span>	Capabilities: [60] Express (v2) Endpoint, MSI 00
-</span></span><span style="display:flex;"><span>[…]
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>		LnkCap:	Port #8, Speed 8GT/s, Width x4, ASPM L0s, Exit Latency L0s unlimited
-</span></span><span style="display:flex;"><span>			ClockPM- Surprise- LLActRep- BwNot- ASPMOptComp+
-</span></span><span style="display:flex;"><span>		LnkCtl:	ASPM Disabled; RCB 64 bytes, Disabled- CommClk+
-</span></span><span style="display:flex;"><span>			ExtSynch- ClockPM- AutWidDis- BWInt- AutBWInt-
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>		LnkSta:	Speed 8GT/s (ok), Width x4 (ok)
-</span></span><span style="display:flex;"><span>			TrErr- Train- SlotClk+ DLActive- BWMgmt- ABWMgmt-
-</span></span><span style="display:flex;"><span>[…]</span></span></code></pre></div>
-<p>You can verify your network link is running at 10 Gbit/s using <a href="https://manpages.debian.org/ethtool.8"><code>ethtool(8)</code></a>
-:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% sudo ethtool enp3s0
-</span></span><span style="display:flex;"><span>Settings for enp3s0:
-</span></span><span style="display:flex;"><span>	Supported ports: [ FIBRE ]
-</span></span><span style="display:flex;"><span>	Supported link modes:   1000baseKX/Full
-</span></span><span style="display:flex;"><span>	                        10000baseKR/Full
-</span></span><span style="display:flex;"><span>	Supported pause frame use: Symmetric Receive-only
-</span></span><span style="display:flex;"><span>	Supports auto-negotiation: No
-</span></span><span style="display:flex;"><span>	Supported FEC modes: Not reported
-</span></span><span style="display:flex;"><span>	Advertised link modes:  1000baseKX/Full
-</span></span><span style="display:flex;"><span>	                        10000baseKR/Full
-</span></span><span style="display:flex;"><span>	Advertised pause frame use: Symmetric
-</span></span><span style="display:flex;"><span>	Advertised auto-negotiation: No
-</span></span><span style="display:flex;"><span>	Advertised FEC modes: Not reported
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>	Speed: 10000Mb/s
-</span></span><span style="display:flex;"><span>	Duplex: Full
-</span></span><span style="display:flex;"><span>	Auto-negotiation: off
-</span></span><span style="display:flex;"><span>	Port: Direct Attach Copper
-</span></span><span style="display:flex;"><span>	PHYAD: 0
-</span></span><span style="display:flex;"><span>	Transceiver: internal
-</span></span><span style="display:flex;"><span>	Supports Wake-on: d
-</span></span><span style="display:flex;"><span>	Wake-on: d
-</span></span><span style="display:flex;"><span>        Current message level: 0x00000014 (20)
-</span></span><span style="display:flex;"><span>                               link ifdown
-</span></span><span style="display:flex;"><span>	Link detected: yes</span></span></code></pre></div>
-<h2 id="benchmarking-batch-transfers">Benchmarking batch transfers</h2>
-<p>As mentioned in the introduction, routing 10 Gbit/s is out of scope in this
-article. If you’re interested in routing performance, check out Andree Toonk’s
-<a href="https://toonk.io/linux-kernel-and-measuring-network-throughput/index.html">post which confirms that Linux can route 10 Gbit/s at line
-rate</a>.</p>
-<p>The following sections cover individual batch transfers of large files, not many
-small flows.</p>
-<h3 id="iperf3-speed-test">iperf3 speed test</h3>
-<p>Out of the box, the speeds that <a href="https://manpages.debian.org/iperf3.1"><code>iperf3(1)</code></a>
- measures
-are decent:</p>
-<pre tabindex="0"><code>chuchi % iperf3 --version
-iperf 3.6 (cJSON 1.5.2)
-Linux chuchi 4.19.0-16-amd64 #1 SMP Debian 4.19.181-1 (2021-03-19) x86_64
-Optional features available: CPU affinity setting, IPv6 flow label, SCTP, TCP congestion algorithm setting, sendfile / zerocopy, socket pacing, authentication
-
-chuchi % iperf3 --server
-[…]
-
-midna % iperf3 --version          
-iperf 3.9 (cJSON 1.7.13)
-Linux midna 5.12.1-arch1-1 #1 SMP PREEMPT Sun, 02 May 2021 12:43:58 +0000 x86_64
-Optional features available: CPU affinity setting, IPv6 flow label, TCP congestion algorithm setting, sendfile / zerocopy, socket pacing, authentication
-
-midna % iperf3 --client chuchi.lan
-Connecting to host 10.0.0.173, port 5201
-[  5] local 10.0.0.76 port 43168 connected to 10.0.0.173 port 5201
-[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
-[  5]   0.00-1.00   sec  1.10 GBytes  9.42 Gbits/sec    0   1.62 MBytes       
-[  5]   1.00-2.00   sec  1.09 GBytes  9.41 Gbits/sec    0   1.70 MBytes       
-[  5]   2.00-3.00   sec  1.10 GBytes  9.41 Gbits/sec    0   1.70 MBytes       
-[  5]   3.00-4.00   sec  1.09 GBytes  9.41 Gbits/sec    0   1.78 MBytes       
-[  5]   4.00-5.00   sec  1.09 GBytes  9.41 Gbits/sec    0   1.87 MBytes       
-[  5]   5.00-6.00   sec  1.10 GBytes  9.42 Gbits/sec    0   1.87 MBytes       
-[  5]   6.00-7.00   sec  1.10 GBytes  9.42 Gbits/sec    0   1.87 MBytes       
-[  5]   7.00-8.00   sec  1.10 GBytes  9.41 Gbits/sec    0   1.87 MBytes       
-[  5]   8.00-9.00   sec  1.09 GBytes  9.41 Gbits/sec    0   1.96 MBytes       
-[  5]   9.00-10.00  sec  1.09 GBytes  9.38 Gbits/sec  402   1.52 MBytes       
-- - - - - - - - - - - - - - - - - - - - - - - - -
-[ ID] Interval           Transfer     Bitrate         Retr
-[  5]   0.00-10.00  sec  11.0 GBytes  9.41 Gbits/sec  402             sender
-[  5]   0.00-10.00  sec  11.0 GBytes  9.40 Gbits/sec                  receiver
-
-iperf Done.
-</code></pre><h3 id="http-speed-test">HTTP speed test</h3>
-<p>Downloading a file from an <a href="https://manpages.debian.org/nginx.1"><code>nginx(1)</code></a>
- web server using <a href="https://manpages.debian.org/curl.1"><code>curl(1)</code></a>
- is fast, too:</p>
-<pre tabindex="0"><code>% curl -o /dev/null http://chuchi.lan/distri/supersilverhaze/img/distri-disk.img.zst
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-100  934M  100  934M    0     0  1118M      0 --:--:-- --:--:-- --:--:-- 1117M
-</code></pre><p>Note that this download was served from RAM (Linux page cache). The next upgrade
-I need to do in this machine is replace the SATA SSD with an NVMe SSD, because
-the disk is now the bottleneck.</p>
-<h2 id="conclusion">Conclusion</h2>
-<p>This was a pleasantly simple upgrade: plug in a bunch of new hardware and batch
-transfers become faster.</p>
-<p>The Mikrotik switch provides great value for money, and the Mellanox ConnectX-3
-cards work well, provided you can find them.</p>
-<h2 id="appendix-a-switching-from-rj45-sfp-modules-to-direct-attach-cables">Appendix A: Switching from RJ45 SFP+ modules to Direct Attach Cables</h2>
-<p>Originally, I connected all PCs to the MikroTik switches with RJ45 SFP+ modules
-for two reasons:</p>
-<ol>
-<li>I bought <a href="https://www.digitec.ch/de/s1/product/intel-x550-t2-pci-express-30-netzwerkadapter-5926807">Intel
-X550-T2</a>
-PCIe 10 Gbit/s network cards that RJ45 as my first choice.</li>
-<li>The SFP+ modules are backwards-compatible and can be used with 1 Gbit/s RJ45
-devices, too, which makes for a nice incremental upgrade path.</li>
-</ol>
-<p>However, I later was made aware that the RJ45 SFP+ modules use significantly
-more power and run significantly hotter than Direct Attach Cables (DAC).</p>
-<p>I measured it: each RJ45 SFP+ module was causing my BiDi SFP+ module to run 5℃
-hotter!</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2021-06-06-sfp-temperatures.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2021-06-06-sfp-temperatures_hu7dc6d141e645d7cfd271ec6844fcfc18_272504_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2021-06-06-sfp-temperatures_hu7dc6d141e645d7cfd271ec6844fcfc18_272504_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2021-06-06-sfp-temperatures_hu7dc6d141e645d7cfd271ec6844fcfc18_272504_600x0_resize_q75_box.jpg"
-  
-  width="600"
-  height="269"
-  style="border: 1px solid #000"
-  
-  loading="lazy"></a>
-
-
-
-<p>Around 06/02 I replaced one RJ45 SFP+ module with a Direct Attach Cable.</p>
-<p>Around 06/06 I replaced the remaining RJ45 SFP+ module with another Direct
-Attach Cable.</p>
-<p>As you can see, this caused a 10℃ drop in temperature of the BiDi SFP+ module.</p>
-<p>The MikroTik is still uncomfortably hot, making it hard to work with when it’s
-powered on.</p>
-<h2 id="appendix-b-network-card-setup-linux-with-intel-x550-t2">Appendix B: Network card setup (Linux) with Intel X550-T2</h2>
-<p>For reference, here is the Network card setup (Linux) section, but with the
-Intel X550-T2 that I previously used.</p>
-<p>After booting with the Intel X550-T2 in a PCIe slot, the card should show up in
-<a href="https://manpages.debian.org/dmesg.8"><code>dmesg(8)</code></a>
-:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>ixgbe: Intel(R) 10 Gigabit PCI Express Network Driver
-</span></span><span style="display:flex;"><span>ixgbe 0000:03:00.0: Multiqueue Enabled: Rx Queue count = 16, Tx Queue count = 16 XDP Queue count = 0
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>ixgbe 0000:03:00.0: 31.504 Gb/s available PCIe bandwidth (8.0 GT/s PCIe x4 link)
-</span></span><span style="display:flex;"><span>ixgbe 0000:03:00.0: MAC: 4, PHY: 0, PBA No: H86377-006
-</span></span><span style="display:flex;"><span>ixgbe 0000:03:00.0: Intel(R) 10 Gigabit Network Connection
-</span></span><span style="display:flex;"><span>libphy: ixgbe-mdio: probed
-</span></span><span style="display:flex;"><span>ixgbe 0000:03:00.1: Multiqueue Enabled: Rx Queue count = 16, Tx Queue count = 16 XDP Queue count = 0
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>ixgbe 0000:03:00.1: 31.504 Gb/s available PCIe bandwidth (8.0 GT/s PCIe x4 link)
-</span></span><span style="display:flex;"><span>ixgbe 0000:03:00.1: MAC: 4, PHY: 0, PBA No: H86377-006
-</span></span><span style="display:flex;"><span>tun: Universal TUN/TAP device driver, 1.6
-</span></span><span style="display:flex;"><span>ixgbe 0000:03:00.1: Intel(R) 10 Gigabit Network Connection
-</span></span><span style="display:flex;"><span>libphy: ixgbe-mdio: probed
-</span></span><span style="display:flex;"><span>ixgbe 0000:03:00.0 enp3s0f0: renamed from eth0
-</span></span><span style="display:flex;"><span>ixgbe 0000:03:00.1 enp3s0f1: renamed from eth1
-</span></span><span style="display:flex;"><span>pps pps0: new PPS source ptp1
-</span></span><span style="display:flex;"><span>ixgbe 0000:03:00.0: registered PHC device on enp3s0f0
-</span></span><span style="display:flex;"><span>pps pps1: new PPS source ptp2
-</span></span><span style="display:flex;"><span>ixgbe 0000:03:00.1: registered PHC device on enp3s0f1</span></span></code></pre></div>
-<p>I think if you only use 1 of the card’s 2 network ports, you might not hit any
-bottlenecks even when running the card only at <a href="https://en.wikipedia.org/wiki/PCI_Express#History_and_revisions">PCIe 3.0 ×2 link
-speed</a>, but I
-haven’t verified this!</p>
-<p>Another way to verify the device is running at maximum speed on the computer’s
-PCIe bus, is to ensure <code>LnkSta</code> matches <code>LnkCap</code> in the <a href="https://manpages.debian.org/lspci.8"><code>lspci(8)</code></a>
- output:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% sudo lspci -vv
-</span></span><span style="display:flex;"><span>[…]
-</span></span><span style="display:flex;"><span>03:00.0 Ethernet controller: Intel Corporation Ethernet Controller 10G X550T (rev 01)
-</span></span><span style="display:flex;"><span>        Subsystem: Intel Corporation Ethernet Converged Network Adapter X550-T2
-</span></span><span style="display:flex;"><span>[…]
-</span></span><span style="display:flex;"><span>        Capabilities: [a0] Express (v2) Endpoint, MSI 00
-</span></span><span style="display:flex;"><span>[…]
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>                LnkCap: Port #0, Speed 8GT/s, Width x4, ASPM L0s L1, Exit Latency L0s &lt;2us, L1 &lt;16us
-</span></span><span style="display:flex;"><span>                        ClockPM- Surprise- LLActRep- BwNot- ASPMOptComp+
-</span></span><span style="display:flex;"><span>                LnkCtl: ASPM Disabled; RCB 64 bytes, Disabled- CommClk+
-</span></span><span style="display:flex;"><span>                        ExtSynch- ClockPM- AutWidDis- BWInt- AutBWInt-
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>                LnkSta: Speed 8GT/s (ok), Width x4 (ok)
-</span></span><span style="display:flex;"><span>                        TrErr- Train- SlotClk+ DLActive- BWMgmt- ABWMgmt-
-</span></span><span style="display:flex;"><span>[…]</span></span></code></pre></div>
-<p>You can verify your network link is running at 10 Gbit/s using <a href="https://manpages.debian.org/ethtool.8"><code>ethtool(8)</code></a>
-:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% sudo ethtool enp3s0f1 
-</span></span><span style="display:flex;"><span>Settings for enp3s0f1:
-</span></span><span style="display:flex;"><span>	Supported ports: [ TP ]
-</span></span><span style="display:flex;"><span>	Supported link modes:   100baseT/Full
-</span></span><span style="display:flex;"><span>	                        1000baseT/Full
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>	                        10000baseT/Full
-</span></span><span style="display:flex;"><span>	                        2500baseT/Full
-</span></span><span style="display:flex;"><span>	                        5000baseT/Full
-</span></span><span style="display:flex;"><span>	Supported pause frame use: Symmetric
-</span></span><span style="display:flex;"><span>	Supports auto-negotiation: Yes
-</span></span><span style="display:flex;"><span>	Supported FEC modes: Not reported
-</span></span><span style="display:flex;"><span>	Advertised link modes:  100baseT/Full
-</span></span><span style="display:flex;"><span>	                        1000baseT/Full
-</span></span><span style="display:flex;"><span>	                        10000baseT/Full
-</span></span><span style="display:flex;"><span>	Advertised pause frame use: Symmetric
-</span></span><span style="display:flex;"><span>	Advertised auto-negotiation: Yes
-</span></span><span style="display:flex;"><span>	Advertised FEC modes: Not reported
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>	Speed: 10000Mb/s
-</span></span><span style="display:flex;"><span>	Duplex: Full
-</span></span><span style="display:flex;"><span>	Auto-negotiation: on
-</span></span><span style="display:flex;"><span>	Port: Twisted Pair
-</span></span><span style="display:flex;"><span>	PHYAD: 0
-</span></span><span style="display:flex;"><span>	Transceiver: internal
-</span></span><span style="display:flex;"><span>	MDI-X: Unknown
-</span></span><span style="display:flex;"><span>	Supports Wake-on: d
-</span></span><span style="display:flex;"><span>	Wake-on: d
-</span></span><span style="display:flex;"><span>        Current message level: 0x00000007 (7)
-</span></span><span style="display:flex;"><span>                               drv probe link
-</span></span><span style="display:flex;"><span>	Link detected: yes</span></span></code></pre></div>
-<h2 id="appendix-c-bios-update-for-mellanox-connectx-3">Appendix C: BIOS update for Mellanox ConnectX-3</h2>
-<p>On my Supermicro X11SSZ-QF mainboard, the Mellanox ConnectX-3 would not
-establish a link. The Mellanox Linux kernel driver logged a number of errors:</p>
-<pre tabindex="0"><code>kernel: mlx4_en: enp1s0: CQE error - cqn 0x8e, ci 0x0, vendor syndrome: 0x57 syndrome: 0x4
-kernel: mlx4_en: enp1s0: Related WQE - qpn 0x20d, wqe index 0x0, wqe size 0x40
-kernel: mlx4_en: enp1s0: Scheduling port restart
-kernel: mlx4_core 0000:01:00.0: Internal error detected:
-kernel: mlx4_core 0000:01:00.0: device is going to be reset
-kernel: mlx4_core 0000:01:00.0: crdump: devlink snapshot disabled, skipping
-kernel: mlx4_core 0000:01:00.0: device was reset successfully
-kernel: mlx4_en 0000:01:00.0: Internal error detected, restarting device
-kernel: &lt;mlx4_ib&gt; mlx4_ib_handle_catas_error: mlx4_ib_handle_catas_error was started
-kernel: &lt;mlx4_ib&gt; mlx4_ib_handle_catas_error: mlx4_ib_handle_catas_error ended
-kernel: mlx4_core 0000:01:00.0: command 0x21 failed: fw status = 0x1
-kernel: pcieport 0000:00:1c.0: AER: Uncorrected (Fatal) error received: 0000:00:1c.0
-kernel: pcieport 0000:00:1c.0: PCIe Bus Error: severity=Uncorrected (Fatal), type=Transaction Layer, (Receiver ID)
-kernel: mlx4_core 0000:01:00.0: command 0x43 failed: fw status = 0x1
-kernel: infiniband mlx4_0: ib_query_port failed (-5)
-kernel: pcieport 0000:00:1c.0:   device [8086:a110] error status/mask=00040000/00010000
-kernel: pcieport 0000:00:1c.0:    [18] MalfTLP                (First)
-kernel: pcieport 0000:00:1c.0: AER:   TLP Header: 4a000001 01000004 00000000 00000000
-kernel: mlx4_core 0000:01:00.0: mlx4_pci_err_detected was called
-kernel: mlx4_core 0000:01:00.0: Fail to set mac in port 1 during unregister
-systemd-networkd[313]: enp1s0: Link DOWN
-kernel: mlx4_en: enp1s0: Failed activating Rx CQ
-kernel: mlx4_en: enp1s0: Failed restarting port 1
-kernel: mlx4_en: enp1s0: Link Down
-kernel: mlx4_en: enp1s0: Close port called
-systemd-networkd[313]: enp1s0: Lost carrier
-kernel: mlx4_en 0000:01:00.0: removed PHC
-kernel: mlx4_core 0000:01:00.0: mlx4_restart_one_up: ERROR: mlx4_load_one failed, pci_name=0000:01:00.0, err=-5
-kernel: mlx4_core 0000:01:00.0: mlx4_restart_one was ended, ret=-5
-systemd-networkd[313]: enp1s0: DHCPv6 lease lost
-kernel: pcieport 0000:00:1c.0: AER: Root Port link has been reset
-kernel: mlx4_core 0000:01:00.0: mlx4_pci_resume was called
-kernel: mlx4_core 0000:01:00.0: Multiple PFs not yet supported - Skipping PF
-kernel: mlx4_core 0000:01:00.0: mlx4_pci_resume: mlx4_load_one failed, err=-22
-kernel: pcieport 0000:00:1c.0: AER: device recovery successful
-</code></pre><p>What helped was to update the X11SSZ-QF BIOS to the latest version.</p>
-]]></content>
   </entry>
 </feed>

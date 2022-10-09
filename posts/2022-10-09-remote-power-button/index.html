@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>DIY out of band management: remote power button - Michael Stapelberg</title>
+
+  <meta property="og:site_name" content="Michael Stapelberg">
+  <meta property="og:title" content="DIY out of band management: remote power button">
+  <meta property="og:description" content="I was pleasantly surprised by how easy it was to make it possible to push a PC’s power button remotely via MQTT by wiring up an ESP32 microcontroller, a MOSFET, a resistor, and a few jumper wires.
+While a commercial solution like IPMI offers many more features like remote serial, or remote image mounting, this DIY solution feels really magical, and has great price performance if all you need is power management.">
+  
+  
+  
+  
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2022-10-09-remote-power-button/IMG_1085_featured_huf7f7db33074cb268ff172c7a33b2b9a7_1568716_200x200_fit_q75_box.jpg">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <meta name="description" content="I was pleasantly surprised by how easy it was to make it possible to push a PC’s power button remotely via MQTT by wiring up an ESP32 microcontroller, a MOSFET, a resistor, and a few jumper wires.
+While a commercial solution like IPMI offers many more features like remote serial, or remote image mounting, this DIY solution feels really magical, and has great price performance if all you need is power management.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2022-10-09-remote-power-button/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div><h1 class="ms_title">DIY out of band management: remote power button</h1>
+
+<div class="ms_meta">
+  <div id="ms_date">published 2022-10-09</div>
+  
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2022-10-09-remote-power-button/index.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
+</div>
+<div class="Artikel" id="content">
+  <p>I was pleasantly surprised by how easy it was to make it possible to push a PC’s
+power button remotely via MQTT by wiring up an ESP32 microcontroller, a MOSFET,
+a resistor, and a few jumper wires.</p>
+<p>While a commercial solution like IPMI offers many more features like remote
+serial, or remote image mounting, this DIY solution feels really magical, and
+has great price performance if all you need is power management.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2022-10-09-remote-power-button/IMG_1085_featured.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2022-10-09-remote-power-button/IMG_1085_featured_huf7f7db33074cb268ff172c7a33b2b9a7_1568716_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-10-09-remote-power-button/IMG_1085_featured_huf7f7db33074cb268ff172c7a33b2b9a7_1568716_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-10-09-remote-power-button/IMG_1085_featured_huf7f7db33074cb268ff172c7a33b2b9a7_1568716_600x0_resize_q75_box.jpg"
+  alt="The inside of a PC case, where an ESP32 micro controller on an Adafruit Perma-Proto bread board is mounted inside the case and wired up to the mainboard with jumper wires for remote power control" title="The inside of a PC case, where an ESP32 micro controller on an Adafruit Perma-Proto bread board is mounted inside the case and wired up to the mainboard with jumper wires for remote power control"
+  width="600"
+  height="450"
+  style="border: 1px solid #000"
+  
+  loading="lazy"></a>
+
+
+
+<h2 id="motivation">Motivation</h2>
+<p>To save power, I want to shut down my <a href="/posts/2019-10-23-nas/">network storage PC</a> when it isn’t currently needed.</p>
+<p>For this plan to work out, my daily backup automation needs to be able to turn on the network storage PC, and power it back off when done.</p>
+<p>Usually, I implement that via <a href="https://en.wikipedia.org/wiki/Wake-on-LAN">Wake On LAN
+(WOL)</a>. But, for this particular
+machine, I don’t have an ethernet network link, I only <a href="/posts/2020-08-09-fiber-link-home-network/">have a fiber
+link</a>. Unfortunately, it seems like
+none of the 3 different 10 Gbit/s network cards I tested has functioning Wake On
+LAN, and when I asked on Twitter, none of my followers had ever seen functioning
+WOL on any 10 Gbit/s card. I suppose it’s not a priority for the typical target
+audience of these network cards, which go into always-on servers.</p>
+<p>I didn’t want to run an extra 10 Gbit/s switch just for WOL over an ethernet
+connection, because switches like the MikroTik CRS305-1G-4S+IN consume at least
+10W. As the network storage PC only consumes about 20W overall, I wanted a more
+power-efficient option.</p>
+<h2 id="hardware-and-wiring">Hardware and Wiring</h2>
+<p>The core of this DIY remote power button is a WiFi-enabled micro controller such
+as the ESP32. To power the micro controller, I use the 5V standby power on the
+mainboard’s USB 2.0 pin headers, which is also available when the PC is turned
+off and only the power supply (PSU) is turned on. A micro controller with an
+on-board 5V voltage regulator is convenient for this.</p>
+<aside class="admonition note">
+  <div class="note-container">
+    <div class="note-icon" style="width: 20px; height: 20px">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+    </div>
+    <div class="admonition-content">I verified the 5V standby power with a multimeter in DC power measurement
+mode. Some embedded machines don’t have always-on 5V standby power, even if they
+use an ATX power supply!</div>
+  </div>
+</aside>
+
+<p>Aside from the micro controller, we also need a transistor or logic-level MOSFET
+to simulate a push of the power button, and a resistor to control the
+transistor. An opto coupler is not needed, since the ESP32 is powered from the
+mainboard, not from a separate power supply.</p>
+<p>The mainboard’s front panel header contains a <code>POWERBTN#</code> signal (3.3V), and a
+<code>GND</code> signal. When connecting a typical PC case power button to the header, you
+don’t need to pay attention to the polarity. This is because the power button
+just physically connects the two signals.</p>
+<p>In our case, the polarity matters, because we need the 3.3V on the transistor’s
+drain pin, otherwise we won’t be able to control the transistor via its base
+pin. The <code>POWERBTN#</code> 3.3V signal is typically labeled <code>+</code> on the mainboard (or
+in the manual), whereas <code>GND</code> is labeled <code>-</code>. If you are unsure, double-check
+the voltage using a multimeter.</p>
+<h2 id="bill-of-materials">Bill of Materials</h2>
+<ul>
+<li>WiFi-enabled microcontroller with 5V power input, e.g. the <a href="https://docs.platformio.org/en/latest/boards/espressif32/pico32.html#board-espressif32-pico32">Espressif ESP32
+Pico
+Kit</a></li>
+<li>transistor or logic-level MOSFET for working with 3.3V, e.g. <a href="https://www.digikey.com/en/products/detail/onsemi/2N7000/244278">2N7000
+(→digikey)</a></li>
+<li>1K resistor for controlling the transistor,
+e.g. <a href="https://www.digikey.com/en/products/detail/stackpole-electronics-inc/CF14JT1K00/1741314">CF14JT1K00</a></li>
+<li>a bread board and/or case for mounting, e.g. <a href="https://www.adafruit.com/product/571">Adafruit
+Perma-Proto</a>.</li>
+</ul>
+<h2 id="schematic">Schematic</h2>
+<p><a href="2022-10-08-remote-power-button.svg"><img src="2022-10-08-remote-power-button.svg" width="100%"></a></p>
+<h2 id="software-esphome">Software: ESPHome</h2>
+<p>I wanted a quick solution (with ideally no custom firmware development) and was
+already familiar with <a href="https://esphome.io/">ESPHome</a>, which turns out to very
+easily implement the functionality I wanted :)</p>
+<p>In addition to a standard ESPHome configuration, I have added the following
+lines to make the GPIO pin available through MQTT, and make it a momentary
+switch instead of a toggle switch, so that it briefly presses the power button
+and doesn’t hold the power button:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">switch</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">platform</span>:<span style="color:#bbb"> </span>gpio<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">pin</span>:<span style="color:#bbb"> </span><span style="color:#40a070">25</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">id</span>:<span style="color:#bbb"> </span>powerbtn<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;powerbtn&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">restore_mode</span>:<span style="color:#bbb"> </span>ALWAYS_OFF<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">on_turn_on</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- <span style="color:#062873;font-weight:bold">delay</span>:<span style="color:#bbb"> </span>500ms<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- <span style="color:#062873;font-weight:bold">switch.turn_off</span>:<span style="color:#bbb"> </span>powerbtn<span style="color:#bbb">
+</span></span></span></code></pre></div><p>I have elided the full configuration for brevity, but you can click here to see it:</p>
+<details>
+<summary>full ESPHome YAML configuration</summary>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">esphome</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>poweresp<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">esp32</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">board</span>:<span style="color:#bbb"> </span>pico32<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">framework</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">type</span>:<span style="color:#bbb"> </span>arduino<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#60a0b0;font-style:italic"># Enable logging</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">logger</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">mqtt</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">broker</span>:<span style="color:#bbb"> </span><span style="color:#40a070">10.0.0.54</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">ota</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">password</span>:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">wifi</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">ssid</span>:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;essid&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">password</span>:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;secret&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#60a0b0;font-style:italic"># Enable fallback hotspot (captive portal) in case wifi connection fails</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">ap</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">ssid</span>:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;Poweresp Fallback Hotspot&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">password</span>:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;secret2&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">captive_portal</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">switch</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">platform</span>:<span style="color:#bbb"> </span>gpio<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">pin</span>:<span style="color:#bbb"> </span><span style="color:#40a070">25</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">id</span>:<span style="color:#bbb"> </span>powerbtn<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;powerbtn&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">restore_mode</span>:<span style="color:#bbb"> </span>ALWAYS_OFF<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">on_turn_on</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- <span style="color:#062873;font-weight:bold">delay</span>:<span style="color:#bbb"> </span>500ms<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- <span style="color:#062873;font-weight:bold">switch.turn_off</span>:<span style="color:#bbb"> </span>powerbtn<span style="color:#bbb">
+</span></span></span></code></pre></div></details>
+<p>For the first flash, I used:</p>
+<pre tabindex="0"><code>docker run --rm \
+  -v &#34;${PWD}&#34;:/config \
+  --device=/dev/ttyUSB0 \
+  -it \
+  esphome/esphome \
+    run poweresp.yaml
+</code></pre><p>To update over the network after making changes (serial connection no longer needed), I used:</p>
+<pre tabindex="0"><code>docker run --rm \
+  -v &#34;${PWD}&#34;:/config \
+  -it \
+  esphome/esphome \
+    run poweresp.yaml
+</code></pre><p>In case you want to learn more about the relevant ESPHome concepts, here are a
+few pointers:</p>
+<ul>
+<li><a href="https://esphome.io/components/wifi.html">https://esphome.io/components/wifi.html</a> might need to set <code>use_address</code></li>
+<li><a href="https://esphome.io/components/switch/index.html">https://esphome.io/components/switch/index.html</a>
+<ul>
+<li>and <a href="https://esphome.io/components/switch/gpio.html">https://esphome.io/components/switch/gpio.html</a></li>
+</ul>
+</li>
+<li><a href="https://esphome.io/components/mqtt.html">https://esphome.io/components/mqtt.html</a></li>
+</ul>
+<h2 id="integration-into-automation">Integration into automation</h2>
+<p>To push the power button remotely from Go, I’m using the following code:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">pushMainboardPower</span>(mqttBroker, clientID <span style="color:#902000">string</span>) <span style="color:#902000">error</span> {
+</span></span><span style="display:flex;"><span>	opts <span style="color:#666">:=</span> mqtt.<span style="color:#06287e">NewClientOptions</span>().<span style="color:#06287e">AddBroker</span>(mqttBroker)
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> hostname, err <span style="color:#666">:=</span> os.<span style="color:#06287e">Hostname</span>(); err <span style="color:#666">==</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		clientID <span style="color:#666">+=</span> <span style="color:#4070a0">&#34;@&#34;</span> <span style="color:#666">+</span> hostname
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	opts.<span style="color:#06287e">SetClientID</span>(clientID)
+</span></span><span style="display:flex;"><span>	opts.<span style="color:#06287e">SetConnectRetry</span>(<span style="color:#007020;font-weight:bold">true</span>)
+</span></span><span style="display:flex;"><span>	mqttClient <span style="color:#666">:=</span> mqtt.<span style="color:#06287e">NewClient</span>(opts)
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> token <span style="color:#666">:=</span> mqttClient.<span style="color:#06287e">Connect</span>(); token.<span style="color:#06287e">Wait</span>() <span style="color:#666">&amp;&amp;</span> token.<span style="color:#06287e">Error</span>() <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;connecting to MQTT: %v&#34;</span>, token.<span style="color:#06287e">Error</span>())
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">const</span> topic = <span style="color:#4070a0">&#34;poweresp/switch/powerbtn/command&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">const</span> qos = <span style="color:#40a070">0</span> <span style="color:#60a0b0;font-style:italic">// at most once (no re-transmissions)
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">const</span> retained = <span style="color:#007020;font-weight:bold">false</span>
+</span></span><span style="display:flex;"><span>	token <span style="color:#666">:=</span> mqttClient.<span style="color:#06287e">Publish</span>(topic, qos, retained, <span style="color:#007020">string</span>(<span style="color:#4070a0">&#34;on&#34;</span>))
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> token.<span style="color:#06287e">Wait</span>() <span style="color:#666">&amp;&amp;</span> token.<span style="color:#06287e">Error</span>() <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;publishing to MQTT: %v&#34;</span>, token.<span style="color:#06287e">Error</span>())
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="conclusion">Conclusion</h2>
+<p>I hope this small project write-up is useful to others in a similar situation!</p>
+<p>If you need more features than that, check out the next step on the feature and
+complexity ladder: <a href="https://pikvm.org/">PiKVM</a> or
+<a href="https://tinypilotkvm.com/">TinyPilot</a>. See also <a href="https://www.jeffgeerling.com/blog/2021/raspberry-pi-kvms-compared-tinypilot-and-pi-kvm-v3">this comparison by Jeff
+Geerling</a>.</p>
+
+</div>
+
+      </div>
+
+    </main><div id="ms_footer">
+  © 2022 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

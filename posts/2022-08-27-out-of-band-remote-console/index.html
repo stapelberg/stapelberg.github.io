@@ -431,8 +431,8 @@ network adapter I had lying around, and my USB-to-serial adapter.</p>
 <p>Just like in the <a href="https://gokrazy.org/quickstart/">gokrazy quickstart</a>, we’re
 going to create a directory for this gokrazy instance:</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#bb60d5">INSTANCE</span><span style="color:#666">=</span>gokrazy/consrv
-</span></span><span style="display:flex;"><span>mkdir -p ~/<span style="color:#70a0d0;font-style:italic">${</span><span style="color:#bb60d5">INSTANCE</span>?<span style="color:#70a0d0;font-style:italic">}</span>
-</span></span><span style="display:flex;"><span><span style="color:#007020">cd</span> ~/<span style="color:#70a0d0;font-style:italic">${</span><span style="color:#bb60d5">INSTANCE</span>?<span style="color:#70a0d0;font-style:italic">}</span>
+</span></span><span style="display:flex;"><span>mkdir -p ~/<span style="color:#70a0d0">${</span><span style="color:#bb60d5">INSTANCE</span>?<span style="color:#70a0d0">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#007020">cd</span> ~/<span style="color:#70a0d0">${</span><span style="color:#bb60d5">INSTANCE</span>?<span style="color:#70a0d0">}</span>
 </span></span><span style="display:flex;"><span>go mod init consrv
 </span></span></code></pre></div><p>You could now directly run <code>gokr-packer</code>, but personally, I like putting the
 <code>gokr-packer</code> command into a
@@ -458,10 +458,10 @@ going to create a directory for this gokrazy instance:</p>
 </span></span><span style="display:flex;"><span><span style="color:#06287e">.PHONY</span><span style="color:#666">:</span> update overwrite
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#06287e">update</span><span style="color:#666">:</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#70a0d0;font-style:italic">${</span><span style="color:#bb60d5">PACKER</span><span style="color:#70a0d0;font-style:italic">}</span> -update<span style="color:#666">=</span>yes <span style="color:#70a0d0;font-style:italic">${</span><span style="color:#bb60d5">PKGS</span><span style="color:#70a0d0;font-style:italic">}</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#70a0d0">${</span><span style="color:#bb60d5">PACKER</span><span style="color:#70a0d0">}</span> -update<span style="color:#666">=</span>yes <span style="color:#70a0d0">${</span><span style="color:#bb60d5">PKGS</span><span style="color:#70a0d0">}</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#06287e">overwrite</span><span style="color:#666">:</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#70a0d0;font-style:italic">${</span><span style="color:#bb60d5">PACKER</span><span style="color:#70a0d0;font-style:italic">}</span> -overwrite<span style="color:#666">=</span>/dev/sdx <span style="color:#70a0d0;font-style:italic">${</span><span style="color:#bb60d5">PKGS</span><span style="color:#70a0d0;font-style:italic">}</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#70a0d0">${</span><span style="color:#bb60d5">PACKER</span><span style="color:#70a0d0">}</span> -overwrite<span style="color:#666">=</span>/dev/sdx <span style="color:#70a0d0">${</span><span style="color:#bb60d5">PKGS</span><span style="color:#70a0d0">}</span>
 </span></span></code></pre></div><p>For the initial install, plug the SD card into your computer, put its device
 name into the <code>overwrite</code> target, and run <code>make overwrite</code>.</p>
 <p>For subsequent changes, you can use <code>make update</code>.</p>

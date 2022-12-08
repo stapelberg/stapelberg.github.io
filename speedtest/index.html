@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>25 Gbit/s speedtest server - Michael Stapelberg</title>
+
+  <meta property="og:site_name" content="Michael Stapelberg">
+  <meta property="og:title" content="25 Gbit/s speedtest server">
+  <meta property="og:description" content="I’m running an Ookla Speedtest server that’s connected via 25 Gbit/s to the internet.
+→ Read more about the hardware
+→ Read more about the internet connection
+Ookla CLI Speedtest using Docker (or podman) Running a Docker container might be the easiest way to run the Ookla Speedtest CLI:">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <meta name="description" content="I’m running an Ookla Speedtest server that’s connected via 25 Gbit/s to the internet.
+→ Read more about the hardware
+→ Read more about the internet connection
+Ookla CLI Speedtest using Docker (or podman) Running a Docker container might be the easiest way to run the Ookla Speedtest CLI:">
+  <link rel="canonical" href="https://michael.stapelberg.ch/speedtest/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" >Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" >Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div><h1 class="ms_title">25 Gbit/s speedtest server</h1>
+
+<div class="ms_meta">
+  <div id="ms_date">published 2022-12-08</div>
+  
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/speedtest.md"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
+</div>
+<div class="Artikel" id="content">
+  <p>I’m running an Ookla Speedtest server that’s connected via 25 Gbit/s to the internet.</p>
+<p><a href="/posts/2021-07-10-linux-25gbit-internet-router-pc-build/">→ Read more about the hardware</a></p>
+<p><a href="/posts/2022-04-23-fiber7-25gbit-upgrade/">→ Read more about the internet connection</a></p>
+<h2 id="ookla-cli-speedtest-using-docker-or-podman">Ookla CLI Speedtest using Docker (or podman)</h2>
+<p>Running a Docker container might be the easiest way to run the Ookla Speedtest CLI:</p>
+<pre tabindex="0"><code># docker run --net host --rm -it \
+  docker.io/stapelberg/speedtest:latest \
+    -s 50092
+</code></pre><p>FYI, server id 43030 is the init7 speedtest server, which is also connected via
+25 Gbit/s.</p>
+<h2 id="ookla-cli-speedtest-manually-installed">Ookla CLI Speedtest, manually installed</h2>
+<p>Follow the instructions at <a href="https://www.speedtest.net/apps/cli">https://www.speedtest.net/apps/cli</a> to install the
+Ookla Speedtest command line tool.</p>
+<aside class="admonition note">
+  <div class="note-container">
+    <div class="note-icon" style="width: 20px; height: 20px">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+    </div>
+    <div class="admonition-content"><p>Do not install the <code>speedtest-cli</code> Debian or Arch Linux packages! These are not
+the Ookla version, but an open-source re-implementation.</p>
+<p>You need the original Ookla Speedtest CLI to be able to select an arbitrary
+server (and for multi-connection speedtests, resulting in better performance).</p>
+</div>
+  </div>
+</aside>
+
+<p>Then, run a speedtest:</p>
+<pre tabindex="0"><code># speedtest-cli -s 50092
+</code></pre><h2 id="http">HTTP</h2>
+<p>If you cannot use the Ookla Speedtest for some reason, you can also download a
+file via HTTP.</p>
+<p>As I described in <a href="/posts/2022-05-14-http-and-https-download-25gbit/">my article on 25 Gbit/s HTTP
+downloads</a>, you should be
+able to easily saturate 25 Gbit/s without any further tuning:</p>
+<pre tabindex="0"><code>% curl -v -o /dev/null http://repo7.distr1.org/tmp/50GB.zero
+</code></pre><p>If your download is unexpectedly slow, try <a href="https://www.cyberciti.biz/cloud-computing/increase-your-linux-server-internet-speed-with-tcp-bbr-congestion-control/">enabling TCP
+BBR</a>.</p>
+
+</div>
+
+      </div>
+
+    </main><div id="ms_footer">
+  © 2022 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

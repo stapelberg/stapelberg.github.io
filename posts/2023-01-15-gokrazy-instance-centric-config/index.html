@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>gokrazy: instance-centric configuration released 🎉 - Michael Stapelberg</title>
+
+  <meta property="og:site_name" content="Michael Stapelberg">
+  <meta property="og:title" content="gokrazy: instance-centric configuration released 🎉">
+  <meta property="og:description" content="gokrazy is an appliance platform for Go programs: with just a few commands, you can deploy your Go program(s) on a Raspberry Pi or a (typically small) PC.
+I’m excited to let you know that gokrazy now comes with a re-designed gok command line tool and gokrazy instance configuration mechanism!">
+  
+  
+  
+  
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2023-01-15-gokrazy-instance-centric-config/gokrazy-logo_hu981a342c5dcf1f6aaac213cb11a773e7_100942_200x200_fit_box_3.png">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <meta name="description" content="gokrazy is an appliance platform for Go programs: with just a few commands, you can deploy your Go program(s) on a Raspberry Pi or a (typically small) PC.
+I’m excited to let you know that gokrazy now comes with a re-designed gok command line tool and gokrazy instance configuration mechanism!">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2023-01-15-gokrazy-instance-centric-config/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div><h1 class="ms_title">gokrazy: instance-centric configuration released 🎉</h1>
+
+<div class="ms_meta">
+  <div id="ms_date">published 2023-01-15</div>
+  
+  
+  <div id="ms_tags">
+  
+  in tag
+  
+  
+  <span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
+  
+  </div>
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2023-01-15-gokrazy-instance-centric-config/index.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
+</div>
+<div class="Artikel" id="content">
+  <p><a href="https://gokrazy.org/">gokrazy</a> is an appliance platform for Go programs: with
+just a few commands, you can deploy your Go program(s) on a Raspberry Pi or a
+(typically small) PC.</p>
+<p>I’m excited to let you know that gokrazy now comes with a re-designed <code>gok</code>
+command line tool and gokrazy instance configuration mechanism!</p>
+<h2 id="context-gokrazy-in-a-few-words">Context: gokrazy in a few words</h2>
+<img src="gokrazy-logo.png" align="right" width="200" style="margin-left: 1.5em" alt="gokrazy logo">
+<p>The traditional way to run Go software on a Raspberry Pi would be to install
+Raspbian or some other Linux distribution onto the SD card, copy over your
+program(s) and then maintain that installation (do regular updates).</p>
+<p>I thought it would be nicer to run my Raspberry Pis such that <strong>only Go
+software</strong> is run by the Linux kernel on it, without any traditional Linux
+distribution programs like package managers or even the usual <a href="https://en.wikipedia.org/wiki/GNU_Core_Utilities">GNU Core
+Utilities</a>.</p>
+<p>gokrazy builds Go programs into a read-only SquashFS root file system
+image. When that image is started on a Raspberry Pi, a minimal init system
+supervises the Go programs, and a DHCP and NTP client configure the IP address
+and synchronize the time, respectively. After the first installation, all
+subsequent updates can be done over the network, with an A/B partitioning
+scheme.</p>
+<p>I use gokrazy to, for example:</p>
+<ul>
+<li>
+<p><a href="https://github.com/stapelberg/scan2drive">Scan incoming paper mail into PDF files on Google
+Drive</a>.</p>
+</li>
+<li>
+<p>Connect to the internet using <a href="https://router7.org/">router7, my small home internet
+router</a> written in Go, running on a <a href="/posts/2021-07-10-linux-25gbit-internet-router-pc-build/">fast router PC
+build</a> that handles a
+<a href="/posts/2022-04-23-fiber7-25gbit-upgrade/">25 Gbit/s Fiber To The Home
+connection</a>.</p>
+</li>
+<li>
+<p><a href="/posts/2021-01-10-mqtt-introduction/">Automate the lights in my home</a>, and
+<a href="https://github.com/stapelberg/hmgo">control and monitor the heating</a>.</p>
+</li>
+<li>
+<p>Offer <a href="https://gokrazy.org/packages/tailscale/">Tailscale access</a> to a
+Raspberry Pi Zero 2 W in my home network to then send Wake On Lan (WOL)
+packets before SSH&rsquo;ing into my normally-suspended computers. See also my post
+<a href="/posts/2022-08-27-out-of-band-remote-console/">DIY out-of-band management: remote console server
+(2022)</a>.</p>
+</li>
+</ul>
+<h2 id="before-and-after">Before and after</h2>
+<p>Previously, the concept of gokrazy instance configuration was only a
+convention. Each gokrazy build was created using the <code>gokr-packer</code> CLI tool, and
+configured by the packer’s command-line flags, parameters, config files in
+<code>~/.config</code> and per-package config files in the current directory
+(e.g. <code>flags/github.com/gokrazy/breakglass/flags.txt</code>).</p>
+<p>Now, all gokrazy commands and tools understand the <code>--instance</code> flag (or <code>-i</code>
+for short), which determines the directory from which the <a href="https://gokrazy.org/userguide/instance-config/">Instance
+Config</a> is read. For a gokrazy
+instance named “hello”, the default directory is <code>~/gokrazy/hello</code>, which
+contains the <code>config.json</code> file.</p>
+<h2 id="example-creating-an-instance-for-a-go-working-copy">Example: creating an instance for a Go working copy</h2>
+<p>Let’s say I have <a href="https://github.com/evcc-io/evcc">the evcc repository</a> cloned
+as <code>~/src/evcc</code>. evcc is an electric vehicle charge controller with PV
+integration, written in Go.</p>
+<p>Now I want to run <code>evcc</code> on my Raspberry Pi using gokrazy. First, I create a new
+instance:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>% gok -i evcc new
+</span></span><span style="display:flex;"><span>gokrazy instance configuration created in /home/michael/gokrazy/evcc/config.json
+</span></span><span style="display:flex;"><span><span style="color:#666">(</span>Use <span style="color:#4070a0">&#39;gok -i evcc edit&#39;</span> to edit the configuration interactively.<span style="color:#666">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Use <span style="color:#4070a0">&#39;gok -i evcc add&#39;</span> to add packages to this instance
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>To deploy this gokrazy instance, see <span style="color:#4070a0">&#39;gok help overwrite&#39;</span>
+</span></span></code></pre></div><p>Now let’s add our working copy of <code>evcc</code> to the instance:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>% gok -i evcc add .
+</span></span><span style="display:flex;"><span>2023/01/15 18:55:39 Adding the following package to gokrazy instance <span style="color:#4070a0">&#34;evcc&#34;</span>:
+</span></span><span style="display:flex;"><span>  Go package  : github.com/evcc-io/evcc
+</span></span><span style="display:flex;"><span>  in Go module: github.com/evcc-io/evcc
+</span></span><span style="display:flex;"><span>  in <span style="color:#007020">local</span> dir: /tmp/evcc
+</span></span><span style="display:flex;"><span>2023/01/15 18:55:39 Creating gokrazy builddir <span style="color:#007020;font-weight:bold">for</span> package github.com/evcc-io/evcc
+</span></span><span style="display:flex;"><span>2023/01/15 18:55:39 Creating go.mod with replace directive
+</span></span><span style="display:flex;"><span>go: creating new go.mod: module gokrazy/build/github.com/evcc-io/evcc
+</span></span><span style="display:flex;"><span>2023/01/15 18:55:39 Adding package to gokrazy config
+</span></span><span style="display:flex;"><span>2023/01/15 18:55:39 All <span style="color:#007020;font-weight:bold">done</span>! Next, use <span style="color:#4070a0">&#39;gok overwrite&#39;</span> <span style="color:#666">(</span>first deployment<span style="color:#666">)</span>, <span style="color:#4070a0">&#39;gok update&#39;</span> <span style="color:#666">(</span>following deployments<span style="color:#666">)</span> or <span style="color:#4070a0">&#39;gok run&#39;</span> <span style="color:#666">(</span>run on running instance temporarily<span style="color:#666">)</span>
+</span></span></code></pre></div><p>We might want to monitor this Raspberry Pi’s stats later, so let’s add the
+Prometheus node exporter to our gokrazy instance, too:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>% gok -i evcc add github.com/prometheus/node_exporter
+</span></span><span style="display:flex;"><span>2023/01/15 19:04:05 Adding github.com/prometheus/node_exporter as a <span style="color:#666">(</span>non-local<span style="color:#666">)</span> package to gokrazy instance evcc
+</span></span><span style="display:flex;"><span>2023/01/15 19:04:05 Creating gokrazy builddir <span style="color:#007020;font-weight:bold">for</span> package github.com/prometheus/node_exporter
+</span></span><span style="display:flex;"><span>2023/01/15 19:04:05 Creating go.mod before calling go get
+</span></span><span style="display:flex;"><span>go: creating new go.mod: module gokrazy/build/github.com/prometheus/node_exporter
+</span></span><span style="display:flex;"><span>2023/01/15 19:04:05 running <span style="color:#666">[</span>go get github.com/prometheus/node_exporter@latest<span style="color:#666">]</span>
+</span></span><span style="display:flex;"><span>go: downloading github.com/prometheus/node_exporter v1.5.0
+</span></span><span style="display:flex;"><span><span style="color:#666">[</span>…<span style="color:#666">]</span>
+</span></span><span style="display:flex;"><span>2023/01/15 19:04:07 Adding package to gokrazy config
+</span></span></code></pre></div><p>It’s time to insert an SD card (<code>/dev/sdx</code>), which we will overwrite with a
+gokrazy build:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>% gok -i evcc overwrite --full /dev/sdx
+</span></span></code></pre></div><p>See <a href="https://gokrazy.org/quickstart/">gokrazy quickstart</a> for more detailed instructions.</p>
+<h2 id="automation">Automation</h2>
+<p>The new <code>gok</code> subcommands (<code>add</code>, <code>update</code>, etc.) are much easier to manage than
+long <code>gokr-packer</code> command lines.</p>
+<p>The new <a href="https://gokrazy.org/userguide/automation/">Automation page</a> shows how
+to automate common tasks, be it daily updates via <code>cron</code>, or automated building
+in Continuous Integration environments like GitHub Actions.</p>
+<h2 id="migration">Migration</h2>
+<p>Are you already a gokrazy user? If so, see <a href="https://gokrazy.org/userguide/migration-guide/">the Instance Config Migration
+Guide</a> for how to switch from
+the old <code>gokr-packer</code> tool to the new <code>gok</code> command.</p>
+<h2 id="feedback--questions">Feedback / Questions?</h2>
+<p>If you have any questions, please feel free to reach out at <a href="https://github.com/gokrazy/gokrazy/discussions">gokrazy GitHub
+Discussions</a> 👋</p>
+
+</div>
+
+      </div>
+
+    </main><div id="ms_footer">
+  © 2022 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

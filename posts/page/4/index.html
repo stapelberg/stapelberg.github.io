@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Blog Posts - Michael Stapelberg</title>
+
+  <meta property="og:site_name" content="Michael Stapelberg">
+  <meta property="og:title" content="Blog Posts">
+  <meta property="og:description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div>
+<h1 class="ms_title">All Blog Posts</h1>
+<div class="Artikel" id="content">
+
+  Filter by tag: <ul class="taglist">
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/debian/">debian</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/distri/">distri</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/fiber/">fiber</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/golang/">golang</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/kinx/">kinX</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/rgb2r/">rgb2r</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/rsync/">rsync</a></li>
+    
+  </ul>
+  <br>
+  
+  
+
+  Go to page:
+  
+    <ul class="pagination pagination-default">
+      <li class="page-item">
+        <a href="/posts/" aria-label="First" class="page-link" role="button"><span aria-hidden="true">&laquo;&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/3/" aria-label="Previous" class="page-link" role="button"><span aria-hidden="true">&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/2/" aria-label="Page 2" class="page-link" role="button">2</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/3/" aria-label="Page 3" class="page-link" role="button">3</a>
+      </li>
+      <li class="page-item active">
+        <a aria-current="page" aria-label="Page 4" class="page-link" role="button">4</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/5/" aria-label="Page 5" class="page-link" role="button">5</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/6/" aria-label="Page 6" class="page-link" role="button">6</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/5/" aria-label="Next" class="page-link" role="button"><span aria-hidden="true">&raquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/10/" aria-label="Last" class="page-link" role="button"><span aria-hidden="true">&raquo;&raquo;</span></a>
+      </li>
+    </ul>
+  <br>
+
+    
+  <h2>2014 › December</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2014-12-23-code-search-taming-the-latency-tail/"><h3>Debian Code Search: taming the latency tail</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  It’s been a couple of weeks since I’ve launched Debian Code Search Instant, so people have had the chance to use it for a while and that gives me plenty of data points to look at :-). For every query, I log the search term itself as well as the duration the query took to execute.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-12-23-code-search-taming-the-latency-tail/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2014-12-03-debian-code-search-instant/"><h3>Announcing the new Debian Code Search Instant</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  For the last few months, I have been working on a new version of Debian Code Search, and today it’s going live! I call it Debian Code Search Instant, for multiple reasons, see below. A lot faster The new Debian Code Search is still hosted by Rackspace (thank you!
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-12-03-debian-code-search-instant/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2014 › November</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2014-11-09-upcoming-debian-codesearch/"><h3>Upcoming Debian Code Search features</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I’ve been working on a significant rearchitecture of Debian Code Search during the last few months (off and on, as time permits). This will enable us to provide a couple of features that have been often requested but were not possible with the old architecture, such as grouping search results by Debian source package (#1 feature request) and performing queries that take a longer time than the default execution limit of a minute (#2 feature request).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-11-09-upcoming-debian-codesearch/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2014 › September</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2014-09-05-fiber7_performance/"><h3>Fiber7 performance</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/fiber/">fiber</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Ever since I moved to Zürich, I wanted to get a fiber internet connection. I’ve lived with a 6 Mbps DSL line at my parent’s place for about 10 years, so I was looking forward to a lot more Megabits and a lot less latency.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-09-05-fiber7_performance/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2014 › August</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2014-08-31-replicated_postgresql_with_pgpool/"><h3>Replicated PostgreSQL with pgpool2</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I run multiple web services, mostly related to i3wm.org. All of them use PostgreSQL as their database, so the data that is stored in that PostgreSQL database is pretty important to me and the users of these services. Since a while now, I have been thinking about storing that data in a more reliable way.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-08-31-replicated_postgresql_with_pgpool/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2014-08-11-fiber7_ubnt_erlite/"><h3>Configuring a Ubiquiti EdgeRouter Lite (Erlite-3) for Fiber7</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/fiber/">fiber</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I immediately ordered a fiber7 internet connection once it became available, and I’ve been connected since a few weeks. They offer a 1 Gbps symmetrical fiber connection, with native (static) IPv6 and no traffic limit — for 65 CHF per month (about 54 €).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-08-11-fiber7_ubnt_erlite/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2014 › July</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2014-07-28-yubikey_wifi_password/"><h3>Don’t type WiFi passwords again: use a yubikey</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  In my flat, I have a printed QR code which contains the WiFi credentials. You can scan it with your Smartphone (provided you have a barcode scanner installed) and then connect to the WiFi network. For notebook computers, this doesn’t work so well.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-07-28-yubikey_wifi_password/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2014 › May</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2014-05-15-horrible_wifi_in_hotels/"><h3>Horrible WiFi in hotels</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I’ve been travelling a bit to foreign countries lately and noticed that all of the places I’ve stayed at (low to medium price range hotels) have one thing in common: their WiFi is absolutely horrible. Even worse, it seems like the more money you pay, the more horrible the WiFi gets.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-05-15-horrible_wifi_in_hotels/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2014 › February</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2014-02-19-ssh-keys-in-your-tpm/"><h3>Using your TPM for SSH authentication</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Thomas Habets has blogged about using your TPM (Trusted Platform Module) for SSH authentication a few weeks ago. We worked together to get his package simple-tpm-pk11 into Debian, and it has just arrived in unstable :-). Using simple-tpm-pk11, you can let your TPM generate a key, which you then can use for SSH authentication.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-02-19-ssh-keys-in-your-tpm/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2014 › January</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2014-01-28-qnap_ts119_wol/"><h3>Wake-On-LAN with Debian on a qnap TS-119P2&#43;</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  The original firmware for the qnap TS-119P2+ supports Wake-On-LAN, meaning you can power down your Network Storage (NAS) when you don’t need it and you can easily wake it up by sending it a magic ethernet packet. This is an awesome feature when you are not at home all the time (say, you have a day job) and want to conserve some power without giving up on convenience.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-01-28-qnap_ts119_wol/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2014-01-27-supermicro_ipmi_openvpn/"><h3>Securing SuperMicro’s IPMI with OpenVPN</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  In my last article, I wrote about my experiences with my new SuperMicro server, and a big part of that article was about the Intelligent Platform Management Interface (IPMI) which is included in the SuperMicro X9SCL-F mainboard I bought. In that previous article, I already suggested that the code quality of the IPMI firmware is questionable at best, and this article is in part proof and in part mitigation :-).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-01-27-supermicro_ipmi_openvpn/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2014-01-17-debmirror-rackspace/"><h3>debmirror 6x speed-up, or how to fill a 1 GBps Rackspace link</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  As explained in more detail in my my last blog post, Rackspace is providing hosting for Debian Code Search. For those of you who don’t know, Rackspace is a cloud company that provides (among other services) a public cloud based on OpenStack.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-01-17-debmirror-rackspace/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2014-01-11-building_supermicro_1u_server/"><h3>Building a SuperMicro 1U server (with IPMI)</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Recently, together with a couple friends of mine, we rented a rack in a datacenter. Not just any datacenter, but that’s a story for another time ;-). Each participant can hang up a 1U server in that rack, so I needed to build one.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-01-11-building_supermicro_1u_server/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2013 › December</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-12-25-codesearch-rackspace/"><h3>Hosting for Debian Code Search provided by Rackspace</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  For a number of weeks now, I have been forwarding traffic being sent to codesearch.debian.net to an instance of Debian Code Search running at Rackspace’s public cloud offering. I feel like it’s overdue to announce how they have been supporting the project and what that means.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-12-25-codesearch-rackspace/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-12-07-coreos_and_docker_first_steps/"><h3>CoreOS and Docker: first steps</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  CoreOS is a minimal operating system based on Linux, systemd and Docker. In this post I describe how I see CoreOS/Docker and how my first steps with it went. What is Docker and why is it a good idea? Finding the right words to describe all of this to someone who has not worked with any of it is hard, but let me try.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-12-07-coreos_and_docker_first_steps/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2013 › November</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-11-27-pdiffs/"><h3>let’s disable pdiffs already!</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Richi’s post about the pdiff-by-default agony resonates with me a lot. On EVERY Debian installation I have ever done in the last few years, without any exceptions, I have turned off pdiffs. Even on all the oddball cases (Raspberry Pi, account on a remote machine, …) where I don’t run my install-configs script, I have ended up turning off pdiffs eventually, because it is just so insanely slow on modern internet connections.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-11-27-pdiffs/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-11-07-debian-meetup/"><h3>First Debian meetup in Zürich</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Thanks to Axel Beckert (abe@), 12 people interested in Debian met last Tuesday in Zürich and celebrated the start of our monthly Debian meetup. New faces are always very welcome. If you live in Zürich, or if you’re visiting, please feel free to attend our meetup — no registration necessary.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-11-07-debian-meetup/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2013 › October</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-10-29-openwrt_wan_watchdog/"><h3>OpenWrt WAN watchdog</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Ideally, an internet connection would be perfectly stable, but since that is not always the case, a watchdog is the next best thing. In case you ever use your home machine(s) remotely, the use case should be clear: make sure the internet connection at home still works so that you can log in when travelling.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-10-29-openwrt_wan_watchdog/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2013 › September</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-09-16-remote_syslog/"><h3>Remote kernel logs with netconsole and rsyslog</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  A couple of times now, I’ve had problems with my server. The earliest one was when a hard disk drive died. Then memory went bad and had to be replaced. Another example was when a power supply of another machine died and took out the whole rack.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-09-16-remote_syslog/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2013 › August</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-08-30-git-performance/"><h3>How git performs when you throw all of Debian at it</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  During DebConf, Asheesh presented the idea of using git instead of the file system for storing the contents of Debian Code Search. The hope was that it would lead to fewer disk seeks and less data due to gits delta-encoding.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-08-30-git-performance/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-08-16-debconf-talks/"><h3>My DebConf13 talks are online</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I gave two talks at this year’s DebConf, both about systemd. A huge thanks goes to the video team for their excellent work and putting up the videos that quickly! Find the recordings and slides here: Making your package work with systemd (508 MiB ogv) (Slides (≈ 230 KiB PDF)) systemd myths debunked!
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-08-16-debconf-talks/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-08-08-debconf/"><h3>Going to DebConf</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I will arrive at DebConf 2013 on Sunday afternoon. In case you are interested in Go (the programming language), systemd, i3 or getting your package reviewed, please talk to me! :-) Looking forward to meeting many of you in real life.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-08-08-debconf/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2013 › July</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-07-31-dh-golang/"><h3>dh-golang in unstable</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Good news, everyone! dh-golang is now in Debian unstable. With this debhelper addon, packaging software written in Go is very simple. Have a look at the example/ directory in dh-golang to see how it is meant to be used. Essentially, export the DH_GOPKG variable containing the canonical upstream location of the package (e.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-31-dh-golang/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-07-27-grep-with-line-continuations/"><h3>grep(1) with line continuations</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  For some rather advanced isolation and automation work I am currently doing with Debian Code Search I needed to modify the ExecStart= line of a systemd service file programmatically. The recommended interface for programmatically querying service file properties is systemctl show -p ExecStart foo.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-27-grep-with-line-continuations/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-07-25-usb-wlan-dongle/"><h3>Looking for a USB WLAN stick</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Posting this on behalf of a friend of mine in the hope that you can help: I’ve failed several times now to find a suitable WLAN USB dongle that works out of the box on Debian testing. Often manufacturers change the chipsets without changing the version numbers, the product pages are incomplete or even state wrong information.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-25-usb-wlan-dongle/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-07-20-systemd-204-in-experimental/"><h3>systemd 204 in Debian experimental</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  As of today, systemd 204 is available in Debian experimental. If you are interested in systemd, please install it and report any issues to the BTS — merely reporting them on IRC is not sufficient, we need to have them in the BTS so we don’t forget about them.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-20-systemd-204-in-experimental/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-07-14-systemd-how-to-help/"><h3>Systemd support in Debian packages: how to help</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Sometimes, people show up in our IRC channel #debian-systemd or on our mailing list pkg-systemd-maintainers@lists.alioth.debian.org and ask how they can help. This blog post answers that question. First of all, whatever you end up doing, please coordinate with us first!
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-14-systemd-how-to-help/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-07-14-searchable-packages/"><h3>How many packages does Debian Code Search contain?</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  The German computer magazine c't has covered Debsources in its most recent edition (c't 16/2013). In that article, they also state: Debsources integriert auch eine Code-Suche, allerdings werden lediglich die Quellen des Unstable-Zweigs durchsucht, der zirka ein Drittel des Quellcodes von Debsources ausmacht.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-14-searchable-packages/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-07-13-systemd-not-portable/"><h3>Survey answers part 3: systemd is not portable and what this means for our ports</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  This blog post is the third of a series of posts dealing with the results of the Debian systemd survey. I intend to give a presentation at DebConf 2013, too, so you could either read my posts, or watch the talk, or both :-).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-13-systemd-not-portable/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-07-01-systemd-transition/"><h3>Survey answers part 2: the transition</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  This blog post is the second of a series of posts dealing with the results of the Debian systemd survey. I intend to give a presentation at DebConf 2013, too, so you could either read my posts, or watch the talk, or both :-).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-01-systemd-transition/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+
+
+  Go to page:
+  
+    <ul class="pagination pagination-default">
+      <li class="page-item">
+        <a href="/posts/" aria-label="First" class="page-link" role="button"><span aria-hidden="true">&laquo;&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/3/" aria-label="Previous" class="page-link" role="button"><span aria-hidden="true">&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/2/" aria-label="Page 2" class="page-link" role="button">2</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/3/" aria-label="Page 3" class="page-link" role="button">3</a>
+      </li>
+      <li class="page-item active">
+        <a aria-current="page" aria-label="Page 4" class="page-link" role="button">4</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/5/" aria-label="Page 5" class="page-link" role="button">5</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/6/" aria-label="Page 6" class="page-link" role="button">6</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/5/" aria-label="Next" class="page-link" role="button"><span aria-hidden="true">&raquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/10/" aria-label="Last" class="page-link" role="button"><span aria-hidden="true">&raquo;&raquo;</span></a>
+      </li>
+    </ul>
+  <br>
+
+</div>
+
+      </div>
+    </main><div id="ms_footer">
+  © 2022 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Blog Posts - Michael Stapelberg</title>
+
+  <meta property="og:site_name" content="Michael Stapelberg">
+  <meta property="og:title" content="Blog Posts">
+  <meta property="og:description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div>
+<h1 class="ms_title">All Blog Posts</h1>
+<div class="Artikel" id="content">
+
+  Filter by tag: <ul class="taglist">
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/debian/">debian</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/distri/">distri</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/fiber/">fiber</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/golang/">golang</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/kinx/">kinX</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/rgb2r/">rgb2r</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/rsync/">rsync</a></li>
+    
+  </ul>
+  <br>
+  
+  
+
+  Go to page:
+  
+    <ul class="pagination pagination-default">
+      <li class="page-item">
+        <a href="/posts/" aria-label="First" class="page-link" role="button"><span aria-hidden="true">&laquo;&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/5/" aria-label="Previous" class="page-link" role="button"><span aria-hidden="true">&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/4/" aria-label="Page 4" class="page-link" role="button">4</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/5/" aria-label="Page 5" class="page-link" role="button">5</a>
+      </li>
+      <li class="page-item active">
+        <a aria-current="page" aria-label="Page 6" class="page-link" role="button">6</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/7/" aria-label="Page 7" class="page-link" role="button">7</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/8/" aria-label="Page 8" class="page-link" role="button">8</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/7/" aria-label="Next" class="page-link" role="button"><span aria-hidden="true">&raquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/10/" aria-label="Last" class="page-link" role="button"><span aria-hidden="true">&raquo;&raquo;</span></a>
+      </li>
+    </ul>
+  <br>
+
+    
+  <h2>2012 › October</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-10-28-printer_status/"><h3>Displaying your printer’s status</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  At our house, we have a single, high-quality laser color printer in the basement (along with the other computer equipment) which everybody uses, as opposed to a crappy cheap printer at everyone’s workplace. This is a great setup in our situation, since nobody prints a lot individually, so the slight discomfort of having to go to the basement is a welcome trade-off for not having to maintain cheap printers.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-10-28-printer_status/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-10-27-rc-bugs/"><h3>RC bugs</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I recently worked on the following RC bugs: #691125 — ejabberd: package installation creates /root/.erlang.cookie
+I tracked down the cause of this and provided a patch. Now I also know how piuparts works in detail :-). #691180 — connman: Connman won't run due to missing libxtables.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-10-27-rc-bugs/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-10-26-systemd-44-5/"><h3>systemd 44-5 available</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  mbiebl has recently uploaded systemd 44-5 to Debian unstable. If you are already using systemd, you should definitely upgrade to this version, it fixes a lot of little annoyances. This is especially important if you are using libvirt &gt;= 0.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-10-26-systemd-44-5/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-10-14-systemd-activity/"><h3>My recent systemd activity</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I recently worked on the following systemd-related issues: #686115 - CanReload is set to yes unconditionally for legacy SysV services
+I wrote a patch which uses a heuristic to figure out whether a SysV init script supports the reload option or not.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-10-14-systemd-activity/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-10-05-kvm_migration/"><h3>Migrating KVM virtual machines to a new host</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  About two years ago, I rented a dedicated server to host a few virtual machines. It’s been running fine ever since, but at some point, faster and more energy-efficient hardware is available for the same price. I decided to rent a new server mostly for the additional RAM, which is very valuable when hosting virtual machines — other resources such as CPU, disk and network are usually not a bottleneck.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-10-05-kvm_migration/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-10-02-hello/"><h3>Hello Planet Debian</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	   Hello Planet Debian. This post serves as a confirmation that my feed/blog setup is working. I am a DD since a few months and will blog occasionally about my Debian activities. 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-10-02-hello/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2012 › September</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-09-29-from_galaxy_s3_to_nexus/"><h3>Why I switched from the Samsung Galaxy S3 to the Galaxy Nexus</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  In July, I was looking for a new android phone. My HTC Desire Z was feeling pretty slow and after seeing how well Android 4.1 (Jelly Bean) performed on my friend’s devices, I decided to upgrade. I’ve read a few reviews back then and it seemed like the Samsung Galaxy S3 was the best phone at the time: Its hardware is stunning, it’s faster than every other phone and it looks okay.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-09-29-from_galaxy_s3_to_nexus/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-09-27-cgo_uint32/"><h3>golang: types such as []uint32 and cgo</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  There is official documentation on the Go C language interface (or cgo in golang terminology), but the things it covers are relatively simple. I have used cgo recently in a real-world project and I want to share my experiences in this short article, that is, how to use types properly (avoiding the void* equivalent unsafe.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-09-27-cgo_uint32/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-09-24-lvm-snapshot/"><h3>lvm-snapshots: fixing lvremove</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  On an up-to-date Debian testing system, lvremove fails sporadically when removing snapshots. The cause is not yet fully debugged, see Debian bug 549691. The symptom looks like this: $ lvremove -f plana/snap_web Unable to deactivate open plana-domu--web-real (253:3) Failed to resume domu-web.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-09-24-lvm-snapshot/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-09-23-systemd-ionice/"><h3>systemd: modify IO scheduling</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  One of the nice things about systemd is that you can change the Nice level and IO scheduling class/priority in a very simple way. I have recently configured bacula-fd on my server in such a way that it will not put a lot of load on the machine: To override the service unit, in this case bacula-fd.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-09-23-systemd-ionice/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-09-22-member_id/"><h3>Assigning typo-safe club member IDs</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Our local computer club NoName e.V. has about 20 members. Since we introduced membership fees to pay for server and domain costs a while ago, we have to deal with bank transfers. To automate confirmation and reminder mails about the payment situation of each member, it’d be helpful to have a unique identifier for each member so that we can build a script which can reliable match a bank transfer to a member (without using fuzzy matching on the name).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-09-22-member_id/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-09-11-rgb2r/"><h3>Einladung RGB2R vom 2012-11-01 bis 2012-11-04</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Hallo! Wie jedes Jahr findet diesen November das Retro-Spiele-Event RGB2R des NoName e.V. statt. Der Plan: Jeder holt seine alten Spiele-Konsolen und -Computer jeglicher Art aus dem Schrank und verbringt in netter Gesellschaft viele Stunden Spaß mit den Spielen, die damals unsere Kindheit prägten.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-09-11-rgb2r/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2012 › August</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-08-16-evince-auto-reload/"><h3>Disabling auto-reload in Evince</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	   Because it is insanely hard to google this, here is how to disable auto-reload of PDF files within Evince (&gt;= v3.4.0): gsettings set org.gnome.Evince auto-reload false 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-08-16-evince-auto-reload/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-08-11-rescuing_webservers_with_nginx_as_cache/"><h3>Rescuing webservers with nginx as a cache</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  First of all, I know that there already are a gazillion of websites out there which praise nginx and other caching HTTP wonders. This one is a tad different in that it contains a few nifty tricks (tl;dr: force caching, selective GET parameter caching, iptables traffic redirection, monitoring nginx with collectd)… The situation There is this website, and it’s using apache with mod_php, running some rather badly engineered code which we cannot get rid of just now.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-08-11-rescuing_webservers_with_nginx_as_cache/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2012 › July</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-07-22-email/"><h3>Mein aktuelles E-Mail-Setup</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Da die Entwicklung von sup (und dessen Nachfolger heliotrope/turnsole) absolut untragbar für ein OSS-Projekt ist, bin ich vor einer Weile auf den „Konkurrent“ notmuch umgestiegen. Da notmuch nur ein Mail-Index ohne Frontend ist, hat man die Wahl zwischen verschiedenen Frontends.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-07-22-email/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-07-03-apc_smartups_700/"><h3>APC Smart UPS 700: Serielle Schnittstelle</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Vor einer Weile habe ich eine alte APC Smart UPS 700 bekommen, für die ich neue Batterien gekauft und eingebaut habe. Nun bin ich dazu gekommen, zu testen, ob die UPS läuft. Wichtig zu erwähnen ist dabei, dass die APCs keine normale Belegung der Seriellen Schnittstelle benutzen.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-07-03-apc_smartups_700/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2012 › June</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-06-24-buying_linux_computer_2012/"><h3>Buying a Linux computer (2012)</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  the finished box (1024x720 px) It’s been roughly three years since I upgraded my last workstation and I felt it was time for a new computer. With a new CPU, a fast SSD and lots of RAM, compilation times should be much faster and annoying waiting for my computer to do stuff should be much reduced.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-06-24-buying_linux_computer_2012/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2012 › April</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-04-29-broken-server/"><h3>Kaputter Server: Verschiedene Tipps</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Gestern kriegte ich bescheid gesagt, dass ein Server, den ich mitbetreue, kaputt gegangen sei. Die Hardware wurde vom Hoster getauscht, allerdings wurden auch neue Platten eingebaut. Der Hoster bot an, zusätzlich die alte Platte anzuschließen, um die Daten zu kopieren.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-04-29-broken-server/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-04-25-i3-v4.2/"><h3>i3 v4.2 released</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	   Soeben habe ich i3 v4.2 released. Die Release notes enthalten alle Neuerungen. 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-04-25-i3-v4.2/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2012 › March</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-03-01-rescue_hdd/"><h3>Rescue-HDD mit grml Linux</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Vor einiger Zeit habe ich einen Artikel veröffentlicht, wie man eine DVD zum Wiederherstellen des Systems in einen definierten Zustand erstellt. Dieser Artikel ist ein Folgeartikel, der nahezu dasselbe macht, aber auf Basis einer USB-Festplatte statt einer DVD, und mit einer neueren Version von grml Linux.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-03-01-rescue_hdd/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2011 › December</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2011-12-24-i3-v4.1.1/"><h3>i3 v4.1.1 released</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	   Soeben habe ich i3 v4.1.1 released. Die Release notes enthalten alle Neuerungen. 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2011-12-24-i3-v4.1.1/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2011-12-19-cpan-install/"><h3>Perl-module von CPAN installieren</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Perl-Module von CPAN installieren ist eigentlich ganz einfach, aber viele Leute wissen nicht, was sie mit der entsprechenden Fehlermeldung anfangen sollen. Daher habe ich http://michael.stapelberg.de/cpan online gestellt, eine Seite, welche erklärt, wie man ein Perl-Modul von CPAN installiert (einmal mit und einmal ohne Root-Rechte).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2011-12-19-cpan-install/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2011-12-13-perl_debian_packaging/"><h3>Packaging your Perl script for Debian</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I wrote a few Perl scripts for various things during the last few years. Many of them run on machines which I don't maintain on my own (other people have root access, too) and some even run on machines which I don't have access to at all.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2011-12-13-perl_debian_packaging/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2011-12-11-mtu_openvpn/"><h3>MTU and OpenVPN: How does it work?</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I use OpenVPN relatively often, for example to get reliable IPv6-connectivity in places which don’t have IPv6 yet (miredo works well most of the time, but an own VPN is more stable). One of the things which I previously understood only a little bit was the MTU (Maximum Transfer Unit).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2011-12-11-mtu_openvpn/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2011 › November</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2011-11-12-systemd-shell-scripts/"><h3>systemd ist lange überfällig…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  systemd ist lange überfällig, denn die Schmerzen beim Überführen eines quick'n'dirty shell scripts in einen ordentlich wartbaren Dienst sind mit sysvinit einfach viel zu groß. Vor ziemlich langer Zeit habe ich den RaumZeitMPD geschrieben, einen IRC-Bot, welcher bei !stream anzeigt, welches Lied gerade gespielt wird und bei !
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2011-11-12-systemd-shell-scripts/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2011-11-11-i3-v4.1-released/"><h3>i3 v4.1 released</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	   Soeben habe ich i3 v4.1 released. Die Release notes enthalten alle Neuerungen. 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2011-11-11-i3-v4.1-released/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2011-11-06-ftp_backups_duplicity/"><h3>FTP-Backups mit duplicity</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Aufmerksame Leser meiner Website wissen, dass ich normalerweise mit bacula Daten sichere. Es gibt allerdings ein Szenario, für das meine bacula-Installation nicht sonderlich gut geeignet ist: Die Sicherung meines Servers. Ich habe seit einiger Zeit bei vollmar.net einen Dedicated Server und bin sehr zufrieden mit dem Angebot und dem Service.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2011-11-06-ftp_backups_duplicity/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2011 › October</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2011-10-26-magnet_erfahrungen/"><h3>Positive Erfahrungen mit dem irischen ISP Magnet</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Überblick und Verfügbarkeit Wasser, Strom und Heizung sind bei Apartments in Irland oftmals standardmäßig im Mietpreis enthalten, weiterhin sind Wohnungen normalerweise möbliert. Das einzige, was also offensichtlich fehlt, ist Breitband-Internet :-). Es gibt einige ISPs, die in Dublin verschiedenste Arten von Internetzugang anbieten.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2011-10-26-magnet_erfahrungen/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2011-10-15-ssd-broken/"><h3>SSD kaputt</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Nachdem meine SSD nun schon mehrfach für manche Blöcke Input/Output-Errors gegeben hat (nach einem power cycle war sie aber wieder benutzbar), ist sie gestern so ausgefallen, dass ich mich nicht mehr an meinem System anmelden konnte und das Symptom auch über einen Neustart bestehen blieb.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2011-10-15-ssd-broken/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2011 › September</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2011-09-25-capture_uvc_gstreamer/"><h3>Kurz-Howto: Videos aufnehmen mit einer USB-Webcam und GStreamer</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Gelegentlich möchte man ein Video aufnehmen. Doch welches Programm verwendet man dafür? Wie erreicht man die beste Qualität bei kleinster Dateigröße? Diese kurze Anleitung erklärt, wie man mit GStreamer und FFmpeg eine Video-Aufnahme von einer USB-Webcam (die VF0610 Live! Cam Socialize HD in meinem Fall) aufzeichnet und enkodiert.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2011-09-25-capture_uvc_gstreamer/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+
+
+  Go to page:
+  
+    <ul class="pagination pagination-default">
+      <li class="page-item">
+        <a href="/posts/" aria-label="First" class="page-link" role="button"><span aria-hidden="true">&laquo;&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/5/" aria-label="Previous" class="page-link" role="button"><span aria-hidden="true">&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/4/" aria-label="Page 4" class="page-link" role="button">4</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/5/" aria-label="Page 5" class="page-link" role="button">5</a>
+      </li>
+      <li class="page-item active">
+        <a aria-current="page" aria-label="Page 6" class="page-link" role="button">6</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/7/" aria-label="Page 7" class="page-link" role="button">7</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/8/" aria-label="Page 8" class="page-link" role="button">8</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/7/" aria-label="Next" class="page-link" role="button"><span aria-hidden="true">&raquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/10/" aria-label="Last" class="page-link" role="button"><span aria-hidden="true">&raquo;&raquo;</span></a>
+      </li>
+    </ul>
+  <br>
+
+</div>
+
+      </div>
+    </main><div id="ms_footer">
+  © 2022 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

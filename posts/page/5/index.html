@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Blog Posts - Michael Stapelberg</title>
+
+  <meta property="og:site_name" content="Michael Stapelberg">
+  <meta property="og:title" content="Blog Posts">
+  <meta property="og:description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div>
+<h1 class="ms_title">All Blog Posts</h1>
+<div class="Artikel" id="content">
+
+  Filter by tag: <ul class="taglist">
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/debian/">debian</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/distri/">distri</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/fiber/">fiber</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/golang/">golang</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/kinx/">kinX</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/rgb2r/">rgb2r</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/rsync/">rsync</a></li>
+    
+  </ul>
+  <br>
+  
+  
+
+  Go to page:
+  
+    <ul class="pagination pagination-default">
+      <li class="page-item">
+        <a href="/posts/" aria-label="First" class="page-link" role="button"><span aria-hidden="true">&laquo;&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/4/" aria-label="Previous" class="page-link" role="button"><span aria-hidden="true">&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/3/" aria-label="Page 3" class="page-link" role="button">3</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/4/" aria-label="Page 4" class="page-link" role="button">4</a>
+      </li>
+      <li class="page-item active">
+        <a aria-current="page" aria-label="Page 5" class="page-link" role="button">5</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/6/" aria-label="Page 6" class="page-link" role="button">6</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/7/" aria-label="Page 7" class="page-link" role="button">7</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/6/" aria-label="Next" class="page-link" role="button"><span aria-hidden="true">&raquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/10/" aria-label="Last" class="page-link" role="button"><span aria-hidden="true">&raquo;&raquo;</span></a>
+      </li>
+    </ul>
+  <br>
+
+    
+  <h2>2013 › June</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-06-25-dsl_connection_troubles/"><h3>Anecdotes about getting a DSL connection</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I recently moved to Zürich and therefore needed a new internet connection. I am given to understand that fiber will be available at my place in a few months, so I chose to go with a provider that will allow me to eventually switch to fiber once it’s available.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-06-25-dsl_connection_troubles/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-06-17-debian-code-search-talk/"><h3>Talk about Debian Code Search</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  At this year’s GPN13 I gave a talk about Debian Code Search. It was in German, so I spent a few hours creating english subtitles. You can watch the video at youtube.com/watch?v=n6DtW3zCTvk with english subtitles. In case you prefer to download the file(s), get http://ftp.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-06-17-debian-code-search-talk/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-06-09-systemd-bloat/"><h3>Survey answers part 1: systemd has too many dependencies, or it is bloated, or it does too many things, or is too complex</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  This blog post is the first of a series of posts dealing with the results of the Debian systemd survey. I intend to give a presentation at DebConf 2013, too, so you could either read my posts, or watch the talk, or both :-).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-06-09-systemd-bloat/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-06-08-uploading-via-sftp/"><h3>Uploading packages via SFTP</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Yesterday I uploaded a big package and got multiple timeouts. I then figured out that DDs can also upload using SFTP (i.e. SSH’s file transfer thingie) instead of traditional FTP, which seems like a more modern alternative. So let’s give that a try.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-06-08-uploading-via-sftp/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2013 › May</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-05-27-systemd-survey-results/"><h3>Results of the Debian systemd survey</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  A week ago, we started the Debian systemd survey. The goal was to figure out a few trends and answer the following two questions: Do our subjective impressions from the discussions on debian-devel reflect the general sentiment about systemd? What are the main concerns that most people have?
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-05-27-systemd-survey-results/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-05-25-d-clone/"><h3>Cloning git-buildpackage repositories</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Whenever I want to work on some package, I usually clone its git repository, make my changes, then push and upload the Debian package. I don’t keep those repositories around in order to avoid cruft and also to have a 100% clean, up-to-date setup whenever I start working on something.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-05-25-d-clone/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-05-20-systemd-survey/"><h3>Debian systemd survey</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  In the past, we have had multiple heated discussions involving systemd. We (the pkg-systemd-maintainers team) would like to better understand why some people dislike systemd. Therefore, we have created a survey, which you can find at http://survey.zekjur.net/index.php/391182 Please only submit your feedback to the survey and not this thread, we are not particularly interested in yet another systemd discussion at this point.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-05-20-systemd-survey/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-05-20-galaxy-nexus-slowness/"><h3>Galaxy Nexus slowness</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  My Galaxy Nexus was getting really slow over the last few weeks, meaning simple things like going to the homescreen took multiple seconds. Turns out that the problem is the SD card filesystem / controller getting really slow once the SD card gets nearly filled up.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-05-20-galaxy-nexus-slowness/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2013 › March</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-03-31-analyzing-rc-bug-messages/"><h3>Analyzing RC bug messages</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Recently, I was wondering how many Debian Developers are actively working on RC bugs in some way or another in the time period of the last release (squeeze) to now (shortly? before wheezy). I therefore grabbed the mailing list archives of debian-bugs-dist@ from gmane, used only those messages whose X-Debian-PR-Message header matches an RC bug (list retrieved from UDD) and then attributed the message counts to the appropriate Debian Developer.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-03-31-analyzing-rc-bug-messages/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-03-21-kinesis_custom_controller/"><h3>Hacking your own Kinesis keyboard controller</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Update: The kinT kinesis keyboard controller from 2020 is an updated version, with several improvements over the older 2013 design! The Kinesis Advantage Contoured is an ergonomic keyboard which I have been using for four years. It has many features that make it a great keyboard, and it’s certainly the best I have ever used.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-03-21-kinesis_custom_controller/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-03-17-openwrt_backup/"><h3>OpenWrt: Backup/Restore</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  OpenWrt is a nice FOSS Linux firmware (primarily) for wireless routers, which I use for many years. Even though I never experienced a problem with my routers, I’d like to be prepared for hardware failures, software failures and getting my router compromised.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-03-17-openwrt_backup/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-03-15-configfiles_in_git/"><h3>configfiles in git</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  About 4 years ago, I started tracking my configuration files with git. The advantages of storing configuration files in some repository are numerous: You can destroy your configuration/computer and easily revert to a known good state. You can easily distribute and update the same set of configfiles across multiple machines (especially virtual machines or other test setups).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-03-15-configfiles_in_git/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-03-10-android-davsync/"><h3>DavSync for Android</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	   I just released github.com/mstap/android-davsync, a FOSS tool with which you can (automatically or manually) upload photos to your WebDAV server. 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-03-10-android-davsync/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-03-08-bts-notmuch-reply/"><h3>Replying to Debian BTS messages in notmuch</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Previously, my workflow regarding replying to bugreports outside my own packages was very uncomfortable: I first downloaded the mbox archive from the BTS, then imported that in claws-mail, hit reply all, remove submit@, add bugnumber@, then send the email. Therefore, I decided to hack up a little elisp function to automate this process for notmuch.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-03-08-bts-notmuch-reply/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2013 › February</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-02-06-rc-bugs-2/"><h3>RC bugs</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I recently worked on the following RC bugs: #696532 — isdnlog: /etc/isdn/isdnlog.isdnctrl0 is easily destroyed in squeeze to wheezy upgrade
+Pinged the maintainer about uploading a fix to unstable, too (was only fixed in experimental). #693208 — clang: unable to link trivial test program on armhf
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-02-06-rc-bugs-2/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-02-06-rc-bugs/"><h3>RC bugs</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I recently worked on the following RC bugs: #696187 — squid-cgi: CVE-2012-5643: cachemgr.cgi denial of service
+NMUed the upstream patches after nearly 2 months of no maintainer reaction on the bugreport. #684645 — sendmail-bin: Order of fcntl and dotlock in maillock
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-02-06-rc-bugs/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2013 › January</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-01-19-c_write_pattern/"><h3>The C write() pattern</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  When writing data to a file descriptor (file, socket, …) in C, it is recommended to use a loop to write the entire buffer and keep track of how many bytes write() could actually write to the file descriptor. This is how to write data to a file in C in a naive way: #include &lt;stdlib.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-01-19-c_write_pattern/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-01-02-wit/"><h3>WIT in Debian</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I just uploaded wit-2.10a to Debian experimental (it has to pass the NEW queue first, though). WIT (Wiimms ISO Tools) is a set of command-line tools to manipulate Wii and GameCube ISO images and WBFS containers. It is useful (for me) to store backups of my Wii games on a USB hard disk drive.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-01-02-wit/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2012 › December</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-12-05-rc-bugs/"><h3>RC bugs</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I recently worked on the following RC bugs: #669513 — gnat-4.4: FTBFS: unsatisfiable build-dependency
+Closed, no longer reproducible with the version in testing. #694810 — plib: CVE-2012-4552
+Uploaded an NMU to unstable. #684130 — digikam: crash when starts
+Closed, not reproducible with the version in testing.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-12-05-rc-bugs/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-12-04-rc-bugs-2/"><h3>RC bugs</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I recently worked on the following RC bugs: #689769 — ample: ships a /var/run/ample folder: Policy 9.3.2
+Uploaded a patched version to DELAYED/5. #694810 — plib: CVE-2012-4552
+Provided a patch, asked for instructions from the security team. #694972 — imposm: missing source for imposm/cache/kc.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-12-04-rc-bugs-2/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-12-04-rc-bugs/"><h3>RC bugs</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I recently worked on the following RC bugs: #694976 — sigit: doesn't work on amd64
+Filed a removal request. #694796 — kscd: crash with no optical drive
+Downgraded severity, it’s not RC. #672926 — oidentd: Missing dependency on net-tools
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-12-04-rc-bugs/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-12-03-rc-bugs/"><h3>RC bugs</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I recently worked on the following RC bugs: #694892 — tvtime: package installation creates /root/.tvtime
+Sent a patch which fixes the issue. Needs a second pair of eyes plus possibly an NMU. #684604 — eclipse-rcp: eclipse 3.8 hangs on splash screen with "
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-12-03-rc-bugs/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-12-01-kscd-rc/"><h3>rc bug #694670: kscd does not play any CD</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Dear Lazyweb, I recently investigated #694670 - kscd does not play any CD — essentially, at least on my machine, phonon-based applications such as kscd won’t play Audio CDs when your CD drive is not called /dev/cdrom, but e.g. /dev/cdrom5 because I have had multiple CD drives connected to my machine.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-12-01-kscd-rc/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2012 › November</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-11-28-root_on_drbd/"><h3>Root on DRBD</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I recently started using DRBD (Distributed Replicated Block Device) on Debian Linux to have a setup in which there are two servers: One server which hosts some virtual machines, and its hot-standby companion which holds exactly the same data and can take over if the hardware of the master server dies.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-11-28-root_on_drbd/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-11-25-rc-bugs/"><h3>RC bugs</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I recently worked on the following RC bugs: #677861 — lftp: FTBFS[kfreebsd-i386]: error: conflicting declaration 'typedef __int32_t gl_intptr_t'
+I provided some analysis. By rebuilding lftp’s configure script with recent autotools, this should be fixed. #676229 — gnustep-make: should depend on a chosen version of gobjc, not just "
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-11-25-rc-bugs/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-11-21-kvm_best_practices_2012/"><h3>My KVM best practices (2012)</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  KVM stands for Kernel-based Virtual Machine and is my preferred way of virtualizing a Linux system, in combination with libvirt. This article documents a few hints on what my current best practice setup is. For the host and most VMs, I use Debian wheezy (which is not yet released as of writing this article).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-11-21-kvm_best_practices_2012/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-11-16-zsh_recent_completion/"><h3>zsh: tab-completing recent files</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  This short article describes the most important productivity enhancement for working in a shell (zsh) in the last few months for me: A shortcut for completing the most recent files. In my daily work, it often happens that I save an email attachment (or download a file from the internet) and then do something with it in a shell, like unpacking it, applying a patch to source code, and so on.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-11-16-zsh_recent_completion/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-11-10-next_revival/"><h3>Eine NeXTstation übers Netz installieren</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  NeXTstation (1024x768 px) Auf der diesjährigen RGB2R brachte Ralf eine NeXTstation mit. Die Maschine hat eine 20 MHz Motorola 68k CPU, 20 MB Arbeitsspeicher und eine leicht defekte 400 MB SCSI-Festplatte. Das installierte Betriebssystem NeXTSTEP ließ sich leider nicht richtig hochfahren, beim Starten kamen einige Fehlermeldungen bezüglich nicht-auflösbarer Services und das Loginfenster erschien nicht.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-11-10-next_revival/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-11-07-sigill_golang/"><h3>One reason for SIGILL with Go (golang)</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  After launching Debian Code Search, sometimes its index-backend processes would crash when presented with some class of queries. The queries itself did not show an interesting pattern, and in fact, it wasn’t their fault. Looking at the system’s journal, I noticed that the processes were crashing with SIGILL, the signal when an illegal instruction for the CPU is encountered: Nov 07 00:11:33 codesearch index-backend[10517]: SIGILL: illegal instruction Nov 07 00:11:33 codesearch index-backend[10517]: PC=0x42558d Interestingly, on my workstation, I could not reproduce this issue.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-11-07-sigill_golang/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-11-06-debian-codesearch/"><h3>Debian Code Search</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I hereby announce a new Debian project: Debian Code Search. Debian Code Search is a search engine for program source code within Debian.
+It allows you to search all ≈ 17000 source packages, containing 130 GiB of
+FLOSS source code (including Debian packaging) with regular expressions.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-11-06-debian-codesearch/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+
+
+  Go to page:
+  
+    <ul class="pagination pagination-default">
+      <li class="page-item">
+        <a href="/posts/" aria-label="First" class="page-link" role="button"><span aria-hidden="true">&laquo;&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/4/" aria-label="Previous" class="page-link" role="button"><span aria-hidden="true">&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/3/" aria-label="Page 3" class="page-link" role="button">3</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/4/" aria-label="Page 4" class="page-link" role="button">4</a>
+      </li>
+      <li class="page-item active">
+        <a aria-current="page" aria-label="Page 5" class="page-link" role="button">5</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/6/" aria-label="Page 6" class="page-link" role="button">6</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/7/" aria-label="Page 7" class="page-link" role="button">7</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/6/" aria-label="Next" class="page-link" role="button"><span aria-hidden="true">&raquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/10/" aria-label="Last" class="page-link" role="button"><span aria-hidden="true">&raquo;&raquo;</span></a>
+      </li>
+    </ul>
+  <br>
+
+</div>
+
+      </div>
+    </main><div id="ms_footer">
+  © 2022 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

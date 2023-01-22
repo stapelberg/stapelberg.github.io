@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Blog Posts - Michael Stapelberg</title>
+
+  <meta property="og:site_name" content="Michael Stapelberg">
+  <meta property="og:title" content="Blog Posts">
+  <meta property="og:description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div>
+<h1 class="ms_title">All Blog Posts</h1>
+<div class="Artikel" id="content">
+
+  Filter by tag: <ul class="taglist">
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/debian/">debian</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/distri/">distri</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/fiber/">fiber</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/golang/">golang</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/kinx/">kinX</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/rgb2r/">rgb2r</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/rsync/">rsync</a></li>
+    
+  </ul>
+  <br>
+  
+  
+
+  Go to page:
+  
+    <ul class="pagination pagination-default">
+      <li class="page-item">
+        <a href="/posts/" aria-label="First" class="page-link" role="button"><span aria-hidden="true">&laquo;&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/2/" aria-label="Previous" class="page-link" role="button"><span aria-hidden="true">&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/" aria-label="Page 1" class="page-link" role="button">1</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/2/" aria-label="Page 2" class="page-link" role="button">2</a>
+      </li>
+      <li class="page-item active">
+        <a aria-current="page" aria-label="Page 3" class="page-link" role="button">3</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/4/" aria-label="Page 4" class="page-link" role="button">4</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/5/" aria-label="Page 5" class="page-link" role="button">5</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/4/" aria-label="Next" class="page-link" role="button"><span aria-hidden="true">&raquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/10/" aria-label="Last" class="page-link" role="button"><span aria-hidden="true">&raquo;&raquo;</span></a>
+      </li>
+    </ul>
+  <br>
+
+    
+  <h2>2017 › December</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2017-12-11-dell-up3218k/"><h3>Dell 8K4K monitor (Dell UP3218K)</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Background Ever since I first used a MacBook Pro with Retina display back in 2013, I’ve been madly in love with hi-DPI displays. I had seen the device before, and marvelled at brilliant font quality with which scientific papers would be rendered.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-12-11-dell-up3218k/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2017 › November</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2017-11-13-rgb2r-network/"><h3>Network setup for our retro computing event RGB2Rv17</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/rgb2r/">rgb2r</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<img src="https://michael.stapelberg.ch/posts/2017-11-13-rgb2r-network/IMG_7157_hu6f9fe808036517c2a10eb7f45830136e_108970_200x200_fit_q75_box.jpg" width="200" height="150"/>
+	
+	<p>
+	  Our computer association NoName e.V. organizes a retro computing event called RGB2R every year, located in Heidelberg, Germany. This year’s version is called RGB2Rv17.
+This article describes the network setup I created for this year’s event.
+The intention is not so much to provide a fully working setup (even though the setup did work fine for us as-is), but rather inspire to you to create your own network, based vaguely on what’s provided here.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-11-13-rgb2r-network/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2017 › October</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2017-10-22-pkg-go-upstreams/"><h3>Which VCS do Debian’s Go package upstreams use?</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	<span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  In the pkg-go team, we are currently discussing which workflows we should standardize on. One of the considerations is what goes into the “upstream” Git branch of our repositories: should it track the upstream Git repository, or should it contain orig tarball imports?
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-10-22-pkg-go-upstreams/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2017-10-21-gitlab-with-dex/"><h3>Making GitLab authenticate against dex</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Because I found it frustratingly hard to make GitLab and dex talk to each other, this article walks you through what I did step-by-step.
+Let’s establish some terminology:
+dex is our OpenID Connect (OIDC) “Provider (OP)”
+in other words: the component which verifies usernames and passwords.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-10-21-gitlab-with-dex/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2017-10-21-pk4/"><h3>pk4: a new tool to avail the Debian source package producing the specified package</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  UNIX distributions used to come with the system source code in /usr/src. This is a concept which fascinates me: if you want to change something in any part of your system, just make your change in the corresponding directory, recomile, reinstall, and you can immediately see your changes in action.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-10-21-pk4/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2017-10-08-raspberry-pi-3/"><h3>Debian stretch on the Raspberry Pi 3 (update)</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I previously wrote about my Debian stretch preview image for the Raspberry Pi 3. Now, I’m publishing an updated version, containing the following changes: SSH host keys are generated on first boot. Old kernel versions are now removed from /boot/firmware when purged.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-10-08-raspberry-pi-3/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2017 › August</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2017-08-19-golang_favorite/"><h3>Why Go is my favorite programming language</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I strive to respect everybody’s personal preferences, so I usually steer clear of debates about which is the best programming language, text editor or operating system.
+However, recently I was asked a couple of times why I like and use a lot of Go, so here is a coherent article to fill in the blanks of my ad-hoc in-person ramblings :-).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-08-19-golang_favorite/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2017 › May</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2017-05-25-network-manager-portal/"><h3>Auto-opening portal pages with NetworkManager</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Modern desktop environments like GNOME offer UI for this, but if you’re using a more bare-bones window manager, you’re on your own. This article outlines how to get a login page opened in your browser when you’re behind a portal.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-05-25-network-manager-portal/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2017 › April</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2017-04-16-homematic-reimplementation/"><h3>HomeMatic re-implementation</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  A while ago, I got myself a bunch of HomeMatic home automation gear (valve drives, temperature and humidity sensors, power switches). The gear itself works reasonably well, but I found the management software painfully lacking. Hence, I re-implemented my own management software.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-04-16-homematic-reimplementation/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2017-04-09-manpages-debian-org-news/"><h3>manpages.debian.org: what’s new since the launch?</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  On 2017-01-18, I announced that https://manpages.debian.org had been modernized. Let me catch you up on a few things which happened in the meantime: Debian experimental was added to manpages.debian.org. I was surprised to learn that adding experimental only required 52MB of disk usage.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-04-09-manpages-debian-org-news/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2017 › March</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2017-03-25-turris-omnia/"><h3>Review: Turris Omnia (with Fiber7)</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  The Turris Omnia is an open source (an OpenWrt fork) open hardware internet router created and supported by nic.cz, the registry for the Czech Republic. It’s the successor to their Project Turris, but with better specs. I was made aware of the Turris Omnia while it was being crowd-funded on Indiegogo and decided to support the cause.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-03-25-turris-omnia/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2017-03-22-raspberry-pi-3/"><h3>Debian stretch on the Raspberry Pi 3 (update)</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I previously wrote about my Debian stretch preview image for the Raspberry Pi 3. Now, I’m publishing an updated version, containing the following changes: A new version of the upstream firmware makes the Ethernet MAC address persist across reboots. Updated initramfs files (without updating the kernel) are now correctly copied to the VFAT boot partition.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-03-22-raspberry-pi-3/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2017 › January</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2017-01-28-golang_atomically_writing/"><h3>Atomically writing files in Go</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  NOTE that the documented assumptions about fsync skipping are incorrect in the code below. Prefer using the renameio package. Writing files is simple, but correctly writing files atomically in a performant way might not be as trivial as one might think.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-01-28-golang_atomically_writing/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2017-01-28-font-loading/"><h3>Webfont loading with FOUT</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  For manpages.debian.org, I looked at loading webfonts. I considered the following scenarios: # local? cached? Network Expected Observed 1 Yes / / perfect render perfect render 2 No Yes / perfect render perfect render 3 No No Fast FOUT FOIT 4 No No Slow FOUT some FOUT, some FOIT Scenario #1 and #2 are easy: the font is available, so if we inline the CSS into the HTML page, the browser should be able to render the page perfectly on the first try.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-01-28-font-loading/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2017-01-18-manpages-debian-org/"><h3>manpages.debian.org has been modernized</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  https://manpages.debian.org has been modernized! We have just launched a major update to our manpage repository. What used to be served via a CGI script is now a statically generated website, and therefore blazingly fast. While we were at it, we have restructured the paths so that we can serve all manpages, even those whose name conflicts with other binary packages (e.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-01-18-manpages-debian-org/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2016 › November</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2016-11-25-build-tools/"><h3>Debian package build tools</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Personally, I find the packaging tools which are available in Debian far too complex. To better understand the options we have, I created a diagram of tools which are frequently used, only covering the build step (i.e. no post-build quality assurance checks or packaging-time helpers): When I was first introduced to Debian packaging, people recommended I use pbuilder.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-11-25-build-tools/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2016-11-24-raspberry-pi-3/"><h3>Debian stretch on the Raspberry Pi 3</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  The last couple of days, I worked on getting Debian to run on the Raspberry Pi 3. Thanks to the work of many talented people, the Linux kernel in version 4.8 is _almost_ ready to run on the Raspberry Pi 3.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-11-24-raspberry-pi-3/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2016-11-21-gigabit-nas-coreos/"><h3>Gigabit NAS (running CoreOS)</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  tl;dr: I upgraded from a qnap TS-119P to a custom HTPC-like network storage solution. This article outlines what my original reasoning was for the qnap TS-119P, what I learnt, and with what solution precisely I replaced the qnap. A little over two years ago, I gave a (German) presentation about my network storage setup (see video or slides).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-11-21-gigabit-nas-coreos/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2016 › August</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2016-08-08-debian-codesearch-latency/"><h3>Debian Code Search: improving client-side latency</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<img src="https://michael.stapelberg.ch/posts/2016-08-08-debian-codesearch-latency/2016-08-08-dcs-before_huc0cd959d5bde36e210184881f13990ae_342853_200x200_fit_box_3.png" width="200" height="89"/>
+	
+	<p>
+	  A while ago, it occurred to me that querying Debian Code Search seemed slow, which surprised me because I previously spent quite some effort on making it faster, see Debian Code Search Instant and Taming the latency tail for the most recent substantial architecture overhaul and related optimizations.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-08-08-debian-codesearch-latency/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2016 › July</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2016-07-17-mergebot/"><h3>mergebot: easily merging contributions</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Recently, I was wondering why I was pushing off accepting contributions in Debian for longer than in other projects. It occurred to me that the effort to accept a contribution in Debian is way higher than in other FOSS projects.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-07-17-mergebot/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2016 › June</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2016-06-16-ssh-conditional-tunneling/"><h3>Conditionally tunneling SSH connections</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Whereas most of the networks I regularly use (home, work, hackerspace, events, …) provide native IPv6 connectivity, sometimes I’m in a legacy-only network, e.g. when tethering via my phone on some mobile providers. By far the most common IPv6-only service I use these days is SSH to my computer(s) at home.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-06-16-ssh-conditional-tunneling/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2016 › May</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2016-05-10-supermicro_x11ssz-qf_workstation_mainboard/"><h3>Supermicro X11SSZ-QF workstation mainboard</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Context For the last 3 years I’ve used the hardware described in my 2012 article. In order to drive a hi-dpi display, I needed to install an nVidia graphics card, since only the nVidia hardware/software supported multi-tile displays requiring MST (Multiple Stream Transport) such as the Dell UP2414Q.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-05-10-supermicro_x11ssz-qf_workstation_mainboard/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2016 › March</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2016-03-06-docker-on-travis-for-new-tools-and-fast-runs/"><h3>Docker on Travis for new tools and fast runs</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Like many other open source projects, the i3 window manager is using Travis CI for continuous integration (CI). In our specific case, we not only verify that every pull request compiles and the test suite still passes, but we also ensure the code is auto-formatted using clang-format, does not contain detectable spelling errors and does not accidentally use C functions like sprintf() without error checking.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-03-06-docker-on-travis-for-new-tools-and-fast-runs/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2016 › January</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2016-01-01-prometheus-blackbox-exporter/"><h3>Prometheus: Using the blackbox exporter</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Up until recently, I used to use kanla, a simple alerting program that I wrote 4 years ago. Back then, delivering alerts via XMPP (Jabber) to mobile devices like Android smartphones seemed like the best course of action. About a year ago, I’ve started using Prometheus for collecting monitoring data and alerting based on that data.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-01-01-prometheus-blackbox-exporter/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2015 › December</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2015-12-20-google_container_engine/"><h3>(Not?) Hosting small projects on Container Engine</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Note: the postings on this site are my own and do not necessarily represent the postings, strategies or opinions of my employer. Background For the last couple of years, faq.i3wm.org was running on a dedicated server I rented. I partitioned that server into multiple virtual machines using KVM, and one of these VMs contained the faq.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2015-12-20-google_container_engine/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2015-12-20-locales/"><h3>Configuring locales on Linux</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  While modern desktop environments that are used on Linux set up the locale with support for UTF-8, users who prefer not to run a desktop environment or users who use SSH to work on remote computers occasionally face trouble setting up their locale correctly.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2015-12-20-locales/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2015-12-02-alertmanager-metamonitoring/"><h3>Prometheus Alertmanager meta-monitoring</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I’m happily using Prometheus for monitoring and alerting since about a year. Regardless of the monitoring system, one problem that I was uncertain of how to solve it in a good way used to be meta-monitoring: if you have a monitoring system, how do you know that the monitoring system itself is running?
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2015-12-02-alertmanager-metamonitoring/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2015 › October</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2015-10-12-ratt/"><h3>ratt: Rebuild All The Things!</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  When uploading a new library package which changes its API/behavior in a subtle way, typically you will only hear about the downstream breakage after you’ve uploaded the new library package (via bug reports telling you that your package FTBFS, fails to build from source).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2015-10-12-ratt/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2015 › July</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2015-07-27-dh-make-golang/"><h3>dh-make-golang: creating Debian packages from Go packages</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Recently, the pkg-go team has been quite busy, uploading dozens of Go library packages in order to be able to package gcsfuse (a user-space file system for interacting with Google Cloud Storage) and InfluxDB (an open-source distributed time series database).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2015-07-27-dh-make-golang/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2015-07-18-viewsonic_vx2475smhl_4k_linux/"><h3>ViewSonic VX2475Smhl-4K HiDPI display on Linux</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I have been using a Dell UP2414Q monitor for a little over a year now. The Dell UP2414Q was the first commercially available display that qualified as what Apple calls a Retina Display, meaning it has such a high resolution that you cannot see the individual pixels in normal viewing distance.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2015-07-18-viewsonic_vx2475smhl_4k_linux/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+
+
+  Go to page:
+  
+    <ul class="pagination pagination-default">
+      <li class="page-item">
+        <a href="/posts/" aria-label="First" class="page-link" role="button"><span aria-hidden="true">&laquo;&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/2/" aria-label="Previous" class="page-link" role="button"><span aria-hidden="true">&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/" aria-label="Page 1" class="page-link" role="button">1</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/2/" aria-label="Page 2" class="page-link" role="button">2</a>
+      </li>
+      <li class="page-item active">
+        <a aria-current="page" aria-label="Page 3" class="page-link" role="button">3</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/4/" aria-label="Page 4" class="page-link" role="button">4</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/5/" aria-label="Page 5" class="page-link" role="button">5</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/4/" aria-label="Next" class="page-link" role="button"><span aria-hidden="true">&raquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/10/" aria-label="Last" class="page-link" role="button"><span aria-hidden="true">&raquo;&raquo;</span></a>
+      </li>
+    </ul>
+  <br>
+
+</div>
+
+      </div>
+    </main><div id="ms_footer">
+  © 2022 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

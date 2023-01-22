@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Blog Posts - Michael Stapelberg</title>
+
+  <meta property="og:site_name" content="Michael Stapelberg">
+  <meta property="og:title" content="Blog Posts">
+  <meta property="og:description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div>
+<h1 class="ms_title">All Blog Posts</h1>
+<div class="Artikel" id="content">
+
+  Filter by tag: <ul class="taglist">
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/debian/">debian</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/distri/">distri</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/fiber/">fiber</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/golang/">golang</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/kinx/">kinX</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/rgb2r/">rgb2r</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/rsync/">rsync</a></li>
+    
+  </ul>
+  <br>
+  
+  
+
+  Go to page:
+  
+    <ul class="pagination pagination-default">
+      <li class="page-item">
+        <a href="/posts/" aria-label="First" class="page-link" role="button"><span aria-hidden="true">&laquo;&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/7/" aria-label="Previous" class="page-link" role="button"><span aria-hidden="true">&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/6/" aria-label="Page 6" class="page-link" role="button">6</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/7/" aria-label="Page 7" class="page-link" role="button">7</a>
+      </li>
+      <li class="page-item active">
+        <a aria-current="page" aria-label="Page 8" class="page-link" role="button">8</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/9/" aria-label="Page 9" class="page-link" role="button">9</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/10/" aria-label="Page 10" class="page-link" role="button">10</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/9/" aria-label="Next" class="page-link" role="button"><span aria-hidden="true">&raquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/10/" aria-label="Last" class="page-link" role="button"><span aria-hidden="true">&raquo;&raquo;</span></a>
+      </li>
+    </ul>
+  <br>
+
+    
+  <h2>2010 › September</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-09-01-wenn-man-dbus-versteht-was-a/"><h3> Wenn man DBus versteht (was a…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Wenn man DBus versteht (was am Anfang nicht einfach ist, insbesondere wenn man nur mal kurz reinschauen will) und insbesondere die DBus-API der Programmiersprache der Wahl versteht, ist das ja ganz in Ordnung. Scheint schnell zu sein und man kann damit recht stabil IPC bauen (auch wenn ich Teile der schwarzen Magie in dem ganzen Konstrukt, was heutzutage einen Desktop auszumachen scheint, noch nicht verstanden habe).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-09-01-wenn-man-dbus-versteht-was-a/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2010 › July</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-07-31-nachdem-rakudo-star-am-donner/"><h3> Nachdem Rakudo Star am Donner…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Nachdem Rakudo Star am Donnerstag herausgekommen ist, habe ich hier mal schnell ein paar Zeilen zusammengehackt, um ein Dokument aus CouchDB zu holen. LWP::Simple und JSON::Tiny kommen bei Rakudo direkt mit: #!/usr/bin/env perl6 use v6; use JSON::Tiny; use LWP::Simple; my $dburl = 'http://localhost:5984/foo'; my $json = LWP::Simple.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-07-31-nachdem-rakudo-star-am-donner/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-07-31-in-c-gibt-es-closures-zwar/"><h3> In C&#43;&#43; gibt es Closures! Zwar…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  In C++ gibt es Closures! Zwar erst mit C++0x (wofür man g++ 4.5 braucht), aber immerhin. Damit wird das Erstellen asynchroner APIs endlich annehmbar (in diesem Fall der CouchDB-Teil einer Qt-Anwendung, wegen Qt muss ich überhaupt erst C++ nutzen). Zum Vergleich mal die API vorher: void MainWindow::clickedTask() { TodoButton *btn = (TodoButton*)sender(); /* Get the document from CouchDB */ QNetworkReply *nreply = db->get_document(btn->ID()); connect(nreply, SIGNAL(finished()), this, SLOT(recv_entry_edit())); } void MainWindow::recv_entry_edit() { QNetworkReply *reply = (QNetworkReply*)sender(); QByteArray answer = reply->readAll(); QJson::Parser p; bool ok; QVariant var = p.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-07-31-in-c-gibt-es-closures-zwar/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-07-27-nachdem-ich-letztens-ein-webd/"><h3> Nachdem ich letztens ein WebD…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Nachdem ich letztens ein WebDAV-plugin für Maemo gehackt habe, wollte ich das nun hochladen. Dazu registriert man sich bei maemo.org und stellt dann einen Request auf Upload-Rechte für das extras-devel-Repository. Nachdem man diese Rechte bekommt lädt man seinen SSH-Public-Key hoch und kann danach Pakete in den Autobuilder laden.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-07-27-nachdem-ich-letztens-ein-webd/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-07-25-asterisk_mp3_voicemail/"><h3>Kurz-Howto: Anrufbeantworter-Nachrichten in Asterisk als MP3 versenden</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Auf meiner Asterisk-Telefonanlage läuft natürlich auch ein Anrufbeantworter. Damit ich diesen nicht immer nur abfragen kann, wenn ich gerade einen E-Mail-Client vor mir habe (sup unterstützt leider noch keine verteilten Setups), sondern auch, wenn ich gerade nur mein Telefon greifbar habe, habe ich meine Konfiguration etwas geändert.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-07-25-asterisk_mp3_voicemail/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-07-23-auf-dem-n900-kann-man-fotosv/"><h3> Auf dem N900 kann man Fotos/V…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Auf dem N900 kann man Fotos/Videos via flickr und anderen Diensten direkt ins Netz stellen. Gestern fiel mir auf, dass flickr bei kostenlosen Accounts allerdings ein Limit von 2 Videos pro Monat hat, was ein bisschen stört, wenn man gerade das dritte Video hochladen möchte.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-07-23-auf-dem-n900-kann-man-fotosv/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-07-21-wer-i3lock-nutzt-ist-herzlich/"><h3> Wer i3lock nutzt ist herzlich…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Wer i3lock nutzt ist herzlich dazu eingeladen, den xcb-Branch von i3lock auszuprobieren. Der Code darin wurde komplett auf xcb portiert und ist dadurch zum einen hübscher und geringfügig schneller, zum anderen wurden einige Probleme behoben. Eine kurze Übersicht: Man kann Bilddateien im PNG-Format statt im XPM-Format laden Beim Suspend-to-RAM verschwindet das Bild nicht mehr gelegentlich Popups überlagern nun nicht mehr das i3lock-Fenster (sondern i3lock bleibt permanent im Vordergrund) Für diejenigen, die nicht fließend git sprechen: $ git clone git://code.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-07-21-wer-i3lock-nutzt-ist-herzlich/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-07-12-bloat-berall-rw-r--r--/"><h3> Bloat, überall!
+
+
+-rw-r--r--…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	   Bloat, überall! -rw-r--r-- 1 michael staff 7946 _____________ steuer.07 -rw-r--r-- 1 michael staff 36718 _____________ steuer.08 -rw-r--r-- 1 michael staff 72673 _____________ steuer.elfo (Einkommenssteuererklärung generiert mit ElsterFormular von 2007, 2008 und 2009) 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-07-12-bloat-berall-rw-r--r--/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2010 › June</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-06-23-xen_to_kvm/"><h3>Mini-Howto: Xen nach KVM migrieren</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Da Xen wohl auch in Zukunft nicht in den Linux-Kernel aufgenommen wird und stattdessen KVM bereits verfügbar ist, habe ich meinen Server von Xen auf KVM migriert. Da die Migration ziemlich stressfrei lief (wenn man weiß, wo man drehen muss), möchte ich hier kurz den Verlauf schildern.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-06-23-xen_to_kvm/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-06-09-soeben-wurde-i3-v3-bf1-ver/"><h3> Soeben wurde i3 v3.ε-bf1 verö…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	   Soeben wurde i3 v3.ε-bf1 veröffentlicht. Dieses Release enthält nur Bugfixes und gilt als stabil. Ein Upgrade wird allen Nutzern von v3.ε empfohlen. Die Release Notes enthalten alle Änderungen. 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-06-09-soeben-wurde-i3-v3-bf1-ver/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-06-05-meine-erste-grafische-maemo-a/"><h3> Meine erste grafische Maemo-A…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	   Meine erste grafische Maemo-Anwendung ist fertig: http://michael.stapelberg.de/moodlampctl (damit kann man eine moodlamp steuern). 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-06-05-meine-erste-grafische-maemo-a/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2010 › May</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-05-31-da-ich-mich-hufig-dabei-erwi/"><h3> Da ich mich häufig dabei erwi…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Da ich mich häufig dabei erwische, im aktuellen Verzeichnis nach dem letzten Coredump zu suchen um ihn inklusive zugehörigem Programm in den Debugger zu laden, habe ich diese Aufgabe in ein Script ausgelagert. Die folgenden Zeilen Perl suchen den letzten Coredump (dazu muss das Coredump-Pattern mit sysctl -w kernel.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-05-31-da-ich-mich-hufig-dabei-erwi/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-05-22-firebox/"><h3>Linux auf einer WatchGuard Firebox X500</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Im RaumZeitLabor tauchte letztens eine WatchGuard Firebox X500 (Modellnummer R6264S) auf, die von ihrem Besitzer auf den Müll geworfen wurde. Für uns ist die Kiste allerdings durchaus noch zu gebrauchen: In ihr steckt ein größtenteils aus Standard-x86-Hardware bestehendes System mit Serieller Konsole, 6 Ethernet-Ports, 256 MB SDRAM und einem Celeron 1,2 GHz.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-05-22-firebox/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-05-22-die-folien-undder-beispielco/"><h3> Die Folien und der Beispielco…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	   Die Folien und der Beispielcode zu meinem Vortrag „Portieren von C-Programmen auf IPv6” (gehalten auf dem 2. IPv6-Kongress vor zwei Tagen) sind nun online. 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-05-22-die-folien-undder-beispielco/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-05-11-folgendes-ist-valider-c-code-/"><h3> Folgendes ist valider C-Code …</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	   Folgendes ist valider C-Code (ausprobieren mit gcc foo.c): main(){int B[ 0 :> ;( 8) ;} Hat noch jemand Ideen für Smilies? 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-05-11-folgendes-ist-valider-c-code-/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-05-07-und-hier-ist-der-grund-wies/"><h3> …und hier ist der Grund, wies…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	   …und hier ist der Grund, wieso alle qt-Programme in der falschen Sprache angezeigt werden: Die Klasse QLocale macht das system-locale (welches die meisten Programme an QTranslator verfüttern) an LC_NUMERIC (!) fest. Normalerweise ist dafür LC_MESSAGES zuständig. Hier ist der passende Bugreport, der übrigens seit 2007-11-12 offen ist… 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-05-07-und-hier-ist-der-grund-wies/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-05-04-ein-hbscher-vergleich-zwisch/"><h3> Ein hübscher Vergleich zwisch…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	   Ein hübscher Vergleich zwischen LaTeX und Microsoft Word (was die typografischen Details angeht): http://nitens.org/taraborelli/latex 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-05-04-ein-hbscher-vergleich-zwisch/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-05-04-ich-habe-gerade-auf-arbeit-ei/"><h3> Ich habe gerade auf Arbeit ei…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Ich habe gerade auf Arbeit einen 9 Jahre alten Fehler in einem Treiber für eine unserer Karten behoben. Das Symptom war, dass manchmal das Auslesen des Buffers auf der Karte einfach hing. Als ich mir das Problem auf meiner Testmaschine anschaute, hing der Transfer nicht nur, sondern gelegentlich startete auch die Maschine neu (manchmal mit Kernel Panic).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-05-04-ich-habe-gerade-auf-arbeit-ei/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2010 › April</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-04-28-ein-cooles-feature-von-couchd/"><h3> Ein cooles Feature von CouchD…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Ein cooles Feature von CouchDB sind Change Notifications: Anstatt wiederholt zu pullen, ob neue Daten da sind, kann man sich von CouchDB benachrichtigen lassen („continuous polling”). Besonders in Kombination mit Replikation ist das eine nette Sache und integriert sich nahtlos in ein event-basiertes Programm (man kann natürlich auch blockierend effizient pollen).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-04-28-ein-cooles-feature-von-couchd/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-04-18-heute-in-warum-ich-die-gnu-a/"><h3> Heute in „Warum ich die GNU a…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Heute in „Warum ich die GNU autotools nicht mag”: Warum unter IRIX PHP5 nicht gelinkt werden kann. Die autotools sind eigentlich dazu da, Besonderheiten bestimmter Systeme zu ermitteln, damit man als Programmierer beispielsweise andere Funktionen nutzen kann, wenn auf einem System eine bestimmte Funktion fehlt.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-04-18-heute-in-warum-ich-die-gnu-a/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-04-17-es-gibt-ja-nicht-hufig-debia/"><h3> Es gibt ja nicht häufig Debia…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Es gibt ja nicht häufig Debian-Bugs, bei denen ein Facepalm angebracht wäre, aber das hier ist einer: Im Schriftpaket ttf-linux-libertine gab es Bug #523186, bei dem es um ein OpenOffice.org-Problem mit dieser Schriftart geht. Die „Lösung” war dann, die Schriftart umzubenennen, und zwar zu „Linux Libertine O” (das ist der OpenFont-Name, nicht der TrueType-Name!
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-04-17-es-gibt-ja-nicht-hufig-debia/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-04-01-wenn-vmware-modconfig-sich-mi/"><h3> Wenn vmware-modconfig sich mi…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Wenn vmware-modconfig sich mit der Meldung „gcc and kernel headers must be installed” beschwert, obwohl beides installiert ist, könnte das daran liegen, dass unter Linux 2.6.33 die Dateien utsrelease.h und autoconf.h nicht mehr in include/linux/, sondern in autogenerated/ landen. Folgender Workaround schafft abhilfe, bis VMware eine funktionierende Variante ausliefert: cd /lib/modules/$(uname -r)/build/include/linux ln -s .
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-04-01-wenn-vmware-modconfig-sich-mi/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2010 › March</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-03-30-i3-v3-wurde-soeben-released/"><h3> i3 v3.ε wurde soeben released…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  i3 v3.ε wurde soeben released. Ein Upgrade wird allen Nutzern empfohlen, Version 3.ε ist stabil. Es wurden einige Aufräumarbeiten durchgeführt (XRandR statt Xinerama, der neue Parser/Lexer ist nun Standard, Debugoutput ist regulierbar, man kann die Workspace-Leiste abschalten und eine externe nutzen, die IPC-Schnittstelle wurde deutlich erweitert), wodurch einige Bugs nicht mehr auftreten.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-03-30-i3-v3-wurde-soeben-released/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-03-30-wer-sich-ber-die-tastenkombi/"><h3> Wer sich über die Tastenkombi…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Wer sich über die Tastenkombination Shift+Insert zum Pasten ärgert (auf manchen Tastaturen schwer erreichbar), kann folgendermaßen eine beliebige Taste mit der mittleren Maustaste (also effektiv Pasten) belegen: xmodmap -e 'keycode 115 = Pointer_Button2' xkbset m xkbset exp =m Die xkbset-Aufrufe aktivieren den Mousekeys-Modus und sind nötig, damit das spezielle Keysym Pointer_Button2 zur Verfügung steht.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-03-30-wer-sich-ber-die-tastenkombi/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-03-24-in-x11-gibt-es-oftmals-die-si/"><h3> In X11 gibt es oftmals die Si…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  In X11 gibt es oftmals die Situation, dass es eine alte API gibt, die aufgrund einer neuen Extension obsolet wurde. So beispielsweise auch bei Mauszeigern: Es gibt eine spezielle Schriftart namens „cursor”, welche Masken enthält, die Vordergrund und Hintergrund der jeweiligen Cursor bestimmen (siehe http://www.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-03-24-in-x11-gibt-es-oftmals-die-si/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-03-21-auf-meinem-server-nutze-ich-x/"><h3> Auf meinem Server nutze ich X…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Auf meinem Server nutze ich Xen zur Virtualisierung, netterweise kann das Logical Volumes (LVM) für die Festplatten der Gastsysteme nutzen. Damit ich nun nicht auf jeder virtuellen Maschine bacula konfigurieren muss und beim Wiederherstellen des Backups direkt alle Gastsysteme auf einen Schlag restauriert habe, habe ich mir vor einiger Zeit ein Script geschrieben, welches einen Snapshot der LVs mountet, der dann gesichert wird: http://code.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-03-21-auf-meinem-server-nutze-ich-x/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-03-19-whrend-ich-herausfand-dass-/"><h3> Während ich herausfand, dass …</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	   Während ich herausfand, dass in Ruby File.stat(fn).mtime erst ab Version 1.9 auch Nanosekunden beinhaltet, bin ich auf folgendes großartige Python-Problem gestoßen: http://ciaranm.wordpress.com/2009/11/15/this-week-in-python-stupidity-os-stat-os-utime-and-sub-second-timestamps/ 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-03-19-whrend-ich-herausfand-dass-/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-03-09-da-ich-ein-neues-system-board/"><h3> Da ich ein neues System Board…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Da ich ein neues System Board in meinem Notebook habe (damit auch eine neue MAC-Adresse) und der Änderungsantrag noch nicht durch war, hatte ich heute am Institut nur IPv6-Connectivity zum Internet (das geht über einen separaten Tunnel). Jetzt hätte man sich zwar ein VPN bauen können, aber lustiger ist es doch, mal auszuprobieren, wieviel schon funktioniert.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-03-09-da-ich-ein-neues-system-board/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2009 › December</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2009-12-13-ssd/"><h3>Super Talent Solid State Disk im Test</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Da mir Volker freundlicherweise seine brandneue Solid State Disk ausgeliehen hat um damit ein paar Tests durchzuführen, möchte ich meine Erfahrungen hier festhalten. Solid State Disks sind „Festplatten”, die nicht magnetisch funktionieren, sondern stattdessen Flash-Speicher verwenden. Durch die starke Nachfrage nach Flash-Speicher in den letzten Jahren (beispielsweise durch USB-Sticks) wurden die Chips mit immer mehr Kapazität zu immer günstigeren Preisen verfügbar, was sie schließlich auch für Endkunden als Festplattenersatz in einigen Szenarien attraktiv macht (nichtsdestotrotz sprechen wir immernoch von ca.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2009-12-13-ssd/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2009 › October</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2009-10-08-xen_lvm_snapshot/"><h3>Xen-Server sichern mit LVM-Snapshots</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Wenn man einen Server mit Xen virtualisiert, steht man beim Einrichten des Backups vor der Frage, wie man das Backup organisiert. Hier gibt es (mindestens) die folgenden Ansätze: Man betrachtet jede virtuelle Instanz als eigenständig und installiert dort jeweils die Backupsoftware.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2009-10-08-xen_lvm_snapshot/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+
+
+  Go to page:
+  
+    <ul class="pagination pagination-default">
+      <li class="page-item">
+        <a href="/posts/" aria-label="First" class="page-link" role="button"><span aria-hidden="true">&laquo;&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/7/" aria-label="Previous" class="page-link" role="button"><span aria-hidden="true">&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/6/" aria-label="Page 6" class="page-link" role="button">6</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/7/" aria-label="Page 7" class="page-link" role="button">7</a>
+      </li>
+      <li class="page-item active">
+        <a aria-current="page" aria-label="Page 8" class="page-link" role="button">8</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/9/" aria-label="Page 9" class="page-link" role="button">9</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/10/" aria-label="Page 10" class="page-link" role="button">10</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/9/" aria-label="Next" class="page-link" role="button"><span aria-hidden="true">&raquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/10/" aria-label="Last" class="page-link" role="button"><span aria-hidden="true">&raquo;&raquo;</span></a>
+      </li>
+    </ul>
+  <br>
+
+</div>
+
+      </div>
+    </main><div id="ms_footer">
+  © 2022 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

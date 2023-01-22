@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Blog Posts - Michael Stapelberg</title>
+
+  <meta property="og:site_name" content="Michael Stapelberg">
+  <meta property="og:title" content="Blog Posts">
+  <meta property="og:description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div>
+<h1 class="ms_title">All Blog Posts</h1>
+<div class="Artikel" id="content">
+
+  Filter by tag: <ul class="taglist">
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/debian/">debian</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/distri/">distri</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/fiber/">fiber</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/golang/">golang</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/kinx/">kinX</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/rgb2r/">rgb2r</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/rsync/">rsync</a></li>
+    
+  </ul>
+  <br>
+  
+  
+
+  Go to page:
+  
+    <ul class="pagination pagination-default">
+      <li class="page-item">
+        <a href="/posts/" aria-label="First" class="page-link" role="button"><span aria-hidden="true">&laquo;&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/" aria-label="Previous" class="page-link" role="button"><span aria-hidden="true">&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/" aria-label="Page 1" class="page-link" role="button">1</a>
+      </li>
+      <li class="page-item active">
+        <a aria-current="page" aria-label="Page 2" class="page-link" role="button">2</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/3/" aria-label="Page 3" class="page-link" role="button">3</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/4/" aria-label="Page 4" class="page-link" role="button">4</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/5/" aria-label="Page 5" class="page-link" role="button">5</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/3/" aria-label="Next" class="page-link" role="button"><span aria-hidden="true">&raquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/10/" aria-label="Last" class="page-link" role="button"><span aria-hidden="true">&raquo;&raquo;</span></a>
+      </li>
+    </ul>
+  <br>
+
+    
+  <h2>2020 › July</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2020-07-09-kint-kinesis-keyboard-controller/"><h3>Introducing the kinT kinesis keyboard controller</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/kinx/">kinX</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<img src="https://michael.stapelberg.ch/posts/2020-07-09-kint-kinesis-keyboard-controller/kint-pcb-3d-render-back-v2020-06-30_hu30a1e426a4c0be1e0484551f5906a1ac_928372_200x200_fit_box_3.png" width="200" height="163"/>
+	
+	<p>
+	  Back in 2013, I published a replacement controller for the Kinesis Advantage ergonomic keyboard. In the community, it is often referred to simply as the “stapelberg”, and became quite popular.
+Many people like to use the feature-rich QMK firmware, which supports my replacement controller out of the box.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-07-09-kint-kinesis-keyboard-controller/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2020 › June</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2020-06-06-iphone-camera-linux-v4l2loopback/"><h3>Using the iPhone camera as a Linux webcam with v4l2loopback</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<img src="https://michael.stapelberg.ch/posts/2020-06-06-iphone-camera-linux-v4l2loopback/2020-06-06-iphone-cam_hud2d472f6b7b139eb735fe6ed7f317f07_1422223_200x200_fit_q75_box.jpg" width="150" height="200"/>
+	
+	<p>
+	  For my programming stream at twitch.tv/stapelberg, I wanted to add an additional camera to show test devices, electronics projects, etc. I couldn’t find my old webcam, and new ones are hard to come by currently, so I figured I would try to include a phone camera somehow.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-06-06-iphone-camera-linux-v4l2loopback/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2020 › May</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2020-05-23-desk-setup/"><h3>stapelberg uses this: my 2020 desk setup</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<img src="https://michael.stapelberg.ch/posts/2020-05-23-desk-setup/2020-05-22-desk-setup_hu10db40f5c3156b454e7677b477ea23e3_3331547_200x200_fit_q75_box.jpg" width="200" height="150"/>
+	
+	<p>
+	  I generally enjoy reading the uses this blog, and recently people have been talking about desk setups in my bubble (and on my Twitch stream), so I figured I’d write a post about my current setup!
+Desk setup I’m using a desk I bought at IKEA well over 10 years ago.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-05-23-desk-setup/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2020-05-16-distri-release/"><h3>a new distri linux (fast package management) release</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/distri/">distri</a></span>
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I just released a new version of distri.
+The focus of this release lies on:
+a better developer experience, allowing users to debug any installed package without extra setup steps
+performance improvements in all areas (starting programs, building distri packages, generating distri images)
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-05-16-distri-release/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2020-05-09-distri-hermetic-packages/"><h3>Hermetic packages (in distri)</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/distri/">distri</a></span>
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  In distri, packages (e.g. emacs) are hermetic. By hermetic, I mean that the dependencies a package uses (e.g. libusb) don’t change, even when newer versions are installed.
+For example, if package libusb-amd64-1.0.22-7 is available at build time, the package will always use that same version, even after the newer libusb-amd64-1.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-05-09-distri-hermetic-packages/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2020 › February</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2020-02-02-readiness-notifications-in-golang/"><h3>Readiness notifications in Go</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  When spawning a child program, for example in an integration test, it is often helpful to know when the child program is ready to receive requests.
+Delaying A brittle strategy is to just add a delay (say, time.Sleep(2 * time.Second)) and hope the child program finishes initialization in that time.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-02-02-readiness-notifications-in-golang/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2020 › January</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2020-01-21-initramfs-from-scratch-golang/"><h3>distri: 20x faster initramfs (initrd) from scratch</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/distri/">distri</a></span>
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	<span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  In case you are not yet familiar with why an initramfs (or initrd, or initial ramdisk) is typically used when starting Linux, let me quote the wikipedia definition:
+“[…] initrd is a scheme for loading a temporary root file system into memory, which may be used as part of the Linux startup process […] to make preparations before the real root file system can be mounted.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-01-21-initramfs-from-scratch-golang/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2019 › October</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2019-10-23-nas/"><h3>Network Storage PC Hardware (2019)</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  One of my two NAS builds recently died, so I bought a new one until I find some time to debug the old one. Since a couple of people have been asking me what I would recommend nowadays based on my November 2016 article “Gigabit NAS (running CoreOS)”, I figured I would share the new hardware listing:
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-10-23-nas/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2019 › September</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2019-09-29-dcs-positional-turbopfor-index/"><h3>Debian Code Search: positional index, TurboPFor-compressed</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	<span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Over the last few months, I have been developing a new index format for Debian Code Search. This required a lot of careful refactoring, re-implementation, debug tool creation and debugging.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-09-29-dcs-positional-turbopfor-index/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2019 › August</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2019-08-17-introducing-distri/"><h3>distri: a Linux distribution to research fast package management</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/distri/">distri</a></span>
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	<span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Over the last year or so I have worked on a research linux distribution in my spare time. It’s not a distribution for researchers (like Scientific Linux), but my personal playground project to research linux distribution development, i.e. try out fresh ideas.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-08-17-introducing-distri/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2019-08-17-linux-package-managers-are-slow/"><h3>Linux package managers are slow</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/distri/">distri</a></span>
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I measured how long the most popular Linux distribution’s package manager take to install small and large packages.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-08-17-linux-package-managers-are-slow/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2019 › July</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2019-07-20-hooks-and-triggers/"><h3>Linux distributions: Can we do without hooks and triggers?</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/distri/">distri</a></span>
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Hooks are an extension feature provided by all package managers that are used in larger Linux distributions. For example, Debian uses apt, which has various maintainer scripts. Fedora uses rpm, which has scriptlets. Different package managers use different names for the concept, but all of them offer package maintainers the ability to run arbitrary code during package installation and upgrades.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-07-20-hooks-and-triggers/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2019 › May</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2019-05-23-optional-dependencies/"><h3>Optional dependencies don’t work</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  In the i3 projects, we have always tried hard to avoid optional dependencies. There are a number of reasons behind it, and as I have recently encountered some of the downsides of optional dependencies firsthand, I summarized my thoughts in this article.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-05-23-optional-dependencies/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2019 › March</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2019-03-10-debian-winding-down/"><h3>Winding down my Debian involvement</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  This post is hard to write, both in the emotional sense but also in the “I would have written a shorter letter, but I didn’t have the time” sense. Hence, please assume the best of intentions when reading it—it is not my intention to make anyone feel bad about their contributions, but rather to provide some insight into why my frustration level ultimately exceeded the threshold.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-03-10-debian-winding-down/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2019 › February</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2019-02-15-debian-debugging-devex/"><h3>Debugging experience in Debian</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Recently, a user reported that they don’t see window titles in i3 when running i3 on a Raspberry Pi with Debian.
+I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and was able to reproduce the issue.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-02-15-debian-debugging-devex/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2019-02-05-turbopfor-analysis/"><h3>TurboPFor: an analysis</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Motivation I have recently been looking into speeding up Debian Code Search. As a quick reminder, search engines answer queries by consulting an inverted index: a map from term to documents containing that term (called a “posting list”). See the Debian Code Search Bachelor Thesis (PDF) for a lot more details.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-02-05-turbopfor-analysis/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2018 › December</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2018-12-12-docker-ipv6/"><h3>Docker and IPv6</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  My use-case is seemingly very simple: I want to run a webserver in a Docker container, and it should be reachable via IPv4 and IPv6. The webserver has multiple virtual hosts, some of which just serve static files, while others proxy to, say, a Grafana instance, which is also running in a Docker container.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-12-12-docker-ipv6/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2018 › October</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2018-10-31-rgb2rv18-network/"><h3>Network setup for our retro computing event RGB2Rv18</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/rgb2r/">rgb2r</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Our computer association NoName e.V. organizes a retro computing event called RGB2R every year, located in Heidelberg, Germany. This year’s version is called RGB2Rv18.
+This article describes the network setup I created for this year’s event. If you haven’t read it, the article about last year’s RGB2Rv17 network is also available.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-10-31-rgb2rv18-network/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2018 › June</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2018-06-03-raspi3-looking-for-maintainer/"><h3>Looking for a new Raspberry Pi image maintainer</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  This is taken care of: Gunnar Wolf has taken on maintenance of the Raspberry Pi image. Thank you! (Cross-posting this message I sent to pkg-raspi-maintainers for broader visibility.) I started building Raspberry Pi images because I thought there should be an easy, official way to install Debian on the Raspberry Pi.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-06-03-raspi3-looking-for-maintainer/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2018 › May</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2018-05-07-xps-13-9360-linux/"><h3>Installing Dell’s Ubuntu image on an XPS 9360</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Update (2021) Update (2021): After Dell didn’t update their Linux version for a while, I concluded it would be best to just install a standard Ubuntu Linux. All required drivers are upstreamed, and I never needed the Dell tools that come with their version.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-05-07-xps-13-9360-linux/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2018 › April</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-latency-measurement/"><h3>kinX: latency measurement</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/kinx/">kinX</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  This post is part of a series of posts about the kinX project.
+Latency measurement End-to-end latency consists of 3 parts:
+input latency (keyboard) processing latency (computer) output latency (monitor) During the development of the kinX keyboard controller, I realized that measuring processing latency was quite simple with my hardware: I could start a timer when sending a key press HID report to the computer and measure the elapsed time when I would receive a reply from the computer.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-latency-measurement/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-usb-hub/"><h3>kinX: USB Hub</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/kinx/">kinX</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<img src="https://michael.stapelberg.ch/posts/2018-04-17-kinx-usb-hub/kinx-hub_hub171d3553dfb50fbddf8778151525534_430879_200x200_fit_q75_box.jpg" width="200" height="171"/>
+	
+	<p>
+	  This post is part of a series of posts about the kinX project.
+Motivation The Kinesis Advantage comes with a built-in 2-port USB hub. That hub uses a proprietary connector to interface with a PS/2 keyboard controller, so it cannot be used with a USB keyboard controller.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-usb-hub/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-keyboard-controller/"><h3>kinX: keyboard controller with &lt;0.33ms input latency</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/kinx/">kinX</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<img src="https://michael.stapelberg.ch/posts/2018-04-17-kinx-keyboard-controller/kinx-mk66f_huadaad7ed50f8d38b8cbe347b2c1948f3_1364992_200x200_fit_q75_box.jpg" width="200" height="156"/>
+	
+	<p>
+	  This post is part of a series of posts about the kinX project.
+Background 10 years ago I got a Kinesis Advantage keyboard. I wrote about the experience of learning to touch-type using the ergonomic NEO layout in my (German) post “Neo-Layout auf einer Kinesis-Tastatur”.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-keyboard-controller/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx/"><h3>kinX: overview</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/kinx/">kinX</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  The kinX project is described in a series of blog posts:
+While not strictly a part of this series, “Hacking your own Kinesis keyboard controller” describes the first controller I built in 2013 (maybe interesting for context).
+The first post introduces the kinX, a keyboard controller with merely 0.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-04-17-kinx/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2018 › March</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2018-03-19-sbuild-debian-developer-setup/"><h3>sbuild-debian-developer-setup(1)</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I have heard a number of times that sbuild is too hard to get started with, and hence people don’t use it. To reduce hurdles from using/contributing to Debian, I wanted to make sbuild easier to set up. sbuild ≥ 0.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-03-19-sbuild-debian-developer-setup/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2018-03-13-cpu/"><h3>cpu(1) with Linux</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  motivation To run the tests of my i3 Go package, I use the following command:
+go test -v go.i3wm.org/... To run the tests of my i3 Go package on a different architecture, the only thing I should need to change is to declare the architecture by setting GOARCH=arm64:
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-03-13-cpu/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2018-03-10-dput-usability/"><h3>dput usability changes</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  dput-ng ≥ 1.16 contains two usability changes which make uploading easier: When no arguments are specified, dput-ng auto-selects the most recent .changes file (with confirmation). Instead of erroring out when detecting an unsigned .changes file, debsign(1) is invoked to sign the .
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-03-10-dput-usability/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2018 › January</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2018-01-28-pristine-tar/"><h3>pristine-tar considered harmful</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  If you want to follow along at home, clone this repository: % GBP_CONF_FILES=:debian/gbp.conf gbp clone https://anonscm.debian.org/git/pkg-go/packages/golang-github-go-macaron-inject.git Now, in the golang-github-go-macaron-inject directory, I’m aware of three ways to obtain an orig tarball (please correct me if there are more): Run gbp buildpackage, creating an orig tarball from git (upstream/0.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-01-28-pristine-tar/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2018-01-13-offsite-backup-apu2c4/"><h3>Off-site backups with an apu2c4</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Background A short summary of my backup strategy is: I run daily backups to my NAS. In order to recover from risks like my apartment burning down or my belongings being stolen, I like to keep one copy of my data off-site, updated less frequently.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-01-13-offsite-backup-apu2c4/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2018-01-08-raspberry-pi-3/"><h3>Debian buster on the Raspberry Pi 3 (update)</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  I previously wrote about my Debian buster preview image for the Raspberry Pi 3. Now, I’m publishing an updated version, containing the following changes: WiFi works out of the box. Use e.g. ip link set dev wlan0 up, and iwlist wlan0 scan.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-01-08-raspberry-pi-3/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+
+
+  Go to page:
+  
+    <ul class="pagination pagination-default">
+      <li class="page-item">
+        <a href="/posts/" aria-label="First" class="page-link" role="button"><span aria-hidden="true">&laquo;&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/" aria-label="Previous" class="page-link" role="button"><span aria-hidden="true">&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/" aria-label="Page 1" class="page-link" role="button">1</a>
+      </li>
+      <li class="page-item active">
+        <a aria-current="page" aria-label="Page 2" class="page-link" role="button">2</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/3/" aria-label="Page 3" class="page-link" role="button">3</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/4/" aria-label="Page 4" class="page-link" role="button">4</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/5/" aria-label="Page 5" class="page-link" role="button">5</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/3/" aria-label="Next" class="page-link" role="button"><span aria-hidden="true">&raquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/10/" aria-label="Last" class="page-link" role="button"><span aria-hidden="true">&raquo;&raquo;</span></a>
+      </li>
+    </ul>
+  <br>
+
+</div>
+
+      </div>
+    </main><div id="ms_footer">
+  © 2022 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

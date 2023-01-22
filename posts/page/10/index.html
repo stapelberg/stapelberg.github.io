@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Blog Posts - Michael Stapelberg</title>
+
+  <meta property="og:site_name" content="Michael Stapelberg">
+  <meta property="og:title" content="Blog Posts">
+  <meta property="og:description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div>
+<h1 class="ms_title">All Blog Posts</h1>
+<div class="Artikel" id="content">
+
+  Filter by tag: <ul class="taglist">
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/debian/">debian</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/distri/">distri</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/fiber/">fiber</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/golang/">golang</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/kinx/">kinX</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/rgb2r/">rgb2r</a></li>
+    
+    <li><a href="https://michael.stapelberg.ch/posts/tags/rsync/">rsync</a></li>
+    
+  </ul>
+  <br>
+  
+  
+
+  Go to page:
+  
+    <ul class="pagination pagination-default">
+      <li class="page-item">
+        <a href="/posts/" aria-label="First" class="page-link" role="button"><span aria-hidden="true">&laquo;&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/9/" aria-label="Previous" class="page-link" role="button"><span aria-hidden="true">&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/6/" aria-label="Page 6" class="page-link" role="button">6</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/7/" aria-label="Page 7" class="page-link" role="button">7</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/8/" aria-label="Page 8" class="page-link" role="button">8</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/9/" aria-label="Page 9" class="page-link" role="button">9</a>
+      </li>
+      <li class="page-item active">
+        <a aria-current="page" aria-label="Page 10" class="page-link" role="button">10</a>
+      </li>
+      <li class="page-item disabled">
+        <a aria-disabled="true" aria-label="Next" class="page-link" role="button" tabindex="-1"><span aria-hidden="true">&raquo;</span></a>
+      </li>
+      <li class="page-item disabled">
+        <a aria-disabled="true" aria-label="Last" class="page-link" role="button" tabindex="-1"><span aria-hidden="true">&raquo;&raquo;</span></a>
+      </li>
+    </ul>
+  <br>
+
+    
+  <h2>2007 › August</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2007-08-21-automatisch_mounten/"><h3>Automatisch Mounten</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Da ich an meiner Schule vier PCs mit Linux betreue, suchte ich vor kurzem nach einer Möglichkeit, einen Ordner auf allen PCs gleichermaßen freizugeben und diesen auf allen anderen PCs einzubinden. Ich entschied mich für Samba, weil eventuell auch Windows-PCs auf die Freigabe zugreifen sollen und NFS nicht auf Anhieb funktionieren wollte ;-).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2007-08-21-automatisch_mounten/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2007-08-21-die_nintendo_wii/"><h3>Die Nintendo Wii™</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Meine erste Spielkonsole war der Nintendo 64, der zu Kaufzeitpunkt eine tolle Grafik und viel Spielspaß bot. Bis zu Beginn dieses Jahres blieb dies meine einzige Spielkonsole. Die Playstation-Reihe war für mich immer nur ein nachgemachter N64, mit ein paar Knöpfen und Ego-Shootern mehr (letztere spielte ich lieber auf dem PC, da die Steuerung mit der Maus der eines PS- oder N64-Controller hoch überlegen war).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2007-08-21-die_nintendo_wii/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2007-08-21-dv_zu_dvd/"><h3>DV zu DVD (mit Mac OS X und Linux)</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Eigentlich müsste der Titel dieses Artikels „Von VHS zu DVD” lauten, aber da die Anleitung auch auf alle anderen Eingangsmedien zutreffend ist, die man über Firewire/DV in den Rechner einlesen kann, habe ich das etwas verallgemeinert. Die Aufgabe klingt zunächst recht simpel: Ein VHS-Band auf DVD digitalisieren.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2007-08-21-dv_zu_dvd/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2007-08-21-auerswald_auf_debian/"><h3>Kurz-Howto: Auerswald-Telefonanlage unter Debian benutzen</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Da die Installation der Programme zum Verwalten einer Auerswald-Telefonanlage (COMpact 4410 USB in meinem Fall) dank eigenem Auerswald-Kerneltreiber, nicht verfügbarem Debian-Modul und Javas problematischer Lizenz nicht ganz so trivial ist, werde ich hier eine kurze Anleitung geben. Kernel-Quelltext installieren Benutzer, die einen eigenen Kernel verwenden, können diesen Schritt überspringen.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2007-08-21-auerswald_auf_debian/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2007-08-21-debian_via_pxe_installieren/"><h3>Kurz-Howto: Debian via PXE installieren</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Worum geht's? Wir werden ein System via PXE installieren. Das ist nett, wenn man zum Beispiel ein System hat, das nicht von CD oder sonstigen Medien booten kann, wie es mir mit einem Fujitsu Siemens Laptop passiert ist... Wir brauchen: Ein Debian-system, mit dem eine Netzwerkverbindung hergestellt werden kann Die Debian-woody Installations-CD (in meinem Fall hat's mit woody 3.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2007-08-21-debian_via_pxe_installieren/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2007-08-21-debian_repository/"><h3>Kurz-Howto: Eigenes Debian-Repository aufbauen</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Linux/UNIX-kenntnisse erforderlich! (in den Bereichen dpkg, apt-get und gpg) Worum geht’s? Ein eigenes Debian-Repository ist nützlich, wenn man privat Pakete verteilen möchte – zum Beispiel an den Freundeskreis oder in der Firma um die Installation zu erleichtern. Die Installation verläuft recht einfach, wenn man mal raus hat, wie’s geht.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2007-08-21-debian_repository/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2007-08-21-video_dvds_unter_linux/"><h3>Kurz-HowTo: Video-DVDs unter Linux erstellen und brennen</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Worum geht’s? Oft habe ich Filme in verschiedensten Formaten (AVI, MPEG, DV, QuickTime), die ich gerne möglichst einfach vorführen möchte. Dazu ist meines Erachtens eine (Video-)DVD sehr geeignet. Eine Video-DVD unterscheidet sich von einer normalen DVD, indem sie kein Menü hat und direkt startet – wie bei einem Video, oder einer (S)VCD eben.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2007-08-21-video_dvds_unter_linux/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2007-08-21-videos_fuer_pdas_konvertieren/"><h3>Kurz-Howto: Videos für PDAs konvertieren</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Worum geht’s? Da die meisten PDAs nur begrenzten Speicher haben (in meinem Fall eine 512 MB-SD-Karte) und außerdem ohnehin weniger Pixel darstellen können, als PCs, lohnt es sich, vorhandene Videos zu konvertieren. Wir werden dies mithilfe von mencoder durchühren, der für alle gängigen Betriebssysteme verfügbar ist.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2007-08-21-videos_fuer_pdas_konvertieren/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2007-08-21-internet_und_voip/"><h3>Neuer Internetanschluss und VoIP-Flatrate (Alice, Arcor, congster, sipgate, bellshare)</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Dieser Artikel schildert lediglich meine persönliche Erfahrung und Meinung!
+Die hier aufgeführten Kritikpunkte sollen nicht zur Rufschädigung der Kritisierten führen.
+Trotz der Existenz vieler ähnlicher Geschichten möchte ich meine Erfahrungen beim Suchen eines neuen DSL- und VoIP-Anbieters hier niederschreiben und hoffe, dass es den einen oder anderen vor einer Fehlentscheidung schützt oder dazu führt, einer meiner Empfehlungen nachzukommen.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2007-08-21-internet_und_voip/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2007-08-21-portweiterleitung/"><h3>Port-weiterleitungen bei OpenWRT</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Linux/UNIX-kenntnisse erforderlich! (in den Bereichen ssh, Dateisystem, vi) Einleitung Der Linksys WRT54(G(S)) ist ein sehr beliebter Router, was auf die Verwendung von Linux als Firmware zurückzuführen ist. Durch einen Bug im Webinterface der Originalfirmware gelang es Hackern, alternative Firmwares aufzuspielen (den Sourcecode musste Linksys herausrücken, da Linux unter der GPLv2 steht, sodass man sich selbst ein Firmware-Image erstellen kann).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2007-08-21-portweiterleitung/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2007-08-21-praesentation_auf_einem_mac/"><h3>Präsentation auf einem Mac</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Einleitung Ich denke, dass die meisten PC-Benutzer Microsoft Powerpoint kennen. Man könnte behaupten, dass es sich mittlerweile in Schulen als Standard für Präsentationen eingebürgert hat. Daher wird man wohl auch bei einer Powerpoint-Präsentation eher Hilfe bekommen, als wenn man andere Software nutzt.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2007-08-21-praesentation_auf_einem_mac/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2007-08-21-quicktime_konvertieren/"><h3>Quicktime-Dateien für das Brennen auf DVD konvertieren</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Einleitung Wer kennt es nicht, das Problem mit den Formaten an Computern? Jeder Hersteller hält das eigene Format für das Beste und einige legen überhaupt keinen Wert darauf, zu anderen kompatibel zu sein. Das fängt bei Textdokumenten an (Microsoft Word) und hört bei Multimediaformaten auf: für mich ist ein solches Format zum Beispiel Quicktime oder Realvideo: Bei beiden Formaten muss man anstelle eines Codecs direkt einen ganzen Player installieren, um sie ansehen zu können (vom Bearbeiten sehen wir momentan mal komplett ab).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2007-08-21-quicktime_konvertieren/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2007-08-21-ssh_faehiges_terminal/"><h3>SSH-fähiges Terminal</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Warum? Es gibt doch Terminal.app! Das normale Terminal(.app) funktioniert zwar recht schnell und sieht ganz gut aus (auch die Farben werden relativ gut dargestellt), doch es hat einige Probleme, was es für den Einsatz von SSH unbrauchbar macht. Eine Alternative muss also her.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2007-08-21-ssh_faehiges_terminal/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2007-08-21-dl_dvd_in_idvd/"><h3>Tipp: Double-Layer DVDs auch ohne DL-Superdrive in iDVD</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  In iDVD (ich beziehe mich hierbei auf Version 6) kann man ohne Double-Layer-fähiges Superdrive (so nennt sich der CD/DVD-Brenner im Mac) keine Double-Layer-DVDs erstellen, das Auswahlfeld dazu ist deaktiviert. Da iDVD aber die Möglichkeit bietet, die fertige DVD als ISO-Image zu sichern, könnte man sie doch an einem anderen Rechner brennen, somit würde die Option sehr sinnvoll sein.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2007-08-21-dl_dvd_in_idvd/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2007-08-21-umstieg_auf_gentoo/"><h3>Umstieg auf Gentoo</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Mit dem laufenden Xubuntu auf meinem Rechner war ich eigentlich recht zufrieden. Es gab keine Probleme (wenn man mal von der Installation absieht), außer, dass ich im Laufe der Zeit immer mehr Software selbst kompilieren musste. Sei es, weil sie einfach nicht in den offiziellen Repositories verfügbar waren, oder weil sie hoffnungslos veraltet waren (gerade beim Enkodieren bringen aktuelle Versionen viele Verbesserungen).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2007-08-21-umstieg_auf_gentoo/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2007-08-21-unannehmlichkeiten_bei_der_linuxinstallation/"><h3>Unannehmlichkeiten bei der Linuxinstallation</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Vorgeplänkel Nach 5-jährigem Einsatz Windows XP hatte ich endgültig genug von dessen Macken wenn man mehr Hardware verwendet als der Durchschnittuser (oder als vor 5 Jahren eben utopisch war): Mehr als 1 GB RAM und mehr als 1 Bildschirm und schon fangen die Probleme an (nicht genügend Resourcen trotz 1,3 GB freiem RAM sage ich nur; hab’ gar keine Lust darüber noch mehr Worte zu verlieren :-/).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2007-08-21-unannehmlichkeiten_bei_der_linuxinstallation/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2007-08-21-voip_mit_congster/"><h3>VoIP mit congster und asterisk</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Vorwort Asterisk ist eine freie Open-Source-Telefonanlage, die eine sehr flexible Konfiguration und somit sehr viele Möglichkeiten bietet. Congster ist eine Tochterfirma der Telekom, die Internet-Flatrates/Zugänge und nun auch eine VoIP-Flatrate ins deutsche Festnetz anbietet. VoIP mit congster und asterisk Da congster auf der Website nur die Einrichtung der Internettelefonie auf den DSL-Routern der Speedport-Serie beschreibt und ich den ganzen Abend lang – letztendlich doch noch erfolgreich – damit verbrachte, asterisk zu konfigurieren, habe ich diese Schritte zu einem Artikel zusammengefasst, damit das lange Herumprobieren dem geneigten Benutzer erspart bleibt.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2007-08-21-voip_mit_congster/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2007-08-21-windows_server_retten_mit_grml/"><h3>Windows Server retten mit grml Linux</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  grml ist eine Linux-Live-CD für Nutzer, die lieber textbasierte Programme als grafische benutzen. Es basiert auf Debian GNU/Linux, ist aber deutlich aktueller. Meiner Meinung nach eignet sich grml am besten, wenn es darum geht, Rechner zu retten. Die Problematik Der zu rettende Rechner war ein Windows Small Business Server 2003.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2007-08-21-windows_server_retten_mit_grml/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+
+
+  Go to page:
+  
+    <ul class="pagination pagination-default">
+      <li class="page-item">
+        <a href="/posts/" aria-label="First" class="page-link" role="button"><span aria-hidden="true">&laquo;&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/9/" aria-label="Previous" class="page-link" role="button"><span aria-hidden="true">&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/6/" aria-label="Page 6" class="page-link" role="button">6</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/7/" aria-label="Page 7" class="page-link" role="button">7</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/8/" aria-label="Page 8" class="page-link" role="button">8</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/9/" aria-label="Page 9" class="page-link" role="button">9</a>
+      </li>
+      <li class="page-item active">
+        <a aria-current="page" aria-label="Page 10" class="page-link" role="button">10</a>
+      </li>
+      <li class="page-item disabled">
+        <a aria-disabled="true" aria-label="Next" class="page-link" role="button" tabindex="-1"><span aria-hidden="true">&raquo;</span></a>
+      </li>
+      <li class="page-item disabled">
+        <a aria-disabled="true" aria-label="Last" class="page-link" role="button" tabindex="-1"><span aria-hidden="true">&raquo;&raquo;</span></a>
+      </li>
+    </ul>
+  <br>
+
+</div>
+
+      </div>
+    </main><div id="ms_footer">
+  © 2022 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

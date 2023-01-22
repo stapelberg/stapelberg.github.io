@@ -7,9 +7,8 @@
 
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="Fixing the Nuki Opener smart intercom IOT device (on the BTicino SCS bus intercom system)">
-  <meta property="og:description" content="I recently bought a Nuki Opener, which “turns your existing intercom into a smart door opener”.
-Unfortunately, I have had a lot of trouble getting it to work.
-I finally got the device working by interjecting my own micro controller between the intercom bus and the Nuki Opener, then driving the Nuki Opener in its Analogue mode:">
+  <meta property="og:description" content="This post is the second article in a series of blog posts about the Nuki Opener on the SCS bus intercom, see the Series Overview.
+I recently bought a Nuki Opener, which “turns your existing intercom into a smart door opener”.">
   
   
   
@@ -21,9 +20,8 @@ I finally got the device working by interjecting my own micro controller between
   <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
-  <meta name="description" content="I recently bought a Nuki Opener, which “turns your existing intercom into a smart door opener”.
-Unfortunately, I have had a lot of trouble getting it to work.
-I finally got the device working by interjecting my own micro controller between the intercom bus and the Nuki Opener, then driving the Nuki Opener in its Analogue mode:">
+  <meta name="description" content="This post is the second article in a series of blog posts about the Nuki Opener on the SCS bus intercom, see the Series Overview.
+I recently bought a Nuki Opener, which “turns your existing intercom into a smart door opener”.">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2020-11-30-scs-processing-microcontroller/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -228,11 +226,15 @@ I finally got the device working by interjecting my own micro controller between
     </li>
     <li><a href="#it-works">It works!</a></li>
     <li><a href="#how-is-the-nuki-opener">How is the Nuki Opener?</a></li>
+    <li><a href="#next-up">Next up</a></li>
     <li><a href="#appendix-project-journal">Appendix: Project Journal</a></li>
   </ul>
 </nav>
   </details>
-  <p>I recently bought a <a href="https://nuki.io/en/opener/">Nuki Opener, which “turns your existing intercom into a
+  <p>This post is the second article in a series of blog posts about the Nuki Opener
+on the SCS bus intercom, <a href="/posts/2021-03-13-nuki-scs-series-overview/">see the Series
+Overview</a>.</p>
+<p>I recently bought a <a href="https://nuki.io/en/opener/">Nuki Opener, which “turns your existing intercom into a
 smart door opener”</a>.</p>
 <p>Unfortunately, I have had a lot of trouble getting it to work.</p>
 <p>I finally got the device working by interjecting my own micro controller between
@@ -830,6 +832,14 @@ system!</p>
 turns out in practice. I think I noticed push notifications when the door rang
 coming in rather late (many seconds later).</p>
 <p>I’ll keep an eye on this and explore the various Nuki APIs more.</p>
+<p><strong>Update (January 2023)</strong>: The doorbell push notification typically arrives
+within seconds of the doorbell ring, but sometimes there is a noticeable delay
+of tens of seconds — definitely long enough for the delivery person to lose
+patience. I’m glad I have my <a href="/posts/2021-03-13-smart-intercom-backpack/">MQTT-based
+solution</a> which has a &lt;1s delay.</p>
+<h2 id="next-up">Next up</h2>
+<p>The third article in this series is <a href="/posts/2021-03-13-smart-intercom-backpack/">Make your intercom smarter with an MQTT
+backpack</a>.</p>
 <h2 id="appendix-project-journal">Appendix: Project Journal</h2>
 <ul>
 <li>2020-09-26: I buy a Nuki Opener (Nuki Opener #1), but despite connecting it correctly, it never successfully opens the door. I start learning about <a href="https://en.wikipedia.org/wiki/Bus_SCS">the SCS home automation bus system that our intercom uses</a>.</li>
@@ -873,6 +883,7 @@ coming in rather late (many seconds later).</p>
     </li>
     <li><a href="#it-works">It works!</a></li>
     <li><a href="#how-is-the-nuki-opener">How is the Nuki Opener?</a></li>
+    <li><a href="#next-up">Next up</a></li>
     <li><a href="#appendix-project-journal">Appendix: Project Journal</a></li>
   </ul>
 </nav>

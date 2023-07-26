@@ -388,24 +388,24 @@ messages from your Arduino sketch:</p>
 </span></span><span style="display:flex;"><span>PubSubClient <span style="color:#06287e">client</span>(wificlient);
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#902000">void</span> <span style="color:#06287e">callback</span>(<span style="color:#902000">char</span><span style="color:#666">*</span> topic, byte<span style="color:#666">*</span> payload, <span style="color:#902000">unsigned</span> <span style="color:#902000">int</span> length) {
-</span></span><span style="display:flex;"><span>    Serial.print(<span style="color:#4070a0">&#34;Message arrived [&#34;</span>);
-</span></span><span style="display:flex;"><span>    Serial.print(topic);
-</span></span><span style="display:flex;"><span>    Serial.print(<span style="color:#4070a0">&#34;] &#34;</span>);
+</span></span><span style="display:flex;"><span>    Serial.<span style="color:#06287e">print</span>(<span style="color:#4070a0">&#34;Message arrived [&#34;</span>);
+</span></span><span style="display:flex;"><span>    Serial.<span style="color:#06287e">print</span>(topic);
+</span></span><span style="display:flex;"><span>    Serial.<span style="color:#06287e">print</span>(<span style="color:#4070a0">&#34;] &#34;</span>);
 </span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">for</span> (<span style="color:#902000">int</span> i <span style="color:#666">=</span> <span style="color:#40a070">0</span>; i <span style="color:#666">&lt;</span> length; i<span style="color:#666">++</span>) {
-</span></span><span style="display:flex;"><span>      Serial.print((<span style="color:#902000">char</span>)payload[i]);
+</span></span><span style="display:flex;"><span>      Serial.<span style="color:#06287e">print</span>((<span style="color:#902000">char</span>)payload[i]);
 </span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    Serial.println();
+</span></span><span style="display:flex;"><span>    Serial.<span style="color:#06287e">println</span>();
 </span></span><span style="display:flex;"><span>  
-</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> (strcmp(topic, <span style="color:#4070a0">&#34;doorbell/cmd/unlock&#34;</span>) <span style="color:#666">==</span> <span style="color:#40a070">0</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> (<span style="color:#06287e">strcmp</span>(topic, <span style="color:#4070a0">&#34;doorbell/cmd/unlock&#34;</span>) <span style="color:#666">==</span> <span style="color:#40a070">0</span>) {
 </span></span><span style="display:flex;"><span>  		<span style="color:#60a0b0;font-style:italic">// …
 </span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    }
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#902000">void</span> <span style="color:#06287e">taskmqtt</span>(<span style="color:#902000">void</span> <span style="color:#666">*</span>pvParameters) {
 </span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">for</span> (;;) {
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> (<span style="color:#666">!</span>client.connected()) {
-</span></span><span style="display:flex;"><span>			client.connect(<span style="color:#4070a0">&#34;doorbell&#34;</span> <span style="color:#60a0b0;font-style:italic">/* clientid */</span>);
-</span></span><span style="display:flex;"><span>			client.subscribe(<span style="color:#4070a0">&#34;doorbell/cmd/unlock&#34;</span>);
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> (<span style="color:#666">!</span>client.<span style="color:#06287e">connected</span>()) {
+</span></span><span style="display:flex;"><span>			client.<span style="color:#06287e">connect</span>(<span style="color:#4070a0">&#34;doorbell&#34;</span> <span style="color:#60a0b0;font-style:italic">/* clientid */</span>);
+</span></span><span style="display:flex;"><span>			client.<span style="color:#06287e">subscribe</span>(<span style="color:#4070a0">&#34;doorbell/cmd/unlock&#34;</span>);
 </span></span><span style="display:flex;"><span>		}
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// Poll PubSubClient for new messages and invoke the callback.
@@ -414,22 +414,22 @@ messages from your Arduino sketch:</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// Should not be called too frequently to avoid strain on
 </span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// the network hardware:
 </span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// https://github.com/knolleary/pubsubclient/issues/756#issuecomment-654335096
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		client.loop();
-</span></span><span style="display:flex;"><span>		vTaskDelay(pdMS_TO_TICKS(<span style="color:#40a070">100</span>));
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		client.<span style="color:#06287e">loop</span>();
+</span></span><span style="display:flex;"><span>		<span style="color:#06287e">vTaskDelay</span>(<span style="color:#06287e">pdMS_TO_TICKS</span>(<span style="color:#40a070">100</span>));
 </span></span><span style="display:flex;"><span>	}
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#902000">void</span> <span style="color:#06287e">setup</span>() {
-</span></span><span style="display:flex;"><span>	connectToWiFi(); <span style="color:#60a0b0;font-style:italic">// WiFi configuration omitted for brevity
+</span></span><span style="display:flex;"><span>	<span style="color:#06287e">connectToWiFi</span>(); <span style="color:#60a0b0;font-style:italic">// WiFi configuration omitted for brevity
 </span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>
-</span></span><span style="display:flex;"><span>	client.setServer(<span style="color:#4070a0">&#34;dr.lan&#34;</span>, <span style="color:#40a070">1883</span>);
-</span></span><span style="display:flex;"><span>	client.setCallback(callback);
+</span></span><span style="display:flex;"><span>	client.<span style="color:#06287e">setServer</span>(<span style="color:#4070a0">&#34;dr.lan&#34;</span>, <span style="color:#40a070">1883</span>);
+</span></span><span style="display:flex;"><span>	client.<span style="color:#06287e">setCallback</span>(callback);
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	xTaskCreatePinnedToCore(taskmqtt, <span style="color:#4070a0">&#34;MQTT&#34;</span>, <span style="color:#40a070">2048</span>, <span style="color:#007020">NULL</span>, <span style="color:#40a070">1</span>, <span style="color:#007020">NULL</span>, PRO_CPU_NUM);
+</span></span><span style="display:flex;"><span>	<span style="color:#06287e">xTaskCreatePinnedToCore</span>(taskmqtt, <span style="color:#4070a0">&#34;MQTT&#34;</span>, <span style="color:#40a070">2048</span>, <span style="color:#007020">NULL</span>, <span style="color:#40a070">1</span>, <span style="color:#007020">NULL</span>, PRO_CPU_NUM);
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#902000">void</span> <span style="color:#06287e">processEvent</span>(<span style="color:#902000">void</span> <span style="color:#666">*</span>buf, <span style="color:#902000">int</span> telegramLen) {
-</span></span><span style="display:flex;"><span>	client.publish(<span style="color:#4070a0">&#34;doorbell/events/scs&#34;</span>, buf, telegramLen);
+</span></span><span style="display:flex;"><span>	client.<span style="color:#06287e">publish</span>(<span style="color:#4070a0">&#34;doorbell/events/scs&#34;</span>, buf, telegramLen);
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><h2 id="integration-webhook-to-mqtt">Integration: Webhook to MQTT</h2>
 <p>The Nuki Opener doesn’t support MQTT out of the box, but the Nuki Bridge can
@@ -638,6 +638,18 @@ looks like software makes up for that via configuration options.</p>
 <p>There are plenty of existing integrations that should cover most needs.</p>
 <p>Ideally, more Smart Home and IOT vendors would add MQTT support out of the box,
 like <a href="https://shelly.cloud/">Shelly</a>.</p>
+<div id="bmc">
+  <p>
+    I run a blog since 2005, spreading knowledge and experience for almost 20 years! :)
+  </p>
+  <p>
+    If you want to support my work, you
+    can <a href="https://www.buymeacoffee.com/stapelberg">buy me a coffee</a>.
+  </p>
+  <p>
+    Thank you for your support! ❤️
+  </p>
+</div>
 
 </div>
 

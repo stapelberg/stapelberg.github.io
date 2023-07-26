@@ -317,7 +317,7 @@ in which devices that print a banner select the <code>DISABLE_ECHO</code> quirk,
 results in the CDC ACM driver turning off the echoing termios flag early:</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">static</span> <span style="color:#007020;font-weight:bold">const</span> <span style="color:#007020;font-weight:bold">struct</span> usb_device_id acm_ids[] <span style="color:#666">=</span> {
 </span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">/* quirky and broken devices */</span>
-</span></span><span style="display:flex;"><span>	{ USB_DEVICE(<span style="color:#40a070">0x0424</span>, <span style="color:#40a070">0x274e</span>), <span style="color:#60a0b0;font-style:italic">/* Microchip Technology, Inc. */</span>
+</span></span><span style="display:flex;"><span>	{ <span style="color:#06287e">USB_DEVICE</span>(<span style="color:#40a070">0x0424</span>, <span style="color:#40a070">0x274e</span>), <span style="color:#60a0b0;font-style:italic">/* Microchip Technology, Inc. */</span>
 </span></span><span style="display:flex;"><span>	  .driver_info <span style="color:#666">=</span> DISABLE_ECHO, }, <span style="color:#60a0b0;font-style:italic">/* DISABLE ECHO in termios flag */</span>
 </span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// …
 </span></span></span></code></pre></div><p>So, a quick solution to turn off echoing early is to change your USB vendor and
@@ -413,25 +413,25 @@ application a chance to configure the serial device.</li>
 first <code>CDC_SET_CONTROL_LINE_STATE</code> request because the serial port was opened:</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">while</span> (<span style="color:#007020">true</span>) {
 </span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> (SDU1.config<span style="color:#666">-&gt;</span>usbp<span style="color:#666">-&gt;</span>state <span style="color:#666">==</span> USB_ACTIVE) {
-</span></span><span style="display:flex;"><span>      chSemWait(<span style="color:#666">&amp;</span>scls);
-</span></span><span style="display:flex;"><span>      chThdSleepMilliseconds(<span style="color:#40a070">100</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#06287e">chSemWait</span>(<span style="color:#666">&amp;</span>scls);
+</span></span><span style="display:flex;"><span>      <span style="color:#06287e">chThdSleepMilliseconds</span>(<span style="color:#40a070">100</span>);
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>      thread_t <span style="color:#666">*</span>shelltp <span style="color:#666">=</span> chThdCreateFromHeap(<span style="color:#007020">NULL</span>, SHELL_WA_SIZE, <span style="color:#4070a0">&#34;shell&#34;</span>, NORMALPRIO <span style="color:#666">+</span> <span style="color:#40a070">1</span>, shellThread, (<span style="color:#902000">void</span> <span style="color:#666">*</span>)<span style="color:#666">&amp;</span>shell_cfg1);
-</span></span><span style="display:flex;"><span>      chThdWait(shelltp);
+</span></span><span style="display:flex;"><span>      <span style="color:#902000">thread_t</span> <span style="color:#666">*</span>shelltp <span style="color:#666">=</span> <span style="color:#06287e">chThdCreateFromHeap</span>(<span style="color:#007020">NULL</span>, SHELL_WA_SIZE, <span style="color:#4070a0">&#34;shell&#34;</span>, NORMALPRIO <span style="color:#666">+</span> <span style="color:#40a070">1</span>, shellThread, (<span style="color:#902000">void</span> <span style="color:#666">*</span>)<span style="color:#666">&amp;</span>shell_cfg1);
+</span></span><span style="display:flex;"><span>      <span style="color:#06287e">chThdWait</span>(shelltp);
 </span></span><span style="display:flex;"><span>    }
 </span></span><span style="display:flex;"><span>  }
 </span></span></code></pre></div><p>And in our <code>usbcfg.c</code>, when receiving a <code>CDC_SET_CONTROL_LINE_STATE</code> request, we
 will reset the semaphore to non-blockingly wake up all waiters:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">extern</span> semaphore_t scls;
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">extern</span> <span style="color:#902000">semaphore_t</span> scls;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#902000">bool</span> <span style="color:#06287e">requests_hook</span>(USBDriver <span style="color:#666">*</span>usbp) {
-</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">bool</span> result <span style="color:#666">=</span> sduRequestsHook(usbp);
+</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">bool</span> result <span style="color:#666">=</span> <span style="color:#06287e">sduRequestsHook</span>(usbp);
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">if</span> ((usbp<span style="color:#666">-&gt;</span>setup[<span style="color:#40a070">0</span>] <span style="color:#666">&amp;</span> USB_RTYPE_TYPE_MASK) <span style="color:#666">==</span> USB_RTYPE_TYPE_CLASS <span style="color:#666">&amp;&amp;</span>
 </span></span><span style="display:flex;"><span>      usbp<span style="color:#666">-&gt;</span>setup[<span style="color:#40a070">1</span>] <span style="color:#666">==</span> CDC_SET_CONTROL_LINE_STATE) {
-</span></span><span style="display:flex;"><span>    osalSysLockFromISR();
-</span></span><span style="display:flex;"><span>    chSemResetI(<span style="color:#666">&amp;</span>scls, <span style="color:#40a070">0</span>);
-</span></span><span style="display:flex;"><span>    osalSysUnlockFromISR();
+</span></span><span style="display:flex;"><span>    <span style="color:#06287e">osalSysLockFromISR</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#06287e">chSemResetI</span>(<span style="color:#666">&amp;</span>scls, <span style="color:#40a070">0</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#06287e">osalSysUnlockFromISR</span>();
 </span></span><span style="display:flex;"><span>  }
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">return</span> result;
@@ -501,6 +501,18 @@ border: 1px solid #000;
 
 
 
+<div id="bmc">
+  <p>
+    I run a blog since 2005, spreading knowledge and experience for almost 20 years! :)
+  </p>
+  <p>
+    If you want to support my work, you
+    can <a href="https://www.buymeacoffee.com/stapelberg">buy me a coffee</a>.
+  </p>
+  <p>
+    Thank you for your support! ❤️
+  </p>
+</div>
 
 </div>
 

@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>pc - Michael Stapelberg</title>
+
+  <meta property="og:site_name" content="Michael Stapelberg">
+  <meta property="og:title" content="pc">
+  <meta property="og:description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/tags/pc/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="https://michael.stapelberg.ch/posts/tags/pc/feed.xml" type="application/atom+xml" title="ATOM feed for posts tagged pc">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div>
+<h1 class="ms_title">Blog Posts tagged pc
+  <a href="https://michael.stapelberg.ch/posts/tags/pc/feed.xml">
+    <img src="/feed-icon.svg" style="width: .75em"
+	 alt="ATOM feed for posts tagged pc"
+	 title="ATOM feed for posts tagged pc">
+  </a>
+</h1>
+
+<div class="Artikel" id="content">
+  <p>
+  I regularly build my own PCs for various use-cases.
+</p>
+
+<p>
+  For example, I like to do most of my computer work on <a href="/posts/2022-01-15-high-end-linux-pc/">my high-end PC</a>.
+</p>
+
+  
+    
+  <h2>2023 › October</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/"><h3>My 2023 all-flash ZFS NAS (Network Storage) build</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/pc/">pc</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<img src="https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/2023-10-22-samsung-870qvo-featured_hu799c805b17c89c62874113693200acea_520811_200x200_fit_q75_box.jpg" width="200" height="113"/>
+	
+	<p>
+	  For over 10 years now, I run two self-built NAS (Network Storage) devices which serve media (currently via Jellyfin) and run daily backups of all my PCs and servers.
+In this article, I describe my goals, which hardware I picked for my new build (and why) and how I set it up.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2023 › July</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2023-07-03-dell-u3224kba-32-inch-6k-monitor/"><h3>Can Dell’s 6K monitor beat their 8K monitor?</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/pc/">pc</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<img src="https://michael.stapelberg.ch/posts/2023-07-03-dell-u3224kba-32-inch-6k-monitor/IMG_2383_featured_hu855bbe0a9c47ac557e5b09db74fa3b06_1638957_200x200_fit_q75_box.jpg" width="200" height="150"/>
+	
+	<p>
+	  For the last 10 years, I have been interested in hi-DPI monitors, and recently I read about an interesting new monitor: Dell’s 32-inch 6K monitor (U3224KBA), a productivity monitor that offers plenty of modern connectivity options like DisplayPort 2, HDMI 2 and Thunderbolt 4.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2023-07-03-dell-u3224kba-32-inch-6k-monitor/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2022 › October</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2022-10-09-remote-power-button/"><h3>DIY out-of-band management: remote power button</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/pc/">pc</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<img src="https://michael.stapelberg.ch/posts/2022-10-09-remote-power-button/IMG_1085_featured_huf7f7db33074cb268ff172c7a33b2b9a7_1568716_200x200_fit_q75_box.jpg" width="200" height="150"/>
+	
+	<p>
+	  I was pleasantly surprised by how easy it was to make it possible to push a PC’s power button remotely via MQTT by wiring up an ESP32 microcontroller, a MOSFET, a resistor, and a few jumper wires.
+While a commercial solution like IPMI offers many more features like remote serial, or remote image mounting, this DIY solution feels really magical, and has great price performance if all you need is power management.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2022-10-09-remote-power-button/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2022 › August</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/"><h3>DIY out-of-band management: remote console server</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/pc/">pc</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<img src="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured_hu855bbe0a9c47ac557e5b09db74fa3b06_860347_200x200_fit_q75_box.jpg" width="200" height="200"/>
+	
+	<p>
+	  For the guest WiFi at an event that eventually fell through, we wanted to tunnel all the traffic through my internet connection via my home router.
+Because the event is located in another country, many hours of travel away, there are a couple of scenarios where remote control of my home router can be a life-saver.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2022 › January</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2022-01-15-high-end-linux-pc/"><h3>My 2022 high-end Linux PC 🐧</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/pc/">pc</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<img src="https://michael.stapelberg.ch/posts/2022-01-15-high-end-linux-pc/IMG_4025_featured_hu4b4c2e46b77a93acc4771692c9f8c225_1593191_200x200_fit_q75_box.jpg" width="200" height="174"/>
+	
+	<p>
+	  I finally managed to get my hands on some DDR5 RAM to complete my Intel i9-12900 high-end PC build! This article contains the exact component list if you’re interested in doing a similar build.
+Usually, I try to stay on the latest Intel CPU generation when possible.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2022-01-15-high-end-linux-pc/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2021 › November</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2021-11-28-macbook-air-m1/"><h3>MacBook Air M1: the best laptop?</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/pc/">pc</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<img src="https://michael.stapelberg.ch/posts/2021-11-28-macbook-air-m1/mba_hu855bbe0a9c47ac557e5b09db74fa3b06_1092595_200x200_fit_q75_box.jpg" width="178" height="200"/>
+	
+	<p>
+	  You most likely have heard that Apple switched from Intel CPUs to their own, ARM-based CPUs.
+Various early reviews touted the new MacBooks, among the first devices with the ARM-based M1 CPU, as the best computer ever. This got me curious: after years of not using any Macs, would an M1 Mac blow my mind?
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2021-11-28-macbook-air-m1/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2021 › August</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/"><h3>Silent HP Z440 workstation: replacing noisy fans</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/pc/">pc</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<img src="https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/2021-08-20-rear-fan-featured_hubc92ae85c899c14de0806668526f039c_1572517_200x200_fit_q75_box.jpg" width="150" height="200"/>
+	
+	<p>
+	  Since March 2020, I have been using my work computer at home: an HP Z440 workstation.
+When I originally took the machine home, I immediately noticed that it’s quite a bit louder than my other PCs, but only now did I finally decide to investigate what I could do about it.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2021-08-28-silent-hp-z440-workstation/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2021 › July</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/"><h3>25 Gigabit Linux internet router PC build</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/fiber/">fiber</a></span>
+	
+	<span class="ms_tag"><a href="/posts/tags/pc/">pc</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<img src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-router-featured_hu1fe795dd8828eccf339de1acf31abbd0_2106743_200x200_fit_q75_box.jpg" width="198" height="200"/>
+	
+	<p>
+	  init7 recently announced that with their FTTH fiber offering Fiber7, they will now sell and connect you with 25 Gbit/s (Fiber7-X2) or 10 Gbit/s (Fiber7-X) fiber optics, if you want more than 1 Gbit/s.
+While this offer will only become available at my location late this year (or possibly later due to the supply chain shortage), I already wanted to get the hardware on my end sorted out.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2021 › June</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2021-06-05-laptop-review-lenovo-thinkpad-x1-extreme-gen2/"><h3>Laptop review: ThinkPad X1 Extreme (Gen 2)</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/pc/">pc</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<img src="https://michael.stapelberg.ch/posts/2021-06-05-laptop-review-lenovo-thinkpad-x1-extreme-gen2/2021-06-02-thinkpad-x1-extreme_hu855bbe0a9c47ac557e5b09db74fa3b06_2918849_200x200_fit_q75_box.jpg" width="200" height="150"/>
+	
+	<p>
+	  For many of my school and university years, I used and liked my ThinkPad X200 ultraportable laptop. But now that these years are long gone, I realized my use-case for laptops had changed: instead of carrying my laptop with me every day, I am now only bringing it on occasion, for example when I travel to conferences, visit friends, or do volunteer work.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2021-06-05-laptop-review-lenovo-thinkpad-x1-extreme-gen2/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2019 › October</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2019-10-23-nas/"><h3>Network Storage PC Hardware (2019)</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/pc/">pc</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  One of my two NAS builds recently died, so I bought a new one until I find some time to debug the old one. Since a couple of people have been asking me what I would recommend nowadays based on my November 2016 article “Gigabit NAS (running CoreOS)”, I figured I would share the new hardware listing:
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-10-23-nas/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2017 › December</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2017-12-11-dell-up3218k/"><h3>Dell 8K4K monitor (Dell UP3218K)</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/pc/">pc</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Background Ever since I first used a MacBook Pro with Retina display back in 2013, I’ve been madly in love with hi-DPI displays. I had seen the device before, and marvelled at brilliant font quality with which scientific papers would be rendered.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-12-11-dell-up3218k/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2016 › November</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2016-11-21-gigabit-nas-coreos/"><h3>Gigabit NAS (running CoreOS)</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/pc/">pc</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  tl;dr: I upgraded from a qnap TS-119P to a custom HTPC-like network storage solution. This article outlines what my original reasoning was for the qnap TS-119P, what I learnt, and with what solution precisely I replaced the qnap. A little over two years ago, I gave a (German) presentation about my network storage setup (see video or slides).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-11-21-gigabit-nas-coreos/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+  <h2>2016 › May</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2016-05-10-supermicro_x11ssz-qf_workstation_mainboard/"><h3>Supermicro X11SSZ-QF workstation mainboard</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/pc/">pc</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Context For the last 3 years I’ve used the hardware described in my 2012 article. In order to drive a hi-dpi display, I needed to install an nVidia graphics card, since only the nVidia hardware/software supported multi-tile displays requiring MST (Multiple Stream Transport) such as the Dell UP2414Q.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-05-10-supermicro_x11ssz-qf_workstation_mainboard/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
+
+</div>
+
+      </div>
+    </main><div id="ms_footer">
+  © 2023 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

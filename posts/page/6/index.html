@@ -187,6 +187,8 @@
     
     <li><a href="https://michael.stapelberg.ch/posts/tags/kinx/">kinX</a></li>
     
+    <li><a href="https://michael.stapelberg.ch/posts/tags/pc/">pc</a></li>
+    
     <li><a href="https://michael.stapelberg.ch/posts/tags/rgb2r/">rgb2r</a></li>
     
     <li><a href="https://michael.stapelberg.ch/posts/tags/rsync/">rsync</a></li>
@@ -232,6 +234,29 @@
     
   <h2>2012 › November</h2>
   <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-11-07-sigill_golang/"><h3>One reason for SIGILL with Go (golang)</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  After launching Debian Code Search, sometimes its index-backend processes would crash when presented with some class of queries. The queries itself did not show an interesting pattern, and in fact, it wasn’t their fault. Looking at the system’s journal, I noticed that the processes were crashing with SIGILL, the signal when an illegal instruction for the CPU is encountered: Nov 07 00:11:33 codesearch index-backend[10517]: SIGILL: illegal instruction Nov 07 00:11:33 codesearch index-backend[10517]: PC=0x42558d Interestingly, on my workstation, I could not reproduce this issue.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-11-07-sigill_golang/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
     
     <li>
       <div>
@@ -845,24 +870,6 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
 	<p>
 	  Überblick und Verfügbarkeit Wasser, Strom und Heizung sind bei Apartments in Irland oftmals standardmäßig im Mietpreis enthalten, weiterhin sind Wohnungen normalerweise möbliert. Das einzige, was also offensichtlich fehlt, ist Breitband-Internet :-). Es gibt einige ISPs, die in Dublin verschiedenste Arten von Internetzugang anbieten.
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2011-10-26-magnet_erfahrungen/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2011-10-15-ssd-broken/"><h3>SSD kaputt</h3></a>
-	
-	<div class="tags"></div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	<p>
-	  Nachdem meine SSD nun schon mehrfach für manche Blöcke Input/Output-Errors gegeben hat (nach einem power cycle war sie aber wieder benutzbar), ist sie gestern so ausgefallen, dass ich mich nicht mehr an meinem System anmelden konnte und das Symptom auch über einen Neustart bestehen blieb.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2011-10-15-ssd-broken/">Read more →</a></span>
 	</p>
       </div>
     </li>

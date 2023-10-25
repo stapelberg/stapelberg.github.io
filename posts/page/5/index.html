@@ -187,6 +187,8 @@
     
     <li><a href="https://michael.stapelberg.ch/posts/tags/kinx/">kinX</a></li>
     
+    <li><a href="https://michael.stapelberg.ch/posts/tags/pc/">pc</a></li>
+    
     <li><a href="https://michael.stapelberg.ch/posts/tags/rgb2r/">rgb2r</a></li>
     
     <li><a href="https://michael.stapelberg.ch/posts/tags/rsync/">rsync</a></li>
@@ -232,6 +234,29 @@
     
   <h2>2013 › July</h2>
   <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-07-13-systemd-not-portable/"><h3>Survey answers part 3: systemd is not portable and what this means for our ports</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  This blog post is the third of a series of posts dealing with the results of the Debian systemd survey. I intend to give a presentation at DebConf 2013, too, so you could either read my posts, or watch the talk, or both :-).
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-13-systemd-not-portable/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
     
     <li>
       <div>
@@ -894,29 +919,6 @@ I provided some analysis. By rebuilding lftp’s configure script with recent au
 	<p>
 	  NeXTstation (1024x768 px) Auf der diesjährigen RGB2R brachte Ralf eine NeXTstation mit. Die Maschine hat eine 20 MHz Motorola 68k CPU, 20 MB Arbeitsspeicher und eine leicht defekte 400 MB SCSI-Festplatte. Das installierte Betriebssystem NeXTSTEP ließ sich leider nicht richtig hochfahren, beim Starten kamen einige Fehlermeldungen bezüglich nicht-auflösbarer Services und das Loginfenster erschien nicht.
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-11-10-next_revival/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2012-11-07-sigill_golang/"><h3>One reason for SIGILL with Go (golang)</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	<p>
-	  After launching Debian Code Search, sometimes its index-backend processes would crash when presented with some class of queries. The queries itself did not show an interesting pattern, and in fact, it wasn’t their fault. Looking at the system’s journal, I noticed that the processes were crashing with SIGILL, the signal when an illegal instruction for the CPU is encountered: Nov 07 00:11:33 codesearch index-backend[10517]: SIGILL: illegal instruction Nov 07 00:11:33 codesearch index-backend[10517]: PC=0x42558d Interestingly, on my workstation, I could not reproduce this issue.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-11-07-sigill_golang/">Read more →</a></span>
 	</p>
       </div>
     </li>

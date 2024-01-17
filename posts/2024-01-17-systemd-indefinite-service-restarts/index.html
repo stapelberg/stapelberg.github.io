@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>systemd: enable indefinite service restarts - Michael Stapelberg</title>
+
+  <meta property="og:site_name" content="Michael Stapelberg">
+  <meta property="og:title" content="systemd: enable indefinite service restarts">
+  <meta property="og:description" content="When a service fails to start up enough times in a row, systemd gives up on it.
+On servers, this isn’t what I want — in general it’s helpful for automated recovery if daemons are restarted indefinitely. As long as you don’t have circular dependencies between services, all your services will eventually come up after transient failures, without having to specify dependencies.">
+  
+  
+  
+  
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2024-01-17-systemd-indefinite-service-restarts/systemd-light-vertical-color_hua11b395d68aa3b8e1fe72e3f3d0d618c_7877_200x200_fit_box_3.png">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <meta name="description" content="When a service fails to start up enough times in a row, systemd gives up on it.
+On servers, this isn’t what I want — in general it’s helpful for automated recovery if daemons are restarted indefinitely. As long as you don’t have circular dependencies between services, all your services will eventually come up after transient failures, without having to specify dependencies.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2024-01-17-systemd-indefinite-service-restarts/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <link rel="stylesheet" href="/1.min.css" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div><h1 class="ms_title">systemd: enable indefinite service restarts</h1>
+
+<div class="ms_meta">
+  <div id="ms_date">published 2024-01-17</div>
+  
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2024-01-17-systemd-indefinite-service-restarts/index.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
+</div>
+<div class="Artikel" id="content">
+  <p>When a service fails to start up enough times in a row, systemd gives up on it.</p>
+<p>On servers, this isn’t what I want — in general it’s helpful for automated
+recovery if daemons are restarted indefinitely. As long as you don’t have
+circular dependencies between services, all your services will eventually come
+up after transient failures, without having to specify dependencies.</p>
+<p>This is particularly useful because specifying dependencies on the systemd level
+introduces footguns: when interactively stopping individual services, systemd
+also stops the dependents. And then you need to remember to restart the
+dependent services later, which is easy to forget.</p>
+<h2 id="enabling-indefinite-restarts-for-a-service">Enabling indefinite restarts for a service</h2>
+<p>To make systemd restart a service indefinitely, I first like to create a drop-in
+config file like so:</p>
+<pre tabindex="0"><code>cat &gt; /etc/systemd/system/restart-drop-in.conf &lt;&lt;&#39;EOT&#39;
+[Unit]
+StartLimitIntervalSec=0
+
+[Service]
+Restart=always
+RestartSec=1s
+EOT
+</code></pre><p>Then, I can enable the restart behavior for individual services like
+<code>prometheus-node-exporter</code>, without having to modify their <code>.service</code> files
+(which needs manual effort when updating):</p>
+<pre tabindex="0"><code>cd /etc/systemd/system
+mkdir prometheus-node-exporter.service.d
+cd prometheus-node-exporter.service.d
+ln -s ../restart-drop-in.conf
+systemctl daemon-reload
+</code></pre><h2 id="changing-the-defaults-for-all-services">Changing the defaults for all services</h2>
+<p>If most of your services set <code>Restart=always</code> or <code>Restart=on-failure</code>, you can
+change the system-wide defaults for <code>RestartSec</code> and <code>StartLimitIntervalSec</code>
+like so:</p>
+<pre tabindex="0"><code>mkdir /etc/systemd/system.conf.d
+cat &gt; /etc/systemd/system.conf.d/restartdefaults.conf &lt;&lt;&#39;EOT&#39;
+[Manager]
+DefaultRestartSec=1s
+DefaultStartLimitIntervalSec=0
+EOT
+systemctl daemon-reload
+</code></pre><h2 id="what-do-the-default-settings-do">What do the default settings do?</h2>
+<p>So why do we need to change these settings to begin with?</p>
+<p>The default systemd settings (as of systemd 255) are:</p>
+<pre tabindex="0"><code>DefaultRestartSec=100ms
+DefaultStartLimitIntervalSec=10s
+DefaultStartLimitBurst=5
+</code></pre><p>This means that services which specify <code>Restart=always</code> are restarted 100ms
+after they crash, and if the service crashes more than 5 times in 10 seconds,
+systemd does not attempt to restart the service anymore.</p>
+<p>It’s easy to see that for a service which takes, say, 100ms to crash, for
+example because it can’t bind on its listening IP address, this means:</p>
+<table>
+<thead>
+<tr>
+<th>time</th>
+<th>event</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T+0</td>
+<td>first start</td>
+</tr>
+<tr>
+<td>T+100ms</td>
+<td>first crash</td>
+</tr>
+<tr>
+<td>T+200ms</td>
+<td>second start</td>
+</tr>
+<tr>
+<td>T+300ms</td>
+<td>second crash</td>
+</tr>
+<tr>
+<td>T+400ms</td>
+<td>third start</td>
+</tr>
+<tr>
+<td>T+500ms</td>
+<td>third crash</td>
+</tr>
+<tr>
+<td>T+600ms</td>
+<td>fourth start</td>
+</tr>
+<tr>
+<td>T+700ms</td>
+<td>fourth crash</td>
+</tr>
+<tr>
+<td>T+800ms</td>
+<td>fifth start</td>
+</tr>
+<tr>
+<td>T+900ms</td>
+<td>fifth crash within 10s</td>
+</tr>
+<tr>
+<td>T+1s</td>
+<td>systemd gives up</td>
+</tr>
+</tbody>
+</table>
+<h2 id="why-does-systemd-give-up-by-default">Why does systemd give up by default?</h2>
+<p>I’m not sure. If I had to speculate, I would guess the developers wanted to
+prevent laptops running out of battery too quickly because one CPU core is
+permanently busy just restarting some service that’s crashing in a tight loop.</p>
+<p>That same goal could be achieved with a more relaxed <code>DefaultRestartSec=</code> value,
+though: With <code>DefaultRestartSec=5s</code>, for example, we would sufficiently space
+out these crashes over time.</p>
+<p>There is <a href="https://github.com/systemd/systemd/issues/30804">some recent discussion
+upstream</a> regarding changing
+the default. Let’s see where the discussion goes.</p>
+<div id="bmc">
+  <p>
+    I run a blog since 2005, spreading knowledge and experience for almost 20 years! :)
+  </p>
+  <p>
+    If you want to support my work, you
+    can <a href="https://www.buymeacoffee.com/stapelberg">buy me a coffee</a>.
+  </p>
+  <p>
+    Thank you for your support! ❤️
+  </p>
+</div>
+
+</div>
+
+      </div>
+
+    </main><div id="ms_footer">
+  © 2023 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

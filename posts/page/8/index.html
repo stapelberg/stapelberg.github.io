@@ -237,6 +237,24 @@
     
     <li>
       <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-10-20-android-ist-ipv6-enabled-stan/"><h3> Android ist IPv6-enabled stan…</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	<p>
+	  Android ist IPv6-enabled standardmäßig. Was man braucht, um das zu verifizieren und eventuell die Einstellungen zu ändern, ist Busybox: http://zedomax.com/android/busybox.zip (von diesem Blogpost) Die Installation ging bei mir einfacher als im mitgelieferten Script: x200 $ unzip busybox.zip x200 $ adb push busybox /sdcard/busybox x200 $ adb shell $ su # mount -o remount,rw /dev/block/mtdblock6 /system # mv /sdcard/busybox /system/xbin/busybox # cd /system/xbin # chmod 755 busybox # .
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-10-20-android-ist-ipv6-enabled-stan/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
 	<a href="https://michael.stapelberg.ch/posts/2010-10-15-android-hat-mich---ich-mc/"><h3> Android hat mich ;-). Ich möc…</h3></a>
 	
 	<div class="tags"></div>
@@ -792,24 +810,6 @@
 	<p>
 	  Auf meinem Server nutze ich Xen zur Virtualisierung, netterweise kann das Logical Volumes (LVM) für die Festplatten der Gastsysteme nutzen. Damit ich nun nicht auf jeder virtuellen Maschine bacula konfigurieren muss und beim Wiederherstellen des Backups direkt alle Gastsysteme auf einen Schlag restauriert habe, habe ich mir vor einiger Zeit ein Script geschrieben, welches einen Snapshot der LVs mountet, der dann gesichert wird: http://code.
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-03-21-auf-meinem-server-nutze-ich-x/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2010-03-19-whrend-ich-herausfand-dass-/"><h3> Während ich herausfand, dass …</h3></a>
-	
-	<div class="tags"></div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	<p>
-	   Während ich herausfand, dass in Ruby File.stat(fn).mtime erst ab Version 1.9 auch Nanosekunden beinhaltet, bin ich auf folgendes großartige Python-Problem gestoßen: http://ciaranm.wordpress.com/2009/11/15/this-week-in-python-stupidity-os-stat-os-utime-and-sub-second-timestamps/ 
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-03-19-whrend-ich-herausfand-dass-/">Read more →</a></span>
 	</p>
       </div>
     </li>

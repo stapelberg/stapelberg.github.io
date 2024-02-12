@@ -179,7 +179,7 @@ The update process for both of these builds is entirely automated, meaning new L
       <div><h1 class="ms_title">Minimal Linux Bootloader debugging story 🐞</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2024-02-11</div>
+  <div id="ms_date">published 2024-02-11, last modified 2024-02-12</div>
   
   
   <div>
@@ -437,7 +437,8 @@ and takes the size from the <strong>kernel header</strong>, which I did not upda
   </div>
 </aside>
 
-<p>I read that one of the main changes in GCC 10 is to enable stack protection by default.</p>
+<p>I read that GCC 10 <a href="https://lore.kernel.org/lkml/20200422192113.GG26846@zn.tnic/t/">changed behavior with regards to stack
+protection</a>.</p>
 <p>Indeed, building the kernel with Debian 11 (bullseye), but with
 <code>CONFIG_STACKPROTECTOR=n</code> makes it boot. So, I suspected that our bootloader
 does not set up the stack correctly, or similar.</p>

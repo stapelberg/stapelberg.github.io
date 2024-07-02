@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Ryzen 7 Mini-PC makes a power-efficient VM host - Michael Stapelberg</title>
+
+  <meta property="og:site_name" content="Michael Stapelberg">
+  <meta property="og:title" content="Ryzen 7 Mini-PC makes a power-efficient VM host">
+  <meta property="og:description" content="When I saw the first reviews of the ASRock DeskMini X600 barebone, I was immediately interested in building a home-lab hypervisor (VM host) with it. Apparently, the DeskMini X600 uses less than 10W of power but supports latest-generation AMD CPUs like the Ryzen 7 8700G!">
+  
+  
+  
+  
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/240630-server-featured_hu3cb7c72c5372ea18e945c976b24c8b83_4997169_200x200_fit_q75_box.jpg">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <meta name="description" content="When I saw the first reviews of the ASRock DeskMini X600 barebone, I was immediately interested in building a home-lab hypervisor (VM host) with it. Apparently, the DeskMini X600 uses less than 10W of power but supports latest-generation AMD CPUs like the Ryzen 7 8700G!">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+
+  
+
+  
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-0KNb0FMBigC18vvjx7OX9%2brtwvlFcqRW9ot8oyvDaFTNa8BkK%2bXi6zXmEodv2l64rdRSjQ2aU8LqbO%2b3FR%2bSdA%3d%3d" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div><h1 class="ms_title">Ryzen 7 Mini-PC makes a power-efficient VM host</h1>
+
+<div class="ms_meta">
+  <div id="ms_date">published 2024-07-02</div>
+  
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/index.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
+</div>
+<div class="Artikel" id="content">
+  <style type="text/css">
+    .TableOfContents > ul, .TableOfContents > ul > li > ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+    }
+    .TableOfContents > ul > li > ul {
+	margin: 1em;
+    }
+    .TableOfContents li {
+	margin-bottom: 1rem;
+    }
+  </style>
+  <details class="ms_toc_details">
+    <summary>Table of contents</summary>
+    <nav class="TableOfContents">
+  <ul>
+    <li><a href="#component-list">Component List</a></li>
+    <li><a href="#uefi-setup">UEFI Setup</a></li>
+    <li><a href="#operating-system-setup">Operating System Setup</a></li>
+    <li><a href="#power-usage">Power Usage</a></li>
+    <li><a href="#noise">Noise</a></li>
+    <li><a href="#performance-comparison">Performance comparison</a>
+      <ul>
+        <li><a href="#compiling-go-1224">Compiling Go 1.22.4</a></li>
+        <li><a href="#go-http-and-json-benchmarks">Go HTTP and JSON benchmarks</a></li>
+      </ul>
+    </li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+  </details>
+  <p>When I saw the first reviews of the <a href="https://www.asrock.com/nettop/AMD/DeskMini%20X600%20Series/index.asp">ASRock DeskMini X600
+barebone</a>,
+I was immediately interested in building a home-lab hypervisor (VM host) with
+it. Apparently, the DeskMini X600 uses less than 10W of power but supports
+latest-generation AMD CPUs like the Ryzen 7 8700G!</p>
+<p>Sounds like the perfect base for a power-efficient, always-on VM host that still
+provides enough compute power (and fast disks!) to be competitive with
+commercial VM offerings. In this article, I’ll show how I built and set up my
+DIY self-hosting VM host.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/240630-server-featured.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/240630-server-featured_hu3cb7c72c5372ea18e945c976b24c8b83_4997169_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/240630-server-featured_hu3cb7c72c5372ea18e945c976b24c8b83_4997169_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/240630-server-featured_hu3cb7c72c5372ea18e945c976b24c8b83_4997169_600x0_resize_q75_box.jpg"
+  alt="ASRock DeskMini X600" title="ASRock DeskMini X600"
+  width="600"
+  height="401"
+  style="
+
+border: 1px solid #000;
+
+"
+  
+  loading="lazy"></a>
+
+
+
+<h2 id="component-list">Component List</h2>
+<p>The term “barebone” means that the machine comes without CPU, RAM and disk. You
+only get a case with a mainboard and power supply, the rest is up to you. I
+chose the following parts:</p>
+<table>
+<thead>
+<tr>
+<th>Price</th>
+<th>Type</th>
+<th>Article</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>215 EUR</td>
+<td>barebone</td>
+<td><a href="https://shop.jzelectronic.de/product_info.php?info=p75250_asrock-deskmini-x600.html">ASRock DeskMini X600</a></td>
+</tr>
+<tr>
+<td>293 CHF</td>
+<td>CPU</td>
+<td><a href="https://www.digitec.ch/de/s1/product/amd-ryzen-7-8700g-am5-420-ghz-8-core-prozessor-42390585?supplier=406802">AMD Ryzen 7 8700G (AM5, 4.20 GHz, 8 Core)</a></td>
+</tr>
+<tr>
+<td>48 CHF</td>
+<td>CPU fan</td>
+<td><a href="https://www.digitec.ch/de/s1/product/noctua-nh-l9a-am5-37-mm-cpu-kuehler-24147242?supplier=406802">Noctua NH-L9a-AM5 (37 mm)</a></td>
+</tr>
+<tr>
+<td>195 CHF</td>
+<td>RAM</td>
+<td><a href="https://www.digitec.ch/de/s1/product/kingston-fury-impact-2-x-32gb-5600-mhz-ddr5-ram-so-dimm-ram-23704483?supplier=406802">Kingston FURY Impact (2 x 32GB, DDR5-5600 SO-DIMM)</a></td>
+</tr>
+<tr>
+<td>218 CHF</td>
+<td>SSD</td>
+<td>2 x <a href="https://www.digitec.ch/de/s1/product/samsung-980-pro-1000-gb-m2-2280-ssd-13823466?supplier=406802">Samsung 980 Pro (1000 GB, M.2 2280)</a> (for RAID-1)</td>
+</tr>
+</tbody>
+</table>
+<p>Total cost: 969 CHF</p>
+<p>The CPU fan is not strictly required (the DeskMini X600 already comes with a
+fan), but I wanted the best cooling performance at lowest noise levels, so
+Noctua it is.</p>
+<p>I read that the machine should support ECC RAM, too, but I couldn’t find any ECC
+DDR5-SODIMM in stock at my usual electronics stores. If you have successfully
+used ECC RAM in the X600, please send me a note with the model name :-)</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/IMG_3871.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/IMG_3871_hu59fa65490ce2e48b2c5b284fe97e0775_2062424_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/IMG_3871_hu59fa65490ce2e48b2c5b284fe97e0775_2062424_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/IMG_3871_hu59fa65490ce2e48b2c5b284fe97e0775_2062424_600x0_resize_q75_box.jpg"
+  alt="components" title="components"
+  width="600"
+  height="631"
+  style="
+
+border: 1px solid #000;
+
+"
+  
+  loading="lazy"></a>
+
+
+
+<p>It took me about an hour to assemble the parts. Note that the M.2 SSD screws
+might seem a little hard to screw in, but don’t be deterred by that. When first
+powering on the system, be patient as the memory training will take a minute or so,
+during which the screen will stay black.</p>
+<h2 id="uefi-setup">UEFI Setup</h2>
+<p>The UEFI on the DeskMini X600 comes with reasonable defaults.</p>
+<p>The CPU fan setting alreadys defaults to “Silent Mode”, for example.</p>
+<p>I changed the following option, which is typical for server usage:</p>
+<ul>
+<li>Advanced → ACPI Configuration → Restore on AC/Power Loss: Power On</li>
+</ul>
+<p>And I disabled the onboard devices I know I won’t need, just in case it saves power:</p>
+<ul>
+<li>Advanced → Onboard Devices Configuration → Onboard HD Audio: Disabled</li>
+<li>SATA3 Controller: Disabled</li>
+</ul>
+<h2 id="operating-system-setup">Operating System Setup</h2>
+<p>I want to run this machine as a VM hypervisor. The easiest way that I know to set up such a hypervisor is to install Proxmox, an open
+source virtualization appliance based on Debian.</p>
+<p>I booted the machine with the Proxmox installer copied to a USB memory stick,
+then selected ZFS in a RAID-1 configuration. The setup worked smoothly and was
+done in a few minutes.</p>
+<p>Then, I set up Tailscale <a href="https://tailscale.com/kb/1133/proxmox">as recommended</a>
+and used <code>tailscale serve</code> so that I can access the Proxmox web interface on its
+Tailscale hostname via HTTPS, instead of having to deal with certificates and
+custom ports:</p>
+<pre tabindex="0"><code>pve# curl -fsSL https://tailscale.com/install.sh | sh
+pve# tailscale up
+[…]
+  follow instructions and disable key expiration
+[…]
+pve# tailscale serve --bg https+insecure://localhost:8006
+</code></pre><p>(Of course I’ll also install Tailscale on each VM running on the host.)</p>
+<p>Now I can log into the Proxmox web interface from anywhere without certificate
+warnings:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/2024-06-30-proxmox.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/2024-06-30-proxmox_hu72d4f4d0189dc6f0891d857b6c038b39_1406117_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/2024-06-30-proxmox_hu72d4f4d0189dc6f0891d857b6c038b39_1406117_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/2024-06-30-proxmox_hu72d4f4d0189dc6f0891d857b6c038b39_1406117_600x0_resize_q75_box.jpg"
+  alt="proxmox web interface" title="proxmox web interface"
+  width="600"
+  height="418"
+  style="
+
+border: 1px solid #000;
+
+"
+  
+  loading="lazy"></a>
+
+
+
+<p>In this screenshot, I have already created 2 VMs (“batch” and “web”) using the
+“Create VM” button at the top right. Proxmox allows controlling the installer
+via its “Console” tab and once set up, the VM shows up in the same network that
+the hypervisor is connected to with a MAC address from the “Proxmox Server
+Solutions GmbH” range. That’s pretty much all there is to it.</p>
+<p>I don’t have enough nodes for advanced features like clustering, but I might
+investigate whether I want to set up backups on the Proxmox layer or keep doing
+them on the OS layer.</p>
+<h2 id="power-usage">Power Usage</h2>
+<p>The power usage values I measure are indeed excellent: The DeskMini X600 with
+Ryzen 7 8700G consumes less than 10W (idle)! When the machine has something to
+do, it spikes up to 50W:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/2024-06-24-energy-usage.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/2024-06-24-energy-usage_hu6ff618f9e9023ea7df34e8fd6d4f3691_213887_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/2024-06-24-energy-usage_hu6ff618f9e9023ea7df34e8fd6d4f3691_213887_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/2024-06-24-energy-usage_hu6ff618f9e9023ea7df34e8fd6d4f3691_213887_600x0_resize_q75_box.jpg"
+  alt="Grafana dashboard showing power usage" title="Grafana dashboard showing power usage"
+  width="600"
+  height="257"
+  style="
+
+border: 1px solid #000;
+
+"
+  
+  loading="lazy"></a>
+
+
+
+<h2 id="noise">Noise</h2>
+<p>ASRock explicitly lists the Noctua NH-L9a-AM5 as compatible with the DeskMini
+X600, which was one of the factors that made me select this barebone. Installing
+the fan was easy.</p>
+<p>Fan noise is very low, as expected with Noctua. I can’t hear the device even
+when it is standing in front of me on my desk. Of course, under heavy load, the
+fan will be audible. This is an issue with all small form-factor PCs, as they
+just don’t have enough case space to swallow more noise.</p>
+<p>Aside from the fan noise, if you hold your ear directly next to the X600, you
+can hear the usual electrical component noise (not coil whine per se, but that
+sort of thing).</p>
+<p>I recommend positioning this device under a desk, or on a shelf, or
+similar.</p>
+<h2 id="performance-comparison">Performance comparison</h2>
+<p>You can find synthetic benchmark results for the Ryzen 8700G elsewhere, so as
+usual, I will write about the specific angle I care about: How fast can this
+machine handle Go workloads?</p>
+<h3 id="compiling-go-1224">Compiling Go 1.22.4</h3>
+<p>On the Ryzen 8700G, we can compile Go 1.22.4 in a little under 40 seconds:</p>
+<pre tabindex="0"><code>% time ./make.bash
+[…]
+./make.bash  208,55s user 36,96s system 631% cpu 38,896 total
+</code></pre><p>For comparison, <a href="/posts/2022-01-15-high-end-linux-pc/">my 2022 high-end Linux PC with Core
+i9-12900K</a> is only a few seconds faster:</p>
+<pre tabindex="0"><code>% time ./make.bash
+[…]
+./make.bash  207,33s user 29,55s system 685% cpu 34,550 total
+</code></pre><h3 id="go-http-and-json-benchmarks">Go HTTP and JSON benchmarks</h3>
+<p>I also ran the HTTP and JSON benchmarks from Go’s <a href="https://github.com/golang/benchmarks">x/benchmarks
+repository</a>.</p>
+<p>Compared to the Virtual Server I’m currently renting, the Ryzen 8700G is more
+than twice as fast:</p>
+<pre tabindex="0"><code>% benchstat rentedvirtual ryzen8700g 
+name    old time/op                  new time/op                  delta
+HTTP-2  28.5µs ± 2%                  10.2µs ± 1%  -64.17%  (p=0.008 n=5+5)
+JSON-2  24.1ms ±29%                   9.4ms ± 1%  -61.06%  (p=0.008 n=5+5)
+</code></pre><p>Of course, the Intel i9 12900K is still a bit faster — how much depends on the
+specific workload:</p>
+<pre tabindex="0"><code>% benchstat ryzen8700g i9_12900k 
+name    old time/op                  new time/op                  delta
+HTTP-2  10.2µs ± 1%                   7.6µs ± 1%  -25.13%  (p=0.008 n=5+5)
+JSON-2  9.40ms ± 1%                  9.23ms ± 1%   -1.82%  (p=0.008 n=5+5)
+</code></pre><h2 id="conclusion">Conclusion</h2>
+<p>What a delightful little Mini-PC! It’s modern enough to house the current
+generation of CPUs, compact enough to fit in well anywhere, yet just large
+enough to fit a Noctua CPU cooler for super-quiet operation. The low power draw
+makes it acceptable to run this machine 24/7.</p>
+<p>Paired with 64 GB of RAM and large, fast NVMe disks, this machine packs a punch
+and will easily power your home automation, home lab, hobby project, small office server, etc.</p>
+<p>If a Raspberry Pi isn’t enough for your needs, check out the DeskMini X600, or
+perhaps its larger variant, the <a href="https://www.asrock.com/nettop/AMD/DeskMeet%20X600%20Series/index.asp">DeskMeet
+X600</a>
+which is largely identical, but comes with a PCIe slot.</p>
+<p>If this one doesn’t fit your needs, keep looking: there are many more mini PCs on the market. Check out <a href="https://www.servethehome.com/introducing-project-tinyminimicro-home-lab-revolution/">ServeTheHome’s “Project TinyMiniMicro”</a> for a lot more reviews.</p>
+<div id="bmc">
+  <p>
+    I run a blog since 2005, spreading knowledge and experience for almost 20 years! :)
+  </p>
+  <p>
+    If you want to support my work, you
+    can <a href="https://www.buymeacoffee.com/stapelberg">buy me a coffee</a>.
+  </p>
+  <p>
+    Thank you for your support! ❤️
+  </p>
+</div>
+
+</div>
+
+      </div>
+<div id="ms_toc">
+  <div>
+    <strong>Table Of Contents</strong>
+
+    <nav class="TableOfContents">
+  <ul>
+    <li><a href="#component-list">Component List</a></li>
+    <li><a href="#uefi-setup">UEFI Setup</a></li>
+    <li><a href="#operating-system-setup">Operating System Setup</a></li>
+    <li><a href="#power-usage">Power Usage</a></li>
+    <li><a href="#noise">Noise</a></li>
+    <li><a href="#performance-comparison">Performance comparison</a>
+      <ul>
+        <li><a href="#compiling-go-1224">Compiling Go 1.22.4</a></li>
+        <li><a href="#go-http-and-json-benchmarks">Go HTTP and JSON benchmarks</a></li>
+      </ul>
+    </li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+
+    </main><div id="ms_footer">
+  © 2024 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

@@ -338,6 +338,7 @@ RestartSec=1
 <p>Ubuntu Server comes with Netplan by default, but I don’t know Netplan and don’t want to use it.</p>
 <p>To switch to <code>systemd-networkd</code>, I ran:</p>
 <pre tabindex="0"><code>apt remove --purge netplan.io
+systemctl enable --now systemd-networkd
 </code></pre><p>Then, I created a <code>systemd-networkd</code> config file with a static IPv6 token, resulting in a predictable IPv6 address:</p>
 <pre tabindex="0"><code>$EDITOR /etc/systemd/network/enp.network
 </code></pre><p>My config file looks like this:</p>

@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>A Signal run a day keeps the un-link away - Michael Stapelberg</title>
+
+  <meta property="og:site_name" content="Michael Stapelberg">
+  <meta property="og:title" content="A Signal run a day keeps the un-link away">
+  <meta property="og:description" content="I have a couple of people who are best reachable on the Signal messaging app, but not that many. This exposes me to an awkward edge case of Signal’s design decisions: Whenever I get a message (on my phone), I want to reply to it (on my laptop) only to discover that Signal has un-linked my laptop because of inactivity and won’t sync the message history from my phone to my laptop, making it impossible to quote-reply to messages.">
+  
+  
+  
+  
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2024-09-18-a-signal-run-a-day-keeps-the-un-link-away/2024-09-18-signal-screenshot-featured_huf68b5c8fb399dff8a6aa9770ac6d6081_823721_200x200_fit_q75_box.jpg">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <meta name="description" content="I have a couple of people who are best reachable on the Signal messaging app, but not that many. This exposes me to an awkward edge case of Signal’s design decisions: Whenever I get a message (on my phone), I want to reply to it (on my laptop) only to discover that Signal has un-linked my laptop because of inactivity and won’t sync the message history from my phone to my laptop, making it impossible to quote-reply to messages.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2024-09-18-a-signal-run-a-day-keeps-the-un-link-away/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+
+  
+
+  
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-0KNb0FMBigC18vvjx7OX9%2brtwvlFcqRW9ot8oyvDaFTNa8BkK%2bXi6zXmEodv2l64rdRSjQ2aU8LqbO%2b3FR%2bSdA%3d%3d" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div><h1 class="ms_title">A Signal run a day keeps the un-link away</h1>
+
+<div class="ms_meta">
+  <div id="ms_date">published 2024-09-18</div>
+  
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2024-09-18-a-signal-run-a-day-keeps-the-un-link-away/index.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
+</div>
+<div class="Artikel" id="content">
+  <style type="text/css">
+    .TableOfContents > ul, .TableOfContents > ul > li > ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+    }
+    .TableOfContents > ul > li > ul {
+	margin: 1em;
+    }
+    .TableOfContents li {
+	margin-bottom: 1rem;
+    }
+  </style>
+  <details class="ms_toc_details">
+    <summary>Table of contents</summary>
+    <nav class="TableOfContents">
+  <ul>
+    <li><a href="#high-level-sketch">High-level sketch</a></li>
+    <li><a href="#checking-connectivity">Checking connectivity</a></li>
+    <li><a href="#ensuring-at-most-once-semantics">Ensuring at-most-once semantics</a></li>
+    <li><a href="#full-program-code">Full program code</a></li>
+    <li><a href="#macos-installation-launchd">macOS installation: launchd</a></li>
+    <li><a href="#in-practice">In practice</a></li>
+    <li><a href="#linux-installation-systemd">Linux installation: systemd</a></li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+  </details>
+  <p>I have a couple of people who are best reachable on the <a href="https://en.wikipedia.org/wiki/Signal_(software)">Signal messaging
+app</a>, but not that many. This
+exposes me to an awkward edge case of Signal’s design decisions: Whenever I get
+a message (on my phone), I want to reply to it (on my laptop) only to discover
+that Signal has un-linked my laptop because of inactivity and won’t sync the
+message history from my phone to my laptop, making it impossible to quote-reply
+to messages.</p>
+<p>After complaining about this on Social Media for the n-th time, I figured I’d
+write a quick program to run Signal once a day, so that it won’t un-link my
+devices because of too long a period of inactivity. (Of course, the easiest
+solution would be to just run Signal in the background all the time. But I don’t
+use Signal often enough to justify letting it drain my battery and mobile data.)</p>
+<p>In this article, I want to share the program in case it’s useful to anyone else,
+and also explain how to install it on a Mac, as this kind of “do a task once a
+day” automation is a useful pattern.</p>
+<p><img src="2024-09-18-signal-screenshot-featured.jpg" alt=""></p>
+<h2 id="high-level-sketch">High-level sketch</h2>
+<ol>
+<li>Run Signal for, say, 5 minutes.</li>
+<li>Ensure at-most-once semantics regardless of the task scheduler. For example,
+if I wanted to start this program from an <code>@reboot</code> hook and restart my
+computer a few times, I don’t want the program to do anything after the first
+run of the day. (Similarly, an on-online hook of NetworkManager or similar
+software might fire once per network interface, or something like that.)</li>
+<li>Depending on the specifics of the activation mechanism, the computer might be
+online or not. The program should wait for a little while, say, 10 minutes,
+until internet connectivity was established.</li>
+<li>I would like to log the program’s output (and Signal’s output) for debugging.</li>
+</ol>
+<h2 id="checking-connectivity">Checking connectivity</h2>
+<p>The easiest option is to just… not do a connectivity check at all, and hope for
+the best. This would probably work well enough in practice, but I would like the
+debug logs to have a high signal-to-noise ratio: If I have to debug why Signal
+was unlinked despite my automation attempts, I don’t want to comb through tons
+of spurious log messages that were a result from being offline. So, I want to
+check that I’m online before even starting Signal.</p>
+<p>The most thorough option would be to somehow ask Signal programmatically whether
+it can connect to its servers and then wait until it can. I don’t think Signal
+has such an interface, so we’ll chose a middle-ground solution and work with a
+stand-in.</p>
+<p>Using HTTP for connectivity checks is an easy way in today’s world. We just need
+a target website that doesn’t go offline unless I want it to. So let’s just use
+this website! Go’s <code>net/http</code> package that is included in Go’s standard library
+makes this super easy:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">checkConnectivity</span>() <span style="color:#902000">error</span> {
+</span></span><span style="display:flex;"><span>	_, err <span style="color:#666">:=</span> http.<span style="color:#06287e">Get</span>(<span style="color:#4070a0">&#34;https://michael.stapelberg.ch/&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Now we just need to loop around this single connectivity check:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">waitForConnectivity</span>(timeout time.Duration) <span style="color:#902000">error</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">const</span> freq = <span style="color:#40a070">1</span> <span style="color:#666">*</span> time.Second
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">for</span> start <span style="color:#666">:=</span> time.<span style="color:#06287e">Now</span>(); time.<span style="color:#06287e">Since</span>(start) &lt; timeout; time.<span style="color:#06287e">Sleep</span>(freq) {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">checkConnectivity</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;connectivity check failed: %v&#34;</span>, err)
+</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">continue</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span> <span style="color:#60a0b0;font-style:italic">// connectivity check succeeded
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;no connectivity established within %v&#34;</span>, timeout)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>We could improve this code to be more generally applicable by adding
+<a href="https://en.wikipedia.org/wiki/Exponential_backoff">Exponential Backoff</a>, but
+for this particular connectivity check, we should be fine even without
+Exponential Backoff.</p>
+<h2 id="ensuring-at-most-once-semantics">Ensuring at-most-once semantics</h2>
+<p>An easy way to implement at-most-once semantics is to delegate to the file
+system: we can specify the <code>O_EXCL</code> flag when creating our program’s log file to
+make the first creation attempt proceed, but any further creation attempt fail
+because the file already exists. We’ll then redirect the standard library’s
+<code>log</code> package output to the log file:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>logFn <span style="color:#666">:=</span> filepath.<span style="color:#06287e">Join</span>(home, <span style="color:#4070a0">&#34;signal-keepalive&#34;</span>, <span style="color:#4070a0">&#34;_logs&#34;</span>, time.<span style="color:#06287e">Now</span>().<span style="color:#06287e">Format</span>(<span style="color:#4070a0">&#34;2006-01-02&#34;</span>)<span style="color:#666">+</span><span style="color:#4070a0">&#34;.txt&#34;</span>)
+</span></span><span style="display:flex;"><span>f, err <span style="color:#666">:=</span> os.<span style="color:#06287e">OpenFile</span>(logFn, os.O_RDWR|os.O_CREATE|os.O_EXCL, <span style="color:#40a070">0666</span>)
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> os.<span style="color:#06287e">IsExist</span>(err) {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span> <span style="color:#60a0b0;font-style:italic">// nothing to do, already ran today
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Intentionally not closing this file so that even the log.Fatal()
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// call in the calling function will end up in the log file.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>log.<span style="color:#06287e">SetOutput</span>(f) <span style="color:#60a0b0;font-style:italic">// redirect standard library logging into this file
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;signal-keepalive, waiting for internet connectivity&#34;</span>)
+</span></span></code></pre></div><p>Not closing the file might seem weird at first, but remember that this is a
+short-lived program and the operating system closes all file handles of a
+process when it exits.</p>
+<h2 id="full-program-code">Full program code</h2>
+<p>For your convenience, here is the full program code. It contains a bunch of file
+system paths that you might want or need to adjust.</p>
+<details>
+<summary>Click to expand: <code>keepalive.go</code></summary>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span> main
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;log&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;net/http&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;os&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;os/exec&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;path/filepath&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;time&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">checkConnectivity</span>() <span style="color:#902000">error</span> {
+</span></span><span style="display:flex;"><span>	_, err <span style="color:#666">:=</span> http.<span style="color:#06287e">Get</span>(<span style="color:#4070a0">&#34;https://michael.stapelberg.ch/&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">waitForConnectivity</span>(timeout time.Duration) <span style="color:#902000">error</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">for</span> start <span style="color:#666">:=</span> time.<span style="color:#06287e">Now</span>(); time.<span style="color:#06287e">Since</span>(start) &lt; timeout; time.<span style="color:#06287e">Sleep</span>(<span style="color:#40a070">1</span> <span style="color:#666">*</span> time.Second) {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">checkConnectivity</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;connectivity check failed: %v&#34;</span>, err)
+</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">continue</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span> <span style="color:#60a0b0;font-style:italic">// connectivity check succeeded
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;no connectivity established within %v&#34;</span>, timeout)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">keepalive</span>() <span style="color:#902000">error</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Limit to one attempt per day by exclusively creating a logfile.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	home <span style="color:#666">:=</span> os.<span style="color:#06287e">Getenv</span>(<span style="color:#4070a0">&#34;HOME&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> home <span style="color:#666">==</span> <span style="color:#4070a0">&#34;&#34;</span> {
+</span></span><span style="display:flex;"><span>		home = <span style="color:#4070a0">&#34;/Users/michael&#34;</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	logFn <span style="color:#666">:=</span> filepath.<span style="color:#06287e">Join</span>(home, <span style="color:#4070a0">&#34;signal-keepalive&#34;</span>, <span style="color:#4070a0">&#34;_logs&#34;</span>, time.<span style="color:#06287e">Now</span>().<span style="color:#06287e">Format</span>(<span style="color:#4070a0">&#34;2006-01-02&#34;</span>)<span style="color:#666">+</span><span style="color:#4070a0">&#34;.txt&#34;</span>)
+</span></span><span style="display:flex;"><span>	f, err <span style="color:#666">:=</span> os.<span style="color:#06287e">OpenFile</span>(logFn, os.O_RDWR|os.O_CREATE|os.O_EXCL, <span style="color:#40a070">0666</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> os.<span style="color:#06287e">IsExist</span>(err) {
+</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span> <span style="color:#60a0b0;font-style:italic">// nothing to do, already ran today
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Intentionally not closing this file so that even the log.Fatal()
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// call in the calling function will end up in the log file.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">SetOutput</span>(f) <span style="color:#60a0b0;font-style:italic">// redirect standard library logging into this file
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;signal-keepalive, waiting for internet connectivity&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Wait for network connectivity
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">waitForConnectivity</span>(<span style="color:#40a070">10</span> <span style="color:#666">*</span> time.Minute); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Start signal
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;connectivity verified, starting signal&#34;</span>)
+</span></span><span style="display:flex;"><span>	signal <span style="color:#666">:=</span> exec.<span style="color:#06287e">Command</span>(<span style="color:#4070a0">&#34;/Applications/Signal.app/Contents/MacOS/Signal&#34;</span>, <span style="color:#4070a0">&#34;--start-in-tray&#34;</span>)
+</span></span><span style="display:flex;"><span>	signal.Stdout = f
+</span></span><span style="display:flex;"><span>	signal.Stderr = f
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> signal.<span style="color:#06287e">Start</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Wait for some time to give Signal a chance to synchronize messages.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">const</span> signalWaitTime = <span style="color:#40a070">5</span> <span style="color:#666">*</span> time.Minute
+</span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;giving signal %v to sync messages&#34;</span>, signalWaitTime)
+</span></span><span style="display:flex;"><span>	time.<span style="color:#06287e">Sleep</span>(signalWaitTime)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Stop signal
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;killing signal&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> signal.Process.<span style="color:#06287e">Kill</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;waiting for signal&#34;</span>)
+</span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;signal returned: %v&#34;</span>, signal.<span style="color:#06287e">Wait</span>())
+</span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;all done&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> f.<span style="color:#06287e">Sync</span>()
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">keepalive</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Fatal</span>(err)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div></details>
+<p>(Use <code>go build keepalive.go</code> to compile if you’re unfamiliar with <a href="https://go.dev">Go</a>.)</p>
+<h2 id="macos-installation-launchd">macOS installation: launchd</h2>
+<p>The corresponding piece of infrastructure to
+<a href="https://en.wikipedia.org/wiki/Systemd">systemd</a> on Linux is called
+<a href="https://en.wikipedia.org/wiki/Launchd">launchd</a> on macOS. Aside from managing
+daemon processes, launchd also supports time-triggered program execution,
+specifically via the <code>StartCalendarInterval</code> configuration option.</p>
+<p>I followed <a href="https://alvinalexander.com/mac-os-x/launchd-plist-examples-startinterval-startcalendarinterval/">Alvin Alexander’s blog post about launchd StartCalendarInterval
+examples</a>
+and decided to configure my program to run at 08:03 each day:</p>
+<details>
+<summary>
+Click to expand: <code>net.zekjur.signalkeepalive.plist</code>
+</summary>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#007020">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#007020">&lt;!DOCTYPE plist PUBLIC &#34;-//Apple Computer//DTD PLIST 1.0//EN&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#007020">&#34;http://www.apple.com/DTDs/PropertyList-1.0.dtd&#34;&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">&lt;plist</span> <span style="color:#4070a0">version=</span><span style="color:#4070a0">&#34;1.0&#34;</span><span style="color:#062873;font-weight:bold">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">&lt;dict&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#062873;font-weight:bold">&lt;key&gt;</span>StartCalendarInterval<span style="color:#062873;font-weight:bold">&lt;/key&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#062873;font-weight:bold">&lt;dict&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#062873;font-weight:bold">&lt;key&gt;</span>Hour<span style="color:#062873;font-weight:bold">&lt;/key&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#062873;font-weight:bold">&lt;integer&gt;</span>8<span style="color:#062873;font-weight:bold">&lt;/integer&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#062873;font-weight:bold">&lt;key&gt;</span>Minute<span style="color:#062873;font-weight:bold">&lt;/key&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#062873;font-weight:bold">&lt;integer&gt;</span>3<span style="color:#062873;font-weight:bold">&lt;/integer&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#062873;font-weight:bold">&lt;/dict&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#062873;font-weight:bold">&lt;key&gt;</span>Label<span style="color:#062873;font-weight:bold">&lt;/key&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#062873;font-weight:bold">&lt;string&gt;</span>net.zekjur.signalkeepalive<span style="color:#062873;font-weight:bold">&lt;/string&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#062873;font-weight:bold">&lt;key&gt;</span>Program<span style="color:#062873;font-weight:bold">&lt;/key&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#062873;font-weight:bold">&lt;string&gt;</span>/Users/michael/signal-keepalive/signalkeepalive<span style="color:#062873;font-weight:bold">&lt;/string&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">&lt;/dict&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">&lt;/plist&gt;</span>
+</span></span></code></pre></div></details>
+<p>What happens when my computer isn’t running at 08:03, for example because the
+lid is closed? Apple documents the behavior in the <a href="https://keith.github.io/xcode-man-pages/launchd.plist.5.html"><code>launchd.plist(5)</code> man
+page</a>:</p>
+<blockquote>
+<p><em>Unlike cron which skips job invocations when the computer is asleep, launchd
+will start the job the next time the computer wakes up.</em></p>
+</blockquote>
+<p>To install and test this configuration:</p>
+<ol>
+<li>Copy the plist file to <code>~/Library/LaunchAgents</code></li>
+<li>Run <code>launchctl load ~/Library/LaunchAgents/net.zekjur.signalkeepalive.plist</code></li>
+<li>Run <code>launchctl start net.zekjur.signalkeepalive</code></li>
+</ol>
+<h2 id="in-practice">In practice</h2>
+<p>It’s interesting to see this behavior in practice. Take note of the time stamps
+in the following log. The computer was not running at 08:03. At 08:18, it woke
+up to update background information (Apple calls this <a href="https://support.apple.com/en-az/guide/mac-help/mh40773/mac">“Power
+Nap”</a>), and then it
+suspended again (while Signal was running) until it woke up at 08:47 again:</p>
+<pre tabindex="0"><code>2024/09/07 08:18:10 signal-keepalive, waiting for internet connectivity
+2024/09/07 08:18:11 connectivity verified, starting signal
+2024/09/07 08:18:11 giving signal 5m0s to sync messages
+Set Windows Application User Model ID (AUMID) { AUMID: &#39;org.whispersystems.signal-desktop&#39; }
+NODE_ENV production
+NODE_CONFIG_DIR /Applications/Signal.app/Contents/Resources/app.asar/config
+NODE_CONFIG {}
+ALLOW_CONFIG_MUTATIONS undefined
+HOSTNAME m1a.fritz.box
+NODE_APP_INSTANCE undefined
+SUPPRESS_NO_CONFIG_WARNING undefined
+SIGNAL_ENABLE_HTTP undefined
+userData: /Users/michael/Library/Application Support/Signal
+config/get: Successfully read user config file
+config/get: Successfully read ephemeral config file
+2024/09/07 08:47:31 killing signal
+2024/09/07 08:47:31 waiting for signal
+2024/09/07 08:47:31 signal returned: signal: killed
+2024/09/07 08:47:31 all done
+</code></pre><h2 id="linux-installation-systemd">Linux installation: systemd</h2>
+<p>With systemd, we need two units. First, a <code>signal-keepalive.service</code> unit to
+declare which program should be run:</p>
+<pre tabindex="0"><code>cat &gt; ~/.config/systemd/user/signal-keepalive.service &lt;&lt;&#39;EOT&#39;
+[Unit]
+Description=signal keepalive
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/michael/signal-keepalive/signalkeepalive
+
+[Install]
+WantedBy=default.target
+EOT
+</code></pre><p>And secondly, a <code>signal-keepalive.timer</code> unit which automatically starts the
+<code>signal-keepalive.service</code> every day:</p>
+<pre tabindex="0"><code>cat &gt; ~/.config/systemd/user/signal-keepalive.timer &lt;&lt;&#39;EOT&#39;
+[Unit]
+Description=signal keepalive
+
+[Timer]
+Persistent=true
+OnCalendar=daily
+
+[Install]
+WantedBy=timers.target
+EOT
+</code></pre><p>The <code>Persistent=true</code> line is important so that the program will be run even
+when the computer is asleep when the timer would have fired.</p>
+<p>Let’s enable the timer:</p>
+<pre tabindex="0"><code>systemctl --user enable --now signal-keepalive.timer
+</code></pre><p>For an initial test run, we can start the .service directly:</p>
+<pre tabindex="0"><code>systemctl --user restart signal-keepalive.service
+</code></pre><h2 id="conclusion">Conclusion</h2>
+<p>It’s silly that I need to go through so much trouble just because I don’t use
+Signal enough.</p>
+<p>I also don’t understand why Signal can’t just sync message history from my phone
+to my computer when linking. WhatsApp and Telegram have no trouble doing it.</p>
+<p>Either way, I thought this was a fun little refresher on automating periodic
+jobs.</p>
+<div id="bmc">
+  <p>
+    I run a blog since 2005, spreading knowledge and experience for almost 20 years! :)
+  </p>
+  <p>
+    If you want to support my work, you
+    can <a href="https://www.buymeacoffee.com/stapelberg">buy me a coffee</a>.
+  </p>
+  <p>
+    Thank you for your support! ❤️
+  </p>
+</div>
+
+</div>
+
+      </div>
+<div id="ms_toc">
+  <div>
+    <strong>Table Of Contents</strong>
+
+    <nav class="TableOfContents">
+  <ul>
+    <li><a href="#high-level-sketch">High-level sketch</a></li>
+    <li><a href="#checking-connectivity">Checking connectivity</a></li>
+    <li><a href="#ensuring-at-most-once-semantics">Ensuring at-most-once semantics</a></li>
+    <li><a href="#full-program-code">Full program code</a></li>
+    <li><a href="#macos-installation-launchd">macOS installation: launchd</a></li>
+    <li><a href="#in-practice">In practice</a></li>
+    <li><a href="#linux-installation-systemd">Linux installation: systemd</a></li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+
+    </main><div id="ms_footer">
+  © 2024 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

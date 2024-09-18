@@ -240,12 +240,38 @@
     
     <li>
       <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-11-25-rc-bugs/"><h3>RC bugs</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<p>
+	  I recently worked on the following RC bugs: #677861 — lftp: FTBFS[kfreebsd-i386]: error: conflicting declaration 'typedef __int32_t gl_intptr_t'
+I provided some analysis. By rebuilding lftp’s configure script with recent autotools, this should be fixed. #676229 — gnustep-make: should depend on a chosen version of gobjc, not just "
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-11-25-rc-bugs/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
 	<a href="https://michael.stapelberg.ch/posts/2012-11-21-kvm_best_practices_2012/"><h3>My KVM best practices (2012)</h3></a>
 	
 	<div class="tags"></div>
 	
       </div>
       <div class="summary">
+	
 	
 	
 	
@@ -267,6 +293,7 @@
 	
 	
 	
+	
 	<p>
 	  This short article describes the most important productivity enhancement for working in a shell (zsh) in the last few months for me: A shortcut for completing the most recent files. In my daily work, it often happens that I save an email attachment (or download a file from the internet) and then do something with it in a shell, like unpacking it, applying a patch to source code, and so on.
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-11-16-zsh_recent_completion/">Read more →</a></span>
@@ -282,6 +309,7 @@
 	
       </div>
       <div class="summary">
+	
 	
 	
 	
@@ -308,6 +336,7 @@
 	
 	
 	
+	
 	<p>
 	  After launching Debian Code Search, sometimes its index-backend processes would crash when presented with some class of queries. The queries itself did not show an interesting pattern, and in fact, it wasn’t their fault. Looking at the system’s journal, I noticed that the processes were crashing with SIGILL, the signal when an illegal instruction for the CPU is encountered: Nov 07 00:11:33 codesearch index-backend[10517]: SIGILL: illegal instruction Nov 07 00:11:33 codesearch index-backend[10517]: PC=0x42558d Interestingly, on my workstation, I could not reproduce this issue.
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-11-07-sigill_golang/">Read more →</a></span>
@@ -328,6 +357,7 @@
 	
       </div>
       <div class="summary">
+	
 	
 	
 	
@@ -357,6 +387,7 @@ FLOSS source code (including Debian packaging) with regular expressions.
 	
 	
 	
+	
 	<p>
 	  At our house, we have a single, high-quality laser color printer in the basement (along with the other computer equipment) which everybody uses, as opposed to a crappy cheap printer at everyone’s workplace. This is a great setup in our situation, since nobody prints a lot individually, so the slight discomfort of having to go to the basement is a welcome trade-off for not having to maintain cheap printers.
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-10-28-printer_status/">Read more →</a></span>
@@ -377,6 +408,7 @@ FLOSS source code (including Debian packaging) with regular expressions.
 	
       </div>
       <div class="summary">
+	
 	
 	
 	
@@ -404,6 +436,7 @@ I tracked down the cause of this and provided a patch. Now I also know how piupa
 	
 	
 	
+	
 	<p>
 	  mbiebl has recently uploaded systemd 44-5 to Debian unstable. If you are already using systemd, you should definitely upgrade to this version, it fixes a lot of little annoyances. This is especially important if you are using libvirt &gt;= 0.
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-10-26-systemd-44-5/">Read more →</a></span>
@@ -427,6 +460,7 @@ I tracked down the cause of this and provided a patch. Now I also know how piupa
 	
 	
 	
+	
 	<p>
 	  I recently worked on the following systemd-related issues: #686115 - CanReload is set to yes unconditionally for legacy SysV services
 I wrote a patch which uses a heuristic to figure out whether a SysV init script supports the reload option or not.
@@ -443,6 +477,7 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
 	
       </div>
       <div class="summary">
+	
 	
 	
 	
@@ -466,6 +501,7 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
 	
       </div>
       <div class="summary">
+	
 	
 	
 	
@@ -493,6 +529,7 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
 	
 	
 	
+	
 	<p>
 	  In July, I was looking for a new android phone. My HTC Desire Z was feeling pretty slow and after seeing how well Android 4.1 (Jelly Bean) performed on my friend’s devices, I decided to upgrade. I’ve read a few reviews back then and it seemed like the Samsung Galaxy S3 was the best phone at the time: Its hardware is stunning, it’s faster than every other phone and it looks okay.
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-09-29-from_galaxy_s3_to_nexus/">Read more →</a></span>
@@ -516,6 +553,7 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
 	
 	
 	
+	
 	<p>
 	  There is official documentation on the Go C language interface (or cgo in golang terminology), but the things it covers are relatively simple. I have used cgo recently in a real-world project and I want to share my experiences in this short article, that is, how to use types properly (avoiding the void* equivalent unsafe.
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-09-27-cgo_uint32/">Read more →</a></span>
@@ -531,6 +569,7 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
 	
       </div>
       <div class="summary">
+	
 	
 	
 	
@@ -552,6 +591,7 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
 	
 	
 	
+	
 	<p>
 	  One of the nice things about systemd is that you can change the Nice level and IO scheduling class/priority in a very simple way. I have recently configured bacula-fd on my server in such a way that it will not put a lot of load on the machine: To override the service unit, in this case bacula-fd.
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-09-23-systemd-ionice/">Read more →</a></span>
@@ -570,6 +610,7 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
 	
 	
 	
+	
 	<p>
 	  Our local computer club NoName e.V. has about 20 members. Since we introduced membership fees to pay for server and domain costs a while ago, we have to deal with bank transfers. To automate confirmation and reminder mails about the payment situation of each member, it’d be helpful to have a unique identifier for each member so that we can build a script which can reliable match a bank transfer to a member (without using fuzzy matching on the name).
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-09-22-member_id/">Read more →</a></span>
@@ -585,6 +626,7 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
 	
       </div>
       <div class="summary">
+	
 	
 	
 	
@@ -612,6 +654,7 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
 	
 	
 	
+	
 	<p>
 	   Because it is insanely hard to google this, here is how to disable auto-reload of PDF files within Evince (&gt;= v3.4.0): gsettings set org.gnome.Evince auto-reload false 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-08-16-evince-auto-reload/">Read more →</a></span>
@@ -627,6 +670,7 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
 	
       </div>
       <div class="summary">
+	
 	
 	
 	
@@ -654,6 +698,7 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
 	
 	
 	
+	
 	<p>
 	  Da die Entwicklung von sup (und dessen Nachfolger heliotrope/turnsole) absolut untragbar für ein OSS-Projekt ist, bin ich vor einer Weile auf den „Konkurrent“ notmuch umgestiegen. Da notmuch nur ein Mail-Index ohne Frontend ist, hat man die Wahl zwischen verschiedenen Frontends.
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-07-22-email/">Read more →</a></span>
@@ -669,6 +714,7 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
 	
       </div>
       <div class="summary">
+	
 	
 	
 	
@@ -696,6 +742,7 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
 	
 	
 	
+	
 	<p>
 	  the finished box (1024x720 px) It’s been roughly three years since I upgraded my last workstation and I felt it was time for a new computer. With a new CPU, a fast SSD and lots of RAM, compilation times should be much faster and annoying waiting for my computer to do stuff should be much reduced.
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-06-24-buying_linux_computer_2012/">Read more →</a></span>
@@ -720,6 +767,7 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
 	
 	
 	
+	
 	<p>
 	  Gestern kriegte ich bescheid gesagt, dass ein Server, den ich mitbetreue, kaputt gegangen sei. Die Hardware wurde vom Hoster getauscht, allerdings wurden auch neue Platten eingebaut. Der Hoster bot an, zusätzlich die alte Platte anzuschließen, um die Daten zu kopieren.
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-04-29-broken-server/">Read more →</a></span>
@@ -735,6 +783,7 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
 	
       </div>
       <div class="summary">
+	
 	
 	
 	
@@ -762,6 +811,7 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
 	
 	
 	
+	
 	<p>
 	  Vor einiger Zeit habe ich einen Artikel veröffentlicht, wie man eine DVD zum Wiederherstellen des Systems in einen definierten Zustand erstellt. Dieser Artikel ist ein Folgeartikel, der nahezu dasselbe macht, aber auf Basis einer USB-Festplatte statt einer DVD, und mit einer neueren Version von grml Linux.
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-03-01-rescue_hdd/">Read more →</a></span>
@@ -786,6 +836,7 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
 	
 	
 	
+	
 	<p>
 	   Soeben habe ich i3 v4.1.1 released. Die Release notes enthalten alle Neuerungen. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2011-12-24-i3-v4.1.1/">Read more →</a></span>
@@ -801,6 +852,7 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
 	
       </div>
       <div class="summary">
+	
 	
 	
 	
@@ -822,6 +874,7 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
 	
 	
 	
+	
 	<p>
 	  I wrote a few Perl scripts for various things during the last few years. Many of them run on machines which I don't maintain on my own (other people have root access, too) and some even run on machines which I don't have access to at all.
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2011-12-13-perl_debian_packaging/">Read more →</a></span>
@@ -840,33 +893,10 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
 	
 	
 	
+	
 	<p>
 	  I use OpenVPN relatively often, for example to get reliable IPv6-connectivity in places which don’t have IPv6 yet (miredo works well most of the time, but an own VPN is more stable). One of the things which I previously understood only a little bit was the MTU (Maximum Transfer Unit).
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2011-12-11-mtu_openvpn/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-  </ul>
-
-  
-  <h2>2011 › November</h2>
-  <ul class="ArticleList">
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2011-11-12-systemd-shell-scripts/"><h3>systemd ist lange überfällig…</h3></a>
-	
-	<div class="tags"></div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	<p>
-	  systemd ist lange überfällig, denn die Schmerzen beim Überführen eines quick'n'dirty shell scripts in einen ordentlich wartbaren Dienst sind mit sysvinit einfach viel zu groß. Vor ziemlich langer Zeit habe ich den RaumZeitMPD geschrieben, einen IRC-Bot, welcher bei !stream anzeigt, welches Lied gerade gespielt wird und bei !
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2011-11-12-systemd-shell-scripts/">Read more →</a></span>
 	</p>
       </div>
     </li>

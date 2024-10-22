@@ -6,6 +6,346 @@
   <id>https://michael.stapelberg.ch/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[Debug Go core dumps with delve: export byte slices]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/"/>
+    <id>https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/</id>
+    <published>2024-10-22T17:22:23+02:00</published>
+    <content type="html"><![CDATA[<p>Not all bugs can easily be reproduced — sometimes, all you have is a core dump
+from a crashing program, but no idea about the triggering conditions of the bug
+yet.</p>
+<p>When using Go, we can use <a href="https://github.com/go-delve/delve">the delve
+debugger</a> for core dump debugging, but I had
+trouble figuring out how to save byte slice contents (for example: the incoming
+request causing the crash) from memory into a file for further analysis, so this
+article walks you through how to do it.</p>
+<h2 id="simple-example">Simple Example</h2>
+<p>Let’s imagine the following scenario: You are working on a performance
+optimization in <a href="https://pkg.go.dev/google.golang.org/protobuf">Go Protobuf</a> and
+have accidentally badly broken the <a href="https://pkg.go.dev/google.golang.org/protobuf/proto#Marshal"><code>proto.Marshal</code>
+function</a>. The
+function is now returning an error, so let’s run one of the failing tests with
+delve:</p>
+<pre tabindex="0"><code>~/protobuf/proto master % dlv test
+(dlv) b ExampleMarshal
+(dlv) c
+&gt; [Breakpoint 1] google.golang.org/protobuf/proto_test.ExampleMarshal() ./encode_test.go:293 (hits goroutine(1):1 total:1) (PC: 0x9d6c96)
+(dlv) next 4
+&gt; google.golang.org/protobuf/proto_test.ExampleMarshal() ./encode_test.go:297 (PC: 0xb54495)
+   292: // [google.golang.org/protobuf/types/known/durationpb.New].
+   293: func ExampleMarshal() {
+   294: b, err := proto.Marshal(&amp;durationpb.Duration{
+   295: Nanos: 125,
+   296: })
+=&gt; 297: if err != nil {
+   298: panic(err)
+   299: }
+   300:
+   301: fmt.Printf(&#34;125ns encoded into %d bytes of Protobuf wire format:\n% x\n&#34;, len(b), b)
+   302:
+</code></pre><p>Go Protobuf happens to return the already encoded bytes even when returning an
+error, so we can inspect the <code>b</code> byte slice to see how far the encoding got
+before the error happened:</p>
+<pre tabindex="0"><code>(dlv) print b
+[]uint8 len: 2, cap: 2, [16,125]
+</code></pre><p>In this case, we can see that the entire (trivial) message was encoded, so our
+error must happen at a later stage — this allows us to rule out a large chunk of
+code in our search for the bug.</p>
+<p>But what would we do if a longer part of the message was displayed and we wanted
+to load it into a different tool for further analysis, e.g. the excellent
+<a href="https://github.com/protocolbuffers/protoscope">protoscope</a>?</p>
+<p>The low-tech approach is to print the contents and copy&amp;paste from the delve
+output into an editor or similar. This stops working as soon as your data
+contains non-printable characters.</p>
+<p>We have multiple options to export the byte slice to a file:</p>
+<ol>
+<li>
+<p>We could add <code>os.WriteFile(&quot;/tmp/b.raw&quot;, b, 0644)</code> to the source code and
+re-run the test. This is definitely the simplest option, as it works with or
+without a debugger.</p>
+</li>
+<li>
+<p>As long as delve is connected to a running program, we can use delve’s call
+command to just execute the same code without having to add it to our source:</p>
+<pre tabindex="0"><code>(dlv) call os.WriteFile(&#34;/tmp/b.raw&#34;, b, 0644)
+(dlv)
+</code></pre></li>
+</ol>
+<p>Notably, both options only work when you can debug interactively. For the first
+option, you need to be able to change the source. The second option requires
+that delve is attached to a running process that you can afford to pause and
+interactively control.</p>
+<p>These are trivial requirements when running a unit tests on your local machine,
+but get much harder when debugging an RPC service that crashes with specific
+requests, as you need to only run your changed debugging code for the
+troublesome requests, skipping the unproblematic requests that should still be
+handled normally.</p>
+<h2 id="core-dump-debugging-with-go">Core dump debugging with Go</h2>
+<p>So let’s switch example: we are no longer working on Go Protobuf. Instead, we
+now need to debug an RPC service where certain requests crash the service. We’ll
+use core dump debugging!</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_huc92a382266793767583fa56b2a20c9d0_1575273_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_huc92a382266793767583fa56b2a20c9d0_1575273_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_huc92a382266793767583fa56b2a20c9d0_1575273_600x0_resize_q75_box.jpg"
+  alt="Core memory" title="Core memory"
+  width="600"
+  height="516"
+  style="
+
+border: 1px solid #000;
+
+"
+  
+  loading="lazy"></a>
+
+
+
+<p>In case you’re wondering: The name “<a href="https://en.wikipedia.org/wiki/Core_dump">core
+dump</a>” comes from <a href="https://en.wikipedia.org/wiki/Magnetic-core_memory">magnetic-core
+memory</a>. These days we
+should probably say “memory dump” instead. The picture above shows an exhibit
+from the <a href="https://mitmuseum.mit.edu/">MIT Museum</a> (<em>Core Memory Unit, Bank C
+(from Project Whirlwind, 1953-1959))</em>, a core memory unit with 4 KB of capacity.</p>
+<p>To make Go write a core dump when panicing, run your program with the
+environment variable <code>GOTRACEBACK=crash</code> set (all possible values are documented
+<a href="https://pkg.go.dev/runtime">in the <code>runtime</code> package</a>).</p>
+<p>You also need to ensure your system is set up to collect core dumps, as they are
+typically discarded by default:</p>
+<ul>
+<li>On Linux, the easiest way is to install <a href="https://manpages.debian.org/systemd-coredump.8"><code>systemd-coredump(8)</code></a>
+, after which core dumps will automatically be collected. You
+can use <a href="https://manpages.debian.org/coredumpctl.1"><code>coredumpctl(1)</code></a>
+ to list and work with them.</li>
+<li>On macOS, you can enable core dump collection, but <a href="https://github.com/go-delve/delve/issues/2026">delve cannot open macOS
+core dumps</a>. Luckily, macOS is
+rarely used for production servers.</li>
+<li>I don’t know about Windows and other systems.</li>
+</ul>
+<p>You can find more details and options in the <a href="https://go.dev/wiki/CoreDumpDebugging">CoreDumpDebugging page of the Go
+wiki</a>. For this article, we will stick to
+the <code>coredumpctl</code> route:</p>
+<p>We’ll use the <a href="https://grpc.io/docs/languages/go/quickstart/">gRPC Go Quick start
+example</a>, a greeter client/server
+program, and add a <code>panic()</code> call to the server <code>SayHello</code> handler:</p>
+<pre tabindex="0"><code>% cd greeter_server
+% go build -gcflags=all=&#34;-N -l&#34;  # disable optimizations
+% GOTRACEBACK=crash ./greeter_server
+2024/10/19 21:48:01 server listening at [::]:50051
+2024/10/19 21:48:03 Received: world
+panic: oh no!
+
+goroutine 5 gp=0xc000007c00 m=5 mp=0xc000100008 [running]:
+panic({0x83ca60?, 0x9a3710?})
+	/home/michael/sdk/go1.23.0/src/runtime/panic.go:804 +0x168 fp=0xc000169850 sp=0xc0001697a0 pc=0x46fe88
+main.(*server).SayHello(0xcbb840?, {0x877200?, 0xc000094900?}, 0x4a6f25?)
+	/home/michael/go/src/github.com/grpc/grpc-go/examples/helloworld/greeter_server/main.go:45 +0xbf fp=0xc0001698c0 sp=0xc000169850 pc=0x8037ff
+[…]
+signal: aborted (core dumped)
+</code></pre><p>The last line is what we want to see: it should say “core dumped”.</p>
+<p>We can now use <a href="https://manpages.debian.org/coredumpctl.1"><code>coredumpctl(1)</code></a>
+ to launch delve for
+this program + core dump:</p>
+<pre tabindex="0"><code>% coredumpctl debug --debugger=dlv --debugger-arguments=core
+           PID: 1729467 (greeter_server)
+           UID: 1000 (michael)
+           GID: 1000 (michael)
+        Signal: 6 (ABRT)
+     Timestamp: Sat 2024-10-19 21:50:12 CEST (1min 49s ago)
+  Command Line: ./greeter_server
+    Executable: /home/michael/go/src/github.com/grpc/grpc-go/examples/helloworld/greeter_server/greeter_server
+ Control Group: /user.slice/user-1000.slice/session-1.scope
+          Unit: session-1.scope
+         Slice: user-1000.slice
+       Session: 1
+     Owner UID: 1000 (michael)
+       Storage: /var/lib/systemd/coredump/core.greeter_server.1000.zst (present)
+  Size on Disk: 204.7K
+       Message: Process 1729467 (greeter_server) of user 1000 dumped core.
+                
+                Module /home/michael/go/src/github.com/grpc/grpc-go/examples/helloworld/greeter_server/greeter_server without build-id.
+                Stack trace of thread 1729470:
+                #0  0x0000000000479461 n/a (greeter_server + 0x79461)
+[…]
+                ELF object binary architecture: AMD x86-64
+
+Type &#39;help&#39; for list of commands.
+(dlv) bt
+ 0  0x0000000000479461 in runtime.raise
+    at /home/michael/sdk/go1.23.0/src/runtime/sys_linux_amd64.s:154
+ 1  0x0000000000451a85 in runtime.dieFromSignal
+    at /home/michael/sdk/go1.23.0/src/runtime/signal_unix.go:942
+ 2  0x00000000004520e6 in runtime.sigfwdgo
+    at /home/michael/sdk/go1.23.0/src/runtime/signal_unix.go:1154
+ 3  0x0000000000450a85 in runtime.sigtrampgo
+    at /home/michael/sdk/go1.23.0/src/runtime/signal_unix.go:432
+ 4  0x0000000000479461 in runtime.raise
+    at /home/michael/sdk/go1.23.0/src/runtime/sys_linux_amd64.s:153
+ 5  0x0000000000451a85 in runtime.dieFromSignal
+    at /home/michael/sdk/go1.23.0/src/runtime/signal_unix.go:942
+ 6  0x0000000000439551 in runtime.crash
+    at /home/michael/sdk/go1.23.0/src/runtime/signal_unix.go:1031
+ 7  0x0000000000439551 in runtime.fatalpanic
+    at /home/michael/sdk/go1.23.0/src/runtime/panic.go:1290
+ 8  0x000000000046fe88 in runtime.gopanic
+    at /home/michael/sdk/go1.23.0/src/runtime/panic.go:804
+ 9  0x00000000008037ff in main.(*server).SayHello
+    at ./main.go:45
+10  0x00000000008033a6 in google.golang.org/grpc/examples/helloworld/helloworld._Greeter_SayHello_Handler
+    at /home/michael/go/src/github.com/grpc/grpc-go/examples/helloworld/helloworld/helloworld_grpc.pb.go:115
+11  0x00000000007edeeb in google.golang.org/grpc.(*Server).processUnaryRPC
+    at /home/michael/go/src/github.com/grpc/grpc-go/server.go:1394
+12  0x00000000007f2eab in google.golang.org/grpc.(*Server).handleStream
+    at /home/michael/go/src/github.com/grpc/grpc-go/server.go:1805
+13  0x00000000007ebbff in google.golang.org/grpc.(*Server).serveStreams.func2.1
+    at /home/michael/go/src/github.com/grpc/grpc-go/server.go:1029
+14  0x0000000000477c21 in runtime.goexit
+    at /home/michael/sdk/go1.23.0/src/runtime/asm_amd64.s:1700
+(dlv) 
+</code></pre><p>Alright! Now let’s switch to frame 9 (our server’s <code>SayHello</code> handler) and
+inspect the <code>Name</code> field of the incoming RPC request:</p>
+<pre tabindex="0"><code>(dlv) frame 9
+&gt; runtime.raise() /home/michael/sdk/go1.23.0/src/runtime/sys_linux_amd64.s:154 (PC: 0x482681)
+Warning: debugging optimized function
+Frame 9: ./main.go:45 (PC: aaabf8)
+    40:	}
+    41:	
+    42:	// SayHello implements helloworld.GreeterServer
+    43:	func (s *server) SayHello(_ context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
+    44:		log.Printf(&#34;Received: %v&#34;, in.GetName())
+=&gt;  45:		panic(&#34;oh no!&#34;)
+    46:		return &amp;pb.HelloReply{Message: &#34;Hello &#34; + in.GetName()}, nil
+    47:	}
+    48:	
+    49:	func main() {
+    50:		flag.Parse()
+(dlv) p in
+(&#34;*google.golang.org/grpc/examples/helloworld/helloworld.HelloRequest&#34;)(0xc000120100)
+*google.golang.org/grpc/examples/helloworld/helloworld.HelloRequest {
+[…]
+	unknownFields: []uint8 len: 0, cap: 0, nil,
+	Name: &#34;world&#34;,}
+</code></pre><p>In this case, it’s easy to see that the <code>Name</code> field was set to <code>world</code> in the
+incoming request, but let’s assume the request contained lots of binary data
+that was not as easy to read or copy.</p>
+<p>How do we write the byte slice contents to a file? In this scenario, we cannot
+modify the source code and delve’s <code>call</code> command does not work on core dumps
+(only when delve is attached to a running process):</p>
+<pre tabindex="0"><code>(dlv) call os.WriteFile(&#34;/tmp/name.raw&#34;, in.Name, 0644)
+&gt; runtime.raise() /home/michael/sdk/go1.23.0/src/runtime/sys_linux_amd64.s:154 (PC: 0x482681)
+Warning: debugging optimized function
+Command failed: can not continue execution of core process
+</code></pre><p>Luckily, we can extend delve with a custom Starlark function to write byte slice
+contents to a file.</p>
+<h2 id="exporting-byte-slices-with-writebytestofile">Exporting byte slices with writebytestofile</h2>
+<p>You need a version of dlv that contains commit
+<a href="https://github.com/go-delve/delve/commit/52405ba86bd9e14a2e643db391cbdebdcbdb3368">https://github.com/go-delve/delve/commit/52405ba86bd9e14a2e643db391cbdebdcbdb3368</a>. Until
+the commit is part of a released version, you can install the latest dlv
+directly from git:</p>
+<pre tabindex="0"><code>% go install github.com/go-delve/delve/cmd/dlv@master
+</code></pre><p>Save the following Starlark code to a file, for example <code>~/dlv_writebytestofile.star</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Syntax: writebytestofile &lt;byte slice var&gt; &lt;output file path&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">def</span> <span style="color:#06287e">command_writebytestofile</span>(args):
+</span></span><span style="display:flex;"><span>	var_name, filename <span style="color:#666">=</span> args<span style="color:#666">.</span>split(<span style="color:#4070a0">&#34; &#34;</span>)
+</span></span><span style="display:flex;"><span>	s <span style="color:#666">=</span> <span style="color:#007020">eval</span>(<span style="color:#007020;font-weight:bold">None</span>, var_name)<span style="color:#666">.</span>Variable
+</span></span><span style="display:flex;"><span>	mem <span style="color:#666">=</span> examine_memory(s<span style="color:#666">.</span>Base, s<span style="color:#666">.</span>Len)<span style="color:#666">.</span>Mem
+</span></span><span style="display:flex;"><span>	write_file(filename, mem)
+</span></span></code></pre></div><p>Then, in delve, load the Starlark code and run the function to export the byte
+slice contents of <code>in.Name</code> to <code>/tmp/name.raw</code>:</p>
+<pre tabindex="0"><code>% coredumpctl debug --debugger=dlv --debugger-arguments=core
+(dlv) frame 9
+(dlv) source ~/dlv_writebytestofile.star
+(dlv) writebytestofile in.Name /tmp/name.raw
+</code></pre><p>Let’s verify that we got the right contents:</p>
+<pre tabindex="0"><code>% hexdump -C /tmp/name.raw
+00000000  77 6f 72 6c 64                                    |world|
+00000005
+</code></pre><h2 id="core-dump-debugging-with-nethttp-servers">Core dump debugging with <code>net/http</code> servers</h2>
+<p>When you want to apply the core dump debugging technique on a <code>net/http</code> server
+(instead of a gRPC server, as above), you will notice that panics in your HTTP
+handlers do not actually result in a core dump! This code in
+<code>go/src/net/http/server.go</code> recovers panics and logs a stack trace:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">defer</span> <span style="color:#007020;font-weight:bold">func</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#007020">recover</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> <span style="color:#666">&amp;&amp;</span> err <span style="color:#666">!=</span> ErrAbortHandler {
+</span></span><span style="display:flex;"><span>        <span style="color:#007020;font-weight:bold">const</span> size = <span style="color:#40a070">64</span> <span style="color:#666">&lt;&lt;</span> <span style="color:#40a070">10</span>
+</span></span><span style="display:flex;"><span>        buf <span style="color:#666">:=</span> <span style="color:#007020">make</span>([]<span style="color:#902000">byte</span>, size)
+</span></span><span style="display:flex;"><span>        buf = buf[:runtime.<span style="color:#06287e">Stack</span>(buf, <span style="color:#007020;font-weight:bold">false</span>)]
+</span></span><span style="display:flex;"><span>        c.server.<span style="color:#06287e">logf</span>(<span style="color:#4070a0">&#34;http: panic serving %v: %v\n%s&#34;</span>, c.remoteAddr, err, buf)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}()
+</span></span></code></pre></div><p>Or, in other words: the <code>GOTRACEBACK=crash</code> environment variable configures what
+happens for unhandled signals, but this signal is handled with the <code>recover()</code>
+call, so no core is dumped.</p>
+<p>This default behavior of <code>net/http</code> servers <a href="https://github.com/golang/go/issues/25245">is now considered regrettable but
+cannot be changed for
+compatibility</a>. (We probably can add
+a struct field to optionally not recover panics, though. I’ll update this
+paragraph once there is a proposal.)</p>
+<p>So, what options do we have in the meantime?</p>
+<p>We could recover panics in our own code (before <code>net/http</code>’s panic handler is
+called), but then how do we produce a core dump from our own handler?</p>
+<p>A closer look reveals that the Go runtime’s <code>crash</code> function is defined in
+<code>signal_unix.go</code> and <a href="https://cs.opensource.google/go/go/+/refs/tags/go1.23.2:src/runtime/signal_unix.go;l=938">sends signal <code>SIGABRT</code> with the <code>dieFromSignal</code>
+function</a>
+to the current thread:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">//go:nosplit
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">crash</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#06287e">dieFromSignal</span>(_SIGABRT)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The default action for <code>SIGABRT</code> is to “terminate the process and dump core”,
+see <a href="https://manpages.debian.org/signal.7"><code>signal(7)</code></a>
+.</p>
+<p>We can follow the same strategy and send <code>SIGABRT</code> to our process:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+</span></span><span style="display:flex;"><span>	http.<span style="color:#06287e">HandleFunc</span>(<span style="color:#4070a0">&#34;/&#34;</span>, <span style="color:#007020;font-weight:bold">func</span>(w http.ResponseWriter, r <span style="color:#666">*</span>http.Request) {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">defer</span> <span style="color:#007020;font-weight:bold">func</span>() {
+</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#007020">recover</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>				proc, err <span style="color:#666">:=</span> os.<span style="color:#06287e">FindProcess</span>(syscall.<span style="color:#06287e">Getpid</span>())
+</span></span><span style="display:flex;"><span>				<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>					<span style="color:#007020">panic</span>(fmt.<span style="color:#06287e">Sprintf</span>(<span style="color:#4070a0">&#34;could not find own process (pid %d): %v&#34;</span>, syscall.<span style="color:#06287e">Getpid</span>(), err))
+</span></span><span style="display:flex;"><span>				}
+</span></span><span style="display:flex;"><span>				proc.<span style="color:#06287e">Signal</span>(syscall.SIGABRT)
+</span></span><span style="display:flex;"><span>				<span style="color:#60a0b0;font-style:italic">// Ensure the stack triggering the core dump sticks around
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>				proc.<span style="color:#06287e">Wait</span>()
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>		}()
+</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// …buggy handler code goes here; for illustration we panic
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#007020">panic</span>(<span style="color:#4070a0">&#34;this should result in a core dump&#34;</span>)
+</span></span><span style="display:flex;"><span>	})
+</span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Fatal</span>(http.<span style="color:#06287e">ListenAndServe</span>(<span style="color:#4070a0">&#34;:8080&#34;</span>, <span style="color:#007020;font-weight:bold">nil</span>))
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>There is one caveat: If you have any non-Go threads running in your program,
+e.g. by using cgo, they might pick up the signal, so ensure they do not install
+a <code>SIGABRT</code> handler (see also: <a href="https://pkg.go.dev/os/signal#hdr-Go_programs_that_use_cgo_or_SWIG">cgo-related documentation in
+<code>os/signal</code></a>).</p>
+<p>If this is a concern, you can make the above code more platform-specific and use
+the <a href="https://manpages.debian.org/tgkill.2"><code>tgkill(2)</code></a>
+ syscall to direct the signal to the
+current thread, as <a href="https://cs.opensource.google/go/go/+/refs/tags/go1.23.2:src/runtime/sys_linux_amd64.s;l=143">the Go runtime
+does</a>.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>Core dump debugging can be a very useful technique to quickly make progress on
+otherwise hard-to-debug problems. In small environments (single to few Linux
+servers), core dumps are easy enough to turn on and work with, but in larger
+environments you might need to invest into central core dump collection.</p>
+<p>I hope the technique shown above comes in handy when you need to work with core
+dumps.</p>
+]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[A Signal run a day keeps the un-link away]]></title>
     <link href="https://michael.stapelberg.ch/posts/2024-09-18-a-signal-run-a-day-keeps-the-un-link-away/"/>
     <id>https://michael.stapelberg.ch/posts/2024-09-18-a-signal-run-a-day-keeps-the-un-link-away/</id>
@@ -4466,474 +4806,6 @@ http {
     }
 }
 </code></pre></details>
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[My upgrade to 25 Gbit/s Fiber To The Home]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/"/>
-    <id>https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/</id>
-    <published>2022-04-23T16:00:00+02:00</published>
-    <content type="html"><![CDATA[<p>My favorite internet service provider, init7, is rolling out faster speeds with their infrastructure upgrade. Last week, the point of presence (POP) that my apartment’s fiber connection terminates in was upgraded, so now I am enjoying a 25 Gbit/s fiber internet connection!</p>
-<h2 id="firstinternet">My first internet connections</h2>
-<p>(Feel free to skip right to the <a href="#announcement">25 Gbit/s announcement</a> section, but I figured this would be a good point to reflect on the last 20 years of internet connections for me!)</p>
-<p>The first internet connection that I consciously used was a symmetric DSL connection that <a href="https://rent-a-guru.de">my dad († 2020)</a> shared between his home office and the rest of the house, which was around the year 2000. My dad was an early adopter and was connected to the internet well before then using dial up connections, but the SDSL connection in our second house was the first connection I remember using myself. It wasn’t particularly fast in terms of download speed — I think it delivered 256 kbit/s or something along those lines.</p>
-<p>I encountered two surprises with this internet connection. The first surprise was that the upload speed (also 256 kbit/s — it was a symmetric connection) was faster than other people’s. At the time, even DSL connections with much higher download speeds were asymmetric (ADSL) and came with only 128 kbit/s upload. I learnt this while making first contact with file sharing: people kept asking me to stay online so that their transfers would complete more quickly.</p>
-<p>The second surprise was the concept of a metered connection, specifically one where you pay more the more data you transfer. During the aforementioned file sharing experiments, it never crossed my mind that down- or uploading files could result in extra charges.</p>
-<p>These two facts combined resulted in a 3000 € surprise bill for my dad!</p>
-<p>Luckily, his approach to solve this problem wasn’t to restrict my internet usage, but rather to buy a cheap, separate ADSL flatrate line for the family (from Telekom, which he hated), while he kept the good SDSL metered line for his business.</p>
-<p>I still vividly remember the first time that ADSL connection synchronized. It was a massive upgrade in download speed (768 kbit/s!), but a downgrade in upload speed (128 kbit/s). But, because it was a flatrate, it made possible new use cases for my dad, who would jump on this opportunity to download a number of CD images to upgrade the software of his SGI machines.</p>
-<p>The different connection speeds and characteristics have always interested me, and I used several other connections over the years, all of which felt limiting. The ADSL connection at my parent’s place started at 1 Mbit/s, was upgraded first to 3 Mbit/s, then 6 Mbit/s, and eventually reached its limit at 16 Mbit/s. When I spent one semester in Ireland, I had a 9 Mbit/s ADSL connection, and then later in Zürich I started out with a 15 Mbit/s ADSL connection.</p>
-<p>All of these connections have always felt limiting, like peeking through the keyhole to see a rich world behind, but not being able to open the door. We’ve had to set up (and tune) traffic shaping, and coordinate when large downloads were okay.</p>
-<h2 id="firstfiber">My first fiber connection</h2>
-<p>The dream was always to leave ADSL behind and get a fiber connection. The
-advantages are numerous: lower latency (ADSL came with 40 ms at the time), much
-higher bandwidth (possibly Gigabit/s?) and typically the connection was
-established via ethernet (instead of PPPoE). Most importantly, once the fiber is
-there, you can upgrade both ends to achieve higher speeds.</p>
-<p>In Zürich, I managed to get a fiber connection set up in my apartment after fighting bureaucracy for many months. The issue was that there was no permission slip on file at Swisscom. Either the owner of my apartment never signed it to begin with, or it got lost. This is not a state that the online fiber availability checker can represent, but once you know it, the fix is easy: just have Swisscom send out the form again, have the owner sign it, and a few weeks later, you can order!</p>
-<p>One wrinkle was that availability was only fixed in the Swisscom checker, and it was unclear when EWZ or other providers would get an updated data dump. Hence, I ordered Swisscom fiber to get things moving as quick as possible, and figured I could switch to a different provider later.</p>
-<p>Here’s a picture of when the electrician pulled the fiber from the building entry endpoint (BEP) in the basement into my flat, from March 2014:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2014-03-26-fiber-apartment.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2014-03-26-fiber-apartment_hu0f3ae1648cd06c8d0596b6712702fd43_157282_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2014-03-26-fiber-apartment_hu0f3ae1648cd06c8d0596b6712702fd43_157282_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2014-03-26-fiber-apartment_hu0f3ae1648cd06c8d0596b6712702fd43_157282_600x0_resize_q75_box.jpg"
-  
-  width="600"
-  height="800"
-  style="
-
-border: 1px solid #000;
-
-"
-  
-  loading="lazy"></a>
-
-
-
-<h2 id="switching">Switching to fiber7</h2>
-<p>Only two months after I first got my fiber connection, init7 launched their fiber7 offering, and I switched from Swisscom to fiber7 as quickly as I could.</p>
-<p>The switch was worth it in every single dimension:</p>
-<ul>
-<li>Swisscom charged over 200 CHF per month for a 1 Gbit/s download, 100 Mbit/s upload fiber connection. fiber7 costs only 65 CHF per month and comes with a symmetric 1 Gbit/s connection. (Other providers had to follow, so now symmetric is standard.)</li>
-<li>init7’s network performs much better than Swisscom’s: ping times dropped when I switched, and downloads are generally much faster. Note that this is with <em>the same physical fiber line</em>, so the difference is thanks to the numerous peerings that init7 maintains.</li>
-<li>init7 gives you a static IPv6 prefix (if you want) for free, and even delegates reverse DNS to your servers of choice.</li>
-<li>I enjoy init7’s unparalleled transparency. For example, check out <a href="https://blog.init7.net/de/rentabilitatsrechnung/">the blog post about cost calculation</a> if you’re ever curious if there could be a fiber7 POP in your area.</li>
-</ul>
-<p>I have been very happy with my fiber7 connection ever since. <a href="/posts/2014-09-05-fiber7_performance/">What I wrote in 2014 regarding its performance</a> remained true over the years — downloads were always fast for me, latencies were low, outages were rare (and came with good explanations).</p>
-<p>I switched hardware multiple times over the years:</p>
-<ul>
-<li>First, I started with the <a href="/posts/2014-08-11-fiber7_ubnt_erlite/">Ubiquiti EdgeRouter Lite</a> which could handle the full Gigabit line rate (the MikroTik router I originally ordered maxed out at about 500 Mbit/s!).</li>
-<li>In 2017, I switched to the <a href="/posts/2017-03-25-turris-omnia/">Turris Omnia</a>, an open hardware, open source software router that comes with automated updates.</li>
-<li>In July 2018, after my connectivity was broken due to an incompatibility between the DHCPv6 client on the Turris Omnia and fiber7, I started developing my own <a href="https://router7.org">router7</a> in Go, <a href="/posts/2017-08-19-golang_favorite/">my favorite programming language</a>, mostly for fun, but also as a proof of concept for some cool features I think routers should have. For example, you can retro-actively start up Wireshark and open up a live ring buffer of the last few hours of network configuration traffic.</li>
-</ul>
-<p>Notably, init7 encourages people to use their preferred router (<a href="https://fsfe.org/activities/routers/routers.en.html">Router
-Freedom</a>).</p>
-<h2 id="announcement">The 25 Gbit/s announcement</h2>
-<p>Over the years, other Swiss internet providers such as Swisscom and Salt introduced 10 Gbit/s offerings, so an obvious question was when init7 would follow suit.</p>
-<p>People who were following init7 closely already knew that an infrastructure upgrade was coming. In 2020, init7 CEO Fredy Künzler <a href="https://twitter.com/kuenzler/status/1317841532813254659">disclosed that in 2021, init7 would start offering 10 Gbit/s</a>.</p>
-<p>What nobody expected before init7 announced it on their seventh birthday, however, was that init7 started offering not only 10 Gbit/s (Fiber7-X), but also 25 Gbit/s connections (Fiber7-X2)! 🤯</p>
-<p>This was init7’s announcement on Twitter:</p>
-<blockquote class="twitter-tweet" data-dnt="true"><p lang="de" dir="ltr">Fünfundzwanzig ist das neue <a href="https://twitter.com/hashtag/Gigabit?src=hash&amp;ref_src=twsrc%5Etfw">#Gigabit</a>.<br><br>Sieben Jahre nach dem Launch von <a href="https://twitter.com/hashtag/Fiber7?src=hash&amp;ref_src=twsrc%5Etfw">#Fiber7</a> zünden wir die nächste Stufe 🚀 - Fiber7-X (10Gbps) und Fiber7-X2 (25Gbps) - zum selben Preis: CHF 777 pro Jahr.<br><br>Unsere Medienmitteilung: <a href="https://t.co/UnnWTexcD0">https://t.co/UnnWTexcD0</a> <a href="https://twitter.com/hashtag/MaxFix?src=hash&amp;ref_src=twsrc%5Etfw">#MaxFix</a> <a href="https://twitter.com/hashtag/FTTH?src=hash&amp;ref_src=twsrc%5Etfw">#FTTH</a> <a href="https://twitter.com/hashtag/Glasfaser?src=hash&amp;ref_src=twsrc%5Etfw">#Glasfaser</a></p>&mdash; Init7 (AS13030) (@init7) <a href="https://twitter.com/init7/status/1397111796914327552?ref_src=twsrc%5Etfw">May 25, 2021</a></blockquote>
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<p>With this move, init7 has done it again: they introduced an offer that is better than anything else in the Swiss internet market, perhaps even world-wide!</p>
-<p>One interesting aspect is init7’s so-called «<a href="https://www.init7.net/en/internet/offer/">MaxFix principle</a>»: maximum speed for a fixed price. No matter if you’re using 1 Gbit/s or 25 Gbit/s, you pay the same monthly fee. init7’s approach is to make the maximum bandwidth available to you, limited only by your physical connection. This is such a breath of fresh air compared to other ISPs that think rate-limiting customers to ridiculously low speeds is somehow acceptable on an FTTH offering 🙄 (<a href="https://twitter.com/kuenzler/status/1515062457731063815">recent example</a>).</p>
-<p>If you’re curious about the infrastructure upgrade that enabled this change,
-check out <a href="https://blog.init7.net/de/neue-infrastruktur/">init7’s blog post about their new POP
-infrastructure</a>.</p>
-<h2 id="usecase">What for? The use-case</h2>
-<p>A common first reaction to fast network connections is the question: “For what do you need so much bandwidth?”</p>
-<p>Interestingly enough, I heard this question as recently as last year, in the context of a Gigabit internet connection! Some people can’t imagine using more than 100 Mbit/s. And sure, from a certain perspective, I get it — that 100 Mbit/s connection will not be overloaded any time soon.</p>
-<p>But, looking at when a line is overloaded is only one aspect to take into account when deciding how fast of a connection you want.</p>
-<p>There is a lower limit where you notice your connection is slow. Back in 2014, a 2 Mbit/s connection was noticeably slow for regular web browsing. These days, even a 10 Mbit/s connection is noticeably slow when re-opening my browser and loading a few tabs in parallel.</p>
-<p>So what should you get? A 100 Mbit/s line? 500 Mbit/s? 1000 Mbit/s? Personally, I like to not worry about it and just get the fastest line I can, to reduce any and all wait times as much as possible, whenever possible. It’s a freeing feeling! Here are a few specific examples:</p>
-<ul>
-<li>If I have to wait only <a href="https://twitter.com/zekjur/status/1494569749195468813">17 minutes</a> to download a PS5 game, that can make the difference between an evening waiting in frustration, or playing the title I’ve been waiting for.</li>
-<li>If I can run a daily backup (over the internet) of all servers I care about without worrying that the transfers interfere with my work video calls, that gives me peace of mind.</li>
-<li>If I can transfer a Debian Code Search index to my computer for debugging when needed, that might make the difference between being able to use the limited spare time I have to debug or improve Debian Code Search, or having to postpone that improvement until I find more time.</li>
-</ul>
-<p>Aside from my distaste for waiting, a fast and reliable fiber connection enables self-hosting. In particular for my <a href="https://distr1.org/">distri Linux</a> project where I explore fast package installation, it’s very appealing to connect it to the internet on as fast a line as possible. I want to optimize all the parts: software architecture and implementation, hardware, and network connectivity. But, for my hobby project budget, getting even a 10 Gbit/s line at a server hoster is too expensive, let alone a 25 Gbit/s line!</p>
-<p>Lastly, even if there isn’t really a <em>need</em> to have such a fast connection, I hope you can understand that after spending so many years of my life limited by slow connections, that I’ll happily <em>take the opportunity</em> of a faster connection whenever I can. Especially at no additional monthly cost!</p>
-<h2 id="gettingready">Getting ready</h2>
-<p>Right after the announcement dropped, I wanted to prepare my side of the connection and therefore ordered a MikroTik CCR2004, the only router that init7 lists as compatible. I <a href="/posts/2021-05-28-configured-and-returned-mikrotik-ccr2004-for-fiber7/">returned the MikroTik CCR2004 shortly afterwards</a>, mostly because of its annoying fan regulation (spins up to top speed for about 1 minute every hour or so), and also because MikroTik seems to have made no progress at all since I last used their products almost 10 years ago. Table-stakes features such as DNS resolution for hostnames within the local network are still not included!</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/mikrotik-ccr2004.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/mikrotik-ccr2004_hu855bbe0a9c47ac557e5b09db74fa3b06_1283584_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/mikrotik-ccr2004_hu855bbe0a9c47ac557e5b09db74fa3b06_1283584_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/mikrotik-ccr2004_hu855bbe0a9c47ac557e5b09db74fa3b06_1283584_600x0_resize_q75_box.jpg"
-  
-  width="600"
-  height="347"
-  style="
-
-border: 1px solid #000;
-
-"
-  
-  loading="lazy"></a>
-
-
-
-<p>I expect that more and more embedded devices with SFP28 slots (like the MikroTik CCR2004) will become available over the next few years (hopefully with better fan control!), but at the moment, the selection seems to be rather small.</p>
-<p>For my router, I instead went with a <a href="/posts/2021-07-10-linux-25gbit-internet-router-pc-build/">custom PC build</a>. Having more space available means I can run larger, slow-spinning fans that are not as loud. Plugging in high-end Intel network cards (2 × 25 Gbit/s, and 4 × 10 Gbit/s on the other one) turns a PC into a 25 Gbit/s capable router.</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2021-06-27-router25.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2021-06-27-router25_hu1fe795dd8828eccf339de1acf31abbd0_2106743_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2021-06-27-router25_hu1fe795dd8828eccf339de1acf31abbd0_2106743_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2021-06-27-router25_hu1fe795dd8828eccf339de1acf31abbd0_2106743_600x0_resize_q75_box.jpg"
-  
-  width="600"
-  height="607"
-  style="
-
-border: 1px solid #000;
-
-"
-  
-  loading="lazy"></a>
-
-
-
-<p>With my equipment sorted out, I figured it was time to actually place the order. I wasn’t in a hurry to order, because it was clear that it would be months before my POP could be upgraded. But, it can’t hurt to register my interest (just in case it influences the POP upgrade plan). Shortly after, I got back this email from init7 where they promised to send me the SFP module via post:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2021-08-16-confirmation.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2021-08-16-confirmation_hu7177e23638c82c254cf4ef8f0c721783_131592_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2021-08-16-confirmation_hu7177e23638c82c254cf4ef8f0c721783_131592_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2021-08-16-confirmation_hu7177e23638c82c254cf4ef8f0c721783_131592_600x0_resize_q75_box.jpg"
-  
-  width="600"
-  height="338"
-  style="
-
-border: 1px solid #000;
-
-"
-  
-  loading="lazy"></a>
-
-
-
-<p>And sure enough, a few days later, I received the SFP28 module in the mail:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2021-08-19-sfp-mail.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2021-08-19-sfp-mail_hu2dfb7addab9232f9b7fcfb62cf14b878_1675905_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2021-08-19-sfp-mail_hu2dfb7addab9232f9b7fcfb62cf14b878_1675905_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2021-08-19-sfp-mail_hu2dfb7addab9232f9b7fcfb62cf14b878_1675905_600x0_resize_q75_box.jpg"
-  
-  width="600"
-  height="450"
-  style="
-
-border: 1px solid #000;
-
-"
-  
-  loading="lazy"></a>
-
-
-
-<p>With my router build, and the SFP28 module, I had everything I needed for my side of the connection.</p>
-<p>The other side of the connection was originally planned to be upgraded in fall 2021, but <a href="https://twitter.com/init7/status/1403287499175235584">the global supply shortage imposed various delays on the schedule</a>.</p>
-<p>Eventually, the <a href="https://www.init7.net/en/infrastructure/fiber7-pops/">fiber7 POP list</a> showed an upgrade date of April 2022 for my POP, and that turned out to be correct.</p>
-<h2 id="upgrade">The night of the upgrade</h2>
-<p>I had read <a href="https://ipng.ch/s/articles/2021/08/28/fiber7-x.html">Pim’s blog post on the upgrade of the 1790BRE POP in Brüttisellen</a>, which contains a lot of super interesting details, so definitely check that one out, too!</p>
-<p>Being able to plug in the SFP module into the new POP infrastructure yourself (like Pim did) sounded super cool to me, so I decided to reach out, and init7 actually agreed to let me stop by to plug in “my” fiber and SFP module!</p>
-<p>Giddy with excitement, I left my place at just before 23:00 for a short walk to the POP building, which I had seen many times before, but never from the inside.</p>
-<p><a href="https://twitter.com/patte8">Patrick</a>, the init7 engineer met me in front of the building and explained “Hey! You wrote my <a href="https://i3wm.org/">window manager</a>!” — what a coincidence :-). Luckily I had packed some i3 stickers that I could hand him as a small thank you.</p>
-<p>Inside, I met the other init7 employee working on this upgrade. Pascal, init7’s CTO, was coordinating everything remotely.</p>
-<p>Standing in front of init7’s rack, I spotted the old Cisco switch (at the bottom), and the new Cisco C9500-48Y4C switches that were already prepared (at the top). The SFP modules are for customers who decided to upgrade to 10 or 25 Gbit/s, whereas for the others, the old SFP modules would be re-used:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2022-04-12-pop-before.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2022-04-12-pop-before_hu7af45c05e7eaab656aeab8d5fe153c59_584743_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2022-04-12-pop-before_hu7af45c05e7eaab656aeab8d5fe153c59_584743_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2022-04-12-pop-before_hu7af45c05e7eaab656aeab8d5fe153c59_584743_600x0_resize_q75_box.jpg"
-  
-  width="600"
-  height="800"
-  style="
-
-border: 1px solid #000;
-
-"
-  
-  loading="lazy"></a>
-
-
-
-<p>We then spent the next hour pulling out fiber cables and SFP modules out of the old Cisco switch, and plugging them back into the new Cisco switch.</p>
-<p>Just like the init7 engineer working with me (who is usually a software guy, too, he explained), I enjoy doing physical labor from time to time for variety. Especially with nice hardware like this, and when it’s for a good cause (faster internet)! It’s almost meditative, in a way, and I enjoyed the nice conversation we had while we were both moving the connections.</p>
-<p>After completing about half of the upgrade (the top half of the old Cisco switch), I walked back to my place — still blissfully smiling all the way — to turn up my end of the connection while the others were still on site and could fix any mistakes.</p>
-<p>After switching my <code>uplink0</code> network interface to the faster network card, it also took a full reboot of my router for some reason, but then it recognized the SFP28 module without trouble and successfully established a 25 Gbit/s link! 🎉 🥳</p>
-<p>I did a quick speed test to confirm and called it a night.</p>
-<h2 id="speedtest">Speed tests / benchmarks</h2>
-<p>Just like in the early days of Gigabit connections, my internet connection is
-now faster than the connection of many servers. It’s a luxury problem to be
-sure, but in case you’re curious how far a 25 Gbit/s connection gets you in the
-internet, in this section I collected some speed test results.</p>
-<h3 id="ookla-speedtestnet">Ookla speedtest.net</h3>
-<p>speedtest.net (run by Ookla) is the best way to measure fast connections that I’m aware of.</p>
-<p>Here is <a href="https://www.speedtest.net/result/c/ed97e48a-3655-4fc8-8e7f-4d18d48f10f5">my first 25 Gbit/s
-speedtest</a>,
-which was run using the <a href="https://speedtest.init7.net/">init7 speedtest server</a>:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2022-04-14-speedtest-ookla-featured.png"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2022-04-14-speedtest-ookla-featured_hu9a3b8a18687193b143064b34e61f7b8e_236916_1200x0_resize_box_3.png 2x,https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2022-04-14-speedtest-ookla-featured_hu9a3b8a18687193b143064b34e61f7b8e_236916_1800x0_resize_box_3.png 3x"
-  src="https://michael.stapelberg.ch/posts/2022-04-23-fiber7-25gbit-upgrade/2022-04-14-speedtest-ookla-featured_hu9a3b8a18687193b143064b34e61f7b8e_236916_600x0_resize_box_3.png"
-  
-  width="600"
-  height="237"
-  style="
-
-border: 1px solid #000;
-
-"
-  
-  loading="lazy"></a>
-
-
-
-<p>I also ran speedtests to all other servers that were listed for the broader
-Zürich area at the time, using the
-<a href="https://hub.docker.com/r/tamasboros/ookla-speedtest">tamasboros/ookla-speedtest</a>
-Docker image. As you can see, most speedtest servers are connected with a 10
-Gbit/s port, and some (GGA Maur) even only with a 1 Gbit/s port:</p>
-<table>
-<thead>
-<tr>
-<th>Speedtest server</th>
-<th>latency</th>
-<th>download (mbps)</th>
-<th>upload (mbps)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Init7 AG - Winterthur</td>
-<td>1.45</td>
-<td>23530.27</td>
-<td>23031.24</td>
-</tr>
-<tr>
-<td>fdcservers.net</td>
-<td>18.15</td>
-<td>9386.29</td>
-<td>1262.92</td>
-</tr>
-<tr>
-<td>GIB-Solutions AG - Schlieren</td>
-<td>6.64</td>
-<td>9154.12</td>
-<td>2207.68</td>
-</tr>
-<tr>
-<td>Monzoon Networks AG</td>
-<td>0.74</td>
-<td>8874.85</td>
-<td>6427.66</td>
-</tr>
-<tr>
-<td>Glattwerk AG</td>
-<td>0.92</td>
-<td>8719.04</td>
-<td>4008.28</td>
-</tr>
-<tr>
-<td>AltusHost B.V.</td>
-<td>0.80</td>
-<td>8373.34</td>
-<td>8518.90</td>
-</tr>
-<tr>
-<td>iWay AG - Zurich</td>
-<td>2.13</td>
-<td>8337.56</td>
-<td>8194.89</td>
-</tr>
-<tr>
-<td>Sunrise Communication AG</td>
-<td>9.04</td>
-<td>8279.60</td>
-<td>3109.34</td>
-</tr>
-<tr>
-<td>31173 Services AB</td>
-<td>18.69</td>
-<td>8279.75</td>
-<td>1503.92</td>
-</tr>
-<tr>
-<td>Wingo</td>
-<td>4.25</td>
-<td>6179.57</td>
-<td>5248.36</td>
-</tr>
-<tr>
-<td>Netrics Zürich AG</td>
-<td>0.74</td>
-<td>7910.78</td>
-<td>8770.19</td>
-</tr>
-<tr>
-<td>Cloudflare - Zurich</td>
-<td>1.14</td>
-<td>7410.97</td>
-<td>2218.88</td>
-</tr>
-<tr>
-<td>Netprotect - Zurich</td>
-<td>0.87</td>
-<td>7034.62</td>
-<td>8948.01</td>
-</tr>
-<tr>
-<td>C41.ch - Zurich</td>
-<td>9.90</td>
-<td>6792.60</td>
-<td>690.33</td>
-</tr>
-<tr>
-<td>Goldenphone GmbH</td>
-<td>18.91</td>
-<td>3116.32</td>
-<td>659.23</td>
-</tr>
-<tr>
-<td>GGA Maur</td>
-<td>0.99</td>
-<td>940.24</td>
-<td>941.24</td>
-</tr>
-</tbody>
-</table>
-<h3 id="linux-mirrors">Linux mirrors</h3>
-<p>For a few popular Linux distributions, I went through the mirror list and tried
-all servers in Switzerland and Germany. Only one or two would be able to deliver
-files at more than 1 Gigabit/s. Other miror servers were either capped at 1
-Gigabit/s, or wouldn’t even reach that (slow disks?).</p>
-<p>Here are the fast ones:</p>
-<ul>
-<li><strong>Debian:</strong> <code>mirror1.infomaniak.com</code> and <code>mirror2.infomaniak.com</code></li>
-<li><strong>Arch Linux:</strong> <code>mirror.puzzle.ch</code></li>
-<li><strong>Fedora Linux:</strong> <code>mirrors.xtom.de</code></li>
-<li><strong>Ubuntu Linux:</strong> <code>mirror.netcologne.de</code> and <code>ubuntu.ch.altushost.com</code></li>
-</ul>
-<h3 id="iperf3">iperf3</h3>
-<p>Using <code>iperf3 -P 2 -c speedtest.init7.net</code>, iperf3 shows 23 Gbit/s:</p>
-<pre tabindex="0"><code>[SUM]   0.00-10.00  sec  26.9 GBytes  23.1 Gbits/sec  597             sender
-[SUM]   0.00-10.00  sec  26.9 GBytes  23.1 Gbits/sec                  receiver
-</code></pre><p>It’s hard to find public iperf3 servers that are connected with a fast-enough
-port. I could only find one that claims to be connected via a 40 Gbit/s port,
-but it was unavailable when I wanted to test.</p>
-<h3 id="interested-in-a-speed-test">Interested in a speed test?</h3>
-<p>Do you have a ≥ 10 Gbit/s line in Europe, too? Are you interested in a speed
-test? Reach out to me and we can set something up.</p>
-<h2 id="conclusion">Conclusion</h2>
-<p>What an exciting time to be an init7 customer! I still can’t quite believe that
-I now have a 25 Gbit/s connection in 2022, and it feels like I’m living 10 years
-in the future.</p>
-<p>Thank you to <a href="https://twitter.com/kuenzler">Fredy</a>,
-<a href="https://twitter.com/spale75">Pascal</a>, <a href="https://twitter.com/patte8">Patrick</a>,
-and all the other former and current init7 employees for showing how to run an
-amazing Internet Service Provider. Thank you for letting me peek behind the
-curtains, and keep up the good work! 💪</p>
-<p>If you want to learn more, check out Pascal’s talk at DENOG:</p>
-
-<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-  <iframe src="https://www.youtube-nocookie.com/embed/fmzst6I5LwQ" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="Wie wir unabsichtlich das schnellste residential Internet access gebaut haben - Pascal Gloor"></iframe>
-</div>
-
 ]]></content>
   </entry>
 </feed>

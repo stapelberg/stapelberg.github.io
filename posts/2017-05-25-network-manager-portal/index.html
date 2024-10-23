@@ -179,7 +179,7 @@
 <h1 class="ms_title">Auto-opening portal pages with NetworkManager (2017)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2017-05-25, last modified 2018-03-18</div>
+  <div id="ms_date">published 2017-05-25, last modified 2024-10-23</div>
   
   
   <div>
@@ -198,10 +198,7 @@ If your distribution does not automatically enable it (Fedora does, Debian
 doesn’t), you’ll first need to enable connectivity checking in NetworkManager:
 </p>
 <pre>
-# cat &gt;&gt; /etc/NetworkManager/NetworkManager.conf &lt;&lt;'EOT'
-[connectivity]
-uri=http://network-test.debian.org/nm
-EOT
+# sudo apt install network-manager-config-connectivity-debian
 </pre>
 <p>
 Then, add a dispatcher hook which will open a browser when NetworkManager

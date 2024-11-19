@@ -6,6 +6,451 @@
   <id>https://michael.stapelberg.ch/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[Testing with Go and PostgreSQL: ephemeral DBs]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2024-11-19-testing-with-go-and-postgresql-ephemeral-dbs/"/>
+    <id>https://michael.stapelberg.ch/posts/2024-11-19-testing-with-go-and-postgresql-ephemeral-dbs/</id>
+    <published>2024-11-19T17:04:00+01:00</published>
+    <content type="html"><![CDATA[<p><a href="https://en.wikipedia.org/wiki/PostgreSQL" target="_blank"><img
+src="postgresql-elephant-featured.png" align="right" width="125"
+style="margin-left: 1.5em" alt="PostgreSQL elephant logo"></a></p>
+<p>Let’s say you created a Go program that stores data in PostgreSQL — you
+installed PostgreSQL, wrote the Go code, and everything works; great!</p>
+<p>But after writing a test for your code, you wonder: how do you best provide
+PostgreSQL to your automated tests? Do you start a separate PostgreSQL in a
+Docker container, for example, or do you maybe reuse your development PostgreSQL
+instance?</p>
+<p>I have come to like using <strong>ephemeral PostgreSQL instances</strong> for their many benefits:</p>
+<ul>
+<li>Easier development setup: no need to <em>configure</em> a database, installation is enough.
+<br>
+I recommend installing PostgreSQL from your package manager, e.g. <code>apt install postgresql</code> (Debian) or <code>brew install postgresql</code> (macOS). No need for Docker :)</li>
+<li>No risk of “works on my machine” (but nowhere else) problems: every test run
+starts with an empty database instance, so your test <em>must</em> set up the database
+correctly.</li>
+<li>The same approach works locally and on CI systems like GitHub Actions.</li>
+</ul>
+<p>In this article, I want to show how to integrate ephemeral PostgreSQL instances
+into your test setup. The examples are all specific to Go, but I expect that
+users of other programming languages and environments can benefit from some of
+these techniques as well.</p>
+<h2 id="single-package-tests">Single-package tests</h2>
+<p>When you are in the very early stages of your project, you might start out with
+just a single test file (say, <code>app_test.go</code>), containing one or more test
+functions (say, <code>TestSignupForm</code>).</p>
+<p>In this scenario, all tests will run in the same process. While it’s easy enough
+to write a few lines of code to start and stop PostgreSQL, I recommend reaching
+for an existing test helper package.</p>
+<p>Throughout this article, I will be using the
+<a href="https://pkg.go.dev/github.com/stapelberg/postgrestest"><code>github.com/stapelberg/postgrestest</code></a>
+package, which is based on <a href="https://pkg.go.dev/zombiezen.com/go/postgrestest">Roxy Light’s <code>postgrestest</code>
+package</a> but was extended to
+work well in the scenarios this article explains.</p>
+<p>To start an ephemeral PostgreSQL instance before your test functions run, you
+would <a href="https://pkg.go.dev/testing#hdr-Main">declare a custom <code>TestMain</code>
+function</a>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">var</span> pgt <span style="color:#666">*</span>postgrestest.Server
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">TestMain</span>(m <span style="color:#666">*</span>testing.M) {
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">var</span> err <span style="color:#902000">error</span>
+</span></span><span style="display:flex;"><span>	pgt, err = postgrestest.<span style="color:#06287e">Start</span>(context.<span style="color:#06287e">Background</span>())
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020">panic</span>(err)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">defer</span> pgt.<span style="color:#06287e">Cleanup</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	m.<span style="color:#06287e">Run</span>()
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Starting a PostgreSQL instance takes about:</p>
+<ul>
+<li>300ms on my <a href="/posts/2022-01-15-high-end-linux-pc/">Intel Core i9 12900K CPU</a> (from 2022)</li>
+<li>800ms on my <a href="/posts/2021-11-28-macbook-air-m1/">MacBook Air M1</a> (from 2020)</li>
+</ul>
+<p>Then, you can create a separate database for each test on this ephemeral
+Postgres instance:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">TestSignupForm</span>(t <span style="color:#666">*</span>testing.T) {
+</span></span><span style="display:flex;"><span>	pgurl, err <span style="color:#666">:=</span> pgt.<span style="color:#06287e">CreateDatabase</span>(context.<span style="color:#06287e">Background</span>())
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		t.<span style="color:#06287e">Fatal</span>(err)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// test goes here…
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>}
+</span></span></code></pre></div><p>Each CreateDatabase call takes about:</p>
+<ul>
+<li>5-10ms on my <a href="/posts/2022-01-15-high-end-linux-pc/">Intel Core i9 12900K CPU</a> (from 2022)</li>
+<li>20ms on my <a href="/posts/2021-11-28-macbook-air-m1/">MacBook Air M1</a> (from 2020)</li>
+</ul>
+<p>Usually, most projects quickly grow beyond just a single <code>_test.go</code> file.</p>
+<p>In one project if mine, I eventually reached over 50 test functions in 25 Go
+packages. I stuck to the above approach of adding a custom <code>TestMain</code> to each
+package in which my tests needed PostgreSQL, and my test runtimes eventually
+looked like this:</p>
+<pre tabindex="0"><code># Intel Core i9 12900K
+CGO_ENABLED=0 GOGC=off go test -count=1 -fullpath ./...
+14,24s user 4,11s system 709% cpu 2,586 total
+
+# MacBook Air M1
+CGO_ENABLED=0 GOGC=off go test -count=1 -fullpath ./...
+20,23s user 8,67s system 350% cpu 8,257 total
+</code></pre><p>That’s not <em>terrible</em>, but not great either.</p>
+<p>If you happen to open a process monitor while running tests, you might have
+noticed that there are quite a number of PostgreSQL instances running. This
+seems like something to optimize! Shouldn’t one PostgreSQL instance be enough
+for all tests of a test run?</p>
+<p>Let’s review the process model of <code>go test</code> before we can talk about how to
+integrate with it.</p>
+<h2 id="go-test-process-model">go test process model</h2>
+<p>The usual command to run all tests of a Go project is <code>go test ./...</code> (see <a href="https://pkg.go.dev/cmd/go/internal/help#HelpPackages"><code>go help packages</code></a> for
+details on the <code>/...</code> pattern syntax), which matches the Go package in the
+current directory and all Go packages in its subdirectories.</p>
+<p>Each Go package (≈ directory), including <code>_test.go</code> files, is compiled into a
+<em>separate test binary:</em></p>
+<pre tabindex="0"><code>% go help test
+[…]
+&#39;Go test&#39; recompiles each package along with any files with names matching
+the file pattern &#34;*_test.go&#34;.
+[…]
+Each listed package causes the execution of a separate test binary.
+[…]
+</code></pre><p>These test binaries are then run in parallel. In fact, there are two levels of
+parallelism at play here:</p>
+<ol>
+<li>All test functions (within a single test binary) that call <code>t.Parallel()</code> will be
+run in parallel (in batches of size <code>-parallel</code>).</li>
+<li><code>go test</code> will run different test binaries in parallel.</li>
+</ol>
+<p>The documentation explains that the <code>-parallel</code> test flag defaults to
+<code>GOMAXPROCS</code> and references the <code>go test</code> parallelism:</p>
+<pre tabindex="0"><code>% go help testflag
+[…]
+-parallel n
+    Allow parallel execution of test functions that call t.Parallel, and
+    fuzz targets that call t.Parallel when running the seed corpus.
+    The value of this flag is the maximum number of tests to run
+    simultaneously.
+[…]
+    By default, -parallel is set to the value of GOMAXPROCS.
+    Setting -parallel to values higher than GOMAXPROCS may cause degraded
+    performance due to CPU contention, especially when fuzzing.
+    Note that -parallel only applies within a single test binary.
+    The &#39;go test&#39; command may run tests for different packages
+    in parallel as well, according to the setting of the -p flag
+    (see &#39;go help build&#39;).
+</code></pre><p>The <code>go test</code> parallelism is controlled by the <code>-p</code> flag, which also defaults to
+<code>GOMAXPROCS</code>:</p>
+<pre tabindex="0"><code>% go help build
+[…]
+-p n
+	the number of programs, such as build commands or
+	test binaries, that can be run in parallel.
+	The default is GOMAXPROCS, normally the number of CPUs available.
+[…]
+</code></pre><p>To print <code>GOMAXPROCS</code> on a given machine, we can run a test program like this
+<code>gomaxprocs.go</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span> main
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;runtime&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#007020">print</span>(runtime.<span style="color:#06287e">GOMAXPROCS</span>(<span style="color:#40a070">0</span>))
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>For me, <code>GOMAXPROCS</code> defaults to the <a href="https://ark.intel.com/content/www/us/en/ark/products/134597/intel-core-i9-12900-processor-30m-cache-up-to-5-10-ghz.html">24 <em>threads</em> of my Intel Core i9 12900K
+CPU</a>,
+which has 16 <em>cores</em> (8 Performance, 8 Efficiency; only the Performance cores
+have Hyper Threading):</p>
+<pre tabindex="0"><code>% go run gomaxprocs.go
+24
+% grep &#39;model name&#39; /proc/cpuinfo | wc -l
+24
+</code></pre><p>So with a single <code>go test ./...</code> command, we can expect 24 parallel processes
+each running 24 tests in parallel. With our current approach, we would start up
+to 24 concurrent ephemeral PostgreSQL instances (if we have that many packages),
+which seems wasteful to me.</p>
+<p>Starting one ephemeral PostgreSQL instance per <code>go test</code> run seems better.</p>
+<h2 id="sharing-one-postgresql-among-all-tests">Sharing one PostgreSQL among all tests</h2>
+<p>How can we go from starting 24 Postgres instances to starting just one?</p>
+<p>First, we need to update our test setup code to work with a passed-in database
+URL. For that, we switch from calling
+<a href="https://pkg.go.dev/github.com/stapelberg/postgrestest#Server.CreateDatabase"><code>CreateDatabase</code></a>
+to using a
+<a href="https://pkg.go.dev/github.com/stapelberg/postgrestest#DBCreator"><code>DBCreator</code></a>
+for a database identified by a URL. The old code still needs to remain so that
+you can run a single test without bothering with <code>PGURL</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">var</span> dbc <span style="color:#666">*</span>postgrestest.DBCreator
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">TestMain</span>(m <span style="color:#666">*</span>testing.M) {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	<span style="color:#60a0b0;font-style:italic">// It is best to specify the PGURL environment variable so that only
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// one PostgreSQL instance is used for all tests.
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#60a0b0;font-style:italic"></span>	pgurl <span style="color:#666">:=</span> os.<span style="color:#06287e">Getenv</span>(<span style="color:#4070a0">&#34;PGURL&#34;</span>)
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	<span style="color:#007020;font-weight:bold">if</span> pgurl <span style="color:#666">==</span> <span style="color:#4070a0">&#34;&#34;</span> {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>		<span style="color:#60a0b0;font-style:italic">// &#39;go test&#39; was started directly, start one Postgres per process:
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		pgt, err <span style="color:#666">:=</span> postgrestest.<span style="color:#06287e">Start</span>(context.<span style="color:#06287e">Background</span>())
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#007020">panic</span>(err)
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">defer</span> pgt.<span style="color:#06287e">Cleanup</span>()
+</span></span><span style="display:flex;"><span>		pgurl = pgt.<span style="color:#06287e">DefaultDatabase</span>()
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	<span style="color:#007020;font-weight:bold">var</span> err <span style="color:#902000">error</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	dbc, err = postgrestest.<span style="color:#06287e">NewDBCreator</span>(pgurl)
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>		<span style="color:#007020">panic</span>(err)
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	m.<span style="color:#06287e">Run</span>()
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+<p>Inside the test function(s), we only need to update the <code>CreateDatabase</code>
+receiver name:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">TestSignupForm</span>(t <span style="color:#666">*</span>testing.T) {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	pgurl, err <span style="color:#666">:=</span> dbc.<span style="color:#06287e">CreateDatabase</span>(context.<span style="color:#06287e">Background</span>())
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		t.<span style="color:#06287e">Fatal</span>(err)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// test goes here…
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>}</span></span></code></pre></div>
+<p>Then, we create a new wrapper program (e.g. <code>internal/cmd/initpg/initpg.go</code>)
+which calls <code>postgrestest.Start</code> and passes the <code>PGURL</code> environment variable to
+the process(es) it starts:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// initpg is a small test helper command which starts a Postgres
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// instance and makes it available to the wrapped &#39;go test&#39; command.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">package</span> main
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;context&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;log&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;os&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;os/exec&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;github.com/stapelberg/postgrestest&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Use the same database driver as in the rest of your project.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	_ <span style="color:#4070a0">&#34;github.com/lib/pq&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">runWrappedCommand</span>(pgurl <span style="color:#902000">string</span>) <span style="color:#902000">error</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// os.Args[0] is initpg
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// os.Args[1] is --
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// os.Args[2] is go
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// os.Args[3] is test
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// etc.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	wrapped <span style="color:#666">:=</span> exec.<span style="color:#06287e">Command</span>(os.Args[<span style="color:#40a070">2</span>], os.Args[<span style="color:#40a070">3</span>:]<span style="color:#666">...</span>)
+</span></span><span style="display:flex;"><span>	wrapped.Stdin = os.Stdin
+</span></span><span style="display:flex;"><span>	wrapped.Stdout = os.Stdout
+</span></span><span style="display:flex;"><span>	wrapped.Stderr = os.Stderr
+</span></span><span style="display:flex;"><span>	wrapped.Env = <span style="color:#007020">append</span>(os.<span style="color:#06287e">Environ</span>(), <span style="color:#4070a0">&#34;PGURL=&#34;</span><span style="color:#666">+</span>pgurl)
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> wrapped.<span style="color:#06287e">Run</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;%v: %v&#34;</span>, wrapped.Args, err)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">initpg</span>() <span style="color:#902000">error</span> {
+</span></span><span style="display:flex;"><span>	pgt, err <span style="color:#666">:=</span> postgrestest.<span style="color:#06287e">Start</span>(context.<span style="color:#06287e">Background</span>())
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// NOTE: keep reading the article, do not submit as-is
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">defer</span> pgt.<span style="color:#06287e">Cleanup</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Run the wrapped command (&#39;go test&#39;, typically)
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#06287e">runWrappedCommand</span>(pgt.<span style="color:#06287e">DefaultDatabase</span>())
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">initpg</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Fatal</span>(err)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="running-the-initpg-wrapper-program">Running the initpg wrapper program</h3>
+<p>While we could use <code>go run ./internal/cmd/initpg</code> to compile and run this
+wrapper program, it is a bit wasteful to recompile this program over and over
+when it rarely changes.</p>
+<p>One alternative is to use <code>go install</code> instead of <code>go run</code>. I have two minor
+concerns with that:</p>
+<ol>
+<li>
+<p><code>go install</code> installs into the bin directory, which is <code>~/go/bin</code> by default.</p>
+<ul>
+<li>This means we need to rely on the <code>PATH</code> environment variable containing
+the bin directory to run the installed program. Unfortunately, influencing
+or determining the <code>go install</code> destination path is tricky.</li>
+<li>It would be nice to not litter the user’s bin directory. I think the bin
+directory should contain programs which the user explicitly requested to
+install, not helper programs that are only necessary to run tests.</li>
+</ul>
+</li>
+<li>
+<p>On my machine, <code>go install</code> takes about 100ms, even when nothing has changed.</p>
+</li>
+</ol>
+<p>I like to define a <code>Makefile</code> in each of my projects with a set of targets that
+are consistently named, e.g. <code>make test</code>, <code>make push</code>, etc. Given that I already
+use <code>make</code>, I like to set up my <code>Makefile</code> to build initpg in the <code>_bin</code>
+directory:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Makefile" data-lang="Makefile"><span style="display:flex;"><span><span style="color:#06287e">.PHONY</span><span style="color:#666">:</span> test
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#06287e">_bin/initpg</span><span style="color:#666">:</span> internal/cmd/initpg/initpg.go
+</span></span><span style="display:flex;"><span>	mkdir -p _bin
+</span></span><span style="display:flex;"><span>	go build -o _bin/initpg ./internal/cmd/initpg
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#06287e">test</span><span style="color:#666">:</span> _bin/initpg
+</span></span><span style="display:flex;"><span>	./_bin/initpg -- go <span style="color:#007020">test</span> ./...
+</span></span></code></pre></div><p>Because <code>initpg.go</code> rarely changes, the program will typically not need to be
+recompiled.</p>
+<p>Note that this <code>Makefile</code> is only approximately correct: <code>initpg</code>’s dependency
+on <code>postgrestest</code> is not modeled, so you need to delete <code>_bin/initpg</code> to pick up
+changes to <code>postgrestest</code>.</p>
+<h2 id="performance">Performance</h2>
+<p>Let’s compare the before and after test runtimes on the Intel Core i9 12900K:</p>
+<pre tabindex="0"><code># Intel Core i9 12900K: one Postgres for each test
+CGO_ENABLED=0 GOGC=off go test -count=1 -fullpath ./...
+14,24s user 4,11s system 709% cpu 2,586 total
+
+# Intel Core i9 12900K: one Postgres shared among all tests
+CGO_ENABLED=0 GOGC=off ./_bin/initpg -- go test -count=1 -fullpath ./...
+11,40s user 3,10s system 659% cpu 2,199 total
+</code></pre><p>For comparison, the effect is more pronounced on the MacBook Air M1:</p>
+<pre tabindex="0"><code># MacBook Air M1: one Postgres for each test
+CGO_ENABLED=0 GOGC=off go test -count=1 -fullpath ./...
+20,23s user 8,67s system 350% cpu 8,257 total
+
+# MacBook Air M1: one Postgres shared among all tests
+CGO_ENABLED=0 GOGC=off ./_bin/initpg -- go test -count=1 -fullpath ./...
+14,25s user 4,36s system 275% cpu 6,752 total
+</code></pre><p>Sharing one PostgreSQL instance has reduced the total test runtime for a full
+run by about 20%!</p>
+<h3 id="why-is-it-sometimes-slower">Why is it sometimes slower?</h3>
+<p>We have measurably reduced the runtime of a full test run, but if you pay close
+attention during development you will notice that now <strong>every test run is a full
+test run</strong>, even when you only change a single package!</p>
+<p>Why can Go no longer cache any of the test results? The problem is that the
+<code>PGURL</code> environment variable has a different value on each run: the name of the
+temporary directory that the <code>postgrestest</code> package uses for its ephemeral
+database instance changes on each run.</p>
+<p>The documentation on the <code>go test</code> caching behavior explains this in the last
+paragraph:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% go help test
+</span></span><span style="display:flex;"><span>[…]
+</span></span><span style="display:flex;"><span>In package list mode only, go test caches successful package test
+</span></span><span style="display:flex;"><span>results to avoid unnecessary repeated running of tests. When the
+</span></span><span style="display:flex;"><span>result of a test can be recovered from the cache, go test will
+</span></span><span style="display:flex;"><span>redisplay the previous output instead of running the test binary
+</span></span><span style="display:flex;"><span>again. When this happens, go test prints &#39;(cached)&#39; in place of the
+</span></span><span style="display:flex;"><span>elapsed time in the summary line.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>The rule for a match in the cache is that the run involves the same
+</span></span><span style="display:flex;"><span>test binary and the flags on the command line come entirely from a
+</span></span><span style="display:flex;"><span>restricted set of &#39;cacheable&#39; test flags, defined as -benchtime, -cpu,
+</span></span><span style="display:flex;"><span>-list, -parallel, -run, -short, -timeout, -failfast, -fullpath and -v.
+</span></span><span style="display:flex;"><span>If a run of go test has any test or non-test flags outside this set,
+</span></span><span style="display:flex;"><span>the result is not cached. To disable test caching, use any test flag
+</span></span><span style="display:flex;"><span>or argument other than the cacheable flags. The idiomatic way to disable
+</span></span><span style="display:flex;"><span>test caching explicitly is to use -count=1.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Tests that open files within the package&#39;s source root (usually $GOPATH)
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>or that consult environment variables only match future runs in which
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>the files and environment variables are unchanged.
+</span></span><span style="display:flex;"><span>[…]</span></span></code></pre></div>
+<p>(See also <a href="https://github.com/golang/go/issues/22593">Go issue #22593</a> for more details.)</p>
+<h3 id="fixing-go-test-caching-env-vars">Fixing Go test caching (env vars)</h3>
+<p>For the Go test caching to work, all environment variables our tests access
+(including <code>PGURL</code>) need to contain the same value between runs. For us, this
+means we cannot use a randomly generated name for the Postgres data directory,
+but instead need to use a fixed name.</p>
+<p>My <code>postgrestest</code> package offers convenient support for specifying the desired
+directory:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">initpg</span>() <span style="color:#902000">error</span> {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	cacheDir, err <span style="color:#666">:=</span> os.<span style="color:#06287e">UserCacheDir</span>()
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>		<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	}
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	pgt, err <span style="color:#666">:=</span> postgrestest.<span style="color:#06287e">Start</span>(context.<span style="color:#06287e">Background</span>(),
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>		postgrestest.<span style="color:#06287e">WithDir</span>(filepath.<span style="color:#06287e">Join</span>(cacheDir, <span style="color:#4070a0">&#34;initpg.gus&#34;</span>)))
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">defer</span> pgt.<span style="color:#06287e">Cleanup</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Run the wrapped command (&#39;go test&#39;, typically)
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#06287e">runWrappedCommand</span>(pgt.<span style="color:#06287e">DefaultDatabase</span>())
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+<p>When running the tests now, starting with the second run (without any changes),
+you should see a “ (cached)” suffix printed behind tests that were successfully
+cached, and the test runtime should be much shorter — under a second in my
+project:</p>
+<pre tabindex="0"><code>% time ./_bin/initpg -- go test -fullpath ./...
+ok  	example/internal/handlers/adminhandler	(cached)
+[…]
+./_bin/initpg -- go test -fullpath ./...
+1,30s user 0,88s system 288% cpu 0,756 total
+</code></pre><h2 id="conclusion">Conclusion</h2>
+<p>In this article, I have shown how to integrate PostgreSQL into your test
+environment in a way that is convenient for developers, light on system
+resources and measurably reduces total test time.</p>
+<p>Adopting <code>postgrestest</code> seems easy enough to me. If you want to see a complete
+example, see <a href="https://github.com/gokrazy/gus/commit/b97c652fd03754ba817bd3c13f18ea6e2e154ef4">how I converted the <code>gokrazy/gus</code> repository to use
+<code>postgrestest</code></a>.</p>
+<h2 id="further-optimization-potential">Further optimization potential</h2>
+<p>Now that we have a detailed understanding of the <code>go test</code> process model and
+PostgreSQL startup, we can consider further optimizations. I won’t actually
+implement them in this article, which is already long enough, but maybe you want
+to go further in your project…</p>
+<h3 id="hide-postgres-startup">Hide Postgres startup</h3>
+<p>My journey into ephemeral PostgreSQL instances started with <a href="https://eradman.com/ephemeralpg/">Eric Radman’s
+<code>pg_tmp</code> shell script</a>. Ultimately, I ended up
+with the <code>postgrestest</code> Go solution that I much prefer: I don’t need to ship (or
+require) the <code>pg_tmp</code> shell script with my projects. The fewer languages, the
+better.</p>
+<p>Also, <code>pg_tmp</code> is not a wrapper program, which resulted in problems regarding
+cleanup: A wrapper program can reliably trigger cleanup when tests are done,
+whereas <code>pg_tmp</code> has to poll for activity. Polling is prone to running too
+quickly (cleaning up a database before tests were even started) or too slowly,
+requiring constant tuning.</p>
+<p>But, <code>pg_tmp</code> does have quite a clever concept of preparing PostgreSQL instances
+in the background and thereby amortizing startup costs between test runs.</p>
+<p>There might be an even simpler approach that could amount to the same startup
+latency hiding behavior: Turning the sequential startup (<code>initpg</code> needs to wait
+for PostgreSQL to start and only then can begin running <code>go test</code>) into parallel
+startup using Socket Activation.</p>
+<p>Note that PostgreSQL does not seem to support Socket Activation natively, so
+probably one would need to implement a program-agnostic solution into <code>initpg</code>
+as described in this <a href="https://unix.stackexchange.com/questions/352495/systemd-on-demand-start-of-services-like-postgresql-and-mysql-that-do-not-yet-s">Unix Stack Exchange
+question</a>
+or <a href="https://andreas.rammhold.de/posts/postgresql-tmpfs-with-sytemdsocket-activation-for-local-ephemeral-data-during-development/">Andreas Rammhold’s blog
+post</a>.</p>
+<h3 id="de-duplicate-schema-creation-cost">De-duplicate schema creation cost</h3>
+<p>For isolation, we use a different PostgreSQL database for every test. This means
+we need to initialize the database schema for each of these per-test databases.</p>
+<p>We can eliminate this duplicative work by <strong>sharing the same database</strong> across
+all tests, provided we have another way of isolating the tests from each other.</p>
+<p>The <a href="https://github.com/DATA-DOG/go-txdb"><code>txdb</code> package</a> provides a standard
+<code>database/sql.Driver</code> which runs all queries of an entire test in a single
+transaction. Using <code>txdb</code> means we can now safely share the same database
+between tests without running into conflicts, failing tests, or needing extra
+locking.</p>
+<p>Be sure to initialize the database schema <em>before</em> using <code>txdb</code> to share the
+database: long-running transactions needs to lock the PostgreSQL catalog as soon
+as you change the database schema (i.e. create or modify tables), meaning only
+one test can run at a time. (Using <a href="https://sourcegraph.com/blog/go/an-introduction-to-go-tool-trace-rhys-hiltner"><code>go tool trace</code></a>
+is a great way to understand such performance issues.)</p>
+<p>I am aware that some people don’t like the transaction isolation approach. For
+example, <a href="https://gajus.com/blog/setting-up-postgre-sql-for-running-integration-tests">Gajus Kuizinas’s blog post “Setting up PostgreSQL for running
+integration
+tests”</a>
+finds that transactions don’t work in their (JavaScript) setup. I don’t share
+this experience at all: In Go, the <a href="https://github.com/DATA-DOG/go-txdb"><code>txdb</code>
+package</a> works well, even with nested
+transactions. I have used <code>txdb</code> for months without problems.</p>
+<p>In my tests, eliminating this duplicative schema initialization work saves
+about:</p>
+<ul>
+<li>0.5s on my Intel Core i9 12900K</li>
+<li>1s on the MacBook Air M1</li>
+</ul>
+]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[Debug Go core dumps with delve: export byte slices]]></title>
     <link href="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/"/>
     <id>https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/</id>
@@ -4243,569 +4688,6 @@ work?</a>. With rsync up and running, it’s
 time to take a peek under the hood of rsync to better understand how it works.</li>
 <li>rsync, article 4: My own rsync implementation (To be published.)</li>
 </ul>
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[25 Gbit/s HTTP and HTTPS download speeds]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/"/>
-    <id>https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/</id>
-    <published>2022-05-14T16:18:00+02:00</published>
-    <content type="html"><![CDATA[<p>Now that I <a href="/posts/2022-04-23-fiber7-25gbit-upgrade/">recently upgraded my internet connection to 25
-Gbit/s</a>, I was curious how hard or
-easy it is to download files via HTTP and HTTPS over a 25 Gbit/s link. I don’t
-have another 25 Gbit/s connected machine other than my router, so I decided to
-build a little lab for tests like these 🧑‍🔬</p>
-<h2 id="hardware-and-software-setup">Hardware and Software setup</h2>
-<p>I found a Mellanox ConnectX-4 Lx for the comparatively low price of 204 CHF on
-digitec:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0209.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0209_hu855bbe0a9c47ac557e5b09db74fa3b06_1118443_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0209_hu855bbe0a9c47ac557e5b09db74fa3b06_1118443_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0209_hu855bbe0a9c47ac557e5b09db74fa3b06_1118443_600x0_resize_q75_box.jpg"
-  
-  width="600"
-  height="480"
-  style="
-
-border: 1px solid #000;
-
-"
-  
-  loading="lazy"></a>
-
-
-
-<p>To connect it to my router, I ordered a MikroTik XS+DA0003 SFP28/SFP+ Direct
-Attach Cable (DAC) with it. I installed the network card into my old workstation
-(on the right) and connected it with the 25 Gbit/s DAC to router7 (on the left):</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0204.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0204_hue1ce97509a6d1573a4d6789b4fcce12c_1559726_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0204_hue1ce97509a6d1573a4d6789b4fcce12c_1559726_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0204_hue1ce97509a6d1573a4d6789b4fcce12c_1559726_600x0_resize_q75_box.jpg"
-  
-  width="600"
-  height="450"
-  style="
-
-border: 1px solid #000;
-
-"
-  
-  loading="lazy"></a>
-
-
-
-<h3 id="25-gbits-router-left">25 Gbit/s router (left)</h3>
-<table>
-<thead>
-<tr>
-<th>Component</th>
-<th>Model</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Mainboard</td>
-<td>ASRock B550 Taichi</td>
-</tr>
-<tr>
-<td>CPU</td>
-<td>AMD Ryzen 5 5600X 6-Core Processor</td>
-</tr>
-<tr>
-<td>Network card</td>
-<td><a href="https://www.fs.com/de/products/75603.html">Intel XXV710</a></td>
-</tr>
-<tr>
-<td>Linux</td>
-<td>Linux 5.17.4 (<a href="https://router7.org">router7</a>)<br>curl 7.83.0 from debian bookworm<br>Go <code>net/http</code> from Go 1.18</td>
-</tr>
-</tbody>
-</table>
-<p>router7 comes with <a href="https://en.wikipedia.org/wiki/TCP_congestion_control#TCP_BBR">TCP
-BBR</a> enabled by
-default.</p>
-<h3 id="old-workstation-right">Old workstation (right)</h3>
-<table>
-<thead>
-<tr>
-<th>Component</th>
-<th>Model</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Mainboard</td>
-<td>ASUS PRIME Z370-A</td>
-</tr>
-<tr>
-<td>CPU</td>
-<td>Intel i9-9900K CPU @ 3.60GHz</td>
-</tr>
-<tr>
-<td>Network card</td>
-<td>Mellanox ConnectX-4</td>
-</tr>
-<tr>
-<td>Linux</td>
-<td>5.17.5 (Arch Linux)<br>nginx 1.21.6<br>caddy 2.4.3</td>
-</tr>
-</tbody>
-</table>
-<h2 id="test-preparation">Test preparation</h2>
-<p>Before taking any measurements, I do one full download so that the file contents
-are entirely in the Linux page cache, and the measurements therefore no longer
-contain the speed of the disk.</p>
-<p><code>big.img</code> in the tests below refers to the 35 GB test file I’m downloading,
-which consists of distri-disk.img repeated 5 times.</p>
-<h2 id="http">T1: HTTP download speed (unencrypted)</h2>
-<h3 id="http1">T1.1: Single TCP connection</h3>
-<p>The simplest test is using just a single TCP connection, for example:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -v -o /dev/null http://oldmidna:8080/distri/tmp/big.img
-</span></span><span style="display:flex;"><span>./httpget25 http://oldmidna:8080/distri/tmp/big.img
-</span></span></code></pre></div><table>
-<thead>
-<tr>
-<th>Client</th>
-<th>Server</th>
-<th>Gbit/s</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>curl</strong></td>
-<td><strong>nginx</strong></td>
-<td><strong>
-<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
-
-</strong></td>
-</tr>
-<tr>
-<td>curl</td>
-<td>caddy</td>
-<td>
-<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
-
-</td>
-</tr>
-<tr>
-<td>Go</td>
-<td>nginx</td>
-<td>
-<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (20em / 10)); background-color: blue; color: white">20</div></div>
-
-</td>
-</tr>
-<tr>
-<td>Go</td>
-<td>caddy</td>
-<td>
-<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (20.2em / 10)); background-color: blue; color: white">20.2</div></div>
-
-</td>
-</tr>
-</tbody>
-</table>
-<p>curl can saturate a 25 Gbit/s link without any trouble.</p>
-<p>The Go <code>net/http</code> package is slower and comes in at 20 Gbit/s.</p>
-<h3 id="http4">T1.2: Multiple TCP connections</h3>
-<p>Running 4 of these downloads concurrently is a reliable and easy way to saturate
-a 25 Gbit/s link:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">for</span> i in <span style="color:#007020;font-weight:bold">$(</span>seq <span style="color:#40a070">0</span> 4<span style="color:#007020;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">do</span>
-</span></span><span style="display:flex;"><span>  curl -v -o /dev/null http://oldmidna:8080/distri/tmp/big.img &amp;
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">done</span>
-</span></span></code></pre></div><table>
-<thead>
-<tr>
-<th>Client</th>
-<th>Server</th>
-<th>Gbit/s</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>curl</td>
-<td>nginx</td>
-<td>
-<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
-
-</td>
-</tr>
-<tr>
-<td>curl</td>
-<td>caddy</td>
-<td>
-<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
-
-</td>
-</tr>
-<tr>
-<td>Go</td>
-<td>nginx</td>
-<td>
-<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
-
-</td>
-</tr>
-<tr>
-<td>Go</td>
-<td>caddy</td>
-<td>
-<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
-
-</td>
-</tr>
-</tbody>
-</table>
-<h2 id="https">T2: HTTPS download speed (encrypted)</h2>
-<p>At link speeds this high, enabling TLS slashes bandwidth in half or worse.</p>
-<p>Using 4 TCP connections allows saturating a 25 Gbit/s link.</p>
-<p>Caddy uses more CPU to serve files compared to nginx.</p>
-<h3 id="https1">T2.1: Single TCP connection</h3>
-<p>This test works the same as T1.1, but with a HTTPS URL:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -v -o /dev/null --insecure https://oldmidna:8443/distri/tmp/big.img
-</span></span><span style="display:flex;"><span>./httpget25 https://oldmidna:8443/distri/tmp/big.img
-</span></span></code></pre></div><table>
-<thead>
-<tr>
-<th>Client</th>
-<th>Server</th>
-<th>Gbit/s</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>curl</td>
-<td>nginx</td>
-<td>
-<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (8em / 10)); background-color: blue; color: white">8</div></div>
-
-</td>
-</tr>
-<tr>
-<td>curl</td>
-<td>caddy</td>
-<td>
-<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (7.5em / 10)); background-color: blue; color: white">7.5</div></div>
-
-</td>
-</tr>
-<tr>
-<td><strong>Go</strong></td>
-<td><strong>nginx</strong></td>
-<td><strong>
-<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (12em / 10)); background-color: blue; color: white">12</div></div>
-
-</strong></td>
-</tr>
-<tr>
-<td>Go</td>
-<td>caddy</td>
-<td>
-<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (7.2em / 10)); background-color: blue; color: white">7.2</div></div>
-
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="https4">T2.2: Multiple TCP connections</h3>
-<p>This test works the same as T1.2, but with a HTTPS URL:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">for</span> i in <span style="color:#007020;font-weight:bold">$(</span>seq <span style="color:#40a070">0</span> 4<span style="color:#007020;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">do</span>
-</span></span><span style="display:flex;"><span>  curl -v -o /dev/null --insecure https://oldmidna:8443/distri/tmp/big.img &amp;
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">done</span>
-</span></span></code></pre></div><p>Curiously, the Go <code>net/http</code> client downloading from caddy cannot saturate a 25
-Gbit/s link.</p>
-<table>
-<thead>
-<tr>
-<th>Client</th>
-<th>Server</th>
-<th>Gbit/s</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>curl</td>
-<td>nginx</td>
-<td>
-<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
-
-</td>
-</tr>
-<tr>
-<td>curl</td>
-<td>caddy</td>
-<td>
-<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
-
-</td>
-</tr>
-<tr>
-<td>Go</td>
-<td>nginx</td>
-<td>
-<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
-
-</td>
-</tr>
-<tr>
-<td>Go</td>
-<td>caddy</td>
-<td>
-<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (21.6em / 10)); background-color: blue; color: white">21.6</div></div>
-
-</td>
-</tr>
-</tbody>
-</table>
-<h2 id="httpsktls">T3: HTTPS with Kernel TLS (KTLS)</h2>
-<p>Linux 4.13 got support for Kernel TLS back in 2017.</p>
-<p>nginx 1.21.4 introduced support for Kernel TLS, and they have a <a href="https://www.nginx.com/blog/improving-nginx-performance-with-kernel-tls/">blog post on
-how to configure
-it</a>.</p>
-<p>In terms of download speeds, there is no difference with or without KTLS. But,
-enabling KTLS noticeably reduces CPU usage, from ≈10% to a steady 2%.</p>
-<p>For even newer network cards such as the Mellanox ConnectX-6, the kernel can
-even offload TLS onto the network card!</p>
-<h3 id="httpsktls1">T3.1: Single TCP connection</h3>
-<table>
-<thead>
-<tr>
-<th>Client</th>
-<th>Server</th>
-<th>Gbit/s</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>curl</td>
-<td>nginx</td>
-<td>
-<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (8em / 10)); background-color: blue; color: white">8</div></div>
-
-</td>
-</tr>
-<tr>
-<td><strong>Go</strong></td>
-<td><strong>nginx</strong></td>
-<td><strong>
-<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (12em / 10)); background-color: blue; color: white">12</div></div>
-
-</strong></td>
-</tr>
-</tbody>
-</table>
-<h3 id="httpsktls4">T3.2: Multiple TCP connections</h3>
-<table>
-<thead>
-<tr>
-<th>Client</th>
-<th>Server</th>
-<th>Gbit/s</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>curl</td>
-<td>nginx</td>
-<td>
-<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
-
-</td>
-</tr>
-<tr>
-<td>Go</td>
-<td>nginx</td>
-<td>
-<div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
-
-</td>
-</tr>
-</tbody>
-</table>
-<h2 id="conclusions">Conclusions</h2>
-<p>When downloading from nginx with 1 TCP connection, with TLS encryption enabled
-(HTTPS), the Go <code>net/http</code> client is faster than curl!</p>
-<p>Caddy is slightly slower than nginx, which manifests itself in slower speeds
-with curl and even slower speeds with Go’s <code>net/http</code>.</p>
-<p>To max out 25 Gbit/s, even when using TLS encryption, just use 3 or more
-connections in parallel. This helps with HTTP and HTTPS, with any combination of
-client and server.</p>
-<h2 id="appendix">Appendix</h2>
-<details>
-<summary>Go <code>net/http</code> test program <code>httpget25.go</code></summary>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span> main
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> (
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;crypto/tls&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;flag&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;fmt&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;io&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;io/ioutil&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;log&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;net/http&#34;</span>
-</span></span><span style="display:flex;"><span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">httpget25</span>() <span style="color:#902000">error</span> {
-</span></span><span style="display:flex;"><span>	http.DefaultTransport.(<span style="color:#666">*</span>http.Transport).TLSClientConfig = <span style="color:#666">&amp;</span>tls.Config{InsecureSkipVerify: <span style="color:#007020;font-weight:bold">true</span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">for</span> _, arg <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> flag.<span style="color:#06287e">Args</span>() {
-</span></span><span style="display:flex;"><span>		resp, err <span style="color:#666">:=</span> http.<span style="color:#06287e">Get</span>(arg)
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">return</span> err
-</span></span><span style="display:flex;"><span>		}
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> resp.StatusCode <span style="color:#666">!=</span> http.StatusOK {
-</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;unexpected HTTP status code: want %v, got %v&#34;</span>, http.StatusOK, resp.Status)
-</span></span><span style="display:flex;"><span>		}
-</span></span><span style="display:flex;"><span>		io.<span style="color:#06287e">Copy</span>(ioutil.Discard, resp.Body)
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
-</span></span><span style="display:flex;"><span>	flag.<span style="color:#06287e">Parse</span>()
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">httpget25</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Fatal</span>(err)
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div></details>
-<details>
-<summary>Caddy config file <code>Caddyfile</code></summary>
-<pre tabindex="0"><code>{
-  local_certs
-  http_port 8080
-  https_port 8443
-}
-
-http://oldmidna:8080 {
-  file_server browse
-}
-
-https://oldmidna:8443 {
-  file_server browse
-}
-</code></pre></details>
-<details>
-<summary>nginx installation instructions</summary>
-<pre tabindex="0"><code>mkdir -p ~/lab25
-cd ~/lab25
-
-wget https://nginx.org/download/nginx-1.21.6.tar.gz
-tar tf nginx-1.21.6.tar.gz
-
-wget https://www.openssl.org/source/openssl-3.0.3.tar.gz
-tar xf openssl-3.0.3.tar.gz
-
-cd nginx-1.21.6
-./configure --with-http_ssl_module --with-http_v2_module --with-openssl=$HOME/lab25/openssl-3.0.3 --with-openssl-opt=enable-ktls
-make -j8
-cd objs
-./nginx -c nginx.conf -p $HOME/lab25
-</code></pre></details>
-<details>
-<summary>nginx config file <code>nginx.conf</code></summary>
-<pre tabindex="0"><code>worker_processes  auto;
-
-pid        logs/nginx.pid;
-
-daemon off;
-
-events {
-    worker_connections  1024;
-}
-
-http {
-    include       mime.types;
-    default_type  application/octet-stream;
-
-    access_log /home/michael/lab25/logs/access.log  combined;
-
-    sendfile        on;
-    sendfile_max_chunk 2m;
-
-    keepalive_timeout  65;
-
-    server {
-        listen       8080;
-        listen [::]:8080;
-        server_name  localhost;
-
-        root /srv/repo.distr1.org/;
-
-        location / {
-            index index.html index.htm;
-        }
-
-        error_page   500 502 503 504  /50x.html;
-        location = /50x.html {
-            root /usr/share/nginx/html;
-        }
-
-        location /distri {
-            autoindex on;
-        }
-    }
-
-    server {
-        listen 8443 ssl;
-        listen [::]:8443 ssl;
-        server_name localhost;
-
-        ssl_certificate nginx-ecc-p256.pem;
-        ssl_certificate_key nginx-ecc-p256.key;
-
-        #ssl_conf_command Options KTLS;
-
-        ssl_buffer_size 32768;
-        ssl_protocols TLSv1.3;
-
-        root /srv/repo.distr1.org/;
-
-        location / {
-            index index.html index.htm;
-        }
-
-        error_page   500 502 503 504  /50x.html;
-        location = /50x.html {
-            root /usr/share/nginx/html;
-        }
-
-        location /distri {
-            autoindex on;
-        }
-    }
-}
-</code></pre></details>
 ]]></content>
   </entry>
 </feed>

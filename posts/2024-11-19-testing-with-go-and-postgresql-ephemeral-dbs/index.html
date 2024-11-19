@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Testing with Go and PostgreSQL: ephemeral DBs - Michael Stapelberg</title>
+
+  <meta property="og:site_name" content="Michael Stapelberg">
+  <meta property="og:title" content="Testing with Go and PostgreSQL: ephemeral DBs">
+  <meta property="og:description" content="Let’s say you created a Go program that stores data in PostgreSQL — you installed PostgreSQL, wrote the Go code, and everything works; great!
+But after writing a test for your code, you wonder: how do you best provide PostgreSQL to your automated tests?">
+  
+  
+  
+  
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2024-11-19-testing-with-go-and-postgresql-ephemeral-dbs/postgresql-elephant-featured_hu62d4951bd671b33ba4be0d77c8ae651f_183979_200x200_fit_box_3.png">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <meta name="description" content="Let’s say you created a Go program that stores data in PostgreSQL — you installed PostgreSQL, wrote the Go code, and everything works; great!
+But after writing a test for your code, you wonder: how do you best provide PostgreSQL to your automated tests?">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2024-11-19-testing-with-go-and-postgresql-ephemeral-dbs/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+
+  
+
+  
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-iGJMHQjzgEZNnlFE7k1dSfoUmIiSacMTod6n92W%2fQ2XfiAHbsxdg3iDAHZknvzuzIbcQfkH1dra%2fuDQwVTJ9Kg%3d%3d" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div><h1 class="ms_title">Testing with Go and PostgreSQL: ephemeral DBs</h1>
+
+<div class="ms_meta">
+  <div id="ms_date">published 2024-11-19</div>
+  
+  
+  <div id="ms_tags">
+  
+  in tag
+  
+  
+  <span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
+  
+  </div>
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2024-11-19-testing-with-go-and-postgresql-ephemeral-dbs/index.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
+</div>
+<div class="Artikel" id="content">
+  <style type="text/css">
+    .TableOfContents > ul, .TableOfContents > ul > li > ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+    }
+    .TableOfContents > ul > li > ul {
+	margin: 1em;
+    }
+    .TableOfContents li {
+	margin-bottom: 1rem;
+    }
+  </style>
+  <details class="ms_toc_details">
+    <summary>Table of contents</summary>
+    <nav class="TableOfContents">
+  <ul>
+    <li><a href="#single-package-tests">Single-package tests</a></li>
+    <li><a href="#go-test-process-model">go test process model</a></li>
+    <li><a href="#sharing-one-postgresql-among-all-tests">Sharing one PostgreSQL among all tests</a>
+      <ul>
+        <li><a href="#running-the-initpg-wrapper-program">Running the initpg wrapper program</a></li>
+      </ul>
+    </li>
+    <li><a href="#performance">Performance</a>
+      <ul>
+        <li><a href="#why-is-it-sometimes-slower">Why is it sometimes slower?</a></li>
+        <li><a href="#fixing-go-test-caching-env-vars">Fixing Go test caching (env vars)</a></li>
+      </ul>
+    </li>
+    <li><a href="#conclusion">Conclusion</a></li>
+    <li><a href="#further-optimization-potential">Further optimization potential</a>
+      <ul>
+        <li><a href="#hide-postgres-startup">Hide Postgres startup</a></li>
+        <li><a href="#de-duplicate-schema-creation-cost">De-duplicate schema creation cost</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </details>
+  <p><a href="https://en.wikipedia.org/wiki/PostgreSQL" target="_blank"><img
+src="postgresql-elephant-featured.png" align="right" width="125"
+style="margin-left: 1.5em" alt="PostgreSQL elephant logo"></a></p>
+<p>Let’s say you created a Go program that stores data in PostgreSQL — you
+installed PostgreSQL, wrote the Go code, and everything works; great!</p>
+<p>But after writing a test for your code, you wonder: how do you best provide
+PostgreSQL to your automated tests? Do you start a separate PostgreSQL in a
+Docker container, for example, or do you maybe reuse your development PostgreSQL
+instance?</p>
+<p>I have come to like using <strong>ephemeral PostgreSQL instances</strong> for their many benefits:</p>
+<ul>
+<li>Easier development setup: no need to <em>configure</em> a database, installation is enough.
+<br>
+I recommend installing PostgreSQL from your package manager, e.g. <code>apt install postgresql</code> (Debian) or <code>brew install postgresql</code> (macOS). No need for Docker :)</li>
+<li>No risk of “works on my machine” (but nowhere else) problems: every test run
+starts with an empty database instance, so your test <em>must</em> set up the database
+correctly.</li>
+<li>The same approach works locally and on CI systems like GitHub Actions.</li>
+</ul>
+<p>In this article, I want to show how to integrate ephemeral PostgreSQL instances
+into your test setup. The examples are all specific to Go, but I expect that
+users of other programming languages and environments can benefit from some of
+these techniques as well.</p>
+<h2 id="single-package-tests">Single-package tests</h2>
+<p>When you are in the very early stages of your project, you might start out with
+just a single test file (say, <code>app_test.go</code>), containing one or more test
+functions (say, <code>TestSignupForm</code>).</p>
+<p>In this scenario, all tests will run in the same process. While it’s easy enough
+to write a few lines of code to start and stop PostgreSQL, I recommend reaching
+for an existing test helper package.</p>
+<p>Throughout this article, I will be using the
+<a href="https://pkg.go.dev/github.com/stapelberg/postgrestest"><code>github.com/stapelberg/postgrestest</code></a>
+package, which is based on <a href="https://pkg.go.dev/zombiezen.com/go/postgrestest">Roxy Light’s <code>postgrestest</code>
+package</a> but was extended to
+work well in the scenarios this article explains.</p>
+<p>To start an ephemeral PostgreSQL instance before your test functions run, you
+would <a href="https://pkg.go.dev/testing#hdr-Main">declare a custom <code>TestMain</code>
+function</a>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">var</span> pgt <span style="color:#666">*</span>postgrestest.Server
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">TestMain</span>(m <span style="color:#666">*</span>testing.M) {
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">var</span> err <span style="color:#902000">error</span>
+</span></span><span style="display:flex;"><span>	pgt, err = postgrestest.<span style="color:#06287e">Start</span>(context.<span style="color:#06287e">Background</span>())
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020">panic</span>(err)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">defer</span> pgt.<span style="color:#06287e">Cleanup</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	m.<span style="color:#06287e">Run</span>()
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Starting a PostgreSQL instance takes about:</p>
+<ul>
+<li>300ms on my <a href="/posts/2022-01-15-high-end-linux-pc/">Intel Core i9 12900K CPU</a> (from 2022)</li>
+<li>800ms on my <a href="/posts/2021-11-28-macbook-air-m1/">MacBook Air M1</a> (from 2020)</li>
+</ul>
+<p>Then, you can create a separate database for each test on this ephemeral
+Postgres instance:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">TestSignupForm</span>(t <span style="color:#666">*</span>testing.T) {
+</span></span><span style="display:flex;"><span>	pgurl, err <span style="color:#666">:=</span> pgt.<span style="color:#06287e">CreateDatabase</span>(context.<span style="color:#06287e">Background</span>())
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		t.<span style="color:#06287e">Fatal</span>(err)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// test goes here…
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>}
+</span></span></code></pre></div><p>Each CreateDatabase call takes about:</p>
+<ul>
+<li>5-10ms on my <a href="/posts/2022-01-15-high-end-linux-pc/">Intel Core i9 12900K CPU</a> (from 2022)</li>
+<li>20ms on my <a href="/posts/2021-11-28-macbook-air-m1/">MacBook Air M1</a> (from 2020)</li>
+</ul>
+<p>Usually, most projects quickly grow beyond just a single <code>_test.go</code> file.</p>
+<p>In one project if mine, I eventually reached over 50 test functions in 25 Go
+packages. I stuck to the above approach of adding a custom <code>TestMain</code> to each
+package in which my tests needed PostgreSQL, and my test runtimes eventually
+looked like this:</p>
+<pre tabindex="0"><code># Intel Core i9 12900K
+CGO_ENABLED=0 GOGC=off go test -count=1 -fullpath ./...
+14,24s user 4,11s system 709% cpu 2,586 total
+
+# MacBook Air M1
+CGO_ENABLED=0 GOGC=off go test -count=1 -fullpath ./...
+20,23s user 8,67s system 350% cpu 8,257 total
+</code></pre><p>That’s not <em>terrible</em>, but not great either.</p>
+<p>If you happen to open a process monitor while running tests, you might have
+noticed that there are quite a number of PostgreSQL instances running. This
+seems like something to optimize! Shouldn’t one PostgreSQL instance be enough
+for all tests of a test run?</p>
+<p>Let’s review the process model of <code>go test</code> before we can talk about how to
+integrate with it.</p>
+<h2 id="go-test-process-model">go test process model</h2>
+<p>The usual command to run all tests of a Go project is <code>go test ./...</code> (see <a href="https://pkg.go.dev/cmd/go/internal/help#HelpPackages"><code>go help packages</code></a> for
+details on the <code>/...</code> pattern syntax), which matches the Go package in the
+current directory and all Go packages in its subdirectories.</p>
+<p>Each Go package (≈ directory), including <code>_test.go</code> files, is compiled into a
+<em>separate test binary:</em></p>
+<pre tabindex="0"><code>% go help test
+[…]
+&#39;Go test&#39; recompiles each package along with any files with names matching
+the file pattern &#34;*_test.go&#34;.
+[…]
+Each listed package causes the execution of a separate test binary.
+[…]
+</code></pre><p>These test binaries are then run in parallel. In fact, there are two levels of
+parallelism at play here:</p>
+<ol>
+<li>All test functions (within a single test binary) that call <code>t.Parallel()</code> will be
+run in parallel (in batches of size <code>-parallel</code>).</li>
+<li><code>go test</code> will run different test binaries in parallel.</li>
+</ol>
+<p>The documentation explains that the <code>-parallel</code> test flag defaults to
+<code>GOMAXPROCS</code> and references the <code>go test</code> parallelism:</p>
+<pre tabindex="0"><code>% go help testflag
+[…]
+-parallel n
+    Allow parallel execution of test functions that call t.Parallel, and
+    fuzz targets that call t.Parallel when running the seed corpus.
+    The value of this flag is the maximum number of tests to run
+    simultaneously.
+[…]
+    By default, -parallel is set to the value of GOMAXPROCS.
+    Setting -parallel to values higher than GOMAXPROCS may cause degraded
+    performance due to CPU contention, especially when fuzzing.
+    Note that -parallel only applies within a single test binary.
+    The &#39;go test&#39; command may run tests for different packages
+    in parallel as well, according to the setting of the -p flag
+    (see &#39;go help build&#39;).
+</code></pre><p>The <code>go test</code> parallelism is controlled by the <code>-p</code> flag, which also defaults to
+<code>GOMAXPROCS</code>:</p>
+<pre tabindex="0"><code>% go help build
+[…]
+-p n
+	the number of programs, such as build commands or
+	test binaries, that can be run in parallel.
+	The default is GOMAXPROCS, normally the number of CPUs available.
+[…]
+</code></pre><p>To print <code>GOMAXPROCS</code> on a given machine, we can run a test program like this
+<code>gomaxprocs.go</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span> main
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;runtime&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#007020">print</span>(runtime.<span style="color:#06287e">GOMAXPROCS</span>(<span style="color:#40a070">0</span>))
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>For me, <code>GOMAXPROCS</code> defaults to the <a href="https://ark.intel.com/content/www/us/en/ark/products/134597/intel-core-i9-12900-processor-30m-cache-up-to-5-10-ghz.html">24 <em>threads</em> of my Intel Core i9 12900K
+CPU</a>,
+which has 16 <em>cores</em> (8 Performance, 8 Efficiency; only the Performance cores
+have Hyper Threading):</p>
+<pre tabindex="0"><code>% go run gomaxprocs.go
+24
+% grep &#39;model name&#39; /proc/cpuinfo | wc -l
+24
+</code></pre><p>So with a single <code>go test ./...</code> command, we can expect 24 parallel processes
+each running 24 tests in parallel. With our current approach, we would start up
+to 24 concurrent ephemeral PostgreSQL instances (if we have that many packages),
+which seems wasteful to me.</p>
+<p>Starting one ephemeral PostgreSQL instance per <code>go test</code> run seems better.</p>
+<h2 id="sharing-one-postgresql-among-all-tests">Sharing one PostgreSQL among all tests</h2>
+<p>How can we go from starting 24 Postgres instances to starting just one?</p>
+<p>First, we need to update our test setup code to work with a passed-in database
+URL. For that, we switch from calling
+<a href="https://pkg.go.dev/github.com/stapelberg/postgrestest#Server.CreateDatabase"><code>CreateDatabase</code></a>
+to using a
+<a href="https://pkg.go.dev/github.com/stapelberg/postgrestest#DBCreator"><code>DBCreator</code></a>
+for a database identified by a URL. The old code still needs to remain so that
+you can run a single test without bothering with <code>PGURL</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">var</span> dbc <span style="color:#666">*</span>postgrestest.DBCreator
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">TestMain</span>(m <span style="color:#666">*</span>testing.M) {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	<span style="color:#60a0b0;font-style:italic">// It is best to specify the PGURL environment variable so that only
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// one PostgreSQL instance is used for all tests.
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#60a0b0;font-style:italic"></span>	pgurl <span style="color:#666">:=</span> os.<span style="color:#06287e">Getenv</span>(<span style="color:#4070a0">&#34;PGURL&#34;</span>)
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	<span style="color:#007020;font-weight:bold">if</span> pgurl <span style="color:#666">==</span> <span style="color:#4070a0">&#34;&#34;</span> {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>		<span style="color:#60a0b0;font-style:italic">// &#39;go test&#39; was started directly, start one Postgres per process:
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		pgt, err <span style="color:#666">:=</span> postgrestest.<span style="color:#06287e">Start</span>(context.<span style="color:#06287e">Background</span>())
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#007020">panic</span>(err)
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">defer</span> pgt.<span style="color:#06287e">Cleanup</span>()
+</span></span><span style="display:flex;"><span>		pgurl = pgt.<span style="color:#06287e">DefaultDatabase</span>()
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	<span style="color:#007020;font-weight:bold">var</span> err <span style="color:#902000">error</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	dbc, err = postgrestest.<span style="color:#06287e">NewDBCreator</span>(pgurl)
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>		<span style="color:#007020">panic</span>(err)
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	m.<span style="color:#06287e">Run</span>()
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+<p>Inside the test function(s), we only need to update the <code>CreateDatabase</code>
+receiver name:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">TestSignupForm</span>(t <span style="color:#666">*</span>testing.T) {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	pgurl, err <span style="color:#666">:=</span> dbc.<span style="color:#06287e">CreateDatabase</span>(context.<span style="color:#06287e">Background</span>())
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		t.<span style="color:#06287e">Fatal</span>(err)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// test goes here…
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>}</span></span></code></pre></div>
+<p>Then, we create a new wrapper program (e.g. <code>internal/cmd/initpg/initpg.go</code>)
+which calls <code>postgrestest.Start</code> and passes the <code>PGURL</code> environment variable to
+the process(es) it starts:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// initpg is a small test helper command which starts a Postgres
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// instance and makes it available to the wrapped &#39;go test&#39; command.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">package</span> main
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;context&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;log&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;os&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;os/exec&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;github.com/stapelberg/postgrestest&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Use the same database driver as in the rest of your project.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	_ <span style="color:#4070a0">&#34;github.com/lib/pq&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">runWrappedCommand</span>(pgurl <span style="color:#902000">string</span>) <span style="color:#902000">error</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// os.Args[0] is initpg
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// os.Args[1] is --
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// os.Args[2] is go
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// os.Args[3] is test
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// etc.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	wrapped <span style="color:#666">:=</span> exec.<span style="color:#06287e">Command</span>(os.Args[<span style="color:#40a070">2</span>], os.Args[<span style="color:#40a070">3</span>:]<span style="color:#666">...</span>)
+</span></span><span style="display:flex;"><span>	wrapped.Stdin = os.Stdin
+</span></span><span style="display:flex;"><span>	wrapped.Stdout = os.Stdout
+</span></span><span style="display:flex;"><span>	wrapped.Stderr = os.Stderr
+</span></span><span style="display:flex;"><span>	wrapped.Env = <span style="color:#007020">append</span>(os.<span style="color:#06287e">Environ</span>(), <span style="color:#4070a0">&#34;PGURL=&#34;</span><span style="color:#666">+</span>pgurl)
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> wrapped.<span style="color:#06287e">Run</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;%v: %v&#34;</span>, wrapped.Args, err)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">initpg</span>() <span style="color:#902000">error</span> {
+</span></span><span style="display:flex;"><span>	pgt, err <span style="color:#666">:=</span> postgrestest.<span style="color:#06287e">Start</span>(context.<span style="color:#06287e">Background</span>())
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// NOTE: keep reading the article, do not submit as-is
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">defer</span> pgt.<span style="color:#06287e">Cleanup</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Run the wrapped command (&#39;go test&#39;, typically)
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#06287e">runWrappedCommand</span>(pgt.<span style="color:#06287e">DefaultDatabase</span>())
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">initpg</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Fatal</span>(err)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="running-the-initpg-wrapper-program">Running the initpg wrapper program</h3>
+<p>While we could use <code>go run ./internal/cmd/initpg</code> to compile and run this
+wrapper program, it is a bit wasteful to recompile this program over and over
+when it rarely changes.</p>
+<p>One alternative is to use <code>go install</code> instead of <code>go run</code>. I have two minor
+concerns with that:</p>
+<ol>
+<li>
+<p><code>go install</code> installs into the bin directory, which is <code>~/go/bin</code> by default.</p>
+<ul>
+<li>This means we need to rely on the <code>PATH</code> environment variable containing
+the bin directory to run the installed program. Unfortunately, influencing
+or determining the <code>go install</code> destination path is tricky.</li>
+<li>It would be nice to not litter the user’s bin directory. I think the bin
+directory should contain programs which the user explicitly requested to
+install, not helper programs that are only necessary to run tests.</li>
+</ul>
+</li>
+<li>
+<p>On my machine, <code>go install</code> takes about 100ms, even when nothing has changed.</p>
+</li>
+</ol>
+<p>I like to define a <code>Makefile</code> in each of my projects with a set of targets that
+are consistently named, e.g. <code>make test</code>, <code>make push</code>, etc. Given that I already
+use <code>make</code>, I like to set up my <code>Makefile</code> to build initpg in the <code>_bin</code>
+directory:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Makefile" data-lang="Makefile"><span style="display:flex;"><span><span style="color:#06287e">.PHONY</span><span style="color:#666">:</span> test
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#06287e">_bin/initpg</span><span style="color:#666">:</span> internal/cmd/initpg/initpg.go
+</span></span><span style="display:flex;"><span>	mkdir -p _bin
+</span></span><span style="display:flex;"><span>	go build -o _bin/initpg ./internal/cmd/initpg
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#06287e">test</span><span style="color:#666">:</span> _bin/initpg
+</span></span><span style="display:flex;"><span>	./_bin/initpg -- go <span style="color:#007020">test</span> ./...
+</span></span></code></pre></div><p>Because <code>initpg.go</code> rarely changes, the program will typically not need to be
+recompiled.</p>
+<p>Note that this <code>Makefile</code> is only approximately correct: <code>initpg</code>’s dependency
+on <code>postgrestest</code> is not modeled, so you need to delete <code>_bin/initpg</code> to pick up
+changes to <code>postgrestest</code>.</p>
+<h2 id="performance">Performance</h2>
+<p>Let’s compare the before and after test runtimes on the Intel Core i9 12900K:</p>
+<pre tabindex="0"><code># Intel Core i9 12900K: one Postgres for each test
+CGO_ENABLED=0 GOGC=off go test -count=1 -fullpath ./...
+14,24s user 4,11s system 709% cpu 2,586 total
+
+# Intel Core i9 12900K: one Postgres shared among all tests
+CGO_ENABLED=0 GOGC=off ./_bin/initpg -- go test -count=1 -fullpath ./...
+11,40s user 3,10s system 659% cpu 2,199 total
+</code></pre><p>For comparison, the effect is more pronounced on the MacBook Air M1:</p>
+<pre tabindex="0"><code># MacBook Air M1: one Postgres for each test
+CGO_ENABLED=0 GOGC=off go test -count=1 -fullpath ./...
+20,23s user 8,67s system 350% cpu 8,257 total
+
+# MacBook Air M1: one Postgres shared among all tests
+CGO_ENABLED=0 GOGC=off ./_bin/initpg -- go test -count=1 -fullpath ./...
+14,25s user 4,36s system 275% cpu 6,752 total
+</code></pre><p>Sharing one PostgreSQL instance has reduced the total test runtime for a full
+run by about 20%!</p>
+<h3 id="why-is-it-sometimes-slower">Why is it sometimes slower?</h3>
+<p>We have measurably reduced the runtime of a full test run, but if you pay close
+attention during development you will notice that now <strong>every test run is a full
+test run</strong>, even when you only change a single package!</p>
+<p>Why can Go no longer cache any of the test results? The problem is that the
+<code>PGURL</code> environment variable has a different value on each run: the name of the
+temporary directory that the <code>postgrestest</code> package uses for its ephemeral
+database instance changes on each run.</p>
+<p>The documentation on the <code>go test</code> caching behavior explains this in the last
+paragraph:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% go help test
+</span></span><span style="display:flex;"><span>[…]
+</span></span><span style="display:flex;"><span>In package list mode only, go test caches successful package test
+</span></span><span style="display:flex;"><span>results to avoid unnecessary repeated running of tests. When the
+</span></span><span style="display:flex;"><span>result of a test can be recovered from the cache, go test will
+</span></span><span style="display:flex;"><span>redisplay the previous output instead of running the test binary
+</span></span><span style="display:flex;"><span>again. When this happens, go test prints &#39;(cached)&#39; in place of the
+</span></span><span style="display:flex;"><span>elapsed time in the summary line.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>The rule for a match in the cache is that the run involves the same
+</span></span><span style="display:flex;"><span>test binary and the flags on the command line come entirely from a
+</span></span><span style="display:flex;"><span>restricted set of &#39;cacheable&#39; test flags, defined as -benchtime, -cpu,
+</span></span><span style="display:flex;"><span>-list, -parallel, -run, -short, -timeout, -failfast, -fullpath and -v.
+</span></span><span style="display:flex;"><span>If a run of go test has any test or non-test flags outside this set,
+</span></span><span style="display:flex;"><span>the result is not cached. To disable test caching, use any test flag
+</span></span><span style="display:flex;"><span>or argument other than the cacheable flags. The idiomatic way to disable
+</span></span><span style="display:flex;"><span>test caching explicitly is to use -count=1.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Tests that open files within the package&#39;s source root (usually $GOPATH)
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>or that consult environment variables only match future runs in which
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>the files and environment variables are unchanged.
+</span></span><span style="display:flex;"><span>[…]</span></span></code></pre></div>
+<p>(See also <a href="https://github.com/golang/go/issues/22593">Go issue #22593</a> for more details.)</p>
+<h3 id="fixing-go-test-caching-env-vars">Fixing Go test caching (env vars)</h3>
+<p>For the Go test caching to work, all environment variables our tests access
+(including <code>PGURL</code>) need to contain the same value between runs. For us, this
+means we cannot use a randomly generated name for the Postgres data directory,
+but instead need to use a fixed name.</p>
+<p>My <code>postgrestest</code> package offers convenient support for specifying the desired
+directory:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">initpg</span>() <span style="color:#902000">error</span> {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	cacheDir, err <span style="color:#666">:=</span> os.<span style="color:#06287e">UserCacheDir</span>()
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>		<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	}
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	pgt, err <span style="color:#666">:=</span> postgrestest.<span style="color:#06287e">Start</span>(context.<span style="color:#06287e">Background</span>(),
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>		postgrestest.<span style="color:#06287e">WithDir</span>(filepath.<span style="color:#06287e">Join</span>(cacheDir, <span style="color:#4070a0">&#34;initpg.gus&#34;</span>)))
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">defer</span> pgt.<span style="color:#06287e">Cleanup</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Run the wrapped command (&#39;go test&#39;, typically)
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#06287e">runWrappedCommand</span>(pgt.<span style="color:#06287e">DefaultDatabase</span>())
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+<p>When running the tests now, starting with the second run (without any changes),
+you should see a “ (cached)” suffix printed behind tests that were successfully
+cached, and the test runtime should be much shorter — under a second in my
+project:</p>
+<pre tabindex="0"><code>% time ./_bin/initpg -- go test -fullpath ./...
+ok  	example/internal/handlers/adminhandler	(cached)
+[…]
+./_bin/initpg -- go test -fullpath ./...
+1,30s user 0,88s system 288% cpu 0,756 total
+</code></pre><h2 id="conclusion">Conclusion</h2>
+<p>In this article, I have shown how to integrate PostgreSQL into your test
+environment in a way that is convenient for developers, light on system
+resources and measurably reduces total test time.</p>
+<p>Adopting <code>postgrestest</code> seems easy enough to me. If you want to see a complete
+example, see <a href="https://github.com/gokrazy/gus/commit/b97c652fd03754ba817bd3c13f18ea6e2e154ef4">how I converted the <code>gokrazy/gus</code> repository to use
+<code>postgrestest</code></a>.</p>
+<h2 id="further-optimization-potential">Further optimization potential</h2>
+<p>Now that we have a detailed understanding of the <code>go test</code> process model and
+PostgreSQL startup, we can consider further optimizations. I won’t actually
+implement them in this article, which is already long enough, but maybe you want
+to go further in your project…</p>
+<h3 id="hide-postgres-startup">Hide Postgres startup</h3>
+<p>My journey into ephemeral PostgreSQL instances started with <a href="https://eradman.com/ephemeralpg/">Eric Radman’s
+<code>pg_tmp</code> shell script</a>. Ultimately, I ended up
+with the <code>postgrestest</code> Go solution that I much prefer: I don’t need to ship (or
+require) the <code>pg_tmp</code> shell script with my projects. The fewer languages, the
+better.</p>
+<p>Also, <code>pg_tmp</code> is not a wrapper program, which resulted in problems regarding
+cleanup: A wrapper program can reliably trigger cleanup when tests are done,
+whereas <code>pg_tmp</code> has to poll for activity. Polling is prone to running too
+quickly (cleaning up a database before tests were even started) or too slowly,
+requiring constant tuning.</p>
+<p>But, <code>pg_tmp</code> does have quite a clever concept of preparing PostgreSQL instances
+in the background and thereby amortizing startup costs between test runs.</p>
+<p>There might be an even simpler approach that could amount to the same startup
+latency hiding behavior: Turning the sequential startup (<code>initpg</code> needs to wait
+for PostgreSQL to start and only then can begin running <code>go test</code>) into parallel
+startup using Socket Activation.</p>
+<p>Note that PostgreSQL does not seem to support Socket Activation natively, so
+probably one would need to implement a program-agnostic solution into <code>initpg</code>
+as described in this <a href="https://unix.stackexchange.com/questions/352495/systemd-on-demand-start-of-services-like-postgresql-and-mysql-that-do-not-yet-s">Unix Stack Exchange
+question</a>
+or <a href="https://andreas.rammhold.de/posts/postgresql-tmpfs-with-sytemdsocket-activation-for-local-ephemeral-data-during-development/">Andreas Rammhold’s blog
+post</a>.</p>
+<h3 id="de-duplicate-schema-creation-cost">De-duplicate schema creation cost</h3>
+<p>For isolation, we use a different PostgreSQL database for every test. This means
+we need to initialize the database schema for each of these per-test databases.</p>
+<p>We can eliminate this duplicative work by <strong>sharing the same database</strong> across
+all tests, provided we have another way of isolating the tests from each other.</p>
+<p>The <a href="https://github.com/DATA-DOG/go-txdb"><code>txdb</code> package</a> provides a standard
+<code>database/sql.Driver</code> which runs all queries of an entire test in a single
+transaction. Using <code>txdb</code> means we can now safely share the same database
+between tests without running into conflicts, failing tests, or needing extra
+locking.</p>
+<p>Be sure to initialize the database schema <em>before</em> using <code>txdb</code> to share the
+database: long-running transactions needs to lock the PostgreSQL catalog as soon
+as you change the database schema (i.e. create or modify tables), meaning only
+one test can run at a time. (Using <a href="https://sourcegraph.com/blog/go/an-introduction-to-go-tool-trace-rhys-hiltner"><code>go tool trace</code></a>
+is a great way to understand such performance issues.)</p>
+<p>I am aware that some people don’t like the transaction isolation approach. For
+example, <a href="https://gajus.com/blog/setting-up-postgre-sql-for-running-integration-tests">Gajus Kuizinas’s blog post “Setting up PostgreSQL for running
+integration
+tests”</a>
+finds that transactions don’t work in their (JavaScript) setup. I don’t share
+this experience at all: In Go, the <a href="https://github.com/DATA-DOG/go-txdb"><code>txdb</code>
+package</a> works well, even with nested
+transactions. I have used <code>txdb</code> for months without problems.</p>
+<p>In my tests, eliminating this duplicative schema initialization work saves
+about:</p>
+<ul>
+<li>0.5s on my Intel Core i9 12900K</li>
+<li>1s on the MacBook Air M1</li>
+</ul>
+<div id="bmc">
+  <p>
+    I run a blog since 2005, spreading knowledge and experience for almost 20 years! :)
+  </p>
+  <p>
+    If you want to support my work, you
+    can <a href="https://www.buymeacoffee.com/stapelberg">buy me a coffee</a>.
+  </p>
+  <p>
+    Thank you for your support! ❤️
+  </p>
+</div>
+
+</div>
+
+      </div>
+<div id="ms_toc">
+  <div>
+    <strong>Table Of Contents</strong>
+
+    <nav class="TableOfContents">
+  <ul>
+    <li><a href="#single-package-tests">Single-package tests</a></li>
+    <li><a href="#go-test-process-model">go test process model</a></li>
+    <li><a href="#sharing-one-postgresql-among-all-tests">Sharing one PostgreSQL among all tests</a>
+      <ul>
+        <li><a href="#running-the-initpg-wrapper-program">Running the initpg wrapper program</a></li>
+      </ul>
+    </li>
+    <li><a href="#performance">Performance</a>
+      <ul>
+        <li><a href="#why-is-it-sometimes-slower">Why is it sometimes slower?</a></li>
+        <li><a href="#fixing-go-test-caching-env-vars">Fixing Go test caching (env vars)</a></li>
+      </ul>
+    </li>
+    <li><a href="#conclusion">Conclusion</a></li>
+    <li><a href="#further-optimization-potential">Further optimization potential</a>
+      <ul>
+        <li><a href="#hide-postgres-startup">Hide Postgres startup</a></li>
+        <li><a href="#de-duplicate-schema-creation-cost">De-duplicate schema creation cost</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+
+    </main><div id="ms_footer">
+  © 2024 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

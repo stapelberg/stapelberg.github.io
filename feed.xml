@@ -6,6 +6,369 @@
   <id>https://michael.stapelberg.ch/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[Go Protobuf: The new Opaque API]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2024-12-21-go-protobuf-opaque/"/>
+    <id>https://michael.stapelberg.ch/posts/2024-12-21-go-protobuf-opaque/</id>
+    <published>2024-12-21T11:06:00+01:00</published>
+    <content type="html"><![CDATA[<aside class="admonition note">
+  <div class="note-container">
+    <div class="note-icon" style="width: 20px; height: 20px">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+    </div>
+    <div class="admonition-content">I originally published this post in <a href="https://go.dev/blog">the Go blog</a>, but am
+publishing this copy of it in my own blog as well for readers who don’t follow
+the Go blog.</div>
+  </div>
+</aside>
+
+<p>[<a href="https://en.wikipedia.org/wiki/Protocol_Buffers">Protocol Buffers (Protobuf)</a>
+is Google&rsquo;s language-neutral data interchange format. See
+<a href="https://protobuf.dev/">protobuf.dev</a>.]</p>
+<p>Back in March 2020, we released <a href="https://go.dev/blog/protobuf-apiv2">a major overhaul of the Go Protobuf
+API</a>. The <code>google.golang.org/protobuf</code>
+package introduced first-class <a href="https://pkg.go.dev/google.golang.org/protobuf/reflect/protoreflect">support for
+reflection</a>,
+a <a href="https://pkg.go.dev/google.golang.org/protobuf/types/dynamicpb"><code>dynamicpb</code></a>
+implementation and the
+<a href="https://pkg.go.dev/google.golang.org/protobuf/testing/protocmp"><code>protocmp</code></a>
+package for easier testing.</p>
+<p>That release introduced a new protobuf module with a new API. Today, we are
+releasing an additional API for generated code, meaning the Go code in the
+<code>.pb.go</code> files created by the protocol compiler (<code>protoc</code>). This blog post
+explains our motivation for creating a new API and shows you how to use it in
+your projects.</p>
+<p>To be clear: We are not removing anything. We will continue to support the
+existing API for generated code, just like we still support the older protobuf
+module (by wrapping the <code>google.golang.org/protobuf</code> implementation). Go is
+<a href="https://go.dev/blog/compat">committed to backwards compatibility</a> and this
+applies to Go Protobuf, too!</p>
+<h2 id="background">Background: the (existing) Open Struct API</h2>
+<p>We now call the existing API the Open Struct API, because generated struct types
+are open to direct access. In the next section, we will see how it differs from
+the new Opaque API.</p>
+<p>To work with protocol buffers, you first create a <code>.proto</code> definition file like
+this one:</p>
+<pre><code>edition = &quot;2023&quot;;  // successor to proto2 and proto3
+
+package log;
+
+message LogEntry {
+  string backend_server = 1;
+  uint32 request_size = 2;
+  string ip_address = 3;
+}
+</code></pre>
+<p>Then, you <a href="https://protobuf.dev/getting-started/gotutorial/">run the protocol compiler
+(<code>protoc</code>)</a> to generate code
+like the following (in a <code>.pb.go</code> file):</p>
+<pre><code>package logpb
+
+type LogEntry struct {
+  BackendServer *string
+  RequestSize   *uint32
+  IPAddress     *string
+  // …internal fields elided…
+}
+
+func (l *LogEntry) GetBackendServer() string { … }
+func (l *LogEntry) GetRequestSize() uint32   { … }
+func (l *LogEntry) GetIPAddress() string     { … }
+</code></pre>
+<p>Now you can import the generated <code>logpb</code> package from your Go code and call
+functions like
+<a href="https://pkg.go.dev/google.golang.org/protobuf/proto#Marshal"><code>proto.Marshal</code></a>
+to encode <code>logpb.LogEntry</code> messages into protobuf wire format.</p>
+<p>You can find more details in the <a href="https://protobuf.dev/reference/go/go-generated/">Generated Code API
+documentation</a>.</p>
+<h3 id="presence">(Existing) Open Struct API: Field Presence</h3>
+<p>An important aspect of this generated code is how <em>field presence</em> (whether a
+field is set or not) is modeled. For instance, the above example models presence
+using pointers, so you could set the <code>BackendServer</code> field to:</p>
+<ol>
+<li><code>proto.String(&quot;zrh01.prod&quot;)</code>: the field is set and contains &ldquo;zrh01.prod&rdquo;</li>
+<li><code>proto.String(&quot;&quot;)</code>: the field is set (non-<code>nil</code> pointer) but contains an
+empty value</li>
+<li><code>nil</code> pointer: the field is not set</li>
+</ol>
+<p>If you are used to generated code not having pointers, you are probably using
+<code>.proto</code> files that start with <code>syntax = &quot;proto3&quot;</code>. The field presence behavior
+changed over the years:</p>
+<ul>
+<li><code>syntax = &quot;proto2&quot;</code> uses <em>explicit presence</em> by default</li>
+<li><code>syntax = &quot;proto3&quot;</code> used <em>implicit presence</em> by default (where cases 2 and 3
+cannot be distinguished and are both represented by an empty string), but was
+later extended to allow <a href="https://protobuf.dev/programming-guides/proto3/#field-labels">opting into explicit presence with the <code>optional</code>
+keyword</a></li>
+<li><code>edition = &quot;2023&quot;</code>, the <a href="https://protobuf.dev/editions/overview/">successor to both proto2 and
+proto3</a>, uses <a href="https://protobuf.dev/programming-guides/field_presence/"><em>explicit
+presence</em></a> by default</li>
+</ul>
+<h2 id="opaqueapi">The new Opaque API</h2>
+<p>We created the new <em>Opaque API</em> to uncouple the <a href="https://protobuf.dev/reference/go/go-generated/">Generated Code
+API</a> from the underlying
+in-memory representation. The (existing) Open Struct API has no such separation:
+it allows programs direct access to the protobuf message memory. For example,
+one could use the <code>flag</code> package to parse command-line flag values into protobuf
+message fields:</p>
+<pre><code>var req logpb.LogEntry
+flag.StringVar(&amp;req.BackendServer, &quot;backend&quot;, os.Getenv(&quot;HOST&quot;), &quot;…&quot;)
+flag.Parse() // fills the BackendServer field from -backend flag
+</code></pre>
+<p>The problem with such a tight coupling is that we can never change how we lay
+out protobuf messages in memory. Lifting this restriction enables many
+implementation improvements, which we&rsquo;ll see below.</p>
+<p>What changes with the new Opaque API? Here is how the generated code from the
+above example would change:</p>
+<pre><code>package logpb
+
+type LogEntry struct {
+  xxx_hidden_BackendServer *string // no longer exported
+  xxx_hidden_RequestSize   uint32  // no longer exported
+  xxx_hidden_IPAddress     *string // no longer exported
+  // …internal fields elided…
+}
+
+func (l *LogEntry) GetBackendServer() string { … }
+func (l *LogEntry) HasBackendServer() bool   { … }
+func (l *LogEntry) SetBackendServer(string)  { … }
+func (l *LogEntry) ClearBackendServer()      { … }
+// …
+</code></pre>
+<p>With the Opaque API, the struct fields are hidden and can no longer be
+directly accessed. Instead, the new accessor methods allow for getting, setting,
+or clearing a field.</p>
+<h3 id="lessmemory">Opaque structs use less memory</h3>
+<p>One change we made to the memory layout is to model field presence for
+elementary fields more efficiently:</p>
+<ul>
+<li>The (existing) Open Struct API uses pointers, which adds a 64-bit word to the
+space cost of the field.</li>
+<li>The Opaque API uses <a href="https://en.wikipedia.org/wiki/Bit_field">bit
+fields</a>, which require one bit per
+field (ignoring padding overhead).</li>
+</ul>
+<p>Using fewer variables and pointers also lowers load on the allocator and on the
+garbage collector.</p>
+<p>The performance improvement depends heavily on the shapes of your protocol
+messages: The change only affects elementary fields like integers, bools, enums,
+and floats, but not strings, repeated fields, or submessages (because it is
+<a href="https://protobuf.dev/reference/go/opaque-faq/#memorylayout">less
+profitable</a>
+for those types).</p>
+<p>Our benchmark results show that messages with few elementary fields exhibit
+performance that is as good as before, whereas messages with more elementary
+fields are decoded with significantly fewer allocations:</p>
+<pre><code>             │ Open Struct API │             Opaque API             │
+             │    allocs/op    │  allocs/op   vs base               │
+Prod#1          360.3k ± 0%       360.3k ± 0%  +0.00% (p=0.002 n=6)
+Search#1       1413.7k ± 0%       762.3k ± 0%  -46.08% (p=0.002 n=6)
+Search#2        314.8k ± 0%       132.4k ± 0%  -57.95% (p=0.002 n=6)
+</code></pre>
+<p>Reducing allocations also makes decoding protobuf messages more efficient:</p>
+<pre><code>             │ Open Struct API │             Opaque API            │
+             │   user-sec/op   │ user-sec/op  vs base              │
+Prod#1         55.55m ± 6%        55.28m ± 4%  ~ (p=0.180 n=6)
+Search#1       324.3m ± 22%       292.0m ± 6%  -9.97% (p=0.015 n=6)
+Search#2       67.53m ± 10%       45.04m ± 8%  -33.29% (p=0.002 n=6)
+</code></pre>
+<p>(All measurements done on an AMD Castle Peak Zen 2. Results on ARM and Intel
+CPUs are similar.)</p>
+<p>Note: proto3 with implicit presence similarly does not use pointers, so you will
+not see a performance improvement if you are coming from proto3. If you were
+using implicit presence for performance reasons, forgoing the convenience of
+being able to distinguish empty fields from unset ones, then the Opaque API now
+makes it possible to use explicit presence without a performance penalty.</p>
+<h3 id="lazydecoding">Motivation: Lazy Decoding</h3>
+<p>Lazy decoding is a performance optimization where the contents of a submessage
+are decoded when first accessed instead of during
+<a href="https://pkg.go.dev/google.golang.org/protobuf/proto#Unmarshal"><code>proto.Unmarshal</code></a>. Lazy
+decoding can improve performance by avoiding unnecessarily decoding fields which
+are never accessed.</p>
+<p>Lazy decoding can&rsquo;t be supported safely by the (existing) Open Struct API. While
+the Open Struct API provides getters, leaving the (un-decoded) struct fields
+exposed would be extremely error-prone. To ensure that the decoding logic runs
+immediately before the field is first accessed, we must make the field private
+and mediate all accesses to it through getter and setter functions.</p>
+<p>This approach made it possible to implement lazy decoding with the Opaque
+API. Of course, not every workload will benefit from this optimization, but for
+those that do benefit, the results can be spectacular: We have seen logs
+analysis pipelines that discard messages based on a top-level message condition
+(e.g. whether <code>backend_server</code> is one of the machines running a new Linux kernel
+version) and can skip decoding deeply nested subtrees of messages.</p>
+<p>As an example, here are the results of the micro-benchmark we included,
+demonstrating how lazy decoding saves over 50% of the work and over 87% of
+allocations!</p>
+<pre><code>                  │   nolazy    │                lazy                │
+                  │   sec/op    │   sec/op     vs base               │
+Unmarshal/lazy-24   6.742µ ± 0%   2.816µ ± 0%  -58.23% (p=0.002 n=6)
+
+                  │    nolazy    │                lazy                 │
+                  │     B/op     │     B/op      vs base               │
+Unmarshal/lazy-24   3.666Ki ± 0%   1.814Ki ± 0%  -50.51% (p=0.002 n=6)
+
+                  │   nolazy    │               lazy                │
+                  │  allocs/op  │ allocs/op   vs base               │
+Unmarshal/lazy-24   64.000 ± 0%   8.000 ± 0%  -87.50% (p=0.002 n=6)
+</code></pre>
+<h3 id="pointercomparison">Motivation: reduce pointer comparison mistakes</h3>
+<p>Modeling field presence with pointers invites pointer-related bugs.</p>
+<p>Consider an enum, declared within the <code>LogEntry</code> message:</p>
+<pre><code>message LogEntry {
+  enum DeviceType {
+    DESKTOP = 0;
+    MOBILE = 1;
+    VR = 2;
+  };
+  DeviceType device_type = 1;
+}
+</code></pre>
+<p>A simple mistake is to compare the <code>device_type</code> enum field like so:</p>
+<pre><code>if cv.DeviceType == logpb.LogEntry_DESKTOP.Enum() { // incorrect!
+</code></pre>
+<p>Did you spot the bug? The condition compares the memory address instead of the
+value. Because the <code>Enum()</code> accessor allocates a new variable on each call, the
+condition can never be true. The check should have read:</p>
+<pre><code>if cv.GetDeviceType() == logpb.LogEntry_DESKTOP {
+</code></pre>
+<p>The new Opaque API prevents this mistake: Because fields are hidden, all access
+must go through the getter.</p>
+<h3 id="accidentalsharing">Motivation: reduce accidental sharing mistakes</h3>
+<p>Let&rsquo;s consider a slightly more involved pointer-related bug. Assume you are
+trying to stabilize an RPC service that fails under high load. The following
+part of the request middleware looks correct, but still the entire service goes
+down whenever just one customer sends a high volume of requests:</p>
+<pre><code>logEntry.IPAddress = req.IPAddress
+logEntry.BackendServer = proto.String(hostname)
+// The redactIP() function redacts IPAddress to 127.0.0.1,
+// unexpectedly not just in logEntry *but also* in req!
+go auditlog(redactIP(logEntry))
+if quotaExceeded(req) {
+	// BUG: All requests end up here, regardless of their source.
+	return fmt.Errorf(&quot;server overloaded&quot;)
+}
+</code></pre>
+<p>Did you spot the bug? The first line accidentally copied the pointer (thereby
+sharing the pointed-to variable between the <code>logEntry</code> and <code>req</code> messages)
+instead of its value. It should have read:</p>
+<pre><code>logEntry.IPAddress = proto.String(req.GetIPAddress())
+</code></pre>
+<p>The new Opaque API prevents this problem as the setter takes a value
+(<code>string</code>) instead of a pointer:</p>
+<pre><code>logEntry.SetIPAddress(req.GetIPAddress())
+</code></pre>
+<h3 id="reflection">Motivation: Fix Sharp Edges: reflection</h3>
+<p>To write code that works not only with a specific message type
+(e.g. <code>logpb.LogEntry</code>), but with any message type, one needs some kind of
+reflection. The previous example used a function to redact IP addresses. To work
+with any type of message, it could have been defined as <code>func redactIP(proto.Message) proto.Message { … }</code>.</p>
+<p>Many years ago, your only option to implement a function like <code>redactIP</code> was to
+reach for <a href="https://go.dev/blog/laws-of-reflection">Go&rsquo;s <code>reflect</code> package</a>,
+which resulted in very tight coupling: you had only the generator output and had
+to reverse-engineer what the input protobuf message definition might have looked
+like. The <a href="https://go.dev/blog/protobuf-apiv2"><code>google.golang.org/protobuf</code> module
+release</a> (from March 2020) introduced
+<a href="https://pkg.go.dev/google.golang.org/protobuf/reflect/protoreflect">Protobuf
+reflection</a>,
+which should always be preferred: Go&rsquo;s <code>reflect</code> package traverses the data
+structure&rsquo;s representation, which should be an implementation detail. Protobuf
+reflection traverses the logical tree of protocol messages without regard to its
+representation.</p>
+<p>Unfortunately, merely <em>providing</em> protobuf reflection is not sufficient and
+still leaves some sharp edges exposed: In some cases, users might accidentally
+use Go reflection instead of protobuf reflection.</p>
+<p>For example, encoding a protobuf message with the <code>encoding/json</code> package (which
+uses Go reflection) was technically possible, but the result is not <a href="https://protobuf.dev/programming-guides/proto3/#json">canonical
+Protobuf JSON
+encoding</a>. Use the
+<a href="https://pkg.go.dev/google.golang.org/protobuf/encoding/protojson"><code>protojson</code></a>
+package instead.</p>
+<p>The new Opaque API prevents this problem because the message struct fields are
+hidden: accidental usage of Go reflection will see an empty message. This is
+clear enough to steer developers towards protobuf reflection.</p>
+<h3 id="idealmemory">Motivation: Making the ideal memory layout possible</h3>
+<p>The benchmark results from the <a href="#lessmemory">More Efficient Memory
+Representation</a> section have already shown that protobuf
+performance heavily depends on the specific usage: How are the messages defined?
+Which fields are set?</p>
+<p>To keep Go Protobuf as fast as possible for <em>everyone</em>, we cannot implement
+optimizations that help only one program, but hurt the performance of other
+programs.</p>
+<p>The Go compiler used to be in a similar situation, up until <a href="https://go.dev/blog/go1.20">Go 1.20 introduced
+Profile-Guided Optimization (PGO)</a>. By recording the
+production behavior (through <a href="https://go.dev/blog/pprof">profiling</a>) and feeding
+that profile back to the compiler, we allow the compiler to make better
+trade-offs <em>for a specific program or workload</em>.</p>
+<p>We think using profiles to optimize for specific workloads is a promising
+approach for further Go Protobuf optimizations. The Opaque API makes those
+possible: Program code uses accessors and does not need to be updated when the
+memory representation changes, so we could, for example, move rarely set fields
+into an overflow struct.</p>
+<h2 id="migration">Migration</h2>
+<p>You can migrate on your own schedule, or even not at all—the (existing) Open
+Struct API will not be removed. But, if you’re not on the new Opaque API, you
+won’t benefit from its improved performance, or future optimizations that target
+it.</p>
+<p>We recommend you select the Opaque API for new development. Protobuf Edition
+2024 (see <a href="https://protobuf.dev/editions/overview/">Protobuf Editions Overview</a>
+if you are not yet familiar) will make the Opaque API the default.</p>
+<h3 id="hybridapi">The Hybrid API</h3>
+<p>Aside from the Open Struct API and Opaque API, there is also the Hybrid API,
+which keeps existing code working by keeping struct fields exported, but also
+enabling migration to the Opaque API by adding the new accessor methods.</p>
+<p>With the Hybrid API, the protobuf compiler will generate code on two API levels:
+the <code>.pb.go</code> is on the Hybrid API, whereas the <code>_protoopaque.pb.go</code> version is
+on the Opaque API and can be selected by building with the <code>protoopaque</code> build
+tag.</p>
+<h3 id="rewriting">Rewriting Code to the Opaque API</h3>
+<p>See the <a href="https://protobuf.dev/reference/go/opaque-migration/">migration
+guide</a>
+for detailed instructions. The high-level steps are:</p>
+<ol>
+<li>Enable the Hybrid API.</li>
+<li>Update existing code using the <code>open2opaque</code> migration tool.</li>
+<li>Switch to the Opaque API.</li>
+</ol>
+<h3 id="publishing">Advice for published generated code: Use Hybrid API</h3>
+<p>Small usages of protobuf can live entirely within the same repository, but
+usually, <code>.proto</code> files are shared between different projects that are owned by
+different teams. An obvious example is when different companies are involved: To
+call Google APIs (with protobuf), use the <a href="https://github.com/googleapis/google-cloud-go">Google Cloud Client Libraries for
+Go</a> from your project. Switching
+the Cloud Client Libraries to the Opaque API is not an option, as that would be
+a breaking API change, but switching to the Hybrid API is safe.</p>
+<p>Our advice for such packages that publish generated code (<code>.pb.go</code> files) is to
+switch to the Hybrid API please! Publish both the <code>.pb.go</code> and the
+<code>_protoopaque.pb.go</code> files, please. The <code>protoopaque</code> version allows your
+consumers to migrate on their own schedule.</p>
+<h3 id="enablelazy">Enabling Lazy Decoding</h3>
+<p>Lazy decoding is available (but not enabled) once you migrate to the Opaque API!
+🎉</p>
+<p>To enable: in your <code>.proto</code> file, annotate your message-typed fields with the
+<code>[lazy = true]</code> annotation.</p>
+<p>To opt out of lazy decoding (despite <code>.proto</code> annotations), the <a href="https://pkg.go.dev/google.golang.org/protobuf/runtime/protolazy"><code>protolazy</code>
+package
+documentation</a>
+describes the available opt-outs, which affect either an individual Unmarshal
+operation or the entire program.</p>
+<h2 id="nextsteps">Next Steps</h2>
+<p>By using the open2opaque tool in an automated fashion over the last few years,
+we have converted the vast majority of Google’s <code>.proto</code> files and Go code to
+the Opaque API. We continuously improved the Opaque API implementation as we
+moved more and more production workloads to it.</p>
+<p>Therefore, we expect you should not encounter problems when trying the Opaque
+API. In case you do encounter any issues after all, please <a href="https://github.com/golang/protobuf/issues/">let us know on the
+Go Protobuf issue tracker</a>.</p>
+<p>Reference documentation for Go Protobuf can be found on <a href="https://protobuf.dev/reference/go/">protobuf.dev → Go
+Reference</a>.</p>
+]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[Get a solar panel for your balcony now ☀️]]></title>
     <link href="https://michael.stapelberg.ch/posts/2024-12-10-solar-panel-for-your-balcony/"/>
     <id>https://michael.stapelberg.ch/posts/2024-12-10-solar-panel-for-your-balcony/</id>
@@ -4751,212 +5114,6 @@ Linux</a>.</p>
 <p>The third article in this series is <a href="../2022-07-02-rsync-how-does-it-work/">rsync, article 3: How does rsync
 work?</a>. With rsync up and running, it’s
 time to take a peek under the hood of rsync to better understand how it works.</p>
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[rsync, article 1: Scenarios]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2022-06-18-rsync-article-1-scenarios/"/>
-    <id>https://michael.stapelberg.ch/posts/2022-06-18-rsync-article-1-scenarios/</id>
-    <published>2022-06-18T15:04:00+02:00</published>
-    <content type="html"><![CDATA[<p>This post is the first article in a series of blog posts about rsync, <a href="../2022-06-18-rsync-overview/">see the
-Series Overview</a>.</p>
-<p>To motivate why it makes sense to look at rsync, I present three scenarios for
-which I have come to appreciate rsync: <a href="#dokuwiki-transfers-using-rsync">DokuWiki
-transfers</a>, <a href="#software-deployment-using-rsync">Software
-deployment</a> and
-<a href="#backups-using-rsync">Backups</a>.</p>
-<h2 id="dokuwiki-transfers-using-rsync">Scenario: DokuWiki transfers using rsync</h2>
-<p>Recently, I set up a couple of tools for a website that is built on DokuWiki,
-such as a dead link checker and a statistics program. To avoid overloading the
-live website (and possibly causing spurious requests that interfere with
-statistics), I decided it would be best to run a separate copy of the DokuWiki
-installation locally. This requires synchronizing:</p>
-<ol>
-<li>The PHP source code files of DokuWiki itself (including plugins and configuration)</li>
-<li>One text file per wiki page, and all uploaded media files</li>
-</ol>
-<p>A DokuWiki installation is exactly the kind of file tree that <a href="https://manpages.debian.org/scp.1"><code>scp(1)</code></a>
- cannot efficiently transfer (too many small files),
-but <a href="https://manpages.debian.org/rsync.1"><code>rsync(1)</code></a>
- can! The <code>rsync</code> transfer only takes a few seconds, no matter if
-it’s a full download (can be simpler for batch jobs) or an incremental
-synchronization (more efficient for regular synchronizations like backups).</p>
-<h2 id="software-deployment-using-rsync">Scenario: Software deployment using rsync</h2>
-<p>For smaller projects where I don’t publish new versions through Docker, I
-instead use a shell script to transfer and run my software on the server.</p>
-<p><code>rsync</code> is a great fit here, as it transfers many small files (static assets and
-templates) efficiently, only transfers the binaries that actually changed, and
-doesn’t mind if the binary file it’s uploading is currently running (contrary to
-<a href="https://manpages.debian.org/scp.1"><code>scp(1)</code></a>
-, for example).</p>
-<p>To illustrate how such a script could look like, here’s my push script for
-<a href="https://codesearch.debian.net/">Debian Code Search</a>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#007020">#!/bin/zsh
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span><span style="color:#007020">set</span> -ex
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Asynchronously transfer assets while compiling:</span>
-</span></span><span style="display:flex;"><span><span style="color:#666">(</span>
-</span></span><span style="display:flex;"><span>    ssh root@dcs <span style="color:#4070a0">&#39;for i in $(seq 0 5); do mkdir -p /srv/dcs/shard${i}/{src,idx}; done&#39;</span>
-</span></span><span style="display:flex;"><span>    ssh root@dcs <span style="color:#4070a0">&#34;adduser --disabled-password --gecos &#39;Debian Code Search&#39; dcs || true&#34;</span>
-</span></span><span style="display:flex;"><span>    rsync -r systemd/ root@dcs:/etc/systemd/system/ &amp;
-</span></span><span style="display:flex;"><span>    rsync -r cmd/dcs-web/templates/ root@dcs:/srv/dcs/templates/ &amp;
-</span></span><span style="display:flex;"><span>    rsync -r static/ root@dcs:/srv/dcs/static/ &amp;
-</span></span><span style="display:flex;"><span>    <span style="color:#007020">wait</span>
-</span></span><span style="display:flex;"><span><span style="color:#666">)</span> &amp;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Compile a new Debian Code Search version:</span>
-</span></span><span style="display:flex;"><span><span style="color:#bb60d5">tmp</span><span style="color:#666">=</span><span style="color:#007020;font-weight:bold">$(</span>mktemp -d<span style="color:#007020;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>mkdir <span style="color:#bb60d5">$tmp</span>/bin
-</span></span><span style="display:flex;"><span><span style="color:#bb60d5">GOBIN</span><span style="color:#666">=</span><span style="color:#bb60d5">$tmp</span>/bin <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span><span style="color:#bb60d5">GOAMD64</span><span style="color:#666">=</span>v3 <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  go install <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  -ldflags <span style="color:#4070a0">&#39;-X github.com/Debian/dcs/cmd/dcs-web/common.Version=$version&#39;</span> <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  github.com/Debian/dcs/cmd/...
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Transfer the Debian Code Search binaries:</span>
-</span></span><span style="display:flex;"><span>rsync <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  <span style="color:#bb60d5">$tmp</span>/bin/dcs-<span style="color:#666">{</span>web,source-backend,package-importer,compute-ranking,feeder<span style="color:#666">}</span> <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  <span style="color:#bb60d5">$tmp</span>/bin/dcs <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  root@dcs:/srv/dcs/bin/
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Wait for the asynchronous asset transfer to complete:</span>
-</span></span><span style="display:flex;"><span><span style="color:#007020">wait</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Restart Debian Code Search on the server:</span>
-</span></span><span style="display:flex;"><span><span style="color:#bb60d5">UNITS</span><span style="color:#666">=(</span>dcs-package-importer.service dcs-source-backend.service dcs-compute-ranking.timer dcs-web.service<span style="color:#666">)</span>
-</span></span><span style="display:flex;"><span>ssh root@dcs systemctl daemon-reload <span style="color:#4070a0;font-weight:bold">\&amp;\&amp;</span> <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  systemctl <span style="color:#007020">enable</span> <span style="color:#70a0d0">${</span><span style="color:#bb60d5">UNITS</span><span style="color:#70a0d0">}</span> <span style="color:#4070a0;font-weight:bold">\;</span> <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  systemctl reset-failed <span style="color:#70a0d0">${</span><span style="color:#bb60d5">UNITS</span><span style="color:#70a0d0">}</span> <span style="color:#4070a0;font-weight:bold">\;</span> <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  systemctl restart <span style="color:#70a0d0">${</span><span style="color:#bb60d5">UNITS</span><span style="color:#70a0d0">}</span> <span style="color:#4070a0;font-weight:bold">\;</span> <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  systemctl reload nginx
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>rm -rf <span style="color:#4070a0">&#34;</span><span style="color:#70a0d0">${</span><span style="color:#bb60d5">tmp</span>?<span style="color:#70a0d0">}</span><span style="color:#4070a0">&#34;</span>
-</span></span></code></pre></div><h2 id="backups-using-rsync">Scenario: Backups using rsync</h2>
-<p>The first backup system I used was
-<a href="https://en.wikipedia.org/wiki/Bacula">bacula</a>, which Wikipedia describes as an
-enterprise-level backup system. That certainly matches my impression, both in
-positive and negative ways: while bacula is very powerful, some seemingly common
-operations turn out quite complicated in bacula. Restoring a single file or
-directory tree from a backup was always more effort than I thought
-reasonable. For some reason, I often had to restore backup catalogs before I was
-able to access the backup contents (I don’t remember the exact details).</p>
-<p>When moving apartment last time, I used the opportunity to change my backup
-strategy. Instead of using complicated custom software with its own volume file
-format (like bacula), I wanted backed-up files to be usable on the file system
-level with standard tools like <code>rm</code>, <code>ls</code>, <code>cp</code>, etc.</p>
-<p>Working with files in a regular file system makes day-to-day usage easier, and
-also ensures that when my network storage hardware dies, I can just plug the
-hard disk into any PC, boot a Linux live system, and recover my data.</p>
-<p>To back up machines onto my <a href="/posts/2019-10-23-nas/">network storage PC</a>’s file
-system, I ended up with a <a href="https://github.com/stapelberg/zkj-nas-tools/blob/85e445a284c89590d595a52e16cb6dd652b1388e/dornroeschen/backup-remote.pl">hand-written rsync wrapper
-script</a>
-that copies the full file system of each machine into dated directory trees:</p>
-<pre tabindex="0"><code>storage2# ls -l backup/midna/2022-05-27
-bin   boot  etc  home  lib  lib64  media  opt
-proc  root  run  sbin  sys  tmp    usr    var
-
-storage2# ls -l backup/midna/2022-05-27/home/michael/configfiles/zshrc
--rw-r--r--. 7 1000 1000 14554 May  9 19:37 backup/midna/2022-05-27/home/michael/configfiles/zshrc
-</code></pre><p>To revert my <code>~/.zshrc</code> to an older version, I can <a href="https://manpages.debian.org/scp.1"><code>scp(1)</code></a>
- the file:</p>
-<pre tabindex="0"><code>midna% scp storage2:/srv/backup/midna/2022-05-27/home/michael/configfiles/zshrc ~/configfiles/zshrc
-</code></pre><p>To compare a whole older source tree, I can mount it using <a href="https://manpages.debian.org/sshfs.1"><code>sshfs(1)</code></a>
-:</p>
-<pre tabindex="0"><code>midna% mkdir /tmp/2022-05-27-i3
-midna% sshfs storage2:/srv/backup/midna/2022-05-27/$HOME/i3 /tmp/2022-05-27-i3
-midna% diff -ur /tmp/2022-05-27-i3 ~/i3/
-</code></pre><h3 id="incremental-backups">Incremental backups</h3>
-<p>Of course, the idea is not to transfer the full machine contents every day, as
-that would quickly fill up my network storage’s 16 TB disk! Instead, we can use
-rsync’s <code>--link-dest</code> option to elegantly deduplicate files using file system
-hard links:</p>
-<pre tabindex="0"><code>backup/midna/2022-05-26
-backup/midna/2022-05-27 # rsync --link-dest=2022-05-26
-</code></pre><p>To check the de-duplication level, we can use <a href="https://manpages.debian.org/du.1"><code>du(1)</code></a>
-,
-first on a single directory:</p>
-<pre tabindex="0"><code>storage2# du -hs 2022-05-27 
-113G	2022-05-27
-</code></pre><p>…and then on two subsequent directories:</p>
-<pre tabindex="0"><code>storage2# du -hs 2022-05-25 2022-05-27
-112G	2022-05-25
-7.3G	2022-05-27
-</code></pre><p>As you can see, the 2022-05-27 backup took 7.3 GB of disk space, and 104.7 GB
-were re-used from the previous backup(s).</p>
-<p>To print all files which have changed since the last backup, we can use:</p>
-<pre tabindex="0"><code>storage2# find 2022-05-27 -type f -links 1 -print
-</code></pre><h3 id="limitation-file-system-compatibility">Limitation: file system compatibility</h3>
-<p>A significant limitation of backups at the file level is that the destination
-file system (network storage) needs to support all the file system features used
-on the machines you are backing up.</p>
-<p>For example, if you use <a href="https://help.ubuntu.com/community/FilePermissionsACLs">POSIX
-ACLs</a> or <a href="https://wiki.archlinux.org/title/File_permissions_and_attributes#Extended_attributes">Extended
-attributes</a>
-(possibly for <a href="https://wiki.archlinux.org/title/Capabilities">Capabilities</a> or
-<a href="https://wiki.archlinux.org/title/SELinux">SELinux</a>), you need to ensure that
-your backup file system has these features enabled, and that you are using <a href="https://manpages.debian.org/rsync.1"><code>rsync(1)</code></a>
-’s <code>--xattrs</code> (or <code>-X</code> for short) option.</p>
-<p>This can turn from a pitfall into a dealbreaker as soon as multiple operating
-systems are involved. For example, the <code>rsync</code> version on macOS has
-<a href="https://github.com/apple-oss-distributions/rsync/blob/aa4e500aa53b9417014c718a5ff0e29215f08e48/rsync/generator.c#L1447">Apple-specific
-code</a>
-to work with Apple <a href="https://en.wikipedia.org/wiki/Resource_fork">resource forks</a>
-and other extended attributes. It’s not clear to me whether macOS <code>rsync</code> can
-send files to Linux <code>rsync</code>, restore them, and end up with the same system state.</p>
-<p>Luckily, I am only interested in backing up Linux systems, or merely home
-directories of non-Linux systems, where no extended attributes are used.</p>
-<h3 id="downside-slow-bulk-operations-disk-usage-deletion">Downside: slow bulk operations (disk usage, deletion)</h3>
-<p>The biggest downside of this architecture is that working with the directory
-trees in bulk can be very slow, especially when using a hard disk instead of an
-SSD. For example, deleting old backups can easily take many hours to multiple
-days (!). Sure, you can just let the <code>rm</code> command run in the background, but
-it’s annoying nevertheless.</p>
-<p>Even merely calculating the disk space usage of each directory tree is a
-painfully slow operation. I tried using stateful disk usage tools like
-<a href="http://duc.zevv.nl/">duc</a>, but it <a href="https://github.com/zevv/duc/issues/240">didn’t work
-reliably</a> on my backups.</p>
-<p>In practice, I found that for tracking down large files, using <a href="https://manpages.debian.org/ncdu.1"><code>ncdu(1)</code></a>
- on any recent backup typically quickly shows the
-large file. In one case, I found <code>var/lib/postgresql</code> to consume many
-gigabytes. I excluded it in favor of using <a href="https://manpages.debian.org/pg_dump.1"><code>pg_dump(1)</code></a>
-, which resulted in much smaller backups!</p>
-<p>Unfortunately, even when using an SSD, determining which files take up most
-space of a full backup takes a few minutes:</p>
-<pre tabindex="0"><code>storage2# time du -hs backup/midna/2022-06-09
-742G	backup/midna/2022-06-09
-
-real	8m0.202s
-user	0m11.651s
-sys	2m0.731s
-</code></pre><h3 id="backup-transport-ssh-and-scheduling">Backup transport (SSH) and scheduling</h3>
-<p>To transfer data via <code>rsync</code> from the backup host to my network storage, I’m
-using SSH.</p>
-<p>Each machine’s SSH access is restricted in my network storage’s SSH <a href="https://manpages.debian.org/authorized_keys.5"><code>authorized_keys(5)</code></a>
- config file to not allow arbitrary
-commands, but to perform just a specific operation. The only allowed operation
-in my case is running <code>rrsync</code> (“restricted rsync”) in a container whose file
-system only contains the backup host’s sub directory, e.g. .<code>websrv.zekjur.net</code>:</p>
-<pre tabindex="0"><code>command=&#34;/bin/docker run --log-driver none -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/websrv.zekjur.net:/srv/backup/websrv.zekjur.net stapelberg/docker-rsync /srv/backup/websrv.zekjur.net&#34;,no-port-forwarding,no-X11-forwarding ssh-ed25519 AAAAC3…
-</code></pre><p>(The <a href="/posts/2016-11-21-gigabit-nas-coreos/#dockerfiles-rrsync-and-samba">corresponding <code>Dockerfile</code> can be found in my Gigabit NAS
-article</a>.)</p>
-<p>To trigger such an SSH-protected <code>rsync</code> transfer remotely, I’m using a small
-custom scheduling program called
-<a href="https://github.com/stapelberg/zkj-nas-tools/tree/master/dornroeschen">dornröschen</a>. The
-program arranges for all involved machines to be powered on (using
-<a href="https://en.wikipedia.org/wiki/Wake-on-LAN">Wake-on-LAN</a>) and then starts
-<code>rsync</code> via <em>another operation-restricted SSH connection</em>.</p>
-<p>You could easily replace this with a cron job if you don’t care about WOL.</p>
-<p>The architecture looks like this:</p>
-<p><img src="2022-05-29-backup-architecture.svg" alt="backup architecture"></p>
-<p>The operation-restricted SSH connection on each backup host is configured in
-SSH’s <a href="https://manpages.debian.org/authorized_keys.5"><code>authorized_keys(5)</code></a>
- config file:</p>
-<pre tabindex="0"><code>command=&#34;/root/backup-remote.pl&#34;,no-port-forwarding,no-X11-forwarding ssh-ed25519 AAAAC3…
-</code></pre><h2 id="next-up">Next up</h2>
-<p>The second article in this series is <a href="../2022-07-02-rsync-surroundings/">rsync, article 2:
-Surroundings</a>. Now that we know what to use
-rsync for, how can we best integrate rsync into monitoring and alerting, and on
-which operating systems does it work?</p>
 ]]></content>
   </entry>
 </feed>

@@ -1941,7 +1941,14 @@ Solutions GmbH” range. That’s pretty much all there is to it.</p>
 <p>I don’t have enough nodes for advanced features like clustering, but I might
 investigate whether I want to set up backups on the Proxmox layer or keep doing
 them on the OS layer.</p>
-<h2 id="power-usage">Power Usage</h2>
+<h3 id="fan-speed-monitoring">Fan speed monitoring</h3>
+<p>Sven Geggus shared how to make the fan speed sensors work in current versions of
+Debian:</p>
+<pre tabindex="0"><code>pve# echo &#34;options nct6683 force=1&#34; &gt;&gt; /etc/modprobe.d/sensors.conf
+pve# echo nct6683 &gt;&gt; /etc/modules-load.d/sensors.conf
+pve# modprobe nct6683
+pve# systemctl restart prometheus-node-exporter
+</code></pre><h2 id="power-usage">Power Usage</h2>
 <p>The power usage values I measure are indeed excellent: The DeskMini X600 with
 Ryzen 7 8700G consumes less than 10W (idle)! When the machine has something to
 do, it spikes up to 50W:</p>

@@ -8,6 +8,450 @@
   <id>https://michael.stapelberg.ch/posts/tags/golang/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[Tips to debug hanging Go programs]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/"/>
+    <id>https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/</id>
+    <published>2025-02-27T17:51:38+01:00</published>
+    <content type="html"><![CDATA[<p>I was helping someone get my <a href="https://github.com/gokrazy/rsync">gokrazy/rsync</a>
+implementation set up to synchronize <a href="https://en.wikipedia.org/wiki/Resource_Public_Key_Infrastructure">RPKI
+data</a> (used
+for securing BGP routing infrastructure), when we discovered that with the right
+invocation, my rsync receiver would just hang indefinitely.</p>
+<p>This was a quick problem to solve, but in the process, I realized that I should
+probably write down a few Go debugging tips I have come to appreciate over the
+years!</p>
+<h2 id="scenario-hanging-go-program">Scenario: hanging Go program</h2>
+<p>If you want to follow along, you can reproduce the issue by building an older
+version of gokrazy/rsync, just before the bug fix commit (you’ll need <a href="https://go.dev/dl/">Go 1.22
+or newer</a>):</p>
+<pre tabindex="0"><code>git clone https://github.com/gokrazy/rsync
+cd rsync
+git reset --hard 6c89d4dda3be055f19684c0ed56d623da458194e^
+go install ./cmd/...
+</code></pre><p>Now we can try to sync the repository:</p>
+<pre tabindex="0"><code>% gokr-rsync \
+  -rtO \
+  --delete \
+  rsync://rsync.paas.rpki.ripe.net/repository/ \
+  /tmp/rpki-repo
+[…]
+2025/02/08 09:35:10 Opening TCP connection to rsync.paas.rpki.ripe.net:873
+2025/02/08 09:35:10 rsync module &#34;repo&#34;, path &#34;repo/&#34;
+2025/02/08 09:35:10 (Client) Protocol versions: remote=31, negotiated=27
+2025/02/08 09:35:10 Client checksum: md4
+2025/02/08 09:35:10 sending daemon args: [--server --sender -tr . repo/]
+2025/02/08 09:35:10 exclusion list sent
+2025/02/08 09:35:10 receiving file list
+2025/02/08 09:35:11 [Receiver] i=0 ? . mode=40755 len=4096 uid=0 gid=0 flags=?
+[…]
+2025/02/08 09:35:11 [Receiver] i=89 ? clonoth/1/3139332e33322e3130302e302f32342d3234203d3e203537313936.roa mode=100644 len=1747 uid=0 gid=0 flags=?
+</code></pre><p>…and then the program just sits there.</p>
+<h2 id="sigquit-stack-trace">Tip 1: Press Ctrl+\ (SIGQUIT) to print a stack trace</h2>
+<p>The easiest way to look at where a Go program is hanging is to press <code>Ctrl+\</code>
+(backslash) to <a href="https://en.wikipedia.org/wiki/Signal_(IPC)#SIGQUIT">make the terminal send it a <code>SIGQUIT</code>
+signal</a>. When the Go runtime
+receives <code>SIGQUIT</code>, it prints a stack trace to the terminal before exiting the
+process. This behavior is enabled by default and can be customized via the
+<code>GOTRACEBACK</code> environment variable, see the <a href="https://pkg.go.dev/runtime"><code>runtime</code> package
+docs</a>.</p>
+<p>Here is what the output looks like in our case. I have made the font small so
+that you can recognize the shape of the output (the details are not important,
+continue reading below):</p>
+<div style="font-size: 60%">
+<pre tabindex="0"><code>^\SIGQUIT: quit
+PC=0x47664e m=0 sigcode=128
+
+goroutine 0 gp=0x6e6020 m=0 mp=0x6e6ec0 [idle]:
+internal/runtime/syscall.Syscall6()
+	/home/michael/sdk/go1.23.0/src/internal/runtime/syscall/asm_linux_amd64.s:36 +0xe fp=0x7ffc58665090 sp=0x7ffc58665088 pc=0x47664e
+internal/runtime/syscall.EpollWait(0x586651e0?, {0x7ffc5866511c?, 0x3000000018?, 0x7ffc586651f0?}, 0x58665110?, 0x7ffc?)
+	/home/michael/sdk/go1.23.0/src/internal/runtime/syscall/syscall_linux.go:32 +0x45 fp=0x7ffc586650e0 sp=0x7ffc58665090 pc=0x4765e5
+runtime.netpoll(0xc0000000c0?)
+	/home/michael/sdk/go1.23.0/src/runtime/netpoll_epoll.go:116 +0xd2 fp=0x7ffc58665768 sp=0x7ffc586650e0 pc=0x432332
+runtime.findRunnable()
+	/home/michael/sdk/go1.23.0/src/runtime/proc.go:3580 +0x8c5 fp=0x7ffc586658e0 sp=0x7ffc58665768 pc=0x43f045
+runtime.schedule()
+	/home/michael/sdk/go1.23.0/src/runtime/proc.go:3995 +0xb1 fp=0x7ffc58665918 sp=0x7ffc586658e0 pc=0x4405b1
+runtime.park_m(0xc0000061c0)
+	/home/michael/sdk/go1.23.0/src/runtime/proc.go:4102 +0x1eb fp=0x7ffc58665970 sp=0x7ffc58665918 pc=0x4409cb
+runtime.mcall()
+	/home/michael/sdk/go1.23.0/src/runtime/asm_amd64.s:459 +0x4e fp=0x7ffc58665988 sp=0x7ffc58665970 pc=0x470e2e
+
+goroutine 1 gp=0xc0000061c0 m=nil [IO wait]:
+runtime.gopark(0x452658?, 0x0?, 0x98?, 0xb3?, 0xb?)
+	/home/michael/sdk/go1.23.0/src/runtime/proc.go:424 +0xce fp=0xc0000eb358 sp=0xc0000eb338 pc=0x46bc0e
+runtime.netpollblock(0x4a01b8?, 0x4058e6?, 0x0?)
+	/home/michael/sdk/go1.23.0/src/runtime/netpoll.go:575 +0xf7 fp=0xc0000eb390 sp=0xc0000eb358 pc=0x4318f7
+internal/poll.runtime_pollWait(0x7ef586628808, 0x72)
+	/home/michael/sdk/go1.23.0/src/runtime/netpoll.go:351 +0x85 fp=0xc0000eb3b0 sp=0xc0000eb390 pc=0x46af05
+internal/poll.(*pollDesc).wait(0xc0000ce180?, 0xc00020e99c?, 0x0)
+	/home/michael/sdk/go1.23.0/src/internal/poll/fd_poll_runtime.go:84 +0x27 fp=0xc0000eb3d8 sp=0xc0000eb3b0 pc=0x4b0ce7
+internal/poll.(*pollDesc).waitRead(...)
+	/home/michael/sdk/go1.23.0/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0xc0000ce180, {0xc00020e99c, 0x4, 0x4})
+	/home/michael/sdk/go1.23.0/src/internal/poll/fd_unix.go:165 +0x27a fp=0xc0000eb470 sp=0xc0000eb3d8 pc=0x4b17da
+net.(*netFD).Read(0xc0000ce180, {0xc00020e99c?, 0x6eeea0?, 0x1?})
+	/home/michael/sdk/go1.23.0/src/net/fd_posix.go:55 +0x25 fp=0xc0000eb4b8 sp=0xc0000eb470 pc=0x4f7e85
+net.(*conn).Read(0xc000206000, {0xc00020e99c?, 0xc000212000?, 0x6e6ec0?})
+	/home/michael/sdk/go1.23.0/src/net/net.go:189 +0x45 fp=0xc0000eb500 sp=0xc0000eb4b8 pc=0x5001a5
+net.(*TCPConn).Read(0x0?, {0xc00020e99c?, 0xc0000eb568?, 0x46d449?})
+	&lt;autogenerated&gt;:1 +0x25 fp=0xc0000eb530 sp=0xc0000eb500 pc=0x50bb25
+io.ReadAtLeast({0x5d9640, 0xc000206000}, {0xc00020e99c, 0x4, 0x4}, 0x4)
+	/home/michael/sdk/go1.23.0/src/io/io.go:335 +0x90 fp=0xc0000eb578 sp=0xc0000eb530 pc=0x4957d0
+io.ReadFull(...)
+	/home/michael/sdk/go1.23.0/src/io/io.go:354
+encoding/binary.Read({0x5d9640, 0xc000206000}, {0x5da8b0, 0x7059a0}, {0x55e7c0, 0xc0000eb6a0})
+	/home/michael/sdk/go1.23.0/src/encoding/binary/binary.go:244 +0xa5 fp=0xc0000eb670 sp=0xc0000eb578 pc=0x5102a5
+github.com/gokrazy/rsync/internal/rsyncwire.(*MultiplexReader).ReadMsg(0xc00020a100)
+	/home/michael/kr/rsync/internal/rsyncwire/wire.go:50 +0x48 fp=0xc0000eb6e8 sp=0xc0000eb670 pc=0x514428
+github.com/gokrazy/rsync/internal/rsyncwire.(*MultiplexReader).Read(0x7ef5869b9a68?, {0xc000280000, 0x40000, 0x4dd4fb?})
+	/home/michael/kr/rsync/internal/rsyncwire/wire.go:72 +0x2f fp=0xc0000eb788 sp=0xc0000eb6e8 pc=0x5145af
+bufio.(*Reader).Read(0xc0002020c0, {0xc00020e998, 0x4, 0x40ece5?})
+	/home/michael/sdk/go1.23.0/src/bufio/bufio.go:241 +0x197 fp=0xc0000eb7c0 sp=0xc0000eb788 pc=0x4d5a57
+io.ReadAtLeast({0x5d93e0, 0xc0002020c0}, {0xc00020e998, 0x4, 0x4}, 0x4)
+	/home/michael/sdk/go1.23.0/src/io/io.go:335 +0x90 fp=0xc0000eb808 sp=0xc0000eb7c0 pc=0x4957d0
+io.ReadFull(...)
+	/home/michael/sdk/go1.23.0/src/io/io.go:354
+github.com/gokrazy/rsync/internal/rsyncwire.(*Conn).ReadInt32(0xc000208060)
+	/home/michael/kr/rsync/internal/rsyncwire/wire.go:163 +0x4a fp=0xc0000eb850 sp=0xc0000eb808 pc=0x51490a
+github.com/gokrazy/rsync/internal/receiver.(*Transfer).recvIdMapping1(0xc000202120, 0x5a9b58)
+	/home/michael/kr/rsync/internal/receiver/uidlist.go:16 +0x3d fp=0xc0000eb8c0 sp=0xc0000eb850 pc=0x51fc7d
+github.com/gokrazy/rsync/internal/receiver.(*Transfer).RecvIdList(0xc000202120)
+	/home/michael/kr/rsync/internal/receiver/uidlist.go:52 +0x1dd fp=0xc0000eba08 sp=0xc0000eb8c0 pc=0x51ffbd
+github.com/gokrazy/rsync/internal/receiver.(*Transfer).ReceiveFileList(0xc000202120)
+	/home/michael/kr/rsync/internal/receiver/flist.go:229 +0x378 fp=0xc0000ebb10 sp=0xc0000eba08 pc=0x51c5b8
+github.com/gokrazy/rsync/internal/receivermaincmd.clientRun({{0x5d9280, 0xc000078058}, {0x5d92a0, 0xc000078060}, {0x5d92a0, 0xc000078068}}, 0xc0000d0d90, {0x7ef53d47efc8, 0xc000206000}, {0x7ffc5866600e, ...}, ...)
+	/home/michael/kr/rsync/internal/receivermaincmd/receivermaincmd.go:341 +0x5cd fp=0xc0000ebc10 sp=0xc0000ebb10 pc=0x550c2d
+github.com/gokrazy/rsync/internal/receivermaincmd.socketClient({{0x5d9280, 0xc000078058}, {0x5d92a0, 0xc000078060}, {0x5d92a0, 0xc000078068}}, 0xc0000d0d90, {0x7ffc58665ff4?, 0x1?}, {0x7ffc5866600e, ...})
+	/home/michael/kr/rsync/internal/receivermaincmd/clientserver.go:44 +0x425 fp=0xc0000ebcd0 sp=0xc0000ebc10 pc=0x54c205
+github.com/gokrazy/rsync/internal/receivermaincmd.rsyncMain({{0x5d9280, 0xc000078058}, {0x5d92a0, 0xc000078060}, {0x5d92a0, 0xc000078068}}, 0xc0000d0d90, {0xc00007e440, 0x1, 0x2}, ...)
+	/home/michael/kr/rsync/internal/receivermaincmd/receivermaincmd.go:160 +0x5d7 fp=0xc0000ebdf0 sp=0xc0000ebcd0 pc=0x54f697
+github.com/gokrazy/rsync/internal/receivermaincmd.Main({0xc0000160a0, 0x5, 0x5}, {0x5d9280?, 0xc000078058?}, {0x5d92a0?, 0xc000078060?}, {0x5d92a0?, 0xc000078068?})
+	/home/michael/kr/rsync/internal/receivermaincmd/receivermaincmd.go:394 +0x272 fp=0xc0000ebee8 sp=0xc0000ebdf0 pc=0x5510d2
+main.main()
+	/home/michael/kr/rsync/cmd/gokr-rsync/rsync.go:12 +0x4e fp=0xc0000ebf50 sp=0xc0000ebee8 pc=0x5515ae
+runtime.main()
+	/home/michael/sdk/go1.23.0/src/runtime/proc.go:272 +0x28b fp=0xc0000ebfe0 sp=0xc0000ebf50 pc=0x438d4b
+runtime.goexit({})
+	/home/michael/sdk/go1.23.0/src/runtime/asm_amd64.s:1700 +0x1 fp=0xc0000ebfe8 sp=0xc0000ebfe0 pc=0x472e61
+
+goroutine 2 gp=0xc000006c40 m=nil [force gc (idle)]:
+runtime.gopark(0x0?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/home/michael/sdk/go1.23.0/src/runtime/proc.go:424 +0xce fp=0xc000074fa8 sp=0xc000074f88 pc=0x46bc0e
+runtime.goparkunlock(...)
+	/home/michael/sdk/go1.23.0/src/runtime/proc.go:430
+runtime.forcegchelper()
+	/home/michael/sdk/go1.23.0/src/runtime/proc.go:337 +0xb3 fp=0xc000074fe0 sp=0xc000074fa8 pc=0x439093
+runtime.goexit({})
+	/home/michael/sdk/go1.23.0/src/runtime/asm_amd64.s:1700 +0x1 fp=0xc000074fe8 sp=0xc000074fe0 pc=0x472e61
+created by runtime.init.7 in goroutine 1
+	/home/michael/sdk/go1.23.0/src/runtime/proc.go:325 +0x1a
+</code></pre></div>
+<p>Phew! This output is pretty dense.</p>
+<p>We can use the <a href="https://github.com/maruel/panicparse">https://github.com/maruel/panicparse</a> program to present this
+stack trace in a more colorful and much shorter version:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu3e0f2d5aa6180df20bb553ed5c6fa57b_1741005_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu3e0f2d5aa6180df20bb553ed5c6fa57b_1741005_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu3e0f2d5aa6180df20bb553ed5c6fa57b_1741005_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="394"
+  style="
+
+border: 1px solid #000;
+
+"
+  
+  loading="lazy"></a>
+
+
+
+<p>The functions helpfully highlighted in red are where the problem lies: My rsync
+receiver implementation was incorrectly expecting the server to send a uid/gid
+list, despite the PreserveUid and PreserveGid options not being enabled. <a href="https://github.com/gokrazy/rsync/commit/6c89d4dda3be055f19684c0ed56d623da458194e">Commit
+<code>6c89d4d</code></a>
+fixes the issue.</p>
+<h2 id="attach-dlv">Tip 2: Attach the delve debugger to the process</h2>
+<p>If dumping the stack trace in the moment is not sufficient to diagnose the
+problem, you can go one step further and reach for an interactive debugger.</p>
+<p>The most well-known Linux debugger is probably GDB, but when working with Go, I
+recommend using <a href="https://github.com/go-delve/delve">the delve debugger</a> instead
+as it typically works better. Install delve if you haven’t already:</p>
+<pre tabindex="0"><code>% go install github.com/go-delve/delve/cmd/dlv@latest
+</code></pre><p>In this article, I am using delve v1.24.0.</p>
+<aside class="admonition note">
+  <div class="note-container">
+    <div class="note-icon" style="width: 20px; height: 20px">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+    </div>
+    <div class="admonition-content"><p><strong>Note:</strong> If you want to explore local variables, you should rebuild your
+program without optimizations and inlining (see the <a href="https://github.com/go-delve/delve/blob/master/Documentation/usage/dlv_exec.md"><code>dlv exec</code>
+docs</a>):</p>
+<pre tabindex="0"><code>% go install -gcflags=all=&#34;-N -l&#34; ./cmd/...
+</code></pre></div>
+  </div>
+</aside>
+
+<p>While you can run a new child process in a debugger (use <code>dlv exec</code>) without any
+special permissions, attaching existing processes in a debugger is <a href="https://www.kernel.org/doc/Documentation/security/Yama.txt">disabled by
+default in Linux</a>
+for security reasons. We can allow this feature (remember to turn it off later!)
+using:</p>
+<pre tabindex="0"><code>% sudo sysctl -w kernel.yama.ptrace_scope=0
+kernel.yama.ptrace_scope = 0
+</code></pre><p>…and then we can just <code>dlv attach</code> to the hanging <code>gokr-rsync</code> process:</p>
+<pre tabindex="0"><code>% dlv attach $(pidof gokr-rsync)
+Type &#39;help&#39; for list of commands.
+(dlv)
+</code></pre><p>Great. But if we just print a stack trace, we only see functions from the
+<code>runtime</code> package:</p>
+<pre tabindex="0"><code>(dlv) bt
+0  0x000000000047bb83 in runtime.futex
+   at /home/michael/sdk/go1.23.6/src/runtime/sys_linux_amd64.s:558
+1  0x00000000004374d0 in runtime.futexsleep
+   at /home/michael/sdk/go1.23.6/src/runtime/os_linux.go:69
+2  0x000000000040d89d in runtime.notesleep
+   at /home/michael/sdk/go1.23.6/src/runtime/lock_futex.go:170
+3  0x000000000044123e in runtime.mPark
+   at /home/michael/sdk/go1.23.6/src/runtime/proc.go:1866
+4  0x000000000044290d in runtime.stopm
+   at /home/michael/sdk/go1.23.6/src/runtime/proc.go:2886
+5  0x00000000004433d0 in runtime.findRunnable
+   at /home/michael/sdk/go1.23.6/src/runtime/proc.go:3623
+6  0x0000000000444e1d in runtime.schedule
+   at /home/michael/sdk/go1.23.6/src/runtime/proc.go:3996
+7  0x00000000004451cb in runtime.park_m
+   at /home/michael/sdk/go1.23.6/src/runtime/proc.go:4103
+8  0x0000000000477eee in runtime.mcall
+   at /home/michael/sdk/go1.23.6/src/runtime/asm_amd64.s:459
+</code></pre><p>The reason is that no goroutine is running (the program is waiting indefinitely
+to receive data from the server), so we see one of the OS threads waiting in the
+Go scheduler.</p>
+<p>We first need to switch to the goroutine we are interested in (<code>grs</code> prints all
+goroutines), and then the stack trace looks like what we expect:</p>
+<pre tabindex="0"><code>(dlv) gr 1
+Switched from 0 to 1 (thread 414327)
+(dlv) bt
+ 0  0x0000000000474ebc in runtime.gopark
+    at /home/michael/sdk/go1.23.6/src/runtime/proc.go:425
+ 1  0x000000000043819e in runtime.netpollblock
+    at /home/michael/sdk/go1.23.6/src/runtime/netpoll.go:575
+ 2  0x000000000047435c in internal/poll.runtime_pollWait
+    at /home/michael/sdk/go1.23.6/src/runtime/netpoll.go:351
+ 3  0x00000000004ed15a in internal/poll.(*pollDesc).wait
+    at /home/michael/sdk/go1.23.6/src/internal/poll/fd_poll_runtime.go:84
+ 4  0x00000000004ed1f1 in internal/poll.(*pollDesc).waitRead
+    at /home/michael/sdk/go1.23.6/src/internal/poll/fd_poll_runtime.go:89
+ 5  0x00000000004ee351 in internal/poll.(*FD).Read
+    at /home/michael/sdk/go1.23.6/src/internal/poll/fd_unix.go:165
+ 6  0x0000000000569bb3 in net.(*netFD).Read
+    at /home/michael/sdk/go1.23.6/src/net/fd_posix.go:55
+ 7  0x000000000057a025 in net.(*conn).Read
+    at /home/michael/sdk/go1.23.6/src/net/net.go:189
+ 8  0x000000000058fcc5 in net.(*TCPConn).Read
+    at &lt;autogenerated&gt;:1
+ 9  0x00000000004b72e8 in io.ReadAtLeast
+    at /home/michael/sdk/go1.23.6/src/io/io.go:335
+10  0x00000000004b74d3 in io.ReadFull
+    at /home/michael/sdk/go1.23.6/src/io/io.go:354
+11  0x0000000000598d5f in encoding/binary.Read
+    at /home/michael/sdk/go1.23.6/src/encoding/binary/binary.go:244
+12  0x00000000005a0b7a in github.com/gokrazy/rsync/internal/rsyncwire.(*MultiplexReader).ReadMsg
+    at /home/michael/kr/rsync/internal/rsyncwire/wire.go:50
+13  0x00000000005a0f17 in github.com/gokrazy/rsync/internal/rsyncwire.(*MultiplexReader).Read
+    at /home/michael/kr/rsync/internal/rsyncwire/wire.go:72
+14  0x0000000000528de8 in bufio.(*Reader).Read
+    at /home/michael/sdk/go1.23.6/src/bufio/bufio.go:241
+15  0x00000000004b72e8 in io.ReadAtLeast
+    at /home/michael/sdk/go1.23.6/src/io/io.go:335
+16  0x00000000004b74d3 in io.ReadFull
+    at /home/michael/sdk/go1.23.6/src/io/io.go:354
+17  0x00000000005a19ef in github.com/gokrazy/rsync/internal/rsyncwire.(*Conn).ReadInt32
+    at /home/michael/kr/rsync/internal/rsyncwire/wire.go:163
+18  0x00000000005b77d2 in github.com/gokrazy/rsync/internal/receiver.(*Transfer).recvIdMapping1
+    at /home/michael/kr/rsync/internal/receiver/uidlist.go:16
+19  0x00000000005b7ea8 in github.com/gokrazy/rsync/internal/receiver.(*Transfer).RecvIdList
+    at /home/michael/kr/rsync/internal/receiver/uidlist.go:52
+20  0x00000000005b18db in github.com/gokrazy/rsync/internal/receiver.(*Transfer).ReceiveFileList
+    at /home/michael/kr/rsync/internal/receiver/flist.go:229
+21  0x0000000000605390 in github.com/gokrazy/rsync/internal/receivermaincmd.clientRun
+    at /home/michael/kr/rsync/internal/receivermaincmd/receivermaincmd.go:341
+22  0x00000000005fe572 in github.com/gokrazy/rsync/internal/receivermaincmd.socketClient
+    at /home/michael/kr/rsync/internal/receivermaincmd/clientserver.go:44
+23  0x0000000000602f10 in github.com/gokrazy/rsync/internal/receivermaincmd.rsyncMain
+    at /home/michael/kr/rsync/internal/receivermaincmd/receivermaincmd.go:160
+24  0x0000000000605e7e in github.com/gokrazy/rsync/internal/receivermaincmd.Main
+    at /home/michael/kr/rsync/internal/receivermaincmd/receivermaincmd.go:394
+25  0x0000000000606653 in main.main
+    at /home/michael/kr/rsync/cmd/gokr-rsync/rsync.go:12
+26  0x000000000043fa47 in runtime.main
+    at /home/michael/sdk/go1.23.6/src/runtime/proc.go:272
+27  0x000000000047bd01 in runtime.goexit
+    at /home/michael/sdk/go1.23.6/src/runtime/asm_amd64.s:1700
+</code></pre><h2 id="save-core-dump">Tip 3: Save a core dump for later</h2>
+<p>If you don’t have time to poke around in the debugger now, you can save a core
+dump for later.</p>
+<aside class="admonition note">
+  <div class="note-container">
+    <div class="note-icon" style="width: 20px; height: 20px">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+    </div>
+    <div class="admonition-content"><strong>Tip:</strong> Check out my <a href="/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/">debugging Go core dumps with
+delve</a> blog post from
+2024 for more details! This section just explains how to collect core dumps.</div>
+  </div>
+</aside>
+
+<p>In addition to printing the stack trace on <code>SIGQUIT</code>, we can make the Go runtime
+crash the program, which in turn makes the Linux kernel write a core dump, by
+running our program with the environment variable
+<a href="https://pkg.go.dev/runtime"><code>GOTRACEBACK=crash</code></a>.</p>
+<p>Modern Linux systems typically include <a href="https://manpages.debian.org/systemd-coredump.8"><code>systemd-coredump(8)</code></a>
+ (but you might need to explicitly install it, for example on
+Ubuntu) to collect core dumps (and remove old ones). You can use <a href="https://manpages.debian.org/coredumpctl.1"><code>coredumpctl(1)</code></a>
+ to list and work with them. On macOS,
+<a href="https://developer.apple.com/forums/thread/694233#695943022">collecting cores is more
+involved</a>. I don’t
+know about Windows.</p>
+<p>In case your Linux system does not use <code>systemd-coredump</code>, you can use <code>ulimit -c unlimited</code> and set the kernel’s <code>kernel.core_pattern</code> sysctl setting. You can
+find more details and options in the <a href="https://go.dev/wiki/CoreDumpDebugging">CoreDumpDebugging page of the Go
+wiki</a>. For this article, we will stick to
+<code>coredumpctl</code>:</p>
+<pre tabindex="0"><code>% GOTRACEBACK=crash gokr-rsync -rtO --delete rsync://rsync.paas.rpki.ripe.net/repo/ /tmp/rpki-repo
+[…]
+^\SIGQUIT: quit
+[…]
+zsh: IOT instruction (core dumped)  GOTRACEBACK=crash gokr-rsync -rtO […]
+</code></pre><p>The last line is what we want to see: it should say “core dumped”.</p>
+<p>This core should now show up in <a href="https://manpages.debian.org/coredumpctl.1"><code>coredumpctl(1)</code></a>
+:</p>
+<pre tabindex="0"><code>% coredumpctl info
+           PID: 414607 (gokr-rsync)
+           UID: 1000 (michael)
+           GID: 1000 (michael)
+        Signal: 6 (ABRT)
+     Timestamp: Sat 2025-02-08 10:18:27 CET (12s ago)
+  Command Line: gokr-rsync -rtO --delete rsync://rsync.paas.rpki.ripe.net/repo/ /tmp/rpki-repo
+    Executable: /bin/gokr-rsync
+ Control Group: /user.slice/user-1000.slice/session-1.scope
+          Unit: session-1.scope
+         Slice: user-1000.slice
+       Session: 1
+     Owner UID: 1000 (michael)
+       Boot ID: 6158dd3b52af4b8384c103a8a336fc02
+    Machine ID: ecb5a44f1a5846ad871566e113bf8937
+      Hostname: midna
+       Storage: /var/lib/systemd/coredump/core.gokr-rsync.1000.6158dd3b52af4b8384c103a8a336fc02.414607.1739006307000000.zst (present)
+  Size on Disk: 158.3K
+       Message: Process 414607 (gokr-rsync) of user 1000 dumped core.
+                
+    Module [dso] without build-id.
+    Module [dso]
+    Stack trace of thread 1604447:
+    #0  0x0000000000475a41 runtime.raise.abi0 (/bin/gokr-rsync + 0x75a41)
+    #1  0x0000000000451d85 runtime.dieFromSignal (/bin/gokr-rsync + 0x51d85)
+    #2  0x00000000004522e6 runtime.sigfwdgo (/bin/gokr-rsync + 0x522e6)
+    #3  0x0000000000450c45 runtime.sigtrampgo (/bin/gokr-rsync + 0x50c45)
+    #4  0x0000000000475d26 runtime.sigtramp.abi0 (/bin/gokr-rsync + 0x75d26)
+    #5  0x0000000000475e20 n/a (/bin/gokr-rsync + 0x75e20)
+    ELF object binary architecture: AMD x86-64
+</code></pre><p>If you see only hexadecimal addresses followed by <code>n/a (n/a + 0x0)</code>, that means
+<code>systemd-coredump</code> could not symbolize (= resolve addresses to function names)
+your core dump. Here are a few possible reasons for missing symbolization:</p>
+<ul>
+<li>Linux 6.12 <a href="https://sourceware.org/bugzilla/show_bug.cgi?id=32713">started producing core dumps that elfutils cannot
+symbolize</a>. <code>systemd-coredump</code>
+uses elfutils for symbolization, so until this issue is fixed in either Linux
+and/or elfutils, you’ll need to stick to Linux &lt;6.12 or revert <a href="https://github.com/torvalds/linux/commit/7d442a33bfe817ab2a735f3d2e430e36305354ea">the triggering
+commit</a>.</li>
+<li>With systemd v234-v256, <code>systemd-coredump</code> did not have permission to look
+into programs living in the <code>/home</code> directory (fixed with <a href="https://github.com/systemd/systemd/commit/4ac1755be2d6c141fae7e57c42936e507c5b54e3">commit
+<code>4ac1755</code></a>
+in systemd v257+).
+<ul>
+<li>Similarly, <code>systemd-coredump</code> runs with
+<a href="http://manpages.debian.org/systemd.exec"><code>PrivateTmp=yes</code></a>, meaning it
+won’t be able to access programs you place in <code>/tmp</code>.</li>
+</ul>
+</li>
+<li>Go builds with debug symbols by default, but maybe you are explicitly
+stripping debug symbols in your build, by building with <code>-ldflags=-w</code>?</li>
+</ul>
+<p>We can now use <a href="https://manpages.debian.org/coredumpctl.1"><code>coredumpctl(1)</code></a>
+ to launch delve for
+this program + core dump:</p>
+<pre tabindex="0"><code>% coredumpctl debug --debugger=dlv --debugger-arguments=core
+[…]
+Type &#39;help&#39; for list of commands.
+(dlv) gr 1
+Switched from 0 to 1 (thread 414607)
+(dlv) bt
+[…]
+16  0x00000000004b74d3 in io.ReadFull
+    at /home/michael/sdk/go1.23.6/src/io/io.go:354
+17  0x00000000005a19ef in github.com/gokrazy/rsync/internal/rsyncwire.(*Conn).ReadInt32
+    at /home/michael/kr/rsync/internal/rsyncwire/wire.go:163
+18  0x00000000005b77d2 in github.com/gokrazy/rsync/internal/receiver.(*Transfer).recvIdMapping1
+    at /home/michael/kr/rsync/internal/receiver/uidlist.go:16
+19  0x00000000005b7ea8 in github.com/gokrazy/rsync/internal/receiver.(*Transfer).RecvIdList
+    at /home/michael/kr/rsync/internal/receiver/uidlist.go:52
+20  0x00000000005b18db in github.com/gokrazy/rsync/internal/receiver.(*Transfer).ReceiveFileList
+    at /home/michael/kr/rsync/internal/receiver/flist.go:229
+21  0x0000000000605390 in github.com/gokrazy/rsync/internal/receivermaincmd.clientRun
+    at /home/michael/kr/rsync/internal/receivermaincmd/receivermaincmd.go:341
+22  0x00000000005fe572 in github.com/gokrazy/rsync/internal/receivermaincmd.socketClient
+    at /home/michael/kr/rsync/internal/receivermaincmd/clientserver.go:44
+23  0x0000000000602f10 in github.com/gokrazy/rsync/internal/receivermaincmd.rsyncMain
+    at /home/michael/kr/rsync/internal/receivermaincmd/receivermaincmd.go:160
+24  0x0000000000605e7e in github.com/gokrazy/rsync/internal/receivermaincmd.Main
+    at /home/michael/kr/rsync/internal/receivermaincmd/receivermaincmd.go:394
+25  0x0000000000606653 in main.main
+    at /home/michael/kr/rsync/cmd/gokr-rsync/rsync.go:12
+26  0x000000000043fa47 in runtime.main
+    at /home/michael/sdk/go1.23.6/src/runtime/proc.go:272
+27  0x000000000047bd01 in runtime.goexit
+    at /home/michael/sdk/go1.23.6/src/runtime/asm_amd64.s:1700
+</code></pre><h2 id="conclusion">Conclusion</h2>
+<p>In my experience, in the medium to long term, it always pays off to set up your
+environment such that you can debug your programs conveniently. I strongly
+encourage every programmer (and even users!) to invest time into your
+development and debugging setup.</p>
+<p>Luckily, Go comes with stack printing functionality by default (just press
+<code>Ctrl+\</code>) and we can easily get a core dump out of our Go programs by running
+them with <code>GOTRACEBACK=crash</code> — provided the system is set up to collect core
+dumps.</p>
+<p>Together with the delve debugger, this gives us all we need to effectively and
+efficiently diagnose problems in Go programs.</p>
+]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[Go Protobuf: The new Opaque API]]></title>
     <link href="https://michael.stapelberg.ch/posts/2024-12-21-go-protobuf-opaque/"/>
     <id>https://michael.stapelberg.ch/posts/2024-12-21-go-protobuf-opaque/</id>

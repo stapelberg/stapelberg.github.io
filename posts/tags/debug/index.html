@@ -2,10 +2,10 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>rsync - Michael Stapelberg</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>debug - Michael Stapelberg</title>
 
   <meta property="og:site_name" content="Michael Stapelberg">
-  <meta property="og:title" content="rsync">
+  <meta property="og:title" content="debug">
   <meta property="og:description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
   
   
@@ -16,7 +16,7 @@
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
   <meta name="description" content="Michael Stapelberg’s private website, containing articles about computers and programming, mostly focused on Linux.">
-  <link rel="canonical" href="https://michael.stapelberg.ch/posts/tags/rsync/">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/tags/debug/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
     @font-face {
@@ -99,7 +99,7 @@
 
   
   <link rel="stylesheet" href="/1.min.css?cachebust=sha512-I0UgSa%2b7hYT7qK%2frOve0ZBP50owtJrFZWlIVuNrTjjerYIZ92i01Nz2OTyOq7A0%2f8N3pFbeykhg47FpofWUT%2bA%3d%3d" type="text/css">
-  <link rel="alternate" href="https://michael.stapelberg.ch/posts/tags/rsync/feed.xml" type="application/atom+xml" title="ATOM feed for posts tagged rsync">
+  <link rel="alternate" href="https://michael.stapelberg.ch/posts/tags/debug/feed.xml" type="application/atom+xml" title="ATOM feed for posts tagged debug">
 </head>
 <body>
 
@@ -175,24 +175,17 @@
 </header>
 <main>
       <div>
-<h1 class="ms_title">Blog Posts tagged rsync
-  <a href="https://michael.stapelberg.ch/posts/tags/rsync/feed.xml">
+<h1 class="ms_title">Blog Posts tagged debug
+  <a href="https://michael.stapelberg.ch/posts/tags/debug/feed.xml">
     <img src="/feed-icon.svg" style="width: .75em"
-	 alt="ATOM feed for posts tagged rsync"
-	 title="ATOM feed for posts tagged rsync">
+	 alt="ATOM feed for posts tagged debug"
+	 title="ATOM feed for posts tagged debug">
   </a>
 </h1>
 
 <div class="Artikel" id="content">
   <p>
-  For many years, I was only a casual user of
-  <a href="https://en.wikipedia.org/wiki/Rsync">rsync</a> and used it mostly for
-  one-off file transfers.
-</p>
-
-<p>
-  Over time, I found rsync useful in more and more cases, and would recommend
-  every computer user put this great tool into their toolbox 🛠 🧰 !
+  Tips for debugging.
 </p>
 
   
@@ -235,17 +228,19 @@ This was a quick problem to solve, but in the process, I realized that I should 
   </ul>
 
   
-  <h2>2022 › July</h2>
+  <h2>2024 › October</h2>
   <ul class="ArticleList">
     
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/"><h3>rsync, article 3: How does rsync work?</h3></a>
+	<a href="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/"><h3>Debug Go core dumps with delve: export byte slices</h3></a>
 	
 	<div class="tags">
 	  Tags:
 	
-	<span class="ms_tag"><a href="/posts/tags/rsync/">rsync</a></span>
+	<span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
+	
+	<span class="ms_tag"><a href="/posts/tags/debug/">debug</a></span>
 	
 	</div>
 	
@@ -256,40 +251,12 @@ This was a quick problem to solve, but in the process, I realized that I should 
 	
 	
 	
-	<a href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-logical-view-featured_hu1b95d2c95d5a13b0da7a794463b790a4_117059_200x200_fit_box_3.png" width="200" height="83"/></a>
+	<a href="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_huc92a382266793767583fa56b2a20c9d0_1575273_200x200_fit_q75_box.jpg" width="200" height="172"/></a>
 	
 	<p>
-	  This post is the third article in a series of blog posts about rsync, see the Series Overview.
-With rsync up and running, it’s time to take a peek under the hood of rsync to better understand how it works.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/"><h3>rsync, article 2: Surroundings</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/rsync/">rsync</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	
-	
-	<a href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu49255cbd0611171ac9ea093d82565708_603964_200x200_fit_q75_box.jpg" width="200" height="156"/></a>
-	
-	<p>
-	  This post is the second article in a series of blog posts about rsync, see the Series Overview.
-Now that we know what to use rsync for, how can we best integrate rsync into monitoring and alerting, and on which operating systems does it work?
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/">Read more →</a></span>
+	  Not all bugs can easily be reproduced — sometimes, all you have is a core dump from a crashing program, but no idea about the triggering conditions of the bug yet.
+When using Go, we can use the delve debugger for core dump debugging, but I had trouble figuring out how to save byte slice contents (for example: the incoming request causing the crash) from memory into a file for further analysis, so this article walks you through how to do it.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/">Read more →</a></span>
 	</p>
       </div>
     </li>
@@ -297,17 +264,17 @@ Now that we know what to use rsync for, how can we best integrate rsync into mon
   </ul>
 
   
-  <h2>2022 › June</h2>
+  <h2>2024 › February</h2>
   <ul class="ArticleList">
     
     <li>
       <div>
-	<a href="https://michael.stapelberg.ch/posts/2022-06-18-rsync-article-1-scenarios/"><h3>rsync, article 1: Scenarios</h3></a>
+	<a href="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/"><h3>Minimal Linux Bootloader debugging story 🐞</h3></a>
 	
 	<div class="tags">
 	  Tags:
 	
-	<span class="ms_tag"><a href="/posts/tags/rsync/">rsync</a></span>
+	<span class="ms_tag"><a href="/posts/tags/debug/">debug</a></span>
 	
 	</div>
 	
@@ -318,40 +285,12 @@ Now that we know what to use rsync for, how can we best integrate rsync into mon
 	
 	
 	
-	<a href="https://michael.stapelberg.ch/posts/2022-06-18-rsync-article-1-scenarios/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2022-06-18-rsync-article-1-scenarios/2022-05-29-backup-architecture-featured_hu1125823a3f59628890a4eaaee4bbeec9_124691_200x200_fit_box_3.png" width="200" height="108"/></a>
+	<a href="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured_hucd7e1463fcc59a2458cbdaeb4c4f836a_674116_200x200_fit_q75_box.jpg" width="200" height="194"/></a>
 	
 	<p>
-	  This post is the first article in a series of blog posts about rsync, see the Series Overview.
-To motivate why it makes sense to look at rsync, I present three scenarios for which I have come to appreciate rsync: DokuWiki transfers, Software deployment and Backups.
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2022-06-18-rsync-article-1-scenarios/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2022-06-18-rsync-overview/"><h3>rsync: Series Overview</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/rsync/">rsync</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	
-	
-	<a href="https://michael.stapelberg.ch/posts/2022-06-18-rsync-overview/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2022-06-18-rsync-overview/rsynclogo-featured_hu1867cd41e88a35b18a5cfe108c7f39ac_58869_200x200_fit_box_3.png" width="200" height="97"/></a>
-	
-	<p>
-	  For many years, I was only a casual user of rsync and used it mostly for one-off file transfers.
-Over time, I found rsync useful in more and more cases, and would recommend every computer user put this great tool into their toolbox 🛠 🧰 !
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2022-06-18-rsync-overview/">Read more →</a></span>
+	  I maintain two builds of the Linux kernel, a linux/arm64 build for gokrazy, my Go appliance platform, which started out on the Raspberry Pi, and then a linux/amd64 one for router7, which runs on PCs.
+The update process for both of these builds is entirely automated, meaning new Linux kernel releases are automatically tested and merged, but recently the continuous integration testing failed to automatically merge Linux 6․7 — this article is about tracking down the root cause of that failure.
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/">Read more →</a></span>
 	</p>
       </div>
     </li>

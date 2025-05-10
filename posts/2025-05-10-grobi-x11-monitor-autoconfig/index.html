@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>In praise of grobi for auto-configuring X11 monitors - Michael Stapelberg</title>
+
+  <meta property="og:site_name" content="Michael Stapelberg">
+  <meta property="og:title" content="In praise of grobi for auto-configuring X11 monitors">
+  <meta property="og:description" content="I have recently started using the grobi program by Alexander Neumann again and was delighted to discover that it makes using my fiddly (but wonderful) Dell 32-inch 8K monitor (UP3218K) monitor much more convenient — I get a signal more quickly than with my previous, sleep-based approach.">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <meta name="description" content="I have recently started using the grobi program by Alexander Neumann again and was delighted to discover that it makes using my fiddly (but wonderful) Dell 32-inch 8K monitor (UP3218K) monitor much more convenient — I get a signal more quickly than with my previous, sleep-based approach.">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2025-05-10-grobi-x11-monitor-autoconfig/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+
+  
+
+  
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-I0UgSa%2b7hYT7qK%2frOve0ZBP50owtJrFZWlIVuNrTjjerYIZ92i01Nz2OTyOq7A0%2f8N3pFbeykhg47FpofWUT%2bA%3d%3d" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div><h1 class="ms_title">In praise of grobi for auto-configuring X11 monitors</h1>
+
+<div class="ms_meta">
+  <div id="ms_date">published 2025-05-10</div>
+  
+  
+  <div id="ms_tags">
+  
+  in tags
+  
+  
+  <span class="ms_tag"><a href="/posts/tags/pc/">pc</a></span>
+  
+  <span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
+  
+  </div>
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2025-05-10-grobi-x11-monitor-autoconfig/index.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
+</div>
+<div class="Artikel" id="content">
+  <style type="text/css">
+    .TableOfContents > ul, .TableOfContents > ul > li > ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+    }
+    .TableOfContents > ul > li > ul {
+	margin: 1em;
+    }
+    .TableOfContents li {
+	margin-bottom: 1rem;
+    }
+  </style>
+  <details class="ms_toc_details">
+    <summary>Table of contents</summary>
+    <nav class="TableOfContents">
+  <ul>
+    <li><a href="#automatic-monitor-configuration-with-grobi">Automatic monitor configuration with grobi</a></li>
+    <li><a href="#why-not-autorandr">Why not autorandr?</a></li>
+    <li><a href="#does-grobi-work-on-wayland">Does grobi work on Wayland?</a></li>
+    <li><a href="#zleep">Bonus: my Suspend-to-RAM setup</a></li>
+  </ul>
+</nav>
+  </details>
+  <p>I have recently started using the <a href="https://github.com/fd0/grobi/"><code>grobi</code> program by Alexander
+Neumann</a> again and was delighted to discover that
+it makes using my fiddly (but wonderful) <a href="/posts/2017-12-11-dell-up3218k/">Dell 32-inch 8K monitor
+(UP3218K)</a> monitor much more convenient — I get
+a signal more quickly than with my previous, sleep-based approach.</p>
+<p>Previously, when my PC woke up from suspend-to-RAM, there were two scenarios:</p>
+<ol>
+<li>The monitor was connected. My <a href="#zleep">sleep program</a> would power on the
+monitor (if needed), sleep a little while and then run <a href="https://manpages.debian.org/xrandr.1"><code>xrandr(1)</code></a>
+ to (hopefully) configure the monitor correctly.</li>
+<li>The monitor was not connected, for example because it was still connected to
+my work PC.</li>
+</ol>
+<p>In scenario ②, or if the one-shot configuration attempt in scenario ① fails, I
+would need to SSH in from a different computer and run <code>xrandr</code> manually so that
+the monitor would show a signal:</p>
+<pre tabindex="0"><code>% DISPLAY=:0 xrandr \
+  --output DP-4 --mode 3840x4320 --panning 0x0+0+0 \
+  --output DP-2 --right-of DP-4 --mode 3840x4320 --panning 0x0+3840+0
+</code></pre><h2 id="automatic-monitor-configuration-with-grobi">Automatic monitor configuration with grobi</h2>
+<p>I have now completely solved this problem by creating the following
+<code>~/.config/grobi.conf</code> file:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">rules</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>UP3218K<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">outputs_connected</span>:<span style="color:#bbb"> </span>[DP-2, DP-4]<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic"># DP-4 is left, DP-2 is right</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">configure_row</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>- DP-4@3840x4320<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>- DP-2@3840x4320<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#60a0b0;font-style:italic"># atomic instructs grobi to only call xrandr once and configure all the</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#60a0b0;font-style:italic"># outputs. This does not always work with all graphic cards, but is</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic"># needed to successfully configure the UP3218K monitor.</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">atomic</span>:<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">true</span><span style="color:#bbb">
+</span></span></span></code></pre></div><p>…and installing / enabling <code>grobi</code> (on Arch Linux) using:</p>
+<pre tabindex="0"><code>% sudo pacman -S grobi
+% systemctl --user enable --now grobi
+</code></pre><p>Whenever <code>grobi</code> detects that my monitor is connected (it listens for <a href="https://cgit.freedesktop.org/xorg/proto/randrproto/tree/randrproto.txt">X11
+RandR</a>
+output change events), it will run <a href="https://manpages.debian.org/xrandr.1"><code>xrandr(1)</code></a>
+ to
+configure the monitor resolution and positioning.</p>
+<p>To check what <code>grobi</code> is seeing/doing, you can use:</p>
+<pre tabindex="0"><code>% systemctl --user status grobi
+% journalctl --user -u grob
+</code></pre><p>For example, on my system, I see:</p>
+<pre tabindex="0"><code>grobi: 18:31:48.823765 outputs: [HDMI-0 (primary) DP-0 DP-1 DP-2 (connected) 3840x2160+ [DEL-16711-808727372-DELL UP3218K-D2HP805I043L] DP-3 DP-4 (connected) 3840x21&gt;
+grobi: 18:31:48.823783 new rule found: UP3218K
+grobi: 18:31:48.823785 enable outputs: [DP-4@3840x4320 DP-2@3840x4320]
+grobi: 18:31:48.823789 using one atomic call to xrandr
+grobi: 18:31:48.823806 running command /usr/bin/xrandr xrandr --output DP-4 --mode 3840x4320 --output DP-2 --mode 3840x4320 --right-of DP-4
+grobi: 18:31:49.285944 new RANDR change event received
+</code></pre><p>Notably, the instructions for getting out of a bad state (no signal) are now to
+power off the monitor and power it back on again. This will result in RandR
+output change events, which will trigger <code>grobi</code>, which will run <code>xrandr</code>, which
+configures the monitor. Nice!</p>
+<h2 id="why-not-autorandr">Why not autorandr?</h2>
+<p>No particular reason. I knew <code>grobi</code>.</p>
+<p>If nothing else, <code>grobi</code> is written in Go, so it’s likely to keep working
+smoothly over the years.</p>
+<h2 id="does-grobi-work-on-wayland">Does grobi work on Wayland?</h2>
+<p>Probably not. There is no mention of Wayland over on the <a href="https://github.com/fd0/grobi/">grobi
+repository</a>.</p>
+<h2 id="zleep">Bonus: my Suspend-to-RAM setup</h2>
+<p>As a bonus, this section describes the other half of my monitor-related
+automation.</p>
+<p>When I suspend my PC to RAM, I either want to wake it up manually later, for
+example by pressing a key on the keyboard or by sending a Wake-on-LAN packet, or
+I want it to wake up automatically each morning at 6:50 — that way, daily cron
+jobs have some time to run before I start using the computer.</p>
+<p>To accomplish this, I use <code>zleep</code>, a wrapper program around <a href="https://manpages.debian.org/rtcwake.8"><code>rtcwake(8)</code></a>
+ and <code>systemctl suspend</code> that integrates with the
+myStrom switch smart plug to turn off power to the monitor entirely. This is
+worthwhile because the monitor draws 30W even in standby!</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span> main
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;context&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;flag&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;log&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;net/http&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;net/url&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;os&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;os/exec&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;time&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">var</span> (
+</span></span><span style="display:flex;"><span>	resume = flag.<span style="color:#06287e">Bool</span>(<span style="color:#4070a0">&#34;resume&#34;</span>,
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">false</span>,
+</span></span><span style="display:flex;"><span>		<span style="color:#4070a0">&#34;run resume behavior only (turn on monitor via smart plug)&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	noMonitor = flag.<span style="color:#06287e">Bool</span>(<span style="color:#4070a0">&#34;no_monitor&#34;</span>,
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">false</span>,
+</span></span><span style="display:flex;"><span>		<span style="color:#4070a0">&#34;disable turning off/on monitor&#34;</span>)
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">monitorPower</span>(ctx context.Context, method, cmnd <span style="color:#902000">string</span>) <span style="color:#902000">error</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> <span style="color:#666">*</span>noMonitor {
+</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;[monitor power] skipping because -no_monitor flag is set&#34;</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;[monitor power] command: %v&#34;</span>, cmnd)
+</span></span><span style="display:flex;"><span>	u, err <span style="color:#666">:=</span> url.<span style="color:#06287e">Parse</span>(<span style="color:#4070a0">&#34;http://myStrom-Switch-A46FD0/&#34;</span> <span style="color:#666">+</span> cmnd)
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">for</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> ctx.<span style="color:#06287e">Err</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		req, err <span style="color:#666">:=</span> http.<span style="color:#06287e">NewRequest</span>(method, u.<span style="color:#06287e">String</span>(), <span style="color:#007020;font-weight:bold">nil</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		ctx, canc <span style="color:#666">:=</span> context.<span style="color:#06287e">WithTimeout</span>(ctx, <span style="color:#40a070">5</span><span style="color:#666">*</span>time.Second)
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">defer</span> <span style="color:#06287e">canc</span>()
+</span></span><span style="display:flex;"><span>		req = req.<span style="color:#06287e">WithContext</span>(ctx)
+</span></span><span style="display:flex;"><span>		resp, err <span style="color:#666">:=</span> http.DefaultClient.<span style="color:#06287e">Do</span>(req)
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			log.<span style="color:#06287e">Print</span>(err)
+</span></span><span style="display:flex;"><span>			time.<span style="color:#06287e">Sleep</span>(<span style="color:#40a070">1</span> <span style="color:#666">*</span> time.Second)
+</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">continue</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> resp.StatusCode <span style="color:#666">!=</span> http.StatusOK {
+</span></span><span style="display:flex;"><span>			log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;unexpected HTTP status code: got %v, want %v&#34;</span>, resp.Status, http.StatusOK)
+</span></span><span style="display:flex;"><span>			time.<span style="color:#06287e">Sleep</span>(<span style="color:#40a070">1</span> <span style="color:#666">*</span> time.Second)
+</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">continue</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;[monitor power] request succeeded&#34;</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">nextWakeup</span>(now time.Time) time.Time {
+</span></span><span style="display:flex;"><span>	midnight <span style="color:#666">:=</span> time.<span style="color:#06287e">Date</span>(now.<span style="color:#06287e">Year</span>(), now.<span style="color:#06287e">Month</span>(), now.<span style="color:#06287e">Day</span>(), <span style="color:#40a070">0</span>, <span style="color:#40a070">0</span>, <span style="color:#40a070">0</span>, <span style="color:#40a070">0</span>, time.Local)
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> now.<span style="color:#06287e">Hour</span>() &lt; <span style="color:#40a070">6</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// wake up today
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#007020;font-weight:bold">return</span> midnight.<span style="color:#06287e">Add</span>(<span style="color:#40a070">6</span><span style="color:#666">*</span>time.Hour <span style="color:#666">+</span> <span style="color:#40a070">50</span><span style="color:#666">*</span>time.Minute)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// wake up tomorrow
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">return</span> midnight.<span style="color:#06287e">Add</span>(<span style="color:#40a070">24</span> <span style="color:#666">*</span> time.Hour).<span style="color:#06287e">Add</span>(<span style="color:#40a070">6</span><span style="color:#666">*</span>time.Hour <span style="color:#666">+</span> <span style="color:#40a070">50</span><span style="color:#666">*</span>time.Minute)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">runResume</span>() <span style="color:#902000">error</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Retry for up to one minute to give the network some time to come up
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	ctx, canc <span style="color:#666">:=</span> context.<span style="color:#06287e">WithTimeout</span>(context.<span style="color:#06287e">Background</span>(), <span style="color:#40a070">1</span><span style="color:#666">*</span>time.Minute)
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">defer</span> <span style="color:#06287e">canc</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">monitorPower</span>(ctx, <span style="color:#4070a0">&#34;GET&#34;</span>, <span style="color:#4070a0">&#34;relay?state=1&#34;</span>); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Print</span>(err)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">zleep</span>() <span style="color:#902000">error</span> {
+</span></span><span style="display:flex;"><span>	ctx <span style="color:#666">:=</span> context.<span style="color:#06287e">Background</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	now <span style="color:#666">:=</span> time.<span style="color:#06287e">Now</span>().<span style="color:#06287e">Truncate</span>(<span style="color:#40a070">1</span> <span style="color:#666">*</span> time.Second)
+</span></span><span style="display:flex;"><span>	wakeup <span style="color:#666">:=</span> <span style="color:#06287e">nextWakeup</span>(now)
+</span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;now   : %v&#34;</span>, now)
+</span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;wakeup: %v&#34;</span>, wakeup)
+</span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;wakeup: %v (timestamp)&#34;</span>, wakeup.<span style="color:#06287e">Unix</span>())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// assumes hwclock is running in UTC (see timedatectl | grep local)
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Power the monitor off in 15 seconds.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// mode=on is intentional: https://api.mystrom.ch/#e532f952-36ea-40fb-a180-a57b835f550e
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// - the switch will be turned on (already on, so this is a no-op)
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// - the switch will wait for 15 seconds
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// - the switch will be turned off
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">monitorPower</span>(ctx, <span style="color:#4070a0">&#34;POST&#34;</span>, <span style="color:#4070a0">&#34;timer?mode=on&amp;time=15&#34;</span>); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Print</span>(err)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	sleep <span style="color:#666">:=</span> exec.<span style="color:#06287e">Command</span>(<span style="color:#4070a0">&#34;sh&#34;</span>, <span style="color:#4070a0">&#34;-c&#34;</span>, fmt.<span style="color:#06287e">Sprintf</span>(<span style="color:#4070a0">&#34;sudo rtcwake -m no --verbose --utc -t %v &amp;&amp; sudo systemctl suspend&#34;</span>, wakeup.<span style="color:#06287e">Unix</span>()))
+</span></span><span style="display:flex;"><span>	sleep.Stdout = os.Stdout
+</span></span><span style="display:flex;"><span>	sleep.Stderr = os.Stderr
+</span></span><span style="display:flex;"><span>	fmt.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;running %v\n&#34;</span>, sleep.Args)
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> sleep.<span style="color:#06287e">Run</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;%v: %v&#34;</span>, sleep.Args, err)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+</span></span><span style="display:flex;"><span>	flag.<span style="color:#06287e">Parse</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> <span style="color:#666">*</span>resume {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">runResume</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			log.<span style="color:#06287e">Fatal</span>(err)
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	} <span style="color:#007020;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">zsleep</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			log.<span style="color:#06287e">Fatal</span>(err)
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>To turn power to the monitor on after resuming, I placed the following shell
+script in <code>/lib/systemd/system-sleep/zleep.sh</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#007020">#!/bin/sh
+</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">case</span> <span style="color:#4070a0">&#34;</span><span style="color:#bb60d5">$1</span><span style="color:#4070a0">&#34;</span> in
+</span></span><span style="display:flex;"><span>	pre<span style="color:#666">)</span>	<span style="color:#007020">exit</span> <span style="color:#40a070">0</span>
+</span></span><span style="display:flex;"><span>		;;
+</span></span><span style="display:flex;"><span>	post<span style="color:#666">)</span>	/usr/local/bin/zleep -resume
+</span></span><span style="display:flex;"><span>		<span style="color:#007020">exit</span> <span style="color:#40a070">0</span>
+</span></span><span style="display:flex;"><span>		;;
+</span></span><span style="display:flex;"><span> 	*<span style="color:#666">)</span>	<span style="color:#007020">exit</span> <span style="color:#40a070">1</span>
+</span></span><span style="display:flex;"><span>		;;
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">esac</span>
+</span></span></code></pre></div><p>Once power is on, grobi will detect and configure the monitor.</p>
+<p>Here is the program in action:</p>
+<pre tabindex="0"><code>2025/05/06 21:58:32 now   : 2025-05-06 21:58:32 +0200 CEST
+2025/05/06 21:58:32 wakeup: 2025-05-07 06:50:00 +0200 CEST
+2025/05/06 21:58:32 wakeup: 1746593400 (timestamp)
+2025/05/06 21:58:32 [monitor power] command: timer?mode=on&amp;time=15
+2025/05/06 21:58:32 [monitor power] request succeeded
+running [sh -c sudo rtcwake -m no --verbose --utc -t 1746593400 &amp;&amp; sudo systemctl suspend]
+Using UTC time.
+	delta   = 0
+	tzone   = 0
+	tzname  = UTC
+	systime = 1746561512, (UTC) Tue May  6 19:58:32 2025
+	rtctime = 1746561512, (UTC) Tue May  6 19:58:32 2025
+alarm 1746593400, sys_time 1746561512, rtc_time 1746561512, seconds 0
+rtcwake: wakeup using /dev/rtc0 at Wed May  7 04:50:00 2025
+suspend mode: no; leaving
+</code></pre><div id="bmc">
+  <p>
+    I run a blog since 2005, spreading knowledge and experience for over 20 years! :)
+  </p>
+  <p>
+    If you want to support my work, you
+    can <a href="https://www.buymeacoffee.com/stapelberg">buy me a coffee</a>.
+  </p>
+  <p>
+    Thank you for your support! ❤️
+  </p>
+</div>
+
+</div>
+
+      </div>
+<div id="ms_toc">
+  <div>
+    <strong>Table Of Contents</strong>
+
+    <nav class="TableOfContents">
+  <ul>
+    <li><a href="#automatic-monitor-configuration-with-grobi">Automatic monitor configuration with grobi</a></li>
+    <li><a href="#why-not-autorandr">Why not autorandr?</a></li>
+    <li><a href="#does-grobi-work-on-wayland">Does grobi work on Wayland?</a></li>
+    <li><a href="#zleep">Bonus: my Suspend-to-RAM setup</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+
+    </main><div id="ms_footer">
+  © 2025 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

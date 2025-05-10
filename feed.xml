@@ -6,6 +6,244 @@
   <id>https://michael.stapelberg.ch/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[In praise of grobi for auto-configuring X11 monitors]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2025-05-10-grobi-x11-monitor-autoconfig/"/>
+    <id>https://michael.stapelberg.ch/posts/2025-05-10-grobi-x11-monitor-autoconfig/</id>
+    <published>2025-05-10T08:24:00+02:00</published>
+    <content type="html"><![CDATA[<p>I have recently started using the <a href="https://github.com/fd0/grobi/"><code>grobi</code> program by Alexander
+Neumann</a> again and was delighted to discover that
+it makes using my fiddly (but wonderful) <a href="/posts/2017-12-11-dell-up3218k/">Dell 32-inch 8K monitor
+(UP3218K)</a> monitor much more convenient — I get
+a signal more quickly than with my previous, sleep-based approach.</p>
+<p>Previously, when my PC woke up from suspend-to-RAM, there were two scenarios:</p>
+<ol>
+<li>The monitor was connected. My <a href="#zleep">sleep program</a> would power on the
+monitor (if needed), sleep a little while and then run <a href="https://manpages.debian.org/xrandr.1"><code>xrandr(1)</code></a>
+ to (hopefully) configure the monitor correctly.</li>
+<li>The monitor was not connected, for example because it was still connected to
+my work PC.</li>
+</ol>
+<p>In scenario ②, or if the one-shot configuration attempt in scenario ① fails, I
+would need to SSH in from a different computer and run <code>xrandr</code> manually so that
+the monitor would show a signal:</p>
+<pre tabindex="0"><code>% DISPLAY=:0 xrandr \
+  --output DP-4 --mode 3840x4320 --panning 0x0+0+0 \
+  --output DP-2 --right-of DP-4 --mode 3840x4320 --panning 0x0+3840+0
+</code></pre><h2 id="automatic-monitor-configuration-with-grobi">Automatic monitor configuration with grobi</h2>
+<p>I have now completely solved this problem by creating the following
+<code>~/.config/grobi.conf</code> file:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">rules</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>UP3218K<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">outputs_connected</span>:<span style="color:#bbb"> </span>[DP-2, DP-4]<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic"># DP-4 is left, DP-2 is right</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">configure_row</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>- DP-4@3840x4320<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>- DP-2@3840x4320<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#60a0b0;font-style:italic"># atomic instructs grobi to only call xrandr once and configure all the</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#60a0b0;font-style:italic"># outputs. This does not always work with all graphic cards, but is</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic"># needed to successfully configure the UP3218K monitor.</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">atomic</span>:<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">true</span><span style="color:#bbb">
+</span></span></span></code></pre></div><p>…and installing / enabling <code>grobi</code> (on Arch Linux) using:</p>
+<pre tabindex="0"><code>% sudo pacman -S grobi
+% systemctl --user enable --now grobi
+</code></pre><p>Whenever <code>grobi</code> detects that my monitor is connected (it listens for <a href="https://cgit.freedesktop.org/xorg/proto/randrproto/tree/randrproto.txt">X11
+RandR</a>
+output change events), it will run <a href="https://manpages.debian.org/xrandr.1"><code>xrandr(1)</code></a>
+ to
+configure the monitor resolution and positioning.</p>
+<p>To check what <code>grobi</code> is seeing/doing, you can use:</p>
+<pre tabindex="0"><code>% systemctl --user status grobi
+% journalctl --user -u grob
+</code></pre><p>For example, on my system, I see:</p>
+<pre tabindex="0"><code>grobi: 18:31:48.823765 outputs: [HDMI-0 (primary) DP-0 DP-1 DP-2 (connected) 3840x2160+ [DEL-16711-808727372-DELL UP3218K-D2HP805I043L] DP-3 DP-4 (connected) 3840x21&gt;
+grobi: 18:31:48.823783 new rule found: UP3218K
+grobi: 18:31:48.823785 enable outputs: [DP-4@3840x4320 DP-2@3840x4320]
+grobi: 18:31:48.823789 using one atomic call to xrandr
+grobi: 18:31:48.823806 running command /usr/bin/xrandr xrandr --output DP-4 --mode 3840x4320 --output DP-2 --mode 3840x4320 --right-of DP-4
+grobi: 18:31:49.285944 new RANDR change event received
+</code></pre><p>Notably, the instructions for getting out of a bad state (no signal) are now to
+power off the monitor and power it back on again. This will result in RandR
+output change events, which will trigger <code>grobi</code>, which will run <code>xrandr</code>, which
+configures the monitor. Nice!</p>
+<h2 id="why-not-autorandr">Why not autorandr?</h2>
+<p>No particular reason. I knew <code>grobi</code>.</p>
+<p>If nothing else, <code>grobi</code> is written in Go, so it’s likely to keep working
+smoothly over the years.</p>
+<h2 id="does-grobi-work-on-wayland">Does grobi work on Wayland?</h2>
+<p>Probably not. There is no mention of Wayland over on the <a href="https://github.com/fd0/grobi/">grobi
+repository</a>.</p>
+<h2 id="zleep">Bonus: my Suspend-to-RAM setup</h2>
+<p>As a bonus, this section describes the other half of my monitor-related
+automation.</p>
+<p>When I suspend my PC to RAM, I either want to wake it up manually later, for
+example by pressing a key on the keyboard or by sending a Wake-on-LAN packet, or
+I want it to wake up automatically each morning at 6:50 — that way, daily cron
+jobs have some time to run before I start using the computer.</p>
+<p>To accomplish this, I use <code>zleep</code>, a wrapper program around <a href="https://manpages.debian.org/rtcwake.8"><code>rtcwake(8)</code></a>
+ and <code>systemctl suspend</code> that integrates with the
+myStrom switch smart plug to turn off power to the monitor entirely. This is
+worthwhile because the monitor draws 30W even in standby!</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span> main
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;context&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;flag&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;log&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;net/http&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;net/url&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;os&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;os/exec&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;time&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">var</span> (
+</span></span><span style="display:flex;"><span>	resume = flag.<span style="color:#06287e">Bool</span>(<span style="color:#4070a0">&#34;resume&#34;</span>,
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">false</span>,
+</span></span><span style="display:flex;"><span>		<span style="color:#4070a0">&#34;run resume behavior only (turn on monitor via smart plug)&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	noMonitor = flag.<span style="color:#06287e">Bool</span>(<span style="color:#4070a0">&#34;no_monitor&#34;</span>,
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">false</span>,
+</span></span><span style="display:flex;"><span>		<span style="color:#4070a0">&#34;disable turning off/on monitor&#34;</span>)
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">monitorPower</span>(ctx context.Context, method, cmnd <span style="color:#902000">string</span>) <span style="color:#902000">error</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> <span style="color:#666">*</span>noMonitor {
+</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;[monitor power] skipping because -no_monitor flag is set&#34;</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;[monitor power] command: %v&#34;</span>, cmnd)
+</span></span><span style="display:flex;"><span>	u, err <span style="color:#666">:=</span> url.<span style="color:#06287e">Parse</span>(<span style="color:#4070a0">&#34;http://myStrom-Switch-A46FD0/&#34;</span> <span style="color:#666">+</span> cmnd)
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">for</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> ctx.<span style="color:#06287e">Err</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		req, err <span style="color:#666">:=</span> http.<span style="color:#06287e">NewRequest</span>(method, u.<span style="color:#06287e">String</span>(), <span style="color:#007020;font-weight:bold">nil</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		ctx, canc <span style="color:#666">:=</span> context.<span style="color:#06287e">WithTimeout</span>(ctx, <span style="color:#40a070">5</span><span style="color:#666">*</span>time.Second)
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">defer</span> <span style="color:#06287e">canc</span>()
+</span></span><span style="display:flex;"><span>		req = req.<span style="color:#06287e">WithContext</span>(ctx)
+</span></span><span style="display:flex;"><span>		resp, err <span style="color:#666">:=</span> http.DefaultClient.<span style="color:#06287e">Do</span>(req)
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			log.<span style="color:#06287e">Print</span>(err)
+</span></span><span style="display:flex;"><span>			time.<span style="color:#06287e">Sleep</span>(<span style="color:#40a070">1</span> <span style="color:#666">*</span> time.Second)
+</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">continue</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> resp.StatusCode <span style="color:#666">!=</span> http.StatusOK {
+</span></span><span style="display:flex;"><span>			log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;unexpected HTTP status code: got %v, want %v&#34;</span>, resp.Status, http.StatusOK)
+</span></span><span style="display:flex;"><span>			time.<span style="color:#06287e">Sleep</span>(<span style="color:#40a070">1</span> <span style="color:#666">*</span> time.Second)
+</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">continue</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;[monitor power] request succeeded&#34;</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">nextWakeup</span>(now time.Time) time.Time {
+</span></span><span style="display:flex;"><span>	midnight <span style="color:#666">:=</span> time.<span style="color:#06287e">Date</span>(now.<span style="color:#06287e">Year</span>(), now.<span style="color:#06287e">Month</span>(), now.<span style="color:#06287e">Day</span>(), <span style="color:#40a070">0</span>, <span style="color:#40a070">0</span>, <span style="color:#40a070">0</span>, <span style="color:#40a070">0</span>, time.Local)
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> now.<span style="color:#06287e">Hour</span>() &lt; <span style="color:#40a070">6</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// wake up today
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#007020;font-weight:bold">return</span> midnight.<span style="color:#06287e">Add</span>(<span style="color:#40a070">6</span><span style="color:#666">*</span>time.Hour <span style="color:#666">+</span> <span style="color:#40a070">50</span><span style="color:#666">*</span>time.Minute)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// wake up tomorrow
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">return</span> midnight.<span style="color:#06287e">Add</span>(<span style="color:#40a070">24</span> <span style="color:#666">*</span> time.Hour).<span style="color:#06287e">Add</span>(<span style="color:#40a070">6</span><span style="color:#666">*</span>time.Hour <span style="color:#666">+</span> <span style="color:#40a070">50</span><span style="color:#666">*</span>time.Minute)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">runResume</span>() <span style="color:#902000">error</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Retry for up to one minute to give the network some time to come up
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	ctx, canc <span style="color:#666">:=</span> context.<span style="color:#06287e">WithTimeout</span>(context.<span style="color:#06287e">Background</span>(), <span style="color:#40a070">1</span><span style="color:#666">*</span>time.Minute)
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">defer</span> <span style="color:#06287e">canc</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">monitorPower</span>(ctx, <span style="color:#4070a0">&#34;GET&#34;</span>, <span style="color:#4070a0">&#34;relay?state=1&#34;</span>); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Print</span>(err)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">zleep</span>() <span style="color:#902000">error</span> {
+</span></span><span style="display:flex;"><span>	ctx <span style="color:#666">:=</span> context.<span style="color:#06287e">Background</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	now <span style="color:#666">:=</span> time.<span style="color:#06287e">Now</span>().<span style="color:#06287e">Truncate</span>(<span style="color:#40a070">1</span> <span style="color:#666">*</span> time.Second)
+</span></span><span style="display:flex;"><span>	wakeup <span style="color:#666">:=</span> <span style="color:#06287e">nextWakeup</span>(now)
+</span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;now   : %v&#34;</span>, now)
+</span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;wakeup: %v&#34;</span>, wakeup)
+</span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;wakeup: %v (timestamp)&#34;</span>, wakeup.<span style="color:#06287e">Unix</span>())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// assumes hwclock is running in UTC (see timedatectl | grep local)
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Power the monitor off in 15 seconds.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// mode=on is intentional: https://api.mystrom.ch/#e532f952-36ea-40fb-a180-a57b835f550e
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// - the switch will be turned on (already on, so this is a no-op)
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// - the switch will wait for 15 seconds
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// - the switch will be turned off
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">monitorPower</span>(ctx, <span style="color:#4070a0">&#34;POST&#34;</span>, <span style="color:#4070a0">&#34;timer?mode=on&amp;time=15&#34;</span>); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Print</span>(err)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	sleep <span style="color:#666">:=</span> exec.<span style="color:#06287e">Command</span>(<span style="color:#4070a0">&#34;sh&#34;</span>, <span style="color:#4070a0">&#34;-c&#34;</span>, fmt.<span style="color:#06287e">Sprintf</span>(<span style="color:#4070a0">&#34;sudo rtcwake -m no --verbose --utc -t %v &amp;&amp; sudo systemctl suspend&#34;</span>, wakeup.<span style="color:#06287e">Unix</span>()))
+</span></span><span style="display:flex;"><span>	sleep.Stdout = os.Stdout
+</span></span><span style="display:flex;"><span>	sleep.Stderr = os.Stderr
+</span></span><span style="display:flex;"><span>	fmt.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;running %v\n&#34;</span>, sleep.Args)
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> sleep.<span style="color:#06287e">Run</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;%v: %v&#34;</span>, sleep.Args, err)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+</span></span><span style="display:flex;"><span>	flag.<span style="color:#06287e">Parse</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> <span style="color:#666">*</span>resume {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">runResume</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			log.<span style="color:#06287e">Fatal</span>(err)
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	} <span style="color:#007020;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">zsleep</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			log.<span style="color:#06287e">Fatal</span>(err)
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>To turn power to the monitor on after resuming, I placed the following shell
+script in <code>/lib/systemd/system-sleep/zleep.sh</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#007020">#!/bin/sh
+</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">case</span> <span style="color:#4070a0">&#34;</span><span style="color:#bb60d5">$1</span><span style="color:#4070a0">&#34;</span> in
+</span></span><span style="display:flex;"><span>	pre<span style="color:#666">)</span>	<span style="color:#007020">exit</span> <span style="color:#40a070">0</span>
+</span></span><span style="display:flex;"><span>		;;
+</span></span><span style="display:flex;"><span>	post<span style="color:#666">)</span>	/usr/local/bin/zleep -resume
+</span></span><span style="display:flex;"><span>		<span style="color:#007020">exit</span> <span style="color:#40a070">0</span>
+</span></span><span style="display:flex;"><span>		;;
+</span></span><span style="display:flex;"><span> 	*<span style="color:#666">)</span>	<span style="color:#007020">exit</span> <span style="color:#40a070">1</span>
+</span></span><span style="display:flex;"><span>		;;
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">esac</span>
+</span></span></code></pre></div><p>Once power is on, grobi will detect and configure the monitor.</p>
+<p>Here is the program in action:</p>
+<pre tabindex="0"><code>2025/05/06 21:58:32 now   : 2025-05-06 21:58:32 +0200 CEST
+2025/05/06 21:58:32 wakeup: 2025-05-07 06:50:00 +0200 CEST
+2025/05/06 21:58:32 wakeup: 1746593400 (timestamp)
+2025/05/06 21:58:32 [monitor power] command: timer?mode=on&amp;time=15
+2025/05/06 21:58:32 [monitor power] request succeeded
+running [sh -c sudo rtcwake -m no --verbose --utc -t 1746593400 &amp;&amp; sudo systemctl suspend]
+Using UTC time.
+	delta   = 0
+	tzone   = 0
+	tzname  = UTC
+	systime = 1746561512, (UTC) Tue May  6 19:58:32 2025
+	rtctime = 1746561512, (UTC) Tue May  6 19:58:32 2025
+alarm 1746593400, sys_time 1746561512, rtc_time 1746561512, seconds 0
+rtcwake: wakeup using /dev/rtc0 at Wed May  7 04:50:00 2025
+suspend mode: no; leaving
+</code></pre>]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[Intel 9 285K on ASUS Z890: not stable!]]></title>
     <link href="https://michael.stapelberg.ch/posts/2025-03-19-intel-core-ultra-9-285k-on-asus-z890-not-stable/"/>
     <id>https://michael.stapelberg.ch/posts/2025-03-19-intel-core-ultra-9-285k-on-asus-z890-not-stable/</id>
@@ -5119,428 +5357,6 @@ few pointers:</p>
 complexity ladder: <a href="https://pikvm.org/">PiKVM</a> or
 <a href="https://tinypilotkvm.com/">TinyPilot</a>. See also <a href="https://www.jeffgeerling.com/blog/2021/raspberry-pi-kvms-compared-tinypilot-and-pi-kvm-v3">this comparison by Jeff
 Geerling</a>.</p>
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[DIY out-of-band management: remote console server]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/"/>
-    <id>https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/</id>
-    <published>2022-08-27T14:40:00+02:00</published>
-    <content type="html"><![CDATA[<p>For the guest WiFi at an event that eventually fell through, we wanted to tunnel
-all the traffic through my internet connection via my home router.</p>
-<p>Because the event is located in another country, many hours of travel away,
-there are a couple of scenarios where remote control of my home router can be a
-life-saver. For example, should my home router crash, remotely turning power off
-and on again gets the event back online.</p>
-<p>But, power-cycling a machine is a pretty big hammer. For some cases, like
-locking yourself out with a configuration mistake, a more precise tool like a
-remote serial console might be nicer.</p>
-<p>In this article, I’ll present two cheap and pragmatic DIY out-of-band management
-solutions that I have experimented with in the last couple of weeks and wanted
-to share:</p>
-<ul>
-<li><a href="#power-only">Variant 1: Remote Power Management only</a></li>
-<li><a href="#remote-console">Variant 2: a full Remote Console Server</a></li>
-</ul>
-<p>You can easily start with the first variant and upgrade it into the second
-variant later.</p>
-<h2 id="power-only">Variant 1: Remote Power Management</h2>
-<h3 id="architecture-diagram">Architecture Diagram</h3>
-<p>Here is the architecture of the system at a glance. The right-hand side is the
-existing router I want to control, the left-hand side shows the out of band
-management system:</p>
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/2022-07-02-power-mgmt-architecture.svg"><img
-  src="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/2022-07-02-power-mgmt-architecture.svg"
-  
-  style="
-
-border: 1px solid #000;
-
-margin-right: 1rem"
-  
-  loading="lazy"></a>
-
-
-<p>Let’s go through the hardware components from top to bottom.</p>
-<h3 id="hardware-4g-wifi-router-out-of-band-network">Hardware: 4G WiFi Router (Out Of Band Network)</h3>
-<p>The easiest way to have another network connection for projects like this one is
-the <a href="https://www.digitec.ch/en/s1/product/digitec-iot-test-sim-card-data-flat-30-days-unlimited-10-mbits-sim-card-11689214?supplier=406802">digitec iot
-subscription</a>. They
-offer various different options, and their cheapest one, a 0.4 Mbps flatrate for
-4 CHF per month, is sufficient for our use-case.</p>
-<p>A convenient way of making the digitec iot subscription available to other
-devices is to use a mobile WiFi router such as the <a href="https://www.digitec.ch/en/s1/product/tp-link-m7350-routers-5615329?supplier=406802">TP-Link M7350 4G/LTE Mobile
-Wi-Fi
-router</a>
-(68 CHF). You can power it via USB, and it has a built-in battery that will last
-for a few hours.</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0484.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0484_hu855bbe0a9c47ac557e5b09db74fa3b06_1361683_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0484_hu855bbe0a9c47ac557e5b09db74fa3b06_1361683_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0484_hu855bbe0a9c47ac557e5b09db74fa3b06_1361683_600x0_resize_q75_box.jpg"
-  alt="TP-Link M7350 4G/LTE Mobile Wi-Fi router connected to digitec iot" title="TP-Link M7350 4G/LTE Mobile Wi-Fi router connected to digitec iot"
-  width="600"
-  height="450"
-  style="
-
-border: 1px solid #000;
-
-"
-  
-  loading="lazy"></a>
-
-
-
-<p>By default, the device turns itself off after a while when it thinks it is
-unused, which is undesired for us — if the smart plug drops out of the WiFi, we
-don’t want the whole system to go offline. You can turn off this behavior in the
-web interface under <code>Advanced → Power Saving → Power Saving Mode</code>.</p>
-<h3 id="hardware-wifi-smart-plug">Hardware: WiFi Smart Plug</h3>
-<p>With the out of band network connection established, all you need to remotely
-toggle power is a smart plug such as the <a href="https://itead.cc/product/sonoff-s26-wifi-smart-plug/">Sonoff S26 WiFi Smart
-Plug</a>.</p>
-<p>The simplest setup is to connect the Smart Plug to the 4G router via WiFi, and
-control it using Sonoff’s mobile app via Sonoff’s cloud.</p>
-<h4 id="non-cloud-solution">Non-cloud solution</h4>
-<p>Alternatively, if you want to avoid the Sonoff cloud, the device comes with a
-“DIY mode”, but <a href="https://twitter.com/zekjur/status/1321949087160258562">the DIY mode wouldn’t work reliably for
-me</a> when I tried
-it. Instead, I flashed the <a href="https://tasmota.github.io/docs/">Open Source Tasmota
-firmware</a> and connected it to a self-hosted
-MQTT server via the internet.</p>
-<p>Of course, now your self-hosted MQTT server is a single point of failure, but
-perhaps you prefer that over the Sonoff cloud being a single point of failure.</p>
-<h2 id="remote-console">Variant 2: Remote Console Server</h2>
-<p>Turning power off and on remotely is a great start, but what if you need actual
-remote access to a system? In my case, I’m using a <a href="https://en.wikipedia.org/wiki/Serial_port">serial
-port</a> to see log messages and run a
-shell on my router. This is also called a “serial console”, and any device that
-allows accessing a serial console without sitting physically in front of the
-serial port is called a “remote console server”.</p>
-<p>Commercially available remote console servers typically offer lots of ports (up
-to 48) and cost lots of money (many thousand dollars or equivalent), because
-their target application is to be installed in a rack full of machines in a lab
-or data center. A few years ago, I built
-<a href="https://freetserv.github.io/">freetserv</a>, an open source, open hardware
-solution for this problem.</p>
-<p>For the use-case at hand, we only need a single serial console, so we’ll do it
-with a Raspberry Pi.</p>
-<h3 id="architecture-diagram-1">Architecture Diagram</h3>
-<p>The architecture for this variant looks similar to the other variant, but adds
-the <em>consrv</em> Raspberry Pi Zero 2 W and a USB-to-serial adapter:</p>
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/2022-06-19-consrv_architecture.svg"><img
-  src="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/2022-06-19-consrv_architecture.svg"
-  
-  style="
-
-border: 1px solid #000;
-
-margin-right: 1rem"
-  
-  loading="lazy"></a>
-
-
-<h3 id="hardware-raspberry-pi-zero-2-w">Hardware: Raspberry Pi Zero 2 W</h3>
-<p>We’ll use a <a href="https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/">Raspberry Pi Zero 2
-W</a> as our console
-server. While the device is a little slower than a Raspberry Pi 3 B, it is still
-plenty fast enough for providing a serial console, and it only consumes 0.8W of
-power (see <a href="https://gokrazy.org/platforms/">gokrazy → Supported platforms</a> for
-a comparison):</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured_hu855bbe0a9c47ac557e5b09db74fa3b06_860347_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured_hu855bbe0a9c47ac557e5b09db74fa3b06_860347_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured_hu855bbe0a9c47ac557e5b09db74fa3b06_860347_600x0_resize_q75_box.jpg"
-  alt="Raspberry Pi Zero 2 W with USB hub, ethernet and serial" title="Raspberry Pi Zero 2 W with USB hub, ethernet and serial"
-  width="600"
-  height="600"
-  style="
-
-border: 1px solid #000;
-
-"
-  
-  loading="lazy"></a>
-
-
-
-<p>If the Pi Zero 2 W is not available, you can try using any other <a href="https://gokrazy.org/platforms/">Raspberry Pi
-supported by gokrazy</a>, or even an older Pi Zero
-with the <a href="https://gokrazy.org/platforms/#community-supported-raspberry-pi-os-32-bit-kernelfirmware">community-supported Pi OS 32-bit
-kernel</a>
-(I didn’t test that).</p>
-<p>Our Pi will have at least two tasks:</p>
-<ol>
-<li>With a USB-to-serial adapter, the Pi will provide a serial console.</li>
-<li>The Pi will run <a href="https://tailscale.com/">Tailscale</a> mesh networking, which
-will transparently use either the wired network or fail over to the Out Of
-Band network. Tailscale also frees us from setting up port forwardings,
-dynamic DNS or anything like that.</li>
-<li>Optionally, the Pi can run a local MQTT server if you want to avoid the
-Sonoff cloud.</li>
-</ol>
-<h3 id="hardware-usb-to-serial-adapter">Hardware: USB-to-serial adapter</h3>
-<p>You can use any USB-to-serial adapter supported by Linux. Personally, I like the
-<a href="https://www.adafruit.com/product/2264">Adafruit FT232H adapter</a>, which I like
-to <a href="https://twitter.com/zekjur/status/1256879027266224128">re-program with FTDI’s FT_Prog so that it has a unique serial
-number</a>.</p>
-<p>In my router, I plugged in an <a href="https://twitter.com/zekjur/status/1443461234930634755">Longshine LCS-6321M serial PCIe
-card</a> to add a serial
-port. Before you ask: no, <a href="https://twitter.com/zekjur/status/1439612800561819649">using USB serial consoles for the kernel
-console</a> does not cut it.</p>
-<h3 id="hardware-usb-ethernet-adapter">Hardware: USB ethernet adapter</h3>
-<p>Because we not only want this Raspberry Pi to be available via the Out Of Band
-network (via WiFi), but also on the regular home network, we need a USB ethernet
-adapter.</p>
-<p>Originally I was going to use the Waveshare ETH-USB-HUB-BOX: Ethernet / USB HUB
-BOX for Raspberry Pi Zero Series, but it <a href="https://twitter.com/zekjur/status/1538582804224782337">turned out to be
-unreliable</a>.</p>
-<p>Instead, I’m now connecting a USB hub (as the Pi Zero 2 W has only one USB
-port), a <a href="https://www.linksys.com/support-product?sku=USB3GIG">Linksys USB3GIG</a>
-network adapter I had lying around, and my USB-to-serial adapter.</p>
-<h3 id="gokrazy-setup">gokrazy setup</h3>
-<p>Just like in the <a href="https://gokrazy.org/quickstart/">gokrazy quickstart</a>, we’re
-going to create a directory for this gokrazy instance:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#bb60d5">INSTANCE</span><span style="color:#666">=</span>gokrazy/consrv
-</span></span><span style="display:flex;"><span>mkdir -p ~/<span style="color:#70a0d0">${</span><span style="color:#bb60d5">INSTANCE</span>?<span style="color:#70a0d0">}</span>
-</span></span><span style="display:flex;"><span><span style="color:#007020">cd</span> ~/<span style="color:#70a0d0">${</span><span style="color:#bb60d5">INSTANCE</span>?<span style="color:#70a0d0">}</span>
-</span></span><span style="display:flex;"><span>go mod init consrv
-</span></span></code></pre></div><p>You could now directly run <code>gokr-packer</code>, but personally, I like putting the
-<code>gokr-packer</code> command into a
-<a href="https://en.wikipedia.org/wiki/Make_(software)#Makefile"><code>Makefile</code></a> right away:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-makefile" data-lang="makefile"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># The consrv hostname resolves to the device’s Tailscale IP address,
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># once Tailscale is set up.
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#bb60d5">PACKER</span> <span style="color:#666">:=</span> gokr-packer -hostname<span style="color:#666">=</span>consrv
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#bb60d5">PKGS</span> <span style="color:#666">:=</span> <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/gokrazy/breakglass <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/gokrazy/timestamps <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/gokrazy/serial-busybox <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/gokrazy/stat/cmd/gokr-webstat <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/gokrazy/stat/cmd/gokr-stat <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/gokrazy/mkfs <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/gokrazy/wifi <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	tailscale.com/cmd/tailscaled <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	tailscale.com/cmd/tailscale <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/mdlayher/consrv/cmd/consrv
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#06287e">all</span><span style="color:#666">:</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#06287e">.PHONY</span><span style="color:#666">:</span> update overwrite
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#06287e">update</span><span style="color:#666">:</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#70a0d0">${</span><span style="color:#bb60d5">PACKER</span><span style="color:#70a0d0">}</span> -update<span style="color:#666">=</span>yes <span style="color:#70a0d0">${</span><span style="color:#bb60d5">PKGS</span><span style="color:#70a0d0">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#06287e">overwrite</span><span style="color:#666">:</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#70a0d0">${</span><span style="color:#bb60d5">PACKER</span><span style="color:#70a0d0">}</span> -overwrite<span style="color:#666">=</span>/dev/sdx <span style="color:#70a0d0">${</span><span style="color:#bb60d5">PKGS</span><span style="color:#70a0d0">}</span>
-</span></span></code></pre></div><p>For the initial install, plug the SD card into your computer, put its device
-name into the <code>overwrite</code> target, and run <code>make overwrite</code>.</p>
-<p>For subsequent changes, you can use <code>make update</code>.</p>
-<h3 id="tailscale">Tailscale</h3>
-<p>Tailscale is a peer-to-peer mesh VPN, meaning we can use it to connect to our
-<code>consrv</code> Raspberry Pi from anywhere in the world, without having to set up port
-forwardings, dynamic DNS, or similar.</p>
-<p>As an added bonus, Tailscale also transparently fails over between connections,
-so while the fast ethernet/fiber connection works, Tailscale uses that,
-otherwise it uses the Out Of Band network.</p>
-<p>Follow <a href="https://gokrazy.org/packages/tailscale/">the gokrazy guide on Tailscale</a>
-to include the device in your Tailscale mesh VPN.</p>
-<h3 id="wifi-internet-connection-and-dual-homing">WiFi internet connection and dual homing</h3>
-<p>Setup WiFi:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>mkdir -p extrafiles/github.com/gokrazy/wifi/etc
-</span></span><span style="display:flex;"><span>cat <span style="color:#4070a0">&#39;{&#34;ssid&#34;: &#34;oob&#34;, &#34;psk&#34;: &#34;secret&#34;}&#39;</span> <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  &gt; extrafiles/github.com/gokrazy/wifi/etc/wifi.json
-</span></span></code></pre></div><p><code>consrv</code> should use the Out Of Band mobile uplink to reach the internet. At the
-same time, it should still be usable from my home network, too, to make gokrazy
-updates go quickly.</p>
-<p>We accomplish this using route priorities.</p>
-<p>I arranged for the WiFi interface to have higher route priority (5) than the
-ethernet interface (typically 1, but 11 in our setup thanks to the
-<code>-extra_route_priority=10</code> flag):</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>mkdir -p flags/github.com/gokrazy/gokrazy/cmd/dhcp
-</span></span><span style="display:flex;"><span><span style="color:#007020">echo</span> <span style="color:#4070a0">&#39;-extra_route_priority=10&#39;</span> <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  &gt; flags/github.com/gokrazy/gokrazy/cmd/dhcp/flags.txt
-</span></span><span style="display:flex;"><span>make update
-</span></span></code></pre></div><p>Now, <code>tailscale netcheck</code> shows an IPv4 address belonging to Sunrise, the mobile
-network provider behind the digitec iot subscription.</p>
-<h3 id="the-consrv-console-server">The consrv Console Server</h3>
-<p><a href="https://github.com/mdlayher/consrv"><code>consrv</code></a> is an SSH serial console server
-written in Go that Matt Layher and I developed. If you’re curious, you can watch
-the two of us creating it in this twitch stream recording:</p>
-
-<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-  <iframe src="https://www.youtube-nocookie.com/embed/1g46ei9aBH0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video"></iframe>
-</div>
-
-<p>The installation of <code>consrv</code> consists of two steps.</p>
-<p>Step 1 is done: we already included <code>consrv</code> in the <code>Makefile</code> earlier in
-<a href="#gokrazy-setup">gokrazy setup</a>.</p>
-<p>So, we only need to configure the desired serial ports in <code>consrv.toml</code> (in
-<a href="https://gokrazy.org/userguide/package-config/#extrafiles">gokrazy extrafiles</a>):</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>mkdir -p extrafiles/github.com/mdlayher/consrv/cmd/consrv/etc/consrv
-</span></span><span style="display:flex;"><span>cat &gt; extrafiles/github.com/mdlayher/consrv/cmd/consrv/etc/consrv/consrv.toml <span style="color:#4070a0">&lt;&lt;&#39;EOT&#39;
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">[server]
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">address = &#34;:2222&#34;
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">[[devices]]
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">serial = &#34;01716A92&#34;
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">name = &#34;router7&#34;
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">baud = 115200
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">logtostdout = true
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">[[identities]]
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">name = &#34;michael&#34;
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">public_key = &#34;ssh-ed25519 AAAAC3… michael@midna&#34;
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">EOT</span>
-</span></span></code></pre></div><p>Run <code>make update</code> to deploy the configuration to your device.</p>
-<p>If everything is set up correctly, we can now start a serial console session via
-SSH:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>midna% ssh -p 2222 router7@consrv.lan
-</span></span><span style="display:flex;"><span>Warning: Permanently added &#39;[consrv.lan]:2222&#39; (ED25519) to the list of known hosts.
-</span></span><span style="display:flex;"><span>consrv&gt; opened serial connection &#34;router7&#34;: path: &#34;/dev/ttyUSB0&#34;, serial: &#34;01716A92&#34;, baud: 115200
-</span></span><span style="display:flex;"><span>2022/06/19 20:50:47 dns.go:175: probe results: [{upstream: [2001:4860:4860::8888]:53, rtt: 999.665µs} {upstream: [2001:4860:4860::8844]:53, rtt: 2.041079ms} {upstream: 8.8.8.8:53, rtt: 2.073279ms} {upstream: 8.8.4.4:53, rtt: 16.200959ms}]
-</span></span><span style="display:flex;"><span>[…]
-</span></span></code></pre></div><p>I’m using the <code>logtostdout</code> option to make <code>consrv</code> continuously read the serial
-port and send it to <code>stdout</code>, which gokrazy in turn <a href="https://gokrazy.org/userguide/remotesyslog/">sends via remote
-syslog</a> to the <a href="https://github.com/gokrazy/syslogd">gokrazy syslog
-daemon</a>, running on another machine. You
-could also run it on the same machine if you want to log to file.</p>
-<aside class="admonition note">
-  <div class="note-container">
-    <div class="note-icon" style="width: 20px; height: 20px">
-      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
-    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
-    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
-        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
-    </g>
-</svg>
-
-    </div>
-    <div class="admonition-content">There is an <a href="https://github.com/mdlayher/consrv/issues/3">open issue in
-<code>consrv</code></a> regarding the failure
-mode when a serial adapter disappears. Currently, <code>consrv</code> hangs until you try
-to send something, then must be restarted. A workaround is available in the
-GitHub issue.</div>
-  </div>
-</aside>
-
-<h3 id="controlling-tasmota-from-breakglass">Controlling Tasmota from breakglass</h3>
-<p>You can use <a href="https://github.com/gokrazy/breakglass"><code>breakglass</code></a> to
-interactively log into your gokrazy installation.</p>
-<p>If you flashed your Smart Plug with Tasmota, you can easily turn power on from a
-breakglass shell by directly calling Tasmota’s HTTP API with <code>curl</code>:</p>
-<pre tabindex="0"><code>% breakglass consrv
-consrv# curl -v -X POST --data &#39;cmnd=power on&#39; http://tasmota_68462f-1583/cm
-</code></pre><p>The original Sonoff firmware offers a DIY mode which should also offer an HTTP
-API, but the <a href="https://twitter.com/zekjur/status/1321949087160258562">DIY mode did not work in my
-tests</a>. Hence, I’m only
-describing how to do it with Tasmota.</p>
-<h3 id="optional-local-mqtt-server">Optional: Local MQTT Server</h3>
-<p>Personally, I like having the Smart Plug available both on the local network
-(via Tasmota’s HTTP API) and via the internet with an external MQTT server. That
-way, even if either option fails, I still have a way to toggle power remotely.</p>
-<p>But, maybe you want to obtain usage stats by listening to MQTT or similar, and
-you don’t want to use an extra server for this. In that situation, you can
-easily run a local MQTT server on your Pi.</p>
-<p>In the gokrazy <code>Makefile</code>, add
-<a href="https://github.com/fhmq/hmq"><code>github.com/fhmq/hmq</code></a> to the list of packages to
-install, and configure Tasmota to connect to <code>consrv</code> on port 1883.</p>
-<p>To check that everything is working, use <code>mosquitto_sub</code> from another machine:</p>
-<pre tabindex="0"><code>midna% mosquitto_sub --verbose -h consrv.monkey-turtle.ts.net -t &#39;#&#39;
-</code></pre><h2 id="conclusion">Conclusion</h2>
-<p>digitec’s IOT mobile internet subscription makes remote power management
-delightfully easy with a smart plug and 4G WiFi router, and affordable
-enough. The subscription is flexible enough that you can decide to only book it
-while you’re traveling.</p>
-<p>We can elevate the whole setup in functionality (but also complexity) by
-combining Tailscale, consrv and gokrazy, running on a Raspberry Pi Zero 2 W, and
-connecting a USB-to-serial adapter.</p>
-<p>If you need more features than that, check out the next step on the feature and
-complexity ladder: <a href="https://pikvm.org/">PiKVM</a> or
-<a href="https://tinypilotkvm.com/">TinyPilot</a>. See also <a href="https://www.jeffgeerling.com/blog/2021/raspberry-pi-kvms-compared-tinypilot-and-pi-kvm-v3">this comparison by Jeff
-Geerling</a>.</p>
-<h2 id="appendix-a-unstable-apple-usb-ethernet-adapter">Appendix A: Unstable Apple USB ethernet adapter</h2>
-<p>The first USB ethernet adapter I tried was the <a href="https://www.artcomputer.ch/b2c_en/apple-usb-ethernet-adapter-a00004961/">Apple USB Ethernet
-Adapter</a>.</p>
-<p>Unfortunately, after a few days of uptime, I experienced the following kernel
-driver crash (with the <code>asix</code> Linux driver), and the link remained down until I
-rebooted.</p>
-<p>I then switched to a <a href="https://www.linksys.com/support-product?sku=USB3GIG">Linksys
-USB3GIG</a> network adapter
-(supported by the <code>r8152</code> Linux driver) and did not see any problems with that
-so far.</p>
-<details>
-<summary>kernel crash message (in dmesg)</summary>
-<pre tabindex="0"><code>dwc2 3f980000.usb: dwc2_hc_chhltd_intr_dma: Channel 5 - ChHltd set, but reason is unknown
-dwc2 3f980000.usb: hcint 0x00000002, intsts 0x04600009
-dwc2 3f980000.usb: dwc2_update_urb_state_abn(): trimming xfer length
-asix 1-1.4:1.0 eth0: Failed to read reg index 0x0000: -71
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 7588 at drivers/net/phy/phy.c:942 phy_error+0x10/0x58
-Modules linked in: brcmfmac brcmutil
-CPU: 1 PID: 7588 Comm: kworker/u8:2 Not tainted 5.18.3 #1
-Hardware name: Raspberry Pi Zero 2 W Rev 1.0 (DT)
-Workqueue: events_power_efficient phy_state_machine
-pstate: 80000005 (Nzcv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : phy_error+0x10/0x58
-lr : phy_state_machine+0x258/0x2b0
-sp : ffff800009fe3d40
-x29: ffff800009fe3d40 x28: 0000000000000000 x27: ffff6c7ac300c078
-x26: ffff6c7ac300c000 x25: ffff6c7ac4390000 x24: 00000000ffffffb9
-x23: 0000000000000004 x22: ffff6c7ac4019cd8 x21: ffff6c7ac4019800
-x20: ffffce5c97f6f000 x19: ffff6c7ac4019800 x18: 0000000000000010
-x17: 0000000400000000 x16: 0000000000000000 x15: 0000000000001007
-x14: ffff800009fe3810 x13: 00000000ffffffea x12: 00000000fffff007
-x11: fffffffffffe0290 x10: fffffffffffe0240 x9 : ffffce5c988e1018
-x8 : c0000000fffff007 x7 : 00000000000000a8 x6 : ffffce5c98889280
-x5 : 0000000000000268 x4 : ffff6c7acf392b80 x3 : ffff6c7ac4019cd8
-x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff6c7ac4019800
-Call trace:
- phy_error+0x10/0x58
- phy_state_machine+0x258/0x2b0
- process_one_work+0x1e4/0x348
- worker_thread+0x48/0x418
- kthread+0xf4/0x110
- ret_from_fork+0x10/0x20
----[ end trace 0000000000000000 ]---
-asix 1-1.4:1.0 eth0: Link is Down
-</code></pre></details>
 ]]></content>
   </entry>
 </feed>

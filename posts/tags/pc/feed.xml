@@ -8,6 +8,244 @@
   <id>https://michael.stapelberg.ch/posts/tags/pc/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[In praise of grobi for auto-configuring X11 monitors]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2025-05-10-grobi-x11-monitor-autoconfig/"/>
+    <id>https://michael.stapelberg.ch/posts/2025-05-10-grobi-x11-monitor-autoconfig/</id>
+    <published>2025-05-10T08:24:00+02:00</published>
+    <content type="html"><![CDATA[<p>I have recently started using the <a href="https://github.com/fd0/grobi/"><code>grobi</code> program by Alexander
+Neumann</a> again and was delighted to discover that
+it makes using my fiddly (but wonderful) <a href="/posts/2017-12-11-dell-up3218k/">Dell 32-inch 8K monitor
+(UP3218K)</a> monitor much more convenient — I get
+a signal more quickly than with my previous, sleep-based approach.</p>
+<p>Previously, when my PC woke up from suspend-to-RAM, there were two scenarios:</p>
+<ol>
+<li>The monitor was connected. My <a href="#zleep">sleep program</a> would power on the
+monitor (if needed), sleep a little while and then run <a href="https://manpages.debian.org/xrandr.1"><code>xrandr(1)</code></a>
+ to (hopefully) configure the monitor correctly.</li>
+<li>The monitor was not connected, for example because it was still connected to
+my work PC.</li>
+</ol>
+<p>In scenario ②, or if the one-shot configuration attempt in scenario ① fails, I
+would need to SSH in from a different computer and run <code>xrandr</code> manually so that
+the monitor would show a signal:</p>
+<pre tabindex="0"><code>% DISPLAY=:0 xrandr \
+  --output DP-4 --mode 3840x4320 --panning 0x0+0+0 \
+  --output DP-2 --right-of DP-4 --mode 3840x4320 --panning 0x0+3840+0
+</code></pre><h2 id="automatic-monitor-configuration-with-grobi">Automatic monitor configuration with grobi</h2>
+<p>I have now completely solved this problem by creating the following
+<code>~/.config/grobi.conf</code> file:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">rules</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>UP3218K<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">outputs_connected</span>:<span style="color:#bbb"> </span>[DP-2, DP-4]<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic"># DP-4 is left, DP-2 is right</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">configure_row</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>- DP-4@3840x4320<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>- DP-2@3840x4320<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#60a0b0;font-style:italic"># atomic instructs grobi to only call xrandr once and configure all the</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#60a0b0;font-style:italic"># outputs. This does not always work with all graphic cards, but is</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic"># needed to successfully configure the UP3218K monitor.</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">atomic</span>:<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">true</span><span style="color:#bbb">
+</span></span></span></code></pre></div><p>…and installing / enabling <code>grobi</code> (on Arch Linux) using:</p>
+<pre tabindex="0"><code>% sudo pacman -S grobi
+% systemctl --user enable --now grobi
+</code></pre><p>Whenever <code>grobi</code> detects that my monitor is connected (it listens for <a href="https://cgit.freedesktop.org/xorg/proto/randrproto/tree/randrproto.txt">X11
+RandR</a>
+output change events), it will run <a href="https://manpages.debian.org/xrandr.1"><code>xrandr(1)</code></a>
+ to
+configure the monitor resolution and positioning.</p>
+<p>To check what <code>grobi</code> is seeing/doing, you can use:</p>
+<pre tabindex="0"><code>% systemctl --user status grobi
+% journalctl --user -u grob
+</code></pre><p>For example, on my system, I see:</p>
+<pre tabindex="0"><code>grobi: 18:31:48.823765 outputs: [HDMI-0 (primary) DP-0 DP-1 DP-2 (connected) 3840x2160+ [DEL-16711-808727372-DELL UP3218K-D2HP805I043L] DP-3 DP-4 (connected) 3840x21&gt;
+grobi: 18:31:48.823783 new rule found: UP3218K
+grobi: 18:31:48.823785 enable outputs: [DP-4@3840x4320 DP-2@3840x4320]
+grobi: 18:31:48.823789 using one atomic call to xrandr
+grobi: 18:31:48.823806 running command /usr/bin/xrandr xrandr --output DP-4 --mode 3840x4320 --output DP-2 --mode 3840x4320 --right-of DP-4
+grobi: 18:31:49.285944 new RANDR change event received
+</code></pre><p>Notably, the instructions for getting out of a bad state (no signal) are now to
+power off the monitor and power it back on again. This will result in RandR
+output change events, which will trigger <code>grobi</code>, which will run <code>xrandr</code>, which
+configures the monitor. Nice!</p>
+<h2 id="why-not-autorandr">Why not autorandr?</h2>
+<p>No particular reason. I knew <code>grobi</code>.</p>
+<p>If nothing else, <code>grobi</code> is written in Go, so it’s likely to keep working
+smoothly over the years.</p>
+<h2 id="does-grobi-work-on-wayland">Does grobi work on Wayland?</h2>
+<p>Probably not. There is no mention of Wayland over on the <a href="https://github.com/fd0/grobi/">grobi
+repository</a>.</p>
+<h2 id="zleep">Bonus: my Suspend-to-RAM setup</h2>
+<p>As a bonus, this section describes the other half of my monitor-related
+automation.</p>
+<p>When I suspend my PC to RAM, I either want to wake it up manually later, for
+example by pressing a key on the keyboard or by sending a Wake-on-LAN packet, or
+I want it to wake up automatically each morning at 6:50 — that way, daily cron
+jobs have some time to run before I start using the computer.</p>
+<p>To accomplish this, I use <code>zleep</code>, a wrapper program around <a href="https://manpages.debian.org/rtcwake.8"><code>rtcwake(8)</code></a>
+ and <code>systemctl suspend</code> that integrates with the
+myStrom switch smart plug to turn off power to the monitor entirely. This is
+worthwhile because the monitor draws 30W even in standby!</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span> main
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;context&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;flag&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;log&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;net/http&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;net/url&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;os&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;os/exec&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;time&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">var</span> (
+</span></span><span style="display:flex;"><span>	resume = flag.<span style="color:#06287e">Bool</span>(<span style="color:#4070a0">&#34;resume&#34;</span>,
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">false</span>,
+</span></span><span style="display:flex;"><span>		<span style="color:#4070a0">&#34;run resume behavior only (turn on monitor via smart plug)&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	noMonitor = flag.<span style="color:#06287e">Bool</span>(<span style="color:#4070a0">&#34;no_monitor&#34;</span>,
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">false</span>,
+</span></span><span style="display:flex;"><span>		<span style="color:#4070a0">&#34;disable turning off/on monitor&#34;</span>)
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">monitorPower</span>(ctx context.Context, method, cmnd <span style="color:#902000">string</span>) <span style="color:#902000">error</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> <span style="color:#666">*</span>noMonitor {
+</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;[monitor power] skipping because -no_monitor flag is set&#34;</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;[monitor power] command: %v&#34;</span>, cmnd)
+</span></span><span style="display:flex;"><span>	u, err <span style="color:#666">:=</span> url.<span style="color:#06287e">Parse</span>(<span style="color:#4070a0">&#34;http://myStrom-Switch-A46FD0/&#34;</span> <span style="color:#666">+</span> cmnd)
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">for</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> ctx.<span style="color:#06287e">Err</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		req, err <span style="color:#666">:=</span> http.<span style="color:#06287e">NewRequest</span>(method, u.<span style="color:#06287e">String</span>(), <span style="color:#007020;font-weight:bold">nil</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		ctx, canc <span style="color:#666">:=</span> context.<span style="color:#06287e">WithTimeout</span>(ctx, <span style="color:#40a070">5</span><span style="color:#666">*</span>time.Second)
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">defer</span> <span style="color:#06287e">canc</span>()
+</span></span><span style="display:flex;"><span>		req = req.<span style="color:#06287e">WithContext</span>(ctx)
+</span></span><span style="display:flex;"><span>		resp, err <span style="color:#666">:=</span> http.DefaultClient.<span style="color:#06287e">Do</span>(req)
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			log.<span style="color:#06287e">Print</span>(err)
+</span></span><span style="display:flex;"><span>			time.<span style="color:#06287e">Sleep</span>(<span style="color:#40a070">1</span> <span style="color:#666">*</span> time.Second)
+</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">continue</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> resp.StatusCode <span style="color:#666">!=</span> http.StatusOK {
+</span></span><span style="display:flex;"><span>			log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;unexpected HTTP status code: got %v, want %v&#34;</span>, resp.Status, http.StatusOK)
+</span></span><span style="display:flex;"><span>			time.<span style="color:#06287e">Sleep</span>(<span style="color:#40a070">1</span> <span style="color:#666">*</span> time.Second)
+</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">continue</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;[monitor power] request succeeded&#34;</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">nextWakeup</span>(now time.Time) time.Time {
+</span></span><span style="display:flex;"><span>	midnight <span style="color:#666">:=</span> time.<span style="color:#06287e">Date</span>(now.<span style="color:#06287e">Year</span>(), now.<span style="color:#06287e">Month</span>(), now.<span style="color:#06287e">Day</span>(), <span style="color:#40a070">0</span>, <span style="color:#40a070">0</span>, <span style="color:#40a070">0</span>, <span style="color:#40a070">0</span>, time.Local)
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> now.<span style="color:#06287e">Hour</span>() &lt; <span style="color:#40a070">6</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// wake up today
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#007020;font-weight:bold">return</span> midnight.<span style="color:#06287e">Add</span>(<span style="color:#40a070">6</span><span style="color:#666">*</span>time.Hour <span style="color:#666">+</span> <span style="color:#40a070">50</span><span style="color:#666">*</span>time.Minute)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// wake up tomorrow
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">return</span> midnight.<span style="color:#06287e">Add</span>(<span style="color:#40a070">24</span> <span style="color:#666">*</span> time.Hour).<span style="color:#06287e">Add</span>(<span style="color:#40a070">6</span><span style="color:#666">*</span>time.Hour <span style="color:#666">+</span> <span style="color:#40a070">50</span><span style="color:#666">*</span>time.Minute)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">runResume</span>() <span style="color:#902000">error</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Retry for up to one minute to give the network some time to come up
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	ctx, canc <span style="color:#666">:=</span> context.<span style="color:#06287e">WithTimeout</span>(context.<span style="color:#06287e">Background</span>(), <span style="color:#40a070">1</span><span style="color:#666">*</span>time.Minute)
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">defer</span> <span style="color:#06287e">canc</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">monitorPower</span>(ctx, <span style="color:#4070a0">&#34;GET&#34;</span>, <span style="color:#4070a0">&#34;relay?state=1&#34;</span>); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Print</span>(err)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">zleep</span>() <span style="color:#902000">error</span> {
+</span></span><span style="display:flex;"><span>	ctx <span style="color:#666">:=</span> context.<span style="color:#06287e">Background</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	now <span style="color:#666">:=</span> time.<span style="color:#06287e">Now</span>().<span style="color:#06287e">Truncate</span>(<span style="color:#40a070">1</span> <span style="color:#666">*</span> time.Second)
+</span></span><span style="display:flex;"><span>	wakeup <span style="color:#666">:=</span> <span style="color:#06287e">nextWakeup</span>(now)
+</span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;now   : %v&#34;</span>, now)
+</span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;wakeup: %v&#34;</span>, wakeup)
+</span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;wakeup: %v (timestamp)&#34;</span>, wakeup.<span style="color:#06287e">Unix</span>())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// assumes hwclock is running in UTC (see timedatectl | grep local)
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Power the monitor off in 15 seconds.
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// mode=on is intentional: https://api.mystrom.ch/#e532f952-36ea-40fb-a180-a57b835f550e
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// - the switch will be turned on (already on, so this is a no-op)
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// - the switch will wait for 15 seconds
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// - the switch will be turned off
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">monitorPower</span>(ctx, <span style="color:#4070a0">&#34;POST&#34;</span>, <span style="color:#4070a0">&#34;timer?mode=on&amp;time=15&#34;</span>); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Print</span>(err)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	sleep <span style="color:#666">:=</span> exec.<span style="color:#06287e">Command</span>(<span style="color:#4070a0">&#34;sh&#34;</span>, <span style="color:#4070a0">&#34;-c&#34;</span>, fmt.<span style="color:#06287e">Sprintf</span>(<span style="color:#4070a0">&#34;sudo rtcwake -m no --verbose --utc -t %v &amp;&amp; sudo systemctl suspend&#34;</span>, wakeup.<span style="color:#06287e">Unix</span>()))
+</span></span><span style="display:flex;"><span>	sleep.Stdout = os.Stdout
+</span></span><span style="display:flex;"><span>	sleep.Stderr = os.Stderr
+</span></span><span style="display:flex;"><span>	fmt.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;running %v\n&#34;</span>, sleep.Args)
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> sleep.<span style="color:#06287e">Run</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;%v: %v&#34;</span>, sleep.Args, err)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+</span></span><span style="display:flex;"><span>	flag.<span style="color:#06287e">Parse</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> <span style="color:#666">*</span>resume {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">runResume</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			log.<span style="color:#06287e">Fatal</span>(err)
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	} <span style="color:#007020;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">zsleep</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			log.<span style="color:#06287e">Fatal</span>(err)
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>To turn power to the monitor on after resuming, I placed the following shell
+script in <code>/lib/systemd/system-sleep/zleep.sh</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#007020">#!/bin/sh
+</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">case</span> <span style="color:#4070a0">&#34;</span><span style="color:#bb60d5">$1</span><span style="color:#4070a0">&#34;</span> in
+</span></span><span style="display:flex;"><span>	pre<span style="color:#666">)</span>	<span style="color:#007020">exit</span> <span style="color:#40a070">0</span>
+</span></span><span style="display:flex;"><span>		;;
+</span></span><span style="display:flex;"><span>	post<span style="color:#666">)</span>	/usr/local/bin/zleep -resume
+</span></span><span style="display:flex;"><span>		<span style="color:#007020">exit</span> <span style="color:#40a070">0</span>
+</span></span><span style="display:flex;"><span>		;;
+</span></span><span style="display:flex;"><span> 	*<span style="color:#666">)</span>	<span style="color:#007020">exit</span> <span style="color:#40a070">1</span>
+</span></span><span style="display:flex;"><span>		;;
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">esac</span>
+</span></span></code></pre></div><p>Once power is on, grobi will detect and configure the monitor.</p>
+<p>Here is the program in action:</p>
+<pre tabindex="0"><code>2025/05/06 21:58:32 now   : 2025-05-06 21:58:32 +0200 CEST
+2025/05/06 21:58:32 wakeup: 2025-05-07 06:50:00 +0200 CEST
+2025/05/06 21:58:32 wakeup: 1746593400 (timestamp)
+2025/05/06 21:58:32 [monitor power] command: timer?mode=on&amp;time=15
+2025/05/06 21:58:32 [monitor power] request succeeded
+running [sh -c sudo rtcwake -m no --verbose --utc -t 1746593400 &amp;&amp; sudo systemctl suspend]
+Using UTC time.
+	delta   = 0
+	tzone   = 0
+	tzname  = UTC
+	systime = 1746561512, (UTC) Tue May  6 19:58:32 2025
+	rtctime = 1746561512, (UTC) Tue May  6 19:58:32 2025
+alarm 1746593400, sys_time 1746561512, rtc_time 1746561512, seconds 0
+rtcwake: wakeup using /dev/rtc0 at Wed May  7 04:50:00 2025
+suspend mode: no; leaving
+</code></pre>]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[Intel 9 285K on ASUS Z890: not stable!]]></title>
     <link href="https://michael.stapelberg.ch/posts/2025-03-19-intel-core-ultra-9-285k-on-asus-z890-not-stable/"/>
     <id>https://michael.stapelberg.ch/posts/2025-03-19-intel-core-ultra-9-285k-on-asus-z890-not-stable/</id>
@@ -5418,207 +5656,5 @@ CoreOS rebooting to update itself.
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          -v /srv/emby:/config \
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          emby/embyserver</span><span style="color:#bbb">        
 </span></span></span></code></pre></div>]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[Supermicro X11SSZ-QF workstation mainboard]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2016-05-10-supermicro_x11ssz-qf_workstation_mainboard/"/>
-    <id>https://michael.stapelberg.ch/posts/2016-05-10-supermicro_x11ssz-qf_workstation_mainboard/</id>
-    <published>2016-05-10T18:46:00+00:00</published>
-    <content type="html"><![CDATA[<h3>Context</h3>
-<p>
-For the last 3 years I’ve used <a
-href="/Artikel/buying_linux_computer_2012/">the hardware described in my 2012
-article</a>. In order to drive a hi-dpi display, I needed to install an nVidia
-graphics card, since only the nVidia hardware/software supported multi-tile
-displays requiring MST (Multiple Stream Transport) such as the Dell UP2414Q.
-While I’ve switched to <a href="/Artikel/viewsonic_vx2475smhl_4k_linux/">a
-Viewsonic VX2475Smhl-4K</a> in the meantime, I still needed a recent-enough
-DisplayPort output that could deliver 3840x2160@60Hz. This is not the case for
-the Intel Core i7-2600K’s integrated GPU, so I needed to stick with the nVidia
-card.
-</p>
-<p>
-I then stumbled over a video file which, when played back using the nouveau
-driver’s <a href="https://en.wikipedia.org/wiki/VDPAU">VDPAU</a> functionality,
-would lock up my graphics card entirely, so that only a cold reboot helped.
-This got me annoyed enough to upgrade my hardware.
-</p>
-<h3>Why the Supermicro X11SSZ-QF?</h3>
-<p>
-Intel, my standard pick for mainboards with good Linux support, unfortunately
-<a
-href="http://gizmodo.com/5978232/intel-to-stop-making-desktop-motherboards">stopped
-producing desktop mainboards</a>. I looked around a bit for <a
-href="https://en.wikipedia.org/wiki/Skylake_(microarchitecture)">Skylake</a>
-mainboards and realized that the Intel Q170 Express chipset actually supports 2
-DisplayPort outputs that each support 3840x2160@60Hz, enabling a multi-monitor
-hi-dpi display setup. While I don’t currently have multiple monitors and don’t
-intend to get another monitor in the near future, I thought it’d be nice to
-have that as a possibility.
-</p>
-<p>
-Turns out that there are only two mainboards out there which use the Q170
-Express chipset and actually expose two DisplayPort outputs: the <a
-href="http://www.fujitsu.com/global/products/computing/peripheral/mainboards/extended-lifecycle-main/pmod-177971.html">Fujitsu
-D3402-B</a>, and the <a
-href="http://www.supermicro.com/products/motherboard/core/q170/x11ssz-qf.cfm">Supermicro
-X11SSZ-QF</a>. The Fujitsu one doesn’t have an integrated S/PDIF output, which
-I need to play audio on my <a
-href="http://usa.denon.com/us/product/hometheater/avreceiversht/avrx1100w">Denon
-AVR-X1100W</a> without a constant noise level. Also, I wasn’t able to find
-software downloads or even a manual for the board on the Fujitsu website. For
-Supermicro, you can find the manual and software very easily on their website,
-and because I bought Supermicro hardware in the past and was rather happy with
-it, I decided to go with the Supermicro option.
-</p>
-<p>
-I’ve been using the board for half a year now, without any stability issues.
-</p>
-<h3>Mechanics and accessories</h3>
-<p>
-The X11SSZ-QF ships with a printed quick reference sheet, an I/O shield and 4
-SATA cables. Unfortunately, Supermicro apparently went for the cheapest SATA
-cables they could find, as they do not have a clip to ensure they don’t slide
-off of the hard disk connector. This is rather disappointing for a mainboard
-that costs more than 300 CHF. Further, an S/PDIF bracket is not included, so I
-needed to <a
-href="http://www.amazon.com/SPDIF-Optical-Plate-Cable-Bracket/dp/B003AV944Y">order
-one from the USA</a>.
-</p>
-<p>
-The I/O shield comes with covers over each port, which I assume is because the
-X11SSZ mainboard family has different ports (one model has more ethernet ports,
-for example). When removing the covers, push them through from the rear side of
-the case (if you had installed it already). If you do it from the other side, a
-bit of metal will remain in each port.
-</p>
-<p>
-Due to the positioning of the CPU socket, with my Fractal Design Define R3
-case, one cannot reach the back of the CPU fan bracket when the mainboard is
-installed in the case. Hence, you need to first install the CPU fan, then
-install the mainboard. This is doable, you just need to realize it early enough
-and think about it, otherwise you’ll install the mainboard twice.
-</p>
-<h3>Integrated GPU not initialized</h3>
-<p>
-The integrated GPU is not initialized by default. You need to either install an
-external graphics card or use IPMI to enter the BIOS and change <code>Advanced
-→ Chipset Configuration → Graphics Configuration → Primary Display</code> to
-“IGFX”.
-</p>
-<p>
-For using IPMI, you need to connect the ethernet port <code>IPMI_LAN</code>
-(top right on the back panel, see <a
-href="http://www.supermicro.com/QuickRefs/motherboard/Q170/QRG-1744.pdf">the
-X11SSZ-QF quick reference guide</a>) to a network which has a DHCP server, then
-connect to the IPMI’s IP address in a browser.
-</p>
-<h3>Overeager Fan Control</h3>
-<p>
-When I first powered up the mainboard, I was rather confused by the behavior: I got no picture (see above), but <code>LED2</code> was blinking, meaning “PWR Fail or Fan Fail”. In addition, the computer seemed to turn itself off and on in a loop. After a while, I realized that it’s just the fan control which thinks my slow-spinning Scythe Mugen 3 Rev. B CPU fan is broken because of its low RPM value. The fan control subsequently spins up the fan to maximum speed, realizes the CPU is cool enough, spins down the fan, realizes the fan speed is too low, spins up the fan, etc.
-</p>
-<p>
-Neither in the BIOS nor in the IPMI web interface did I find any options for the fan thresholds. Luckily, you can actually introspect and configure them using IPMI:
-</p>
-<pre>
-# apt-get install freeipmi-tools
-# ipmi-sensors-config --filename=ipmi-sensors.config --checkout
-</pre>
-<p>
-In the human-readable text file <code>ipmi-sensors.config</code> you can now introspect the current configuration. You can see that <code>FAN1</code> and <code>FAN2</code> have sections in that file:
-</p>
-<pre>
-Section 607_FAN1
- Enable_All_Event_Messages Yes
- Enable_Scanning_On_This_Sensor Yes
- Enable_Assertion_Event_Lower_Critical_Going_Low Yes
- Enable_Assertion_Event_Lower_Non_Recoverable_Going_Low Yes
- Enable_Assertion_Event_Upper_Critical_Going_High Yes
- Enable_Assertion_Event_Upper_Non_Recoverable_Going_High Yes
- Enable_Deassertion_Event_Lower_Critical_Going_Low Yes
- Enable_Deassertion_Event_Lower_Non_Recoverable_Going_Low Yes
- Enable_Deassertion_Event_Upper_Critical_Going_High Yes
- Enable_Deassertion_Event_Upper_Non_Recoverable_Going_High Yes
- Lower_Non_Critical_Threshold 700.000000
- Lower_Critical_Threshold 500.000000
- Lower_Non_Recoverable_Threshold 300.000000
- Upper_Non_Critical_Threshold 25300.000000
- Upper_Critical_Threshold 25400.000000
- Upper_Non_Recoverable_Threshold 25500.000000
- Positive_Going_Threshold_Hysteresis 100.000000
- Negative_Going_Threshold_Hysteresis 100.000000
-EndSection
-</pre>
-<p>
-When running <code>ipmi-sensors</code>, you can see the current temperatures,
-voltages and fan readings. In my case, the fan spins with 700 RPM during normal
-operation, which was exactly the <code>Lower_Non_Critical_Threshold</code> in
-the default IPMI config. Hence, I modified my config file as illustrated by the
-following diff:
-</p>
-<pre>
---- ipmi-sensors.config	2015-11-13 11:53:00.940595043 +0100
-+++ ipmi-sensors-fixed.config	2015-11-13 11:54:49.955641295 +0100
-@@ -206,11 +206,11 @@
- Enable_Deassertion_Event_Upper_Non_Recoverable_Going_High Yes
-- Lower_Non_Critical_Threshold 700.000000
-+ Lower_Non_Critical_Threshold 400.000000
-- Lower_Critical_Threshold 500.000000
-+ Lower_Critical_Threshold 200.000000
-- Lower_Non_Recoverable_Threshold 300.000000
-+ Lower_Non_Recoverable_Threshold 0.000000
- Upper_Non_Critical_Threshold 25300.000000
-</pre>
-<p>
-You can install the new configuration using the <code>--commit</code> flag:
-</p>
-<pre>
-# ipmi-sensors-config --filename=ipmi-sensors-fixed.config --commit
-</pre>
-<p>
-You might need to shut down your computer and disconnect power for this change to take effect, since the BMC is running even when the mainboard is powered off.
-</p>
-<h3>S/PDIF output</h3>
-<p>
-The S/PDIF pin header on the mainboard just doesn’t work at all. It does not work
-in Windows 7 (for which the board was made), and it doesn’t work in Linux.
-Neither the digital nor the analog part of an S/PDIF port works. When
-introspecting the Intel HDA setup of the board, the S/PDIF output is not even
-hooked up correctly. Even after fixing that, it doesn’t work.
-</p>
-<p>
-Of course, I’ve contacted the Supermicro support. After making clear to them
-what my use-case is, they ordered (!) an S/PDIF header and tested the analog
-part of it. Their technical support claims that their port is working, but they
-never replied to my question with which operating system they tested that,
-despite me asking multiple times.
-</p>
-<p>
-It’s pretty disappointing to see that the support is unable to help here or at
-least confirm that it’s broken.
-</p>
-<p>
-To address the issue, I’ve bought an <a
-href="https://www.asus.com/us/Sound-Cards/Xonar_DX/specifications/">ASUS Xonar
-DX</a> sound card. It works out of the box on Linux, and its S/PDIF port works.
-The S/PDIF port is shared with the Line-in/Mic-in jack, but a suitable adapter
-is shipped with the card.
-</p>
-<h3>Wake-on-LAN</h3>
-<p>
-I haven’t gotten around to using Wake-on-LAN or Suspend-to-RAM yet. I will
-amend this section when I get around to it.
-</p>
-<h3>Conclusion</h3>
-<p>
-It’s clear that this mainboard is not for consumers. This begins with the
-awkward graphics and fan control setup and culminates in the apparently
-entirely untested S/PDIF output.
-</p>
-<p>
-That said, once you get it working, it works reliably, and it seems like the
-only reasonable option with two onboard DisplayPort outputs.
-</p>
-]]></content>
   </entry>
 </feed>

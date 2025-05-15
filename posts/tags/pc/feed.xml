@@ -8,6 +8,723 @@
   <id>https://michael.stapelberg.ch/posts/tags/pc/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[My 2025 high-end Linux PC 🐧]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/"/>
+    <id>https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/</id>
+    <published>2025-05-15T15:44:24+02:00</published>
+    <content type="html"><![CDATA[<p>Turns out <a href="/posts/2025-03-19-intel-core-ultra-9-285k-on-asus-z890-not-stable/">my previous attempt at this build had a faulty
+CPU!</a> With
+the CPU replaced, the machine now is stable and fast! 🚀 In this article, I’ll
+go into a lot more detail about the component selection, but in a nutshell, I
+picked an Intel 285K CPU for low idle power, chose a 4TB SSD so I don’t have to
+worry about running out of storage quickly, and a capable nvidia graphics card
+to <a href="/posts/2017-12-11-dell-up3218k/">drive my Dell UP3218K 8K monitor</a>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/IMG_4795_featured.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/IMG_4795_featured_hu5465b399bad9f1b50eba8e81064e2014_2034445_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/IMG_4795_featured_hu5465b399bad9f1b50eba8e81064e2014_2034445_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/IMG_4795_featured_hu5465b399bad9f1b50eba8e81064e2014_2034445_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="
+
+border: 1px solid #000;
+
+"
+  
+  loading="lazy"></a>
+
+
+
+<h2 id="components">Components</h2>
+<p>Which components did I pick for this build? Here’s the full list:</p>
+<table>
+<thead>
+<tr>
+<th>Price</th>
+<th>Type</th>
+<th>Article</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>140 CHF</td>
+<td>Case</td>
+<td><a href="https://www.digitec.ch/de/s1/product/fractal-define-7-compact-black-solid-atx-matx-mini-itx-pc-gehaeuse-13220301">Fractal Define 7 Compact Black Solid</a></td>
+</tr>
+<tr>
+<td>155 CHF</td>
+<td>Power Supply</td>
+<td><a href="https://www.digitec.ch/de/s1/product/corsair-rm850x-850-w-pc-netzteil-47356173?supplier=8560040">Corsair RM850x</a></td>
+</tr>
+<tr>
+<td>233 CHF</td>
+<td>Mainboard</td>
+<td><a href="https://www.digitec.ch/de/s1/product/asus-prime-z890-p-lga-1851-intel-z890-atx-mainboard-50252296">ASUS PRIME Z890-P</a></td>
+</tr>
+<tr>
+<td>620 CHF</td>
+<td>CPU</td>
+<td><a href="https://www.digitec.ch/de/s1/product/intel-core-ultra-9-285k-lga-1851-370-ghz-24-core-prozessor-49734792">Intel Core Ultra 9 285K</a></td>
+</tr>
+<tr>
+<td>120 CHF</td>
+<td>CPU fan</td>
+<td><a href="https://www.digitec.ch/de/s1/product/noctua-nh-d15-g2-168-mm-cpu-kuehler-46985628">Noctua NH-D15 G2</a></td>
+</tr>
+<tr>
+<td>39 CHF</td>
+<td>Case fan</td>
+<td><a href="https://www.digitec.ch/de/s1/product/noctua-nf-a14-pwm-140-mm-1-x-pc-luefter-657800?supplier=3204073">Noctua NF-A14 PWM (140 mm)</a></td>
+</tr>
+<tr>
+<td>209 CHF</td>
+<td>RAM</td>
+<td><a href="https://www.digitec.ch/de/s1/product/corsair-vengeance-2-x-32gb-6400-mhz-ddr5-ram-dimm-ram-24473300">64 GB DDR5-6400 Corsair Vengeance (2 x 32GB)</a></td>
+</tr>
+<tr>
+<td>280 CHF</td>
+<td>Disk</td>
+<td><a href="https://www.digitec.ch/de/s1/product/samsung-990-pro-4000-gb-m2-2280-ssd-37073751?supplier=406802">4000 GB Samsung 990 Pro</a></td>
+</tr>
+<tr>
+<td>554 CHF</td>
+<td>GPU</td>
+<td><a href="https://www.digitec.ch/de/s1/product/msi-geforce-rtx-3060-ti-gaming-x-trio-8gb-grafikkarte-14365529">MSI GeForce RTX 3060 Ti GAMING X TRIO</a></td>
+</tr>
+</tbody>
+</table>
+<p>Total: 2350 CHF</p>
+<p>…and the next couple of sections go into detail on how I selected these components.</p>
+<h3 id="case">Case</h3>
+<p>I have been a fan of Fractal cases for a couple of generations. In particular, I
+realized that the “Compact” series offers plenty of space even for large
+graphics cards and CPU coolers, so that’s now my go-to case: the Fractal Define
+7 Compact (Black Solid).</p>
+<p>My general requirements for a PC case are as follows:</p>
+<ol>
+<li>No extra effort should be required for the case to be as quiet as possible.</li>
+<li>The case should not have any sharp corners (no danger of injury!).</li>
+<li>The case should provide just enough space for easy access to your components.</li>
+<li>The more support the case has to encourage clean cable routing, the better.</li>
+<li>USB3 front panel headers should be included.</li>
+</ol>
+<p>I really like building components into the case and working with the case. There
+are no sharp edges, the mechanisms are a pleasure to use and the
+cable-management is well thought-out.</p>
+<p>The only thing that wasn’t top-notch is that Fractal ships the case screws in
+sealed plastic packages that you need to cut open. I would have wished for a
+re-sealable plastic baggie so that one can keep the unused screws instead of
+losing them.</p>
+<p>With this build, I have standardized all my PCs into Fractal Define 7 Compact
+Black cases!</p>
+<h3 id="power-supply">Power Supply</h3>
+<p>I wanted to keep my options open regarding upgrading to an nvidia 50xx series
+graphics card at a later point. Those models have a TGP (“Total Graphics Power”)
+of 575 watts, so I needed a power supply that delivers enough power for the
+whole system even at peak power usage in all dimensions.</p>
+<p>I ended up selecting the Corsair RM850x, which <a href="https://www.tomshardware.com/reviews/corsair-rm850x-2021-power-supply-review">reviews favorably (“leader in
+the 850W gold
+category”)</a>
+and was available at my electronics store of choice.</p>
+<p>This was a good choice: the PSU indeed runs quiet, and I really like the power
+cables (e.g. the GPU cable) that they include: they are very flexible, which
+makes them easy to cable-manage.</p>
+<p>One interesting realization was that it’s more convenient to not use the PSU’s
+12VHPWR cable, but instead stick to the older 8-pin power connectors for the GPU
+in combination with a 12VHPWR-to-8-pin adapter. The reason is that the 12VHPWR
+connector’s locking mechanism is very hard to unlock, so when swapping out the
+GPU (as I had to do a number of times while trouble-shooting), unlocking an
+8-pin connector is much easier…</p>
+<h3 id="ssd-disk">SSD disk</h3>
+<p>I have been avoiding PCIe 5 SSDs so far because they consume a lot more power
+compared to PCIe 4 SSDs. While bulk streaming data transfer rates are higher on
+PCIe 5 SSDs, random transfers are not significantly faster. Most of my compute
+workload are random transfers, not large bulk transfers.</p>
+<p>The power draw situation with PCIe 5 SSDs seems to be getting better lately,
+with the Phison E31T being the first controller that implements power saving. A
+disk that uses the E31T controller is the Corsair Force Series MP700
+Elite. Unfortunately, said disk was unavailable when I ordered.</p>
+<p>Instead, I picked the Samsung 990 Pro with 4 TB. I have had good experiences
+with the Samsung Pro series over the years (never had one die or degrade
+performance), and my previous 2 TB disk was starting to fill up, so the extra
+storage space is appreciated.</p>
+<h3 id="onboard-25gbe-network-card">Onboard 2.5GbE Network Card</h3>
+<p>One annoying realization is that most mainboard vendors seem to have moved to
+2.5 GbE (= 2.5 Gbit/s ethernet) onboard network cards. I would have been
+perfectly happy to play it safe and buy another Intel I225 1 GbE network card,
+as long as it <em>just works</em> with Linux.</p>
+<p>In the 2.5 GbE space, the main players seem to be Realtek and Intel. Most
+mainboard vendors opted for Realtek as far as I could see.</p>
+<p>Linux includes the <code>r8169</code> driver for Realtek network cards, but whether the
+card will work out of the box depends on the exact revision of the network card!
+For example:</p>
+<ul>
+<li>The AsRock Z890 Pro-A has rev 8125B. lshw:
+<code>firmware=rtl8125b-2_0.0.2 07/13/20</code></li>
+<li>The ASUS PRIME Z890-P has rev 8125<strong>D</strong>. lshw:
+<code>firmware=rtl8125d-1_0.0.7 10/15/24</code></li>
+</ul>
+<p>For revision 8125D, you need a recent-enough Linux version (6.13+) that includes
+commit “<a href="https://github.com/torvalds/linux/commit/f75d1fbe7809bc5ed134204b920fd9e2fc5db1df">r8169: add support for
+RTL8125D</a>”,
+accompanied by a recent-enough linux-firmware package.</p>
+<p>Even with the latest firmware, there is some concern around stability and ASPM
+support. See for example <a href="https://serverfault.com/a/1169558">this ServerFault
+post</a> by someone working on the <code>r8169</code>
+driver. But, despite the Intel 1 GbE options being well-supported at this point,
+Intel’s 2.5 GbE options might not fare any better than the Realtek ones: I found
+<a href="https://www.reddit.com/r/HomeServer/comments/1cc0yuq/are_intel_25_gbe_nics_i225v_i226v_stable_now/">reports of instability with Intel’s 2.5 GbE network
+cards</a>.</p>
+<p>That said, aside from the annoying firmware requirements, the Realtek 2.5 GbE
+card seems to work fine for me in practice.</p>
+<h3 id="mainboard">Mainboard</h3>
+<p>Despite the suboptimal network card choice, I decided to stick to the ASUS PRIME
+series of mainboards, as I made good experiences with those in my past few
+builds. Here are a couple of thoughts on the ASUS PRIME Z890-P mainboard I went
+with:</p>
+<ul>
+<li>I like the quick-release PCIe mechanism: ASUS understood that people had
+trouble unlocking large graphics cards from their PCIe slot, so they added a
+lever-like mechanism that is easily reachable. In my couple of usages, this
+worked pretty well!</li>
+<li>I wrote about <a href="/posts/2022-01-15-high-end-linux-pc/#slow-boot">slow boot times with my 2022 PC
+build</a> that were caused by
+time-consuming memory training. On this ASUS board, I noticed that the board
+blinks the Power LED to signal that memory training is in progress. Very nice!
+It hadn’t occurred to me previously that the various phases of the boot could
+be signaled by different Power LED blinking patterns :)
+<ul>
+<li>The downside of this feature is: While the machine is in suspend-to-RAM, the
+Power LED also blinks! This is annoying, so I might just disconnect the
+Power LED entirely.</li>
+</ul>
+</li>
+<li>The UEFI firmware includes what they call a Q-Dashboard: An overview of what
+is installed/connected in which slot. Quite nice:</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/IMG_4809.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/IMG_4809_hubd58b5eea90ff3475e2027d31ae65ea9_1032931_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/IMG_4809_hubd58b5eea90ff3475e2027d31ae65ea9_1032931_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/IMG_4809_hubd58b5eea90ff3475e2027d31ae65ea9_1032931_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="357"
+  style="
+
+border: 1px solid #000;
+
+"
+  
+  loading="lazy"></a>
+
+
+
+<p>One surprising difference between the two mainboards I tested was that the
+AsRock Z890 Pro-A does not seem to report the correct DIMM clock in <code>lshw</code>,
+whereas the ASUS does:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#a00000">--- lshw-intel-285k-asrock.txt	2025-04-30 20:35:24 +0200
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ lshw-intel-285k-asus.txt		2025-04-30 21:39:52 +0200
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>      *-firmware
+</span></span><span style="display:flex;"><span>           description: BIOS
+</span></span><span style="display:flex;"><span><span style="color:#a00000">-          vendor: American Megatrends International, LLC.
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+          vendor: American Megatrends Inc.
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>           physical id: 0
+</span></span><span style="display:flex;"><span><span style="color:#a00000">-          version: 2.25
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">-          date: 03/24/2025
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+          version: 1601
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+          date: 02/07/2025
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>           size: 64KiB
+</span></span><span style="display:flex;"><span><span style="color:#a00000">-          capacity: 32MiB
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+          capacity: 16MiB
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>           capabilities: pci upgrade shadowing cdboot bootselect socketedrom edd acpi biosbootspecification uefi
+</span></span><span style="display:flex;"><span>[…]
+</span></span><span style="display:flex;"><span>      *-memory
+</span></span><span style="display:flex;"><span>           description: System Memory
+</span></span><span style="display:flex;"><span><span style="color:#a00000">-          physical id: 9
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+          physical id: e
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>           slot: System board or motherboard
+</span></span><span style="display:flex;"><span>           size: 64GiB
+</span></span><span style="display:flex;"><span>         *-bank:0
+</span></span><span style="display:flex;"><span><span style="color:#a00000">-             description: DIMM [empty]
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+             description: [empty]
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>              physical id: 0
+</span></span><span style="display:flex;"><span>              slot: Controller0-ChannelA-DIMM0
+</span></span><span style="display:flex;"><span>         *-bank:1
+</span></span><span style="display:flex;"><span><span style="color:#a00000">-             description: DIMM Synchronous 4800 MHz (0,2 ns)
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+             description: DIMM Synchronous 6400 MHz (0,2 ns)
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>              product: CMK64GX5M2B6400C32
+</span></span><span style="display:flex;"><span>              vendor: Corsair
+</span></span><span style="display:flex;"><span>              physical id: 1
+</span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -40,13 +42,13 @@
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>              slot: Controller0-ChannelA-DIMM1
+</span></span><span style="display:flex;"><span>              size: 32GiB
+</span></span><span style="display:flex;"><span>              width: 64 bits
+</span></span><span style="display:flex;"><span><span style="color:#a00000">-             clock: 505MHz (2.0ns)
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+             clock: 2105MHz (0.5ns)
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>         *-bank:2
+</span></span><span style="display:flex;"><span><span style="color:#a00000">-             description: DIMM [empty]
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+             description: [empty]
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>              physical id: 2
+</span></span><span style="display:flex;"><span>              slot: Controller0-ChannelB-DIMM0
+</span></span><span style="display:flex;"><span>         *-bank:3
+</span></span><span style="display:flex;"><span><span style="color:#a00000">-             description: DIMM Synchronous 4800 MHz (0,2 ns)
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+             description: DIMM Synchronous 6400 MHz (0,2 ns)
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>              product: CMK64GX5M2B6400C32
+</span></span><span style="display:flex;"><span>              vendor: Corsair
+</span></span><span style="display:flex;"><span>              physical id: 3
+</span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -54,7 +56,7 @@
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>              slot: Controller0-ChannelB-DIMM1
+</span></span><span style="display:flex;"><span>              size: 32GiB
+</span></span><span style="display:flex;"><span>              width: 64 bits
+</span></span><span style="display:flex;"><span><span style="color:#a00000">-             clock: 505MHz (2.0ns)
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+             clock: 2105MHz (0.5ns)
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>[…]
+</span></span></code></pre></div><p>I haven’t checked if there are measurable performance differences (e.g. if the
+XMP profile is truly active), but at least you now know to not necessarily trust
+what <code>lshw</code> can show you.</p>
+<h3 id="cpu-fan">CPU fan</h3>
+<p>I am a long-time fan of Noctua’s products: This company makes silent fans with
+great cooling capacity that work reliably! For many years, I have swapped out
+all the fans of each of my PCs with Noctua fans, and it was always an
+upgrade. Highly recommended.</p>
+<p>Hence, it is no question that I picked the latest and greatest Noctua CPU cooler
+for this build: the Noctua NH-D15 G2. There are a couple of things to pay
+attention to with this cooler:</p>
+<ul>
+<li>I decided to configure it with one fan instead of two fans: Using only one fan
+will be the quietest setup, yet still have plenty of cooling capacity for this
+setup.</li>
+<li>There are 3 different versions that differ in how their base plate is
+shaped. Noctua recommends: “For LGA1851, we generally recommend the regular
+standard version with medium base convexity”
+(<a href="https://noctua.at/en/intel-lga1851-all-you-need-to-know">https://noctua.at/en/intel-lga1851-all-you-need-to-know</a>)</li>
+<li>With a height of 168 mm, this cooler fits well into the Fractal Define 7
+Compact Black.</li>
+</ul>
+<h3 id="cpu-and-gpu-idle-power-vs-peak-performance">CPU and GPU: Idle Power vs. Peak Performance</h3>
+<h4 id="cpu-choice-intel-over-amd">CPU choice: Intel over AMD</h4>
+<p>Probably the point that raises most questions about this build is why I selected
+an Intel CPU over an AMD CPU. The primary reason is that Intel CPUs are so much
+better at power saving!</p>
+<p>Let me explain: Most benchmarks online are for gamers and hence measure a usage
+curve that goes “start game, run PC at 100% resources for hours”. Of course,
+when you never let the machine idle, you would care about <em>power efficiency</em>:
+how much power do you need to use to achieve the desired result?</p>
+<p>My use-case is software development, not gaming. My usage curve oscillates
+between “barely any usage because Michael is reading text” to “complete this
+compilation as quickly as possible with all the power available”. For me, I need
+both absolute power consumption at idle, and absolute performance to be
+best-of-class.</p>
+<p>AMD’s CPUs offer great performance (the recently released <a href="https://www.phoronix.com/review/amd-ryzen-9-9950x3d-linux">Ryzen 9 9950X3D is
+even faster</a> than the
+Intel 9 285K), and have great <em>power efficiency</em>, but poor <em>power consumption</em>
+at idle: With ≈35W of idle power draw, Zen 5 CPUs consume ≈3x as much power as
+Intel CPUs!</p>
+<p>Intel’s CPUs offer great performance (like AMD), but excellent power consumption
+at idle.</p>
+<p>Therefore, I can’t in good conscience buy an AMD CPU, but if you want a fast
+gaming-only PC or run an always-loaded HPC cluster with those CPUs, definitely
+go ahead :)</p>
+<h4 id="graphics-card-nvidia-over-amd">Graphics card: nvidia over AMD</h4>
+<p>I don’t necessarily recommend any particular nvidia graphics card, but I have
+had to stick to nvidia cards because they are the only option that work with my
+picky <a href="/posts/2017-12-11-dell-up3218k/">Dell UP3218K monitor</a>.</p>
+<p>From time to time, I try out different graphics cards. Recently, I got myself an
+AMD Radeon RX 9070 because I read that it works well with open source drivers.</p>
+<p>While the Radeon RX 9070 works with my monitor (great!), it seems to consume 45W
+in idle, which is much higher than my nvidia cards, which idle at ≈ 20W. This is
+unacceptable to me: Aside from high power costs and wasting precious resources,
+the high power draw also means that my room will be hotter in summer and the
+fans need to spin faster and therefore louder.</p>
+<p>People asked me on Social Media if this could be a measurement error (like, the
+card reporting inaccurate values), so I double-checked with a <a href="https://mystrom.ch/de/wifi-switch/">myStrom WiFi
+Switch</a> and confirmed that with the Radeon
+card, the PC indeed draws 20-30W more from the wall socket.</p>
+<h4 id="why-low-idle-power-is-so-important">Why Low Idle Power is so important</h4>
+<p>In the comments for my <a href="/posts/2025-03-19-intel-core-ultra-9-285k-on-asus-z890-not-stable/">my previous blog post about the first build of this
+machine not running
+stable</a>,
+people were asking why it is worth it to optimize a few watts of power
+usage. People calculate what higher power usage might cost, put it in relation
+to the total cost of the components, and conclude that saving ±10% of the price
+can’t possibly be worth the effort.</p>
+<p>Let me try to illustrate the importance of low idle power with this anecdote:
+For one year, I was suffering from an nvidia driver bug that meant the GPU would
+not clock down to the most efficient power-saving mode (because of the high
+resolution of my monitor). The 10-20W of difference should have been
+insignificant. Yet, when the bug was fixed, I noticed how my PC got quieter
+(fans don’t need to spin up) and my room noticeably cooled down, which was great
+as it was peak temperatures in summer.</p>
+<p>To me, having a whisper-quiet computing environment that does not heat up my
+room is a great, actual, real-life, measurable benefit. Not wasting resources
+and saving a tiny amount of money is a nice cherry on top.</p>
+<p>Obviously all the factors are very dependent on your specific situation: Your
+house’s thermal behavior might differ from mine, your tolerance for noise
+(and/or baseline noise levels) might be different, you might put more/less
+weight on resource usage, etc.</p>
+<h2 id="installation">Installation</h2>
+<h3 id="uefi-setup">UEFI setup</h3>
+<p>On the internet, I read that there was some issue related to the Power Limits
+that mainboards come with by default. Therefore, I did a <a href="https://www.asus.com/motherboards-components/motherboards/prime/prime-z890-p/helpdesk_bios?model2Name=PRIME-Z890-P">UEFI firmware
+update</a>
+immediately after getting the mainboard. I upgraded to version 1404 (2025/01/10)
+using the provided ZIP file (<code>PRIME-Z890-P-ASUS-1404.zip</code>) on an MS-DOS
+FAT-formatted USB stick with the EZ Flash tool in the UEFI firmware
+interface. Tip: do not extract the ZIP file, otherwise the EZ Flash tool cannot
+update the Intel ME firmware. Just put the ZIP file onto the USB disk as-is.</p>
+<p>I verified that with this UEFI version, the <code>Power Limit 1 (PL1)</code> is 250W, and
+<code>ICCMAX=347A</code>, which are exactly the values that Intel recommends. Great!</p>
+<p>I also enabled XMP and verified that memtest86 reported no errors.</p>
+<h3 id="software-setup-early-adopter-pains">Software setup: early adopter pains</h3>
+<p>To copy over the data from the old disk to the new disk, I wanted to boot a live
+linux distribution (specifically, <a href="https://grml.org/">grml.org</a>) and follow my
+usual procedure: boot with the old disk and the new (empty) disk, then use <code>dd</code>
+to copy the data. It’s nice and simple, hard to screw up.</p>
+<p>Unfortunately, while grml 2024.12 technically does boot up, there are two big
+problems:</p>
+<ol>
+<li>
+<p>There is no network connectivity because the kernel and linux-firmware
+versions are too old.</p>
+<ul>
+<li>Kernel commit <a href="https://github.com/torvalds/linux/commit/f75d1fbe7809bc5ed134204b920fd9e2fc5db1df">r8169: add support for
+RTL8125D</a>
+is not included.</li>
+</ul>
+</li>
+<li>
+<p>I could not get Xorg to work at all. Not with the Intel integrated GPU, nor
+with the nvidia dedicated GPU. Not with <code>nomodeset</code> or any of the other
+options in the grml menu. This wasn’t merely a convenience problem: I needed
+to use <code>gparted</code> (the graphical version) for its partition moving/resizing
+support.</p>
+</li>
+</ol>
+<p>Ultimately, it was easier to upgrade my old PC to Linux 6.13 and linux-firmware
+20250109, then put in the new disk and copy over the installation.</p>
+<h3 id="trim-your-ssds">TRIM your SSDs</h3>
+<p>SSD disks can degrade over time, especially when using full-disk encryption,
+because then the SSD firmware cannot know anymore which parts of the disk are
+used and which parts are free.</p>
+<p>I think I saw this effect in action back in 2022, <a href="/posts/2022-01-15-high-end-linux-pc/#copying-the-data">when I copied my data from a
+Force MP600 to a WD Black
+SN850</a>, which
+unexpectedly took many hours!</p>
+<p>To make sure my disk has a long and healthy life, I double-checked that both
+<a href="https://wiki.archlinux.org/title/Solid_state_drive">periodic and continuous TRIM are
+enabled</a> on my Arch Linux
+system: The <a href="https://manpages.debian.org/fstab.5"><code>fstab(5)</code></a>
+ file contains the <code>discard</code>
+option (and <a href="https://manpages.debian.org/mount.8"><code>mount(8)</code></a>
+ lists the <code>discard</code> option),
+and <code>fstrim.service</code> ran within the last week:</p>
+<pre tabindex="0"><code>systemd[1]: Starting Discard unused blocks on filesystems from /etc/fstab...
+fstrim[779617]: /boot: 10.1 GiB (10799427584 bytes) trimmed on /dev/nvme0n1p1
+fstrim[779617]: /: 1.8 TiB (2018906263552 bytes) trimmed on /dev/mapper/cryptroot
+systemd[1]: fstrim.service: Deactivated successfully.
+</code></pre><p>Speaking of copying data: the transfer from my WD Black SN850 to my Samsung 990
+PRO ran at 856 MB/s and took about 40 minutes in total.</p>
+<h2 id="performance">Performance</h2>
+<p>Here are the total times for a couple of typical workloads I run:</p>
+<table>
+<thead>
+<tr>
+<th>Workload</th>
+<th><a href="/posts/2022-01-15-high-end-linux-pc/">12900K (2022)</a></th>
+<th>285K (2025)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://go.dev/dl/">build Go 1.24.3 (<code>cd src; ./make.bash</code>)</a></td>
+<td>≈35s</td>
+<td>≈26s</td>
+</tr>
+<tr>
+<td><a href="https://github.com/gokrazy/rsync/tree/0c5ac23ecf8b337dd5672c2ae9f945defa5d0b7f">gokrazy/rsync tests (<code>make test</code>)</a></td>
+<td>≈0.5s</td>
+<td>≈0.4s</td>
+</tr>
+<tr>
+<td><a href="https://github.com/gokrazy/gokrazy/">gokrazy UEFI test (<code>go test ./integration/...</code>)</a></td>
+<td>≈30s</td>
+<td>≈10s</td>
+</tr>
+<tr>
+<td><a href="https://github.com/gokrazy/kernel/tree/699ad7a064b8702dbe91b801ea21c2da2f0e9737">gokrazy Linux compile (<code>gokr-rebuild-kernel -cross=arm64</code>)</a></td>
+<td>3m 13s</td>
+<td>2m 7s</td>
+</tr>
+</tbody>
+</table>
+<p>The performance boost is great! Building Linux kernels a whole minute faster is
+really nice.</p>
+<h2 id="stability-issues">Stability issues</h2>
+<p>In March, I published <a href="/posts/2025-03-19-intel-core-ultra-9-285k-on-asus-z890-not-stable/">an article about how the first build of this machine was
+not stable</a>,
+in which you can read in detail about the various crashes I ran into.</p>
+<p>Now, in early May, I know for sure that the CPU was defective, after a lengthy
+trouble-shooting in which I swapped out <strong>all</strong> the other parts of this PC, sent
+back the CPU and got a new one.</p>
+<p>The CPU was the most annoying component to diagnose in this build because it’s
+an LGA 1851 socket and I don’t (yet) have any other machines which uses
+that same socket. AMD’s approach of sticking to each socket for a longer time
+would have been better in this situation.</p>
+<h3 id="stress-testing">Stress testing</h3>
+<p>When I published my earlier blog post about the PC being unstable, I did not
+really know how to reliably trigger the issue. Some compute-intensive tasks like
+running a Django test suite seemed to trigger the issue. I <em>suspect</em> that the
+problem somehow got worse, because when I started stress testing the machine,
+suddenly it would crash <strong>every time</strong> when building a Linux kernel.</p>
+<p>That got me curious to see if other well-known CPU stress testers like
+<a href="https://en.wikipedia.org/wiki/Prime95">Prime95</a> would show problems, and
+indeed: within seconds, Prime95 would report errors.</p>
+<p>I figured I would use Prime95 as a quick signal: if it reports errors, the
+machine is faulty. This typically happens within seconds of starting Prime95.</p>
+<p>If Prime95 reported no errors, I would use Linux kernel compilation as a slow
+signal: if I can successfully build a kernel, the machine is likely stable
+enough.</p>
+<p>The specific setup I used is to run <code>./mprime -m</code>, hit N (do not participate in
+distributed computation projects), then Enter a few times to confirm the
+defaults. Eventually, Prime95 starts calculating, which pushes the CPU to 100%
+usage (see the <a href="https://manpages.debian.org/dstat.1"><code>dstat(1)</code></a>
+-like output by my
+<a href="https://github.com/gokrazy/stat"><code>gokrazy/stat</code></a> implementation) and draws the
+expected ≈300W of power from the wall:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/IMG_5271.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/IMG_5271_hu9195b7f4a2d211fcbbaf9d7af5929362_1260331_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/IMG_5271_hu9195b7f4a2d211fcbbaf9d7af5929362_1260331_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/IMG_5271_hu9195b7f4a2d211fcbbaf9d7af5929362_1260331_600x0_resize_q75_box.jpg"
+  alt="photo of running Prime95 to stress-test a CPU" title="photo of running Prime95 to stress-test a CPU"
+  width="600"
+  height="339"
+  style="
+
+border: 1px solid #000;
+
+"
+  
+  loading="lazy"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/2025-05-04-power.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/2025-05-04-power_hu7aec9296030e417f94707460ba79baa0_117407_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/2025-05-04-power_hu7aec9296030e417f94707460ba79baa0_117407_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/2025-05-04-power_hu7aec9296030e417f94707460ba79baa0_117407_600x0_resize_q75_box.jpg"
+  alt="screenshot of PC power usage" title="screenshot of PC power usage"
+  width="600"
+  height="216"
+  style="
+
+border: 1px solid #000;
+
+"
+  
+  loading="lazy"></a>
+
+
+
+<p>In addition, I also ran <a href="https://en.wikipedia.org/wiki/MemTest86">MemTest86</a> for
+a few hours:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/IMG_4821.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/IMG_4821_hue7fa39d39d038bbbcc4c494c53cf8eac_938366_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/IMG_4821_hue7fa39d39d038bbbcc4c494c53cf8eac_938366_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/IMG_4821_hue7fa39d39d038bbbcc4c494c53cf8eac_938366_600x0_resize_q75_box.jpg"
+  alt="photo of running memtest86" title="photo of running memtest86"
+  width="600"
+  height="306"
+  style="
+
+border: 1px solid #000;
+
+"
+  
+  loading="lazy"></a>
+
+
+
+<p>To be clear: I also successfully ran MemTest86 on the previous, unstable build,
+so only running MemTest86 is not good enough if you are dealing with a faulty
+CPU.</p>
+<h3 id="rma-timeline">RMA timeline</h3>
+<ul>
+<li>Jan 15th: I receive the components for my new PC
+<ul>
+<li>In January and February, the PC crashes occasionally.</li>
+</ul>
+</li>
+<li>Mar 4th: I switch back to my old PC and start writing my blog post</li>
+<li>Mar 19th: I publish my blog post about the machine not being stable
+<ul>
+<li>The online discussion does not result in any interesting tips or leads.</li>
+</ul>
+</li>
+<li>Mar 20th: I order the AsRock Z890 Pro-A mainboard to ensure the mainboard is OK</li>
+<li>Mar 24th: the AsRock Z890 Pro-A arrives</li>
+<li>Apr 5th (Sat): started an RMA for the CPU
+<ul>
+<li>They ask me to send the CPU to orderflow, which is the merchant that fulfilled my order.</li>
+<li>Typically, I prefer buying directly at digitec, but many PC components seem
+to only be available from orderflow on digitec nowadays.</li>
+</ul>
+</li>
+<li>Apr 9th (Wed): package arrives at orderflow (digitec gave me a non-priority return label)</li>
+<li>Apr 14th (Mon): I got the following mail from digitec’s customer support and
+had to explain that I have thoroughly diagnosed the CPU as defective (a link
+to my blog post was sufficient):</li>
+</ul>
+<blockquote>
+<p>Händler hat dies beim Hersteller angemeldet und dieser hat folgende Fragen:</p>
+<p>Um sicherzugehen, dass wir Sie richtig verstehen: Sie haben die CPU auf zwei
+verschiedenen Motherboards getestet und das gleiche Problem besteht weiterhin?</p>
+<p>Könnten Sie uns mitteilen, welche Marke und welches Modell die beiden
+verwendeten Motherboards sind?</p>
+<p>Wurde auf beiden Motherboards die neueste BIOS-Version verwendet?</p>
+<p>Bestand das Problem von Anfang an oder trat es erst später auf?</p>
+<p>Wurde der Prozessor übertaktet? (Bitte beachten Sie, dass durch Übertakten die
+Garantie erlischt.)</p>
+</blockquote>
+<ul>
+<li>Apr 25th (Fri): orderflow hands the replacement CPU to Swiss Post</li>
+<li>May 1st (Thu): the machine successfully passes stress tests; I start using it</li>
+</ul>
+<p>In summary, I spent March without a working PC, but that was because I didn’t
+have much time to pursue the project. Then, I spent April without a working PC
+because RMA&rsquo;ing an Intel CPU through digitec seems pretty slow. I would have
+wished for a little more trust and a replacement CPU right away.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>What a rollercoaster and time sink this build was! I have never received a
+faulty-on-arrival CPU in my entire life before. How did the CPU I first received
+pass Intel’s quality control? Or did it pass QC, but was damaged in transport? I
+will probably never know.</p>
+<p>From now on, I know to extensively stress test new PC builds for stability to
+detect such issues quicker. Should the CPU be faulty, unfortunately getting it
+replaced is a month-long process — it’s very annoying to have such a costly
+machine just gather dust for a month.</p>
+<p>But, once the faulty component was replaced, this is my best PC build yet:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/IMG_5278.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/IMG_5278_hu19f32a9181df3f875ffdc7d2dc442b2e_1049075_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/IMG_5278_hu19f32a9181df3f875ffdc7d2dc442b2e_1049075_1800x0_resize_q75_box.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2025-05-15-my-2025-high-end-linux-pc/IMG_5278_hu19f32a9181df3f875ffdc7d2dc442b2e_1049075_600x0_resize_q75_box.jpg"
+  
+  width="600"
+  height="800"
+  style="
+
+border: 1px solid #000;
+
+"
+  
+  loading="lazy"></a>
+
+
+
+<p>The case is the perfect size for the components and offers incredibly convenient
+access to all components throughout the entire lifecycle of this PC, including
+the troubleshooting period, and the later stages of its life when this PC will
+be rotated into its “lab machine” period before I sell it second-hand to someone
+who will hopefully use the machine for another few years.</p>
+<p>The machine is quiet, draws little power (for such a powerful machine) and
+really packs a punch!</p>
+<p>As usual, I run Linux on this PC and haven’t noticed any problems in my
+day-to-day usage. I use <a href="/posts/2025-05-10-grobi-x11-monitor-autoconfig/#zleep">suspend-to-RAM multiple times a
+day</a> without any issues.</p>
+<p>I hope some of these details were interesting and useful to you in your own PC
+builds!</p>
+<p>If you want to learn about which peripherals I use aside from my 8K monitor
+(e.g. the Kinesis Advantage keyboard, Logitech MX Ergo trackball, etc.), check
+out my post <a href="/posts/2020-05-23-desk-setup/">stapelberg uses this: my 2020 desk
+setup</a>. I might publish an updated version at
+some point :)</p>
+]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[In praise of grobi for auto-configuring X11 monitors]]></title>
     <link href="https://michael.stapelberg.ch/posts/2025-05-10-grobi-x11-monitor-autoconfig/"/>
     <id>https://michael.stapelberg.ch/posts/2025-05-10-grobi-x11-monitor-autoconfig/</id>
@@ -250,7 +967,24 @@ suspend mode: no; leaving
     <link href="https://michael.stapelberg.ch/posts/2025-03-19-intel-core-ultra-9-285k-on-asus-z890-not-stable/"/>
     <id>https://michael.stapelberg.ch/posts/2025-03-19-intel-core-ultra-9-285k-on-asus-z890-not-stable/</id>
     <published>2025-03-19T17:35:38+01:00</published>
-    <content type="html"><![CDATA[<p>In January I ordered the components for a new PC and expected that I would
+    <content type="html"><![CDATA[<aside class="admonition note">
+  <div class="note-container">
+    <div class="note-icon" style="width: 20px; height: 20px">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+    </div>
+    <div class="admonition-content"><strong>Update (2025-05-15):</strong> Turns out the CPU was faulty! See <a href="/posts/2025-05-11-my-2025-high-end-linux-pc/">My 2025 high-end
+Linux PC</a> for a new article on
+this build, now with a working CPU.</div>
+  </div>
+</aside>
+
+<p>In January I ordered the components for a new PC and expected that I would
 publish a successor to my <a href="/posts/2022-01-15-high-end-linux-pc/">2022 high-end Linux PC
 🐧</a> article. Instead, I am now sitting on
 a PC which regularly encounters crashes of the worst-to-debug kind, so I am
@@ -523,7 +1257,7 @@ interface. Tip: do not extract the ZIP file, otherwise the EZ Flash tool cannot
 update the Intel ME firmware. Just put the ZIP file onto the USB disk as-is.</p>
 <p>I verified that with this UEFI version, the <code>Power Limit 1 (PL1)</code> is 250W, and
 <code>ICCMAX=347A</code>, which are exactly the values that Intel recommends. Great!</p>
-<p>I also enabled XMPP and verified that memtest86 reported no errors.</p>
+<p>I also enabled XMP and verified that memtest86 reported no errors.</p>
 <h3 id="software-setup-early-adopter-pains">Software setup: early adopter pains</h3>
 <p>To copy over the data from the old disk to the new disk, I wanted to boot a live
 linux distribution (specifically, <a href="https://grml.org/">grml.org</a>) and follow my
@@ -628,6 +1362,9 @@ shows exactly the same symptoms! I also swapped the power supply, which also did
 not help. Running Prime95 crashed almost immediately. At this point, I have to
 assume the CPU itself is defective and have started an RMA. I will post another
 update once (if?) I get a replaced CPU.</p>
+<p><strong>Update 2025-05-11:</strong> The CPU was faulty indeed! See <a href="/posts/2025-05-11-my-2025-high-end-linux-pc/">My 2025 high-end Linux
+PC</a> for a new article on this
+build, now with a working CPU.</p>
 ]]></content>
   </entry>
   <entry>
@@ -5124,537 +5861,5 @@ eventually see matte 8K monitors with higher refresh rates than 60 Hz.</p>
 <li><a href="/dell-up3218k/xorg.0.log">Xorg.0.log</a></li>
 </ul>
 ]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[Gigabit NAS (running CoreOS)]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2016-11-21-gigabit-nas-coreos/"/>
-    <id>https://michael.stapelberg.ch/posts/2016-11-21-gigabit-nas-coreos/</id>
-    <published>2016-11-21T16:12:00+00:00</published>
-    <content type="html"><![CDATA[<p>
-tl;dr: I upgraded from a qnap TS-119P to a custom HTPC-like network storage
-solution. This article outlines what my original reasoning was for the qnap
-TS-119P, what I learnt, and with what solution precisely I replaced the qnap.
-</p>
-<p>
-A little over two years ago, I gave a (German) presentation about my network
-storage setup (see <a
-href="https://media.ccc.de/v/gpn14_-_5801_-_de_-_studio_-_201406202130_-_linux-based_home_nas_-_secure">video</a>
-or <a
-href="https://entropia.de/images/6/6b/Gpn14_linux_based_home_nas.pdf">slides</a>).
-Given that video isn’t a great consumption format when you’re pressed on time,
-and given that a number of my readers might not speak German, I’ll recap the
-most important points:
-</p>
-<ul>
-<li>
-<strong>I reduced the scope of the setup to storing daily backups and providing
-media files via CIFS</strong>.<br>
-I have come to prefer numerous smaller setups over one gigantic setup which
-offers everything (think a <a href="https://omnia.turris.cz/en/">Turris
-Omnia</a> acting as a router, mail server, network storage, etc.). Smaller
-setups can be debugged, upgraded or rebuilt in less time. Time-boxing
-activities has become very important to me as I work full time: if I can’t
-imagine finishing the activity within 1 or 2 hours, I usually don’t get started
-on it at all unless I’m on vacation.
-</li>
-<li>
-<strong>Requirements: FOSS, relatively cheap, relatively low power usage,
-relatively high redundancy level</strong>.<br>
-I’m looking not to spend a large amount of money on hardware. Whenever I do
-spend a lot, I feel pressured to get the most out of my purchase and use the
-hardware for many years. However, I find it more satisfying to be able to
-upgrade more frequently — just like the update this article is describing
-:).<br>
-<p>With regards to redundancy, I’m not content with being able to rebuild the
-system within a couple of days after a failure occurs. Instead, I want to be
-able to trivially switch to a replacement system within minutes. This
-requirement results in the decision to run 2 separate qnap NAS appliances with
-1 hard disk each (instead of e.g. a RAID-1 setup).<br></p>
-<p>The decision to go with qnap as a vendor came from the fact that their devices
-are pretty well supported in the Debian ecosystem: there is a network installer
-for it, the custom hardware is supported by the <a
-href="https://www.hellion.org.uk/qcontrol/">qcontrol</a> tool and one can build
-a serial console connector.</p>
-</li>
-<li>
-The remainder of the points is largely related to software, and hence not
-relevant for this article, as I’m keeping the software largely the same (aside
-from the surrounding operating system).
-</li>
-</ul>
-<h2 id="what-did-not-work-well">What did not work well</h2>
-<p>
-Even a well-supported embedded device like the qnap TS-119P requires too much
-effort to be set up:
-</p>
-<ol>
-<li>
-Setting up the network installer is cumbersome.
-</li>
-<li>
-I contributed patches to qcontrol for setting the <a
-href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=703888">wake on LAN
-configuration on the qnap TS-119P’s controller board</a> and for <a
-href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=703894">systemd
-support in qcontrol</a>.
-</li>
-<li>
-I contributed my first ever patch to the Linux kernel for <a
-href="https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/drivers/net/ethernet/marvell/mv643xx_eth.c?id=3871c3876f8084a2f40ba3c3fc20a6bb5754d88d">wake
-on LAN support for the Marvell MV643xx series chips</a>.
-</li>
-<li>
-I ended up <a
-href="http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=723177">lobbying Debian
-to enable the <code>CONFIG_MARVELL_PHY</code> kernel option</a>, while
-personally running a custom kernel.
-</li>
-</ol>
-<p>
-On the hardware side, to get any insight into what the device is doing, your
-only input/output option is a serial console. To get easy access to that serial
-console, you need to <a
-href="https://www.cyrius.com/debian/kirkwood/qnap/ts-119/serial/">solder an
-adapter cable for the somewhat non-standard header which they use</a>.
-</p>
-<p>
-All of this contributed to my impression that upgrading the device would be
-equally involved. Logically speaking, I know that this is unlikely since my patches
-are upstream in the Linux kernel and in Debian. Nevertheless, I couldn’t help
-but feel like it would be hard. As a result, I have not upgraded my device ever
-since I got it working, i.e. more than two years ago.
-</p>
-<p>
-The take-away is that I now try hard to:
-</p>
-<ol>
-<li>
-use <strong>standard hardware which fits well into my landscape</strong>
-</li>
-<li>
-use a software setup which has as <strong>few non-standard
-modifications</strong> as possible and which <strong>automatically updates
-itself</strong>.
-</li>
-</ol>
-<h2 id="what-i-would-like-to-improve">What I would like to improve</h2>
-<p>
-One continuous pain point was how slow the qnap TS-119P was with regards to
-writing data to disk. The slowness was largely caused by full-disk encryption.
-The device’s hardware accelerator turned out to be useless with
-cryptsetup-luks’s comparatively small hard-coded 4K block size, resulting in
-about 6 to 10 MB/s of throughput.
-</p>
-<p>
-This resulted in me downloading files onto the SSD in my workstation and then
-transferring them to the network storage. Doing these downloads in a faster
-environment circumvents my somewhat irrational fears about the files becoming
-unavailable while you are downloading them, and allows me to take pleasure in
-how fast I’m able to download things :).
-</p>
-<p>
-The take-away is that any new solution should be as quick as my workstation and
-network, i.e. it should be able to <strong>write files to disk with gigabit
-speed</strong>.
-</p>
-<h2 id="what-i-can-get-rid-of">What I can get rid of</h2>
-<p>
-While <a
-href="https://github.com/stapelberg/zkj-nas-tools/tree/master/dramaqueen">dramaqueen</a>
-and <a
-href="https://github.com/stapelberg/zkj-nas-tools/tree/master/autowake">autowake</a>
-worked well in principle, they turned out to no longer be very useful in my
-environment: I switched from a dedicated OpenELEC-based media center box to
-using <a href="https://emby.media/">emby</a> and a Chromecast. emby is also
-nice to access remotely, e.g. when watching series at a friend’s place, or
-watching movies while on vacation or business trips somewhere. Hence, my
-storage solution needs to be running 24/7 — no more automated shutdowns and
-wake-up procedures.
-</p>
-<h2 id="what-worked-well">What worked well</h2>
-<p>
-Reducing the scope drastically in terms of software setup complexity paid off.
-If it weren’t for that, I probably would not have been able to complete this
-upgrade within a few mornings/evenings and would likely have pushed this
-project out for a long time.
-</p>
-<h2 id="the-new-hardware">The new hardware</h2>
-<p>
-I researched the following components back in March, but then put the project
-on hold due to time constraints and to allow myself some more time to think
-about it. I finally ordered the components in August, and they still ranked
-best with regards to cost / performance ratio and fulfilling my requirements.
-</p>
-<table width="100%" style="margin-top: 1.5em; margin-bottom: 1.5em; margin-left: 2em">
-<tr>
-<th>Price</th>
-<th>Type</th>
-<th>Article</th>
-</tr>
-<tr>
-<td>43.49 CHF</td>
-<td>Case</td>
-<td><a href="http://www.silverstonetek.com/product.php?pid=413">SILVERSTONE Sugo SST-SG05BB-LITE</a></td>
-</tr>
-<tr>
-<td>60.40 CHF</td>
-<td>Mainboard</td>
-<td><a href="http://www.asrock.com/mb/AMD/AM1H-ITX/">ASROCK AM1H-ITX</a></td>
-</tr>
-<tr>
-<td>38.99 CHF</td>
-<td>CPU</td>
-<td>AMD Athlon 5350 (supports <a
-href="https://en.wikipedia.org/wiki/AES_instruction_set">AES-NI</a>)</td>
-</tr>
-<tr>
-<td>20.99 CHF</td>
-<td>Cooler</td>
-<td><a href="https://www.arctic.ac/ch_en/alpine-m1-passive.html">Alpine M1-Passive</a></td>
-</tr>
-<tr>
-<td>32.80 CHF</td>
-<td>RAM</td>
-<td>KINGSTON ValueRAM, 8.0GB (KVR16N11/8)</td>
-</tr>
-<tr>
-<td valign="top">28.70 CHF</td>
-<td valign="top">PSU</td>
-<td><a href="https://www.accuswiss.ch/product_info.php?info=p18088_Netzteil-fuer-Toshiba-PA3822U-1ACA--PA3822E-1AC3--19V-2-37A.html">Toshiba PA3822U-1ACA, PA3822E-1AC3, 19V 2,37A</a><br>
-(<code>To19V_2.37A_5.5x2.5</code>)</td>
-</tr>
-<tr>
-<td valign="top">0 CHF</td>
-<td valign="top">System disk</td>
-<td>(OCZ-AGILITY3 60G)<br>
-You’ll need to do your own research.<br>
-Currently, my system uses 5GB of space,<br>
-so chose the smallest SSD you can find.</td>
-</tr>
-<tr>
-<td>225.37 CHF</td>
-<td colspan="2"><strong>total sum</strong></td>
-</tr>
-</table>
-<p>
-For the qnap TS-119P, I paid 226 CHF, so my new solution is a tad more
-expensive. However, I had the OCZ-AGILITY3 lying around from a warranty
-exchange, so bottomline, I paid less than what I had paid for the previous
-solution.
-</p>
-<p>
-I haven’t measured this myself, but according to the internet, the setups have
-the following power consumption (without disks):
-<ul>
-<li>
-The qnap TS-119P uses ≈7W, i.e. ≈60 CHF/year for electricity.
-</li>
-<li>
-The AM1H-ITX / Athlon 5350 setup uses ≈20W, i.e. ≈77 CHF/year for electricity.
-</li>
-</ul>
-<p>
-In terms of fitting well into my hardware landscape, this system does a much
-better job than the qnap. Instead of having to solder a custom serial port
-adapter, I can simply connect a USB keyboard and an HDMI or DisplayPort monitor
-and I’m done.
-</p>
-<p>
-Further, any linux distribution can easily be installed from a bootable USB
-drive, without the need for any custom tools or ports.
-</p>
-<h3 id="full-disk-encryption-performance">Full-disk encryption performance</h3>
-<pre>
-# cryptsetup benchmark
-# Tests are approximate using memory only (no storage IO).
-PBKDF2-sha1       338687 iterations per second
-PBKDF2-sha256     228348 iterations per second
-PBKDF2-sha512     138847 iterations per second
-PBKDF2-ripemd160  246375 iterations per second
-PBKDF2-whirlpool   84891 iterations per second
-#  Algorithm | Key |  Encryption |  Decryption
-     aes-cbc   128b   468.8 MiB/s  1040.9 MiB/s
-     aes-cbc   256b   366.4 MiB/s   885.8 MiB/s
-     aes-xts   256b   850.8 MiB/s   843.9 MiB/s
-     aes-xts   512b   725.0 MiB/s   740.6 MiB/s
-</pre>
-<h3 id="network-performance">Network performance</h3>
-<p>
-As the old qnap TS-119P would only sustain gigabit performance using IPv4 (with
-TCP checksum offloading), I was naturally relieved to see that the new solution
-can send packets at gigabit line rate using both protocols, IPv4 and IPv6. I
-ran the following tests inside a docker container (<code>docker run --net=host
--t -i debian:latest</code>):
-</p>
-<pre>
-# nc 10.0.0.76 3000 | dd of=/dev/null bs=5M
-0+55391 records in
-0+55391 records out
-416109464 bytes (416 MB) copied, 3.55637 s, 117 MB/s
-</pre>
-<pre>
-# nc 2001:db8::225:8aff:fe5d:53a9 3000 | dd of=/dev/null bs=5M
-0+275127 records in
-0+275127 records out
-629802884 bytes (630 MB) copied, 5.45907 s, 115 MB/s
-</pre>
-<p>
-The CPU was >90% idle using <code>netcat-traditional</code>.<br>
-The CPU was >70% idle using <code>netcat-openbsd</code>.
-</p>
-<h3 id="end-to-end-throughput">End-to-end throughput</h3>
-<p>
-Reading/writing to a disk which uses cryptsetup-luks full-disk encryption with
-the <code>aes-cbc-essiv:sha256</code> cipher, these are the resulting speeds:
-</p>
-<p>
-Reading a file from a CIFS mount works at gigabit throughput, without any
-tuning:
-</p>
-<pre>
-311+1 records in
-311+1 records out
-1632440260 bytes (1,6 GB) copied, 13,9396 s, 117 MB/s
-</pre>
-<p>
-Writing works at almost gigabit throughput:
-</p>
-<pre>
-1160+1 records in
-1160+1 records out
-6082701588 bytes (6,1 GB) copied, 58,0304 s, 105 MB/s
-</pre>
-<p>
-During rsync+ssh backups, the CPU is never 100% maxed out, and data is sent to
-the NAS at 65 MB/s.
-</p>
-<h2 id="the-new-software-setup">The new software setup</h2>
-<p>
-Given that I wanted to use a software setup which has as few non-standard
-modifications as possible and automatically updates itself, I was curious to
-see if I could carry this to the extreme by using <a
-href="https://coreos.com/">CoreOS</a>.
-</p>
-<p>
-If you’re unfamiliar with it, CoreOS is a Linux distribution which is intended
-to be used in clusters on individual nodes. It updates itself automatically
-(using <a href="https://github.com/google/omaha">omaha, Google’s updater behind
-ChromeOS</a>) and comes as a largely read-only system without a package
-manager. You deploy software using <a href="https://www.docker.com/">Docker</a>
-and configure the setup using <a
-href="https://coreos.com/os/docs/latest/cloud-config.html">cloud-config</a>.
-</p>
-<p>
-I have been successfully using CoreOS for a few years in virtual machine setups
-such as the one for <a href="https://robustirc.net/">the RobustIRC network</a>.
-</p>
-<p>
-The cloud-config file I came up with can be found in Appendix A. You can pass
-it to the <a
-href="https://coreos.com/os/docs/latest/installing-to-disk.html">CoreOS
-installer’s <code>-c</code> flag</a>. Personally, I installed CoreOS by booting
-from a <a href="https://grml.org/">grml live linux USB key</a>, then <a
-href="https://coreos.com/os/docs/latest/installing-to-disk.html">running the
-CoreOS installer</a>.
-</p>
-<p>
-In order to update the cloud-config file after installing CoreOS, you can use
-the following commands:
-</p>
-<pre>
-midna $ scp cloud-config.storage.yaml core@10.252:/tmp/
-storage $ sudo cp /tmp/cloud-config.storage.yaml /var/lib/coreos-install/user_data
-storage $ sudo coreos-cloudinit --from-file=/var/lib/coreos-install/user_data
-</pre>
-<h3 id="dockerfiles-rrsync-and-samba">Dockerfiles: rrsync and samba</h3>
-<p>
-Since neither rsync nor samba directly provide Docker containers, I had to whip
-up the following small Dockerfiles which install the latest versions from
-Debian jessie.
-</p>
-<p>
-Of course, this means that I need to rebuild these two containers regularly,
-but I also can easily roll them back in case an update broke, and the rest of
-the operating system updates independently of these mission-critical pieces.
-</p>
-<p>
-Eventually, I’m looking to enable auto-build for these Docker containers so
-that the Docker hub rebuilds the images when necessary, and the updates are
-picked up either manually when time-critical, or automatically by virtue of
-CoreOS rebooting to update itself.
-</p>
-<p>rrsync:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">FROM</span><span style="color:#4070a0"> debian:jessie</span><span style="">
-</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">RUN</span> apt-get update <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  <span style="color:#666">&amp;&amp;</span> apt-get install -y rsync <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  <span style="color:#666">&amp;&amp;</span> gunzip -c /usr/share/doc/rsync/scripts/rrsync.gz &gt; /usr/bin/rrsync <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  <span style="color:#666">&amp;&amp;</span> chmod +x /usr/bin/rrsync<span style="">
-</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">ENTRYPOINT</span> [<span style="color:#4070a0">&#34;/usr/bin/rrsync&#34;</span>]<span style="">
-</span></span></span></code></pre></div><p>samba:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">FROM</span><span style="color:#4070a0"> debian:jessie</span><span style="">
-</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">RUN</span> apt-get update <span style="color:#666">&amp;&amp;</span> apt-get install -y samba<span style="">
-</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">ADD</span> smb.conf /etc/samba/smb.conf<span style="">
-</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">EXPOSE</span><span style="color:#4070a0"> 137 138 139 445</span><span style="">
-</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">CMD</span> [<span style="color:#4070a0">&#34;/usr/sbin/smbd&#34;</span>, <span style="color:#4070a0">&#34;-FS&#34;</span>]<span style="">
-</span></span></span></code></pre></div><h3 id="appendix-a-cloud-config">Appendix A: cloud-config</h3>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">#cloud-config</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">hostname</span>:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;storage&#34;</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">ssh_authorized_keys</span>:<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- ssh-rsa AAAAB… michael@midna<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">write_files</span>:<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">path</span>:<span style="color:#bbb"> </span>/etc/ssl/certs/r.zekjur.net.crt<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      -----BEGIN CERTIFICATE-----
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      MIIDYjCCAko…
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      -----END CERTIFICATE-----</span><span style="color:#bbb">      
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">path</span>:<span style="color:#bbb"> </span>/var/lib/ip6tables/rules-save<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">permissions</span>:<span style="color:#bbb"> </span><span style="color:#40a070">0644</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">owner</span>:<span style="color:#bbb"> </span>root:root<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      # Generated by ip6tables-save v1.4.14 on Fri Aug 26 19:57:51 2016
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      *filter
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      :INPUT DROP [0:0]
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      :FORWARD ACCEPT [0:0]
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      :OUTPUT ACCEPT [0:0]
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      -A INPUT -p ipv6-icmp -m comment --comment &#34;IPv6 needs ICMPv6 to work&#34; -j ACCEPT
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      -A INPUT -m state --state RELATED,ESTABLISHED -m comment --comment &#34;Allow packets for outgoing connections&#34; -j ACCEPT
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      -A INPUT -s fe80::/10 -d fe80::/10 -m comment --comment &#34;Allow link-local traffic&#34; -j ACCEPT
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      -A INPUT -s 2001:db8::/32 -m comment --comment &#34;local traffic&#34; -j ACCEPT
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      -A INPUT -p tcp -m tcp --dport 22 -m comment --comment &#34;SSH&#34; -j ACCEPT
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      COMMIT
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      # Completed on Fri Aug 26 19:57:51 2016</span><span style="color:#bbb">      
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">path</span>:<span style="color:#bbb"> </span>/root/.ssh/authorized_keys<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">permissions</span>:<span style="color:#bbb"> </span><span style="color:#40a070">0600</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">owner</span>:<span style="color:#bbb"> </span>root:root<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      command=&#34;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/midna:/srv/backup/midna stapelberg/rsync /srv/backup/midna&#34; ssh-rsa AAAAB… root@midna
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      command=&#34;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/scan2drive:/srv/backup/scan2drive stapelberg/rsync /srv/backup/scan2drive&#34; ssh-rsa AAAAB… root@scan2drive
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      command=&#34;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/alp.zekjur.net:/srv/backup/alp.zekjur.net stapelberg/rsync /srv/backup/alp.zekjur.net&#34; ssh-rsa AAAAB… root@alp</span><span style="color:#bbb">      
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">coreos</span>:<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">update</span>:<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">reboot-strategy</span>:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;reboot&#34;</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">locksmith</span>:<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">window_start</span>:<span style="color:#bbb"> </span><span style="color:#40a070">01</span>:<span style="color:#40a070">00</span><span style="color:#bbb"> </span><span style="color:#60a0b0;font-style:italic"># UTC, i.e. 02:00 CET or 03:00 CEST</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">window_length</span>:<span style="color:#bbb"> </span>2h <span style="color:#bbb"> </span><span style="color:#60a0b0;font-style:italic"># i.e. until 03:00 CET or 04:00 CEST</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">units</span>:<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>ip6tables-restore.service<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">enable</span>:<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">true</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span><span style="color:#40a070">00</span>-enp2s0.network<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">runtime</span>:<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">true</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        [Match]
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Name=enp2s0
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        [Network]
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        DNS=10.0.0.1
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Address=10.0.0.252/24
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Gateway=10.0.0.1
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        IPv6Token=0:0:0:0:10::252</span><span style="color:#bbb">        
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>systemd-networkd-wait-online.service<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">command</span>:<span style="color:#bbb"> </span>start<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">drop-ins</span>:<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;10-interface.conf&#34;</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">          </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">            [Service]
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">            ExecStart=
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">            ExecStart=/usr/lib/systemd/systemd-networkd-wait-online \</span><span style="color:#bbb">            
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	      </span>--interface=enp2s0<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>unlock.service<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">command</span>:<span style="color:#bbb"> </span>start<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        [Unit]
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Description=unlock hard drive
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Wants=network.target
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        After=systemd-networkd-wait-online.service
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Before=samba.service
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        [Service]
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Type=oneshot
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        RemainAfterExit=yes
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        # Wait until the host is actually reachable.
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStart=/bin/sh -c &#34;c=0; while [ $c -lt 5 ]; do \</span><span style="color:#bbb">        
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	    </span>/bin/ping6 -n -c 1 r.zekjur.net &amp;&amp; break; \<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	    </span>c=$((c+1)); \<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	    </span>sleep 1; \<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	  </span>done&#34;<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>ExecStart=/bin/sh -c &#34;(echo -n my_local_secret &amp;&amp; \<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	  </span>wget \<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	    </span>--retry-connrefused \<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	    </span>--ca-directory=/dev/null \<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	    </span>--ca-certificate=/etc/ssl/certs/r.zekjur.net.crt \<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	    </span>-qO- https://r.zekjur.net/sdb2_crypt) \<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	  </span>| /sbin/cryptsetup --key-file=- luksOpen /dev/sdb2 sdb2_crypt&#34;<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>ExecStart=/bin/mount /dev/mapper/sdb2_crypt /srv<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>samba.service<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">command</span>:<span style="color:#bbb"> </span>start<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        [Unit]
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Description=samba server
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        After=docker.service srv.mount
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Requires=docker.service srv.mount
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        [Service]
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Restart=always
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        StartLimitInterval=0
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        # Always pull the latest version (bleeding edge).
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=-/usr/bin/docker pull stapelberg/samba:latest
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        # Set up samba users (cannot be done in the (public) Dockerfile
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        # because users/passwords are sensitive information).
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=-/usr/bin/docker kill smb
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=-/usr/bin/docker rm smb
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=-/usr/bin/docker rm smb-prep
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=/usr/bin/docker run --name smb-prep stapelberg/samba \</span><span style="color:#bbb">        
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	  </span>adduser --quiet --disabled-password --gecos &#34;&#34; --uid 29901 michael<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>ExecStartPre=/usr/bin/docker commit smb-prep smb-prepared<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>ExecStartPre=/usr/bin/docker rm smb-prep<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>ExecStartPre=/usr/bin/docker run --name smb-prep smb-prepared \<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	  </span>/bin/sh -c &#34;echo my_password | tee - | smbpasswd -a -s michael&#34;<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>ExecStartPre=/usr/bin/docker commit smb-prep smb-prepared<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>ExecStart=/usr/bin/docker run \<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>-p 137:137 \<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>-p 138:138 \<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>-p 139:139 \<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>-p 445:445 \<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>--tmpfs=/run \<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>-v /srv/data:/srv/data \<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>--name smb \<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>-t \<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>smb-prepared \<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">            </span>/usr/sbin/smbd -FS<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>emby.service<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">command</span>:<span style="color:#bbb"> </span>start<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        [Unit]
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Description=emby
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        After=docker.service srv.mount
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Requires=docker.service srv.mount
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        [Service]
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Restart=always
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        StartLimitInterval=0
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        # Always pull the latest version (bleeding edge).
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=-/usr/bin/docker pull emby/embyserver
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStart=/usr/bin/docker run \
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          --rm \
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          --net=host \
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          -v /srv/data/movies:/srv/data/movies:ro \
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          -v /srv/data/series:/srv/data/series:ro \
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          -v /srv/emby:/config \
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          emby/embyserver</span><span style="color:#bbb">        
-</span></span></span></code></pre></div>]]></content>
   </entry>
 </feed>

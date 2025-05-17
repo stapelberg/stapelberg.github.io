@@ -430,11 +430,11 @@ support.</p>
 <p>Ultimately, it was easier to upgrade my old PC to Linux 6.13 and linux-firmware
 20250109, then put in the new disk and copy over the installation.</p>
 <h3 id="trim-your-ssds">TRIM your SSDs</h3>
-<p>SSD disks can degrade over time, especially when using full-disk encryption,
-because then the SSD firmware cannot know anymore which parts of the disk are
-used and which parts are free.</p>
-<p>I think I saw this effect in action back in 2022, <a href="/posts/2022-01-15-high-end-linux-pc/#copying-the-data">when I copied my data from a
-Force MP600 to a WD Black
+<p>SSD disks can degrade over time, so it is essential that the Operating System
+tells the SSD firmware about freed-up blocks (for wear leveling). When using
+full-disk encryption, all involved layers need to have TRIM support enabled.</p>
+<p>I think I saw the effect of an incorrectly configured TRIM setup in action back
+in 2022, <a href="/posts/2022-01-15-high-end-linux-pc/#copying-the-data">when I copied my data from a Force MP600 to a WD Black
 SN850</a>, which
 unexpectedly took many hours!</p>
 <p>To make sure my disk has a long and healthy life, I double-checked that both

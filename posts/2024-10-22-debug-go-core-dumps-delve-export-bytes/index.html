@@ -104,7 +104,7 @@ When using Go, we can use the delve debugger for core dump debugging, but I had 
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-I0UgSa%2b7hYT7qK%2frOve0ZBP50owtJrFZWlIVuNrTjjerYIZ92i01Nz2OTyOq7A0%2f8N3pFbeykhg47FpofWUT%2bA%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-MmDletsiVVexqmh4i3stLXAHVECuOzqin3b%2babGWq5wv%2fwd%2f9IdQTTMV1IZowrB21EMrM9N1VHI17hmnyeCskw%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -184,7 +184,7 @@ When using Go, we can use the delve debugger for core dump debugging, but I had 
 <h1 class="ms_title">Debug Go core dumps with delve: export byte slices (2024)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2024-10-22, last modified 2025-04-11</div>
+  <div id="ms_date">published 2024-10-22, last modified 2025-05-20</div>
   
   
   <div id="ms_tags">
@@ -470,8 +470,8 @@ Command failed: can not continue execution of core process
 </code></pre><p>Luckily, we can extend delve with a custom Starlark function to write byte slice
 contents to a file.</p>
 <h2 id="exporting-byte-slices-with-writebytestofile">Exporting byte slices with writebytestofile</h2>
-<p>You need a version of dlv that contains commit
-<a href="https://github.com/go-delve/delve/commit/52405ba86bd9e14a2e643db391cbdebdcbdb3368">https://github.com/go-delve/delve/commit/52405ba86bd9e14a2e643db391cbdebdcbdb3368</a>. Until
+<p>You need a version of dlv that contains <a href="https://github.com/go-delve/delve/commit/52405ba86bd9e14a2e643db391cbdebdcbdb3368">commit
+52405ba</a>. Until
 the commit is part of a released version, you can install the latest dlv
 directly from git:</p>
 <pre tabindex="0"><code>% go install github.com/go-delve/delve/cmd/dlv@master

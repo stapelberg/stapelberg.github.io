@@ -7,7 +7,7 @@
 
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="3WARE 9550S-4LP mit Gentoo GNU/Linux">
-  <meta property="og:description" content="In meinem Fileserver betreibe ich den 3WARE 9500S-4LP SATA-RAID-Controller mit Gentoo GNU/Linux. Auf dem neuen Mainboard, das etwas mehr Durchsatz ermöglicht und somit keinen Flaschenhals mehr darstellt, war die Auslastung während Backups allerdings deutlich zu hoch (load von 10-15, hauptsächlich IO-Wait).">
+  <meta property="og:description" content=" In meinem Fileserver betreibe ich den 3WARE 9500S-4LP SATA-RAID-Controller mit Gentoo GNU/Linux. Auf dem neuen Mainboard, das etwas mehr Durchsatz ermöglicht und somit keinen Flaschenhals mehr darstellt, war die Auslastung während Backups allerdings deutlich zu hoch (load von 10-15, hauptsächlich IO-Wait). Daher probierte ich allerlei Dinge aus, die ich hier der Vollständigkeit halber (und natürlich als Tipp für diejenigen mit ähnlichen Problemen) niederschreibe. ">
   
   
   
@@ -16,7 +16,7 @@
   <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
-  <meta name="description" content="In meinem Fileserver betreibe ich den 3WARE 9500S-4LP SATA-RAID-Controller mit Gentoo GNU/Linux. Auf dem neuen Mainboard, das etwas mehr Durchsatz ermöglicht und somit keinen Flaschenhals mehr darstellt, war die Auslastung während Backups allerdings deutlich zu hoch (load von 10-15, hauptsächlich IO-Wait).">
+  <meta name="description" content=" In meinem Fileserver betreibe ich den 3WARE 9500S-4LP SATA-RAID-Controller mit Gentoo GNU/Linux. Auf dem neuen Mainboard, das etwas mehr Durchsatz ermöglicht und somit keinen Flaschenhals mehr darstellt, war die Auslastung während Backups allerdings deutlich zu hoch (load von 10-15, hauptsächlich IO-Wait). Daher probierte ich allerlei Dinge aus, die ich hier der Vollständigkeit halber (und natürlich als Tipp für diejenigen mit ähnlichen Problemen) niederschreibe. ">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2008-03-17-3ware_gentoo/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -259,7 +259,7 @@ benutze ich folgendes Script:
 </p>
 <pre># /etc/conf.d/local.start
 <h1 id="this-is-a-good-place-to-load-any-misc-programs">This is a good place to load any misc programs</h1>
-<h1 id="on-startup-use-ampgtdevnull-to-hide-output">on startup (use &amp;&gt;/dev/null to hide output)</h1>
+<h1 id="on-startup-use-devnull-to-hide-output">on startup (use &amp;&gt;/dev/null to hide output)</h1>
 <p>REALDEV=$(readlink /dev/disk/by-id/scsi-1AMCC_W51517585EC0DB000531 | tr -d ./)
 if [ &ldquo;${REALDEV}&rdquo; != &quot;&quot; ]
 then

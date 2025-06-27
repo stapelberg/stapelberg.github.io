@@ -55,19 +55,19 @@ client for the Debian Code Search OpenAPI, run a query, and aggregate the result
 </span></span><span style="display:flex;"><span>	client <span style="color:#666">:=</span> openapiclient.<span style="color:#06287e">NewAPIClient</span>(cfg)
 </span></span><span style="display:flex;"><span>	ctx <span style="color:#666">:=</span> context.<span style="color:#06287e">Background</span>()
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Search through the full Debian Code Search corpus, blocking until all
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// results are available:
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	results, _, err <span style="color:#666">:=</span> client.SearchApi.<span style="color:#06287e">Search</span>(ctx, <span style="color:#4070a0">&#34;fmt.Sprint(err)&#34;</span>, <span style="color:#666">&amp;</span>openapiclient.SearchApiSearchOpts{
-</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// Literal searches are faster and do not require escaping special
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// characters, regular expression searches are more powerful.
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		MatchMode: optional.<span style="color:#06287e">NewString</span>(<span style="color:#4070a0">&#34;literal&#34;</span>),
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Search through the full Debian Code Search corpus, blocking until all</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// results are available:</span>
+</span></span><span style="display:flex;"><span>	results, _, err <span style="color:#666">:=</span> client.SearchApi.<span style="color:#06287e">Search</span>(ctx, <span style="color:#4070a0">&#34;fmt.Sprint(err)&#34;</span>, <span style="color:#666">&amp;</span>openapiclient.SearchApiSearchOpts{
+</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// Literal searches are faster and do not require escaping special</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// characters, regular expression searches are more powerful.</span>
+</span></span><span style="display:flex;"><span>		MatchMode: optional.<span style="color:#06287e">NewString</span>(<span style="color:#4070a0">&#34;literal&#34;</span>),
 </span></span><span style="display:flex;"><span>	})
 </span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
 </span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> err
 </span></span><span style="display:flex;"><span>	}
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Print to stdout a CSV file with the path and number of occurrences:
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	wr <span style="color:#666">:=</span> csv.<span style="color:#06287e">NewWriter</span>(os.Stdout)
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Print to stdout a CSV file with the path and number of occurrences:</span>
+</span></span><span style="display:flex;"><span>	wr <span style="color:#666">:=</span> csv.<span style="color:#06287e">NewWriter</span>(os.Stdout)
 </span></span><span style="display:flex;"><span>	header <span style="color:#666">:=</span> []<span style="color:#902000">string</span>{<span style="color:#4070a0">&#34;path&#34;</span>, <span style="color:#4070a0">&#34;number of occurrences&#34;</span>}
 </span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> wr.<span style="color:#06287e">Write</span>(header); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
 </span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> err
@@ -81,8 +81,8 @@ client for the Debian Code Search OpenAPI, run a query, and aggregate the result
 </span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> !ok {
 </span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">continue</span>
 </span></span><span style="display:flex;"><span>		}
-</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// Print one CSV record per path:
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#007020">delete</span>(occurrences, result.Path)
+</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// Print one CSV record per path:</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#007020">delete</span>(occurrences, result.Path)
 </span></span><span style="display:flex;"><span>		record <span style="color:#666">:=</span> []<span style="color:#902000">string</span>{result.Path, strconv.<span style="color:#06287e">Itoa</span>(o)}
 </span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> wr.<span style="color:#06287e">Write</span>(record); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
 </span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">return</span> err
@@ -100,26 +100,26 @@ client for the Debian Code Search OpenAPI, run a query, and aggregate the result
 <p>I’m aware of the following <a href="https://codesearch.debian.net/thirdparty">third-party projects using Debian Code
 Search</a>:</p>
 <table>
-<thead>
-<tr>
-<th>Tool</th>
-<th>Migration status</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="https://salsa.debian.org/debian/codesearch-cli">Debian Code Search CLI tool</a></td>
-<td><a href="https://salsa.debian.org/debian/codesearch-cli/-/merge_requests/1">Updated to OpenAPI</a></td>
-</tr>
-<tr>
-<td><a href="https://salsa.debian.org/aviau/identify-incomplete-xs-go-import-path">identify-incomplete-xs-go-import-path</a></td>
-<td><a href="https://salsa.debian.org/aviau/identify-incomplete-xs-go-import-path/-/merge_requests/1">Update pending</a></td>
-</tr>
-<tr>
-<td><a href="https://gitlab.gnome.org/nbenitez/gnome-codesearch">gnome-codesearch</a></td>
-<td>makes no API queries</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Tool</th>
+          <th>Migration status</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><a href="https://salsa.debian.org/debian/codesearch-cli">Debian Code Search CLI tool</a></td>
+          <td><a href="https://salsa.debian.org/debian/codesearch-cli/-/merge_requests/1">Updated to OpenAPI</a></td>
+      </tr>
+      <tr>
+          <td><a href="https://salsa.debian.org/aviau/identify-incomplete-xs-go-import-path">identify-incomplete-xs-go-import-path</a></td>
+          <td><a href="https://salsa.debian.org/aviau/identify-incomplete-xs-go-import-path/-/merge_requests/1">Update pending</a></td>
+      </tr>
+      <tr>
+          <td><a href="https://gitlab.gnome.org/nbenitez/gnome-codesearch">gnome-codesearch</a></td>
+          <td>makes no API queries</td>
+      </tr>
+  </tbody>
 </table>
 <p>If you find any others, please point them to this post in case they are not
 using Debian Code Search’s OpenAPI yet.</p>
@@ -330,30 +330,30 @@ them. Here is a table summarizing how affected programs might try to arrange for
 re-execution, whether the technique results in a wrapper bypass, and what we do
 about it in distri:</p>
 <table>
-<thead>
-<tr>
-<th>technique to execute itself</th>
-<th>uses wrapper</th>
-<th>mitigation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>run-time: find own basename in <code>PATH</code></td>
-<td>yes</td>
-<td>wrapper program</td>
-</tr>
-<tr>
-<td>compile-time: embed expected path</td>
-<td>no; bypass!</td>
-<td>configure or patch</td>
-</tr>
-<tr>
-<td>run-time: <code>argv[0]</code> or <code>/proc/self/exe</code></td>
-<td>no; bypass!</td>
-<td><a href="https://github.com/distr1/distri/commit/f45ee9ac1121da284f2943c80e2c30afa24ca80d">patch</a></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>technique to execute itself</th>
+          <th>uses wrapper</th>
+          <th>mitigation</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>run-time: find own basename in <code>PATH</code></td>
+          <td>yes</td>
+          <td>wrapper program</td>
+      </tr>
+      <tr>
+          <td>compile-time: embed expected path</td>
+          <td>no; bypass!</td>
+          <td>configure or patch</td>
+      </tr>
+      <tr>
+          <td>run-time: <code>argv[0]</code> or <code>/proc/self/exe</code></td>
+          <td>no; bypass!</td>
+          <td><a href="https://github.com/distr1/distri/commit/f45ee9ac1121da284f2943c80e2c30afa24ca80d">patch</a></td>
+      </tr>
+  </tbody>
 </table>
 <p>One might think that setting <code>argv[0]</code> to the wrapper location seems like a way
 to side-step this problem. We tried doing this in distri, but <a href="https://github.com/distr1/distri/commit/b517cb33ed827d358b00737434c7a09dd75583b7">had to
@@ -1373,101 +1373,101 @@ outputs.</p>
 actual performance, but your experience may vary.</p>
 <h4 id="ack-small-perl-program">ack (small Perl program)</h4>
 <table>
-<thead>
-<tr>
-<th>distribution</th>
-<th>package manager</th>
-<th>data</th>
-<th>wall-clock time</th>
-<th>rate</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Fedora</td>
-<td>dnf</td>
-<td>84 MB</td>
-<td>25s</td>
-<td>3.4 MB/s</td>
-</tr>
-<tr>
-<td>NixOS</td>
-<td>Nix</td>
-<td>15 MB</td>
-<td>7s</td>
-<td>2.3 MB/s</td>
-</tr>
-<tr>
-<td>Debian</td>
-<td>apt</td>
-<td>16 MB</td>
-<td>3s</td>
-<td>4.9 MB/s</td>
-</tr>
-<tr>
-<td>Arch Linux</td>
-<td>pacman</td>
-<td>25 MB</td>
-<td>1s</td>
-<td>18.4 MB/s</td>
-</tr>
-<tr>
-<td>Alpine</td>
-<td>apk</td>
-<td>10 MB</td>
-<td>1s</td>
-<td>11.9 MB/s</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>distribution</th>
+          <th>package manager</th>
+          <th>data</th>
+          <th>wall-clock time</th>
+          <th>rate</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Fedora</td>
+          <td>dnf</td>
+          <td>84 MB</td>
+          <td>25s</td>
+          <td>3.4 MB/s</td>
+      </tr>
+      <tr>
+          <td>NixOS</td>
+          <td>Nix</td>
+          <td>15 MB</td>
+          <td>7s</td>
+          <td>2.3 MB/s</td>
+      </tr>
+      <tr>
+          <td>Debian</td>
+          <td>apt</td>
+          <td>16 MB</td>
+          <td>3s</td>
+          <td>4.9 MB/s</td>
+      </tr>
+      <tr>
+          <td>Arch Linux</td>
+          <td>pacman</td>
+          <td>25 MB</td>
+          <td>1s</td>
+          <td>18.4 MB/s</td>
+      </tr>
+      <tr>
+          <td>Alpine</td>
+          <td>apk</td>
+          <td>10 MB</td>
+          <td>1s</td>
+          <td>11.9 MB/s</td>
+      </tr>
+  </tbody>
 </table>
 <h4 id="qemu-large-c-program">qemu (large C program)</h4>
 <table>
-<thead>
-<tr>
-<th>distribution</th>
-<th>package manager</th>
-<th>data</th>
-<th>wall-clock time</th>
-<th>rate</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Fedora</td>
-<td>dnf</td>
-<td>350 MB</td>
-<td>56s</td>
-<td>6.25 MB/s</td>
-</tr>
-<tr>
-<td>Debian</td>
-<td>apt</td>
-<td>256 MB</td>
-<td>39s</td>
-<td>6.5 MB/s</td>
-</tr>
-<tr>
-<td>NixOS</td>
-<td>Nix</td>
-<td>251 MB</td>
-<td>36s</td>
-<td>6.8 MB/s</td>
-</tr>
-<tr>
-<td>Arch Linux</td>
-<td>pacman</td>
-<td>128 MB</td>
-<td>10s</td>
-<td>12.1 MB/s</td>
-</tr>
-<tr>
-<td>Alpine</td>
-<td>apk</td>
-<td>34 MB</td>
-<td>1.8s</td>
-<td>18.6 MB/s</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>distribution</th>
+          <th>package manager</th>
+          <th>data</th>
+          <th>wall-clock time</th>
+          <th>rate</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Fedora</td>
+          <td>dnf</td>
+          <td>350 MB</td>
+          <td>56s</td>
+          <td>6.25 MB/s</td>
+      </tr>
+      <tr>
+          <td>Debian</td>
+          <td>apt</td>
+          <td>256 MB</td>
+          <td>39s</td>
+          <td>6.5 MB/s</td>
+      </tr>
+      <tr>
+          <td>NixOS</td>
+          <td>Nix</td>
+          <td>251 MB</td>
+          <td>36s</td>
+          <td>6.8 MB/s</td>
+      </tr>
+      <tr>
+          <td>Arch Linux</td>
+          <td>pacman</td>
+          <td>128 MB</td>
+          <td>10s</td>
+          <td>12.1 MB/s</td>
+      </tr>
+      <tr>
+          <td>Alpine</td>
+          <td>apk</td>
+          <td>34 MB</td>
+          <td>1.8s</td>
+          <td>18.6 MB/s</td>
+      </tr>
+  </tbody>
 </table>
 <p>(Looking for older measurements? See <a href="#appendix-b">Appendix B (2019)</a> or <a href="#appendix-c">Appendix C (2020)</a>).</p>
 <p>The difference between the slowest and fastest package managers is 30x!</p>
@@ -1515,88 +1515,88 @@ manager could likely beat <code>apk</code>’s performance. It could, for exampl
 systems</a>
 fare:</p>
 <table>
-<thead>
-<tr>
-<th>name</th>
-<th>scope</th>
-<th>package file format</th>
-<th>hooks/triggers</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>AppImage</td>
-<td>apps</td>
-<td>image: ISO9660, SquashFS</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="https://snapcraft.io/">snappy</a></td>
-<td>apps</td>
-<td>image: SquashFS</td>
-<td>yes: <a href="https://docs.snapcraft.io/build-snaps/hooks">hooks</a></td>
-</tr>
-<tr>
-<td>FlatPak</td>
-<td>apps</td>
-<td>archive: <a href="https://ostree.readthedocs.io/en/latest/">OSTree</a></td>
-<td>no</td>
-</tr>
-<tr>
-<td>0install</td>
-<td>apps</td>
-<td>archive: tar.bz2</td>
-<td>no</td>
-</tr>
-<tr>
-<td>nix, guix</td>
-<td>distro</td>
-<td>archive: nar.{bz2,xz}</td>
-<td><a href="https://github.com/NixOS/nixos/blob/master/modules/system/activation/activation-script.nix">activation script</a></td>
-</tr>
-<tr>
-<td>dpkg</td>
-<td>distro</td>
-<td>archive: tar.{gz,xz,bz2} in ar(1)</td>
-<td>yes</td>
-</tr>
-<tr>
-<td>rpm</td>
-<td>distro</td>
-<td>archive: cpio.{bz2,lz,xz}</td>
-<td><a href="https://fedoraproject.org/wiki/Packaging:Scriptlets">scriptlets</a></td>
-</tr>
-<tr>
-<td>pacman</td>
-<td>distro</td>
-<td>archive: tar.xz</td>
-<td><a href="https://wiki.archlinux.org/index.php/PKGBUILD#install">install</a></td>
-</tr>
-<tr>
-<td>slackware</td>
-<td>distro</td>
-<td>archive: tar.{gz,xz}</td>
-<td>yes: doinst.sh</td>
-</tr>
-<tr>
-<td>apk</td>
-<td>distro</td>
-<td>archive: tar.gz</td>
-<td>yes: .post-install</td>
-</tr>
-<tr>
-<td>Entropy</td>
-<td>distro</td>
-<td>archive: tar.bz2</td>
-<td>yes</td>
-</tr>
-<tr>
-<td>ipkg, opkg</td>
-<td>distro</td>
-<td>archive: tar{,.gz}</td>
-<td>yes</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>name</th>
+          <th>scope</th>
+          <th>package file format</th>
+          <th>hooks/triggers</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>AppImage</td>
+          <td>apps</td>
+          <td>image: ISO9660, SquashFS</td>
+          <td>no</td>
+      </tr>
+      <tr>
+          <td><a href="https://snapcraft.io/">snappy</a></td>
+          <td>apps</td>
+          <td>image: SquashFS</td>
+          <td>yes: <a href="https://docs.snapcraft.io/build-snaps/hooks">hooks</a></td>
+      </tr>
+      <tr>
+          <td>FlatPak</td>
+          <td>apps</td>
+          <td>archive: <a href="https://ostree.readthedocs.io/en/latest/">OSTree</a></td>
+          <td>no</td>
+      </tr>
+      <tr>
+          <td>0install</td>
+          <td>apps</td>
+          <td>archive: tar.bz2</td>
+          <td>no</td>
+      </tr>
+      <tr>
+          <td>nix, guix</td>
+          <td>distro</td>
+          <td>archive: nar.{bz2,xz}</td>
+          <td><a href="https://github.com/NixOS/nixos/blob/master/modules/system/activation/activation-script.nix">activation script</a></td>
+      </tr>
+      <tr>
+          <td>dpkg</td>
+          <td>distro</td>
+          <td>archive: tar.{gz,xz,bz2} in ar(1)</td>
+          <td>yes</td>
+      </tr>
+      <tr>
+          <td>rpm</td>
+          <td>distro</td>
+          <td>archive: cpio.{bz2,lz,xz}</td>
+          <td><a href="https://fedoraproject.org/wiki/Packaging:Scriptlets">scriptlets</a></td>
+      </tr>
+      <tr>
+          <td>pacman</td>
+          <td>distro</td>
+          <td>archive: tar.xz</td>
+          <td><a href="https://wiki.archlinux.org/index.php/PKGBUILD#install">install</a></td>
+      </tr>
+      <tr>
+          <td>slackware</td>
+          <td>distro</td>
+          <td>archive: tar.{gz,xz}</td>
+          <td>yes: doinst.sh</td>
+      </tr>
+      <tr>
+          <td>apk</td>
+          <td>distro</td>
+          <td>archive: tar.gz</td>
+          <td>yes: .post-install</td>
+      </tr>
+      <tr>
+          <td>Entropy</td>
+          <td>distro</td>
+          <td>archive: tar.bz2</td>
+          <td>yes</td>
+      </tr>
+      <tr>
+          <td>ipkg, opkg</td>
+          <td>distro</td>
+          <td>archive: tar{,.gz}</td>
+          <td>yes</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="conclusion">Conclusion</h3>
 <p>As per the <a href="#current-landscape">current landscape</a>, there is no

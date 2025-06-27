@@ -7,19 +7,21 @@
 
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="Eclipse: Enabling Compilation Database (CDB, compile_commands.json) in NXP MCUXpresso v11.3">
-  <meta property="og:description" content="NXP’s Eclipse-based MCUXpresso IDE is the easiest way to make full use of the hardware debugging features of modern NXP micro controllers such as the i.MX RT1060 found on the NXP i.MX RT1060 Evaluation Kit (MIMXRT1060-EVK), which I use for Teensy 4 development.">
+  <meta property="og:description" content="NXP’s Eclipse-based MCUXpresso IDE is the easiest way to make full use of the hardware debugging features of modern NXP micro controllers such as the i.MX RT1060 found on the NXP i.MX RT1060 Evaluation Kit (MIMXRT1060-EVK), which I use for Teensy 4 development.
+">
   
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-1_hu2472da729552826bf692ea90f41fcb42_1282459_200x200_fit_q75_box.jpg">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-1_hu_5b181edc680bca7e.jpg">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
   <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
-  <meta name="description" content="NXP’s Eclipse-based MCUXpresso IDE is the easiest way to make full use of the hardware debugging features of modern NXP micro controllers such as the i.MX RT1060 found on the NXP i.MX RT1060 Evaluation Kit (MIMXRT1060-EVK), which I use for Teensy 4 development.">
+  <meta name="description" content="NXP’s Eclipse-based MCUXpresso IDE is the easiest way to make full use of the hardware debugging features of modern NXP micro controllers such as the i.MX RT1060 found on the NXP i.MX RT1060 Evaluation Kit (MIMXRT1060-EVK), which I use for Teensy 4 development.
+">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -310,8 +312,8 @@ later in <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=559186">Bug 5591
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-1.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-1_hu2472da729552826bf692ea90f41fcb42_1282459_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-1_hu2472da729552826bf692ea90f41fcb42_1282459_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-1_hu2472da729552826bf692ea90f41fcb42_1282459_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-1_hu_2baa0b1192fbdbc2.jpg 2x,https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-1_hu_763b318d787e02c1.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-1_hu_b8529f8863cb013f.jpg"
   alt="Compilation Database Parser settings" title="Compilation Database Parser settings"
   width="600"
   height="562"
@@ -343,8 +345,8 @@ up:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-2.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-2_hu3785c06d044add2745f30f8a2a36e111_353949_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-2_hu3785c06d044add2745f30f8a2a36e111_353949_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-2_hu3785c06d044add2745f30f8a2a36e111_353949_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-2_hu_d766dd79527543fa.jpg 2x,https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-2_hu_5c90e79f09b05871.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-2_hu_6e52380f5a3d1b3b.jpg"
   alt="Compilation Database progress" title="Compilation Database progress"
   width="600"
   height="179"
@@ -391,8 +393,8 @@ example</li>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-6.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-6_hu9efc4b93b6aefec1d634e69f8dd62cd0_914059_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-6_hu9efc4b93b6aefec1d634e69f8dd62cd0_914059_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-6_hu9efc4b93b6aefec1d634e69f8dd62cd0_914059_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-6_hu_51b0f2ca92bcb81c.jpg 2x,https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-6_hu_372ca7c9fe5b2618.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-6_hu_1453ba2b06f4a28e.jpg"
   alt="Compilation Database in effect: files greyed out and macros expanded" title="Compilation Database in effect: files greyed out and macros expanded"
   width="600"
   height="301"
@@ -428,8 +430,8 @@ endure watching the slow algorithm for a few seconds:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-4.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-4_hu3785c06d044add2745f30f8a2a36e111_391538_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-4_hu3785c06d044add2745f30f8a2a36e111_391538_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-4_hu3785c06d044add2745f30f8a2a36e111_391538_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-4_hu_a61534cc92f001f8.jpg 2x,https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-4_hu_a49bceb1351b55a1.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-04-01-compilation-database-eclipse-mcuxpresso/cdb-4_hu_1e52d9a5e1d6bc3f.jpg"
   alt="Compilation Database exclusion slow" title="Compilation Database exclusion slow"
   width="600"
   height="179"

@@ -7,7 +7,7 @@
 
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="golang: types such as []uint32 and cgo">
-  <meta property="og:description" content="There is official documentation on the Go C language interface (or cgo in golang terminology), but the things it covers are relatively simple. I have used cgo recently in a real-world project and I want to share my experiences in this short article, that is, how to use types properly (avoiding the void* equivalent unsafe.">
+  <meta property="og:description" content=" There is official documentation on the Go C language interface (or cgo in golang terminology), but the things it covers are relatively simple. I have used cgo recently in a real-world project and I want to share my experiences in this short article, that is, how to use types properly (avoiding the void* equivalent unsafe.Pointer) and how to deal with Go’s data structures such as slices. ">
   
   
   
@@ -16,7 +16,7 @@
   <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
-  <meta name="description" content="There is official documentation on the Go C language interface (or cgo in golang terminology), but the things it covers are relatively simple. I have used cgo recently in a real-world project and I want to share my experiences in this short article, that is, how to use types properly (avoiding the void* equivalent unsafe.">
+  <meta name="description" content=" There is official documentation on the Go C language interface (or cgo in golang terminology), but the things it covers are relatively simple. I have used cgo recently in a real-world project and I want to share my experiences in this short article, that is, how to use types properly (avoiding the void* equivalent unsafe.Pointer) and how to deal with Go’s data structures such as slices. ">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2012-09-27-cgo_uint32/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -235,8 +235,8 @@ pretty simple:
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;fmt&#34;</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">multiply</span>(input []<span style="color:#902000">int</span>) []<span style="color:#902000">int</span> {
-</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic">// Create an output list with the same size
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    output <span style="color:#666">:=</span> <span style="color:#007020">make</span>([]<span style="color:#902000">int</span>, <span style="color:#007020">len</span>(input))
+</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic">// Create an output list with the same size</span>
+</span></span><span style="display:flex;"><span>    output <span style="color:#666">:=</span> <span style="color:#007020">make</span>([]<span style="color:#902000">int</span>, <span style="color:#007020">len</span>(input))
 </span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> input {
 </span></span><span style="display:flex;"><span>        output[idx] = val <span style="color:#666">*</span> <span style="color:#40a070">2</span>
 </span></span><span style="display:flex;"><span>    }

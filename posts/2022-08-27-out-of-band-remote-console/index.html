@@ -8,12 +8,13 @@
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="DIY out-of-band management: remote console server">
   <meta property="og:description" content="For the guest WiFi at an event that eventually fell through, we wanted to tunnel all the traffic through my internet connection via my home router.
-Because the event is located in another country, many hours of travel away, there are a couple of scenarios where remote control of my home router can be a life-saver.">
+Because the event is located in another country, many hours of travel away, there are a couple of scenarios where remote control of my home router can be a life-saver. For example, should my home router crash, remotely turning power off and on again gets the event back online.
+">
   
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured_hu855bbe0a9c47ac557e5b09db74fa3b06_860347_200x200_fit_q75_box.jpg">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured_hu_fb4eb0d6ecb08f81.jpg">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -21,7 +22,8 @@ Because the event is located in another country, many hours of travel away, ther
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
   <meta name="description" content="For the guest WiFi at an event that eventually fell through, we wanted to tunnel all the traffic through my internet connection via my home router.
-Because the event is located in another country, many hours of travel away, there are a couple of scenarios where remote control of my home router can be a life-saver.">
+Because the event is located in another country, many hours of travel away, there are a couple of scenarios where remote control of my home router can be a life-saver. For example, should my home router crash, remotely turning power off and on again gets the event back online.
+">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -313,8 +315,8 @@ for a few hours.</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0484.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0484_hu855bbe0a9c47ac557e5b09db74fa3b06_1361683_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0484_hu855bbe0a9c47ac557e5b09db74fa3b06_1361683_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0484_hu855bbe0a9c47ac557e5b09db74fa3b06_1361683_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0484_hu_14535dbad7bfddc6.jpg 2x,https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0484_hu_922e9517419a793d.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0484_hu_5f273a3b631f4096.jpg"
   alt="TP-Link M7350 4G/LTE Mobile Wi-Fi router connected to digitec iot" title="TP-Link M7350 4G/LTE Mobile Wi-Fi router connected to digitec iot"
   width="600"
   height="450"
@@ -404,8 +406,8 @@ a comparison):</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured_hu855bbe0a9c47ac557e5b09db74fa3b06_860347_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured_hu855bbe0a9c47ac557e5b09db74fa3b06_860347_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured_hu855bbe0a9c47ac557e5b09db74fa3b06_860347_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured_hu_76069bc2981b9a05.jpg 2x,https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured_hu_6a8a714e14e8207b.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured_hu_d9b9bca89a19aaac.jpg"
   alt="Raspberry Pi Zero 2 W with USB hub, ethernet and serial" title="Raspberry Pi Zero 2 W with USB hub, ethernet and serial"
   width="600"
   height="600"
@@ -522,10 +524,9 @@ network provider behind the digitec iot subscription.</p>
 <p><a href="https://github.com/mdlayher/consrv"><code>consrv</code></a> is an SSH serial console server
 written in Go that Matt Layher and I developed. If you’re curious, you can watch
 the two of us creating it in this twitch stream recording:</p>
-
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-  <iframe src="https://www.youtube-nocookie.com/embed/1g46ei9aBH0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video"></iframe>
-</div>
+      <iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" loading="eager" referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube-nocookie.com/embed/1g46ei9aBH0?autoplay=0&amp;controls=1&amp;end=0&amp;loop=0&amp;mute=0&amp;start=0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" title="YouTube video"></iframe>
+    </div>
 
 <p>The installation of <code>consrv</code> consists of two steps.</p>
 <p>Step 1 is done: we already included <code>consrv</code> in the <code>Makefile</code> earlier in

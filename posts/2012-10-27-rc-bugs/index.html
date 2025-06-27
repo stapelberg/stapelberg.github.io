@@ -7,8 +7,10 @@
 
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="RC bugs">
-  <meta property="og:description" content="I recently worked on the following RC bugs: #691125 — ejabberd: package installation creates /root/.erlang.cookie
-I tracked down the cause of this and provided a patch. Now I also know how piuparts works in detail :-). #691180 — connman: Connman won&#39;t run due to missing libxtables.">
+  <meta property="og:description" content=" I recently worked on the following RC bugs: #691125 — ejabberd: package installation creates /root/.erlang.cookie
+I tracked down the cause of this and provided a patch. Now I also know how piuparts works in detail :-). #691180 — connman: Connman won&#39;t run due to missing libxtables.so.7
+Since this bug does not affect testing and it doesn’t look like iptables 1.4.16.3-1 (a new upstream release) will go into wheezy (no freeze unblock filed), I tagged this with wheezy-ignore. I hope this was right, if not, feel free to correct me. #684645 — liblockfile1: Order of fcntl and dotlock in maillock
+I identified the piece of code which does locking the wrong way. Since I’m not familiar enough with either sendmail or NFS-safe locking, I did not send a patch. In case you have experience with this, please have a look! ">
   
   
   
@@ -17,8 +19,10 @@ I tracked down the cause of this and provided a patch. Now I also know how piupa
   <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
-  <meta name="description" content="I recently worked on the following RC bugs: #691125 — ejabberd: package installation creates /root/.erlang.cookie
-I tracked down the cause of this and provided a patch. Now I also know how piuparts works in detail :-). #691180 — connman: Connman won&#39;t run due to missing libxtables.">
+  <meta name="description" content=" I recently worked on the following RC bugs: #691125 — ejabberd: package installation creates /root/.erlang.cookie
+I tracked down the cause of this and provided a patch. Now I also know how piuparts works in detail :-). #691180 — connman: Connman won&#39;t run due to missing libxtables.so.7
+Since this bug does not affect testing and it doesn’t look like iptables 1.4.16.3-1 (a new upstream release) will go into wheezy (no freeze unblock filed), I tagged this with wheezy-ignore. I hope this was right, if not, feel free to correct me. #684645 — liblockfile1: Order of fcntl and dotlock in maillock
+I identified the piece of code which does locking the wrong way. Since I’m not familiar enough with either sendmail or NFS-safe locking, I did not send a patch. In case you have experience with this, please have a look! ">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2012-10-27-rc-bugs/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">

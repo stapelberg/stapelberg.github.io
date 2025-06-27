@@ -8,7 +8,8 @@
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="Readiness notifications in Go">
   <meta property="og:description" content="When spawning a child program, for example in an integration test, it is often helpful to know when the child program is ready to receive requests.
-Delaying A brittle strategy is to just add a delay (say, time.Sleep(2 * time.Second)) and hope the child program finishes initialization in that time.">
+Delaying A brittle strategy is to just add a delay (say, time.Sleep(2 * time.Second)) and hope the child program finishes initialization in that time. This is brittle because it depends on timing, so when the computer running the test is slow for whichever reason, your test starts failing. Many CI/CD systems have less capacity (and/or are more heavily utilized) than developer machines, so timeouts frequently need to be adjusted.
+">
   
   
   
@@ -18,7 +19,8 @@ Delaying A brittle strategy is to just add a delay (say, time.Sleep(2 * time.Sec
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
   <meta name="description" content="When spawning a child program, for example in an integration test, it is often helpful to know when the child program is ready to receive requests.
-Delaying A brittle strategy is to just add a delay (say, time.Sleep(2 * time.Second)) and hope the child program finishes initialization in that time.">
+Delaying A brittle strategy is to just add a delay (say, time.Sleep(2 * time.Second)) and hope the child program finishes initialization in that time. This is brittle because it depends on timing, so when the computer running the test is slow for whichever reason, your test starts failing. Many CI/CD systems have less capacity (and/or are more heavily utilized) than developer machines, so timeouts frequently need to be adjusted.
+">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2020-02-02-readiness-notifications-in-golang/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -262,34 +264,34 @@ modified when we add new file descriptors in the parent, and also because this
 behavior is usually opt-in.</p>
 <p>In this case, we’ll do that via an environment variable and start the child
 program:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Go dup2()’s ExtraFiles to file descriptor 3 and counting.
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// File descriptors 0, 1, 2 are stdin, stdout and stderr.
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>child.Env = <span style="color:#007020">append</span>(os.<span style="color:#06287e">Environ</span>(), <span style="color:#4070a0">&#34;CHILD_READY_FD=3&#34;</span>)
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Go dup2()’s ExtraFiles to file descriptor 3 and counting.</span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// File descriptors 0, 1, 2 are stdin, stdout and stderr.</span>
+</span></span><span style="display:flex;"><span>child.Env = <span style="color:#007020">append</span>(os.<span style="color:#06287e">Environ</span>(), <span style="color:#4070a0">&#34;CHILD_READY_FD=3&#34;</span>)
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Note child.Start(), not child.Run():
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> child.<span style="color:#06287e">Start</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Note child.Start(), not child.Run():</span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> child.<span style="color:#06287e">Start</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
 </span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;%v: %v&#34;</span>, child.Args, err)
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>At this point, both the parent and the child process have a file descriptor
 referencing the write end of the pipe. Since the pipe will only be closed once
 <em>all</em> processes have closed the write end, we need to close the write end in the
 parent program:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Close the write end of the pipe in the parent:
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>w.<span style="color:#06287e">Close</span>()
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Close the write end of the pipe in the parent:</span>
+</span></span><span style="display:flex;"><span>w.<span style="color:#06287e">Close</span>()
 </span></span></code></pre></div><p>Now, we can blockingly read from the pipe, and know that once the read call
 returns, the child program is ready to receive requests:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Avoid hanging forever in case the child program never becomes ready;
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// this is easier to diagnose than an unspecified CI/CD test timeout.
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// This timeout should be much much longer than initialization takes.
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>r.<span style="color:#06287e">SetReadDeadline</span>(time.<span style="color:#06287e">Now</span>().<span style="color:#06287e">Add</span>(<span style="color:#40a070">1</span> <span style="color:#666">*</span> time.Minute))
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Avoid hanging forever in case the child program never becomes ready;</span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// this is easier to diagnose than an unspecified CI/CD test timeout.</span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// This timeout should be much much longer than initialization takes.</span>
+</span></span><span style="display:flex;"><span>r.<span style="color:#06287e">SetReadDeadline</span>(time.<span style="color:#06287e">Now</span>().<span style="color:#06287e">Add</span>(<span style="color:#40a070">1</span> <span style="color:#666">*</span> time.Minute))
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> _, err <span style="color:#666">:=</span> ioutil.<span style="color:#06287e">ReadAll</span>(r); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
 </span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;awaiting readiness: %v&#34;</span>, err)
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// …send requests…
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>
-</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// …tear down child program…
-</span></span></span></code></pre></div><h4 id="child-program">Child Program</h4>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// …send requests…</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// …tear down child program…</span>
+</span></span></code></pre></div><h4 id="child-program">Child Program</h4>
 <p>In the child program, we need to recognize that the parent program requests a
 readiness notification, and ensure our signaling doesn’t leak to child programs
 of the child program:</p>
@@ -303,12 +305,12 @@ of the child program:</p>
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
-</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">// …initialize…
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">// …initialize…</span>
+</span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">if</span> readyFile <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>    readyFile.<span style="color:#06287e">Close</span>() <span style="color:#60a0b0;font-style:italic">// signal readiness
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    readyFile = <span style="color:#007020;font-weight:bold">nil</span>   <span style="color:#60a0b0;font-style:italic">// just to be prudent
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  }
+</span></span><span style="display:flex;"><span>    readyFile.<span style="color:#06287e">Close</span>() <span style="color:#60a0b0;font-style:italic">// signal readiness</span>
+</span></span><span style="display:flex;"><span>    readyFile = <span style="color:#007020;font-weight:bold">nil</span>   <span style="color:#60a0b0;font-style:italic">// just to be prudent</span>
+</span></span><span style="display:flex;"><span>  }
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><h3 id="conclusion">Conclusion</h3>
 <p>Depending on what you’re communicating from the child to the parent, and how

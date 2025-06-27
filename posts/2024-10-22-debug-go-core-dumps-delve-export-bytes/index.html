@@ -8,12 +8,13 @@
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="Debug Go core dumps with delve: export byte slices">
   <meta property="og:description" content="Not all bugs can easily be reproduced — sometimes, all you have is a core dump from a crashing program, but no idea about the triggering conditions of the bug yet.
-When using Go, we can use the delve debugger for core dump debugging, but I had trouble figuring out how to save byte slice contents (for example: the incoming request causing the crash) from memory into a file for further analysis, so this article walks you through how to do it.">
+When using Go, we can use the delve debugger for core dump debugging, but I had trouble figuring out how to save byte slice contents (for example: the incoming request causing the crash) from memory into a file for further analysis, so this article walks you through how to do it.
+">
   
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_huc92a382266793767583fa56b2a20c9d0_1575273_200x200_fit_q75_box.jpg">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_b208734b3dba9111.jpg">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -21,7 +22,8 @@ When using Go, we can use the delve debugger for core dump debugging, but I had 
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
   <meta name="description" content="Not all bugs can easily be reproduced — sometimes, all you have is a core dump from a crashing program, but no idea about the triggering conditions of the bug yet.
-When using Go, we can use the delve debugger for core dump debugging, but I had trouble figuring out how to save byte slice contents (for example: the incoming request causing the crash) from memory into a file for further analysis, so this article walks you through how to do it.">
+When using Go, we can use the delve debugger for core dump debugging, but I had trouble figuring out how to save byte slice contents (for example: the incoming request causing the crash) from memory into a file for further analysis, so this article walks you through how to do it.
+">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -318,8 +320,8 @@ use core dump debugging!</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_huc92a382266793767583fa56b2a20c9d0_1575273_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_huc92a382266793767583fa56b2a20c9d0_1575273_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_huc92a382266793767583fa56b2a20c9d0_1575273_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_a8173ece4c3f11e6.jpg 2x,https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_beea9b0751b668d7.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_604c37f3566e3ffa.jpg"
   alt="Core memory" title="Core memory"
   width="600"
   height="516"
@@ -520,8 +522,8 @@ called), but then how do we produce a core dump from our own handler?</p>
 <code>signal_unix.go</code> and <a href="https://cs.opensource.google/go/go/+/refs/tags/go1.23.2:src/runtime/signal_unix.go;l=938">sends signal <code>SIGABRT</code> with the <code>dieFromSignal</code>
 function</a>
 to the current thread:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">//go:nosplit
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">crash</span>() {
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">//go:nosplit</span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">crash</span>() {
 </span></span><span style="display:flex;"><span>        <span style="color:#06287e">dieFromSignal</span>(_SIGABRT)
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>The default action for <code>SIGABRT</code> is to “terminate the process and dump core”,
@@ -537,12 +539,12 @@ see <a href="https://manpages.debian.org/signal.7"><code>signal(7)</code></a>
 </span></span><span style="display:flex;"><span>					<span style="color:#007020">panic</span>(fmt.<span style="color:#06287e">Sprintf</span>(<span style="color:#4070a0">&#34;could not find own process (pid %d): %v&#34;</span>, syscall.<span style="color:#06287e">Getpid</span>(), err))
 </span></span><span style="display:flex;"><span>				}
 </span></span><span style="display:flex;"><span>				proc.<span style="color:#06287e">Signal</span>(syscall.SIGABRT)
-</span></span><span style="display:flex;"><span>				<span style="color:#60a0b0;font-style:italic">// Ensure the stack triggering the core dump sticks around
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>				proc.<span style="color:#06287e">Wait</span>()
+</span></span><span style="display:flex;"><span>				<span style="color:#60a0b0;font-style:italic">// Ensure the stack triggering the core dump sticks around</span>
+</span></span><span style="display:flex;"><span>				proc.<span style="color:#06287e">Wait</span>()
 </span></span><span style="display:flex;"><span>			}
 </span></span><span style="display:flex;"><span>		}()
-</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// …buggy handler code goes here; for illustration we panic
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#007020">panic</span>(<span style="color:#4070a0">&#34;this should result in a core dump&#34;</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// …buggy handler code goes here; for illustration we panic</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#007020">panic</span>(<span style="color:#4070a0">&#34;this should result in a core dump&#34;</span>)
 </span></span><span style="display:flex;"><span>	})
 </span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Fatal</span>(http.<span style="color:#06287e">ListenAndServe</span>(<span style="color:#4070a0">&#34;:8080&#34;</span>, <span style="color:#007020;font-weight:bold">nil</span>))
 </span></span><span style="display:flex;"><span>}

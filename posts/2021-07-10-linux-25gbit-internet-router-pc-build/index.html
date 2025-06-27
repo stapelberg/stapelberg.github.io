@@ -8,12 +8,13 @@
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="25 Gigabit Linux internet router PC build">
   <meta property="og:description" content="init7 recently announced that with their FTTH fiber offering Fiber7, they will now sell and connect you with 25 Gbit/s (Fiber7-X2) or 10 Gbit/s (Fiber7-X) fiber optics, if you want more than 1 Gbit/s.
-While this offer will only become available at my location late this year (or possibly later due to the supply chain shortage), I already wanted to get the hardware on my end sorted out.">
+While this offer will only become available at my location late this year (or possibly later due to the supply chain shortage), I already wanted to get the hardware on my end sorted out.
+">
   
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-router-featured_hu1fe795dd8828eccf339de1acf31abbd0_2106743_200x200_fit_q75_box.jpg">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-router-featured_hu_b335e8c211fd1447.jpg">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -21,7 +22,8 @@ While this offer will only become available at my location late this year (or po
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
   <meta name="description" content="init7 recently announced that with their FTTH fiber offering Fiber7, they will now sell and connect you with 25 Gbit/s (Fiber7-X2) or 10 Gbit/s (Fiber7-X) fiber optics, if you want more than 1 Gbit/s.
-While this offer will only become available at my location late this year (or possibly later due to the supply chain shortage), I already wanted to get the hardware on my end sorted out.">
+While this offer will only become available at my location late this year (or possibly later due to the supply chain shortage), I already wanted to get the hardware on my end sorted out.
+">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -285,8 +287,8 @@ install some network expansion cards!</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-router-featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-router-featured_hu1fe795dd8828eccf339de1acf31abbd0_2106743_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-router-featured_hu1fe795dd8828eccf339de1acf31abbd0_2106743_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-router-featured_hu1fe795dd8828eccf339de1acf31abbd0_2106743_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-router-featured_hu_ca02a165c273f12b.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-router-featured_hu_50e2aa518afc9266.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-router-featured_hu_2004f1d4ab8c4516.jpg"
   alt="router PC build" title="router PC build"
   width="600"
   height="607"
@@ -322,66 +324,66 @@ I’m using 2 network cards: an SFP28 network card for the uplink, and a quad-po
 10G SFP+ network card for the local network (LAN). This leaves us with the
 following network ports and connections:</p>
 <table>
-<thead>
-<tr>
-<th>Network Card</th>
-<th>max speed</th>
-<th>cable</th>
-<th>effective</th>
-<th>Connection</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Intel XXV710</td>
-<td>25 Gbit/s</td>
-<td>fiber</td>
-<td>25 Gbit/s</td>
-<td>Fiber7-X2 uplink</td>
-</tr>
-<tr>
-<td>Intel XXV710</td>
-<td>25 Gbit/s</td>
-<td>DAC</td>
-<td>10 Gbit/s</td>
-<td>workstation</td>
-</tr>
-<tr>
-<td>Intel XL710</td>
-<td>10 Gbit/s</td>
-<td>RJ45</td>
-<td>1 Gbit/s</td>
-<td>rest (RJ45 Gigabit)</td>
-</tr>
-<tr>
-<td>Intel XL710</td>
-<td>10 Gbit/s</td>
-<td>fiber</td>
-<td>10 Gbit/s</td>
-<td>MikroTik 1</td>
-</tr>
-<tr>
-<td>Intel XL710</td>
-<td>10 Gbit/s</td>
-<td>fiber</td>
-<td>10 Gbit/s</td>
-<td>MikroTik 2</td>
-</tr>
-<tr>
-<td>Intel XL710</td>
-<td>10 Gbit/s</td>
-<td>/</td>
-<td>10 Gbit/s</td>
-<td>(unused)</td>
-</tr>
-<tr>
-<td>onboard</td>
-<td>2.5 Gbit/s</td>
-<td>RJ45</td>
-<td>1 Gbit/s</td>
-<td>(management)</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Network Card</th>
+          <th>max speed</th>
+          <th>cable</th>
+          <th>effective</th>
+          <th>Connection</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Intel XXV710</td>
+          <td>25 Gbit/s</td>
+          <td>fiber</td>
+          <td>25 Gbit/s</td>
+          <td>Fiber7-X2 uplink</td>
+      </tr>
+      <tr>
+          <td>Intel XXV710</td>
+          <td>25 Gbit/s</td>
+          <td>DAC</td>
+          <td>10 Gbit/s</td>
+          <td>workstation</td>
+      </tr>
+      <tr>
+          <td>Intel XL710</td>
+          <td>10 Gbit/s</td>
+          <td>RJ45</td>
+          <td>1 Gbit/s</td>
+          <td>rest (RJ45 Gigabit)</td>
+      </tr>
+      <tr>
+          <td>Intel XL710</td>
+          <td>10 Gbit/s</td>
+          <td>fiber</td>
+          <td>10 Gbit/s</td>
+          <td>MikroTik 1</td>
+      </tr>
+      <tr>
+          <td>Intel XL710</td>
+          <td>10 Gbit/s</td>
+          <td>fiber</td>
+          <td>10 Gbit/s</td>
+          <td>MikroTik 2</td>
+      </tr>
+      <tr>
+          <td>Intel XL710</td>
+          <td>10 Gbit/s</td>
+          <td>/</td>
+          <td>10 Gbit/s</td>
+          <td>(unused)</td>
+      </tr>
+      <tr>
+          <td>onboard</td>
+          <td>2.5 Gbit/s</td>
+          <td>RJ45</td>
+          <td>1 Gbit/s</td>
+          <td>(management)</td>
+      </tr>
+  </tbody>
 </table>
 
 
@@ -399,8 +401,8 @@ following network ports and connections:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-back-connectors.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-back-connectors_hu2cfa90931bbae9f0fd461262de6dceaf_1588951_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-back-connectors_hu2cfa90931bbae9f0fd461262de6dceaf_1588951_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-back-connectors_hu2cfa90931bbae9f0fd461262de6dceaf_1588951_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-back-connectors_hu_cf2960be27bee433.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-back-connectors_hu_d81e5cd5c5720ed.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-back-connectors_hu_d6f2c034bd089de9.jpg"
   alt="network connectors" title="network connectors"
   width="600"
   height="800"
@@ -436,8 +438,8 @@ hardware!</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-03-network-cards.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-03-network-cards_hue8caea776ef0fb2df2e421fd4fc4446d_3100418_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-03-network-cards_hue8caea776ef0fb2df2e421fd4fc4446d_3100418_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-03-network-cards_hue8caea776ef0fb2df2e421fd4fc4446d_3100418_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-03-network-cards_hu_5fb8ddcb0a4d8b8b.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-03-network-cards_hu_328225827af2ae28.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-03-network-cards_hu_89e7b15dcfa494b.jpg"
   alt="Network cards" title="Network cards"
   width="600"
   height="450"
@@ -540,8 +542,8 @@ mode should work, too.</div>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-08-ryzen5-on-mainboard.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-08-ryzen5-on-mainboard_hudb2375ee03466882b5ba09d7fd065b5d_1054095_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-08-ryzen5-on-mainboard_hudb2375ee03466882b5ba09d7fd065b5d_1054095_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-08-ryzen5-on-mainboard_hudb2375ee03466882b5ba09d7fd065b5d_1054095_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-08-ryzen5-on-mainboard_hu_23d3d7a02be73f4.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-08-ryzen5-on-mainboard_hu_a6aa883982d017d9.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-08-ryzen5-on-mainboard_hu_878be964927689f0.jpg"
   alt="Ryzen 5" title="Ryzen 5"
   width="600"
   height="440"
@@ -581,8 +583,8 @@ comes without fans.</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/x570p_expansion.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/x570p_expansion_hu3e0f2d5aa6180df20bb553ed5c6fa57b_271626_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/x570p_expansion_hu3e0f2d5aa6180df20bb553ed5c6fa57b_271626_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/x570p_expansion_hu3e0f2d5aa6180df20bb553ed5c6fa57b_271626_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/x570p_expansion_hu_cdb363d2f6d6af51.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/x570p_expansion_hu_1eb62c6705e48606.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/x570p_expansion_hu_66cdb07026cbf56f.jpg"
   
   width="600"
   height="244"
@@ -643,8 +645,8 @@ large air intakes:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-01-airflow-case-top.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-01-airflow-case-top_hu74d32c9eb10022fb50f09605538b4d16_1754161_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-01-airflow-case-top_hu74d32c9eb10022fb50f09605538b4d16_1754161_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-01-airflow-case-top_hu74d32c9eb10022fb50f09605538b4d16_1754161_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-01-airflow-case-top_hu_b69505892c3851b3.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-01-airflow-case-top_hu_39ef421815a94f26.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-01-airflow-case-top_hu_d5cd8015f10696ce.jpg"
   alt="Airflow case (from the top)" title="Airflow case (from the top)"
   width="600"
   height="699"
@@ -675,8 +677,8 @@ border: 1px solid #000;
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-case-back.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-case-back_hu24f36c0d8bab8e8a026702698b97bc68_1930320_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-case-back_hu24f36c0d8bab8e8a026702698b97bc68_1930320_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-case-back_hu24f36c0d8bab8e8a026702698b97bc68_1930320_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-case-back_hu_5f3cd9e08bf1e35b.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-case-back_hu_80f05756d645181e.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-case-back_hu_5cc6a307364413d6.jpg"
   alt="Airflow case (back)" title="Airflow case (back)"
   width="600"
   height="536"
@@ -707,8 +709,8 @@ border: 1px solid #000;
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-case-front.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-case-front_hu876ee6dd48eb5e24d09b830a310f7016_2072230_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-case-front_hu876ee6dd48eb5e24d09b830a310f7016_2072230_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-case-front_hu876ee6dd48eb5e24d09b830a310f7016_2072230_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-case-front_hu_25dcb2bd1eca7789.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-case-front_hu_ce612193e30e0787.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-27-case-front_hu_9e891fd61c514f0d.jpg"
   alt="Airflow case (front)" title="Airflow case (front)"
   width="600"
   height="800"
@@ -742,8 +744,8 @@ fan noise):</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-01-noctua-fans.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-01-noctua-fans_hufa2be48cd91c5b51113bfeb4460bf154_1457999_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-01-noctua-fans_hufa2be48cd91c5b51113bfeb4460bf154_1457999_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-01-noctua-fans_hufa2be48cd91c5b51113bfeb4460bf154_1457999_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-01-noctua-fans_hu_442c2416abff03ce.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-01-noctua-fans_hu_50a7fa25d3bac78.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-01-noctua-fans_hu_3a318768393597d1.jpg"
   alt="Noctua fans" title="Noctua fans"
   width="600"
   height="800"
@@ -856,105 +858,105 @@ Ryzen 7 PRO 5750GE, and its integrated HDMI output works like a charm :)</div>
 but Option B is a lot cheaper if you only want a router. Both options use the
 same base components:</p>
 <table>
-<thead>
-<tr>
-<th>Price</th>
-<th>Type</th>
-<th>Article</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>347 CHF</td>
-<td>Network card</td>
-<td><a href="https://www.fs.com/products/75603.html">FS.COM Intel XXV710, 2 × 25 Gbit/s (#75603)</a></td>
-</tr>
-<tr>
-<td>329 CHF</td>
-<td>Network card</td>
-<td><a href="https://www.fs.com/products/75602.html">FS.COM Intel XL710, 4 × 10 Gbit/s (#75602)</a></td>
-</tr>
-<tr>
-<td>395 CHF</td>
-<td>CPU</td>
-<td><a href="https://www.digitec.ch/de/s1/product/amd-ryzen-7-pro-5750ge-46ghz-tray-am4-460-ghz-8-core-prozessor-20796931">Ryzen 7 PRO 5750GE</a></td>
-</tr>
-<tr>
-<td>290 CHF</td>
-<td>Mainboard</td>
-<td><a href="https://www.digitec.ch/de/s1/product/asrock-b550-taichi-am4-amd-b550-atx-mainboard-13348335">ASRock B550 Taichi</a></td>
-</tr>
-<tr>
-<td>92 CHF</td>
-<td>Case</td>
-<td><a href="https://www.digitec.ch/de/s1/product/corsair-4000d-airflow-midi-tower-pc-gehaeuse-13552873">Corsair 4000D Airflow (Midi Tower)</a></td>
-</tr>
-<tr>
-<td>67 CHF</td>
-<td>Fan control</td>
-<td><a href="https://www.digitec.ch/de/s1/product/corsair-commander-pro-extern-6x-luefter-kontroller-6332927">Corsair Commander Pro</a></td>
-</tr>
-<tr>
-<td>65 CHF</td>
-<td>Case fan</td>
-<td><a href="https://www.digitec.ch/de/s1/product/noctua-nf-a14-pwm-140mm-1x-pc-luefter-657800">2 × Noctua NF-A14 PWM (140mm)</a></td>
-</tr>
-<tr>
-<td>62 CHF</td>
-<td>CPU fan</td>
-<td><a href="https://www.digitec.ch/de/s1/product/noctua-nh-l12s-7cm-cpu-kuehler-6817433">Noctua NH-L12S</a></td>
-</tr>
-<tr>
-<td>35 CHF</td>
-<td>Case fan</td>
-<td><a href="https://www.digitec.ch/de/s1/product/noctua-nf-a12x25-pwm-120mm-1x-pc-luefter-9161307">1 × Noctua NF-A12x25 PWM (120mm)</a></td>
-</tr>
-<tr>
-<td>60 CHF</td>
-<td>GPU</td>
-<td><a href="https://www.digitec.ch/de/s1/product/zotac-geforce-gt-710-zone-edition-1gb-grafikkarte-7526609">Zotac GeForce GT 710 Zone Edition (1GB)</a></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Price</th>
+          <th>Type</th>
+          <th>Article</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>347 CHF</td>
+          <td>Network card</td>
+          <td><a href="https://www.fs.com/products/75603.html">FS.COM Intel XXV710, 2 × 25 Gbit/s (#75603)</a></td>
+      </tr>
+      <tr>
+          <td>329 CHF</td>
+          <td>Network card</td>
+          <td><a href="https://www.fs.com/products/75602.html">FS.COM Intel XL710, 4 × 10 Gbit/s (#75602)</a></td>
+      </tr>
+      <tr>
+          <td>395 CHF</td>
+          <td>CPU</td>
+          <td><a href="https://www.digitec.ch/de/s1/product/amd-ryzen-7-pro-5750ge-46ghz-tray-am4-460-ghz-8-core-prozessor-20796931">Ryzen 7 PRO 5750GE</a></td>
+      </tr>
+      <tr>
+          <td>290 CHF</td>
+          <td>Mainboard</td>
+          <td><a href="https://www.digitec.ch/de/s1/product/asrock-b550-taichi-am4-amd-b550-atx-mainboard-13348335">ASRock B550 Taichi</a></td>
+      </tr>
+      <tr>
+          <td>92 CHF</td>
+          <td>Case</td>
+          <td><a href="https://www.digitec.ch/de/s1/product/corsair-4000d-airflow-midi-tower-pc-gehaeuse-13552873">Corsair 4000D Airflow (Midi Tower)</a></td>
+      </tr>
+      <tr>
+          <td>67 CHF</td>
+          <td>Fan control</td>
+          <td><a href="https://www.digitec.ch/de/s1/product/corsair-commander-pro-extern-6x-luefter-kontroller-6332927">Corsair Commander Pro</a></td>
+      </tr>
+      <tr>
+          <td>65 CHF</td>
+          <td>Case fan</td>
+          <td><a href="https://www.digitec.ch/de/s1/product/noctua-nf-a14-pwm-140mm-1x-pc-luefter-657800">2 × Noctua NF-A14 PWM (140mm)</a></td>
+      </tr>
+      <tr>
+          <td>62 CHF</td>
+          <td>CPU fan</td>
+          <td><a href="https://www.digitec.ch/de/s1/product/noctua-nh-l12s-7cm-cpu-kuehler-6817433">Noctua NH-L12S</a></td>
+      </tr>
+      <tr>
+          <td>35 CHF</td>
+          <td>Case fan</td>
+          <td><a href="https://www.digitec.ch/de/s1/product/noctua-nf-a12x25-pwm-120mm-1x-pc-luefter-9161307">1 × Noctua NF-A12x25 PWM (120mm)</a></td>
+      </tr>
+      <tr>
+          <td>60 CHF</td>
+          <td>GPU</td>
+          <td><a href="https://www.digitec.ch/de/s1/product/zotac-geforce-gt-710-zone-edition-1gb-grafikkarte-7526609">Zotac GeForce GT 710 Zone Edition (1GB)</a></td>
+      </tr>
+  </tbody>
 </table>
 <p>Base total: 1671 CHF</p>
 <p><strong>Option A: Server extension</strong>. Because I had some parts lying around, and because I
 wanted to use my router for serving files (from large RAM cache/fast disk), I
 went with the following parts:</p>
 <table>
-<thead>
-<tr>
-<th>Price</th>
-<th>Type</th>
-<th>Article</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>309 CHF</td>
-<td>Disk</td>
-<td><a href="https://www.digitec.ch/de/s1/product/samsung-970-evo-plus-2000gb-m2-2280-ssd-10339167">Samsung 970 EVO Plus 2000GB, M.2 2280</a></td>
-</tr>
-<tr>
-<td>439 CHF</td>
-<td>RAM</td>
-<td><a href="https://www.digitec.ch/de/s1/product/kingston-hyperx-predator-rgb-4x-16gb-ddr4-3600-dimm-288-ram-14062636">64GB HyperX Predator RAM (4x, 16GB, DDR4-3600, DIMM 288)</a></td>
-</tr>
-<tr>
-<td>127 CHF</td>
-<td>Power supply</td>
-<td><a href="https://www.digitec.ch/de/s1/product/corsair-sf600-platinum-600w-pc-netzteil-9034178">Corsair SF600 Platinum (600W)</a></td>
-</tr>
-<tr>
-<td>14 CHF</td>
-<td>Power ext</td>
-<td><a href="https://www.digitec.ch/de/s1/product/silverstone-atx-24-24pin-verlaengerung-30cm-modding-sleeving-3456447">Silverstone ATX 24-24Pin Extension (30cm)</a></td>
-</tr>
-<tr>
-<td>10 CHF</td>
-<td>Power ext</td>
-<td><a href="https://www.digitec.ch/de/s1/product/silverstone-atx-extension-8-844pin-30cm-modding-sleeving-5808252">Silverstone ATX Extension 8-8(4+4)Pin (30cm)</a></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Price</th>
+          <th>Type</th>
+          <th>Article</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>309 CHF</td>
+          <td>Disk</td>
+          <td><a href="https://www.digitec.ch/de/s1/product/samsung-970-evo-plus-2000gb-m2-2280-ssd-10339167">Samsung 970 EVO Plus 2000GB, M.2 2280</a></td>
+      </tr>
+      <tr>
+          <td>439 CHF</td>
+          <td>RAM</td>
+          <td><a href="https://www.digitec.ch/de/s1/product/kingston-hyperx-predator-rgb-4x-16gb-ddr4-3600-dimm-288-ram-14062636">64GB HyperX Predator RAM (4x, 16GB, DDR4-3600, DIMM 288)</a></td>
+      </tr>
+      <tr>
+          <td>127 CHF</td>
+          <td>Power supply</td>
+          <td><a href="https://www.digitec.ch/de/s1/product/corsair-sf600-platinum-600w-pc-netzteil-9034178">Corsair SF600 Platinum (600W)</a></td>
+      </tr>
+      <tr>
+          <td>14 CHF</td>
+          <td>Power ext</td>
+          <td><a href="https://www.digitec.ch/de/s1/product/silverstone-atx-24-24pin-verlaengerung-30cm-modding-sleeving-3456447">Silverstone ATX 24-24Pin Extension (30cm)</a></td>
+      </tr>
+      <tr>
+          <td>10 CHF</td>
+          <td>Power ext</td>
+          <td><a href="https://www.digitec.ch/de/s1/product/silverstone-atx-extension-8-844pin-30cm-modding-sleeving-5808252">Silverstone ATX Extension 8-8(4+4)Pin (30cm)</a></td>
+      </tr>
+  </tbody>
 </table>
 <p>The Corsair SF600 power supply is not server-related, I just had it lying around. I’d
 recommend going for the Corsair RM650x *2018* (which has longer cables) instead.</p>
@@ -962,30 +964,30 @@ recommend going for the Corsair RM650x *2018* (which has longer cables) instead.
 <p><strong>Option B: Non-server (router only) alternative</strong>. If you’re <em>only</em> interested
 in routing, you can opt for cheaper low-end disk and RAM, for example:</p>
 <table>
-<thead>
-<tr>
-<th>Price</th>
-<th>Type</th>
-<th>Article</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>112 CHF</td>
-<td>Power supply</td>
-<td><a href="https://www.digitec.ch/de/s1/product/corsair-rm650x-2018-650w-pc-netzteil-8849945">Corsair RM650x *2018*</a></td>
-</tr>
-<tr>
-<td>33 CHF</td>
-<td>Disk</td>
-<td><a href="https://www.digitec.ch/de/s1/product/kingston-a400-120gb-m2-2280-ssd-10628775">Kingston A400 120GB M.2 SSD</a></td>
-</tr>
-<tr>
-<td>29 CHF</td>
-<td>RAM</td>
-<td><a href="https://www.digitec.ch/de/s1/product/crucial-ct4g4dfs8266-1x-4gb-ddr4-2666-dimm-288-ram-10447900">Crucial CT4G4DFS8266 4GB DDR4-2666 RAM</a></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Price</th>
+          <th>Type</th>
+          <th>Article</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>112 CHF</td>
+          <td>Power supply</td>
+          <td><a href="https://www.digitec.ch/de/s1/product/corsair-rm650x-2018-650w-pc-netzteil-8849945">Corsair RM650x *2018*</a></td>
+      </tr>
+      <tr>
+          <td>33 CHF</td>
+          <td>Disk</td>
+          <td><a href="https://www.digitec.ch/de/s1/product/kingston-a400-120gb-m2-2280-ssd-10628775">Kingston A400 120GB M.2 SSD</a></td>
+      </tr>
+      <tr>
+          <td>29 CHF</td>
+          <td>RAM</td>
+          <td><a href="https://www.digitec.ch/de/s1/product/crucial-ct4g4dfs8266-1x-4gb-ddr4-2666-dimm-288-ram-10447900">Crucial CT4G4DFS8266 4GB DDR4-2666 RAM</a></td>
+      </tr>
+  </tbody>
 </table>
 <p>Non-server total: 1845 CHF</p>
 <aside class="admonition note">
@@ -1060,8 +1062,8 @@ by ≈1W:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-11-power-network-link.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-11-power-network-link_hu6de13347ba7e4b65728687062274fcb9_385234_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-11-power-network-link_hu6de13347ba7e4b65728687062274fcb9_385234_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-11-power-network-link_hu6de13347ba7e4b65728687062274fcb9_385234_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-11-power-network-link_hu_a8c8b47c0963decd.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-11-power-network-link_hu_66569c182981f8d5.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-11-power-network-link_hu_a4416ec6acf84f92.jpg"
   alt="graph showing power consumption when enabling network links" title="graph showing power consumption when enabling network links"
   width="600"
   height="370"
@@ -1132,8 +1134,8 @@ forward them, so this should be the lightest load scenario.</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-06-bridging.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-06-bridging_hub0cd44ce68a3ab7a30e115765c391440_953670_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-06-bridging_hub0cd44ce68a3ab7a30e115765c391440_953670_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-06-bridging_hub0cd44ce68a3ab7a30e115765c391440_953670_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-06-bridging_hu_63b7dcab260ed5da.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-06-bridging_hu_5475bb54000ea962.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-06-bridging_hu_bdfd7c7fd26eb217.jpg"
   alt="bridging throughput" title="bridging throughput"
   width="600"
   height="315"
@@ -1171,8 +1173,8 @@ resources than 10 Gbit/s bridging:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-12-nat.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-12-nat_hu35fd080505f1a7e499871d8e450fe11e_573889_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-12-nat_hu35fd080505f1a7e499871d8e450fe11e_573889_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-12-nat_hu35fd080505f1a7e499871d8e450fe11e_573889_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-12-nat_hu_c9b0e45d03d5dcc2.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-12-nat_hu_75da3d2b3943c3d1.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-12-nat_hu_125a1d3a75d7946b.jpg"
   alt="NAT throughput" title="NAT throughput"
   width="600"
   height="250"
@@ -1209,8 +1211,8 @@ headroom even when all ports are maxed out!</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-14-four.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-14-four_hu8fa147dd23d5c3ee204bf85eaa69eccf_646280_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-14-four_hu8fa147dd23d5c3ee204bf85eaa69eccf_646280_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-14-four_hu8fa147dd23d5c3ee204bf85eaa69eccf_646280_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-14-four_hu_a26916d77b2d2437.jpg 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-14-four_hu_e917dd9e02ac8fc4.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-06-14-four_hu_819b175988e15a2f.jpg"
   alt="four 10 Gbit/s streams" title="four 10 Gbit/s streams"
   width="600"
   height="292"
@@ -1309,8 +1311,8 @@ spare. So that&rsquo;s what I&rsquo;ll end up buying :)</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-07-13-dpdk-test.png"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-07-13-dpdk-test_hu37b3af6bd791c24945ccf8bd92c24adc_280211_1200x0_resize_box_3.png 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-07-13-dpdk-test_hu37b3af6bd791c24945ccf8bd92c24adc_280211_1800x0_resize_box_3.png 3x"
-  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-07-13-dpdk-test_hu37b3af6bd791c24945ccf8bd92c24adc_280211_600x0_resize_box_3.png"
+  srcset="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-07-13-dpdk-test_hu_2a8808a0d5f67656.png 2x,https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-07-13-dpdk-test_hu_e3b4cf1bf6b18c6c.png 3x"
+  src="https://michael.stapelberg.ch/posts/2021-07-10-linux-25gbit-internet-router-pc-build/2021-07-13-dpdk-test_hu_d7b5585b28218787.png"
   alt="DPDK test" title="DPDK test"
   width="600"
   height="447"

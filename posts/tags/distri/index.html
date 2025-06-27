@@ -224,6 +224,7 @@
 The focus of this release lies on:
 a better developer experience, allowing users to debug any installed package without extra setup steps
 performance improvements in all areas (starting programs, building distri packages, generating distri images)
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-05-16-distri-release/">Read more →</a></span>
 	</p>
       </div>
@@ -250,7 +251,8 @@ performance improvements in all areas (starting programs, building distri packag
 	
 	<p>
 	  In distri, packages (e.g. emacs) are hermetic. By hermetic, I mean that the dependencies a package uses (e.g. libusb) don’t change, even when newer versions are installed.
-For example, if package libusb-amd64-1.0.22-7 is available at build time, the package will always use that same version, even after the newer libusb-amd64-1.
+For example, if package libusb-amd64-1.0.22-7 is available at build time, the package will always use that same version, even after the newer libusb-amd64-1.0.23-8 will be installed into the package store.
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-05-09-distri-hermetic-packages/">Read more →</a></span>
 	</p>
       </div>
@@ -285,7 +287,8 @@ For example, if package libusb-amd64-1.0.22-7 is available at build time, the pa
 	
 	<p>
 	  In case you are not yet familiar with why an initramfs (or initrd, or initial ramdisk) is typically used when starting Linux, let me quote the wikipedia definition:
-“[…] initrd is a scheme for loading a temporary root file system into memory, which may be used as part of the Linux startup process […] to make preparations before the real root file system can be mounted.
+“[…] initrd is a scheme for loading a temporary root file system into memory, which may be used as part of the Linux startup process […] to make preparations before the real root file system can be mounted.”
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-01-21-initramfs-from-scratch-golang/">Read more →</a></span>
 	</p>
       </div>
@@ -320,6 +323,7 @@ For example, if package libusb-amd64-1.0.22-7 is available at build time, the pa
 	
 	<p>
 	  Over the last year or so I have worked on a research linux distribution in my spare time. It’s not a distribution for researchers (like Scientific Linux), but my personal playground project to research linux distribution development, i.e. try out fresh ideas.
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-08-17-introducing-distri/">Read more →</a></span>
 	</p>
       </div>
@@ -377,7 +381,8 @@ For example, if package libusb-amd64-1.0.22-7 is available at build time, the pa
 	
 	
 	<p>
-	  Hooks are an extension feature provided by all package managers that are used in larger Linux distributions. For example, Debian uses apt, which has various maintainer scripts. Fedora uses rpm, which has scriptlets. Different package managers use different names for the concept, but all of them offer package maintainers the ability to run arbitrary code during package installation and upgrades.
+	  Hooks are an extension feature provided by all package managers that are used in larger Linux distributions. For example, Debian uses apt, which has various maintainer scripts. Fedora uses rpm, which has scriptlets. Different package managers use different names for the concept, but all of them offer package maintainers the ability to run arbitrary code during package installation and upgrades. Example hook use cases include adding daemon user accounts to your system (e.g. postgres), or generating/updating cache files.
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-07-20-hooks-and-triggers/">Read more →</a></span>
 	</p>
       </div>

@@ -214,6 +214,7 @@
 	
 	<p>
 	  I have recently started using the grobi program by Alexander Neumann again and was delighted to discover that it makes using my fiddly (but wonderful) Dell 32-inch 8K monitor (UP3218K) monitor much more convenient — I get a signal more quickly than with my previous, sleep-based approach.
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2025-05-10-grobi-x11-monitor-autoconfig/">Read more →</a></span>
 	</p>
       </div>
@@ -247,11 +248,12 @@
 	
 	
 	
-	<a href="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu3e0f2d5aa6180df20bb553ed5c6fa57b_1741005_200x200_fit_q75_box.jpg" width="200" height="131"/></a>
+	<a href="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_98b1740e35f6f5d5.jpg" width="200" height="131"/></a>
 	
 	<p>
 	  I was helping someone get my gokrazy/rsync implementation set up to synchronize RPKI data (used for securing BGP routing infrastructure), when we discovered that with the right invocation, my rsync receiver would just hang indefinitely.
 This was a quick problem to solve, but in the process, I realized that I should probably write down a few Go debugging tips I have come to appreciate over the years!
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/">Read more →</a></span>
 	</p>
       </div>
@@ -281,7 +283,8 @@ This was a quick problem to solve, but in the process, I realized that I should 
 	
 	
 	<p>
-	  I originally published this post in the Go blog, but am publishing this copy of it in my own blog as well for readers who don’t follow the Go blog. [Protocol Buffers (Protobuf) is Google&rsquo;s language-neutral data interchange format. See protobuf.
+	   I originally published this post in the Go blog, but am publishing this copy of it in my own blog as well for readers who don’t follow the Go blog. [Protocol Buffers (Protobuf) is Google&rsquo;s language-neutral data interchange format. See protobuf.dev.]
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2024-12-21-go-protobuf-opaque/">Read more →</a></span>
 	</p>
       </div>
@@ -311,11 +314,13 @@ This was a quick problem to solve, but in the process, I realized that I should 
 	
 	
 	
-	<a href="https://michael.stapelberg.ch/posts/2024-11-19-testing-with-go-and-postgresql-ephemeral-dbs/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2024-11-19-testing-with-go-and-postgresql-ephemeral-dbs/postgresql-elephant-featured_hu62d4951bd671b33ba4be0d77c8ae651f_183979_200x200_fit_box_3.png" width="194" height="200"/></a>
+	<a href="https://michael.stapelberg.ch/posts/2024-11-19-testing-with-go-and-postgresql-ephemeral-dbs/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2024-11-19-testing-with-go-and-postgresql-ephemeral-dbs/postgresql-elephant-featured_hu_efcc4467a0d52f48.png" width="194" height="200"/></a>
 	
 	<p>
-	  Let’s say you created a Go program that stores data in PostgreSQL — you installed PostgreSQL, wrote the Go code, and everything works; great!
-But after writing a test for your code, you wonder: how do you best provide PostgreSQL to your automated tests?
+	  
+Let’s say you created a Go program that stores data in PostgreSQL — you installed PostgreSQL, wrote the Go code, and everything works; great!
+But after writing a test for your code, you wonder: how do you best provide PostgreSQL to your automated tests? Do you start a separate PostgreSQL in a Docker container, for example, or do you maybe reuse your development PostgreSQL instance?
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2024-11-19-testing-with-go-and-postgresql-ephemeral-dbs/">Read more →</a></span>
 	</p>
       </div>
@@ -347,11 +352,12 @@ But after writing a test for your code, you wonder: how do you best provide Post
 	
 	
 	
-	<a href="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_huc92a382266793767583fa56b2a20c9d0_1575273_200x200_fit_q75_box.jpg" width="200" height="172"/></a>
+	<a href="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_b208734b3dba9111.jpg" width="200" height="172"/></a>
 	
 	<p>
 	  Not all bugs can easily be reproduced — sometimes, all you have is a core dump from a crashing program, but no idea about the triggering conditions of the bug yet.
 When using Go, we can use the delve debugger for core dump debugging, but I had trouble figuring out how to save byte slice contents (for example: the incoming request causing the crash) from memory into a file for further analysis, so this article walks you through how to do it.
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/">Read more →</a></span>
 	</p>
       </div>
@@ -381,11 +387,12 @@ When using Go, we can use the delve debugger for core dump debugging, but I had 
 	
 	
 	
-	<a href="https://michael.stapelberg.ch/posts/2023-01-15-gokrazy-instance-centric-config/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2023-01-15-gokrazy-instance-centric-config/gokrazy-logo_hu981a342c5dcf1f6aaac213cb11a773e7_100942_200x200_fit_box_3.png" width="150" height="200"/></a>
+	<a href="https://michael.stapelberg.ch/posts/2023-01-15-gokrazy-instance-centric-config/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2023-01-15-gokrazy-instance-centric-config/gokrazy-logo_hu_4aac4c25f7f93a64.png" width="150" height="200"/></a>
 	
 	<p>
 	  gokrazy is an appliance platform for Go programs: with just a few commands, you can deploy your Go program(s) on a Raspberry Pi or a (typically small) PC.
 I’m excited to let you know that gokrazy now comes with a re-designed gok command line tool and gokrazy instance configuration mechanism!
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2023-01-15-gokrazy-instance-centric-config/">Read more →</a></span>
 	</p>
       </div>
@@ -416,7 +423,8 @@ I’m excited to let you know that gokrazy now comes with a re-designed gok comm
 	
 	<p>
 	  When spawning a child program, for example in an integration test, it is often helpful to know when the child program is ready to receive requests.
-Delaying A brittle strategy is to just add a delay (say, time.Sleep(2 * time.Second)) and hope the child program finishes initialization in that time.
+Delaying A brittle strategy is to just add a delay (say, time.Sleep(2 * time.Second)) and hope the child program finishes initialization in that time. This is brittle because it depends on timing, so when the computer running the test is slow for whichever reason, your test starts failing. Many CI/CD systems have less capacity (and/or are more heavily utilized) than developer machines, so timeouts frequently need to be adjusted.
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-02-02-readiness-notifications-in-golang/">Read more →</a></span>
 	</p>
       </div>
@@ -451,7 +459,8 @@ Delaying A brittle strategy is to just add a delay (say, time.Sleep(2 * time.Sec
 	
 	<p>
 	  In case you are not yet familiar with why an initramfs (or initrd, or initial ramdisk) is typically used when starting Linux, let me quote the wikipedia definition:
-“[…] initrd is a scheme for loading a temporary root file system into memory, which may be used as part of the Linux startup process […] to make preparations before the real root file system can be mounted.
+“[…] initrd is a scheme for loading a temporary root file system into memory, which may be used as part of the Linux startup process […] to make preparations before the real root file system can be mounted.”
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-01-21-initramfs-from-scratch-golang/">Read more →</a></span>
 	</p>
       </div>
@@ -518,6 +527,7 @@ Delaying A brittle strategy is to just add a delay (say, time.Sleep(2 * time.Sec
 	
 	<p>
 	  Over the last year or so I have worked on a research linux distribution in my spare time. It’s not a distribution for researchers (like Scientific Linux), but my personal playground project to research linux distribution development, i.e. try out fresh ideas.
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-08-17-introducing-distri/">Read more →</a></span>
 	</p>
       </div>
@@ -549,7 +559,7 @@ Delaying A brittle strategy is to just add a delay (say, time.Sleep(2 * time.Sec
 	
 	
 	<p>
-	  In the pkg-go team, we are currently discussing which workflows we should standardize on. One of the considerations is what goes into the “upstream” Git branch of our repositories: should it track the upstream Git repository, or should it contain orig tarball imports?
+	   In the pkg-go team, we are currently discussing which workflows we should standardize on. One of the considerations is what goes into the “upstream” Git branch of our repositories: should it track the upstream Git repository, or should it contain orig tarball imports? 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-10-22-pkg-go-upstreams/">Read more →</a></span>
 	</p>
       </div>
@@ -581,6 +591,7 @@ Delaying A brittle strategy is to just add a delay (say, time.Sleep(2 * time.Sec
 	<p>
 	  I strive to respect everybody’s personal preferences, so I usually steer clear of debates about which is the best programming language, text editor or operating system.
 However, recently I was asked a couple of times why I like and use a lot of Go, so here is a coherent article to fill in the blanks of my ad-hoc in-person ramblings :-).
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-08-19-golang_favorite/">Read more →</a></span>
 	</p>
       </div>
@@ -610,7 +621,7 @@ However, recently I was asked a couple of times why I like and use a lot of Go, 
 	
 	
 	<p>
-	  NOTE that the documented assumptions about fsync skipping are incorrect in the code below. Prefer using the renameio package. Writing files is simple, but correctly writing files atomically in a performant way might not be as trivial as one might think.
+	   NOTE that the documented assumptions about fsync skipping are incorrect in the code below. Prefer using the renameio package. Writing files is simple, but correctly writing files atomically in a performant way might not be as trivial as one might think. Here’s an extensively commented function to atomically write compressed files (taken from debiman, the software behind manpages.debian.org): package main import ( "bufio" "compress/gzip" "io" "io/ioutil" "log" "os" "path/filepath" ) func tempDir(dest string) string { tempdir := os.Getenv("TMPDIR") if tempdir == "" { // Convenient for development: decreases the chance that we // cannot move files due to TMPDIR being on a different file // system than dest. tempdir = filepath.Dir(dest) } return tempdir } func writeAtomically(dest string, compress bool, write func(w io.Writer) error) (err error) { f, err := ioutil.TempFile(tempDir(dest), "atomic-") if err != nil { return err } defer func() { // Clean up (best effort) in case we are returning with an error: if err != nil { // Prevent file descriptor leaks. f.Close() // Remove the tempfile to avoid filling up the file system. os.Remove(f.Name()) } }() // Use a buffered writer to minimize write(2) syscalls. bufw := bufio.NewWriter(f) w := io.Writer(bufw) var gzipw *gzip.Writer if compress { // NOTE: gzip’s decompression phase takes the same time, // regardless of compression level. Hence, we invest the // maximum CPU time once to achieve the best compression. gzipw, err = gzip.NewWriterLevel(bufw, gzip.BestCompression) if err != nil { return err } defer gzipw.Close() w = gzipw } if err := write(w); err != nil { return err } if compress { if err := gzipw.Close(); err != nil { return err } } if err := bufw.Flush(); err != nil { return err } // Chmod the file world-readable (ioutil.TempFile creates files with // mode 0600) before renaming. if err := f.Chmod(0644); err != nil { return err } // fsync(2) after fchmod(2) orders writes as per // https://lwn.net/Articles/270891/. Can be skipped for performance // for idempotent applications (which only ever atomically write new // files and tolerate file loss) on an ordered file systems. ext3, // ext4, XFS, Btrfs, ZFS are ordered by default. f.Sync() if err := f.Close(); err != nil { return err } return os.Rename(f.Name(), dest) } func main() { if err := writeAtomically("demo.txt.gz", true, func(w io.Writer) error { _, err := w.Write([]byte("demo")) return err }); err != nil { log.Fatal(err) } } rsync(1) will fail when it lacks permission to read files. Hence, if you are synchronizing a repository of files while updating it, you’ll need to set TMPDIR to point to a directory on the same file system (for rename(2) to work) which is not covered by your rsync(1) invocation. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-01-28-golang_atomically_writing/">Read more →</a></span>
 	</p>
       </div>
@@ -640,7 +651,7 @@ However, recently I was asked a couple of times why I like and use a lot of Go, 
 	
 	
 	<p>
-	  After launching Debian Code Search, sometimes its index-backend processes would crash when presented with some class of queries. The queries itself did not show an interesting pattern, and in fact, it wasn’t their fault. Looking at the system’s journal, I noticed that the processes were crashing with SIGILL, the signal when an illegal instruction for the CPU is encountered: Nov 07 00:11:33 codesearch index-backend[10517]: SIGILL: illegal instruction Nov 07 00:11:33 codesearch index-backend[10517]: PC=0x42558d Interestingly, on my workstation, I could not reproduce this issue.
+	   After launching Debian Code Search, sometimes its index-backend processes would crash when presented with some class of queries. The queries itself did not show an interesting pattern, and in fact, it wasn’t their fault. Looking at the system’s journal, I noticed that the processes were crashing with SIGILL, the signal when an illegal instruction for the CPU is encountered: 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-11-07-sigill_golang/">Read more →</a></span>
 	</p>
       </div>
@@ -670,7 +681,7 @@ However, recently I was asked a couple of times why I like and use a lot of Go, 
 	
 	
 	<p>
-	  There is official documentation on the Go C language interface (or cgo in golang terminology), but the things it covers are relatively simple. I have used cgo recently in a real-world project and I want to share my experiences in this short article, that is, how to use types properly (avoiding the void* equivalent unsafe.
+	   There is official documentation on the Go C language interface (or cgo in golang terminology), but the things it covers are relatively simple. I have used cgo recently in a real-world project and I want to share my experiences in this short article, that is, how to use types properly (avoiding the void* equivalent unsafe.Pointer) and how to deal with Go’s data structures such as slices. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-09-27-cgo_uint32/">Read more →</a></span>
 	</p>
       </div>

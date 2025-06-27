@@ -9,7 +9,8 @@
   <meta property="og:title" content="Debian Code Search: OpenAPI now available">
   <meta property="og:description" content="Debian Code Search now offers an OpenAPI-based API!
 Various developers have created ad-hoc client libraries based on how the web interface works.
-The goal of offering an OpenAPI-based API is to provide developers with automatically generated client libraries for a large number of programming languages, that target a stable interface independent of the web interface’s implementation details.">
+The goal of offering an OpenAPI-based API is to provide developers with automatically generated client libraries for a large number of programming languages, that target a stable interface independent of the web interface’s implementation details.
+">
   
   
   
@@ -20,7 +21,8 @@ The goal of offering an OpenAPI-based API is to provide developers with automati
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
   <meta name="description" content="Debian Code Search now offers an OpenAPI-based API!
 Various developers have created ad-hoc client libraries based on how the web interface works.
-The goal of offering an OpenAPI-based API is to provide developers with automatically generated client libraries for a large number of programming languages, that target a stable interface independent of the web interface’s implementation details.">
+The goal of offering an OpenAPI-based API is to provide developers with automatically generated client libraries for a large number of programming languages, that target a stable interface independent of the web interface’s implementation details.
+">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2021-03-06-debian-code-search-openapi/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -244,19 +246,19 @@ client for the Debian Code Search OpenAPI, run a query, and aggregate the result
 </span></span><span style="display:flex;"><span>	client <span style="color:#666">:=</span> openapiclient.<span style="color:#06287e">NewAPIClient</span>(cfg)
 </span></span><span style="display:flex;"><span>	ctx <span style="color:#666">:=</span> context.<span style="color:#06287e">Background</span>()
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Search through the full Debian Code Search corpus, blocking until all
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// results are available:
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	results, _, err <span style="color:#666">:=</span> client.SearchApi.<span style="color:#06287e">Search</span>(ctx, <span style="color:#4070a0">&#34;fmt.Sprint(err)&#34;</span>, <span style="color:#666">&amp;</span>openapiclient.SearchApiSearchOpts{
-</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// Literal searches are faster and do not require escaping special
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// characters, regular expression searches are more powerful.
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		MatchMode: optional.<span style="color:#06287e">NewString</span>(<span style="color:#4070a0">&#34;literal&#34;</span>),
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Search through the full Debian Code Search corpus, blocking until all</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// results are available:</span>
+</span></span><span style="display:flex;"><span>	results, _, err <span style="color:#666">:=</span> client.SearchApi.<span style="color:#06287e">Search</span>(ctx, <span style="color:#4070a0">&#34;fmt.Sprint(err)&#34;</span>, <span style="color:#666">&amp;</span>openapiclient.SearchApiSearchOpts{
+</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// Literal searches are faster and do not require escaping special</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// characters, regular expression searches are more powerful.</span>
+</span></span><span style="display:flex;"><span>		MatchMode: optional.<span style="color:#06287e">NewString</span>(<span style="color:#4070a0">&#34;literal&#34;</span>),
 </span></span><span style="display:flex;"><span>	})
 </span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
 </span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> err
 </span></span><span style="display:flex;"><span>	}
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Print to stdout a CSV file with the path and number of occurrences:
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	wr <span style="color:#666">:=</span> csv.<span style="color:#06287e">NewWriter</span>(os.Stdout)
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Print to stdout a CSV file with the path and number of occurrences:</span>
+</span></span><span style="display:flex;"><span>	wr <span style="color:#666">:=</span> csv.<span style="color:#06287e">NewWriter</span>(os.Stdout)
 </span></span><span style="display:flex;"><span>	header <span style="color:#666">:=</span> []<span style="color:#902000">string</span>{<span style="color:#4070a0">&#34;path&#34;</span>, <span style="color:#4070a0">&#34;number of occurrences&#34;</span>}
 </span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> wr.<span style="color:#06287e">Write</span>(header); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
 </span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> err
@@ -270,8 +272,8 @@ client for the Debian Code Search OpenAPI, run a query, and aggregate the result
 </span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> !ok {
 </span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">continue</span>
 </span></span><span style="display:flex;"><span>		}
-</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// Print one CSV record per path:
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#007020">delete</span>(occurrences, result.Path)
+</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// Print one CSV record per path:</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#007020">delete</span>(occurrences, result.Path)
 </span></span><span style="display:flex;"><span>		record <span style="color:#666">:=</span> []<span style="color:#902000">string</span>{result.Path, strconv.<span style="color:#06287e">Itoa</span>(o)}
 </span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> wr.<span style="color:#06287e">Write</span>(record); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
 </span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">return</span> err
@@ -289,26 +291,26 @@ client for the Debian Code Search OpenAPI, run a query, and aggregate the result
 <p>I’m aware of the following <a href="https://codesearch.debian.net/thirdparty">third-party projects using Debian Code
 Search</a>:</p>
 <table>
-<thead>
-<tr>
-<th>Tool</th>
-<th>Migration status</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="https://salsa.debian.org/debian/codesearch-cli">Debian Code Search CLI tool</a></td>
-<td><a href="https://salsa.debian.org/debian/codesearch-cli/-/merge_requests/1">Updated to OpenAPI</a></td>
-</tr>
-<tr>
-<td><a href="https://salsa.debian.org/aviau/identify-incomplete-xs-go-import-path">identify-incomplete-xs-go-import-path</a></td>
-<td><a href="https://salsa.debian.org/aviau/identify-incomplete-xs-go-import-path/-/merge_requests/1">Update pending</a></td>
-</tr>
-<tr>
-<td><a href="https://gitlab.gnome.org/nbenitez/gnome-codesearch">gnome-codesearch</a></td>
-<td>makes no API queries</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Tool</th>
+          <th>Migration status</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><a href="https://salsa.debian.org/debian/codesearch-cli">Debian Code Search CLI tool</a></td>
+          <td><a href="https://salsa.debian.org/debian/codesearch-cli/-/merge_requests/1">Updated to OpenAPI</a></td>
+      </tr>
+      <tr>
+          <td><a href="https://salsa.debian.org/aviau/identify-incomplete-xs-go-import-path">identify-incomplete-xs-go-import-path</a></td>
+          <td><a href="https://salsa.debian.org/aviau/identify-incomplete-xs-go-import-path/-/merge_requests/1">Update pending</a></td>
+      </tr>
+      <tr>
+          <td><a href="https://gitlab.gnome.org/nbenitez/gnome-codesearch">gnome-codesearch</a></td>
+          <td>makes no API queries</td>
+      </tr>
+  </tbody>
 </table>
 <p>If you find any others, please point them to this post in case they are not
 using Debian Code Search’s OpenAPI yet.</p>

@@ -8,12 +8,14 @@
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="rsync, article 3: How does rsync work?">
   <meta property="og:description" content="This post is the third article in a series of blog posts about rsync, see the Series Overview.
-With rsync up and running, it’s time to take a peek under the hood of rsync to better understand how it works.">
+With rsync up and running, it’s time to take a peek under the hood of rsync to better understand how it works.
+How does rsync work? When talking about the rsync protocol, we need to distinguish between:
+">
   
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-logical-view-featured_hu1b95d2c95d5a13b0da7a794463b790a4_117059_200x200_fit_box_3.png">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-logical-view-featured_hu_fd4b08433a4b420a.png">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -21,7 +23,9 @@ With rsync up and running, it’s time to take a peek under the hood of rsync to
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
   <meta name="description" content="This post is the third article in a series of blog posts about rsync, see the Series Overview.
-With rsync up and running, it’s time to take a peek under the hood of rsync to better understand how it works.">
+With rsync up and running, it’s time to take a peek under the hood of rsync to better understand how it works.
+How does rsync work? When talking about the rsync protocol, we need to distinguish between:
+">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -293,8 +297,8 @@ to pin-point any bottlenecks:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hua2f50278895cfbee4dc18c7ea60b6d4a_2093260_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hua2f50278895cfbee4dc18c7ea60b6d4a_2093260_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hua2f50278895cfbee4dc18c7ea60b6d4a_2093260_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hu_1e6cb5c3a0d53421.jpg 2x,https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hu_81f1353f7140ad17.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hu_ab177c5f9e8ee16.jpg"
   
   width="600"
   height="331"

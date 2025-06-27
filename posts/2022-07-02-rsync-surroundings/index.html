@@ -8,12 +8,13 @@
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="rsync, article 2: Surroundings">
   <meta property="og:description" content="This post is the second article in a series of blog posts about rsync, see the Series Overview.
-Now that we know what to use rsync for, how can we best integrate rsync into monitoring and alerting, and on which operating systems does it work?">
+Now that we know what to use rsync for, how can we best integrate rsync into monitoring and alerting, and on which operating systems does it work?
+">
   
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu49255cbd0611171ac9ea093d82565708_603964_200x200_fit_q75_box.jpg">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu_e7ef9bb4e85b2e5b.jpg">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -21,7 +22,8 @@ Now that we know what to use rsync for, how can we best integrate rsync into mon
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
   <meta name="description" content="This post is the second article in a series of blog posts about rsync, see the Series Overview.
-Now that we know what to use rsync for, how can we best integrate rsync into monitoring and alerting, and on which operating systems does it work?">
+Now that we know what to use rsync for, how can we best integrate rsync into monitoring and alerting, and on which operating systems does it work?
+">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -291,8 +293,8 @@ running on a (different) server at an ISP.</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu49255cbd0611171ac9ea093d82565708_603964_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu49255cbd0611171ac9ea093d82565708_603964_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu49255cbd0611171ac9ea093d82565708_603964_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu_f49f29f3abecbb80.jpg 2x,https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu_2f7d6622da1f2afd.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu_f9be59dd23c35f90.jpg"
   alt="rsync grafana dashboard" title="rsync grafana dashboard"
   width="600"
   height="469"
@@ -327,45 +329,45 @@ and OpenBSD comes with a BSD-licensed implementation called
 <p>On Windows, you can use the <a href="https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux">Windows Subsystem for
 Linux</a>.</p>
 <table>
-<thead>
-<tr>
-<th>Operating System</th>
-<th>Implementation</th>
-<th>Version</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>FreeBSD 13.1 (ports)</td>
-<td>tridge</td>
-<td><a href="https://www.freebsd.org/cgi/man.cgi?query=rsync&amp;manpath=FreeBSD+13.1-RELEASE+and+Ports">3.2.3</a></td>
-</tr>
-<tr>
-<td>OpenBSD 7.1</td>
-<td>openrsync</td>
-<td>(7.1)</td>
-</tr>
-<tr>
-<td>OpenBSD 7.1 (ports)</td>
-<td>tridge</td>
-<td><a href="https://openports.se/net/rsync">3.2.4</a></td>
-</tr>
-<tr>
-<td>NetBSD 9.2 (pkgsrc)</td>
-<td>tridge</td>
-<td><a href="https://ftp.netbsd.org/pub/pkgsrc/current/pkgsrc/net/rsync/index.html">3.2.4</a></td>
-</tr>
-<tr>
-<td>Linux</td>
-<td>tridge</td>
-<td><a href="https://repology.org/project/rsync/versions">repology</a></td>
-</tr>
-<tr>
-<td>macOS</td>
-<td>tridge</td>
-<td><a href="https://www.unix.com/man-page/osx/1/rsync/">2.6.9</a></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Operating System</th>
+          <th>Implementation</th>
+          <th>Version</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>FreeBSD 13.1 (ports)</td>
+          <td>tridge</td>
+          <td><a href="https://www.freebsd.org/cgi/man.cgi?query=rsync&amp;manpath=FreeBSD+13.1-RELEASE+and+Ports">3.2.3</a></td>
+      </tr>
+      <tr>
+          <td>OpenBSD 7.1</td>
+          <td>openrsync</td>
+          <td>(7.1)</td>
+      </tr>
+      <tr>
+          <td>OpenBSD 7.1 (ports)</td>
+          <td>tridge</td>
+          <td><a href="https://openports.se/net/rsync">3.2.4</a></td>
+      </tr>
+      <tr>
+          <td>NetBSD 9.2 (pkgsrc)</td>
+          <td>tridge</td>
+          <td><a href="https://ftp.netbsd.org/pub/pkgsrc/current/pkgsrc/net/rsync/index.html">3.2.4</a></td>
+      </tr>
+      <tr>
+          <td>Linux</td>
+          <td>tridge</td>
+          <td><a href="https://repology.org/project/rsync/versions">repology</a></td>
+      </tr>
+      <tr>
+          <td>macOS</td>
+          <td>tridge</td>
+          <td><a href="https://www.unix.com/man-page/osx/1/rsync/">2.6.9</a></td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="next-up">Next Up</h2>
 <p>The third article in this series is <a href="../2022-07-02-rsync-how-does-it-work/">rsync, article 3: How does rsync

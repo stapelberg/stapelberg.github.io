@@ -166,8 +166,8 @@ stack trace in a more colorful and much shorter version:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu3e0f2d5aa6180df20bb553ed5c6fa57b_1741005_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu3e0f2d5aa6180df20bb553ed5c6fa57b_1741005_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu3e0f2d5aa6180df20bb553ed5c6fa57b_1741005_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_c04249176648ab38.jpg 2x,https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_8da191a897747329.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_e61da31f617a2260.jpg"
   
   width="600"
   height="394"
@@ -544,8 +544,8 @@ use core dump debugging!</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_huc92a382266793767583fa56b2a20c9d0_1575273_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_huc92a382266793767583fa56b2a20c9d0_1575273_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_huc92a382266793767583fa56b2a20c9d0_1575273_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_a8173ece4c3f11e6.jpg 2x,https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_beea9b0751b668d7.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_604c37f3566e3ffa.jpg"
   alt="Core memory" title="Core memory"
   width="600"
   height="516"
@@ -746,8 +746,8 @@ called), but then how do we produce a core dump from our own handler?</p>
 <code>signal_unix.go</code> and <a href="https://cs.opensource.google/go/go/+/refs/tags/go1.23.2:src/runtime/signal_unix.go;l=938">sends signal <code>SIGABRT</code> with the <code>dieFromSignal</code>
 function</a>
 to the current thread:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">//go:nosplit
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">crash</span>() {
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">//go:nosplit</span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">crash</span>() {
 </span></span><span style="display:flex;"><span>        <span style="color:#06287e">dieFromSignal</span>(_SIGABRT)
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>The default action for <code>SIGABRT</code> is to “terminate the process and dump core”,
@@ -763,12 +763,12 @@ see <a href="https://manpages.debian.org/signal.7"><code>signal(7)</code></a>
 </span></span><span style="display:flex;"><span>					<span style="color:#007020">panic</span>(fmt.<span style="color:#06287e">Sprintf</span>(<span style="color:#4070a0">&#34;could not find own process (pid %d): %v&#34;</span>, syscall.<span style="color:#06287e">Getpid</span>(), err))
 </span></span><span style="display:flex;"><span>				}
 </span></span><span style="display:flex;"><span>				proc.<span style="color:#06287e">Signal</span>(syscall.SIGABRT)
-</span></span><span style="display:flex;"><span>				<span style="color:#60a0b0;font-style:italic">// Ensure the stack triggering the core dump sticks around
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>				proc.<span style="color:#06287e">Wait</span>()
+</span></span><span style="display:flex;"><span>				<span style="color:#60a0b0;font-style:italic">// Ensure the stack triggering the core dump sticks around</span>
+</span></span><span style="display:flex;"><span>				proc.<span style="color:#06287e">Wait</span>()
 </span></span><span style="display:flex;"><span>			}
 </span></span><span style="display:flex;"><span>		}()
-</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// …buggy handler code goes here; for illustration we panic
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#007020">panic</span>(<span style="color:#4070a0">&#34;this should result in a core dump&#34;</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// …buggy handler code goes here; for illustration we panic</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#007020">panic</span>(<span style="color:#4070a0">&#34;this should result in a core dump&#34;</span>)
 </span></span><span style="display:flex;"><span>	})
 </span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Fatal</span>(http.<span style="color:#06287e">ListenAndServe</span>(<span style="color:#4070a0">&#34;:8080&#34;</span>, <span style="color:#007020;font-weight:bold">nil</span>))
 </span></span><span style="display:flex;"><span>}
@@ -1262,8 +1262,8 @@ memory.</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-text.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-text_hufb947737200a71a40def7b55daedda4a_651685_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-text_hufb947737200a71a40def7b55daedda4a_651685_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-text_hufb947737200a71a40def7b55daedda4a_651685_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-text_hu_e53e841704bbad8e.jpg 2x,https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-text_hu_12be45f01fbce110.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-text_hu_566cfd8106263dff.jpg"
   
   width="600"
   height="589"
@@ -1320,8 +1320,8 @@ back using <code>layout regs</code>. I’m not sure if there’s an easier way.<
 
 
 <a href="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured_hucd7e1463fcc59a2458cbdaeb4c4f836a_674116_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured_hucd7e1463fcc59a2458cbdaeb4c4f836a_674116_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured_hucd7e1463fcc59a2458cbdaeb4c4f836a_674116_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured_hu_47f2f78d59fa5cf1.jpg 2x,https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured_hu_2b9035be25bb5308.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured_hu_6b635090913012bc.jpg"
   
   width="600"
   height="583"
@@ -1362,8 +1362,8 @@ enabled</a>:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-emacs.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-emacs_huea0ff23d44f02f4aa1fe1640e7e9fb8a_801503_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-emacs_huea0ff23d44f02f4aa1fe1640e7e9fb8a_801503_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-emacs_huea0ff23d44f02f4aa1fe1640e7e9fb8a_801503_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-emacs_hu_d89d1ec45f8765a6.jpg 2x,https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-emacs_hu_b44b68175d66edb5.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-emacs_hu_85dbec5c64f962eb.jpg"
   
   width="600"
   height="584"

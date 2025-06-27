@@ -289,101 +289,101 @@ outputs.</p>
 actual performance, but your experience may vary.</p>
 <h4 id="ack-small-perl-program">ack (small Perl program)</h4>
 <table>
-<thead>
-<tr>
-<th>distribution</th>
-<th>package manager</th>
-<th>data</th>
-<th>wall-clock time</th>
-<th>rate</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Fedora</td>
-<td>dnf</td>
-<td>84 MB</td>
-<td>25s</td>
-<td>3.4 MB/s</td>
-</tr>
-<tr>
-<td>NixOS</td>
-<td>Nix</td>
-<td>15 MB</td>
-<td>7s</td>
-<td>2.3 MB/s</td>
-</tr>
-<tr>
-<td>Debian</td>
-<td>apt</td>
-<td>16 MB</td>
-<td>3s</td>
-<td>4.9 MB/s</td>
-</tr>
-<tr>
-<td>Arch Linux</td>
-<td>pacman</td>
-<td>25 MB</td>
-<td>1s</td>
-<td>18.4 MB/s</td>
-</tr>
-<tr>
-<td>Alpine</td>
-<td>apk</td>
-<td>10 MB</td>
-<td>1s</td>
-<td>11.9 MB/s</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>distribution</th>
+          <th>package manager</th>
+          <th>data</th>
+          <th>wall-clock time</th>
+          <th>rate</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Fedora</td>
+          <td>dnf</td>
+          <td>84 MB</td>
+          <td>25s</td>
+          <td>3.4 MB/s</td>
+      </tr>
+      <tr>
+          <td>NixOS</td>
+          <td>Nix</td>
+          <td>15 MB</td>
+          <td>7s</td>
+          <td>2.3 MB/s</td>
+      </tr>
+      <tr>
+          <td>Debian</td>
+          <td>apt</td>
+          <td>16 MB</td>
+          <td>3s</td>
+          <td>4.9 MB/s</td>
+      </tr>
+      <tr>
+          <td>Arch Linux</td>
+          <td>pacman</td>
+          <td>25 MB</td>
+          <td>1s</td>
+          <td>18.4 MB/s</td>
+      </tr>
+      <tr>
+          <td>Alpine</td>
+          <td>apk</td>
+          <td>10 MB</td>
+          <td>1s</td>
+          <td>11.9 MB/s</td>
+      </tr>
+  </tbody>
 </table>
 <h4 id="qemu-large-c-program">qemu (large C program)</h4>
 <table>
-<thead>
-<tr>
-<th>distribution</th>
-<th>package manager</th>
-<th>data</th>
-<th>wall-clock time</th>
-<th>rate</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Fedora</td>
-<td>dnf</td>
-<td>350 MB</td>
-<td>56s</td>
-<td>6.25 MB/s</td>
-</tr>
-<tr>
-<td>Debian</td>
-<td>apt</td>
-<td>256 MB</td>
-<td>39s</td>
-<td>6.5 MB/s</td>
-</tr>
-<tr>
-<td>NixOS</td>
-<td>Nix</td>
-<td>251 MB</td>
-<td>36s</td>
-<td>6.8 MB/s</td>
-</tr>
-<tr>
-<td>Arch Linux</td>
-<td>pacman</td>
-<td>128 MB</td>
-<td>10s</td>
-<td>12.1 MB/s</td>
-</tr>
-<tr>
-<td>Alpine</td>
-<td>apk</td>
-<td>34 MB</td>
-<td>1.8s</td>
-<td>18.6 MB/s</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>distribution</th>
+          <th>package manager</th>
+          <th>data</th>
+          <th>wall-clock time</th>
+          <th>rate</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Fedora</td>
+          <td>dnf</td>
+          <td>350 MB</td>
+          <td>56s</td>
+          <td>6.25 MB/s</td>
+      </tr>
+      <tr>
+          <td>Debian</td>
+          <td>apt</td>
+          <td>256 MB</td>
+          <td>39s</td>
+          <td>6.5 MB/s</td>
+      </tr>
+      <tr>
+          <td>NixOS</td>
+          <td>Nix</td>
+          <td>251 MB</td>
+          <td>36s</td>
+          <td>6.8 MB/s</td>
+      </tr>
+      <tr>
+          <td>Arch Linux</td>
+          <td>pacman</td>
+          <td>128 MB</td>
+          <td>10s</td>
+          <td>12.1 MB/s</td>
+      </tr>
+      <tr>
+          <td>Alpine</td>
+          <td>apk</td>
+          <td>34 MB</td>
+          <td>1.8s</td>
+          <td>18.6 MB/s</td>
+      </tr>
+  </tbody>
 </table>
 <p>(Looking for older measurements? See <a href="#appendix-b">Appendix B (2019)</a> or <a href="#appendix-c">Appendix C (2020)</a>).</p>
 <p>The difference between the slowest and fastest package managers is 30x!</p>
@@ -431,88 +431,88 @@ manager could likely beat <code>apk</code>’s performance. It could, for exampl
 systems</a>
 fare:</p>
 <table>
-<thead>
-<tr>
-<th>name</th>
-<th>scope</th>
-<th>package file format</th>
-<th>hooks/triggers</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>AppImage</td>
-<td>apps</td>
-<td>image: ISO9660, SquashFS</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="https://snapcraft.io/">snappy</a></td>
-<td>apps</td>
-<td>image: SquashFS</td>
-<td>yes: <a href="https://docs.snapcraft.io/build-snaps/hooks">hooks</a></td>
-</tr>
-<tr>
-<td>FlatPak</td>
-<td>apps</td>
-<td>archive: <a href="https://ostree.readthedocs.io/en/latest/">OSTree</a></td>
-<td>no</td>
-</tr>
-<tr>
-<td>0install</td>
-<td>apps</td>
-<td>archive: tar.bz2</td>
-<td>no</td>
-</tr>
-<tr>
-<td>nix, guix</td>
-<td>distro</td>
-<td>archive: nar.{bz2,xz}</td>
-<td><a href="https://github.com/NixOS/nixos/blob/master/modules/system/activation/activation-script.nix">activation script</a></td>
-</tr>
-<tr>
-<td>dpkg</td>
-<td>distro</td>
-<td>archive: tar.{gz,xz,bz2} in ar(1)</td>
-<td>yes</td>
-</tr>
-<tr>
-<td>rpm</td>
-<td>distro</td>
-<td>archive: cpio.{bz2,lz,xz}</td>
-<td><a href="https://fedoraproject.org/wiki/Packaging:Scriptlets">scriptlets</a></td>
-</tr>
-<tr>
-<td>pacman</td>
-<td>distro</td>
-<td>archive: tar.xz</td>
-<td><a href="https://wiki.archlinux.org/index.php/PKGBUILD#install">install</a></td>
-</tr>
-<tr>
-<td>slackware</td>
-<td>distro</td>
-<td>archive: tar.{gz,xz}</td>
-<td>yes: doinst.sh</td>
-</tr>
-<tr>
-<td>apk</td>
-<td>distro</td>
-<td>archive: tar.gz</td>
-<td>yes: .post-install</td>
-</tr>
-<tr>
-<td>Entropy</td>
-<td>distro</td>
-<td>archive: tar.bz2</td>
-<td>yes</td>
-</tr>
-<tr>
-<td>ipkg, opkg</td>
-<td>distro</td>
-<td>archive: tar{,.gz}</td>
-<td>yes</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>name</th>
+          <th>scope</th>
+          <th>package file format</th>
+          <th>hooks/triggers</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>AppImage</td>
+          <td>apps</td>
+          <td>image: ISO9660, SquashFS</td>
+          <td>no</td>
+      </tr>
+      <tr>
+          <td><a href="https://snapcraft.io/">snappy</a></td>
+          <td>apps</td>
+          <td>image: SquashFS</td>
+          <td>yes: <a href="https://docs.snapcraft.io/build-snaps/hooks">hooks</a></td>
+      </tr>
+      <tr>
+          <td>FlatPak</td>
+          <td>apps</td>
+          <td>archive: <a href="https://ostree.readthedocs.io/en/latest/">OSTree</a></td>
+          <td>no</td>
+      </tr>
+      <tr>
+          <td>0install</td>
+          <td>apps</td>
+          <td>archive: tar.bz2</td>
+          <td>no</td>
+      </tr>
+      <tr>
+          <td>nix, guix</td>
+          <td>distro</td>
+          <td>archive: nar.{bz2,xz}</td>
+          <td><a href="https://github.com/NixOS/nixos/blob/master/modules/system/activation/activation-script.nix">activation script</a></td>
+      </tr>
+      <tr>
+          <td>dpkg</td>
+          <td>distro</td>
+          <td>archive: tar.{gz,xz,bz2} in ar(1)</td>
+          <td>yes</td>
+      </tr>
+      <tr>
+          <td>rpm</td>
+          <td>distro</td>
+          <td>archive: cpio.{bz2,lz,xz}</td>
+          <td><a href="https://fedoraproject.org/wiki/Packaging:Scriptlets">scriptlets</a></td>
+      </tr>
+      <tr>
+          <td>pacman</td>
+          <td>distro</td>
+          <td>archive: tar.xz</td>
+          <td><a href="https://wiki.archlinux.org/index.php/PKGBUILD#install">install</a></td>
+      </tr>
+      <tr>
+          <td>slackware</td>
+          <td>distro</td>
+          <td>archive: tar.{gz,xz}</td>
+          <td>yes: doinst.sh</td>
+      </tr>
+      <tr>
+          <td>apk</td>
+          <td>distro</td>
+          <td>archive: tar.gz</td>
+          <td>yes: .post-install</td>
+      </tr>
+      <tr>
+          <td>Entropy</td>
+          <td>distro</td>
+          <td>archive: tar.bz2</td>
+          <td>yes</td>
+      </tr>
+      <tr>
+          <td>ipkg, opkg</td>
+          <td>distro</td>
+          <td>archive: tar{,.gz}</td>
+          <td>yes</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="conclusion">Conclusion</h3>
 <p>As per the <a href="#current-landscape">current landscape</a>, there is no

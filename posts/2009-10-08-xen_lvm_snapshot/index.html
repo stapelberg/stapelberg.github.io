@@ -7,7 +7,13 @@
 
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="Xen-Server sichern mit LVM-Snapshots">
-  <meta property="og:description" content="Wenn man einen Server mit Xen virtualisiert, steht man beim Einrichten des Backups vor der Frage, wie man das Backup organisiert. Hier gibt es (mindestens) die folgenden Ansätze: Man betrachtet jede virtuelle Instanz als eigenständig und installiert dort jeweils die Backupsoftware.">
+  <meta property="og:description" content=" Wenn man einen Server mit Xen virtualisiert, steht man beim Einrichten des Backups vor der Frage, wie man das Backup organisiert. Hier gibt es (mindestens) die folgenden Ansätze: Man betrachtet jede virtuelle Instanz als eigenständig und installiert dort jeweils die Backupsoftware.
+Vorteil: Keine zusätzliche/neue Konfiguration nötig für den Host-Rechner.
+Nachteil: Pro Instanz ein Backup-Job nötig, je nach Anzahl der Instanzen wird es schnell unübersichtlich. Man fertigt vor dem Backup einen kompletten Snapshot der Instanzen an und sichert diesen dann auf dem Hostrechner.
+Vorteil: Weniger Konfigurationsaufwand
+Nachteil: Zeitaufwändig, Speicherplatzaufwändig, Wiederherstellung einzelner Dateien kompliziert/zeitaufwändig. Man benutzt LVM und fertigt einen Snapshot vor der Sicherung an, den man dann ins Dateisystem einhängt und einfach den kompletten Hostrechner sichert.
+Vorteil: Spart Zeit, Speicherplatz, ermöglicht Wiederherstellung einzelner Dateien
+Nachteil: Je nach Konfiguration ist es etwas umständlich, die Partitionen aus den einzelnen Logical Volumes zu mounten. Ich möchte in diesem Artikel näher auf die dritte Methode eingehen, da bei allen anderen die Nachteile überwiegen. Weiterhin bietet sich die Methode mit den LVM-Snapshots ohnehin an wenn man seine Instanzen in jeweils einem Logical Volume aufgesetzt hat (damit man später bei Bedarf die Größe ändern kann – das ist bei einer herkömmlichen Installation deutlich komplizierter). ">
   
   
   
@@ -16,7 +22,13 @@
   <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
-  <meta name="description" content="Wenn man einen Server mit Xen virtualisiert, steht man beim Einrichten des Backups vor der Frage, wie man das Backup organisiert. Hier gibt es (mindestens) die folgenden Ansätze: Man betrachtet jede virtuelle Instanz als eigenständig und installiert dort jeweils die Backupsoftware.">
+  <meta name="description" content=" Wenn man einen Server mit Xen virtualisiert, steht man beim Einrichten des Backups vor der Frage, wie man das Backup organisiert. Hier gibt es (mindestens) die folgenden Ansätze: Man betrachtet jede virtuelle Instanz als eigenständig und installiert dort jeweils die Backupsoftware.
+Vorteil: Keine zusätzliche/neue Konfiguration nötig für den Host-Rechner.
+Nachteil: Pro Instanz ein Backup-Job nötig, je nach Anzahl der Instanzen wird es schnell unübersichtlich. Man fertigt vor dem Backup einen kompletten Snapshot der Instanzen an und sichert diesen dann auf dem Hostrechner.
+Vorteil: Weniger Konfigurationsaufwand
+Nachteil: Zeitaufwändig, Speicherplatzaufwändig, Wiederherstellung einzelner Dateien kompliziert/zeitaufwändig. Man benutzt LVM und fertigt einen Snapshot vor der Sicherung an, den man dann ins Dateisystem einhängt und einfach den kompletten Hostrechner sichert.
+Vorteil: Spart Zeit, Speicherplatz, ermöglicht Wiederherstellung einzelner Dateien
+Nachteil: Je nach Konfiguration ist es etwas umständlich, die Partitionen aus den einzelnen Logical Volumes zu mounten. Ich möchte in diesem Artikel näher auf die dritte Methode eingehen, da bei allen anderen die Nachteile überwiegen. Weiterhin bietet sich die Methode mit den LVM-Snapshots ohnehin an wenn man seine Instanzen in jeweils einem Logical Volume aufgesetzt hat (damit man später bei Bedarf die Größe ändern kann – das ist bei einer herkömmlichen Installation deutlich komplizierter). ">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2009-10-08-xen_lvm_snapshot/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">

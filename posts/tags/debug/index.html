@@ -215,11 +215,12 @@
 	
 	
 	
-	<a href="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu3e0f2d5aa6180df20bb553ed5c6fa57b_1741005_200x200_fit_q75_box.jpg" width="200" height="131"/></a>
+	<a href="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_98b1740e35f6f5d5.jpg" width="200" height="131"/></a>
 	
 	<p>
 	  I was helping someone get my gokrazy/rsync implementation set up to synchronize RPKI data (used for securing BGP routing infrastructure), when we discovered that with the right invocation, my rsync receiver would just hang indefinitely.
 This was a quick problem to solve, but in the process, I realized that I should probably write down a few Go debugging tips I have come to appreciate over the years!
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/">Read more →</a></span>
 	</p>
       </div>
@@ -251,11 +252,12 @@ This was a quick problem to solve, but in the process, I realized that I should 
 	
 	
 	
-	<a href="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_huc92a382266793767583fa56b2a20c9d0_1575273_200x200_fit_q75_box.jpg" width="200" height="172"/></a>
+	<a href="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_b208734b3dba9111.jpg" width="200" height="172"/></a>
 	
 	<p>
 	  Not all bugs can easily be reproduced — sometimes, all you have is a core dump from a crashing program, but no idea about the triggering conditions of the bug yet.
 When using Go, we can use the delve debugger for core dump debugging, but I had trouble figuring out how to save byte slice contents (for example: the incoming request causing the crash) from memory into a file for further analysis, so this article walks you through how to do it.
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/">Read more →</a></span>
 	</p>
       </div>
@@ -285,11 +287,12 @@ When using Go, we can use the delve debugger for core dump debugging, but I had 
 	
 	
 	
-	<a href="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured_hucd7e1463fcc59a2458cbdaeb4c4f836a_674116_200x200_fit_q75_box.jpg" width="200" height="194"/></a>
+	<a href="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured_hu_cb2caabab532d8a6.jpg" width="200" height="194"/></a>
 	
 	<p>
 	  I maintain two builds of the Linux kernel, a linux/arm64 build for gokrazy, my Go appliance platform, which started out on the Raspberry Pi, and then a linux/amd64 one for router7, which runs on PCs.
 The update process for both of these builds is entirely automated, meaning new Linux kernel releases are automatically tested and merged, but recently the continuous integration testing failed to automatically merge Linux 6․7 — this article is about tracking down the root cause of that failure.
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/">Read more →</a></span>
 	</p>
       </div>

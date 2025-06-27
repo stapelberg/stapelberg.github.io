@@ -215,6 +215,7 @@
 	  Debian Code Search now offers an OpenAPI-based API!
 Various developers have created ad-hoc client libraries based on how the web interface works.
 The goal of offering an OpenAPI-based API is to provide developers with automatically generated client libraries for a large number of programming languages, that target a stable interface independent of the web interface’s implementation details.
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2021-03-06-debian-code-search-openapi/">Read more →</a></span>
 	</p>
       </div>
@@ -250,6 +251,7 @@ The goal of offering an OpenAPI-based API is to provide developers with automati
 The focus of this release lies on:
 a better developer experience, allowing users to debug any installed package without extra setup steps
 performance improvements in all areas (starting programs, building distri packages, generating distri images)
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-05-16-distri-release/">Read more →</a></span>
 	</p>
       </div>
@@ -276,7 +278,8 @@ performance improvements in all areas (starting programs, building distri packag
 	
 	<p>
 	  In distri, packages (e.g. emacs) are hermetic. By hermetic, I mean that the dependencies a package uses (e.g. libusb) don’t change, even when newer versions are installed.
-For example, if package libusb-amd64-1.0.22-7 is available at build time, the package will always use that same version, even after the newer libusb-amd64-1.
+For example, if package libusb-amd64-1.0.22-7 is available at build time, the package will always use that same version, even after the newer libusb-amd64-1.0.23-8 will be installed into the package store.
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-05-09-distri-hermetic-packages/">Read more →</a></span>
 	</p>
       </div>
@@ -311,7 +314,8 @@ For example, if package libusb-amd64-1.0.22-7 is available at build time, the pa
 	
 	<p>
 	  In case you are not yet familiar with why an initramfs (or initrd, or initial ramdisk) is typically used when starting Linux, let me quote the wikipedia definition:
-“[…] initrd is a scheme for loading a temporary root file system into memory, which may be used as part of the Linux startup process […] to make preparations before the real root file system can be mounted.
+“[…] initrd is a scheme for loading a temporary root file system into memory, which may be used as part of the Linux startup process […] to make preparations before the real root file system can be mounted.”
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-01-21-initramfs-from-scratch-golang/">Read more →</a></span>
 	</p>
       </div>
@@ -378,6 +382,7 @@ For example, if package libusb-amd64-1.0.22-7 is available at build time, the pa
 	
 	<p>
 	  Over the last year or so I have worked on a research linux distribution in my spare time. It’s not a distribution for researchers (like Scientific Linux), but my personal playground project to research linux distribution development, i.e. try out fresh ideas.
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-08-17-introducing-distri/">Read more →</a></span>
 	</p>
       </div>
@@ -435,7 +440,8 @@ For example, if package libusb-amd64-1.0.22-7 is available at build time, the pa
 	
 	
 	<p>
-	  Hooks are an extension feature provided by all package managers that are used in larger Linux distributions. For example, Debian uses apt, which has various maintainer scripts. Fedora uses rpm, which has scriptlets. Different package managers use different names for the concept, but all of them offer package maintainers the ability to run arbitrary code during package installation and upgrades.
+	  Hooks are an extension feature provided by all package managers that are used in larger Linux distributions. For example, Debian uses apt, which has various maintainer scripts. Fedora uses rpm, which has scriptlets. Different package managers use different names for the concept, but all of them offer package maintainers the ability to run arbitrary code during package installation and upgrades. Example hook use cases include adding daemon user accounts to your system (e.g. postgres), or generating/updating cache files.
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-07-20-hooks-and-triggers/">Read more →</a></span>
 	</p>
       </div>
@@ -466,6 +472,7 @@ For example, if package libusb-amd64-1.0.22-7 is available at build time, the pa
 	
 	<p>
 	  In the i3 projects, we have always tried hard to avoid optional dependencies. There are a number of reasons behind it, and as I have recently encountered some of the downsides of optional dependencies firsthand, I summarized my thoughts in this article.
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-05-23-optional-dependencies/">Read more →</a></span>
 	</p>
       </div>
@@ -496,6 +503,7 @@ For example, if package libusb-amd64-1.0.22-7 is available at build time, the pa
 	
 	<p>
 	  This post is hard to write, both in the emotional sense but also in the “I would have written a shorter letter, but I didn’t have the time” sense. Hence, please assume the best of intentions when reading it—it is not my intention to make anyone feel bad about their contributions, but rather to provide some insight into why my frustration level ultimately exceeded the threshold.
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-03-10-debian-winding-down/">Read more →</a></span>
 	</p>
       </div>
@@ -527,6 +535,7 @@ For example, if package libusb-amd64-1.0.22-7 is available at build time, the pa
 	<p>
 	  Recently, a user reported that they don’t see window titles in i3 when running i3 on a Raspberry Pi with Debian.
 I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and was able to reproduce the issue.
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-02-15-debian-debugging-devex/">Read more →</a></span>
 	</p>
       </div>
@@ -551,6 +560,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	<p>
 	  Motivation I have recently been looking into speeding up Debian Code Search. As a quick reminder, search engines answer queries by consulting an inverted index: a map from term to documents containing that term (called a “posting list”). See the Debian Code Search Bachelor Thesis (PDF) for a lot more details.
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-02-05-turbopfor-analysis/">Read more →</a></span>
 	</p>
       </div>
@@ -580,7 +590,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  This is taken care of: Gunnar Wolf has taken on maintenance of the Raspberry Pi image. Thank you! (Cross-posting this message I sent to pkg-raspi-maintainers for broader visibility.) I started building Raspberry Pi images because I thought there should be an easy, official way to install Debian on the Raspberry Pi.
+	   This is taken care of: Gunnar Wolf has taken on maintenance of the Raspberry Pi image. Thank you! (Cross-posting this message I sent to pkg-raspi-maintainers for broader visibility.) I started building Raspberry Pi images because I thought there should be an easy, official way to install Debian on the Raspberry Pi. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-06-03-raspi3-looking-for-maintainer/">Read more →</a></span>
 	</p>
       </div>
@@ -610,7 +620,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  I have heard a number of times that sbuild is too hard to get started with, and hence people don’t use it. To reduce hurdles from using/contributing to Debian, I wanted to make sbuild easier to set up. sbuild ≥ 0.
+	   I have heard a number of times that sbuild is too hard to get started with, and hence people don’t use it. To reduce hurdles from using/contributing to Debian, I wanted to make sbuild easier to set up. sbuild ≥ 0.74.0 provides a Debian package called sbuild-debian-developer-setup. Once installed, run the sbuild-debian-developer-setup(1) command to create a chroot suitable for building packages for Debian unstable. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-03-19-sbuild-debian-developer-setup/">Read more →</a></span>
 	</p>
       </div>
@@ -634,7 +644,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  dput-ng ≥ 1.16 contains two usability changes which make uploading easier: When no arguments are specified, dput-ng auto-selects the most recent .changes file (with confirmation). Instead of erroring out when detecting an unsigned .changes file, debsign(1) is invoked to sign the .
+	   dput-ng ≥ 1.16 contains two usability changes which make uploading easier: When no arguments are specified, dput-ng auto-selects the most recent .changes file (with confirmation). Instead of erroring out when detecting an unsigned .changes file, debsign(1) is invoked to sign the .changes file before proceeding. With these changes, after building a package, you just need to type dput (in the correct directory of course) to sign and upload it. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-03-10-dput-usability/">Read more →</a></span>
 	</p>
       </div>
@@ -664,7 +674,10 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  If you want to follow along at home, clone this repository: % GBP_CONF_FILES=:debian/gbp.conf gbp clone https://anonscm.debian.org/git/pkg-go/packages/golang-github-go-macaron-inject.git Now, in the golang-github-go-macaron-inject directory, I’m aware of three ways to obtain an orig tarball (please correct me if there are more): Run gbp buildpackage, creating an orig tarball from git (upstream/0.
+	   If you want to follow along at home, clone this repository: % GBP_CONF_FILES=:debian/gbp.conf gbp clone https://anonscm.debian.org/git/pkg-go/packages/golang-github-go-macaron-inject.git Now, in the golang-github-go-macaron-inject directory, I’m aware of three ways to obtain an orig tarball (please correct me if there are more): Run gbp buildpackage, creating an orig tarball from git (upstream/0.0_git20160627.0.d8a0b86)
+The resulting sha1sum is d085a04b7b35856be24f8cc4a9a6d9799cdb59b4. Run pristine-tar checkout
+The resulting sha1sum is d51575c0b00db5fe2bbf8eea65bc7c4f767ee954. Run origtargz
+The resulting sha1sum is d51575c0b00db5fe2bbf8eea65bc7c4f767ee954. Have a look at the archive’s golang-github-go-macaron-inject_0.0~git20160627.0.d8a0b86-2.dsc, however: the file entry orig tarball reads: 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-01-28-pristine-tar/">Read more →</a></span>
 	</p>
       </div>
@@ -688,7 +701,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  I previously wrote about my Debian buster preview image for the Raspberry Pi 3. Now, I’m publishing an updated version, containing the following changes: WiFi works out of the box. Use e.g. ip link set dev wlan0 up, and iwlist wlan0 scan.
+	   I previously wrote about my Debian buster preview image for the Raspberry Pi 3. Now, I’m publishing an updated version, containing the following changes: WiFi works out of the box. Use e.g. ip link set dev wlan0 up, and iwlist wlan0 scan. Kernel boot messages are now displayed on an attached monitor (if any), not just on the serial console. Root file system resizing will now not touch the partition table if the user modified it. The image is now compressed using xz, reducing its size to 170M. As before, the image is built with vmdb2, the successor to vmdebootstrap. The input files are available at https://github.com/Debian/raspi3-image-spec. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2018-01-08-raspberry-pi-3/">Read more →</a></span>
 	</p>
       </div>
@@ -720,7 +733,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  In the pkg-go team, we are currently discussing which workflows we should standardize on. One of the considerations is what goes into the “upstream” Git branch of our repositories: should it track the upstream Git repository, or should it contain orig tarball imports?
+	   In the pkg-go team, we are currently discussing which workflows we should standardize on. One of the considerations is what goes into the “upstream” Git branch of our repositories: should it track the upstream Git repository, or should it contain orig tarball imports? 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-10-22-pkg-go-upstreams/">Read more →</a></span>
 	</p>
       </div>
@@ -744,7 +757,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  UNIX distributions used to come with the system source code in /usr/src. This is a concept which fascinates me: if you want to change something in any part of your system, just make your change in the corresponding directory, recomile, reinstall, and you can immediately see your changes in action.
+	   UNIX distributions used to come with the system source code in /usr/src. This is a concept which fascinates me: if you want to change something in any part of your system, just make your change in the corresponding directory, recomile, reinstall, and you can immediately see your changes in action. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-10-21-pk4/">Read more →</a></span>
 	</p>
       </div>
@@ -768,7 +781,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  I previously wrote about my Debian stretch preview image for the Raspberry Pi 3. Now, I’m publishing an updated version, containing the following changes: SSH host keys are generated on first boot. Old kernel versions are now removed from /boot/firmware when purged.
+	   I previously wrote about my Debian stretch preview image for the Raspberry Pi 3. Now, I’m publishing an updated version, containing the following changes: SSH host keys are generated on first boot. Old kernel versions are now removed from /boot/firmware when purged. The image is built with vmdb2, the successor to vmdebootstrap. The input files are available at https://github.com/Debian/raspi3-image-spec. The image uses the linux-image-arm64 4.13.4-3 kernel, which provides HDMI output. The image is now compressed using bzip2, reducing its size to 220M. A couple of issues remain, notably the lack of WiFi and bluetooth support (see wiki:RaspberryPi3 for details. Any help with fixing these issues is very welcome! 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-10-08-raspberry-pi-3/">Read more →</a></span>
 	</p>
       </div>
@@ -798,7 +811,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  On 2017-01-18, I announced that https://manpages.debian.org had been modernized. Let me catch you up on a few things which happened in the meantime: Debian experimental was added to manpages.debian.org. I was surprised to learn that adding experimental only required 52MB of disk usage.
+	   On 2017-01-18, I announced that https://manpages.debian.org had been modernized. Let me catch you up on a few things which happened in the meantime: Debian experimental was added to manpages.debian.org. I was surprised to learn that adding experimental only required 52MB of disk usage. Further, Debian contrib was added after realizing that contrib licenses are compatible with the DFSG. Indentation in some code examples was fixed upstream in mandoc. Address-bar search should now also work in Firefox, which apparently requires a title attribute on the opensearch XML file reference. manpages now specify their language in the HTML tag so that search engines can offer users the most appropriate version of the manpage. I contributed mandocd(8) to the mandoc project, which debiman now uses for significantly faster manpage conversion (useful for disaster recovery/development). An entire run previously took 2 hours on my workstation. With this change, it takes merely 22 minutes. The effects are even more pronounced on manziarly, the VM behind manpages.debian.org. Thanks to Peter Palfrader (weasel) from the Debian System Administrators (DSA) team, manpages.debian.org is now serving its manpages (and most of its redirects) from Debian’s static mirroring infrastructure. That way, planned maintenance won’t result in service downtime. I contributed README.static-mirroring.txt, which describes the infrastructure in more detail. The list above is not complete, but rather a selection of things I found worth pointing out to the larger public. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-04-09-manpages-debian-org-news/">Read more →</a></span>
 	</p>
       </div>
@@ -828,7 +841,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  I previously wrote about my Debian stretch preview image for the Raspberry Pi 3. Now, I’m publishing an updated version, containing the following changes: A new version of the upstream firmware makes the Ethernet MAC address persist across reboots. Updated initramfs files (without updating the kernel) are now correctly copied to the VFAT boot partition.
+	   I previously wrote about my Debian stretch preview image for the Raspberry Pi 3. Now, I’m publishing an updated version, containing the following changes: A new version of the upstream firmware makes the Ethernet MAC address persist across reboots. Updated initramfs files (without updating the kernel) are now correctly copied to the VFAT boot partition. The initramfs’s file system check now works as the required fsck binaries are now available. The root file system is now resized to fill the available space of the SD card on first boot. SSH access is now enabled, restricted via iptables to local network source addresses only. The image uses the linux-image-4.9.0-2-arm64 4.9.13-1 kernel. A couple of issues remain, notably the lack of HDMI, WiFi and bluetooth support (see wiki:RaspberryPi3 for details. Any help with fixing these issues is very welcome! 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-03-22-raspberry-pi-3/">Read more →</a></span>
 	</p>
       </div>
@@ -858,7 +871,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  https://manpages.debian.org has been modernized! We have just launched a major update to our manpage repository. What used to be served via a CGI script is now a statically generated website, and therefore blazingly fast. While we were at it, we have restructured the paths so that we can serve all manpages, even those whose name conflicts with other binary packages (e.
+	   https://manpages.debian.org has been modernized! We have just launched a major update to our manpage repository. What used to be served via a CGI script is now a statically generated website, and therefore blazingly fast. While we were at it, we have restructured the paths so that we can serve all manpages, even those whose name conflicts with other binary packages (e.g. crontab(5) from cron, bcron or systemd-cron). Don’t worry: the old URLs are redirected correctly. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-01-18-manpages-debian-org/">Read more →</a></span>
 	</p>
       </div>
@@ -888,7 +901,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  Personally, I find the packaging tools which are available in Debian far too complex. To better understand the options we have, I created a diagram of tools which are frequently used, only covering the build step (i.e. no post-build quality assurance checks or packaging-time helpers): When I was first introduced to Debian packaging, people recommended I use pbuilder.
+	   Personally, I find the packaging tools which are available in Debian far too complex. To better understand the options we have, I created a diagram of tools which are frequently used, only covering the build step (i.e. no post-build quality assurance checks or packaging-time helpers): 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-11-25-build-tools/">Read more →</a></span>
 	</p>
       </div>
@@ -912,7 +925,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  The last couple of days, I worked on getting Debian to run on the Raspberry Pi 3. Thanks to the work of many talented people, the Linux kernel in version 4.8 is _almost_ ready to run on the Raspberry Pi 3.
+	   The last couple of days, I worked on getting Debian to run on the Raspberry Pi 3. Thanks to the work of many talented people, the Linux kernel in version 4.8 is _almost_ ready to run on the Raspberry Pi 3. The only missing thing is the bcm2835 MMC driver, which is required to read the root file system from the SD card. I’ve asked our maintainers to include the patch for the time being. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-11-24-raspberry-pi-3/">Read more →</a></span>
 	</p>
       </div>
@@ -942,10 +955,11 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	
-	<a href="https://michael.stapelberg.ch/posts/2016-08-08-debian-codesearch-latency/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2016-08-08-debian-codesearch-latency/2016-08-08-dcs-before_huc0cd959d5bde36e210184881f13990ae_342853_200x200_fit_box_3.png" width="200" height="89"/></a>
+	<a href="https://michael.stapelberg.ch/posts/2016-08-08-debian-codesearch-latency/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2016-08-08-debian-codesearch-latency/2016-08-08-dcs-before_hu_a703b9fa350ecc87.png" width="200" height="89"/></a>
 	
 	<p>
 	  A while ago, it occurred to me that querying Debian Code Search seemed slow, which surprised me because I previously spent quite some effort on making it faster, see Debian Code Search Instant and Taming the latency tail for the most recent substantial architecture overhaul and related optimizations.
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-08-08-debian-codesearch-latency/">Read more →</a></span>
 	</p>
       </div>
@@ -975,7 +989,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  Recently, I was wondering why I was pushing off accepting contributions in Debian for longer than in other projects. It occurred to me that the effort to accept a contribution in Debian is way higher than in other FOSS projects.
+	   Recently, I was wondering why I was pushing off accepting contributions in Debian for longer than in other projects. It occurred to me that the effort to accept a contribution in Debian is way higher than in other FOSS projects. My remaining FOSS projects are on GitHub, where I can just click the “Merge” button after deciding a contribution looks good. In Debian, merging is actually a lot of work: I need to clone the repository, configure it, merge the patch, update the changelog, build and upload. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-07-17-mergebot/">Read more →</a></span>
 	</p>
       </div>
@@ -1005,7 +1019,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  When uploading a new library package which changes its API/behavior in a subtle way, typically you will only hear about the downstream breakage after you’ve uploaded the new library package (via bug reports telling you that your package FTBFS, fails to build from source).
+	   When uploading a new library package which changes its API/behavior in a subtle way, typically you will only hear about the downstream breakage after you’ve uploaded the new library package (via bug reports telling you that your package FTBFS, fails to build from source). 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2015-10-12-ratt/">Read more →</a></span>
 	</p>
       </div>
@@ -1035,7 +1049,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  Recently, the pkg-go team has been quite busy, uploading dozens of Go library packages in order to be able to package gcsfuse (a user-space file system for interacting with Google Cloud Storage) and InfluxDB (an open-source distributed time series database).
+	   Recently, the pkg-go team has been quite busy, uploading dozens of Go library packages in order to be able to package gcsfuse (a user-space file system for interacting with Google Cloud Storage) and InfluxDB (an open-source distributed time series database). Packaging Go library packages (!) is a fairly repetitive process, so before starting my work on the dependencies for gcsfuse, I started writing a tool called dh-make-golang. Just like dh-make itself, the goal is to automatically create (almost) an entire Debian package. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2015-07-27-dh-make-golang/">Read more →</a></span>
 	</p>
       </div>
@@ -1065,7 +1079,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  It’s been a couple of weeks since I’ve launched Debian Code Search Instant, so people have had the chance to use it for a while and that gives me plenty of data points to look at :-). For every query, I log the search term itself as well as the duration the query took to execute.
+	   It’s been a couple of weeks since I’ve launched Debian Code Search Instant, so people have had the chance to use it for a while and that gives me plenty of data points to look at :-). For every query, I log the search term itself as well as the duration the query took to execute. That way, I can easily identify queries that take a long time and see why that is. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-12-23-code-search-taming-the-latency-tail/">Read more →</a></span>
 	</p>
       </div>
@@ -1089,7 +1103,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  For the last few months, I have been working on a new version of Debian Code Search, and today it’s going live! I call it Debian Code Search Instant, for multiple reasons, see below. A lot faster The new Debian Code Search is still hosted by Rackspace (thank you!
+	   For the last few months, I have been working on a new version of Debian Code Search, and today it’s going live! I call it Debian Code Search Instant, for multiple reasons, see below. A lot faster The new Debian Code Search is still hosted by Rackspace (thank you!), but our new architecture finally allows us to use their “Performance Cloud Servers” hardware generation. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-12-03-debian-code-search-instant/">Read more →</a></span>
 	</p>
       </div>
@@ -1119,7 +1133,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  I’ve been working on a significant rearchitecture of Debian Code Search during the last few months (off and on, as time permits). This will enable us to provide a couple of features that have been often requested but were not possible with the old architecture, such as grouping search results by Debian source package (#1 feature request) and performing queries that take a longer time than the default execution limit of a minute (#2 feature request).
+	   I’ve been working on a significant rearchitecture of Debian Code Search during the last few months (off and on, as time permits). This will enable us to provide a couple of features that have been often requested but were not possible with the old architecture, such as grouping search results by Debian source package (#1 feature request) and performing queries that take a longer time than the default execution limit of a minute (#2 feature request). Oh, and it also will be a lot faster :-). 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-11-09-upcoming-debian-codesearch/">Read more →</a></span>
 	</p>
       </div>
@@ -1149,7 +1163,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  Thomas Habets has blogged about using your TPM (Trusted Platform Module) for SSH authentication a few weeks ago. We worked together to get his package simple-tpm-pk11 into Debian, and it has just arrived in unstable :-). Using simple-tpm-pk11, you can let your TPM generate a key, which you then can use for SSH authentication.
+	   Thomas Habets has blogged about using your TPM (Trusted Platform Module) for SSH authentication a few weeks ago. We worked together to get his package simple-tpm-pk11 into Debian, and it has just arrived in unstable :-). Using simple-tpm-pk11, you can let your TPM generate a key, which you then can use for SSH authentication. This key will never leave the TPM, so it is safer than having your key on the filesystem (e.g. ~/.ssh/id_rsa), since file system access is not enough to steal your key anymore. Instead, you’ll need remote code execution. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-02-19-ssh-keys-in-your-tpm/">Read more →</a></span>
 	</p>
       </div>
@@ -1179,7 +1193,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  As explained in more detail in my my last blog post, Rackspace is providing hosting for Debian Code Search. For those of you who don’t know, Rackspace is a cloud company that provides (among other services) a public cloud based on OpenStack.
+	   As explained in more detail in my my last blog post, Rackspace is providing hosting for Debian Code Search. For those of you who don’t know, Rackspace is a cloud company that provides (among other services) a public cloud based on OpenStack. That means you can easily (and programmatically, if you want) bring up virtual servers, block storage volumes, configure the network between them, etc. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-01-17-debmirror-rackspace/">Read more →</a></span>
 	</p>
       </div>
@@ -1209,7 +1223,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  For a number of weeks now, I have been forwarding traffic being sent to codesearch.debian.net to an instance of Debian Code Search running at Rackspace’s public cloud offering. I feel like it’s overdue to announce how they have been supporting the project and what that means.
+	   For a number of weeks now, I have been forwarding traffic being sent to codesearch.debian.net to an instance of Debian Code Search running at Rackspace’s public cloud offering. I feel like it’s overdue to announce how they have been supporting the project and what that means. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-12-25-codesearch-rackspace/">Read more →</a></span>
 	</p>
       </div>
@@ -1239,7 +1253,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  Richi’s post about the pdiff-by-default agony resonates with me a lot. On EVERY Debian installation I have ever done in the last few years, without any exceptions, I have turned off pdiffs. Even on all the oddball cases (Raspberry Pi, account on a remote machine, …) where I don’t run my install-configs script, I have ended up turning off pdiffs eventually, because it is just so insanely slow on modern internet connections.
+	   Richi’s post about the pdiff-by-default agony resonates with me a lot. On EVERY Debian installation I have ever done in the last few years, without any exceptions, I have turned off pdiffs. Even on all the oddball cases (Raspberry Pi, account on a remote machine, …) where I don’t run my install-configs script, I have ended up turning off pdiffs eventually, because it is just so insanely slow on modern internet connections. And by modern I mean even the DSL link my parents’ place has since 14 years. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-11-27-pdiffs/">Read more →</a></span>
 	</p>
       </div>
@@ -1263,7 +1277,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  Thanks to Axel Beckert (abe@), 12 people interested in Debian met last Tuesday in Zürich and celebrated the start of our monthly Debian meetup. New faces are always very welcome. If you live in Zürich, or if you’re visiting, please feel free to attend our meetup — no registration necessary.
+	   Thanks to Axel Beckert (abe@), 12 people interested in Debian met last Tuesday in Zürich and celebrated the start of our monthly Debian meetup. New faces are always very welcome. If you live in Zürich, or if you’re visiting, please feel free to attend our meetup — no registration necessary. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-11-07-debian-meetup/">Read more →</a></span>
 	</p>
       </div>
@@ -1293,7 +1307,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  During DebConf, Asheesh presented the idea of using git instead of the file system for storing the contents of Debian Code Search. The hope was that it would lead to fewer disk seeks and less data due to gits delta-encoding.
+	   During DebConf, Asheesh presented the idea of using git instead of the file system for storing the contents of Debian Code Search. The hope was that it would lead to fewer disk seeks and less data due to gits delta-encoding. Maybe the reduction would be big enough that enough data could be held in RAM to allow for fast retrieval. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-08-30-git-performance/">Read more →</a></span>
 	</p>
       </div>
@@ -1317,7 +1331,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  I gave two talks at this year’s DebConf, both about systemd. A huge thanks goes to the video team for their excellent work and putting up the videos that quickly! Find the recordings and slides here: Making your package work with systemd (508 MiB ogv) (Slides (≈ 230 KiB PDF)) systemd myths debunked!
+	   I gave two talks at this year’s DebConf, both about systemd. A huge thanks goes to the video team for their excellent work and putting up the videos that quickly! Find the recordings and slides here: Making your package work with systemd (508 MiB ogv) (Slides (≈ 230 KiB PDF)) systemd myths debunked! (456 MiB ogv) (Slides (≈ 230 KiB PDF)) 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-08-16-debconf-talks/">Read more →</a></span>
 	</p>
       </div>
@@ -1341,7 +1355,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  I will arrive at DebConf 2013 on Sunday afternoon. In case you are interested in Go (the programming language), systemd, i3 or getting your package reviewed, please talk to me! :-) Looking forward to meeting many of you in real life.
+	   I will arrive at DebConf 2013 on Sunday afternoon. In case you are interested in Go (the programming language), systemd, i3 or getting your package reviewed, please talk to me! :-) Looking forward to meeting many of you in real life. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-08-08-debconf/">Read more →</a></span>
 	</p>
       </div>
@@ -1371,7 +1385,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  Good news, everyone! dh-golang is now in Debian unstable. With this debhelper addon, packaging software written in Go is very simple. Have a look at the example/ directory in dh-golang to see how it is meant to be used. Essentially, export the DH_GOPKG variable containing the canonical upstream location of the package (e.
+	   Good news, everyone! dh-golang is now in Debian unstable. With this debhelper addon, packaging software written in Go is very simple. Have a look at the example/ directory in dh-golang to see how it is meant to be used. Essentially, export the DH_GOPKG variable containing the canonical upstream location of the package (e.g. github.com/stapelberg/godebiancontrol) and then use dh $@ --buildsystem=golang --with=golang. That’s it! 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-31-dh-golang/">Read more →</a></span>
 	</p>
       </div>
@@ -1395,7 +1409,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  Posting this on behalf of a friend of mine in the hope that you can help: I’ve failed several times now to find a suitable WLAN USB dongle that works out of the box on Debian testing. Often manufacturers change the chipsets without changing the version numbers, the product pages are incomplete or even state wrong information.
+	   Posting this on behalf of a friend of mine in the hope that you can help: I’ve failed several times now to find a suitable WLAN USB dongle that works out of the box on Debian testing. Often manufacturers change the chipsets without changing the version numbers, the product pages are incomplete or even state wrong information. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-25-usb-wlan-dongle/">Read more →</a></span>
 	</p>
       </div>
@@ -1419,7 +1433,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  As of today, systemd 204 is available in Debian experimental. If you are interested in systemd, please install it and report any issues to the BTS — merely reporting them on IRC is not sufficient, we need to have them in the BTS so we don’t forget about them.
+	   As of today, systemd 204 is available in Debian experimental. If you are interested in systemd, please install it and report any issues to the BTS — merely reporting them on IRC is not sufficient, we need to have them in the BTS so we don’t forget about them. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-20-systemd-204-in-experimental/">Read more →</a></span>
 	</p>
       </div>
@@ -1443,7 +1457,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  Sometimes, people show up in our IRC channel #debian-systemd or on our mailing list pkg-systemd-maintainers@lists.alioth.debian.org and ask how they can help. This blog post answers that question. First of all, whatever you end up doing, please coordinate with us first!
+	   Sometimes, people show up in our IRC channel #debian-systemd or on our mailing list pkg-systemd-maintainers@lists.alioth.debian.org and ask how they can help. This blog post answers that question. First of all, whatever you end up doing, please coordinate with us first! Saying hi in our IRC channel or on our mailing list and explaining what you intend to do is all we ask for. In the past, people have filed bug reports with service files that are not idiomatic, and we really need to avoid that. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-14-systemd-how-to-help/">Read more →</a></span>
 	</p>
       </div>
@@ -1467,7 +1481,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  The German computer magazine c't has covered Debsources in its most recent edition (c't 16/2013). In that article, they also state: Debsources integriert auch eine Code-Suche, allerdings werden lediglich die Quellen des Unstable-Zweigs durchsucht, der zirka ein Drittel des Quellcodes von Debsources ausmacht.
+	   The German computer magazine c't has covered Debsources in its most recent edition (c't 16/2013). In that article, they also state: Debsources integriert auch eine Code-Suche, allerdings werden lediglich die Quellen des Unstable-Zweigs durchsucht, der zirka ein Drittel des Quellcodes von Debsources ausmacht. This loosely translates to: 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-14-searchable-packages/">Read more →</a></span>
 	</p>
       </div>
@@ -1491,7 +1505,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  This blog post is the third of a series of posts dealing with the results of the Debian systemd survey. I intend to give a presentation at DebConf 2013, too, so you could either read my posts, or watch the talk, or both :-).
+	   This blog post is the third of a series of posts dealing with the results of the Debian systemd survey. I intend to give a presentation at DebConf 2013, too, so you could either read my posts, or watch the talk, or both :-). 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-13-systemd-not-portable/">Read more →</a></span>
 	</p>
       </div>
@@ -1515,7 +1529,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  This blog post is the second of a series of posts dealing with the results of the Debian systemd survey. I intend to give a presentation at DebConf 2013, too, so you could either read my posts, or watch the talk, or both :-).
+	   This blog post is the second of a series of posts dealing with the results of the Debian systemd survey. I intend to give a presentation at DebConf 2013, too, so you could either read my posts, or watch the talk, or both :-). 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-01-systemd-transition/">Read more →</a></span>
 	</p>
       </div>
@@ -1545,7 +1559,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  At this year’s GPN13 I gave a talk about Debian Code Search. It was in German, so I spent a few hours creating english subtitles. You can watch the video at youtube.com/watch?v=n6DtW3zCTvk with english subtitles. In case you prefer to download the file(s), get http://ftp.
+	   At this year’s GPN13 I gave a talk about Debian Code Search. It was in German, so I spent a few hours creating english subtitles. You can watch the video at youtube.com/watch?v=n6DtW3zCTvk with english subtitles. In case you prefer to download the file(s), get http://ftp.ccc.de/events/gpn/gpn13/gpn13-debian-code-search.mp4 (84 MiB) and the corresponding subtitle file at http://t.zekjur.net/gpn13-debian-code-search.srt. Drop both files in the same directory, run mplayer gpn13-debian-code-search.mp4 and press v to enable subtitles. I intend to eventually put the (subtitled) video on YouTube and refer to it from codesearch.debian.net, but I wanted to post the video in its current form already. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-06-17-debian-code-search-talk/">Read more →</a></span>
 	</p>
       </div>
@@ -1569,7 +1583,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  This blog post is the first of a series of posts dealing with the results of the Debian systemd survey. I intend to give a presentation at DebConf 2013, too, so you could either read my posts, or watch the talk, or both :-).
+	   This blog post is the first of a series of posts dealing with the results of the Debian systemd survey. I intend to give a presentation at DebConf 2013, too, so you could either read my posts, or watch the talk, or both :-). 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-06-09-systemd-bloat/">Read more →</a></span>
 	</p>
       </div>
@@ -1593,7 +1607,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  Yesterday I uploaded a big package and got multiple timeouts. I then figured out that DDs can also upload using SFTP (i.e. SSH’s file transfer thingie) instead of traditional FTP, which seems like a more modern alternative. So let’s give that a try.
+	   Yesterday I uploaded a big package and got multiple timeouts. I then figured out that DDs can also upload using SFTP (i.e. SSH’s file transfer thingie) instead of traditional FTP, which seems like a more modern alternative. So let’s give that a try. With dput-ng, the following configuration leads to using sftp by default: 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-06-08-uploading-via-sftp/">Read more →</a></span>
 	</p>
       </div>
@@ -1623,7 +1637,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  A week ago, we started the Debian systemd survey. The goal was to figure out a few trends and answer the following two questions: Do our subjective impressions from the discussions on debian-devel reflect the general sentiment about systemd? What are the main concerns that most people have?
+	   A week ago, we started the Debian systemd survey. The goal was to figure out a few trends and answer the following two questions: Do our subjective impressions from the discussions on debian-devel reflect the general sentiment about systemd? What are the main concerns that most people have? Thank you all for your participation! 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-05-27-systemd-survey-results/">Read more →</a></span>
 	</p>
       </div>
@@ -1647,7 +1661,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  Whenever I want to work on some package, I usually clone its git repository, make my changes, then push and upload the Debian package. I don’t keep those repositories around in order to avoid cruft and also to have a 100% clean, up-to-date setup whenever I start working on something.
+	   Whenever I want to work on some package, I usually clone its git repository, make my changes, then push and upload the Debian package. I don’t keep those repositories around in order to avoid cruft and also to have a 100% clean, up-to-date setup whenever I start working on something. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-05-25-d-clone/">Read more →</a></span>
 	</p>
       </div>
@@ -1671,7 +1685,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  In the past, we have had multiple heated discussions involving systemd. We (the pkg-systemd-maintainers team) would like to better understand why some people dislike systemd. Therefore, we have created a survey, which you can find at http://survey.zekjur.net/index.php/391182 Please only submit your feedback to the survey and not this thread, we are not particularly interested in yet another systemd discussion at this point.
+	   In the past, we have had multiple heated discussions involving systemd. We (the pkg-systemd-maintainers team) would like to better understand why some people dislike systemd. Therefore, we have created a survey, which you can find at http://survey.zekjur.net/index.php/391182 Please only submit your feedback to the survey and not this thread, we are not particularly interested in yet another systemd discussion at this point. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-05-20-systemd-survey/">Read more →</a></span>
 	</p>
       </div>
@@ -1701,7 +1715,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  Recently, I was wondering how many Debian Developers are actively working on RC bugs in some way or another in the time period of the last release (squeeze) to now (shortly? before wheezy). I therefore grabbed the mailing list archives of debian-bugs-dist@ from gmane, used only those messages whose X-Debian-PR-Message header matches an RC bug (list retrieved from UDD) and then attributed the message counts to the appropriate Debian Developer.
+	   Recently, I was wondering how many Debian Developers are actively working on RC bugs in some way or another in the time period of the last release (squeeze) to now (shortly? before wheezy). I therefore grabbed the mailing list archives of debian-bugs-dist@ from gmane, used only those messages whose X-Debian-PR-Message header matches an RC bug (list retrieved from UDD) and then attributed the message counts to the appropriate Debian Developer. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-03-31-analyzing-rc-bug-messages/">Read more →</a></span>
 	</p>
       </div>
@@ -1725,7 +1739,7 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  Previously, my workflow regarding replying to bugreports outside my own packages was very uncomfortable: I first downloaded the mbox archive from the BTS, then imported that in claws-mail, hit reply all, remove submit@, add bugnumber@, then send the email. Therefore, I decided to hack up a little elisp function to automate this process for notmuch.
+	   Previously, my workflow regarding replying to bugreports outside my own packages was very uncomfortable: I first downloaded the mbox archive from the BTS, then imported that in claws-mail, hit reply all, remove submit@, add bugnumber@, then send the email. Therefore, I decided to hack up a little elisp function to automate this process for notmuch. It first downloads the message from the BTS, adds it to the notmuch database, then calls notmuch-mua-reply on the message and fixes the To: header: 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-03-08-bts-notmuch-reply/">Read more →</a></span>
 	</p>
       </div>
@@ -1755,8 +1769,14 @@ I copied the latest Raspberry Pi Debian image onto an SD card, booted it, and wa
 	
 	
 	<p>
-	  I recently worked on the following RC bugs: #696532 — isdnlog: /etc/isdn/isdnlog.isdnctrl0 is easily destroyed in squeeze to wheezy upgrade
+	   I recently worked on the following RC bugs: #696532 — isdnlog: /etc/isdn/isdnlog.isdnctrl0 is easily destroyed in squeeze to wheezy upgrade
 Pinged the maintainer about uploading a fix to unstable, too (was only fixed in experimental). #693208 — clang: unable to link trivial test program on armhf
+Filed a request to upload a new version to testing-proposed-updates. #694986 — flash-kernel: postinst modifies /etc/default/rcS
+Pinged. #694352 — lcdf-typetool include non free adobe data; glyph list
+Filed a request to upload a new version to testing-proposed-updates. #593607 — pcmanfm wrongly deleted some files in a failed move operation
+Updated the bugreport status to reflect reality. #698137 — destroys icinga.cfg on postinst when it's a symlink
+Reproduced, asked whether to NMU. #694622 — nut-snmp: Can't connect to UPS [apcpdu] (snmp-ups-apcpdu): No such file or directory
+Reproduced, asked for more info. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-02-06-rc-bugs-2/">Read more →</a></span>
 	</p>
       </div>
@@ -1780,8 +1800,11 @@ Pinged the maintainer about uploading a fix to unstable, too (was only fixed in 
 	
 	
 	<p>
-	  I recently worked on the following RC bugs: #696187 — squid-cgi: CVE-2012-5643: cachemgr.cgi denial of service
+	   I recently worked on the following RC bugs: #696187 — squid-cgi: CVE-2012-5643: cachemgr.cgi denial of service
 NMUed the upstream patches after nearly 2 months of no maintainer reaction on the bugreport. #684645 — sendmail-bin: Order of fcntl and dotlock in maillock
+Coordinated with the soon-to-be maintainer and explained (in private) that the upload should only contain a minimum amount of changes in order to be unblocked. #690075 — unblock: dnsmasq/2.63-4
+Pinged the maintainer about the current situation. #693208 — clang: unable to link trivial test program on armhf
+Reproduced the issue, now building clang on qemu-armhf… This takes quite a while. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-02-06-rc-bugs/">Read more →</a></span>
 	</p>
       </div>
@@ -1811,7 +1834,7 @@ NMUed the upstream patches after nearly 2 months of no maintainer reaction on th
 	
 	
 	<p>
-	  I just uploaded wit-2.10a to Debian experimental (it has to pass the NEW queue first, though). WIT (Wiimms ISO Tools) is a set of command-line tools to manipulate Wii and GameCube ISO images and WBFS containers. It is useful (for me) to store backups of my Wii games on a USB hard disk drive.
+	   I just uploaded wit-2.10a to Debian experimental (it has to pass the NEW queue first, though). WIT (Wiimms ISO Tools) is a set of command-line tools to manipulate Wii and GameCube ISO images and WBFS containers. It is useful (for me) to store backups of my Wii games on a USB hard disk drive. This saves me the optical disc juggling, doesn’t wear off the discs as fast and gives faster load times. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-01-02-wit/">Read more →</a></span>
 	</p>
       </div>
@@ -1841,10 +1864,11 @@ NMUed the upstream patches after nearly 2 months of no maintainer reaction on th
 	
 	
 	<p>
-	  I recently worked on the following RC bugs: #669513 — gnat-4.4: FTBFS: unsatisfiable build-dependency
+	   I recently worked on the following RC bugs: #669513 — gnat-4.4: FTBFS: unsatisfiable build-dependency
 Closed, no longer reproducible with the version in testing. #694810 — plib: CVE-2012-4552
 Uploaded an NMU to unstable. #684130 — digikam: crash when starts
-Closed, not reproducible with the version in testing.
+Closed, not reproducible with the version in testing. #645133 — simile-timeline: source package should use proper source
+Repackaged the orig tarball to generate all files at build-time (instead of using the pre-minified files). 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-12-05-rc-bugs/">Read more →</a></span>
 	</p>
       </div>
@@ -1868,9 +1892,11 @@ Closed, not reproducible with the version in testing.
 	
 	
 	<p>
-	  I recently worked on the following RC bugs: #689769 — ample: ships a /var/run/ample folder: Policy 9.3.2
+	   I recently worked on the following RC bugs: #689769 — ample: ships a /var/run/ample folder: Policy 9.3.2
 Uploaded a patched version to DELAYED/5. #694810 — plib: CVE-2012-4552
-Provided a patch, asked for instructions from the security team. #694972 — imposm: missing source for imposm/cache/kc.
+Provided a patch, asked for instructions from the security team. #694972 — imposm: missing source for imposm/cache/kc.c
+Uploaded a repackaged version to DELAYED/5. #672926 — oidentd: Missing dependency on net-tools
+Uploaded another version which fixes my mistake of shipping changes to debian/ as a patch and hopefully gets an unblock. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-12-04-rc-bugs-2/">Read more →</a></span>
 	</p>
       </div>
@@ -1894,9 +1920,12 @@ Provided a patch, asked for instructions from the security team. #694972 — imp
 	
 	
 	<p>
-	  I recently worked on the following RC bugs: #694976 — sigit: doesn't work on amd64
+	   I recently worked on the following RC bugs: #694976 — sigit: doesn't work on amd64
 Filed a removal request. #694796 — kscd: crash with no optical drive
 Downgraded severity, it’s not RC. #672926 — oidentd: Missing dependency on net-tools
+Merged the patch, added the dependencies, NMUed. #694024 — zutils: Don't print the file name if only one file is grepped
+Provided a patch. Reviews welcome. #694972 — imposm: missing source for imposm/cache/kc.c
+Provided further analysis. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-12-04-rc-bugs/">Read more →</a></span>
 	</p>
       </div>
@@ -1920,8 +1949,10 @@ Downgraded severity, it’s not RC. #672926 — oidentd: Missing dependency on n
 	
 	
 	<p>
-	  I recently worked on the following RC bugs: #694892 — tvtime: package installation creates /root/.tvtime
-Sent a patch which fixes the issue. Needs a second pair of eyes plus possibly an NMU. #684604 — eclipse-rcp: eclipse 3.8 hangs on splash screen with "
+	   I recently worked on the following RC bugs: #694892 — tvtime: package installation creates /root/.tvtime
+Sent a patch which fixes the issue. Needs a second pair of eyes plus possibly an NMU. #684604 — eclipse-rcp: eclipse 3.8 hangs on splash screen with "Loading Workbench" after update from 3.7.2
+Pinged reporter(s) about test files which are offline by now. #673790 — python-prettytables: Broken API on new version
+Investigated the current state, then re-assigned the bug to the only still-broken package python-cloudservers. People who (can) use python-cloudservers and want to change it to the current python-prettytables API can help here. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-12-03-rc-bugs/">Read more →</a></span>
 	</p>
       </div>
@@ -1945,7 +1976,7 @@ Sent a patch which fixes the issue. Needs a second pair of eyes plus possibly an
 	
 	
 	<p>
-	  Dear Lazyweb, I recently investigated #694670 - kscd does not play any CD — essentially, at least on my machine, phonon-based applications such as kscd won’t play Audio CDs when your CD drive is not called /dev/cdrom, but e.g. /dev/cdrom5 because I have had multiple CD drives connected to my machine.
+	   Dear Lazyweb, I recently investigated #694670 - kscd does not play any CD — essentially, at least on my machine, phonon-based applications such as kscd won’t play Audio CDs when your CD drive is not called /dev/cdrom, but e.g. /dev/cdrom5 because I have had multiple CD drives connected to my machine. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-12-01-kscd-rc/">Read more →</a></span>
 	</p>
       </div>
@@ -1975,8 +2006,10 @@ Sent a patch which fixes the issue. Needs a second pair of eyes plus possibly an
 	
 	
 	<p>
-	  I recently worked on the following RC bugs: #677861 — lftp: FTBFS[kfreebsd-i386]: error: conflicting declaration 'typedef __int32_t gl_intptr_t'
-I provided some analysis. By rebuilding lftp’s configure script with recent autotools, this should be fixed. #676229 — gnustep-make: should depend on a chosen version of gobjc, not just "
+	   I recently worked on the following RC bugs: #677861 — lftp: FTBFS[kfreebsd-i386]: error: conflicting declaration 'typedef __int32_t gl_intptr_t'
+I provided some analysis. By rebuilding lftp’s configure script with recent autotools, this should be fixed. #676229 — gnustep-make: should depend on a chosen version of gobjc, not just "gobjc"
+This issue was fixed by an upload, but not marked as closed. I tried to reproduce it and failed (as expected), so I closed the bug. #694091 — bcrypt: Tries to load whole file into memory regardless of the size
+I patched bcrypt to use a window of 256K over the input and output file instead of loading it into memory. I also fixed the offset types so that it works with files &gt; 2 GiB on 32-bit platforms. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-11-25-rc-bugs/">Read more →</a></span>
 	</p>
       </div>
@@ -2000,9 +2033,9 @@ I provided some analysis. By rebuilding lftp’s configure script with recent au
 	
 	
 	<p>
-	  I hereby announce a new Debian project: Debian Code Search. Debian Code Search is a search engine for program source code within Debian.
+	   I hereby announce a new Debian project: Debian Code Search. Debian Code Search is a search engine for program source code within Debian.
 It allows you to search all ≈ 17000 source packages, containing 130 GiB of
-FLOSS source code (including Debian packaging) with regular expressions.
+FLOSS source code (including Debian packaging) with regular expressions. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-11-06-debian-codesearch/">Read more →</a></span>
 	</p>
       </div>
@@ -2032,8 +2065,10 @@ FLOSS source code (including Debian packaging) with regular expressions.
 	
 	
 	<p>
-	  I recently worked on the following RC bugs: #691125 — ejabberd: package installation creates /root/.erlang.cookie
-I tracked down the cause of this and provided a patch. Now I also know how piuparts works in detail :-). #691180 — connman: Connman won't run due to missing libxtables.
+	   I recently worked on the following RC bugs: #691125 — ejabberd: package installation creates /root/.erlang.cookie
+I tracked down the cause of this and provided a patch. Now I also know how piuparts works in detail :-). #691180 — connman: Connman won't run due to missing libxtables.so.7
+Since this bug does not affect testing and it doesn’t look like iptables 1.4.16.3-1 (a new upstream release) will go into wheezy (no freeze unblock filed), I tagged this with wheezy-ignore. I hope this was right, if not, feel free to correct me. #684645 — liblockfile1: Order of fcntl and dotlock in maillock
+I identified the piece of code which does locking the wrong way. Since I’m not familiar enough with either sendmail or NFS-safe locking, I did not send a patch. In case you have experience with this, please have a look! 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-10-27-rc-bugs/">Read more →</a></span>
 	</p>
       </div>
@@ -2057,7 +2092,7 @@ I tracked down the cause of this and provided a patch. Now I also know how piupa
 	
 	
 	<p>
-	  mbiebl has recently uploaded systemd 44-5 to Debian unstable. If you are already using systemd, you should definitely upgrade to this version, it fixes a lot of little annoyances. This is especially important if you are using libvirt &gt;= 0.
+	   mbiebl has recently uploaded systemd 44-5 to Debian unstable. If you are already using systemd, you should definitely upgrade to this version, it fixes a lot of little annoyances. This is especially important if you are using libvirt &gt;= 0.10.2-4 or if you experienced a hanging boot when your network cable is attached. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-10-26-systemd-44-5/">Read more →</a></span>
 	</p>
       </div>
@@ -2081,8 +2116,11 @@ I tracked down the cause of this and provided a patch. Now I also know how piupa
 	
 	
 	<p>
-	  I recently worked on the following systemd-related issues: #686115 - CanReload is set to yes unconditionally for legacy SysV services
-I wrote a patch which uses a heuristic to figure out whether a SysV init script supports the reload option or not.
+	   I recently worked on the following systemd-related issues: #686115 - CanReload is set to yes unconditionally for legacy SysV services
+I wrote a patch which uses a heuristic to figure out whether a SysV init script supports the reload option or not. Not perfect, but a whole lot better than defaulting to "yes" :-). This should also fix #650382 - force-reload translated to reload for SysV services. #688635 - Don’t kill libvirt VMs when restarting libvirt
+I ported a patch from the Fedora systemd packaging which avoids killing all processes of a cgroup when restarting a service. This is necessary for libvirtd, otherwise all virtual machines get killed when you restart libvirt-bin.service. libvirt-bin 0.10.2-4 (experimental) ships systemd service files. #635777 - 90-seconds delay on reboot/shutdown when postfix is installed
+I tracked down the cause of several 90-second delay on shutdown causes and provided a patch (which is a workaround…). #624599 - systemd: DHCP hook scripts calling invoke-rc.d causes boot hang
+I tracked down the cause of a deadlock at boot time when dhcp hooks call invoke-rc.d (as does samba). Several workarounds are known but we have not yet taken any action. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-10-14-systemd-activity/">Read more →</a></span>
 	</p>
       </div>

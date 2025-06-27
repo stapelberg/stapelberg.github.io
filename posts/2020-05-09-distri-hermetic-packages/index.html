@@ -8,7 +8,8 @@
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="Hermetic packages (in distri)">
   <meta property="og:description" content="In distri, packages (e.g. emacs) are hermetic. By hermetic, I mean that the dependencies a package uses (e.g. libusb) don’t change, even when newer versions are installed.
-For example, if package libusb-amd64-1.0.22-7 is available at build time, the package will always use that same version, even after the newer libusb-amd64-1.">
+For example, if package libusb-amd64-1.0.22-7 is available at build time, the package will always use that same version, even after the newer libusb-amd64-1.0.23-8 will be installed into the package store.
+">
   
   
   
@@ -18,7 +19,8 @@ For example, if package libusb-amd64-1.0.22-7 is available at build time, the pa
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
   <meta name="description" content="In distri, packages (e.g. emacs) are hermetic. By hermetic, I mean that the dependencies a package uses (e.g. libusb) don’t change, even when newer versions are installed.
-For example, if package libusb-amd64-1.0.22-7 is available at build time, the package will always use that same version, even after the newer libusb-amd64-1.">
+For example, if package libusb-amd64-1.0.22-7 is available at build time, the package will always use that same version, even after the newer libusb-amd64-1.0.23-8 will be installed into the package store.
+">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2020-05-09-distri-hermetic-packages/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -409,30 +411,30 @@ them. Here is a table summarizing how affected programs might try to arrange for
 re-execution, whether the technique results in a wrapper bypass, and what we do
 about it in distri:</p>
 <table>
-<thead>
-<tr>
-<th>technique to execute itself</th>
-<th>uses wrapper</th>
-<th>mitigation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>run-time: find own basename in <code>PATH</code></td>
-<td>yes</td>
-<td>wrapper program</td>
-</tr>
-<tr>
-<td>compile-time: embed expected path</td>
-<td>no; bypass!</td>
-<td>configure or patch</td>
-</tr>
-<tr>
-<td>run-time: <code>argv[0]</code> or <code>/proc/self/exe</code></td>
-<td>no; bypass!</td>
-<td><a href="https://github.com/distr1/distri/commit/f45ee9ac1121da284f2943c80e2c30afa24ca80d">patch</a></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>technique to execute itself</th>
+          <th>uses wrapper</th>
+          <th>mitigation</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>run-time: find own basename in <code>PATH</code></td>
+          <td>yes</td>
+          <td>wrapper program</td>
+      </tr>
+      <tr>
+          <td>compile-time: embed expected path</td>
+          <td>no; bypass!</td>
+          <td>configure or patch</td>
+      </tr>
+      <tr>
+          <td>run-time: <code>argv[0]</code> or <code>/proc/self/exe</code></td>
+          <td>no; bypass!</td>
+          <td><a href="https://github.com/distr1/distri/commit/f45ee9ac1121da284f2943c80e2c30afa24ca80d">patch</a></td>
+      </tr>
+  </tbody>
 </table>
 <p>One might think that setting <code>argv[0]</code> to the wrapper location seems like a way
 to side-step this problem. We tried doing this in distri, but <a href="https://github.com/distr1/distri/commit/b517cb33ed827d358b00737434c7a09dd75583b7">had to

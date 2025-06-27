@@ -7,19 +7,21 @@
 
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="Ryzen 7 Mini-PC makes a power-efficient VM host">
-  <meta property="og:description" content="When I saw the first reviews of the ASRock DeskMini X600 barebone, I was immediately interested in building a home-lab hypervisor (VM host) with it. Apparently, the DeskMini X600 uses less than 10W of power but supports latest-generation AMD CPUs like the Ryzen 7 8700G!">
+  <meta property="og:description" content="When I saw the first reviews of the ASRock DeskMini X600 barebone, I was immediately interested in building a home-lab hypervisor (VM host) with it. Apparently, the DeskMini X600 uses less than 10W of power but supports latest-generation AMD CPUs like the Ryzen 7 8700G!
+">
   
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/240630-server-featured_hu3cb7c72c5372ea18e945c976b24c8b83_4997169_200x200_fit_q75_box.jpg">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/240630-server-featured_hu_6c2736729d115f81.jpg">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
   <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
-  <meta name="description" content="When I saw the first reviews of the ASRock DeskMini X600 barebone, I was immediately interested in building a home-lab hypervisor (VM host) with it. Apparently, the DeskMini X600 uses less than 10W of power but supports latest-generation AMD CPUs like the Ryzen 7 8700G!">
+  <meta name="description" content="When I saw the first reviews of the ASRock DeskMini X600 barebone, I was immediately interested in building a home-lab hypervisor (VM host) with it. Apparently, the DeskMini X600 uses less than 10W of power but supports latest-generation AMD CPUs like the Ryzen 7 8700G!
+">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -261,8 +263,8 @@ DIY self-hosting VM host.</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/240630-server-featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/240630-server-featured_hu3cb7c72c5372ea18e945c976b24c8b83_4997169_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/240630-server-featured_hu3cb7c72c5372ea18e945c976b24c8b83_4997169_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/240630-server-featured_hu3cb7c72c5372ea18e945c976b24c8b83_4997169_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/240630-server-featured_hu_dc895544ddfb9dfd.jpg 2x,https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/240630-server-featured_hu_81edc732388ae3d1.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/240630-server-featured_hu_cddc0fdf2b7d2814.jpg"
   alt="ASRock DeskMini X600" title="ASRock DeskMini X600"
   width="600"
   height="401"
@@ -281,40 +283,40 @@ border: 1px solid #000;
 only get a case with a mainboard and power supply, the rest is up to you. I
 chose the following parts:</p>
 <table>
-<thead>
-<tr>
-<th>Price</th>
-<th>Type</th>
-<th>Article</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>215 EUR</td>
-<td>barebone</td>
-<td><a href="https://shop.jzelectronic.de/product_info.php?info=p75250_asrock-deskmini-x600.html">ASRock DeskMini X600</a></td>
-</tr>
-<tr>
-<td>293 CHF</td>
-<td>CPU</td>
-<td><a href="https://www.digitec.ch/de/s1/product/amd-ryzen-7-8700g-am5-420-ghz-8-core-prozessor-42390585?supplier=406802">AMD Ryzen 7 8700G (AM5, 4.20 GHz, 8 Core)</a></td>
-</tr>
-<tr>
-<td>48 CHF</td>
-<td>CPU fan</td>
-<td><a href="https://www.digitec.ch/de/s1/product/noctua-nh-l9a-am5-37-mm-cpu-kuehler-24147242?supplier=406802">Noctua NH-L9a-AM5 (37 mm)</a></td>
-</tr>
-<tr>
-<td>195 CHF</td>
-<td>RAM</td>
-<td><a href="https://www.digitec.ch/de/s1/product/kingston-fury-impact-2-x-32gb-5600-mhz-ddr5-ram-so-dimm-ram-23704483?supplier=406802">Kingston FURY Impact (2 x 32GB, DDR5-5600 SO-DIMM)</a></td>
-</tr>
-<tr>
-<td>218 CHF</td>
-<td>SSD</td>
-<td>2 x <a href="https://www.digitec.ch/de/s1/product/samsung-980-pro-1000-gb-m2-2280-ssd-13823466?supplier=406802">Samsung 980 Pro (1000 GB, M.2 2280)</a> (for RAID-1)</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Price</th>
+          <th>Type</th>
+          <th>Article</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>215 EUR</td>
+          <td>barebone</td>
+          <td><a href="https://shop.jzelectronic.de/product_info.php?info=p75250_asrock-deskmini-x600.html">ASRock DeskMini X600</a></td>
+      </tr>
+      <tr>
+          <td>293 CHF</td>
+          <td>CPU</td>
+          <td><a href="https://www.digitec.ch/de/s1/product/amd-ryzen-7-8700g-am5-420-ghz-8-core-prozessor-42390585?supplier=406802">AMD Ryzen 7 8700G (AM5, 4.20 GHz, 8 Core)</a></td>
+      </tr>
+      <tr>
+          <td>48 CHF</td>
+          <td>CPU fan</td>
+          <td><a href="https://www.digitec.ch/de/s1/product/noctua-nh-l9a-am5-37-mm-cpu-kuehler-24147242?supplier=406802">Noctua NH-L9a-AM5 (37 mm)</a></td>
+      </tr>
+      <tr>
+          <td>195 CHF</td>
+          <td>RAM</td>
+          <td><a href="https://www.digitec.ch/de/s1/product/kingston-fury-impact-2-x-32gb-5600-mhz-ddr5-ram-so-dimm-ram-23704483?supplier=406802">Kingston FURY Impact (2 x 32GB, DDR5-5600 SO-DIMM)</a></td>
+      </tr>
+      <tr>
+          <td>218 CHF</td>
+          <td>SSD</td>
+          <td>2 x <a href="https://www.digitec.ch/de/s1/product/samsung-980-pro-1000-gb-m2-2280-ssd-13823466?supplier=406802">Samsung 980 Pro (1000 GB, M.2 2280)</a> (for RAID-1)</td>
+      </tr>
+  </tbody>
 </table>
 <p>Total cost: 969 CHF</p>
 <p>The CPU fan is not strictly required (the DeskMini X600 already comes with a
@@ -340,8 +342,8 @@ after all. Only the Ryzen 7 <strong>PRO</strong> 8700G supports ECC-RAM.</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/IMG_3871.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/IMG_3871_hu59fa65490ce2e48b2c5b284fe97e0775_2062424_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/IMG_3871_hu59fa65490ce2e48b2c5b284fe97e0775_2062424_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/IMG_3871_hu59fa65490ce2e48b2c5b284fe97e0775_2062424_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/IMG_3871_hu_c9bcdcbc546c8f32.jpg 2x,https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/IMG_3871_hu_c715b88202289878.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/IMG_3871_hu_d06b76be69f05034.jpg"
   alt="components" title="components"
   width="600"
   height="631"
@@ -406,8 +408,8 @@ warnings:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/2024-06-30-proxmox.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/2024-06-30-proxmox_hu72d4f4d0189dc6f0891d857b6c038b39_1406117_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/2024-06-30-proxmox_hu72d4f4d0189dc6f0891d857b6c038b39_1406117_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/2024-06-30-proxmox_hu72d4f4d0189dc6f0891d857b6c038b39_1406117_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/2024-06-30-proxmox_hu_846b3dde7722261b.jpg 2x,https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/2024-06-30-proxmox_hu_51076202ea557257.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/2024-06-30-proxmox_hu_d09de1f7014fd7c8.jpg"
   alt="proxmox web interface" title="proxmox web interface"
   width="600"
   height="418"
@@ -456,8 +458,8 @@ do, it spikes up to 50W:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/2024-06-24-energy-usage.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/2024-06-24-energy-usage_hu6ff618f9e9023ea7df34e8fd6d4f3691_213887_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/2024-06-24-energy-usage_hu6ff618f9e9023ea7df34e8fd6d4f3691_213887_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/2024-06-24-energy-usage_hu6ff618f9e9023ea7df34e8fd6d4f3691_213887_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/2024-06-24-energy-usage_hu_a329f80da61672b0.jpg 2x,https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/2024-06-24-energy-usage_hu_b1bc6c75c50d9baf.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/2024-06-24-energy-usage_hu_535545058b6b63ef.jpg"
   alt="Grafana dashboard showing power usage" title="Grafana dashboard showing power usage"
   width="600"
   height="257"

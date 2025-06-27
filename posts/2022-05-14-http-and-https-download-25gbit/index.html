@@ -7,19 +7,21 @@
 
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="25 Gbit/s HTTP and HTTPS download speeds">
-  <meta property="og:description" content="Now that I recently upgraded my internet connection to 25 Gbit/s, I was curious how hard or easy it is to download files via HTTP and HTTPS over a 25 Gbit/s link. I don’t have another 25 Gbit/s connected machine other than my router, so I decided to build a little lab for tests like these 🧑‍🔬">
+  <meta property="og:description" content="Now that I recently upgraded my internet connection to 25 Gbit/s, I was curious how hard or easy it is to download files via HTTP and HTTPS over a 25 Gbit/s link. I don’t have another 25 Gbit/s connected machine other than my router, so I decided to build a little lab for tests like these 🧑‍🔬
+">
   
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0204_hue1ce97509a6d1573a4d6789b4fcce12c_1559726_200x200_fit_q75_box.jpg">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0204_hu_dd14960e829d5c5e.jpg">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
   <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
-  <meta name="description" content="Now that I recently upgraded my internet connection to 25 Gbit/s, I was curious how hard or easy it is to download files via HTTP and HTTPS over a 25 Gbit/s link. I don’t have another 25 Gbit/s connected machine other than my router, so I decided to build a little lab for tests like these 🧑‍🔬">
+  <meta name="description" content="Now that I recently upgraded my internet connection to 25 Gbit/s, I was curious how hard or easy it is to download files via HTTP and HTTPS over a 25 Gbit/s link. I don’t have another 25 Gbit/s connected machine other than my router, so I decided to build a little lab for tests like these 🧑‍🔬
+">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -224,8 +226,8 @@ digitec:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0209.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0209_hu855bbe0a9c47ac557e5b09db74fa3b06_1118443_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0209_hu855bbe0a9c47ac557e5b09db74fa3b06_1118443_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0209_hu855bbe0a9c47ac557e5b09db74fa3b06_1118443_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0209_hu_98ef0d6fbc9f8f88.jpg 2x,https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0209_hu_bba81be879509160.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0209_hu_cc67f65445f20e99.jpg"
   
   width="600"
   height="480"
@@ -258,8 +260,8 @@ Attach Cable (DAC) with it. I installed the network card into my old workstation
 
 
 <a href="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0204.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0204_hue1ce97509a6d1573a4d6789b4fcce12c_1559726_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0204_hue1ce97509a6d1573a4d6789b4fcce12c_1559726_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0204_hue1ce97509a6d1573a4d6789b4fcce12c_1559726_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0204_hu_ba13c40834fef98.jpg 2x,https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0204_hu_297924f1e43ad007.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-05-14-http-and-https-download-25gbit/IMG_0204_hu_54e65460201b80d5.jpg"
   
   width="600"
   height="450"
@@ -275,60 +277,60 @@ border: 1px solid #000;
 
 <h3 id="25-gbits-router-left">25 Gbit/s router (left)</h3>
 <table>
-<thead>
-<tr>
-<th>Component</th>
-<th>Model</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Mainboard</td>
-<td>ASRock B550 Taichi</td>
-</tr>
-<tr>
-<td>CPU</td>
-<td>AMD Ryzen 5 5600X 6-Core Processor</td>
-</tr>
-<tr>
-<td>Network card</td>
-<td><a href="https://www.fs.com/de/products/75603.html">Intel XXV710</a></td>
-</tr>
-<tr>
-<td>Linux</td>
-<td>Linux 5.17.4 (<a href="https://router7.org">router7</a>)<br>curl 7.83.0 from debian bookworm<br>Go <code>net/http</code> from Go 1.18</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Component</th>
+          <th>Model</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Mainboard</td>
+          <td>ASRock B550 Taichi</td>
+      </tr>
+      <tr>
+          <td>CPU</td>
+          <td>AMD Ryzen 5 5600X 6-Core Processor</td>
+      </tr>
+      <tr>
+          <td>Network card</td>
+          <td><a href="https://www.fs.com/de/products/75603.html">Intel XXV710</a></td>
+      </tr>
+      <tr>
+          <td>Linux</td>
+          <td>Linux 5.17.4 (<a href="https://router7.org">router7</a>)<br>curl 7.83.0 from debian bookworm<br>Go <code>net/http</code> from Go 1.18</td>
+      </tr>
+  </tbody>
 </table>
 <p>router7 comes with <a href="https://en.wikipedia.org/wiki/TCP_congestion_control#TCP_BBR">TCP
 BBR</a> enabled by
 default.</p>
 <h3 id="old-workstation-right">Old workstation (right)</h3>
 <table>
-<thead>
-<tr>
-<th>Component</th>
-<th>Model</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Mainboard</td>
-<td>ASUS PRIME Z370-A</td>
-</tr>
-<tr>
-<td>CPU</td>
-<td>Intel i9-9900K CPU @ 3.60GHz</td>
-</tr>
-<tr>
-<td>Network card</td>
-<td>Mellanox ConnectX-4</td>
-</tr>
-<tr>
-<td>Linux</td>
-<td>5.17.5 (Arch Linux)<br>nginx 1.21.6<br>caddy 2.4.3</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Component</th>
+          <th>Model</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Mainboard</td>
+          <td>ASUS PRIME Z370-A</td>
+      </tr>
+      <tr>
+          <td>CPU</td>
+          <td>Intel i9-9900K CPU @ 3.60GHz</td>
+      </tr>
+      <tr>
+          <td>Network card</td>
+          <td>Mellanox ConnectX-4</td>
+      </tr>
+      <tr>
+          <td>Linux</td>
+          <td>5.17.5 (Arch Linux)<br>nginx 1.21.6<br>caddy 2.4.3</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="test-preparation">Test preparation</h2>
 <p>Before taking any measurements, I do one full download so that the file contents
@@ -342,47 +344,47 @@ which consists of distri-disk.img repeated 5 times.</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -v -o /dev/null http://oldmidna:8080/distri/tmp/big.img
 </span></span><span style="display:flex;"><span>./httpget25 http://oldmidna:8080/distri/tmp/big.img
 </span></span></code></pre></div><table>
-<thead>
-<tr>
-<th>Client</th>
-<th>Server</th>
-<th>Gbit/s</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>curl</strong></td>
-<td><strong>nginx</strong></td>
-<td><strong>
+  <thead>
+      <tr>
+          <th>Client</th>
+          <th>Server</th>
+          <th>Gbit/s</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>curl</strong></td>
+          <td><strong>nginx</strong></td>
+          <td><strong>
 <div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
 
 </strong></td>
-</tr>
-<tr>
-<td>curl</td>
-<td>caddy</td>
-<td>
+      </tr>
+      <tr>
+          <td>curl</td>
+          <td>caddy</td>
+          <td>
 <div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
 
 </td>
-</tr>
-<tr>
-<td>Go</td>
-<td>nginx</td>
-<td>
+      </tr>
+      <tr>
+          <td>Go</td>
+          <td>nginx</td>
+          <td>
 <div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (20em / 10)); background-color: blue; color: white">20</div></div>
 
 </td>
-</tr>
-<tr>
-<td>Go</td>
-<td>caddy</td>
-<td>
+      </tr>
+      <tr>
+          <td>Go</td>
+          <td>caddy</td>
+          <td>
 <div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (20.2em / 10)); background-color: blue; color: white">20.2</div></div>
 
 </td>
-</tr>
-</tbody>
+      </tr>
+  </tbody>
 </table>
 <p>curl can saturate a 25 Gbit/s link without any trouble.</p>
 <p>The Go <code>net/http</code> package is slower and comes in at 20 Gbit/s.</p>
@@ -394,47 +396,47 @@ a 25 Gbit/s link:</p>
 </span></span><span style="display:flex;"><span>  curl -v -o /dev/null http://oldmidna:8080/distri/tmp/big.img &amp;
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">done</span>
 </span></span></code></pre></div><table>
-<thead>
-<tr>
-<th>Client</th>
-<th>Server</th>
-<th>Gbit/s</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>curl</td>
-<td>nginx</td>
-<td>
+  <thead>
+      <tr>
+          <th>Client</th>
+          <th>Server</th>
+          <th>Gbit/s</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>curl</td>
+          <td>nginx</td>
+          <td>
 <div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
 
 </td>
-</tr>
-<tr>
-<td>curl</td>
-<td>caddy</td>
-<td>
+      </tr>
+      <tr>
+          <td>curl</td>
+          <td>caddy</td>
+          <td>
 <div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
 
 </td>
-</tr>
-<tr>
-<td>Go</td>
-<td>nginx</td>
-<td>
+      </tr>
+      <tr>
+          <td>Go</td>
+          <td>nginx</td>
+          <td>
 <div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
 
 </td>
-</tr>
-<tr>
-<td>Go</td>
-<td>caddy</td>
-<td>
+      </tr>
+      <tr>
+          <td>Go</td>
+          <td>caddy</td>
+          <td>
 <div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
 
 </td>
-</tr>
-</tbody>
+      </tr>
+  </tbody>
 </table>
 <h2 id="https">T2: HTTPS download speed (encrypted)</h2>
 <p>At link speeds this high, enabling TLS slashes bandwidth in half or worse.</p>
@@ -445,47 +447,47 @@ a 25 Gbit/s link:</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -v -o /dev/null --insecure https://oldmidna:8443/distri/tmp/big.img
 </span></span><span style="display:flex;"><span>./httpget25 https://oldmidna:8443/distri/tmp/big.img
 </span></span></code></pre></div><table>
-<thead>
-<tr>
-<th>Client</th>
-<th>Server</th>
-<th>Gbit/s</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>curl</td>
-<td>nginx</td>
-<td>
+  <thead>
+      <tr>
+          <th>Client</th>
+          <th>Server</th>
+          <th>Gbit/s</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>curl</td>
+          <td>nginx</td>
+          <td>
 <div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (8em / 10)); background-color: blue; color: white">8</div></div>
 
 </td>
-</tr>
-<tr>
-<td>curl</td>
-<td>caddy</td>
-<td>
+      </tr>
+      <tr>
+          <td>curl</td>
+          <td>caddy</td>
+          <td>
 <div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (7.5em / 10)); background-color: blue; color: white">7.5</div></div>
 
 </td>
-</tr>
-<tr>
-<td><strong>Go</strong></td>
-<td><strong>nginx</strong></td>
-<td><strong>
+      </tr>
+      <tr>
+          <td><strong>Go</strong></td>
+          <td><strong>nginx</strong></td>
+          <td><strong>
 <div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (12em / 10)); background-color: blue; color: white">12</div></div>
 
 </strong></td>
-</tr>
-<tr>
-<td>Go</td>
-<td>caddy</td>
-<td>
+      </tr>
+      <tr>
+          <td>Go</td>
+          <td>caddy</td>
+          <td>
 <div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (7.2em / 10)); background-color: blue; color: white">7.2</div></div>
 
 </td>
-</tr>
-</tbody>
+      </tr>
+  </tbody>
 </table>
 <h3 id="https4">T2.2: Multiple TCP connections</h3>
 <p>This test works the same as T1.2, but with a HTTPS URL:</p>
@@ -496,47 +498,47 @@ a 25 Gbit/s link:</p>
 </span></span></code></pre></div><p>Curiously, the Go <code>net/http</code> client downloading from caddy cannot saturate a 25
 Gbit/s link.</p>
 <table>
-<thead>
-<tr>
-<th>Client</th>
-<th>Server</th>
-<th>Gbit/s</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>curl</td>
-<td>nginx</td>
-<td>
+  <thead>
+      <tr>
+          <th>Client</th>
+          <th>Server</th>
+          <th>Gbit/s</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>curl</td>
+          <td>nginx</td>
+          <td>
 <div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
 
 </td>
-</tr>
-<tr>
-<td>curl</td>
-<td>caddy</td>
-<td>
+      </tr>
+      <tr>
+          <td>curl</td>
+          <td>caddy</td>
+          <td>
 <div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
 
 </td>
-</tr>
-<tr>
-<td>Go</td>
-<td>nginx</td>
-<td>
+      </tr>
+      <tr>
+          <td>Go</td>
+          <td>nginx</td>
+          <td>
 <div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
 
 </td>
-</tr>
-<tr>
-<td>Go</td>
-<td>caddy</td>
-<td>
+      </tr>
+      <tr>
+          <td>Go</td>
+          <td>caddy</td>
+          <td>
 <div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (21.6em / 10)); background-color: blue; color: white">21.6</div></div>
 
 </td>
-</tr>
-</tbody>
+      </tr>
+  </tbody>
 </table>
 <h2 id="httpsktls">T3: HTTPS with Kernel TLS (KTLS)</h2>
 <p>Linux 4.13 got support for Kernel TLS back in 2017.</p>
@@ -549,59 +551,59 @@ enabling KTLS noticeably reduces CPU usage, from ≈10% to a steady 2%.</p>
 even offload TLS onto the network card!</p>
 <h3 id="httpsktls1">T3.1: Single TCP connection</h3>
 <table>
-<thead>
-<tr>
-<th>Client</th>
-<th>Server</th>
-<th>Gbit/s</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>curl</td>
-<td>nginx</td>
-<td>
+  <thead>
+      <tr>
+          <th>Client</th>
+          <th>Server</th>
+          <th>Gbit/s</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>curl</td>
+          <td>nginx</td>
+          <td>
 <div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (8em / 10)); background-color: blue; color: white">8</div></div>
 
 </td>
-</tr>
-<tr>
-<td><strong>Go</strong></td>
-<td><strong>nginx</strong></td>
-<td><strong>
+      </tr>
+      <tr>
+          <td><strong>Go</strong></td>
+          <td><strong>nginx</strong></td>
+          <td><strong>
 <div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (12em / 10)); background-color: blue; color: white">12</div></div>
 
 </strong></td>
-</tr>
-</tbody>
+      </tr>
+  </tbody>
 </table>
 <h3 id="httpsktls4">T3.2: Multiple TCP connections</h3>
 <table>
-<thead>
-<tr>
-<th>Client</th>
-<th>Server</th>
-<th>Gbit/s</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>curl</td>
-<td>nginx</td>
-<td>
+  <thead>
+      <tr>
+          <th>Client</th>
+          <th>Server</th>
+          <th>Gbit/s</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>curl</td>
+          <td>nginx</td>
+          <td>
 <div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
 
 </td>
-</tr>
-<tr>
-<td>Go</td>
-<td>nginx</td>
-<td>
+      </tr>
+      <tr>
+          <td>Go</td>
+          <td>nginx</td>
+          <td>
 <div class="barcon" style="width: calc(2 * 2.34em)"><div class="bar" style="width: calc(2 * (23.4em / 10)); background-color: blue; color: white">23.4</div></div>
 
 </td>
-</tr>
-</tbody>
+      </tr>
+  </tbody>
 </table>
 <h2 id="conclusions">Conclusions</h2>
 <p>When downloading from nginx with 1 TCP connection, with TLS encryption enabled

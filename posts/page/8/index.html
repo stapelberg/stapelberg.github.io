@@ -255,7 +255,7 @@
 	
 	
 	<p>
-	  Um in 'git diff' immer einen Pager zu kriegen (also nicht einfach die Ausgabe ins Terminal geklatscht, was mir zu unübersichtlich ist), kann man folgende Einstellung setzen: $ git config --global pager.diff 'LESS=RS less -c' Getestet mit git 1.7.4.1 aus Debian unstable (apt-get install git/unstable), mit älteren Versionen geht es anscheinend nicht.
+	   Um in 'git diff' immer einen Pager zu kriegen (also nicht einfach die Ausgabe ins Terminal geklatscht, was mir zu unübersichtlich ist), kann man folgende Einstellung setzen: $ git config --global pager.diff 'LESS=RS less -c' Getestet mit git 1.7.4.1 aus Debian unstable (apt-get install git/unstable), mit älteren Versionen geht es anscheinend nicht. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2011-03-06-um-in-git-diff-immer-einen-/">Read more →</a></span>
 	</p>
       </div>
@@ -299,7 +299,7 @@
 	
 	
 	<p>
-	  bacula-restore trotz fehlender Datenbankeinträge (weil ich mir das sonst immer wieder zusammenreimen muss): # Keine weiteren Jobs laufen lassen, sonst werden die neuen Einträge gleich # wieder gelöscht $ /etc/init.d/bacula-dir stop # Volumes foo-1 bis foo-3 scannen, Einträge aktualisieren (-m) und tatsächlich # in der Datenbank speichern (-s), dabei Fortschritt anzeigen (-S) $ bscan -P bacula -S -s -m -c /etc/bacula/bacula-sd.
+	   bacula-restore trotz fehlender Datenbankeinträge (weil ich mir das sonst immer wieder zusammenreimen muss): # Keine weiteren Jobs laufen lassen, sonst werden die neuen Einträge gleich # wieder gelöscht $ /etc/init.d/bacula-dir stop # Volumes foo-1 bis foo-3 scannen, Einträge aktualisieren (-m) und tatsächlich # in der Datenbank speichern (-s), dabei Fortschritt anzeigen (-S) $ bscan -P bacula -S -s -m -c /etc/bacula/bacula-sd.conf -V 'foo-1|foo-2|foo-3' foo-files # Workaround, purgedfiles wird nicht richtig aktualisiert in der DB $ echo 'UPDATE job SET purgedfiles = 0 WHERE jobid IN (123, 456, 789)' | psql -U bacula bacula 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2011-01-24-bacula-restore-trotz-fehlende/">Read more →</a></span>
 	</p>
       </div>
@@ -318,7 +318,7 @@
 	
 	
 	<p>
-	  JessyInk ist ein Plugin für Inkscape, mit dem man Präsentationen im SVG-Dateiformat erstellen kann. Die fertige Präsentation öffnet man dann mit einem Browser (bei mir gabs in Firefox in einer Situation ein Rendering-Problem, mit Chromium lief bisher alles problemlos) und durch ein in der SVG-Datei enthaltenes JavaScript kann man dann Pfeiltasten/Maustasten benutzen etc.
+	   JessyInk ist ein Plugin für Inkscape, mit dem man Präsentationen im SVG-Dateiformat erstellen kann. Die fertige Präsentation öffnet man dann mit einem Browser (bei mir gabs in Firefox in einer Situation ein Rendering-Problem, mit Chromium lief bisher alles problemlos) und durch ein in der SVG-Datei enthaltenes JavaScript kann man dann Pfeiltasten/Maustasten benutzen etc. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2011-01-09-jessyink-ist-ein-plugin-fri/">Read more →</a></span>
 	</p>
       </div>
@@ -362,7 +362,7 @@
 	
 	
 	<p>
-	  In letzter Zeit bin ich von Dancer, einem Web-Framework für Perl, immer mehr angetan. Man kann damit in ziemlich kurzer Zeit in klarer Syntax Webanwendungen schreiben. Es muss sich dabei nicht um eine Webanwendung im klassischen Sinne handeln, also eine über den Browser benutzbaren.
+	   In letzter Zeit bin ich von Dancer, einem Web-Framework für Perl, immer mehr angetan. Man kann damit in ziemlich kurzer Zeit in klarer Syntax Webanwendungen schreiben. Es muss sich dabei nicht um eine Webanwendung im klassischen Sinne handeln, also eine über den Browser benutzbaren. Stattdessen habe ich z.B. mit Dancer und AnyEvent den sogenannten npmd gebaut, einen Daemon, um den NPM2000, der 8 ein- und ausschaltbare Kaltgeräteanschlüsse bietet, im RaumZeitLabor zu steuern. Ein Daemon ist hier sinnvoll, weil der NPM nur genau eine Verbindung gleichzeitig abkann und eine Weile braucht, bis er merkt, dass man diese geschlossen hat. Der npmd hält also dauerhaft eine Verbindung offen und serialisiert die Anfragen an den NPM. Für eine HTTP-API mit Dancer habe ich mich entschieden, weil man den npmd dann schön von überall aus benutzen kann: 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-12-25-in-letzter-zeit-bin-ich-von-d/">Read more →</a></span>
 	</p>
       </div>
@@ -409,7 +409,7 @@ Hello…</h3></a>
 	
 	
 	<p>
-	  Aus einer Spam-Mail: Hello Dear My Name is beauty i saw your contact at site, (ftp.gnome.org) and i love your profile on it, i think we can know each other and build a relationship from there… (Auf ftp.gnome.org ist u.
+	   Aus einer Spam-Mail: Hello Dear My Name is beauty i saw your contact at site, (ftp.gnome.org) and i love your profile on it, i think we can know each other and build a relationship from there… (Auf ftp.gnome.org ist u.A. ein Debian-Mirror, dort gibt es eine Index-Datei mit allen Maintainern) 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-11-24-aus-einer-spam-mailhello/">Read more →</a></span>
 	</p>
       </div>
@@ -447,7 +447,7 @@ Hello…</h3></a>
 	
 	
 	<p>
-	  Social Pizza-Bestellung war schon lange eine Funktionalität, die wir auf dem Chaostreff haben wollten. Das bedeutet, dass jeder am eigenen Rechner sich seine Wunschpizza klicken kann und wir dann genau eine Bestellung abschicken. Aufgrund mangelnder Computerfähigkeiten der Jungs bei (bzw.
+	   Social Pizza-Bestellung war schon lange eine Funktionalität, die wir auf dem Chaostreff haben wollten. Das bedeutet, dass jeder am eigenen Rechner sich seine Wunschpizza klicken kann und wir dann genau eine Bestellung abschicken. Aufgrund mangelnder Computerfähigkeiten der Jungs bei (bzw. hinter) Hallo Pizza (Bestellungen gehen per Fax ein und werden dann abgetippt!), kommt dieses Feature natürlich nicht. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-11-11-social-pizza-bestellung-war-s/">Read more →</a></span>
 	</p>
       </div>
@@ -491,7 +491,7 @@ Hello…</h3></a>
 	
 	
 	<p>
-	  Android ist IPv6-enabled standardmäßig. Was man braucht, um das zu verifizieren und eventuell die Einstellungen zu ändern, ist Busybox: http://zedomax.com/android/busybox.zip (von diesem Blogpost) Die Installation ging bei mir einfacher als im mitgelieferten Script: x200 $ unzip busybox.zip x200 $ adb push busybox /sdcard/busybox x200 $ adb shell $ su # mount -o remount,rw /dev/block/mtdblock6 /system # mv /sdcard/busybox /system/xbin/busybox # cd /system/xbin # chmod 755 busybox # .
+	   Android ist IPv6-enabled standardmäßig. Was man braucht, um das zu verifizieren und eventuell die Einstellungen zu ändern, ist Busybox: http://zedomax.com/android/busybox.zip (von diesem Blogpost) Die Installation ging bei mir einfacher als im mitgelieferten Script: x200 $ unzip busybox.zip x200 $ adb push busybox /sdcard/busybox x200 $ adb shell $ su # mount -o remount,rw /dev/block/mtdblock6 /system # mv /sdcard/busybox /system/xbin/busybox # cd /system/xbin # chmod 755 busybox # ./busybox --install -s /system/xbin # mount -o remount,ro /dev/block/mtdblock6 /system Vermutlich arbeitet das Script vergleichsweise umständlich, weil ältere Android-Versionen kein cp hatten. Zu beachten ist, dass die Nummer des MTD-devices je nach Firmware unterschiedlich sein kann. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-10-20-android-ist-ipv6-enabled-stan/">Read more →</a></span>
 	</p>
       </div>
@@ -510,7 +510,7 @@ Hello…</h3></a>
 	
 	
 	<p>
-	  Android hat mich ;-). Ich möchte kurz darauf eingehen, warum ich gewechselt habe. Mein altes (erstes) Smartphone, das Nokia N900, habe ich mir gekauft, weil ich damit viele Aufgaben erledigen kann, für die ich sonst verschiedene Geräte brauchte: SIP-Telefon, MP3-Player (man kann sich auch in der Bahn mal einen Film anschauen, das funktioniert ziemlich gut), Telefon, mobiler IRC- und Webclient, Navigationssystem.
+	   Android hat mich ;-). Ich möchte kurz darauf eingehen, warum ich gewechselt habe. Mein altes (erstes) Smartphone, das Nokia N900, habe ich mir gekauft, weil ich damit viele Aufgaben erledigen kann, für die ich sonst verschiedene Geräte brauchte: SIP-Telefon, MP3-Player (man kann sich auch in der Bahn mal einen Film anschauen, das funktioniert ziemlich gut), Telefon, mobiler IRC- und Webclient, Navigationssystem. Am wichtigsten allerdings war, dass ich darauf eigene Anwendungen entwickeln konnte. Ich suchte zu der Zeit eine mobile Lösung mit Tastatur und Touchscreen, auf der ich selbst Code für einfache TODO-Listen-Programme, Tagesplaner, etc. schreiben konnte. Das N900 schien mir dafür eine gute Wahl. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-10-15-android-hat-mich---ich-mc/">Read more →</a></span>
 	</p>
       </div>
@@ -535,7 +535,7 @@ Hello…</h3></a>
 	
 	
 	<p>
-	  Da CouchDBs SSL-Unterstützung bei der Replikation derzeit nutzlos ist (für das Szenario, dass ich in einem fremden Netz unterwegs bin und der Netzbetreiber Man-in-the-middle spielt um meine Daten abzugreifen), musste ich mir eine Alternative überlegen. Folgende Punkte gilt es zu beachten: Die Kommunikation darf nicht unverschlüsselt das Telefon verlassen und darf erst in einem vertrauenswürdigen Netz entschlüsselt werden.
+	   Da CouchDBs SSL-Unterstützung bei der Replikation derzeit nutzlos ist (für das Szenario, dass ich in einem fremden Netz unterwegs bin und der Netzbetreiber Man-in-the-middle spielt um meine Daten abzugreifen), musste ich mir eine Alternative überlegen. Folgende Punkte gilt es zu beachten: Die Kommunikation darf nicht unverschlüsselt das Telefon verlassen und darf erst in einem vertrauenswürdigen Netz entschlüsselt werden. Die Kommunikation darf nicht an das falsche Ziel (Man-in-the-middle) geschickt werden. Nach Möglichkeit sollte die Lösung ressourcensparend sein. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-09-18-da-couchdbs-ssl-untersttzung/">Read more →</a></span>
 	</p>
       </div>
@@ -554,7 +554,7 @@ Hello…</h3></a>
 	
 	
 	<p>
-	  Und nun die Patches von heute, Montag, dem 2010-09-06: Korrekte Validierung der Zertifikate bei Replikation via SSL sicherstellen (Erlang kommt standardmäßig mit der Einstellung, dass der Fehler unknown_ca einfach ignoriert wird) Replikation kommt bei Transfer-Encoding: Chunked (Standard bei CouchDB) und SSL ins Stocken (wir sind uns noch nicht ganz sicher, was das eigentliche Problem ist) Replikation via IPv6 ermöglichen (überarbeitet, da der alte Patch bindv6only=0 voraussetzte, was mir nicht bewusst war) Erklärung wie man Replikation hinter einem SSL-Proxy (z.
+	   Und nun die Patches von heute, Montag, dem 2010-09-06: Korrekte Validierung der Zertifikate bei Replikation via SSL sicherstellen (Erlang kommt standardmäßig mit der Einstellung, dass der Fehler unknown_ca einfach ignoriert wird) Replikation kommt bei Transfer-Encoding: Chunked (Standard bei CouchDB) und SSL ins Stocken (wir sind uns noch nicht ganz sicher, was das eigentliche Problem ist) Replikation via IPv6 ermöglichen (überarbeitet, da der alte Patch bindv6only=0 voraussetzte, was mir nicht bewusst war) Erklärung wie man Replikation hinter einem SSL-Proxy (z.B. Apache) zum Laufen bekommt (CouchDBs Handling des X-Forwarded-Host-Headers kommt hier ProxyPassReverse in die Quere) Wem es nicht aufgefallen ist: Ja, alles CouchDB, ja, alles von mir. Dabei wollte ich vorhin doch nur mal eben die Datenbank replizieren… 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-09-07-und-nun-die-patches-von-heute/">Read more →</a></span>
 	</p>
       </div>
@@ -573,7 +573,7 @@ Hello…</h3></a>
 	
 	
 	<p>
-	  Wenn man DBus versteht (was am Anfang nicht einfach ist, insbesondere wenn man nur mal kurz reinschauen will) und insbesondere die DBus-API der Programmiersprache der Wahl versteht, ist das ja ganz in Ordnung. Scheint schnell zu sein und man kann damit recht stabil IPC bauen (auch wenn ich Teile der schwarzen Magie in dem ganzen Konstrukt, was heutzutage einen Desktop auszumachen scheint, noch nicht verstanden habe).
+	   Wenn man DBus versteht (was am Anfang nicht einfach ist, insbesondere wenn man nur mal kurz reinschauen will) und insbesondere die DBus-API der Programmiersprache der Wahl versteht, ist das ja ganz in Ordnung. Scheint schnell zu sein und man kann damit recht stabil IPC bauen (auch wenn ich Teile der schwarzen Magie in dem ganzen Konstrukt, was heutzutage einen Desktop auszumachen scheint, noch nicht verstanden habe). 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-09-01-wenn-man-dbus-versteht-was-a/">Read more →</a></span>
 	</p>
       </div>
@@ -598,7 +598,7 @@ Hello…</h3></a>
 	
 	
 	<p>
-	  Nachdem Rakudo Star am Donnerstag herausgekommen ist, habe ich hier mal schnell ein paar Zeilen zusammengehackt, um ein Dokument aus CouchDB zu holen. LWP::Simple und JSON::Tiny kommen bei Rakudo direkt mit: #!/usr/bin/env perl6 use v6; use JSON::Tiny; use LWP::Simple; my $dburl = 'http://localhost:5984/foo'; my $json = LWP::Simple.
+	   Nachdem Rakudo Star am Donnerstag herausgekommen ist, habe ich hier mal schnell ein paar Zeilen zusammengehackt, um ein Dokument aus CouchDB zu holen. LWP::Simple und JSON::Tiny kommen bei Rakudo direkt mit: #!/usr/bin/env perl6 use v6; use JSON::Tiny; use LWP::Simple; my $dburl = 'http://localhost:5984/foo'; my $json = LWP::Simple.new.get("$dburl/b616376f0add14a2feda9ad46b0025f3"); my $doc = from-json($json); say $doc.perl; Das Programm sollte relativ klar sein, mit LWP::Simple kommuniziert man mit CouchDB, das Ergebnis decoded man mit from-json und das Analogon zu Data::Dumper ist die .perl-Method auf beliebige Datenstrukturen. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-07-31-nachdem-rakudo-star-am-donner/">Read more →</a></span>
 	</p>
       </div>
@@ -617,7 +617,7 @@ Hello…</h3></a>
 	
 	
 	<p>
-	  In C++ gibt es Closures! Zwar erst mit C++0x (wofür man g++ 4.5 braucht), aber immerhin. Damit wird das Erstellen asynchroner APIs endlich annehmbar (in diesem Fall der CouchDB-Teil einer Qt-Anwendung, wegen Qt muss ich überhaupt erst C++ nutzen). Zum Vergleich mal die API vorher: void MainWindow::clickedTask() { TodoButton *btn = (TodoButton*)sender(); /* Get the document from CouchDB */ QNetworkReply *nreply = db->get_document(btn->ID()); connect(nreply, SIGNAL(finished()), this, SLOT(recv_entry_edit())); } void MainWindow::recv_entry_edit() { QNetworkReply *reply = (QNetworkReply*)sender(); QByteArray answer = reply->readAll(); QJson::Parser p; bool ok; QVariant var = p.
+	   In C++ gibt es Closures! Zwar erst mit C++0x (wofür man g++ 4.5 braucht), aber immerhin. Damit wird das Erstellen asynchroner APIs endlich annehmbar (in diesem Fall der CouchDB-Teil einer Qt-Anwendung, wegen Qt muss ich überhaupt erst C++ nutzen). Zum Vergleich mal die API vorher: 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-07-31-in-c-gibt-es-closures-zwar/">Read more →</a></span>
 	</p>
       </div>
@@ -636,7 +636,7 @@ Hello…</h3></a>
 	
 	
 	<p>
-	  Nachdem ich letztens ein WebDAV-plugin für Maemo gehackt habe, wollte ich das nun hochladen. Dazu registriert man sich bei maemo.org und stellt dann einen Request auf Upload-Rechte für das extras-devel-Repository. Nachdem man diese Rechte bekommt lädt man seinen SSH-Public-Key hoch und kann danach Pakete in den Autobuilder laden.
+	   Nachdem ich letztens ein WebDAV-plugin für Maemo gehackt habe, wollte ich das nun hochladen. Dazu registriert man sich bei maemo.org und stellt dann einen Request auf Upload-Rechte für das extras-devel-Repository. Nachdem man diese Rechte bekommt lädt man seinen SSH-Public-Key hoch und kann danach Pakete in den Autobuilder laden. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-07-27-nachdem-ich-letztens-ein-webd/">Read more →</a></span>
 	</p>
       </div>
@@ -655,7 +655,7 @@ Hello…</h3></a>
 	
 	
 	<p>
-	  Auf meiner Asterisk-Telefonanlage läuft natürlich auch ein Anrufbeantworter. Damit ich diesen nicht immer nur abfragen kann, wenn ich gerade einen E-Mail-Client vor mir habe (sup unterstützt leider noch keine verteilten Setups), sondern auch, wenn ich gerade nur mein Telefon greifbar habe, habe ich meine Konfiguration etwas geändert.
+	   Auf meiner Asterisk-Telefonanlage läuft natürlich auch ein Anrufbeantworter. Damit ich diesen nicht immer nur abfragen kann, wenn ich gerade einen E-Mail-Client vor mir habe (sup unterstützt leider noch keine verteilten Setups), sondern auch, wenn ich gerade nur mein Telefon greifbar habe, habe ich meine Konfiguration etwas geändert. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-07-25-asterisk_mp3_voicemail/">Read more →</a></span>
 	</p>
       </div>
@@ -674,7 +674,7 @@ Hello…</h3></a>
 	
 	
 	<p>
-	  Auf dem N900 kann man Fotos/Videos via flickr und anderen Diensten direkt ins Netz stellen. Gestern fiel mir auf, dass flickr bei kostenlosen Accounts allerdings ein Limit von 2 Videos pro Monat hat, was ein bisschen stört, wenn man gerade das dritte Video hochladen möchte.
+	   Auf dem N900 kann man Fotos/Videos via flickr und anderen Diensten direkt ins Netz stellen. Gestern fiel mir auf, dass flickr bei kostenlosen Accounts allerdings ein Limit von 2 Videos pro Monat hat, was ein bisschen stört, wenn man gerade das dritte Video hochladen möchte. Neben flickr und ovi, den einzigen beiden Plugins, die standardmäßig installiert sind, gibt es natürlich auch ein youtube-Plugin (für das man sich im Ovi Store registrieren muss, obwohl es kostenlos ist). Leider konnte ich das youtube-Plugin nicht nutzen, da es mir immer wieder sagte, mein Benutzername/Passwort seien falsch, obwohl ich beides mehrfach verifiziert und alle Varianten durchprobiert habe (im Browser klappt der Login). 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-07-23-auf-dem-n900-kann-man-fotosv/">Read more →</a></span>
 	</p>
       </div>
@@ -693,7 +693,7 @@ Hello…</h3></a>
 	
 	
 	<p>
-	  Wer i3lock nutzt ist herzlich dazu eingeladen, den xcb-Branch von i3lock auszuprobieren. Der Code darin wurde komplett auf xcb portiert und ist dadurch zum einen hübscher und geringfügig schneller, zum anderen wurden einige Probleme behoben. Eine kurze Übersicht: Man kann Bilddateien im PNG-Format statt im XPM-Format laden Beim Suspend-to-RAM verschwindet das Bild nicht mehr gelegentlich Popups überlagern nun nicht mehr das i3lock-Fenster (sondern i3lock bleibt permanent im Vordergrund) Für diejenigen, die nicht fließend git sprechen: $ git clone git://code.
+	   Wer i3lock nutzt ist herzlich dazu eingeladen, den xcb-Branch von i3lock auszuprobieren. Der Code darin wurde komplett auf xcb portiert und ist dadurch zum einen hübscher und geringfügig schneller, zum anderen wurden einige Probleme behoben. Eine kurze Übersicht: Man kann Bilddateien im PNG-Format statt im XPM-Format laden Beim Suspend-to-RAM verschwindet das Bild nicht mehr gelegentlich Popups überlagern nun nicht mehr das i3lock-Fenster (sondern i3lock bleibt permanent im Vordergrund) Für diejenigen, die nicht fließend git sprechen: 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-07-21-wer-i3lock-nutzt-ist-herzlich/">Read more →</a></span>
 	</p>
       </div>
@@ -740,7 +740,7 @@ Hello…</h3></a>
 	
 	
 	<p>
-	  Da Xen wohl auch in Zukunft nicht in den Linux-Kernel aufgenommen wird und stattdessen KVM bereits verfügbar ist, habe ich meinen Server von Xen auf KVM migriert. Da die Migration ziemlich stressfrei lief (wenn man weiß, wo man drehen muss), möchte ich hier kurz den Verlauf schildern.
+	   Da Xen wohl auch in Zukunft nicht in den Linux-Kernel aufgenommen wird und stattdessen KVM bereits verfügbar ist, habe ich meinen Server von Xen auf KVM migriert. Da die Migration ziemlich stressfrei lief (wenn man weiß, wo man drehen muss), möchte ich hier kurz den Verlauf schildern. Ich gehe davon aus, dass in der bestehenden Xen-Installation die Daten auf Logical Volumes abgelegt wurden. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-06-23-xen_to_kvm/">Read more →</a></span>
 	</p>
       </div>
@@ -803,7 +803,7 @@ Hello…</h3></a>
 	
 	
 	<p>
-	  Da ich mich häufig dabei erwische, im aktuellen Verzeichnis nach dem letzten Coredump zu suchen um ihn inklusive zugehörigem Programm in den Debugger zu laden, habe ich diese Aufgabe in ein Script ausgelagert. Die folgenden Zeilen Perl suchen den letzten Coredump (dazu muss das Coredump-Pattern mit sysctl -w kernel.
+	   Da ich mich häufig dabei erwische, im aktuellen Verzeichnis nach dem letzten Coredump zu suchen um ihn inklusive zugehörigem Programm in den Debugger zu laden, habe ich diese Aufgabe in ein Script ausgelagert. Die folgenden Zeilen Perl suchen den letzten Coredump (dazu muss das Coredump-Pattern mit sysctl -w kernel.core_pattern = %e.core.%p sinnvoll definiert sein) und starten gdb mit den passenden Optionen: 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-05-31-da-ich-mich-hufig-dabei-erwi/">Read more →</a></span>
 	</p>
       </div>
@@ -822,7 +822,7 @@ Hello…</h3></a>
 	
 	
 	<p>
-	  Im RaumZeitLabor tauchte letztens eine WatchGuard Firebox X500 (Modellnummer R6264S) auf, die von ihrem Besitzer auf den Müll geworfen wurde. Für uns ist die Kiste allerdings durchaus noch zu gebrauchen: In ihr steckt ein größtenteils aus Standard-x86-Hardware bestehendes System mit Serieller Konsole, 6 Ethernet-Ports, 256 MB SDRAM und einem Celeron 1,2 GHz.
+	   Im RaumZeitLabor tauchte letztens eine WatchGuard Firebox X500 (Modellnummer R6264S) auf, die von ihrem Besitzer auf den Müll geworfen wurde. Für uns ist die Kiste allerdings durchaus noch zu gebrauchen: In ihr steckt ein größtenteils aus Standard-x86-Hardware bestehendes System mit Serieller Konsole, 6 Ethernet-Ports, 256 MB SDRAM und einem Celeron 1,2 GHz. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-05-22-firebox/">Read more →</a></span>
 	</p>
       </div>

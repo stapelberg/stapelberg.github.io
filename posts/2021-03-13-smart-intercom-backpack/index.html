@@ -8,12 +8,13 @@
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="Make your intercom smarter with an MQTT backpack">
   <meta property="og:description" content="This post is the third article in a series of blog posts about the Nuki Opener on the SCS bus intercom, see the Series Overview.
-I bought the cheapest compatible BTicino intercom device (BT 344232 for 32 €) that I could find on eBay, then soldered in 4 wires and added microcontrollers to make it smart.">
+I bought the cheapest compatible BTicino intercom device (BT 344232 for 32 €) that I could find on eBay, then soldered in 4 wires and added microcontrollers to make it smart. It now connects to my Nuki Opener Smart Intercom IOT device, and to my local MQTT Pub/Sub bus (why not?).
+">
   
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hub733b3134fea4b189ea38881ff1c39d2_1378037_200x200_fit_q75_box.jpg">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hu_c479ff823d6b145e.jpg">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -21,7 +22,8 @@ I bought the cheapest compatible BTicino intercom device (BT 344232 for 32 €) 
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
   <meta name="description" content="This post is the third article in a series of blog posts about the Nuki Opener on the SCS bus intercom, see the Series Overview.
-I bought the cheapest compatible BTicino intercom device (BT 344232 for 32 €) that I could find on eBay, then soldered in 4 wires and added microcontrollers to make it smart.">
+I bought the cheapest compatible BTicino intercom device (BT 344232 for 32 €) that I could find on eBay, then soldered in 4 wires and added microcontrollers to make it smart. It now connects to my Nuki Opener Smart Intercom IOT device, and to my local MQTT Pub/Sub bus (why not?).
+">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -258,8 +260,8 @@ bus</a> (why not?).</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hub733b3134fea4b189ea38881ff1c39d2_1378037_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hub733b3134fea4b189ea38881ff1c39d2_1378037_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hub733b3134fea4b189ea38881ff1c39d2_1378037_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hu_c408ad597553711c.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hu_ae4f1ab9c047b418.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hu_d89c35e50369a431.jpg"
   alt="modified BTicino" title="modified BTicino"
   width="600"
   height="800"
@@ -337,8 +339,8 @@ jumper wires to them:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/signals.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/signals_huad180b5f717872783fbf44350a70ae1a_718323_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/signals_huad180b5f717872783fbf44350a70ae1a_718323_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/signals_huad180b5f717872783fbf44350a70ae1a_718323_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/signals_hu_c5698a6d07eb10da.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/signals_hu_22e8200ad4d189e5.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/signals_hu_2ea0957177daec92.jpg"
   alt="BTicino signals" title="BTicino signals"
   width="600"
   height="631"
@@ -381,8 +383,8 @@ microcontroller to read the signal and place it on MQTT.</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/schematic.png"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/schematic_hucc6cb59bde9ea030d5dc2bcd00b21a79_47323_1200x0_resize_box_3.png 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/schematic_hucc6cb59bde9ea030d5dc2bcd00b21a79_47323_1800x0_resize_box_3.png 3x"
-  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/schematic_hucc6cb59bde9ea030d5dc2bcd00b21a79_47323_600x0_resize_box_3.png"
+  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/schematic_hu_a076203f2a256912.png 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/schematic_hu_861803767749ba6b.png 3x"
+  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/schematic_hu_7df282ef6c11210f.png"
   alt="schematic" title="schematic"
   width="600"
   height="564"
@@ -426,34 +428,34 @@ be reproduced by sending serial data.</p>
 <p>Here are the 2 microcontrollers I’m using in this project, plus the Teensy I
 used previously:</p>
 <table>
-<thead>
-<tr>
-<th>Microcontroller</th>
-<th>WiFi</th>
-<th>Analog Comparator</th>
-<th>Price</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="https://www.pjrc.com/store/teensy40.html">Teensy 4.0</a></td>
-<td>no</td>
-<td>yes</td>
-<td>19 USD</td>
-</tr>
-<tr>
-<td><a href="https://www.adafruit.com/product/4600">Adafruit QT Py</a></td>
-<td>no</td>
-<td>yes</td>
-<td>6 USD</td>
-</tr>
-<tr>
-<td><a href="https://www.tinypico.com/">TinyPICO</a></td>
-<td>yes</td>
-<td>no</td>
-<td>20 USD</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Microcontroller</th>
+          <th>WiFi</th>
+          <th>Analog Comparator</th>
+          <th>Price</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><a href="https://www.pjrc.com/store/teensy40.html">Teensy 4.0</a></td>
+          <td>no</td>
+          <td>yes</td>
+          <td>19 USD</td>
+      </tr>
+      <tr>
+          <td><a href="https://www.adafruit.com/product/4600">Adafruit QT Py</a></td>
+          <td>no</td>
+          <td>yes</td>
+          <td>6 USD</td>
+      </tr>
+      <tr>
+          <td><a href="https://www.tinypico.com/">TinyPICO</a></td>
+          <td>yes</td>
+          <td>no</td>
+          <td>20 USD</td>
+      </tr>
+  </tbody>
 </table>
 <p>If ESP32 boards such as the TinyPICO had a hardware Analog Comparator, I would
 likely use just one microcontroller, but keep the serial interface on a GPIO for
@@ -486,8 +488,8 @@ MicroPython (hence the name).</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/qtpy.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/qtpy_hud5b1d29bf03dbaef00ea80c4fff123ac_742679_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/qtpy_hud5b1d29bf03dbaef00ea80c4fff123ac_742679_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/qtpy_hud5b1d29bf03dbaef00ea80c4fff123ac_742679_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/qtpy_hu_ab5db638191217e8.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/qtpy_hu_59040b6943c64de3.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/qtpy_hu_3d5b2b4cccbb6f7a.jpg"
   alt="Adafruit QT Py" title="Adafruit QT Py"
   width="600"
   height="378"
@@ -538,8 +540,8 @@ convenience:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-comparison.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-comparison_hu6f8a665b92c49e3c59fd49dc9db9188f_1416694_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-comparison_hu6f8a665b92c49e3c59fd49dc9db9188f_1416694_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-comparison_hu6f8a665b92c49e3c59fd49dc9db9188f_1416694_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-comparison_hu_daade39dbd2ae5f4.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-comparison_hu_39ddb5ba0df623b1.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-comparison_hu_b07c1ddbee95b00a.jpg"
   alt="TinyPICO comparison with Adafruit Huzzah32 and Teensy 4.0" title="TinyPICO comparison with Adafruit Huzzah32 and Teensy 4.0"
   width="600"
   height="415"
@@ -587,8 +589,8 @@ case, but worked flawlessly for weeks:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/prototype.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/prototype_hu9e7bb0ca740035a832123149efe1ff0b_1457519_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/prototype_hu9e7bb0ca740035a832123149efe1ff0b_1457519_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/prototype_hu9e7bb0ca740035a832123149efe1ff0b_1457519_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/prototype_hu_d5870ccb77c4e99.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/prototype_hu_5d6552e3983ee929.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/prototype_hu_36c6d9863cfbcbbb.jpg"
   alt="prototype" title="prototype"
   width="600"
   height="527"
@@ -641,8 +643,8 @@ easily do that from the QT Py itself and skip the TinyPICO.</div>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack_hu6792fa18b3c27ff7621846a3ddcd41b1_1436932_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack_hu6792fa18b3c27ff7621846a3ddcd41b1_1436932_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack_hu6792fa18b3c27ff7621846a3ddcd41b1_1436932_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack_hu_579e97439372cb05.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack_hu_d77aee617f482ba1.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack_hu_ccd5fd7d4609fec6.jpg"
   alt="QT Py with backpack" title="QT Py with backpack"
   width="600"
   height="462"
@@ -672,8 +674,8 @@ border: 1px solid #000;
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack-pcb.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack-pcb_hu7c3948370bbbb36c4b0624284e90cf21_991666_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack-pcb_hu7c3948370bbbb36c4b0624284e90cf21_991666_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack-pcb_hu7c3948370bbbb36c4b0624284e90cf21_991666_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack-pcb_hu_90ad7e076d14509b.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack-pcb_hu_d1b9fdcdb3808c9e.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/backpack-pcb_hu_7d4246956e22c1bd.jpg"
   alt="QT Py with backpack PCB" title="QT Py with backpack PCB"
   width="600"
   height="346"
@@ -709,8 +711,8 @@ and re-combine the parts of this project.</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-wires.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-wires_hu0ea0facd5de8df5b7e0832eec5ec06a2_2526440_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-wires_hu0ea0facd5de8df5b7e0832eec5ec06a2_2526440_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-wires_hu0ea0facd5de8df5b7e0832eec5ec06a2_2526440_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-wires_hu_814d2584d17af693.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-wires_hu_dcd8445b1dc252d.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/tinypico-wires_hu_aa1555c95c20c82e.jpg"
   alt="wires soldered directly into the TinyPICO" title="wires soldered directly into the TinyPICO"
   width="600"
   height="678"
@@ -726,65 +728,65 @@ border: 1px solid #000;
 
 <p>From top to bottom, I made the following connections:</p>
 <table>
-<thead>
-<tr>
-<th>Pin</th>
-<th>Color</th>
-<th>Function</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>25</td>
-<td><span style="background-color: #ff4136; padding: 0 .5em 0 .5em">red</span></td>
-<td><code>SCSRX_3V3</code></td>
-</tr>
-<tr>
-<td>27</td>
-<td><span style="background-color: #2ecc40; padding: 0 .5em 0 .5em">green</span></td>
-<td><code>OPEN_3V3</code></td>
-</tr>
-<tr>
-<td>15</td>
-<td><span style="background-color: #0074d9; color: white; padding: 0 .5em 0 .5em">blue</span></td>
-<td>Nuki Opener blue cable</td>
-</tr>
-<tr>
-<td>14</td>
-<td><span style="background-color: #ffdc00; padding: 0 .5em 0 .5em">yellow</span></td>
-<td>Nuki Opener yellow cable</td>
-</tr>
-<tr>
-<td>4</td>
-<td><span style="background-color: #b10dc9; color: white; padding: 0 .5em 0 .5em">purple</span></td>
-<td>floor ring button pushed</td>
-</tr>
-<tr>
-<td>3V3</td>
-<td><span style="background-color: white; padding: 0 .5em 0 .5em">white</span></td>
-<td>3.3V for the floor ring button</td>
-</tr>
-<tr>
-<td>5V</td>
-<td><span style="background-color: #ff851b; padding: 0 .5em 0 .5em">orange</span></td>
-<td>power for the TinyPICO</td>
-</tr>
-<tr>
-<td>GND</td>
-<td><span style="background-color: brown; color: white; padding: 0 .5em 0 .5em">brown</span></td>
-<td>ground for the TinyPICO</td>
-</tr>
-<tr>
-<td>GND</td>
-<td><span style="background-color: brown; color: white; padding: 0 .5em 0 .5em">brown</span></td>
-<td>ground to the QT Py</td>
-</tr>
-<tr>
-<td>GND</td>
-<td><span style="background-color: brown; color: white; padding: 0 .5em 0 .5em">brown</span></td>
-<td>ground to the Nuki Opener</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Pin</th>
+          <th>Color</th>
+          <th>Function</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>25</td>
+          <td><span style="background-color: #ff4136; padding: 0 .5em 0 .5em">red</span></td>
+          <td><code>SCSRX_3V3</code></td>
+      </tr>
+      <tr>
+          <td>27</td>
+          <td><span style="background-color: #2ecc40; padding: 0 .5em 0 .5em">green</span></td>
+          <td><code>OPEN_3V3</code></td>
+      </tr>
+      <tr>
+          <td>15</td>
+          <td><span style="background-color: #0074d9; color: white; padding: 0 .5em 0 .5em">blue</span></td>
+          <td>Nuki Opener blue cable</td>
+      </tr>
+      <tr>
+          <td>14</td>
+          <td><span style="background-color: #ffdc00; padding: 0 .5em 0 .5em">yellow</span></td>
+          <td>Nuki Opener yellow cable</td>
+      </tr>
+      <tr>
+          <td>4</td>
+          <td><span style="background-color: #b10dc9; color: white; padding: 0 .5em 0 .5em">purple</span></td>
+          <td>floor ring button pushed</td>
+      </tr>
+      <tr>
+          <td>3V3</td>
+          <td><span style="background-color: white; padding: 0 .5em 0 .5em">white</span></td>
+          <td>3.3V for the floor ring button</td>
+      </tr>
+      <tr>
+          <td>5V</td>
+          <td><span style="background-color: #ff851b; padding: 0 .5em 0 .5em">orange</span></td>
+          <td>power for the TinyPICO</td>
+      </tr>
+      <tr>
+          <td>GND</td>
+          <td><span style="background-color: brown; color: white; padding: 0 .5em 0 .5em">brown</span></td>
+          <td>ground for the TinyPICO</td>
+      </tr>
+      <tr>
+          <td>GND</td>
+          <td><span style="background-color: brown; color: white; padding: 0 .5em 0 .5em">brown</span></td>
+          <td>ground to the QT Py</td>
+      </tr>
+      <tr>
+          <td>GND</td>
+          <td><span style="background-color: brown; color: white; padding: 0 .5em 0 .5em">brown</span></td>
+          <td>ground to the Nuki Opener</td>
+      </tr>
+  </tbody>
 </table>
 <p>The TinyPICO USB port is still usable for updating the software and serial console
 debugging.</p>
@@ -805,8 +807,8 @@ debugging.</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hub733b3134fea4b189ea38881ff1c39d2_1378037_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hub733b3134fea4b189ea38881ff1c39d2_1378037_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hub733b3134fea4b189ea38881ff1c39d2_1378037_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hu_c408ad597553711c.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hu_ae4f1ab9c047b418.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/intercom-modified-featured_hu_d89c35e50369a431.jpg"
   alt="modified BTicino" title="modified BTicino"
   width="600"
   height="800"
@@ -840,8 +842,8 @@ through which a USB plug doesn’t fit:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/final-installation.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/final-installation_hu026d112f6291a36ec32cbedad99b0fdb_1989526_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/final-installation_hu026d112f6291a36ec32cbedad99b0fdb_1989526_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/final-installation_hu026d112f6291a36ec32cbedad99b0fdb_1989526_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/final-installation_hu_c8c9e198f83a55b5.jpg 2x,https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/final-installation_hu_26c62134cfbd7446.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-03-13-smart-intercom-backpack/final-installation_hu_259b431127871e09.jpg"
   alt="final installation" title="final installation"
   width="600"
   height="800"

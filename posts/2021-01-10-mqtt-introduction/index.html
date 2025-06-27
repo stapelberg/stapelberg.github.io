@@ -9,7 +9,8 @@
   <meta property="og:title" content="A quick introduction to MQTT for IOT">
   <meta property="og:description" content="While I had heard the abbreviation MQTT many times, I never had a closer look at what MQTT is.
 Here are a few quick notes about using MQTT as Pub/Sub bus in a home IOT network.
-Motivation Once you have a few IOT devices, an obvious question is how to network them.">
+Motivation Once you have a few IOT devices, an obvious question is how to network them.
+">
   
   
   
@@ -20,7 +21,8 @@ Motivation Once you have a few IOT devices, an obvious question is how to networ
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
   <meta name="description" content="While I had heard the abbreviation MQTT many times, I never had a closer look at what MQTT is.
 Here are a few quick notes about using MQTT as Pub/Sub bus in a home IOT network.
-Motivation Once you have a few IOT devices, an obvious question is how to network them.">
+Motivation Once you have a few IOT devices, an obvious question is how to network them.
+">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2021-01-10-mqtt-introduction/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -468,11 +470,11 @@ Bridge sends to MQTT:</p>
 </span></span><span style="display:flex;"><span>		}
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>		mqttClient.<span style="color:#06287e">Publish</span>(
-</span></span><span style="display:flex;"><span>			<span style="color:#4070a0">&#34;zkj-nuki/webhook&#34;</span>, <span style="color:#60a0b0;font-style:italic">// topic
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>			<span style="color:#40a070">0</span>, <span style="color:#60a0b0;font-style:italic">// qos
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>			<span style="color:#007020;font-weight:bold">true</span>, <span style="color:#60a0b0;font-style:italic">// retained
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>			<span style="color:#007020">string</span>(b)) <span style="color:#60a0b0;font-style:italic">// payload
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	})
+</span></span><span style="display:flex;"><span>			<span style="color:#4070a0">&#34;zkj-nuki/webhook&#34;</span>, <span style="color:#60a0b0;font-style:italic">// topic</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#40a070">0</span>, <span style="color:#60a0b0;font-style:italic">// qos</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">true</span>, <span style="color:#60a0b0;font-style:italic">// retained</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#007020">string</span>(b)) <span style="color:#60a0b0;font-style:italic">// payload</span>
+</span></span><span style="display:flex;"><span>	})
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> http.<span style="color:#06287e">ListenAndServe</span>(<span style="color:#4070a0">&#34;:8319&#34;</span>, mux)
 </span></span><span style="display:flex;"><span>}
@@ -509,20 +511,20 @@ notifications, or to headless Raspberry Pis.</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">type</span> controlLoop <span style="color:#007020;font-weight:bold">interface</span> {
 </span></span><span style="display:flex;"><span>	sync.Locker
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#06287e">StatusString</span>() <span style="color:#902000">string</span> <span style="color:#60a0b0;font-style:italic">// for human introspection
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>	<span style="color:#06287e">StatusString</span>() <span style="color:#902000">string</span> <span style="color:#60a0b0;font-style:italic">// for human introspection</span>
+</span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>	<span style="color:#06287e">ProcessEvent</span>(MQTTEvent) []MQTTPublish
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Like mqtt.Message, but with timestamp
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">type</span> MQTTEvent <span style="color:#007020;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Like mqtt.Message, but with timestamp</span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">type</span> MQTTEvent <span style="color:#007020;font-weight:bold">struct</span> {
 </span></span><span style="display:flex;"><span>	Timestamp time.Time
 </span></span><span style="display:flex;"><span>	Topic     <span style="color:#902000">string</span>
 </span></span><span style="display:flex;"><span>	Payload   <span style="color:#007020;font-weight:bold">interface</span>{}
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Parameters for mqtt.Client.Publish()
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">type</span> MQTTPublish <span style="color:#007020;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Parameters for mqtt.Client.Publish()</span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">type</span> MQTTPublish <span style="color:#007020;font-weight:bold">struct</span> {
 </span></span><span style="display:flex;"><span>	Topic    <span style="color:#902000">string</span>
 </span></span><span style="display:flex;"><span>	Qos      <span style="color:#902000">byte</span>
 </span></span><span style="display:flex;"><span>	Retained <span style="color:#902000">bool</span>
@@ -541,18 +543,18 @@ isolation.</p>
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> (h <span style="color:#666">*</span>mqttMessageHandler) <span style="color:#06287e">handle</span>(client mqtt.Client, m mqtt.Message) {
 </span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;received message %q on %q&#34;</span>, m.<span style="color:#06287e">Payload</span>(), m.<span style="color:#06287e">Topic</span>())
 </span></span><span style="display:flex;"><span>	ev <span style="color:#666">:=</span> MQTTEvent{
-</span></span><span style="display:flex;"><span>		Timestamp: time.<span style="color:#06287e">Now</span>(), <span style="color:#60a0b0;font-style:italic">// consistent for all loops
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		Topic:     m.<span style="color:#06287e">Topic</span>(),
+</span></span><span style="display:flex;"><span>		Timestamp: time.<span style="color:#06287e">Now</span>(), <span style="color:#60a0b0;font-style:italic">// consistent for all loops</span>
+</span></span><span style="display:flex;"><span>		Topic:     m.<span style="color:#06287e">Topic</span>(),
 </span></span><span style="display:flex;"><span>		Payload:   m.<span style="color:#06287e">Payload</span>(),
 </span></span><span style="display:flex;"><span>	}
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">for</span> _, l <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> h.loops {
-</span></span><span style="display:flex;"><span>		l <span style="color:#666">:=</span> l <span style="color:#60a0b0;font-style:italic">// copy
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#007020;font-weight:bold">go</span> <span style="color:#007020;font-weight:bold">func</span>() {
-</span></span><span style="display:flex;"><span>			<span style="color:#60a0b0;font-style:italic">// For reliability, we call each loop in its own goroutine
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>			<span style="color:#60a0b0;font-style:italic">// (yes, one per message), so that when one loop gets stuck,
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>			<span style="color:#60a0b0;font-style:italic">// the others still make progress.
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>			l.<span style="color:#06287e">Lock</span>()
+</span></span><span style="display:flex;"><span>		l <span style="color:#666">:=</span> l <span style="color:#60a0b0;font-style:italic">// copy</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">go</span> <span style="color:#007020;font-weight:bold">func</span>() {
+</span></span><span style="display:flex;"><span>			<span style="color:#60a0b0;font-style:italic">// For reliability, we call each loop in its own goroutine</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#60a0b0;font-style:italic">// (yes, one per message), so that when one loop gets stuck,</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#60a0b0;font-style:italic">// the others still make progress.</span>
+</span></span><span style="display:flex;"><span>			l.<span style="color:#06287e">Lock</span>()
 </span></span><span style="display:flex;"><span>			results <span style="color:#666">:=</span> l.<span style="color:#06287e">ProcessEvent</span>(ev)
 </span></span><span style="display:flex;"><span>			l.<span style="color:#06287e">Unlock</span>()
 </span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">if</span> <span style="color:#007020">len</span>(results) <span style="color:#666">==</span> <span style="color:#40a070">0</span> {
@@ -564,8 +566,8 @@ isolation.</p>
 </span></span><span style="display:flex;"><span>					client.<span style="color:#06287e">Publish</span>(r.Topic, r.Qos, r.Retained, r.Payload)
 </span></span><span style="display:flex;"><span>				}
 </span></span><span style="display:flex;"><span>			}
-</span></span><span style="display:flex;"><span>			<span style="color:#60a0b0;font-style:italic">// …input/output logging omitted for brevity…
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		}()
+</span></span><span style="display:flex;"><span>			<span style="color:#60a0b0;font-style:italic">// …input/output logging omitted for brevity…</span>
+</span></span><span style="display:flex;"><span>		}()
 </span></span><span style="display:flex;"><span>	}
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><h3 id="regelwerk-control-loop-example">regelwerk: control loop example</h3>
@@ -580,15 +582,15 @@ and
 the output goes to a Sonoff S26 Smart Power Plug running
 <a href="https://tasmota.github.io/docs/">Tasmota</a>.</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">type</span> avrPowerLoop <span style="color:#007020;font-weight:bold">struct</span> {
-</span></span><span style="display:flex;"><span>	statusLoop <span style="color:#60a0b0;font-style:italic">// for l.statusf() debugging
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>	statusLoop <span style="color:#60a0b0;font-style:italic">// for l.statusf() debugging</span>
+</span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>	midnaUnlocked          <span style="color:#902000">bool</span>
 </span></span><span style="display:flex;"><span>	michaelPhoneExpiration time.Time
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> (l <span style="color:#666">*</span>avrPowerLoop) <span style="color:#06287e">ProcessEvent</span>(ev MQTTEvent) []MQTTPublish {
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Update loop state based on inputs:
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">switch</span> ev.Topic {
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Update loop state based on inputs:</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">switch</span> ev.Topic {
 </span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">case</span> <span style="color:#4070a0">&#34;runstatus/midna/i3lock&#34;</span>:
 </span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">var</span> status <span style="color:#007020;font-weight:bold">struct</span> {
 </span></span><span style="display:flex;"><span>			Running <span style="color:#902000">bool</span> <span style="color:#4070a0">`json:&#34;running&#34;`</span>
@@ -610,11 +612,11 @@ the output goes to a Sonoff S26 Smart Power Plug running
 </span></span><span style="display:flex;"><span>		l.michaelPhoneExpiration = lease.Expiration
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">default</span>:
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span> <span style="color:#60a0b0;font-style:italic">// event did not influence our state
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	}
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span> <span style="color:#60a0b0;font-style:italic">// event did not influence our state</span>
+</span></span><span style="display:flex;"><span>	}
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Publish desired state changes:
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	now <span style="color:#666">:=</span> ev.Timestamp
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Publish desired state changes:</span>
+</span></span><span style="display:flex;"><span>	now <span style="color:#666">:=</span> ev.Timestamp
 </span></span><span style="display:flex;"><span>	phoneHome <span style="color:#666">:=</span> l.michaelPhoneExpiration.<span style="color:#06287e">After</span>(now)
 </span></span><span style="display:flex;"><span>	anyoneHome <span style="color:#666">:=</span> l.midnaUnlocked <span style="color:#666">||</span> (now.<span style="color:#06287e">Hour</span>() &gt; <span style="color:#40a070">8</span> <span style="color:#666">&amp;&amp;</span> phoneHome)
 </span></span><span style="display:flex;"><span>	l.<span style="color:#06287e">statusf</span>(<span style="color:#4070a0">&#34;midnaUnlocked=%v || (now.Hour=%v &gt; 8 &amp;&amp; phoneHome=%v)&#34;</span>,

@@ -7,10 +7,9 @@
 
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="Bug Report: Defekter Nuki Opener (an BTicino 344212)">
-  <meta property="og:description" content="Update 2020-11-03: Ich habe den zweiten Nuki Opener auf Software-Version 1.5.3 aktualisiert, und wider erwarten funktioniert er!
+  <meta property="og:description" content=" Update 2020-11-03: Ich habe den zweiten Nuki Opener auf Software-Version 1.5.3 aktualisiert, und wider erwarten funktioniert er!
 Offenbar war mein erster Nuki Opener defekt.
-Ich habe kürzlich einen Nuki Opener gekauft und leider nicht in Betrieb nehmen können.
-Den Nuki Opener konnte ich zwar anlernen, aber wenn er versucht, die Tür zu öffnen, passiert im Haus einfach nichts — die Klingelanlage reagiert nicht.">
+">
   
   
   
@@ -19,10 +18,9 @@ Den Nuki Opener konnte ich zwar anlernen, aber wenn er versucht, die Tür zu öf
   <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
-  <meta name="description" content="Update 2020-11-03: Ich habe den zweiten Nuki Opener auf Software-Version 1.5.3 aktualisiert, und wider erwarten funktioniert er!
+  <meta name="description" content=" Update 2020-11-03: Ich habe den zweiten Nuki Opener auf Software-Version 1.5.3 aktualisiert, und wider erwarten funktioniert er!
 Offenbar war mein erster Nuki Opener defekt.
-Ich habe kürzlich einen Nuki Opener gekauft und leider nicht in Betrieb nehmen können.
-Den Nuki Opener konnte ich zwar anlernen, aber wenn er versucht, die Tür zu öffnen, passiert im Haus einfach nichts — die Klingelanlage reagiert nicht.">
+">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2020-10-16-nuki-bug-writeup/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -225,30 +223,30 @@ entsperrt die Tür.</p>
 <p>Ein Unterschied zwischen den beiden Geräten: der zweite Opener läuft noch mit
 der alten Software-Version:</p>
 <table>
-<thead>
-<tr>
-<th>Gerät</th>
-<th>Software-Version</th>
-<th>Funktioniert?</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Nuki Opener #1</td>
-<td>1.5.3 (aktuell)</td>
-<td>kaputt :-(</td>
-</tr>
-<tr>
-<td>Nuki Opener #2</td>
-<td>1.3.1</td>
-<td>funktioniert!</td>
-</tr>
-<tr>
-<td>Nuki Opener #2</td>
-<td>1.5.3</td>
-<td>funktioniert!</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Gerät</th>
+          <th>Software-Version</th>
+          <th>Funktioniert?</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Nuki Opener #1</td>
+          <td>1.5.3 (aktuell)</td>
+          <td>kaputt :-(</td>
+      </tr>
+      <tr>
+          <td>Nuki Opener #2</td>
+          <td>1.3.1</td>
+          <td>funktioniert!</td>
+      </tr>
+      <tr>
+          <td>Nuki Opener #2</td>
+          <td>1.5.3</td>
+          <td>funktioniert!</td>
+      </tr>
+  </tbody>
 </table>
 <p><s>Für mich sieht alles danach aus, als ob sich in neuere Software-Versionen ein
 Fehler eingeschlichen hat.</s></p>
@@ -281,34 +279,34 @@ einzelne Bits 104μs lang sind, aufgeteilt in 34μs für High/Low und 70μs Stil
 <p>Die Base Voltage (<code>bv</code>) von 27.6V, und der Comparator Trigger (<code>ct</code>) von 26.0V
 stimmen mit den erwarteten Pegeln des SCS Bus überein.</p>
 <table>
-<thead>
-<tr>
-<th>Oszilloskop-Aufzeichnung SCS Bus</th>
-<th>Rigol Waveform</th>
-<th>CSV</th>
-<th>Sigrok</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>2020-10-15-nuki131-door-open.sr</td>
-<td><a href="/nuki/2020-10-15-nuki131-door-open.wfm">wfm (1,1 MB)</a></td>
-<td><a href="/nuki/2020-10-15-nuki131-door-open.zip">csv (2 MB)</a></td>
-<td><a href="/nuki/2020-10-15-nuki131-door-open.sr">sr (160 KB)</a></td>
-</tr>
-<tr>
-<td>2020-10-15-nuki131-ring.sr</td>
-<td><a href="/nuki/2020-10-15-nuki131-ring.wfm">wfm (1,1 MB)</a></td>
-<td><a href="/nuki/2020-10-15-nuki131-ring.zip">csv (2 MB)</a></td>
-<td><a href="/nuki/2020-10-15-nuki131-ring.sr">sr (160 KB)</a></td>
-</tr>
-<tr>
-<td>2020-10-15-nuki131-nuki-open.sr</td>
-<td><a href="/nuki/2020-10-15-nuki131-nuki-open.wfm">wfm (1,1 MB)</a></td>
-<td><a href="/nuki/2020-10-15-nuki131-nuki-open.zip">csv (2 MB)</a></td>
-<td><a href="/nuki/2020-10-15-nuki131-nuki-open.sr">sr (160 KB)</a></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Oszilloskop-Aufzeichnung SCS Bus</th>
+          <th>Rigol Waveform</th>
+          <th>CSV</th>
+          <th>Sigrok</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2020-10-15-nuki131-door-open.sr</td>
+          <td><a href="/nuki/2020-10-15-nuki131-door-open.wfm">wfm (1,1 MB)</a></td>
+          <td><a href="/nuki/2020-10-15-nuki131-door-open.zip">csv (2 MB)</a></td>
+          <td><a href="/nuki/2020-10-15-nuki131-door-open.sr">sr (160 KB)</a></td>
+      </tr>
+      <tr>
+          <td>2020-10-15-nuki131-ring.sr</td>
+          <td><a href="/nuki/2020-10-15-nuki131-ring.wfm">wfm (1,1 MB)</a></td>
+          <td><a href="/nuki/2020-10-15-nuki131-ring.zip">csv (2 MB)</a></td>
+          <td><a href="/nuki/2020-10-15-nuki131-ring.sr">sr (160 KB)</a></td>
+      </tr>
+      <tr>
+          <td>2020-10-15-nuki131-nuki-open.sr</td>
+          <td><a href="/nuki/2020-10-15-nuki131-nuki-open.wfm">wfm (1,1 MB)</a></td>
+          <td><a href="/nuki/2020-10-15-nuki131-nuki-open.zip">csv (2 MB)</a></td>
+          <td><a href="/nuki/2020-10-15-nuki131-nuki-open.sr">sr (160 KB)</a></td>
+      </tr>
+  </tbody>
 </table>
 <p>Hier ist das Öffnen-Signal des Nuki Openers (<code>2020-10-15-nuki131-nuki-open</code>):</p>
 <p><a href="../../nuki/2020-10-15-nuki131-nuki-open.jpg"><img src="../../nuki/2020-10-15-nuki131-nuki-open.thumb.1x.jpg" srcset="../../nuki/2020-10-15-nuki131-nuki-open.thumb.2x.jpg 2x,../../nuki/2020-10-15-nuki131-nuki-open.thumb.3x.jpg 3x" width="600" alt="2020-10-15-nuki131-nuki-open" style="border: 1px solid #000" loading="lazy"></a></p>
@@ -322,22 +320,22 @@ anders aus.</p>
 <p>Statt <code>0,d7</code> (7 Daten-Bytes, wie auf dem SCS Bus?) findet sich hier <code>2,d0</code>.</p>
 <p>Die Länge des Signals wurde mit <code>n7</code> falsch erkannt.</p>
 <table>
-<thead>
-<tr>
-<th>Oszilloskop-Aufzeichnung SCS Bus</th>
-<th>Rigol Waveform</th>
-<th>CSV</th>
-<th>Sigrok</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>2020-10-09-nuki-open.sr</td>
-<td><a href="/nuki/2020-10-09-nuki-open.wfm">wfm (1,1 MB)</a></td>
-<td><a href="/nuki/2020-10-09-nuki-open.zip">csv (2 MB)</a></td>
-<td><a href="/nuki/2020-10-09-nuki-open.sr">sr (160 KB)</a></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Oszilloskop-Aufzeichnung SCS Bus</th>
+          <th>Rigol Waveform</th>
+          <th>CSV</th>
+          <th>Sigrok</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2020-10-09-nuki-open.sr</td>
+          <td><a href="/nuki/2020-10-09-nuki-open.wfm">wfm (1,1 MB)</a></td>
+          <td><a href="/nuki/2020-10-09-nuki-open.zip">csv (2 MB)</a></td>
+          <td><a href="/nuki/2020-10-09-nuki-open.sr">sr (160 KB)</a></td>
+      </tr>
+  </tbody>
 </table>
 <p>Hier ist das kaputte Öffnen-Signal des Nuki Openers (<code>2020-10-09-nuki-open</code>):</p>
 <p><a href="../../nuki/2020-10-09-nuki-open.jpg"><img src="../../nuki/2020-10-09-nuki-open.thumb.1x.jpg" srcset="../../nuki/2020-10-09-nuki-open.thumb.2x.jpg 2x,../../nuki/2020-10-09-nuki-open.thumb.3x.jpg 3x" width="600" alt="2020-10-09-nuki-open" style="border: 1px solid #000" loading="lazy"></a></p>

@@ -7,7 +7,7 @@
 
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="Debian buster on the Raspberry Pi 3 (update)">
-  <meta property="og:description" content="I previously wrote about my Debian buster preview image for the Raspberry Pi 3. Now, I’m publishing an updated version, containing the following changes: WiFi works out of the box. Use e.g. ip link set dev wlan0 up, and iwlist wlan0 scan.">
+  <meta property="og:description" content=" I previously wrote about my Debian buster preview image for the Raspberry Pi 3. Now, I’m publishing an updated version, containing the following changes: WiFi works out of the box. Use e.g. ip link set dev wlan0 up, and iwlist wlan0 scan. Kernel boot messages are now displayed on an attached monitor (if any), not just on the serial console. Root file system resizing will now not touch the partition table if the user modified it. The image is now compressed using xz, reducing its size to 170M. As before, the image is built with vmdb2, the successor to vmdebootstrap. The input files are available at https://github.com/Debian/raspi3-image-spec. ">
   
   
   
@@ -16,7 +16,7 @@
   <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
-  <meta name="description" content="I previously wrote about my Debian buster preview image for the Raspberry Pi 3. Now, I’m publishing an updated version, containing the following changes: WiFi works out of the box. Use e.g. ip link set dev wlan0 up, and iwlist wlan0 scan.">
+  <meta name="description" content=" I previously wrote about my Debian buster preview image for the Raspberry Pi 3. Now, I’m publishing an updated version, containing the following changes: WiFi works out of the box. Use e.g. ip link set dev wlan0 up, and iwlist wlan0 scan. Kernel boot messages are now displayed on an attached monitor (if any), not just on the serial console. Root file system resizing will now not touch the partition table if the user modified it. The image is now compressed using xz, reducing its size to 170M. As before, the image is built with vmdb2, the successor to vmdebootstrap. The input files are available at https://github.com/Debian/raspi3-image-spec. ">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2018-01-08-raspberry-pi-3/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">

@@ -8,12 +8,13 @@
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="Minimal Linux Bootloader debugging story 🐞">
   <meta property="og:description" content="I maintain two builds of the Linux kernel, a linux/arm64 build for gokrazy, my Go appliance platform, which started out on the Raspberry Pi, and then a linux/amd64 one for router7, which runs on PCs.
-The update process for both of these builds is entirely automated, meaning new Linux kernel releases are automatically tested and merged, but recently the continuous integration testing failed to automatically merge Linux 6․7 — this article is about tracking down the root cause of that failure.">
+The update process for both of these builds is entirely automated, meaning new Linux kernel releases are automatically tested and merged, but recently the continuous integration testing failed to automatically merge Linux 6․7 — this article is about tracking down the root cause of that failure.
+">
   
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured_hucd7e1463fcc59a2458cbdaeb4c4f836a_674116_200x200_fit_q75_box.jpg">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured_hu_cb2caabab532d8a6.jpg">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -21,7 +22,8 @@ The update process for both of these builds is entirely automated, meaning new L
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
   <meta name="description" content="I maintain two builds of the Linux kernel, a linux/arm64 build for gokrazy, my Go appliance platform, which started out on the Raspberry Pi, and then a linux/amd64 one for router7, which runs on PCs.
-The update process for both of these builds is entirely automated, meaning new Linux kernel releases are automatically tested and merged, but recently the continuous integration testing failed to automatically merge Linux 6․7 — this article is about tracking down the root cause of that failure.">
+The update process for both of these builds is entirely automated, meaning new Linux kernel releases are automatically tested and merged, but recently the continuous integration testing failed to automatically merge Linux 6․7 — this article is about tracking down the root cause of that failure.
+">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -716,8 +718,8 @@ memory.</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-text.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-text_hufb947737200a71a40def7b55daedda4a_651685_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-text_hufb947737200a71a40def7b55daedda4a_651685_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-text_hufb947737200a71a40def7b55daedda4a_651685_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-text_hu_e53e841704bbad8e.jpg 2x,https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-text_hu_12be45f01fbce110.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-text_hu_566cfd8106263dff.jpg"
   
   width="600"
   height="589"
@@ -774,8 +776,8 @@ back using <code>layout regs</code>. I’m not sure if there’s an easier way.<
 
 
 <a href="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured_hucd7e1463fcc59a2458cbdaeb4c4f836a_674116_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured_hucd7e1463fcc59a2458cbdaeb4c4f836a_674116_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured_hucd7e1463fcc59a2458cbdaeb4c4f836a_674116_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured_hu_47f2f78d59fa5cf1.jpg 2x,https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured_hu_2b9035be25bb5308.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured_hu_6b635090913012bc.jpg"
   
   width="600"
   height="583"
@@ -816,8 +818,8 @@ enabled</a>:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-emacs.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-emacs_huea0ff23d44f02f4aa1fe1640e7e9fb8a_801503_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-emacs_huea0ff23d44f02f4aa1fe1640e7e9fb8a_801503_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-emacs_huea0ff23d44f02f4aa1fe1640e7e9fb8a_801503_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-emacs_hu_d89d1ec45f8765a6.jpg 2x,https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-emacs_hu_b44b68175d66edb5.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-emacs_hu_85dbec5c64f962eb.jpg"
   
   width="600"
   height="584"

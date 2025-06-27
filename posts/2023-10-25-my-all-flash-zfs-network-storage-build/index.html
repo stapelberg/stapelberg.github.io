@@ -8,12 +8,13 @@
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="My 2023 all-flash ZFS NAS (Network Storage) build">
   <meta property="og:description" content="For over 10 years now, I run two self-built NAS (Network Storage) devices which serve media (currently via Jellyfin) and run daily backups of all my PCs and servers.
-In this article, I describe my goals, which hardware I picked for my new build (and why) and how I set it up.">
+In this article, I describe my goals, which hardware I picked for my new build (and why) and how I set it up.
+">
   
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/2023-10-22-samsung-870qvo-featured_hu799c805b17c89c62874113693200acea_520811_200x200_fit_q75_box.jpg">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/2023-10-22-samsung-870qvo-featured_hu_10b643793b071dc4.jpg">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -21,7 +22,8 @@ In this article, I describe my goals, which hardware I picked for my new build (
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
   <meta name="description" content="For over 10 years now, I run two self-built NAS (Network Storage) devices which serve media (currently via Jellyfin) and run daily backups of all my PCs and servers.
-In this article, I describe my goals, which hardware I picked for my new build (and why) and how I set it up.">
+In this article, I describe my goals, which hardware I picked for my new build (and why) and how I set it up.
+">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -308,8 +310,8 @@ use) in one build, without affecting the other build.</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/IMG_1974.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/IMG_1974_hubee9c905cc3b7237e7c96518cbb38b46_1156723_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/IMG_1974_hubee9c905cc3b7237e7c96518cbb38b46_1156723_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/IMG_1974_hubee9c905cc3b7237e7c96518cbb38b46_1156723_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/IMG_1974_hu_49704dae01310d3e.jpg 2x,https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/IMG_1974_hu_19b36f1264267f2e.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/IMG_1974_hu_72e070fea9f6f6c7.jpg"
   alt="photo of the Network Storage PC from the side, showing the Noctua case fan and CPU cooler, data disks, PSU and cables" title="photo of the Network Storage PC from the side, showing the Noctua case fan and CPU cooler, data disks, PSU and cables"
   width="600"
   height="450"
@@ -325,64 +327,64 @@ border: 1px solid #000;
 
 <h3 id="base-components">Base Components</h3>
 <table>
-<thead>
-<tr>
-<th>Price</th>
-<th>Type</th>
-<th>Article</th>
-<th>Remark</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>114 CHF</td>
-<td>mainboard</td>
-<td><a href="https://www.digitec.ch/en/s1/product/asrock-b450-gaming-itxac-am4-amd-b450-mini-itx-motherboards-9385702">AsRock B450 Gaming ITX/ac</a></td>
-<td>Mini ITX</td>
-</tr>
-<tr>
-<td>80 CHF</td>
-<td>cpu</td>
-<td><a href="https://www.heise.de/preisvergleich/amd-athlon-3000g-yd3000c6m2ofh-yd3000c6fhmpk-a2174924.html?hloc=at&amp;hloc=de">AMD Athlon 3000G</a></td>
-<td>35W TDP, GPU</td>
-</tr>
-<tr>
-<td>65 CHF</td>
-<td>cpu cooler</td>
-<td><a href="https://www.digitec.ch/de/s1/product/noctua-nh-l12s-70-mm-cpu-kuehler-6817433">Noctua NH-L12S</a></td>
-<td>silent!</td>
-</tr>
-<tr>
-<td>58 CHF</td>
-<td>power supply</td>
-<td><a href="https://www.digitec.ch/en/s1/product/silverstone-power-supply-st30sf-300w-sfx-300-w-power-supply-pc-5988297">Silverstone ST30SF 300W SFX</a></td>
-<td>SFX form factor</td>
-</tr>
-<tr>
-<td>51 CHF</td>
-<td>case</td>
-<td><a href="https://www.digitec.ch/en/s1/product/silverstone-sst-sg05bb-lite-mini-itx-mini-dtx-pc-case-3525365">Silverstone SST-SG05BB-Lite</a></td>
-<td>Mini ITX</td>
-</tr>
-<tr>
-<td>48 CHF</td>
-<td>system disk</td>
-<td><a href="https://www.digitec.ch/en/s1/product/wd-red-sn700-250-gb-m2-2280-ssd-17688689">WD Red SN700 250GB</a></td>
-<td>M.2 NVMe</td>
-</tr>
-<tr>
-<td>32 CHF</td>
-<td>case fan</td>
-<td><a href="https://www.digitec.ch/en/s1/product/noctua-nf-s12a-uln-120mm-1x-pc-fans-2451401">Noctua NF-S12A ULN</a></td>
-<td>silent 120mm</td>
-</tr>
-<tr>
-<td>28 CHF</td>
-<td>ram</td>
-<td><a href="https://www.digitec.ch/en/s1/product/gskill-value-1-x-8gb-2400-mhz-ddr4-ram-dimm-ram-11056524">8 GB DDR4 Value RAM (F4-2400C15-8GNT)</a></td>
-<td></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Price</th>
+          <th>Type</th>
+          <th>Article</th>
+          <th>Remark</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>114 CHF</td>
+          <td>mainboard</td>
+          <td><a href="https://www.digitec.ch/en/s1/product/asrock-b450-gaming-itxac-am4-amd-b450-mini-itx-motherboards-9385702">AsRock B450 Gaming ITX/ac</a></td>
+          <td>Mini ITX</td>
+      </tr>
+      <tr>
+          <td>80 CHF</td>
+          <td>cpu</td>
+          <td><a href="https://www.heise.de/preisvergleich/amd-athlon-3000g-yd3000c6m2ofh-yd3000c6fhmpk-a2174924.html?hloc=at&amp;hloc=de">AMD Athlon 3000G</a></td>
+          <td>35W TDP, GPU</td>
+      </tr>
+      <tr>
+          <td>65 CHF</td>
+          <td>cpu cooler</td>
+          <td><a href="https://www.digitec.ch/de/s1/product/noctua-nh-l12s-70-mm-cpu-kuehler-6817433">Noctua NH-L12S</a></td>
+          <td>silent!</td>
+      </tr>
+      <tr>
+          <td>58 CHF</td>
+          <td>power supply</td>
+          <td><a href="https://www.digitec.ch/en/s1/product/silverstone-power-supply-st30sf-300w-sfx-300-w-power-supply-pc-5988297">Silverstone ST30SF 300W SFX</a></td>
+          <td>SFX form factor</td>
+      </tr>
+      <tr>
+          <td>51 CHF</td>
+          <td>case</td>
+          <td><a href="https://www.digitec.ch/en/s1/product/silverstone-sst-sg05bb-lite-mini-itx-mini-dtx-pc-case-3525365">Silverstone SST-SG05BB-Lite</a></td>
+          <td>Mini ITX</td>
+      </tr>
+      <tr>
+          <td>48 CHF</td>
+          <td>system disk</td>
+          <td><a href="https://www.digitec.ch/en/s1/product/wd-red-sn700-250-gb-m2-2280-ssd-17688689">WD Red SN700 250GB</a></td>
+          <td>M.2 NVMe</td>
+      </tr>
+      <tr>
+          <td>32 CHF</td>
+          <td>case fan</td>
+          <td><a href="https://www.digitec.ch/en/s1/product/noctua-nf-s12a-uln-120mm-1x-pc-fans-2451401">Noctua NF-S12A ULN</a></td>
+          <td>silent 120mm</td>
+      </tr>
+      <tr>
+          <td>28 CHF</td>
+          <td>ram</td>
+          <td><a href="https://www.digitec.ch/en/s1/product/gskill-value-1-x-8gb-2400-mhz-ddr4-ram-dimm-ram-11056524">8 GB DDR4 Value RAM (F4-2400C15-8GNT)</a></td>
+          <td></td>
+      </tr>
+  </tbody>
 </table>
 <p>The total price of 476 CHF makes this not a cheap build.</p>
 <p>But, I think each component is well worth its price. Here’s my thinking regarding the components:</p>
@@ -422,8 +424,8 @@ Unfortunately, AMD CPUs with 35W TDP are not readily available right now. My tip
 
 
 <a href="https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/2023-10-22-samsung-870qvo-featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/2023-10-22-samsung-870qvo-featured_hu799c805b17c89c62874113693200acea_520811_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/2023-10-22-samsung-870qvo-featured_hu799c805b17c89c62874113693200acea_520811_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/2023-10-22-samsung-870qvo-featured_hu799c805b17c89c62874113693200acea_520811_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/2023-10-22-samsung-870qvo-featured_hu_2a6c01a845534afd.jpg 2x,https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/2023-10-22-samsung-870qvo-featured_hu_2312a978672c26f0.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/2023-10-22-samsung-870qvo-featured_hu_b801f7771a66de37.jpg"
   alt="two samsung 870 QVO disks" title="two samsung 870 QVO disks"
   width="600"
   height="338"
@@ -447,42 +449,42 @@ border: 1px solid #000;
 <h3 id="power-usage">Power Usage</h3>
 <p>The choice of CPU, Mainboard and Network Card all influence the total power usage of the system. Here are a couple of measurements to give you a rough idea of the power usage:</p>
 <table>
-<thead>
-<tr>
-<th>build</th>
-<th>CPU</th>
-<th>main board</th>
-<th>network card</th>
-<th>idle</th>
-<th>load</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>s2</td>
-<td>5600X</td>
-<td><a href="https://www.digitec.ch/en/s1/product/asrock-b450-gaming-itxac-am4-amd-b450-mini-itx-motherboards-9385702">B450</a></td>
-<td>10G: Mellanox ConnectX-3</td>
-<td>26W</td>
-<td>60W</td>
-</tr>
-<tr>
-<td>s3</td>
-<td>200GE</td>
-<td><a href="https://www.digitec.ch/en/s1/product/asrock-ab350-gaming-itxac-am4-amd-b350-mini-itx-motherboards-7022839">AB350</a></td>
-<td>10G: <a href="https://www.fs.com/products/135978.html">FS Intel 82599</a></td>
-<td>28W</td>
-<td>50W</td>
-</tr>
-<tr>
-<td>s3</td>
-<td>200GE</td>
-<td><a href="https://www.digitec.ch/en/s1/product/asrock-ab350-gaming-itxac-am4-amd-b350-mini-itx-motherboards-7022839">AB350</a></td>
-<td>1G onboard</td>
-<td>23W</td>
-<td>40W</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>build</th>
+          <th>CPU</th>
+          <th>main board</th>
+          <th>network card</th>
+          <th>idle</th>
+          <th>load</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>s2</td>
+          <td>5600X</td>
+          <td><a href="https://www.digitec.ch/en/s1/product/asrock-b450-gaming-itxac-am4-amd-b450-mini-itx-motherboards-9385702">B450</a></td>
+          <td>10G: Mellanox ConnectX-3</td>
+          <td>26W</td>
+          <td>60W</td>
+      </tr>
+      <tr>
+          <td>s3</td>
+          <td>200GE</td>
+          <td><a href="https://www.digitec.ch/en/s1/product/asrock-ab350-gaming-itxac-am4-amd-b350-mini-itx-motherboards-7022839">AB350</a></td>
+          <td>10G: <a href="https://www.fs.com/products/135978.html">FS Intel 82599</a></td>
+          <td>28W</td>
+          <td>50W</td>
+      </tr>
+      <tr>
+          <td>s3</td>
+          <td>200GE</td>
+          <td><a href="https://www.digitec.ch/en/s1/product/asrock-ab350-gaming-itxac-am4-amd-b350-mini-itx-motherboards-7022839">AB350</a></td>
+          <td>1G onboard</td>
+          <td>23W</td>
+          <td>40W</td>
+      </tr>
+  </tbody>
 </table>
 <p>These values were measured using a <a href="https://mystrom.ch/de/wifi-switch/">myStrom WiFi Switch</a>.</p>
 <h2 id="operating-system">Operating System</h2>
@@ -663,8 +665,8 @@ COMMIT
 
 
 <a href="https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/2023-10-11-grafana-scrub.png"><img
-  srcset="https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/2023-10-11-grafana-scrub_huab242c6c68f4e18b70199053338a4d4f_420340_1200x0_resize_box_3.png 2x,https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/2023-10-11-grafana-scrub_huab242c6c68f4e18b70199053338a4d4f_420340_1800x0_resize_box_3.png 3x"
-  src="https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/2023-10-11-grafana-scrub_huab242c6c68f4e18b70199053338a4d4f_420340_600x0_resize_box_3.png"
+  srcset="https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/2023-10-11-grafana-scrub_hu_e0e87a70dc4e8e5d.png 2x,https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/2023-10-11-grafana-scrub_hu_a2fa17e74333768e.png 3x"
+  src="https://michael.stapelberg.ch/posts/2023-10-25-my-all-flash-zfs-network-storage-build/2023-10-11-grafana-scrub_hu_b6d819ed12894a4a.png"
   alt="screenshot of a Grafana dashboard showing Prometheus Node Exporter metrics" title="screenshot of a Grafana dashboard showing Prometheus Node Exporter metrics"
   width="600"
   height="226"

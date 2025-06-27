@@ -152,17 +152,17 @@ worthwhile because the monitor draws 30W even in standby!</p>
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">nextWakeup</span>(now time.Time) time.Time {
 </span></span><span style="display:flex;"><span>	midnight <span style="color:#666">:=</span> time.<span style="color:#06287e">Date</span>(now.<span style="color:#06287e">Year</span>(), now.<span style="color:#06287e">Month</span>(), now.<span style="color:#06287e">Day</span>(), <span style="color:#40a070">0</span>, <span style="color:#40a070">0</span>, <span style="color:#40a070">0</span>, <span style="color:#40a070">0</span>, time.Local)
 </span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> now.<span style="color:#06287e">Hour</span>() &lt; <span style="color:#40a070">6</span> {
-</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// wake up today
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#007020;font-weight:bold">return</span> midnight.<span style="color:#06287e">Add</span>(<span style="color:#40a070">6</span><span style="color:#666">*</span>time.Hour <span style="color:#666">+</span> <span style="color:#40a070">50</span><span style="color:#666">*</span>time.Minute)
+</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// wake up today</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> midnight.<span style="color:#06287e">Add</span>(<span style="color:#40a070">6</span><span style="color:#666">*</span>time.Hour <span style="color:#666">+</span> <span style="color:#40a070">50</span><span style="color:#666">*</span>time.Minute)
 </span></span><span style="display:flex;"><span>	}
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// wake up tomorrow
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">return</span> midnight.<span style="color:#06287e">Add</span>(<span style="color:#40a070">24</span> <span style="color:#666">*</span> time.Hour).<span style="color:#06287e">Add</span>(<span style="color:#40a070">6</span><span style="color:#666">*</span>time.Hour <span style="color:#666">+</span> <span style="color:#40a070">50</span><span style="color:#666">*</span>time.Minute)
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// wake up tomorrow</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> midnight.<span style="color:#06287e">Add</span>(<span style="color:#40a070">24</span> <span style="color:#666">*</span> time.Hour).<span style="color:#06287e">Add</span>(<span style="color:#40a070">6</span><span style="color:#666">*</span>time.Hour <span style="color:#666">+</span> <span style="color:#40a070">50</span><span style="color:#666">*</span>time.Minute)
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">runResume</span>() <span style="color:#902000">error</span> {
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Retry for up to one minute to give the network some time to come up
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	ctx, canc <span style="color:#666">:=</span> context.<span style="color:#06287e">WithTimeout</span>(context.<span style="color:#06287e">Background</span>(), <span style="color:#40a070">1</span><span style="color:#666">*</span>time.Minute)
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Retry for up to one minute to give the network some time to come up</span>
+</span></span><span style="display:flex;"><span>	ctx, canc <span style="color:#666">:=</span> context.<span style="color:#06287e">WithTimeout</span>(context.<span style="color:#06287e">Background</span>(), <span style="color:#40a070">1</span><span style="color:#666">*</span>time.Minute)
 </span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">defer</span> <span style="color:#06287e">canc</span>()
 </span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">monitorPower</span>(ctx, <span style="color:#4070a0">&#34;GET&#34;</span>, <span style="color:#4070a0">&#34;relay?state=1&#34;</span>); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
 </span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Print</span>(err)
@@ -179,14 +179,14 @@ worthwhile because the monitor draws 30W even in standby!</p>
 </span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;wakeup: %v&#34;</span>, wakeup)
 </span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;wakeup: %v (timestamp)&#34;</span>, wakeup.<span style="color:#06287e">Unix</span>())
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// assumes hwclock is running in UTC (see timedatectl | grep local)
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Power the monitor off in 15 seconds.
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// mode=on is intentional: https://api.mystrom.ch/#e532f952-36ea-40fb-a180-a57b835f550e
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// - the switch will be turned on (already on, so this is a no-op)
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// - the switch will wait for 15 seconds
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// - the switch will be turned off
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">monitorPower</span>(ctx, <span style="color:#4070a0">&#34;POST&#34;</span>, <span style="color:#4070a0">&#34;timer?mode=on&amp;time=15&#34;</span>); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// assumes hwclock is running in UTC (see timedatectl | grep local)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Power the monitor off in 15 seconds.</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// mode=on is intentional: https://api.mystrom.ch/#e532f952-36ea-40fb-a180-a57b835f550e</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// - the switch will be turned on (already on, so this is a no-op)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// - the switch will wait for 15 seconds</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// - the switch will be turned off</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">monitorPower</span>(ctx, <span style="color:#4070a0">&#34;POST&#34;</span>, <span style="color:#4070a0">&#34;timer?mode=on&amp;time=15&#34;</span>); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
 </span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Print</span>(err)
 </span></span><span style="display:flex;"><span>	}
 </span></span><span style="display:flex;"><span>
@@ -404,8 +404,8 @@ stack trace in a more colorful and much shorter version:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu3e0f2d5aa6180df20bb553ed5c6fa57b_1741005_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu3e0f2d5aa6180df20bb553ed5c6fa57b_1741005_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu3e0f2d5aa6180df20bb553ed5c6fa57b_1741005_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_c04249176648ab38.jpg 2x,https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_8da191a897747329.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_e61da31f617a2260.jpg"
   
   width="600"
   height="394"
@@ -1118,8 +1118,8 @@ Postgres instance:</p>
 </span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
 </span></span><span style="display:flex;"><span>		t.<span style="color:#06287e">Fatal</span>(err)
 </span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// test goes here…
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>}
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// test goes here…</span>
+</span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>Each CreateDatabase call takes about:</p>
 <ul>
 <li>5-10ms on my <a href="/posts/2022-01-15-high-end-linux-pc/">Intel Core i9 12900K CPU</a> (from 2022)</li>
@@ -1224,12 +1224,12 @@ you can run a single test without bothering with <code>PGURL</code>:</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">var</span> dbc <span style="color:#666">*</span>postgrestest.DBCreator
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">TestMain</span>(m <span style="color:#666">*</span>testing.M) {
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>	<span style="color:#60a0b0;font-style:italic">// It is best to specify the PGURL environment variable so that only
-</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// one PostgreSQL instance is used for all tests.
-</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#60a0b0;font-style:italic"></span>	pgurl <span style="color:#666">:=</span> os.<span style="color:#06287e">Getenv</span>(<span style="color:#4070a0">&#34;PGURL&#34;</span>)
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	<span style="color:#60a0b0;font-style:italic">// It is best to specify the PGURL environment variable so that only</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	<span style="color:#60a0b0;font-style:italic">// one PostgreSQL instance is used for all tests.</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	pgurl <span style="color:#666">:=</span> os.<span style="color:#06287e">Getenv</span>(<span style="color:#4070a0">&#34;PGURL&#34;</span>)
 </span></span><span style="display:flex; background-color:#d8d8d8"><span>	<span style="color:#007020;font-weight:bold">if</span> pgurl <span style="color:#666">==</span> <span style="color:#4070a0">&#34;&#34;</span> {
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>		<span style="color:#60a0b0;font-style:italic">// &#39;go test&#39; was started directly, start one Postgres per process:
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		pgt, err <span style="color:#666">:=</span> postgrestest.<span style="color:#06287e">Start</span>(context.<span style="color:#06287e">Background</span>())
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>		<span style="color:#60a0b0;font-style:italic">// &#39;go test&#39; was started directly, start one Postgres per process:</span>
+</span></span><span style="display:flex;"><span>		pgt, err <span style="color:#666">:=</span> postgrestest.<span style="color:#06287e">Start</span>(context.<span style="color:#06287e">Background</span>())
 </span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
 </span></span><span style="display:flex;"><span>			<span style="color:#007020">panic</span>(err)
 </span></span><span style="display:flex;"><span>		}
@@ -1252,14 +1252,14 @@ receiver name:</p>
 </span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
 </span></span><span style="display:flex;"><span>		t.<span style="color:#06287e">Fatal</span>(err)
 </span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// test goes here…
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>}</span></span></code></pre></div>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// test goes here…</span>
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
 <p>Then, we create a new wrapper program (e.g. <code>internal/cmd/initpg/initpg.go</code>)
 which calls <code>postgrestest.Start</code> and passes the <code>PGURL</code> environment variable to
 the process(es) it starts:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// initpg is a small test helper command which starts a Postgres
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// instance and makes it available to the wrapped &#39;go test&#39; command.
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">package</span> main
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// initpg is a small test helper command which starts a Postgres</span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// instance and makes it available to the wrapped &#39;go test&#39; command.</span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span> main
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> (
 </span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;context&#34;</span>
@@ -1270,17 +1270,17 @@ the process(es) it starts:</p>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;github.com/stapelberg/postgrestest&#34;</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Use the same database driver as in the rest of your project.
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	_ <span style="color:#4070a0">&#34;github.com/lib/pq&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Use the same database driver as in the rest of your project.</span>
+</span></span><span style="display:flex;"><span>	_ <span style="color:#4070a0">&#34;github.com/lib/pq&#34;</span>
 </span></span><span style="display:flex;"><span>)
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">runWrappedCommand</span>(pgurl <span style="color:#902000">string</span>) <span style="color:#902000">error</span> {
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// os.Args[0] is initpg
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// os.Args[1] is --
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// os.Args[2] is go
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// os.Args[3] is test
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#60a0b0;font-style:italic">// etc.
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	wrapped <span style="color:#666">:=</span> exec.<span style="color:#06287e">Command</span>(os.Args[<span style="color:#40a070">2</span>], os.Args[<span style="color:#40a070">3</span>:]<span style="color:#666">...</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// os.Args[0] is initpg</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// os.Args[1] is --</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// os.Args[2] is go</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// os.Args[3] is test</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// etc.</span>
+</span></span><span style="display:flex;"><span>	wrapped <span style="color:#666">:=</span> exec.<span style="color:#06287e">Command</span>(os.Args[<span style="color:#40a070">2</span>], os.Args[<span style="color:#40a070">3</span>:]<span style="color:#666">...</span>)
 </span></span><span style="display:flex;"><span>	wrapped.Stdin = os.Stdin
 </span></span><span style="display:flex;"><span>	wrapped.Stdout = os.Stdout
 </span></span><span style="display:flex;"><span>	wrapped.Stderr = os.Stderr
@@ -1293,14 +1293,14 @@ the process(es) it starts:</p>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">initpg</span>() <span style="color:#902000">error</span> {
 </span></span><span style="display:flex;"><span>	pgt, err <span style="color:#666">:=</span> postgrestest.<span style="color:#06287e">Start</span>(context.<span style="color:#06287e">Background</span>())
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// NOTE: keep reading the article, do not submit as-is
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// NOTE: keep reading the article, do not submit as-is</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
 </span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> err
 </span></span><span style="display:flex;"><span>	}
 </span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">defer</span> pgt.<span style="color:#06287e">Cleanup</span>()
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Run the wrapped command (&#39;go test&#39;, typically)
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#06287e">runWrappedCommand</span>(pgt.<span style="color:#06287e">DefaultDatabase</span>())
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Run the wrapped command (&#39;go test&#39;, typically)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#06287e">runWrappedCommand</span>(pgt.<span style="color:#06287e">DefaultDatabase</span>())
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
@@ -1418,8 +1418,8 @@ directory:</p>
 </span></span><span style="display:flex;"><span>	}
 </span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">defer</span> pgt.<span style="color:#06287e">Cleanup</span>()
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Run the wrapped command (&#39;go test&#39;, typically)
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#06287e">runWrappedCommand</span>(pgt.<span style="color:#06287e">DefaultDatabase</span>())
+</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Run the wrapped command (&#39;go test&#39;, typically)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#06287e">runWrappedCommand</span>(pgt.<span style="color:#06287e">DefaultDatabase</span>())
 </span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
 <p>When running the tests now, starting with the second run (without any changes),
 you should see a “ (cached)” suffix printed behind tests that were successfully
@@ -1590,8 +1590,8 @@ use core dump debugging!</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_huc92a382266793767583fa56b2a20c9d0_1575273_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_huc92a382266793767583fa56b2a20c9d0_1575273_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_huc92a382266793767583fa56b2a20c9d0_1575273_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_a8173ece4c3f11e6.jpg 2x,https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_beea9b0751b668d7.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_604c37f3566e3ffa.jpg"
   alt="Core memory" title="Core memory"
   width="600"
   height="516"
@@ -1792,8 +1792,8 @@ called), but then how do we produce a core dump from our own handler?</p>
 <code>signal_unix.go</code> and <a href="https://cs.opensource.google/go/go/+/refs/tags/go1.23.2:src/runtime/signal_unix.go;l=938">sends signal <code>SIGABRT</code> with the <code>dieFromSignal</code>
 function</a>
 to the current thread:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">//go:nosplit
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">crash</span>() {
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">//go:nosplit</span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">crash</span>() {
 </span></span><span style="display:flex;"><span>        <span style="color:#06287e">dieFromSignal</span>(_SIGABRT)
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>The default action for <code>SIGABRT</code> is to “terminate the process and dump core”,
@@ -1809,12 +1809,12 @@ see <a href="https://manpages.debian.org/signal.7"><code>signal(7)</code></a>
 </span></span><span style="display:flex;"><span>					<span style="color:#007020">panic</span>(fmt.<span style="color:#06287e">Sprintf</span>(<span style="color:#4070a0">&#34;could not find own process (pid %d): %v&#34;</span>, syscall.<span style="color:#06287e">Getpid</span>(), err))
 </span></span><span style="display:flex;"><span>				}
 </span></span><span style="display:flex;"><span>				proc.<span style="color:#06287e">Signal</span>(syscall.SIGABRT)
-</span></span><span style="display:flex;"><span>				<span style="color:#60a0b0;font-style:italic">// Ensure the stack triggering the core dump sticks around
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>				proc.<span style="color:#06287e">Wait</span>()
+</span></span><span style="display:flex;"><span>				<span style="color:#60a0b0;font-style:italic">// Ensure the stack triggering the core dump sticks around</span>
+</span></span><span style="display:flex;"><span>				proc.<span style="color:#06287e">Wait</span>()
 </span></span><span style="display:flex;"><span>			}
 </span></span><span style="display:flex;"><span>		}()
-</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// …buggy handler code goes here; for illustration we panic
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#007020">panic</span>(<span style="color:#4070a0">&#34;this should result in a core dump&#34;</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// …buggy handler code goes here; for illustration we panic</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#007020">panic</span>(<span style="color:#4070a0">&#34;this should result in a core dump&#34;</span>)
 </span></span><span style="display:flex;"><span>	})
 </span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Fatal</span>(http.<span style="color:#06287e">ListenAndServe</span>(<span style="color:#4070a0">&#34;:8080&#34;</span>, <span style="color:#007020;font-weight:bold">nil</span>))
 </span></span><span style="display:flex;"><span>}
@@ -2019,34 +2019,34 @@ modified when we add new file descriptors in the parent, and also because this
 behavior is usually opt-in.</p>
 <p>In this case, we’ll do that via an environment variable and start the child
 program:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Go dup2()’s ExtraFiles to file descriptor 3 and counting.
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// File descriptors 0, 1, 2 are stdin, stdout and stderr.
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>child.Env = <span style="color:#007020">append</span>(os.<span style="color:#06287e">Environ</span>(), <span style="color:#4070a0">&#34;CHILD_READY_FD=3&#34;</span>)
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Go dup2()’s ExtraFiles to file descriptor 3 and counting.</span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// File descriptors 0, 1, 2 are stdin, stdout and stderr.</span>
+</span></span><span style="display:flex;"><span>child.Env = <span style="color:#007020">append</span>(os.<span style="color:#06287e">Environ</span>(), <span style="color:#4070a0">&#34;CHILD_READY_FD=3&#34;</span>)
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Note child.Start(), not child.Run():
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> child.<span style="color:#06287e">Start</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Note child.Start(), not child.Run():</span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> child.<span style="color:#06287e">Start</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
 </span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;%v: %v&#34;</span>, child.Args, err)
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>At this point, both the parent and the child process have a file descriptor
 referencing the write end of the pipe. Since the pipe will only be closed once
 <em>all</em> processes have closed the write end, we need to close the write end in the
 parent program:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Close the write end of the pipe in the parent:
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>w.<span style="color:#06287e">Close</span>()
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Close the write end of the pipe in the parent:</span>
+</span></span><span style="display:flex;"><span>w.<span style="color:#06287e">Close</span>()
 </span></span></code></pre></div><p>Now, we can blockingly read from the pipe, and know that once the read call
 returns, the child program is ready to receive requests:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Avoid hanging forever in case the child program never becomes ready;
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// this is easier to diagnose than an unspecified CI/CD test timeout.
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// This timeout should be much much longer than initialization takes.
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>r.<span style="color:#06287e">SetReadDeadline</span>(time.<span style="color:#06287e">Now</span>().<span style="color:#06287e">Add</span>(<span style="color:#40a070">1</span> <span style="color:#666">*</span> time.Minute))
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Avoid hanging forever in case the child program never becomes ready;</span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// this is easier to diagnose than an unspecified CI/CD test timeout.</span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// This timeout should be much much longer than initialization takes.</span>
+</span></span><span style="display:flex;"><span>r.<span style="color:#06287e">SetReadDeadline</span>(time.<span style="color:#06287e">Now</span>().<span style="color:#06287e">Add</span>(<span style="color:#40a070">1</span> <span style="color:#666">*</span> time.Minute))
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> _, err <span style="color:#666">:=</span> ioutil.<span style="color:#06287e">ReadAll</span>(r); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
 </span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;awaiting readiness: %v&#34;</span>, err)
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// …send requests…
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>
-</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// …tear down child program…
-</span></span></span></code></pre></div><h4 id="child-program">Child Program</h4>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// …send requests…</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// …tear down child program…</span>
+</span></span></code></pre></div><h4 id="child-program">Child Program</h4>
 <p>In the child program, we need to recognize that the parent program requests a
 readiness notification, and ensure our signaling doesn’t leak to child programs
 of the child program:</p>
@@ -2060,12 +2060,12 @@ of the child program:</p>
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
-</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">// …initialize…
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic">// …initialize…</span>
+</span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">if</span> readyFile <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>    readyFile.<span style="color:#06287e">Close</span>() <span style="color:#60a0b0;font-style:italic">// signal readiness
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    readyFile = <span style="color:#007020;font-weight:bold">nil</span>   <span style="color:#60a0b0;font-style:italic">// just to be prudent
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>  }
+</span></span><span style="display:flex;"><span>    readyFile.<span style="color:#06287e">Close</span>() <span style="color:#60a0b0;font-style:italic">// signal readiness</span>
+</span></span><span style="display:flex;"><span>    readyFile = <span style="color:#007020;font-weight:bold">nil</span>   <span style="color:#60a0b0;font-style:italic">// just to be prudent</span>
+</span></span><span style="display:flex;"><span>  }
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><h3 id="conclusion">Conclusion</h3>
 <p>Depending on what you’re communicating from the child to the parent, and how
@@ -3471,8 +3471,8 @@ pretty simple:
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;fmt&#34;</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">multiply</span>(input []<span style="color:#902000">int</span>) []<span style="color:#902000">int</span> {
-</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic">// Create an output list with the same size
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    output <span style="color:#666">:=</span> <span style="color:#007020">make</span>([]<span style="color:#902000">int</span>, <span style="color:#007020">len</span>(input))
+</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic">// Create an output list with the same size</span>
+</span></span><span style="display:flex;"><span>    output <span style="color:#666">:=</span> <span style="color:#007020">make</span>([]<span style="color:#902000">int</span>, <span style="color:#007020">len</span>(input))
 </span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">for</span> idx, val <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> input {
 </span></span><span style="display:flex;"><span>        output[idx] = val <span style="color:#666">*</span> <span style="color:#40a070">2</span>
 </span></span><span style="display:flex;"><span>    }

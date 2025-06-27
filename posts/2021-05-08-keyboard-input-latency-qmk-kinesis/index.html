@@ -9,12 +9,13 @@
   <meta property="og:title" content="Measure and reduce keyboard input latency with QMK on the Kinesis Advantage">
   <meta property="og:description" content="Over the last few years, I worked on a few projects around keyboard input latency:
 In 2018, I introduced the kinX keyboard controller with 0.2ms of input latency.
-In 2020, I introduced the kinT keyboard controller, which works with a wide range of Teensy micro controllers, and both the old KB500 and the newer KB600 Kinesis Advantage models.">
+In 2020, I introduced the kinT keyboard controller, which works with a wide range of Teensy micro controllers, and both the old KB500 and the newer KB600 Kinesis Advantage models.
+">
   
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/endtoend_measure_featured_hu855bbe0a9c47ac557e5b09db74fa3b06_1237431_200x200_fit_q75_box.jpg">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/endtoend_measure_featured_hu_f4dd87efab5b416.jpg">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -23,7 +24,8 @@ In 2020, I introduced the kinT keyboard controller, which works with a wide rang
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
   <meta name="description" content="Over the last few years, I worked on a few projects around keyboard input latency:
 In 2018, I introduced the kinX keyboard controller with 0.2ms of input latency.
-In 2020, I introduced the kinT keyboard controller, which works with a wide range of Teensy micro controllers, and both the old KB500 and the newer KB600 Kinesis Advantage models.">
+In 2020, I introduced the kinT keyboard controller, which works with a wide range of Teensy micro controllers, and both the old KB500 and the newer KB600 Kinesis Advantage models.
+">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -304,8 +306,8 @@ controller</a>, connected to a laptop:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/endtoend_measure_featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/endtoend_measure_featured_hu855bbe0a9c47ac557e5b09db74fa3b06_1237431_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/endtoend_measure_featured_hu855bbe0a9c47ac557e5b09db74fa3b06_1237431_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/endtoend_measure_featured_hu855bbe0a9c47ac557e5b09db74fa3b06_1237431_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/endtoend_measure_featured_hu_3b4d4788f956848.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/endtoend_measure_featured_hu_af7aedd2f9776b4.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/endtoend_measure_featured_hu_7c564a1452d84793.jpg"
   alt="measurement setup" title="measurement setup"
   width="600"
   height="450"
@@ -358,40 +360,40 @@ the corresponding signals are <code>ROW_EQL</code> and <code>COL_2</code>.</p>
 GPIO connections to the kint36, kint41 or kint2pp (with voltage converter!)
 keyboard controllers:</p>
 <table>
-<thead>
-<tr>
-<th>driver 4.0</th>
-<th>signal</th>
-<th>kint36, kint41</th>
-<th>kint2pp (5V!)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>GND</td>
-<td><code>GND</code></td>
-<td>GND</td>
-<td>GND</td>
-</tr>
-<tr>
-<td>pin 10</td>
-<td><code>ROW_EQL</code></td>
-<td>pin 8</td>
-<td>D7</td>
-</tr>
-<tr>
-<td>pin 11</td>
-<td><code>COL_2</code></td>
-<td>pin 15</td>
-<td>F7</td>
-</tr>
-<tr>
-<td>pin 12</td>
-<td><code>LED_CAPS_LOCK</code></td>
-<td>pin 12</td>
-<td>C1</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>driver 4.0</th>
+          <th>signal</th>
+          <th>kint36, kint41</th>
+          <th>kint2pp (5V!)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>GND</td>
+          <td><code>GND</code></td>
+          <td>GND</td>
+          <td>GND</td>
+      </tr>
+      <tr>
+          <td>pin 10</td>
+          <td><code>ROW_EQL</code></td>
+          <td>pin 8</td>
+          <td>D7</td>
+      </tr>
+      <tr>
+          <td>pin 11</td>
+          <td><code>COL_2</code></td>
+          <td>pin 15</td>
+          <td>F7</td>
+      </tr>
+      <tr>
+          <td>pin 12</td>
+          <td><code>LED_CAPS_LOCK</code></td>
+          <td>pin 12</td>
+          <td>C1</td>
+      </tr>
+  </tbody>
 </table>
 <aside class="admonition note">
   <div class="note-container">
@@ -606,8 +608,8 @@ this for the <code>kint36</code> and <code>kint41</code>:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kint41_gpio_measure.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kint41_gpio_measure_hu855bbe0a9c47ac557e5b09db74fa3b06_607037_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kint41_gpio_measure_hu855bbe0a9c47ac557e5b09db74fa3b06_607037_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kint41_gpio_measure_hu855bbe0a9c47ac557e5b09db74fa3b06_607037_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kint41_gpio_measure_hu_add7ae7c59ff1289.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kint41_gpio_measure_hu_99bd2b2ba17b62cb.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kint41_gpio_measure_hu_9aac9f7aaf030a8d.jpg"
   alt="GPIO measurement" title="GPIO measurement"
   width="600"
   height="329"
@@ -642,8 +644,8 @@ border: 1px solid #000;
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kint2pp_levelshifter.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kint2pp_levelshifter_hua983c5221b9326c29ab4450c04cd6d00_1691385_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kint2pp_levelshifter_hua983c5221b9326c29ab4450c04cd6d00_1691385_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kint2pp_levelshifter_hua983c5221b9326c29ab4450c04cd6d00_1691385_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kint2pp_levelshifter_hu_4f255d356e73d9d7.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kint2pp_levelshifter_hu_508fa746fe9ae030.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kint2pp_levelshifter_hu_f003e08be826b795.jpg"
   alt="kint2pp with level shifter" title="kint2pp with level shifter"
   width="600"
   height="800"
@@ -681,8 +683,8 @@ I soldered jumper wires to the board:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kinx_fpc_measure.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kinx_fpc_measure_hu855bbe0a9c47ac557e5b09db74fa3b06_1315352_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kinx_fpc_measure_hu855bbe0a9c47ac557e5b09db74fa3b06_1315352_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kinx_fpc_measure_hu855bbe0a9c47ac557e5b09db74fa3b06_1315352_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kinx_fpc_measure_hu_eeed8a59c3eb743b.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kinx_fpc_measure_hu_ebe912e7486fb690.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kinx_fpc_measure_hu_f466e1f86e18b90f.jpg"
   alt="kinX measurement" title="kinX measurement"
   width="600"
   height="450"
@@ -734,8 +736,8 @@ probe heads onto the contacts while doing your measurements:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kinesis_original_measure.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kinesis_original_measure_hu855bbe0a9c47ac557e5b09db74fa3b06_944081_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kinesis_original_measure_hu855bbe0a9c47ac557e5b09db74fa3b06_944081_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kinesis_original_measure_hu855bbe0a9c47ac557e5b09db74fa3b06_944081_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kinesis_original_measure_hu_cdcac5625dc28784.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kinesis_original_measure_hu_4ec1c61655138ba8.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/kinesis_original_measure_hu_ff90f33267b02595.jpg"
   alt="kinesis original controller measurement" title="kinesis original controller measurement"
   width="600"
   height="450"
@@ -942,58 +944,58 @@ controller runs, so this code needs to be adjusted for each platform.</p>
 <p>With the QMK keyboard firmware configured for lowest input latency, how do the
 different Kinesis keyboard controller compare? Here are my measurements:</p>
 <table>
-<thead>
-<tr>
-<th>model</th>
-<th>CPU speed</th>
-<th>USB poll interval</th>
-<th>scan-to-scan</th>
-<th>scan rate</th>
-<th>caps-to-report</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>kint41</td>
-<td>600 MHz</td>
-<td>125μs</td>
-<td>181μs</td>
-<td>5456 scans/s</td>
-<td>930µs ±17%</td>
-</tr>
-<tr>
-<td>kinX</td>
-<td>120 MHz</td>
-<td>125μs</td>
-<td>213μs</td>
-<td>4694 scans/s</td>
-<td>953µs ±15%</td>
-</tr>
-<tr>
-<td>kint36</td>
-<td>180 MHz</td>
-<td>1000μs</td>
-<td>444μs</td>
-<td>2252 scans/s</td>
-<td>1.97ms ±15%</td>
-</tr>
-<tr>
-<td>kint2pp</td>
-<td>16 MHz</td>
-<td>1000μs</td>
-<td>926μs</td>
-<td>1078 scans/s</td>
-<td>3.27ms ±32%</td>
-</tr>
-<tr>
-<td>original</td>
-<td>60 MHz</td>
-<td>10000μs</td>
-<td>1936μs</td>
-<td>516 scans/s</td>
-<td>13.6ms ±21%</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>model</th>
+          <th>CPU speed</th>
+          <th>USB poll interval</th>
+          <th>scan-to-scan</th>
+          <th>scan rate</th>
+          <th>caps-to-report</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>kint41</td>
+          <td>600 MHz</td>
+          <td>125μs</td>
+          <td>181μs</td>
+          <td>5456 scans/s</td>
+          <td>930µs ±17%</td>
+      </tr>
+      <tr>
+          <td>kinX</td>
+          <td>120 MHz</td>
+          <td>125μs</td>
+          <td>213μs</td>
+          <td>4694 scans/s</td>
+          <td>953µs ±15%</td>
+      </tr>
+      <tr>
+          <td>kint36</td>
+          <td>180 MHz</td>
+          <td>1000μs</td>
+          <td>444μs</td>
+          <td>2252 scans/s</td>
+          <td>1.97ms ±15%</td>
+      </tr>
+      <tr>
+          <td>kint2pp</td>
+          <td>16 MHz</td>
+          <td>1000μs</td>
+          <td>926μs</td>
+          <td>1078 scans/s</td>
+          <td>3.27ms ±32%</td>
+      </tr>
+      <tr>
+          <td>original</td>
+          <td>60 MHz</td>
+          <td>10000μs</td>
+          <td>1936μs</td>
+          <td>516 scans/s</td>
+          <td>13.6ms ±21%</td>
+      </tr>
+  </tbody>
 </table>
 <p>The changes required to obtain these results are included since QMK 0.12.38
 (2021-04-20).</p>

@@ -9,12 +9,13 @@
   <meta property="og:title" content="Home network 10 Gbit/s upgrade">
   <meta property="og:description" content="After adding a fiber link to my home network, I am upgrading that link from 1 Gbit/s to 10 Gbit/s.
 As a reminder, conceptually the fiber link is built using two media converters from/to ethernet:
-Schematically, this is what’s connected to both ends:">
+Schematically, this is what’s connected to both ends:
+">
   
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-07-30-mikrotiks-featured_hu0957e5d484a34f5f279de33468b78758_1267758_200x200_fit_q75_box.jpg">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-07-30-mikrotiks-featured_hu_d8c44a9bc593ff61.jpg">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -23,7 +24,8 @@ Schematically, this is what’s connected to both ends:">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
   <meta name="description" content="After adding a fiber link to my home network, I am upgrading that link from 1 Gbit/s to 10 Gbit/s.
 As a reminder, conceptually the fiber link is built using two media converters from/to ethernet:
-Schematically, this is what’s connected to both ends:">
+Schematically, this is what’s connected to both ends:
+">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -266,8 +268,8 @@ from/to ethernet:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-08-04-media-converters.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-08-04-media-converters_hu863a0a53ff58eb79e087ca8992fd5d37_416326_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-08-04-media-converters_hu863a0a53ff58eb79e087ca8992fd5d37_416326_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-08-04-media-converters_hu863a0a53ff58eb79e087ca8992fd5d37_416326_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-08-04-media-converters_hu_3e23d110e39648be.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-08-04-media-converters_hu_d98ea7db6a7d19aa.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-08-04-media-converters_hu_48b0b6dae3ea2ca2.jpg"
   alt="0.9mm thin fiber cables" title="0.9mm thin fiber cables"
   width="600"
   height="217"
@@ -334,8 +336,8 @@ CRS305-1G-4S+IN</a>.</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-07-30-mikrotiks-featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-07-30-mikrotiks-featured_hu0957e5d484a34f5f279de33468b78758_1267758_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-07-30-mikrotiks-featured_hu0957e5d484a34f5f279de33468b78758_1267758_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-07-30-mikrotiks-featured_hu0957e5d484a34f5f279de33468b78758_1267758_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-07-30-mikrotiks-featured_hu_e821cb4bd4e40c09.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-07-30-mikrotiks-featured_hu_dc872f474db63a85.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2020-07-30-mikrotiks-featured_hu_58107a735ac2e74c.jpg"
   alt="Mikrotik CRS305-1G-4S&#43;IN" title="Mikrotik CRS305-1G-4S&#43;IN"
   width="600"
   height="411"
@@ -370,38 +372,38 @@ power usage and heat.</p>
 <p>The resulting list of SFP modules used in the two Mikrotik switches looks like
 so:</p>
 <table>
-<thead>
-<tr>
-<th>Mikrotik 1 SFP</th>
-<th>speed</th>
-<th></th>
-<th>speed</th>
-<th>Mikrotik 2 SFP</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>chuchi</td>
-<td>10 Gbit/s DAC</td>
-<td></td>
-<td>10 Gbit/s DAC</td>
-<td>midna</td>
-</tr>
-<tr>
-<td>storage2</td>
-<td>1 Gbit/s  RJ45</td>
-<td></td>
-<td>1 Gbit/s RJ45</td>
-<td>router7</td>
-</tr>
-<tr>
-<td></td>
-<td>10 Gbit/s BiDi</td>
-<td>⬅ BiDi fiber link ➡</td>
-<td>10 Gbit/s BiDi</td>
-<td></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Mikrotik 1 SFP</th>
+          <th>speed</th>
+          <th></th>
+          <th>speed</th>
+          <th>Mikrotik 2 SFP</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>chuchi</td>
+          <td>10 Gbit/s DAC</td>
+          <td></td>
+          <td>10 Gbit/s DAC</td>
+          <td>midna</td>
+      </tr>
+      <tr>
+          <td>storage2</td>
+          <td>1 Gbit/s  RJ45</td>
+          <td></td>
+          <td>1 Gbit/s RJ45</td>
+          <td>router7</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>10 Gbit/s BiDi</td>
+          <td>⬅ BiDi fiber link ➡</td>
+          <td>10 Gbit/s BiDi</td>
+          <td></td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="hardware-sourcing">Hardware sourcing</h2>
 <p>The total cost of this upgrade is 676 CHF, with the biggest chunk spent on the
@@ -412,35 +414,35 @@ fiber-related. Everything they have is very affordable, and products in stock at
 their German warehouse arrive in Switzerland (and presumably other European
 countries, too) within the same week.</p>
 <table>
-<thead>
-<tr>
-<th>num</th>
-<th>price</th>
-<th>name</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1 ×</td>
-<td>34 CHF</td>
-<td><a href="https://www.fs.com/de/products/74681.html">Generic Compatible 10GBASE-BX BiDi SFP+ 1270nm-TX/1330nm-RX 10km DOM Transceiver Module, FS P/N: SFP-10G-BX #74681</a></td>
-</tr>
-<tr>
-<td>1 ×</td>
-<td>34 CHF</td>
-<td><a href="https://www.fs.com/de/products/74682.html">Generic Compatible 10GBASE-BX BiDi SFP+ 1330nm-TX/1270nm-RX 10km DOM Transceiver Module, FS P/N: SFP-10G-BX #74682</a></td>
-</tr>
-<tr>
-<td>2 ×</td>
-<td>14 CHF</td>
-<td><a href="https://www.fs.com/de/products/74621.html">3m Generic Compatible 10G SFP+ Passive Direct Attach Copper Twinax Cable</a></td>
-</tr>
-<tr>
-<td>0 ×</td>
-<td>56 CHF</td>
-<td><del><a href="https://www.fs.com/de/products/74680.html">SFP+ Transceiver Modul - Generisch kompatibel 10GBASE-T SFP+ Kupfer RJ-45 30m, FS P/N: SFP-10G-T #74680</a></del></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>num</th>
+          <th>price</th>
+          <th>name</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1 ×</td>
+          <td>34 CHF</td>
+          <td><a href="https://www.fs.com/de/products/74681.html">Generic Compatible 10GBASE-BX BiDi SFP+ 1270nm-TX/1330nm-RX 10km DOM Transceiver Module, FS P/N: SFP-10G-BX #74681</a></td>
+      </tr>
+      <tr>
+          <td>1 ×</td>
+          <td>34 CHF</td>
+          <td><a href="https://www.fs.com/de/products/74682.html">Generic Compatible 10GBASE-BX BiDi SFP+ 1330nm-TX/1270nm-RX 10km DOM Transceiver Module, FS P/N: SFP-10G-BX #74682</a></td>
+      </tr>
+      <tr>
+          <td>2 ×</td>
+          <td>14 CHF</td>
+          <td><a href="https://www.fs.com/de/products/74621.html">3m Generic Compatible 10G SFP+ Passive Direct Attach Copper Twinax Cable</a></td>
+      </tr>
+      <tr>
+          <td>0 ×</td>
+          <td>56 CHF</td>
+          <td><del><a href="https://www.fs.com/de/products/74680.html">SFP+ Transceiver Modul - Generisch kompatibel 10GBASE-T SFP+ Kupfer RJ-45 30m, FS P/N: SFP-10G-T #74680</a></del></td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="digitec-order">digitec order</h3>
 <p>There are a few items that <a href="https://www.FS.COM">FS.COM</a> doesn’t stock. These I
@@ -448,39 +450,39 @@ bought at <a href="https://www.digitec.ch/">digitec</a>, a big and popular elect
 store in Switzerland. My thinking is that if products are available at digitec,
 they most likely are available at your preferred big electronics store, too.</p>
 <table>
-<thead>
-<tr>
-<th>num</th>
-<th>price</th>
-<th>name</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>2 ×</td>
-<td>149 CHF</td>
-<td><a href="https://www.digitec.ch/de/s1/product/mikrotik-crs305-1g-4sin-5ports-switch-9876046">Mikrotik CRS305-1G-4S+IN</a> switch</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>num</th>
+          <th>price</th>
+          <th>name</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2 ×</td>
+          <td>149 CHF</td>
+          <td><a href="https://www.digitec.ch/de/s1/product/mikrotik-crs305-1g-4sin-5ports-switch-9876046">Mikrotik CRS305-1G-4S+IN</a> switch</td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="misc-order">misc order</h3>
 <p>The Mellanox cards are not as widely available as I’d like.</p>
 <p>I’m waiting for an FS.COM card to arrive, which might be a better choice.</p>
 <table>
-<thead>
-<tr>
-<th>num</th>
-<th>price</th>
-<th>name</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>2 ×</td>
-<td>129 EUR</td>
-<td><a href="https://www.heise.de/preisvergleich/nvidia-mellanox-connectx-3-en-10g-mcx311a-xcat-a2508412.html">Mellanox ConnectX-3 MCX311A-XCAT</a></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>num</th>
+          <th>price</th>
+          <th>name</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2 ×</td>
+          <td>129 EUR</td>
+          <td><a href="https://www.heise.de/preisvergleich/nvidia-mellanox-connectx-3-en-10g-mcx311a-xcat-a2508412.html">Mellanox ConnectX-3 MCX311A-XCAT</a></td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="mikrotik-switch-setup">Mikrotik switch setup</h2>
 <p>I want to use my switches only as switches, not for any routing or other layer 3
@@ -656,8 +658,8 @@ hotter!</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2021-06-06-sfp-temperatures.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2021-06-06-sfp-temperatures_hu7dc6d141e645d7cfd271ec6844fcfc18_272504_1200x0_resize_q75_box.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2021-06-06-sfp-temperatures_hu7dc6d141e645d7cfd271ec6844fcfc18_272504_1800x0_resize_q75_box.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2021-06-06-sfp-temperatures_hu7dc6d141e645d7cfd271ec6844fcfc18_272504_600x0_resize_q75_box.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2021-06-06-sfp-temperatures_hu_7ab9f123a162f81f.jpg 2x,https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2021-06-06-sfp-temperatures_hu_66d13233859705e.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-05-16-home-network-fiber-10-gbits-upgrade/2021-06-06-sfp-temperatures_hu_6f5d2f38ef835d7a.jpg"
   
   width="600"
   height="269"

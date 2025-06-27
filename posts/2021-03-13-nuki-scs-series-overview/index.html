@@ -7,7 +7,8 @@
 
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="Nuki Opener on SCS bus: Series Overview">
-  <meta property="og:description" content="When I bought a Nuki Opener, I had a lot of trouble getting it to work — it turns out the device doesn’t properly decode the SCS bus at all, and only captures and replays the signals with a generic code path.">
+  <meta property="og:description" content="When I bought a Nuki Opener, I had a lot of trouble getting it to work — it turns out the device doesn’t properly decode the SCS bus at all, and only captures and replays the signals with a generic code path. This approach does not work well with the SCS bus, where every signal is repeated three times. The repetition is good for reliability when decoding SCS, but bad for the pattern matching and replaying approach the Nuki uses.
+">
   
   
   
@@ -16,7 +17,8 @@
   <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
-  <meta name="description" content="When I bought a Nuki Opener, I had a lot of trouble getting it to work — it turns out the device doesn’t properly decode the SCS bus at all, and only captures and replays the signals with a generic code path.">
+  <meta name="description" content="When I bought a Nuki Opener, I had a lot of trouble getting it to work — it turns out the device doesn’t properly decode the SCS bus at all, and only captures and replays the signals with a generic code path. This approach does not work well with the SCS bus, where every signal is repeated three times. The repetition is good for reliability when decoding SCS, but bad for the pattern matching and replaying approach the Nuki uses.
+">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2021-03-13-nuki-scs-series-overview/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">

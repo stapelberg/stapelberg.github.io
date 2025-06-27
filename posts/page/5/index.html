@@ -260,7 +260,7 @@
 	
 	
 	<p>
-	  Richi’s post about the pdiff-by-default agony resonates with me a lot. On EVERY Debian installation I have ever done in the last few years, without any exceptions, I have turned off pdiffs. Even on all the oddball cases (Raspberry Pi, account on a remote machine, …) where I don’t run my install-configs script, I have ended up turning off pdiffs eventually, because it is just so insanely slow on modern internet connections.
+	   Richi’s post about the pdiff-by-default agony resonates with me a lot. On EVERY Debian installation I have ever done in the last few years, without any exceptions, I have turned off pdiffs. Even on all the oddball cases (Raspberry Pi, account on a remote machine, …) where I don’t run my install-configs script, I have ended up turning off pdiffs eventually, because it is just so insanely slow on modern internet connections. And by modern I mean even the DSL link my parents’ place has since 14 years. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-11-27-pdiffs/">Read more →</a></span>
 	</p>
       </div>
@@ -284,7 +284,7 @@
 	
 	
 	<p>
-	  Thanks to Axel Beckert (abe@), 12 people interested in Debian met last Tuesday in Zürich and celebrated the start of our monthly Debian meetup. New faces are always very welcome. If you live in Zürich, or if you’re visiting, please feel free to attend our meetup — no registration necessary.
+	   Thanks to Axel Beckert (abe@), 12 people interested in Debian met last Tuesday in Zürich and celebrated the start of our monthly Debian meetup. New faces are always very welcome. If you live in Zürich, or if you’re visiting, please feel free to attend our meetup — no registration necessary. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-11-07-debian-meetup/">Read more →</a></span>
 	</p>
       </div>
@@ -309,7 +309,7 @@
 	
 	
 	<p>
-	  Ideally, an internet connection would be perfectly stable, but since that is not always the case, a watchdog is the next best thing. In case you ever use your home machine(s) remotely, the use case should be clear: make sure the internet connection at home still works so that you can log in when travelling.
+	   Ideally, an internet connection would be perfectly stable, but since that is not always the case, a watchdog is the next best thing. In case you ever use your home machine(s) remotely, the use case should be clear: make sure the internet connection at home still works so that you can log in when travelling. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-10-29-openwrt_wan_watchdog/">Read more →</a></span>
 	</p>
       </div>
@@ -334,7 +334,7 @@
 	
 	
 	<p>
-	  A couple of times now, I’ve had problems with my server. The earliest one was when a hard disk drive died. Then memory went bad and had to be replaced. Another example was when a power supply of another machine died and took out the whole rack.
+	   A couple of times now, I’ve had problems with my server. The earliest one was when a hard disk drive died. Then memory went bad and had to be replaced. Another example was when a power supply of another machine died and took out the whole rack. What all of these incidents have in common: after finding my machine unreachable, I would have loved to be able to look at a logfile that would give me a clue about what just happened. Most of the times, the relevant kernel oopses/panics were not persisted to the syslog. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-09-16-remote_syslog/">Read more →</a></span>
 	</p>
       </div>
@@ -364,7 +364,7 @@
 	
 	
 	<p>
-	  During DebConf, Asheesh presented the idea of using git instead of the file system for storing the contents of Debian Code Search. The hope was that it would lead to fewer disk seeks and less data due to gits delta-encoding.
+	   During DebConf, Asheesh presented the idea of using git instead of the file system for storing the contents of Debian Code Search. The hope was that it would lead to fewer disk seeks and less data due to gits delta-encoding. Maybe the reduction would be big enough that enough data could be held in RAM to allow for fast retrieval. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-08-30-git-performance/">Read more →</a></span>
 	</p>
       </div>
@@ -388,7 +388,7 @@
 	
 	
 	<p>
-	  I gave two talks at this year’s DebConf, both about systemd. A huge thanks goes to the video team for their excellent work and putting up the videos that quickly! Find the recordings and slides here: Making your package work with systemd (508 MiB ogv) (Slides (≈ 230 KiB PDF)) systemd myths debunked!
+	   I gave two talks at this year’s DebConf, both about systemd. A huge thanks goes to the video team for their excellent work and putting up the videos that quickly! Find the recordings and slides here: Making your package work with systemd (508 MiB ogv) (Slides (≈ 230 KiB PDF)) systemd myths debunked! (456 MiB ogv) (Slides (≈ 230 KiB PDF)) 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-08-16-debconf-talks/">Read more →</a></span>
 	</p>
       </div>
@@ -412,7 +412,7 @@
 	
 	
 	<p>
-	  I will arrive at DebConf 2013 on Sunday afternoon. In case you are interested in Go (the programming language), systemd, i3 or getting your package reviewed, please talk to me! :-) Looking forward to meeting many of you in real life.
+	   I will arrive at DebConf 2013 on Sunday afternoon. In case you are interested in Go (the programming language), systemd, i3 or getting your package reviewed, please talk to me! :-) Looking forward to meeting many of you in real life. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-08-08-debconf/">Read more →</a></span>
 	</p>
       </div>
@@ -442,7 +442,7 @@
 	
 	
 	<p>
-	  Good news, everyone! dh-golang is now in Debian unstable. With this debhelper addon, packaging software written in Go is very simple. Have a look at the example/ directory in dh-golang to see how it is meant to be used. Essentially, export the DH_GOPKG variable containing the canonical upstream location of the package (e.
+	   Good news, everyone! dh-golang is now in Debian unstable. With this debhelper addon, packaging software written in Go is very simple. Have a look at the example/ directory in dh-golang to see how it is meant to be used. Essentially, export the DH_GOPKG variable containing the canonical upstream location of the package (e.g. github.com/stapelberg/godebiancontrol) and then use dh $@ --buildsystem=golang --with=golang. That’s it! 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-31-dh-golang/">Read more →</a></span>
 	</p>
       </div>
@@ -461,7 +461,7 @@
 	
 	
 	<p>
-	  For some rather advanced isolation and automation work I am currently doing with Debian Code Search I needed to modify the ExecStart= line of a systemd service file programmatically. The recommended interface for programmatically querying service file properties is systemctl show -p ExecStart foo.
+	   For some rather advanced isolation and automation work I am currently doing with Debian Code Search I needed to modify the ExecStart= line of a systemd service file programmatically. The recommended interface for programmatically querying service file properties is systemctl show -p ExecStart foo.service, but with the ExecStart= property in particular, the output cannot be parsed well: 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-27-grep-with-line-continuations/">Read more →</a></span>
 	</p>
       </div>
@@ -485,7 +485,7 @@
 	
 	
 	<p>
-	  Posting this on behalf of a friend of mine in the hope that you can help: I’ve failed several times now to find a suitable WLAN USB dongle that works out of the box on Debian testing. Often manufacturers change the chipsets without changing the version numbers, the product pages are incomplete or even state wrong information.
+	   Posting this on behalf of a friend of mine in the hope that you can help: I’ve failed several times now to find a suitable WLAN USB dongle that works out of the box on Debian testing. Often manufacturers change the chipsets without changing the version numbers, the product pages are incomplete or even state wrong information. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-25-usb-wlan-dongle/">Read more →</a></span>
 	</p>
       </div>
@@ -509,7 +509,7 @@
 	
 	
 	<p>
-	  As of today, systemd 204 is available in Debian experimental. If you are interested in systemd, please install it and report any issues to the BTS — merely reporting them on IRC is not sufficient, we need to have them in the BTS so we don’t forget about them.
+	   As of today, systemd 204 is available in Debian experimental. If you are interested in systemd, please install it and report any issues to the BTS — merely reporting them on IRC is not sufficient, we need to have them in the BTS so we don’t forget about them. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-20-systemd-204-in-experimental/">Read more →</a></span>
 	</p>
       </div>
@@ -533,7 +533,7 @@
 	
 	
 	<p>
-	  Sometimes, people show up in our IRC channel #debian-systemd or on our mailing list pkg-systemd-maintainers@lists.alioth.debian.org and ask how they can help. This blog post answers that question. First of all, whatever you end up doing, please coordinate with us first!
+	   Sometimes, people show up in our IRC channel #debian-systemd or on our mailing list pkg-systemd-maintainers@lists.alioth.debian.org and ask how they can help. This blog post answers that question. First of all, whatever you end up doing, please coordinate with us first! Saying hi in our IRC channel or on our mailing list and explaining what you intend to do is all we ask for. In the past, people have filed bug reports with service files that are not idiomatic, and we really need to avoid that. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-14-systemd-how-to-help/">Read more →</a></span>
 	</p>
       </div>
@@ -557,7 +557,7 @@
 	
 	
 	<p>
-	  The German computer magazine c't has covered Debsources in its most recent edition (c't 16/2013). In that article, they also state: Debsources integriert auch eine Code-Suche, allerdings werden lediglich die Quellen des Unstable-Zweigs durchsucht, der zirka ein Drittel des Quellcodes von Debsources ausmacht.
+	   The German computer magazine c't has covered Debsources in its most recent edition (c't 16/2013). In that article, they also state: Debsources integriert auch eine Code-Suche, allerdings werden lediglich die Quellen des Unstable-Zweigs durchsucht, der zirka ein Drittel des Quellcodes von Debsources ausmacht. This loosely translates to: 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-14-searchable-packages/">Read more →</a></span>
 	</p>
       </div>
@@ -581,7 +581,7 @@
 	
 	
 	<p>
-	  This blog post is the third of a series of posts dealing with the results of the Debian systemd survey. I intend to give a presentation at DebConf 2013, too, so you could either read my posts, or watch the talk, or both :-).
+	   This blog post is the third of a series of posts dealing with the results of the Debian systemd survey. I intend to give a presentation at DebConf 2013, too, so you could either read my posts, or watch the talk, or both :-). 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-13-systemd-not-portable/">Read more →</a></span>
 	</p>
       </div>
@@ -605,7 +605,7 @@
 	
 	
 	<p>
-	  This blog post is the second of a series of posts dealing with the results of the Debian systemd survey. I intend to give a presentation at DebConf 2013, too, so you could either read my posts, or watch the talk, or both :-).
+	   This blog post is the second of a series of posts dealing with the results of the Debian systemd survey. I intend to give a presentation at DebConf 2013, too, so you could either read my posts, or watch the talk, or both :-). 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-07-01-systemd-transition/">Read more →</a></span>
 	</p>
       </div>
@@ -630,7 +630,7 @@
 	
 	
 	<p>
-	  I recently moved to Zürich and therefore needed a new internet connection. I am given to understand that fiber will be available at my place in a few months, so I chose to go with a provider that will allow me to eventually switch to fiber once it’s available.
+	   I recently moved to Zürich and therefore needed a new internet connection. I am given to understand that fiber will be available at my place in a few months, so I chose to go with a provider that will allow me to eventually switch to fiber once it’s available. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-06-25-dsl_connection_troubles/">Read more →</a></span>
 	</p>
       </div>
@@ -654,7 +654,7 @@
 	
 	
 	<p>
-	  At this year’s GPN13 I gave a talk about Debian Code Search. It was in German, so I spent a few hours creating english subtitles. You can watch the video at youtube.com/watch?v=n6DtW3zCTvk with english subtitles. In case you prefer to download the file(s), get http://ftp.
+	   At this year’s GPN13 I gave a talk about Debian Code Search. It was in German, so I spent a few hours creating english subtitles. You can watch the video at youtube.com/watch?v=n6DtW3zCTvk with english subtitles. In case you prefer to download the file(s), get http://ftp.ccc.de/events/gpn/gpn13/gpn13-debian-code-search.mp4 (84 MiB) and the corresponding subtitle file at http://t.zekjur.net/gpn13-debian-code-search.srt. Drop both files in the same directory, run mplayer gpn13-debian-code-search.mp4 and press v to enable subtitles. I intend to eventually put the (subtitled) video on YouTube and refer to it from codesearch.debian.net, but I wanted to post the video in its current form already. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-06-17-debian-code-search-talk/">Read more →</a></span>
 	</p>
       </div>
@@ -678,7 +678,7 @@
 	
 	
 	<p>
-	  This blog post is the first of a series of posts dealing with the results of the Debian systemd survey. I intend to give a presentation at DebConf 2013, too, so you could either read my posts, or watch the talk, or both :-).
+	   This blog post is the first of a series of posts dealing with the results of the Debian systemd survey. I intend to give a presentation at DebConf 2013, too, so you could either read my posts, or watch the talk, or both :-). 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-06-09-systemd-bloat/">Read more →</a></span>
 	</p>
       </div>
@@ -702,7 +702,7 @@
 	
 	
 	<p>
-	  Yesterday I uploaded a big package and got multiple timeouts. I then figured out that DDs can also upload using SFTP (i.e. SSH’s file transfer thingie) instead of traditional FTP, which seems like a more modern alternative. So let’s give that a try.
+	   Yesterday I uploaded a big package and got multiple timeouts. I then figured out that DDs can also upload using SFTP (i.e. SSH’s file transfer thingie) instead of traditional FTP, which seems like a more modern alternative. So let’s give that a try. With dput-ng, the following configuration leads to using sftp by default: 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-06-08-uploading-via-sftp/">Read more →</a></span>
 	</p>
       </div>
@@ -732,7 +732,7 @@
 	
 	
 	<p>
-	  A week ago, we started the Debian systemd survey. The goal was to figure out a few trends and answer the following two questions: Do our subjective impressions from the discussions on debian-devel reflect the general sentiment about systemd? What are the main concerns that most people have?
+	   A week ago, we started the Debian systemd survey. The goal was to figure out a few trends and answer the following two questions: Do our subjective impressions from the discussions on debian-devel reflect the general sentiment about systemd? What are the main concerns that most people have? Thank you all for your participation! 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-05-27-systemd-survey-results/">Read more →</a></span>
 	</p>
       </div>
@@ -756,7 +756,7 @@
 	
 	
 	<p>
-	  Whenever I want to work on some package, I usually clone its git repository, make my changes, then push and upload the Debian package. I don’t keep those repositories around in order to avoid cruft and also to have a 100% clean, up-to-date setup whenever I start working on something.
+	   Whenever I want to work on some package, I usually clone its git repository, make my changes, then push and upload the Debian package. I don’t keep those repositories around in order to avoid cruft and also to have a 100% clean, up-to-date setup whenever I start working on something. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-05-25-d-clone/">Read more →</a></span>
 	</p>
       </div>
@@ -780,7 +780,7 @@
 	
 	
 	<p>
-	  In the past, we have had multiple heated discussions involving systemd. We (the pkg-systemd-maintainers team) would like to better understand why some people dislike systemd. Therefore, we have created a survey, which you can find at http://survey.zekjur.net/index.php/391182 Please only submit your feedback to the survey and not this thread, we are not particularly interested in yet another systemd discussion at this point.
+	   In the past, we have had multiple heated discussions involving systemd. We (the pkg-systemd-maintainers team) would like to better understand why some people dislike systemd. Therefore, we have created a survey, which you can find at http://survey.zekjur.net/index.php/391182 Please only submit your feedback to the survey and not this thread, we are not particularly interested in yet another systemd discussion at this point. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-05-20-systemd-survey/">Read more →</a></span>
 	</p>
       </div>
@@ -799,7 +799,7 @@
 	
 	
 	<p>
-	  My Galaxy Nexus was getting really slow over the last few weeks, meaning simple things like going to the homescreen took multiple seconds. Turns out that the problem is the SD card filesystem / controller getting really slow once the SD card gets nearly filled up.
+	   My Galaxy Nexus was getting really slow over the last few weeks, meaning simple things like going to the homescreen took multiple seconds. Turns out that the problem is the SD card filesystem / controller getting really slow once the SD card gets nearly filled up. You can verify this by running Androbench, a storage benchmark app. You should get a sequential write performance of a few MB/s (e.g. 8 MB/s), but when affected by the problem, you get about 0.x MB/s. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-05-20-galaxy-nexus-slowness/">Read more →</a></span>
 	</p>
       </div>
@@ -829,7 +829,7 @@
 	
 	
 	<p>
-	  Recently, I was wondering how many Debian Developers are actively working on RC bugs in some way or another in the time period of the last release (squeeze) to now (shortly? before wheezy). I therefore grabbed the mailing list archives of debian-bugs-dist@ from gmane, used only those messages whose X-Debian-PR-Message header matches an RC bug (list retrieved from UDD) and then attributed the message counts to the appropriate Debian Developer.
+	   Recently, I was wondering how many Debian Developers are actively working on RC bugs in some way or another in the time period of the last release (squeeze) to now (shortly? before wheezy). I therefore grabbed the mailing list archives of debian-bugs-dist@ from gmane, used only those messages whose X-Debian-PR-Message header matches an RC bug (list retrieved from UDD) and then attributed the message counts to the appropriate Debian Developer. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-03-31-analyzing-rc-bug-messages/">Read more →</a></span>
 	</p>
       </div>
@@ -848,7 +848,7 @@
 	
 	
 	<p>
-	  Update: The kinT kinesis keyboard controller from 2020 is an updated version, with several improvements over the older 2013 design! The Kinesis Advantage Contoured is an ergonomic keyboard which I have been using for four years. It has many features that make it a great keyboard, and it’s certainly the best I have ever used.
+	   Update: The kinT kinesis keyboard controller from 2020 is an updated version, with several improvements over the older 2013 design! The Kinesis Advantage Contoured is an ergonomic keyboard which I have been using for four years. It has many features that make it a great keyboard, and it’s certainly the best I have ever used. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-03-21-kinesis_custom_controller/">Read more →</a></span>
 	</p>
       </div>
@@ -867,7 +867,7 @@
 	
 	
 	<p>
-	  OpenWrt is a nice FOSS Linux firmware (primarily) for wireless routers, which I use for many years. Even though I never experienced a problem with my routers, I’d like to be prepared for hardware failures, software failures and getting my router compromised.
+	   OpenWrt is a nice FOSS Linux firmware (primarily) for wireless routers, which I use for many years. Even though I never experienced a problem with my routers, I’d like to be prepared for hardware failures, software failures and getting my router compromised. Here is a short description of each scenario so that it is clear what I mean: 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-03-17-openwrt_backup/">Read more →</a></span>
 	</p>
       </div>
@@ -886,7 +886,7 @@
 	
 	
 	<p>
-	  About 4 years ago, I started tracking my configuration files with git. The advantages of storing configuration files in some repository are numerous: You can destroy your configuration/computer and easily revert to a known good state. You can easily distribute and update the same set of configfiles across multiple machines (especially virtual machines or other test setups).
+	   About 4 years ago, I started tracking my configuration files with git. The advantages of storing configuration files in some repository are numerous: You can destroy your configuration/computer and easily revert to a known good state. You can easily distribute and update the same set of configfiles across multiple machines (especially virtual machines or other test setups). You can refer other people to your configfiles if you store them in a public repository. This article describes the way I use git to track my configfiles. My solution is simple and should be easy to understand even if you have not used git extensively before. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-03-15-configfiles_in_git/">Read more →</a></span>
 	</p>
       </div>
@@ -929,7 +929,7 @@
 	
 	
 	<p>
-	  Previously, my workflow regarding replying to bugreports outside my own packages was very uncomfortable: I first downloaded the mbox archive from the BTS, then imported that in claws-mail, hit reply all, remove submit@, add bugnumber@, then send the email. Therefore, I decided to hack up a little elisp function to automate this process for notmuch.
+	   Previously, my workflow regarding replying to bugreports outside my own packages was very uncomfortable: I first downloaded the mbox archive from the BTS, then imported that in claws-mail, hit reply all, remove submit@, add bugnumber@, then send the email. Therefore, I decided to hack up a little elisp function to automate this process for notmuch. It first downloads the message from the BTS, adds it to the notmuch database, then calls notmuch-mua-reply on the message and fixes the To: header: 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-03-08-bts-notmuch-reply/">Read more →</a></span>
 	</p>
       </div>
@@ -959,8 +959,14 @@
 	
 	
 	<p>
-	  I recently worked on the following RC bugs: #696532 — isdnlog: /etc/isdn/isdnlog.isdnctrl0 is easily destroyed in squeeze to wheezy upgrade
+	   I recently worked on the following RC bugs: #696532 — isdnlog: /etc/isdn/isdnlog.isdnctrl0 is easily destroyed in squeeze to wheezy upgrade
 Pinged the maintainer about uploading a fix to unstable, too (was only fixed in experimental). #693208 — clang: unable to link trivial test program on armhf
+Filed a request to upload a new version to testing-proposed-updates. #694986 — flash-kernel: postinst modifies /etc/default/rcS
+Pinged. #694352 — lcdf-typetool include non free adobe data; glyph list
+Filed a request to upload a new version to testing-proposed-updates. #593607 — pcmanfm wrongly deleted some files in a failed move operation
+Updated the bugreport status to reflect reality. #698137 — destroys icinga.cfg on postinst when it's a symlink
+Reproduced, asked whether to NMU. #694622 — nut-snmp: Can't connect to UPS [apcpdu] (snmp-ups-apcpdu): No such file or directory
+Reproduced, asked for more info. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-02-06-rc-bugs-2/">Read more →</a></span>
 	</p>
       </div>

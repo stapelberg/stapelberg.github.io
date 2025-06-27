@@ -7,8 +7,10 @@
 
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="RC bugs">
-  <meta property="og:description" content="I recently worked on the following RC bugs: #677861 — lftp: FTBFS[kfreebsd-i386]: error: conflicting declaration &#39;typedef __int32_t gl_intptr_t&#39;
-I provided some analysis. By rebuilding lftp’s configure script with recent autotools, this should be fixed. #676229 — gnustep-make: should depend on a chosen version of gobjc, not just &#34;">
+  <meta property="og:description" content=" I recently worked on the following RC bugs: #677861 — lftp: FTBFS[kfreebsd-i386]: error: conflicting declaration &#39;typedef __int32_t gl_intptr_t&#39;
+I provided some analysis. By rebuilding lftp’s configure script with recent autotools, this should be fixed. #676229 — gnustep-make: should depend on a chosen version of gobjc, not just &#34;gobjc&#34;
+This issue was fixed by an upload, but not marked as closed. I tried to reproduce it and failed (as expected), so I closed the bug. #694091 — bcrypt: Tries to load whole file into memory regardless of the size
+I patched bcrypt to use a window of 256K over the input and output file instead of loading it into memory. I also fixed the offset types so that it works with files &gt; 2 GiB on 32-bit platforms. ">
   
   
   
@@ -17,8 +19,10 @@ I provided some analysis. By rebuilding lftp’s configure script with recent au
   <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
-  <meta name="description" content="I recently worked on the following RC bugs: #677861 — lftp: FTBFS[kfreebsd-i386]: error: conflicting declaration &#39;typedef __int32_t gl_intptr_t&#39;
-I provided some analysis. By rebuilding lftp’s configure script with recent autotools, this should be fixed. #676229 — gnustep-make: should depend on a chosen version of gobjc, not just &#34;">
+  <meta name="description" content=" I recently worked on the following RC bugs: #677861 — lftp: FTBFS[kfreebsd-i386]: error: conflicting declaration &#39;typedef __int32_t gl_intptr_t&#39;
+I provided some analysis. By rebuilding lftp’s configure script with recent autotools, this should be fixed. #676229 — gnustep-make: should depend on a chosen version of gobjc, not just &#34;gobjc&#34;
+This issue was fixed by an upload, but not marked as closed. I tried to reproduce it and failed (as expected), so I closed the bug. #694091 — bcrypt: Tries to load whole file into memory regardless of the size
+I patched bcrypt to use a window of 256K over the input and output file instead of loading it into memory. I also fixed the offset types so that it works with files &gt; 2 GiB on 32-bit platforms. ">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2012-11-25-rc-bugs/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">

@@ -7,7 +7,7 @@
 
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content=" In C&#43;&#43; gibt es Closures! Zwar…">
-  <meta property="og:description" content="In C&#43;&#43; gibt es Closures! Zwar erst mit C&#43;&#43;0x (wofür man g&#43;&#43; 4.5 braucht), aber immerhin. Damit wird das Erstellen asynchroner APIs endlich annehmbar (in diesem Fall der CouchDB-Teil einer Qt-Anwendung, wegen Qt muss ich überhaupt erst C&#43;&#43; nutzen). Zum Vergleich mal die API vorher: void MainWindow::clickedTask() { TodoButton *btn = (TodoButton*)sender(); /* Get the document from CouchDB */ QNetworkReply *nreply = db-&gt;get_document(btn-&gt;ID()); connect(nreply, SIGNAL(finished()), this, SLOT(recv_entry_edit())); } void MainWindow::recv_entry_edit() { QNetworkReply *reply = (QNetworkReply*)sender(); QByteArray answer = reply-&gt;readAll(); QJson::Parser p; bool ok; QVariant var = p.">
+  <meta property="og:description" content=" In C&#43;&#43; gibt es Closures! Zwar erst mit C&#43;&#43;0x (wofür man g&#43;&#43; 4.5 braucht), aber immerhin. Damit wird das Erstellen asynchroner APIs endlich annehmbar (in diesem Fall der CouchDB-Teil einer Qt-Anwendung, wegen Qt muss ich überhaupt erst C&#43;&#43; nutzen). Zum Vergleich mal die API vorher: ">
   
   
   
@@ -16,7 +16,7 @@
   <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
-  <meta name="description" content="In C&#43;&#43; gibt es Closures! Zwar erst mit C&#43;&#43;0x (wofür man g&#43;&#43; 4.5 braucht), aber immerhin. Damit wird das Erstellen asynchroner APIs endlich annehmbar (in diesem Fall der CouchDB-Teil einer Qt-Anwendung, wegen Qt muss ich überhaupt erst C&#43;&#43; nutzen). Zum Vergleich mal die API vorher: void MainWindow::clickedTask() { TodoButton *btn = (TodoButton*)sender(); /* Get the document from CouchDB */ QNetworkReply *nreply = db-&gt;get_document(btn-&gt;ID()); connect(nreply, SIGNAL(finished()), this, SLOT(recv_entry_edit())); } void MainWindow::recv_entry_edit() { QNetworkReply *reply = (QNetworkReply*)sender(); QByteArray answer = reply-&gt;readAll(); QJson::Parser p; bool ok; QVariant var = p.">
+  <meta name="description" content=" In C&#43;&#43; gibt es Closures! Zwar erst mit C&#43;&#43;0x (wofür man g&#43;&#43; 4.5 braucht), aber immerhin. Damit wird das Erstellen asynchroner APIs endlich annehmbar (in diesem Fall der CouchDB-Teil einer Qt-Anwendung, wegen Qt muss ich überhaupt erst C&#43;&#43; nutzen). Zum Vergleich mal die API vorher: ">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2010-07-31-in-c-gibt-es-closures-zwar/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">

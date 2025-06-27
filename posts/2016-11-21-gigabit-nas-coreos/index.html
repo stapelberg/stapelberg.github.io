@@ -7,7 +7,7 @@
 
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="Gigabit NAS (running CoreOS)">
-  <meta property="og:description" content="tl;dr: I upgraded from a qnap TS-119P to a custom HTPC-like network storage solution. This article outlines what my original reasoning was for the qnap TS-119P, what I learnt, and with what solution precisely I replaced the qnap. A little over two years ago, I gave a (German) presentation about my network storage setup (see video or slides).">
+  <meta property="og:description" content=" tl;dr: I upgraded from a qnap TS-119P to a custom HTPC-like network storage solution. This article outlines what my original reasoning was for the qnap TS-119P, what I learnt, and with what solution precisely I replaced the qnap. A little over two years ago, I gave a (German) presentation about my network storage setup (see video or slides). Given that video isn’t a great consumption format when you’re pressed on time, and given that a number of my readers might not speak German, I’ll recap the most important points: ">
   
   
   
@@ -16,7 +16,7 @@
   <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
-  <meta name="description" content="tl;dr: I upgraded from a qnap TS-119P to a custom HTPC-like network storage solution. This article outlines what my original reasoning was for the qnap TS-119P, what I learnt, and with what solution precisely I replaced the qnap. A little over two years ago, I gave a (German) presentation about my network storage setup (see video or slides).">
+  <meta name="description" content=" tl;dr: I upgraded from a qnap TS-119P to a custom HTPC-like network storage solution. This article outlines what my original reasoning was for the qnap TS-119P, what I learnt, and with what solution precisely I replaced the qnap. A little over two years ago, I gave a (German) presentation about my network storage setup (see video or slides). Given that video isn’t a great consumption format when you’re pressed on time, and given that a number of my readers might not speak German, I’ll recap the most important points: ">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2016-11-21-gigabit-nas-coreos/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -613,7 +613,7 @@ CoreOS rebooting to update itself.
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      -----BEGIN CERTIFICATE-----
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      MIIDYjCCAko…
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      -----END CERTIFICATE-----</span><span style="color:#bbb">      
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      -----END CERTIFICATE-----</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">path</span>:<span style="color:#bbb"> </span>/var/lib/ip6tables/rules-save<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">permissions</span>:<span style="color:#bbb"> </span><span style="color:#40a070">0644</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">owner</span>:<span style="color:#bbb"> </span>root:root<span style="color:#bbb">
@@ -629,14 +629,14 @@ CoreOS rebooting to update itself.
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      -A INPUT -s 2001:db8::/32 -m comment --comment &#34;local traffic&#34; -j ACCEPT
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      -A INPUT -p tcp -m tcp --dport 22 -m comment --comment &#34;SSH&#34; -j ACCEPT
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      COMMIT
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      # Completed on Fri Aug 26 19:57:51 2016</span><span style="color:#bbb">      
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      # Completed on Fri Aug 26 19:57:51 2016</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">path</span>:<span style="color:#bbb"> </span>/root/.ssh/authorized_keys<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">permissions</span>:<span style="color:#bbb"> </span><span style="color:#40a070">0600</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">owner</span>:<span style="color:#bbb"> </span>root:root<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      command=&#34;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/midna:/srv/backup/midna stapelberg/rsync /srv/backup/midna&#34; ssh-rsa AAAAB… root@midna
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      command=&#34;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/scan2drive:/srv/backup/scan2drive stapelberg/rsync /srv/backup/scan2drive&#34; ssh-rsa AAAAB… root@scan2drive
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      command=&#34;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/alp.zekjur.net:/srv/backup/alp.zekjur.net stapelberg/rsync /srv/backup/alp.zekjur.net&#34; ssh-rsa AAAAB… root@alp</span><span style="color:#bbb">      
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      command=&#34;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/alp.zekjur.net:/srv/backup/alp.zekjur.net stapelberg/rsync /srv/backup/alp.zekjur.net&#34; ssh-rsa AAAAB… root@alp</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">coreos</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">update</span>:<span style="color:#bbb">
@@ -658,7 +658,7 @@ CoreOS rebooting to update itself.
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        DNS=10.0.0.1
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Address=10.0.0.252/24
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Gateway=10.0.0.1
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        IPv6Token=0:0:0:0:10::252</span><span style="color:#bbb">        
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        IPv6Token=0:0:0:0:10::252</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>systemd-networkd-wait-online.service<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">command</span>:<span style="color:#bbb"> </span>start<span style="color:#bbb">
@@ -667,7 +667,7 @@ CoreOS rebooting to update itself.
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">          </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">            [Service]
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">            ExecStart=
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">            ExecStart=/usr/lib/systemd/systemd-networkd-wait-online \</span><span style="color:#bbb">            
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">            ExecStart=/usr/lib/systemd/systemd-networkd-wait-online \</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	      </span>--interface=enp2s0<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>unlock.service<span style="color:#bbb">
@@ -683,7 +683,7 @@ CoreOS rebooting to update itself.
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Type=oneshot
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        RemainAfterExit=yes
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        # Wait until the host is actually reachable.
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStart=/bin/sh -c &#34;c=0; while [ $c -lt 5 ]; do \</span><span style="color:#bbb">        
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStart=/bin/sh -c &#34;c=0; while [ $c -lt 5 ]; do \</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	    </span>/bin/ping6 -n -c 1 r.zekjur.net &amp;&amp; break; \<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	    </span>c=$((c+1)); \<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	    </span>sleep 1; \<span style="color:#bbb">
@@ -717,7 +717,7 @@ CoreOS rebooting to update itself.
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=-/usr/bin/docker kill smb
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=-/usr/bin/docker rm smb
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=-/usr/bin/docker rm smb-prep
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=/usr/bin/docker run --name smb-prep stapelberg/samba \</span><span style="color:#bbb">        
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=/usr/bin/docker run --name smb-prep stapelberg/samba \</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	  </span>adduser --quiet --disabled-password --gecos &#34;&#34; --uid 29901 michael<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>ExecStartPre=/usr/bin/docker commit smb-prep smb-prepared<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>ExecStartPre=/usr/bin/docker rm smb-prep<span style="color:#bbb">
@@ -758,7 +758,7 @@ CoreOS rebooting to update itself.
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          -v /srv/data/movies:/srv/data/movies:ro \
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          -v /srv/data/series:/srv/data/series:ro \
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          -v /srv/emby:/config \
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          emby/embyserver</span><span style="color:#bbb">        
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          emby/embyserver</span><span style="color:#bbb">
 </span></span></span></code></pre></div><div id="bmc">
   <p>
     I run a blog since 2005, spreading knowledge and experience for over 20 years! :)

@@ -260,7 +260,7 @@
 	
 	
 	<p>
-	  Personally, I find the packaging tools which are available in Debian far too complex. To better understand the options we have, I created a diagram of tools which are frequently used, only covering the build step (i.e. no post-build quality assurance checks or packaging-time helpers): When I was first introduced to Debian packaging, people recommended I use pbuilder.
+	   Personally, I find the packaging tools which are available in Debian far too complex. To better understand the options we have, I created a diagram of tools which are frequently used, only covering the build step (i.e. no post-build quality assurance checks or packaging-time helpers): 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-11-25-build-tools/">Read more →</a></span>
 	</p>
       </div>
@@ -284,7 +284,7 @@
 	
 	
 	<p>
-	  The last couple of days, I worked on getting Debian to run on the Raspberry Pi 3. Thanks to the work of many talented people, the Linux kernel in version 4.8 is _almost_ ready to run on the Raspberry Pi 3.
+	   The last couple of days, I worked on getting Debian to run on the Raspberry Pi 3. Thanks to the work of many talented people, the Linux kernel in version 4.8 is _almost_ ready to run on the Raspberry Pi 3. The only missing thing is the bcm2835 MMC driver, which is required to read the root file system from the SD card. I’ve asked our maintainers to include the patch for the time being. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-11-24-raspberry-pi-3/">Read more →</a></span>
 	</p>
       </div>
@@ -308,7 +308,7 @@
 	
 	
 	<p>
-	  tl;dr: I upgraded from a qnap TS-119P to a custom HTPC-like network storage solution. This article outlines what my original reasoning was for the qnap TS-119P, what I learnt, and with what solution precisely I replaced the qnap. A little over two years ago, I gave a (German) presentation about my network storage setup (see video or slides).
+	   tl;dr: I upgraded from a qnap TS-119P to a custom HTPC-like network storage solution. This article outlines what my original reasoning was for the qnap TS-119P, what I learnt, and with what solution precisely I replaced the qnap. A little over two years ago, I gave a (German) presentation about my network storage setup (see video or slides). Given that video isn’t a great consumption format when you’re pressed on time, and given that a number of my readers might not speak German, I’ll recap the most important points: 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-11-21-gigabit-nas-coreos/">Read more →</a></span>
 	</p>
       </div>
@@ -338,10 +338,11 @@
 	
 	
 	
-	<a href="https://michael.stapelberg.ch/posts/2016-08-08-debian-codesearch-latency/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2016-08-08-debian-codesearch-latency/2016-08-08-dcs-before_huc0cd959d5bde36e210184881f13990ae_342853_200x200_fit_box_3.png" width="200" height="89"/></a>
+	<a href="https://michael.stapelberg.ch/posts/2016-08-08-debian-codesearch-latency/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2016-08-08-debian-codesearch-latency/2016-08-08-dcs-before_hu_a703b9fa350ecc87.png" width="200" height="89"/></a>
 	
 	<p>
 	  A while ago, it occurred to me that querying Debian Code Search seemed slow, which surprised me because I previously spent quite some effort on making it faster, see Debian Code Search Instant and Taming the latency tail for the most recent substantial architecture overhaul and related optimizations.
+
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-08-08-debian-codesearch-latency/">Read more →</a></span>
 	</p>
       </div>
@@ -371,7 +372,7 @@
 	
 	
 	<p>
-	  Recently, I was wondering why I was pushing off accepting contributions in Debian for longer than in other projects. It occurred to me that the effort to accept a contribution in Debian is way higher than in other FOSS projects.
+	   Recently, I was wondering why I was pushing off accepting contributions in Debian for longer than in other projects. It occurred to me that the effort to accept a contribution in Debian is way higher than in other FOSS projects. My remaining FOSS projects are on GitHub, where I can just click the “Merge” button after deciding a contribution looks good. In Debian, merging is actually a lot of work: I need to clone the repository, configure it, merge the patch, update the changelog, build and upload. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-07-17-mergebot/">Read more →</a></span>
 	</p>
       </div>
@@ -396,7 +397,7 @@
 	
 	
 	<p>
-	  Whereas most of the networks I regularly use (home, work, hackerspace, events, …) provide native IPv6 connectivity, sometimes I’m in a legacy-only network, e.g. when tethering via my phone on some mobile providers. By far the most common IPv6-only service I use these days is SSH to my computer(s) at home.
+	   Whereas most of the networks I regularly use (home, work, hackerspace, events, …) provide native IPv6 connectivity, sometimes I’m in a legacy-only network, e.g. when tethering via my phone on some mobile providers. By far the most common IPv6-only service I use these days is SSH to my computer(s) at home. On philosophical grounds, I refuse to set up a dynamic DNS record and port-forwardings, so the alternative I use is either Miredo or tunneling through a dual-stacked machine. For the latter, I used to use the following SSH config: 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-06-16-ssh-conditional-tunneling/">Read more →</a></span>
 	</p>
       </div>
@@ -426,7 +427,7 @@
 	
 	
 	<p>
-	  Context For the last 3 years I’ve used the hardware described in my 2012 article. In order to drive a hi-dpi display, I needed to install an nVidia graphics card, since only the nVidia hardware/software supported multi-tile displays requiring MST (Multiple Stream Transport) such as the Dell UP2414Q.
+	  Context For the last 3 years I’ve used the hardware described in my 2012 article. In order to drive a hi-dpi display, I needed to install an nVidia graphics card, since only the nVidia hardware/software supported multi-tile displays requiring MST (Multiple Stream Transport) such as the Dell UP2414Q. While I’ve switched to a Viewsonic VX2475Smhl-4K in the meantime, I still needed a recent-enough DisplayPort output that could deliver 3840x2160@60Hz. This is not the case for the Intel Core i7-2600K’s integrated GPU, so I needed to stick with the nVidia card. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-05-10-supermicro_x11ssz-qf_workstation_mainboard/">Read more →</a></span>
 	</p>
       </div>
@@ -451,7 +452,7 @@
 	
 	
 	<p>
-	  Like many other open source projects, the i3 window manager is using Travis CI for continuous integration (CI). In our specific case, we not only verify that every pull request compiles and the test suite still passes, but we also ensure the code is auto-formatted using clang-format, does not contain detectable spelling errors and does not accidentally use C functions like sprintf() without error checking.
+	   Like many other open source projects, the i3 window manager is using Travis CI for continuous integration (CI). In our specific case, we not only verify that every pull request compiles and the test suite still passes, but we also ensure the code is auto-formatted using clang-format, does not contain detectable spelling errors and does not accidentally use C functions like sprintf() without error checking. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-03-06-docker-on-travis-for-new-tools-and-fast-runs/">Read more →</a></span>
 	</p>
       </div>
@@ -476,7 +477,7 @@
 	
 	
 	<p>
-	  Up until recently, I used to use kanla, a simple alerting program that I wrote 4 years ago. Back then, delivering alerts via XMPP (Jabber) to mobile devices like Android smartphones seemed like the best course of action. About a year ago, I’ve started using Prometheus for collecting monitoring data and alerting based on that data.
+	   Up until recently, I used to use kanla, a simple alerting program that I wrote 4 years ago. Back then, delivering alerts via XMPP (Jabber) to mobile devices like Android smartphones seemed like the best course of action. About a year ago, I’ve started using Prometheus for collecting monitoring data and alerting based on that data. See „Monitoring mit Prometheus“, my presentation about the topic at GPN, for more details and my experiences. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2016-01-01-prometheus-blackbox-exporter/">Read more →</a></span>
 	</p>
       </div>
@@ -501,7 +502,7 @@
 	
 	
 	<p>
-	  Note: the postings on this site are my own and do not necessarily represent the postings, strategies or opinions of my employer. Background For the last couple of years, faq.i3wm.org was running on a dedicated server I rented. I partitioned that server into multiple virtual machines using KVM, and one of these VMs contained the faq.
+	   Note: the postings on this site are my own and do not necessarily represent the postings, strategies or opinions of my employer. Background For the last couple of years, faq.i3wm.org was running on a dedicated server I rented. I partitioned that server into multiple virtual machines using KVM, and one of these VMs contained the faq.i3wm.org installation. In that VM, I directly used pip to install the django-based askbot, a stack overflow-like questions &amp; answers web application. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2015-12-20-google_container_engine/">Read more →</a></span>
 	</p>
       </div>
@@ -520,7 +521,7 @@
 	
 	
 	<p>
-	  While modern desktop environments that are used on Linux set up the locale with support for UTF-8, users who prefer not to run a desktop environment or users who use SSH to work on remote computers occasionally face trouble setting up their locale correctly.
+	   While modern desktop environments that are used on Linux set up the locale with support for UTF-8, users who prefer not to run a desktop environment or users who use SSH to work on remote computers occasionally face trouble setting up their locale correctly. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2015-12-20-locales/">Read more →</a></span>
 	</p>
       </div>
@@ -539,7 +540,7 @@
 	
 	
 	<p>
-	  I’m happily using Prometheus for monitoring and alerting since about a year. Regardless of the monitoring system, one problem that I was uncertain of how to solve it in a good way used to be meta-monitoring: if you have a monitoring system, how do you know that the monitoring system itself is running?
+	   I’m happily using Prometheus for monitoring and alerting since about a year. Regardless of the monitoring system, one problem that I was uncertain of how to solve it in a good way used to be meta-monitoring: if you have a monitoring system, how do you know that the monitoring system itself is running? You’ll need another level of monitoring/alerting (hence “meta-monitoring”). 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2015-12-02-alertmanager-metamonitoring/">Read more →</a></span>
 	</p>
       </div>
@@ -569,7 +570,7 @@
 	
 	
 	<p>
-	  When uploading a new library package which changes its API/behavior in a subtle way, typically you will only hear about the downstream breakage after you’ve uploaded the new library package (via bug reports telling you that your package FTBFS, fails to build from source).
+	   When uploading a new library package which changes its API/behavior in a subtle way, typically you will only hear about the downstream breakage after you’ve uploaded the new library package (via bug reports telling you that your package FTBFS, fails to build from source). 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2015-10-12-ratt/">Read more →</a></span>
 	</p>
       </div>
@@ -599,7 +600,7 @@
 	
 	
 	<p>
-	  Recently, the pkg-go team has been quite busy, uploading dozens of Go library packages in order to be able to package gcsfuse (a user-space file system for interacting with Google Cloud Storage) and InfluxDB (an open-source distributed time series database).
+	   Recently, the pkg-go team has been quite busy, uploading dozens of Go library packages in order to be able to package gcsfuse (a user-space file system for interacting with Google Cloud Storage) and InfluxDB (an open-source distributed time series database). Packaging Go library packages (!) is a fairly repetitive process, so before starting my work on the dependencies for gcsfuse, I started writing a tool called dh-make-golang. Just like dh-make itself, the goal is to automatically create (almost) an entire Debian package. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2015-07-27-dh-make-golang/">Read more →</a></span>
 	</p>
       </div>
@@ -618,7 +619,7 @@
 	
 	
 	<p>
-	  I have been using a Dell UP2414Q monitor for a little over a year now. The Dell UP2414Q was the first commercially available display that qualified as what Apple calls a Retina Display, meaning it has such a high resolution that you cannot see the individual pixels in normal viewing distance.
+	   I have been using a Dell UP2414Q monitor for a little over a year now. The Dell UP2414Q was the first commercially available display that qualified as what Apple calls a Retina Display, meaning it has such a high resolution that you cannot see the individual pixels in normal viewing distance. In more technical terms, this is called a HiDPI display. To be specific, Dell’s UP2414Q has a 527mm wide and 296mm high screen, hence it has 185 dpi (3840 px / (527 mm / 25.4 mm)). I configured my system to use 192 dpi instead of the actual 185 dpi, because 192 is a clean multiple of 96 dpi, so scaling gets easier for software. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2015-07-18-viewsonic_vx2475smhl_4k_linux/">Read more →</a></span>
 	</p>
       </div>
@@ -648,7 +649,7 @@
 	
 	
 	<p>
-	  It’s been a couple of weeks since I’ve launched Debian Code Search Instant, so people have had the chance to use it for a while and that gives me plenty of data points to look at :-). For every query, I log the search term itself as well as the duration the query took to execute.
+	   It’s been a couple of weeks since I’ve launched Debian Code Search Instant, so people have had the chance to use it for a while and that gives me plenty of data points to look at :-). For every query, I log the search term itself as well as the duration the query took to execute. That way, I can easily identify queries that take a long time and see why that is. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-12-23-code-search-taming-the-latency-tail/">Read more →</a></span>
 	</p>
       </div>
@@ -672,7 +673,7 @@
 	
 	
 	<p>
-	  For the last few months, I have been working on a new version of Debian Code Search, and today it’s going live! I call it Debian Code Search Instant, for multiple reasons, see below. A lot faster The new Debian Code Search is still hosted by Rackspace (thank you!
+	   For the last few months, I have been working on a new version of Debian Code Search, and today it’s going live! I call it Debian Code Search Instant, for multiple reasons, see below. A lot faster The new Debian Code Search is still hosted by Rackspace (thank you!), but our new architecture finally allows us to use their “Performance Cloud Servers” hardware generation. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-12-03-debian-code-search-instant/">Read more →</a></span>
 	</p>
       </div>
@@ -702,7 +703,7 @@
 	
 	
 	<p>
-	  I’ve been working on a significant rearchitecture of Debian Code Search during the last few months (off and on, as time permits). This will enable us to provide a couple of features that have been often requested but were not possible with the old architecture, such as grouping search results by Debian source package (#1 feature request) and performing queries that take a longer time than the default execution limit of a minute (#2 feature request).
+	   I’ve been working on a significant rearchitecture of Debian Code Search during the last few months (off and on, as time permits). This will enable us to provide a couple of features that have been often requested but were not possible with the old architecture, such as grouping search results by Debian source package (#1 feature request) and performing queries that take a longer time than the default execution limit of a minute (#2 feature request). Oh, and it also will be a lot faster :-). 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-11-09-upcoming-debian-codesearch/">Read more →</a></span>
 	</p>
       </div>
@@ -732,7 +733,7 @@
 	
 	
 	<p>
-	  Ever since I moved to Zürich, I wanted to get a fiber internet connection. I’ve lived with a 6 Mbps DSL line at my parent’s place for about 10 years, so I was looking forward to a lot more Megabits and a lot less latency.
+	   Ever since I moved to Zürich, I wanted to get a fiber internet connection. I’ve lived with a 6 Mbps DSL line at my parent’s place for about 10 years, so I was looking forward to a lot more Megabits and a lot less latency. For reasons that I won’t go into in this article, it took me about a year to get a fiber connection, and in the end I had to go with Swisscom (instead of init7 on top of EWZ). 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-09-05-fiber7_performance/">Read more →</a></span>
 	</p>
       </div>
@@ -757,7 +758,7 @@
 	
 	
 	<p>
-	  I run multiple web services, mostly related to i3wm.org. All of them use PostgreSQL as their database, so the data that is stored in that PostgreSQL database is pretty important to me and the users of these services. Since a while now, I have been thinking about storing that data in a more reliable way.
+	   I run multiple web services, mostly related to i3wm.org. All of them use PostgreSQL as their database, so the data that is stored in that PostgreSQL database is pretty important to me and the users of these services. Since a while now, I have been thinking about storing that data in a more reliable way. Currently, it is stored on a single server, and is backed up to two different locations (one on-site, one off-site) every day. The server in question has a RAID-1 of course, but still: the setup implies that if that one server dies, the last backup may be about a day old in the worst case, and also it could take me significant time to get the services back up. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-08-31-replicated_postgresql_with_pgpool/">Read more →</a></span>
 	</p>
       </div>
@@ -781,7 +782,7 @@
 	
 	
 	<p>
-	  I immediately ordered a fiber7 internet connection once it became available, and I’ve been connected since a few weeks. They offer a 1 Gbps symmetrical fiber connection, with native (static) IPv6 and no traffic limit — for 65 CHF per month (about 54 €).
+	   I immediately ordered a fiber7 internet connection once it became available, and I’ve been connected since a few weeks. They offer a 1 Gbps symmetrical fiber connection, with native (static) IPv6 and no traffic limit — for 65 CHF per month (about 54 €). 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-08-11-fiber7_ubnt_erlite/">Read more →</a></span>
 	</p>
       </div>
@@ -806,7 +807,7 @@
 	
 	
 	<p>
-	  In my flat, I have a printed QR code which contains the WiFi credentials. You can scan it with your Smartphone (provided you have a barcode scanner installed) and then connect to the WiFi network. For notebook computers, this doesn’t work so well.
+	   In my flat, I have a printed QR code which contains the WiFi credentials. You can scan it with your Smartphone (provided you have a barcode scanner installed) and then connect to the WiFi network. For notebook computers, this doesn’t work so well. Sometimes they don’t have a usable camera, and even if they have one, people don’t typically have a barcode scanner installed. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-07-28-yubikey_wifi_password/">Read more →</a></span>
 	</p>
       </div>
@@ -831,7 +832,7 @@
 	
 	
 	<p>
-	  I’ve been travelling a bit to foreign countries lately and noticed that all of the places I’ve stayed at (low to medium price range hotels) have one thing in common: their WiFi is absolutely horrible. Even worse, it seems like the more money you pay, the more horrible the WiFi gets.
+	   I’ve been travelling a bit to foreign countries lately and noticed that all of the places I’ve stayed at (low to medium price range hotels) have one thing in common: their WiFi is absolutely horrible. Even worse, it seems like the more money you pay, the more horrible the WiFi gets. As an example, I’ve stayed at the NH city centre in Amsterdam recently. Curiously, swisscom runs the WiFi there — I didn’t even know they do more than access and mobile network in Switzerland. We booked a double room (so the hotel knew there are two people staying in the room), but swisscom only allows one login. I’ll repeat: one (1) login. In 2014. Where people travel with smartphones, tablets and notebooks. Per person. Even better: every time you lose connection, you need to re-acknowledge the terms of service. Of course this breaks automated updates of Android smartphones because they try to save battery and connect to the WiFi only sporadically. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-05-15-horrible_wifi_in_hotels/">Read more →</a></span>
 	</p>
       </div>
@@ -861,7 +862,7 @@
 	
 	
 	<p>
-	  Thomas Habets has blogged about using your TPM (Trusted Platform Module) for SSH authentication a few weeks ago. We worked together to get his package simple-tpm-pk11 into Debian, and it has just arrived in unstable :-). Using simple-tpm-pk11, you can let your TPM generate a key, which you then can use for SSH authentication.
+	   Thomas Habets has blogged about using your TPM (Trusted Platform Module) for SSH authentication a few weeks ago. We worked together to get his package simple-tpm-pk11 into Debian, and it has just arrived in unstable :-). Using simple-tpm-pk11, you can let your TPM generate a key, which you then can use for SSH authentication. This key will never leave the TPM, so it is safer than having your key on the filesystem (e.g. ~/.ssh/id_rsa), since file system access is not enough to steal your key anymore. Instead, you’ll need remote code execution. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-02-19-ssh-keys-in-your-tpm/">Read more →</a></span>
 	</p>
       </div>
@@ -886,7 +887,7 @@
 	
 	
 	<p>
-	  The original firmware for the qnap TS-119P2+ supports Wake-On-LAN, meaning you can power down your Network Storage (NAS) when you don’t need it and you can easily wake it up by sending it a magic ethernet packet. This is an awesome feature when you are not at home all the time (say, you have a day job) and want to conserve some power without giving up on convenience.
+	   The original firmware for the qnap TS-119P2+ supports Wake-On-LAN, meaning you can power down your Network Storage (NAS) when you don’t need it and you can easily wake it up by sending it a magic ethernet packet. This is an awesome feature when you are not at home all the time (say, you have a day job) and want to conserve some power without giving up on convenience. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-01-28-qnap_ts119_wol/">Read more →</a></span>
 	</p>
       </div>
@@ -905,7 +906,7 @@
 	
 	
 	<p>
-	  In my last article, I wrote about my experiences with my new SuperMicro server, and a big part of that article was about the Intelligent Platform Management Interface (IPMI) which is included in the SuperMicro X9SCL-F mainboard I bought. In that previous article, I already suggested that the code quality of the IPMI firmware is questionable at best, and this article is in part proof and in part mitigation :-).
+	   In my last article, I wrote about my experiences with my new SuperMicro server, and a big part of that article was about the Intelligent Platform Management Interface (IPMI) which is included in the SuperMicro X9SCL-F mainboard I bought. In that previous article, I already suggested that the code quality of the IPMI firmware is questionable at best, and this article is in part proof and in part mitigation :-). 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-01-27-supermicro_ipmi_openvpn/">Read more →</a></span>
 	</p>
       </div>
@@ -929,7 +930,7 @@
 	
 	
 	<p>
-	  As explained in more detail in my my last blog post, Rackspace is providing hosting for Debian Code Search. For those of you who don’t know, Rackspace is a cloud company that provides (among other services) a public cloud based on OpenStack.
+	   As explained in more detail in my my last blog post, Rackspace is providing hosting for Debian Code Search. For those of you who don’t know, Rackspace is a cloud company that provides (among other services) a public cloud based on OpenStack. That means you can easily (and programmatically, if you want) bring up virtual servers, block storage volumes, configure the network between them, etc. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-01-17-debmirror-rackspace/">Read more →</a></span>
 	</p>
       </div>
@@ -948,7 +949,7 @@
 	
 	
 	<p>
-	  Recently, together with a couple friends of mine, we rented a rack in a datacenter. Not just any datacenter, but that’s a story for another time ;-). Each participant can hang up a 1U server in that rack, so I needed to build one.
+	   Recently, together with a couple friends of mine, we rented a rack in a datacenter. Not just any datacenter, but that’s a story for another time ;-). Each participant can hang up a 1U server in that rack, so I needed to build one. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-01-11-building_supermicro_1u_server/">Read more →</a></span>
 	</p>
       </div>
@@ -978,7 +979,7 @@
 	
 	
 	<p>
-	  For a number of weeks now, I have been forwarding traffic being sent to codesearch.debian.net to an instance of Debian Code Search running at Rackspace’s public cloud offering. I feel like it’s overdue to announce how they have been supporting the project and what that means.
+	   For a number of weeks now, I have been forwarding traffic being sent to codesearch.debian.net to an instance of Debian Code Search running at Rackspace’s public cloud offering. I feel like it’s overdue to announce how they have been supporting the project and what that means. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-12-25-codesearch-rackspace/">Read more →</a></span>
 	</p>
       </div>
@@ -997,7 +998,7 @@
 	
 	
 	<p>
-	  CoreOS is a minimal operating system based on Linux, systemd and Docker. In this post I describe how I see CoreOS/Docker and how my first steps with it went. What is Docker and why is it a good idea? Finding the right words to describe all of this to someone who has not worked with any of it is hard, but let me try.
+	   CoreOS is a minimal operating system based on Linux, systemd and Docker. In this post I describe how I see CoreOS/Docker and how my first steps with it went. What is Docker and why is it a good idea? Finding the right words to describe all of this to someone who has not worked with any of it is hard, but let me try. With docker, you can package software into “containers”, which can then be run either on your own server(s) or at some cloud infrastructure provider (dotcloud, stackdock, digitalocean). An example for software could be cgit, a fast git web interface. Docker spawns each container in a separate Linux container (LXC), mostly for a clean and well-defined environment, not primarily for security. As far as the software is concerned, it is PID 1, with a dynamic hostname, dynamic IP address and a clean filesystem. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-12-07-coreos_and_docker_first_steps/">Read more →</a></span>
 	</p>
       </div>

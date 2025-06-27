@@ -7,8 +7,11 @@
 
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="My recent systemd activity">
-  <meta property="og:description" content="I recently worked on the following systemd-related issues: #686115 - CanReload is set to yes unconditionally for legacy SysV services
-I wrote a patch which uses a heuristic to figure out whether a SysV init script supports the reload option or not.">
+  <meta property="og:description" content=" I recently worked on the following systemd-related issues: #686115 - CanReload is set to yes unconditionally for legacy SysV services
+I wrote a patch which uses a heuristic to figure out whether a SysV init script supports the reload option or not. Not perfect, but a whole lot better than defaulting to &#34;yes&#34; :-). This should also fix #650382 - force-reload translated to reload for SysV services. #688635 - Don’t kill libvirt VMs when restarting libvirt
+I ported a patch from the Fedora systemd packaging which avoids killing all processes of a cgroup when restarting a service. This is necessary for libvirtd, otherwise all virtual machines get killed when you restart libvirt-bin.service. libvirt-bin 0.10.2-4 (experimental) ships systemd service files. #635777 - 90-seconds delay on reboot/shutdown when postfix is installed
+I tracked down the cause of several 90-second delay on shutdown causes and provided a patch (which is a workaround…). #624599 - systemd: DHCP hook scripts calling invoke-rc.d causes boot hang
+I tracked down the cause of a deadlock at boot time when dhcp hooks call invoke-rc.d (as does samba). Several workarounds are known but we have not yet taken any action. ">
   
   
   
@@ -17,8 +20,11 @@ I wrote a patch which uses a heuristic to figure out whether a SysV init script 
   <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
-  <meta name="description" content="I recently worked on the following systemd-related issues: #686115 - CanReload is set to yes unconditionally for legacy SysV services
-I wrote a patch which uses a heuristic to figure out whether a SysV init script supports the reload option or not.">
+  <meta name="description" content=" I recently worked on the following systemd-related issues: #686115 - CanReload is set to yes unconditionally for legacy SysV services
+I wrote a patch which uses a heuristic to figure out whether a SysV init script supports the reload option or not. Not perfect, but a whole lot better than defaulting to &#34;yes&#34; :-). This should also fix #650382 - force-reload translated to reload for SysV services. #688635 - Don’t kill libvirt VMs when restarting libvirt
+I ported a patch from the Fedora systemd packaging which avoids killing all processes of a cgroup when restarting a service. This is necessary for libvirtd, otherwise all virtual machines get killed when you restart libvirt-bin.service. libvirt-bin 0.10.2-4 (experimental) ships systemd service files. #635777 - 90-seconds delay on reboot/shutdown when postfix is installed
+I tracked down the cause of several 90-second delay on shutdown causes and provided a patch (which is a workaround…). #624599 - systemd: DHCP hook scripts calling invoke-rc.d causes boot hang
+I tracked down the cause of a deadlock at boot time when dhcp hooks call invoke-rc.d (as does samba). Several workarounds are known but we have not yet taken any action. ">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2012-10-14-systemd-activity/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">

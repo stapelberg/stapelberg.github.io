@@ -9,7 +9,8 @@
   <meta property="og:title" content="kinX: latency measurement">
   <meta property="og:description" content="This post is part of a series of posts about the kinX project.
 Latency measurement End-to-end latency consists of 3 parts:
-input latency (keyboard) processing latency (computer) output latency (monitor) During the development of the kinX keyboard controller, I realized that measuring processing latency was quite simple with my hardware: I could start a timer when sending a key press HID report to the computer and measure the elapsed time when I would receive a reply from the computer.">
+input latency (keyboard) processing latency (computer) output latency (monitor) During the development of the kinX keyboard controller, I realized that measuring processing latency was quite simple with my hardware: I could start a timer when sending a key press HID report to the computer and measure the elapsed time when I would receive a reply from the computer.
+">
   
   
   
@@ -20,7 +21,8 @@ input latency (keyboard) processing latency (computer) output latency (monitor) 
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
   <meta name="description" content="This post is part of a series of posts about the kinX project.
 Latency measurement End-to-end latency consists of 3 parts:
-input latency (keyboard) processing latency (computer) output latency (monitor) During the development of the kinX keyboard controller, I realized that measuring processing latency was quite simple with my hardware: I could start a timer when sending a key press HID report to the computer and measure the elapsed time when I would receive a reply from the computer.">
+input latency (keyboard) processing latency (computer) output latency (monitor) During the development of the kinX keyboard controller, I realized that measuring processing latency was quite simple with my hardware: I could start a timer when sending a key press HID report to the computer and measure the elapsed time when I would receive a reply from the computer.
+">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2018-04-17-kinx-latency-measurement/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -251,30 +253,30 @@ measure Emacs’s processing latency.</p>
 <h3 id="end-to-end-latency">End-to-end latency</h3>
 <p>With the kinX keyboard controller, we can achieve the following end-to-end latency:</p>
 <table>
-<thead>
-<tr>
-<th>contributor</th>
-<th>latency</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Matrix scan</td>
-<td>≈ 208 μs</td>
-</tr>
-<tr>
-<td>USB poll</td>
-<td>≈ 125 μs</td>
-</tr>
-<tr>
-<td>Linux</td>
-<td>≈ 152 μs</td>
-</tr>
-<tr>
-<td>Emacs</td>
-<td>≈ 278 μs</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>contributor</th>
+          <th>latency</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Matrix scan</td>
+          <td>≈ 208 μs</td>
+      </tr>
+      <tr>
+          <td>USB poll</td>
+          <td>≈ 125 μs</td>
+      </tr>
+      <tr>
+          <td>Linux</td>
+          <td>≈ 152 μs</td>
+      </tr>
+      <tr>
+          <td>Emacs</td>
+          <td>≈ 278 μs</td>
+      </tr>
+  </tbody>
 </table>
 <p><br>This sums up to ≈ 763 μs on average. On top of that, we have output latency
 within [0, 16ms] due to the 60 Hz refresh rate of our monitors.</p>

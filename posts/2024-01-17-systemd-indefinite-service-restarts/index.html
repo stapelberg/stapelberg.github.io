@@ -8,12 +8,13 @@
   <meta property="og:site_name" content="Michael Stapelberg">
   <meta property="og:title" content="systemd: enable indefinite service restarts">
   <meta property="og:description" content="When a service fails to start up enough times in a row, systemd gives up on it.
-On servers, this isn’t what I want — in general it’s helpful for automated recovery if daemons are restarted indefinitely. As long as you don’t have circular dependencies between services, all your services will eventually come up after transient failures, without having to specify dependencies.">
+On servers, this isn’t what I want — in general it’s helpful for automated recovery if daemons are restarted indefinitely. As long as you don’t have circular dependencies between services, all your services will eventually come up after transient failures, without having to specify dependencies.
+">
   
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2024-01-17-systemd-indefinite-service-restarts/systemd-light-vertical-color_hua11b395d68aa3b8e1fe72e3f3d0d618c_7877_200x200_fit_box_3.png">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2024-01-17-systemd-indefinite-service-restarts/systemd-light-vertical-color_hu_d32958f560e13be9.png">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -21,7 +22,8 @@ On servers, this isn’t what I want — in general it’s helpful for automated
   <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
   <meta name="description" content="When a service fails to start up enough times in a row, systemd gives up on it.
-On servers, this isn’t what I want — in general it’s helpful for automated recovery if daemons are restarted indefinitely. As long as you don’t have circular dependencies between services, all your services will eventually come up after transient failures, without having to specify dependencies.">
+On servers, this isn’t what I want — in general it’s helpful for automated recovery if daemons are restarted indefinitely. As long as you don’t have circular dependencies between services, all your services will eventually come up after transient failures, without having to specify dependencies.
+">
   <link rel="canonical" href="https://michael.stapelberg.ch/posts/2024-01-17-systemd-indefinite-service-restarts/">
   <meta name="author" content="Michael Stapelberg">
   <style type="text/css">
@@ -244,58 +246,58 @@ systemd does not attempt to restart the service anymore.</p>
 <p>It’s easy to see that for a service which takes, say, 100ms to crash, for
 example because it can’t bind on its listening IP address, this means:</p>
 <table>
-<thead>
-<tr>
-<th>time</th>
-<th>event</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>T+0</td>
-<td>first start</td>
-</tr>
-<tr>
-<td>T+100ms</td>
-<td>first crash</td>
-</tr>
-<tr>
-<td>T+200ms</td>
-<td>second start</td>
-</tr>
-<tr>
-<td>T+300ms</td>
-<td>second crash</td>
-</tr>
-<tr>
-<td>T+400ms</td>
-<td>third start</td>
-</tr>
-<tr>
-<td>T+500ms</td>
-<td>third crash</td>
-</tr>
-<tr>
-<td>T+600ms</td>
-<td>fourth start</td>
-</tr>
-<tr>
-<td>T+700ms</td>
-<td>fourth crash</td>
-</tr>
-<tr>
-<td>T+800ms</td>
-<td>fifth start</td>
-</tr>
-<tr>
-<td>T+900ms</td>
-<td>fifth crash within 10s</td>
-</tr>
-<tr>
-<td>T+1s</td>
-<td>systemd gives up</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>time</th>
+          <th>event</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>T+0</td>
+          <td>first start</td>
+      </tr>
+      <tr>
+          <td>T+100ms</td>
+          <td>first crash</td>
+      </tr>
+      <tr>
+          <td>T+200ms</td>
+          <td>second start</td>
+      </tr>
+      <tr>
+          <td>T+300ms</td>
+          <td>second crash</td>
+      </tr>
+      <tr>
+          <td>T+400ms</td>
+          <td>third start</td>
+      </tr>
+      <tr>
+          <td>T+500ms</td>
+          <td>third crash</td>
+      </tr>
+      <tr>
+          <td>T+600ms</td>
+          <td>fourth start</td>
+      </tr>
+      <tr>
+          <td>T+700ms</td>
+          <td>fourth crash</td>
+      </tr>
+      <tr>
+          <td>T+800ms</td>
+          <td>fifth start</td>
+      </tr>
+      <tr>
+          <td>T+900ms</td>
+          <td>fifth crash within 10s</td>
+      </tr>
+      <tr>
+          <td>T+1s</td>
+          <td>systemd gives up</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="why-does-systemd-give-up-by-default">Why does systemd give up by default?</h2>
 <p>I’m not sure. If I had to speculate, I would guess the developers wanted to

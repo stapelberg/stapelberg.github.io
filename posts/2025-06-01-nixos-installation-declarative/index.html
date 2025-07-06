@@ -182,7 +182,7 @@
       <div><h1 class="ms_title">How I like to install NixOS (declaratively)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2025-06-01</div>
+  <div id="ms_date">published 2025-06-01, last modified 2025-07-06</div>
   
   
   <div id="ms_tags">
@@ -312,7 +312,8 @@ NixOS) on Arch Linux:</p>
     nixbld$n; done
 </code></pre><p>Now, running <code>nix-shell -p hello</code> should drop you in a new shell in which the
 GNU hello package is installed:</p>
-<pre tabindex="0"><code>% nix-shell -p hello
+<pre tabindex="0"><code>% export NIX_PATH=nixpkgs=channel:nixos-25.05
+% nix-shell -p hello
 hello
 
 [nix-shell:/tmp]$ hello

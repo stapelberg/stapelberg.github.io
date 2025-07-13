@@ -239,6 +239,31 @@
   <br>
 
     
+  <h2>2013 › December</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-12-07-coreos_and_docker_first_steps/"><h3>CoreOS and Docker: first steps</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<p>
+	   CoreOS is a minimal operating system based on Linux, systemd and Docker. In this post I describe how I see CoreOS/Docker and how my first steps with it went. What is Docker and why is it a good idea? Finding the right words to describe all of this to someone who has not worked with any of it is hard, but let me try. With docker, you can package software into “containers”, which can then be run either on your own server(s) or at some cloud infrastructure provider (dotcloud, stackdock, digitalocean). An example for software could be cgit, a fast git web interface. Docker spawns each container in a separate Linux container (LXC), mostly for a clean and well-defined environment, not primarily for security. As far as the software is concerned, it is PID 1, with a dynamic hostname, dynamic IP address and a clean filesystem. 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-12-07-coreos_and_docker_first_steps/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
   <h2>2013 › November</h2>
   <ul class="ArticleList">
     
@@ -931,43 +956,6 @@
 	<p>
 	   Previously, my workflow regarding replying to bugreports outside my own packages was very uncomfortable: I first downloaded the mbox archive from the BTS, then imported that in claws-mail, hit reply all, remove submit@, add bugnumber@, then send the email. Therefore, I decided to hack up a little elisp function to automate this process for notmuch. It first downloads the message from the BTS, adds it to the notmuch database, then calls notmuch-mua-reply on the message and fixes the To: header: 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-03-08-bts-notmuch-reply/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-  </ul>
-
-  
-  <h2>2013 › February</h2>
-  <ul class="ArticleList">
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2013-02-06-rc-bugs-2/"><h3>RC bugs</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	
-	<p>
-	   I recently worked on the following RC bugs: #696532 — isdnlog: /etc/isdn/isdnlog.isdnctrl0 is easily destroyed in squeeze to wheezy upgrade
-Pinged the maintainer about uploading a fix to unstable, too (was only fixed in experimental). #693208 — clang: unable to link trivial test program on armhf
-Filed a request to upload a new version to testing-proposed-updates. #694986 — flash-kernel: postinst modifies /etc/default/rcS
-Pinged. #694352 — lcdf-typetool include non free adobe data; glyph list
-Filed a request to upload a new version to testing-proposed-updates. #593607 — pcmanfm wrongly deleted some files in a failed move operation
-Updated the bugreport status to reflect reality. #698137 — destroys icinga.cfg on postinst when it's a symlink
-Reproduced, asked whether to NMU. #694622 — nut-snmp: Can't connect to UPS [apcpdu] (snmp-ups-apcpdu): No such file or directory
-Reproduced, asked for more info. 
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-02-06-rc-bugs-2/">Read more →</a></span>
 	</p>
       </div>
     </li>

@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Migrating my NAS from CoreOS/Flatcar Linux to NixOS - Michael Stapelberg</title>
+
+  <meta property="og:site_name" content="Michael Stapelberg">
+  <meta property="og:title" content="Migrating my NAS from CoreOS/Flatcar Linux to NixOS">
+  <meta property="og:description" content="In this article, I want to show how to migrate an existing Linux server to NixOS — in my case the CoreOS/Flatcar Linux installation on my Network Attached Storage (NAS) PC.
+I will show in detail how the previous CoreOS setup looked like (lots of systemd units starting Docker containers), how I migrated it into an intermediate state (using Docker on NixOS) just to get things going, and finally how I migrated all units from Docker to native NixOS modules step-by-step.
+">
+  
+  
+  
+  
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2025-07-13-nixos-nas-network-storage-config/IMG_5563_hu_8529b4be42cd1a8d.jpg">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <meta name="description" content="In this article, I want to show how to migrate an existing Linux server to NixOS — in my case the CoreOS/Flatcar Linux installation on my Network Attached Storage (NAS) PC.
+I will show in detail how the previous CoreOS setup looked like (lots of systemd units starting Docker containers), how I migrated it into an intermediate state (using Docker on NixOS) just to get things going, and finally how I migrated all units from Docker to native NixOS modules step-by-step.
+">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2025-07-13-nixos-nas-network-storage-config/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+
+  
+
+  
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-MmDletsiVVexqmh4i3stLXAHVECuOzqin3b%2babGWq5wv%2fwd%2f9IdQTTMV1IZowrB21EMrM9N1VHI17hmnyeCskw%3d%3d" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div><h1 class="ms_title">Migrating my NAS from CoreOS/Flatcar Linux to NixOS</h1>
+
+<div class="ms_meta">
+  <div id="ms_date">published 2025-07-13</div>
+  
+  
+  <div id="ms_tags">
+  
+  in tags
+  
+  
+  <span class="ms_tag"><a href="/posts/tags/pc/">pc</a></span>
+  
+  <span class="ms_tag"><a href="/posts/tags/nix/">nix</a></span>
+  
+  </div>
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2025-07-13-nixos-nas-network-storage-config/index.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
+</div>
+<div class="Artikel" id="content">
+  <style type="text/css">
+    .TableOfContents > ul, .TableOfContents > ul > li > ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+    }
+    .TableOfContents > ul > li > ul {
+	margin: 1em;
+    }
+    .TableOfContents li {
+	margin-bottom: 1rem;
+    }
+  </style>
+  <details class="ms_toc_details">
+    <summary>Table of contents</summary>
+    <nav class="TableOfContents">
+  <ul>
+    <li><a href="#history">Context/History</a></li>
+    <li><a href="#software-requirements">My NAS Software Requirements</a></li>
+    <li><a href="#why-migrate">Why migrate from CoreOS/Flatcar to NixOS?</a>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+    <li><a href="#vm-prototyping">Prototyping in a VM</a></li>
+    <li><a href="#migrating">Migrating</a>
+      <ul>
+        <li><a href="#m1-install-nixos">M1. Install NixOS</a></li>
+        <li><a href="#m2-set-up-remote-disk-unlock">M2. Set up remote disk unlock</a></li>
+        <li><a href="#m3-set-up-samba-for-access">M3. Set up Samba for access</a></li>
+        <li><a href="#m4-set-up-sshrsync-for-backups">M4. Set up SSH/rsync for backups</a></li>
+      </ul>
+    </li>
+    <li><a href="#nice-to-haves">Nice-to-haves</a>
+      <ul>
+        <li><a href="#prometheus-node-exporter">N1. Prometheus Node Exporter</a></li>
+        <li><a href="#reliable-mount">N2. Reliable mounting</a></li>
+        <li><a href="#nginx-healthz">N3. nginx-healthz</a></li>
+        <li><a href="#jellyfin">N4. NixOS Jellyfin</a></li>
+        <li><a href="#samba-nixos">N5. NixOS samba</a></li>
+        <li><a href="#rrsync-nixos">N6. NixOS rrsync</a></li>
+        <li><a href="#syncpl-nixos">N7. sync.pl script</a></li>
+        <li><a href="#flakes">N8. Sharing configs</a></li>
+        <li><a href="#immich-nixos">N9. Trying immich!</a></li>
+      </ul>
+    </li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+  </details>
+  <p>In this article, I want to show how to migrate an existing Linux server to NixOS
+— in my case the CoreOS/Flatcar Linux installation on my Network Attached
+Storage (NAS) PC.</p>
+<p>I will show in detail how the previous CoreOS setup looked like (lots of systemd
+units starting Docker containers), how I migrated it into an intermediate state
+(using Docker on NixOS) just to get things going, and finally how I migrated all
+units from Docker to native NixOS modules step-by-step.</p>
+<p>If you haven’t heard of NixOS, I recommend you read the <a href="https://nixos.org">first page of the NixOS
+website</a> to understand what NixOS is and what sort of things
+it makes possible.</p>
+<p>The target audience of this blog post is people interested in trying out NixOS
+for the use-case of a NAS, who like seeing examples to understand how to
+configure a system.</p>
+<p>You can apply these examples by first following <a href="/posts/2025-06-01-nixos-installation-declarative/">my blog post “How I like to
+install NixOS
+(declaratively)”</a>, then
+making your way through the sections that interest you. If you prefer seeing the
+full configuration, <a href="#conclusion">skip to the conclusion</a>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2025-07-13-nixos-nas-network-storage-config/IMG_5563.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2025-07-13-nixos-nas-network-storage-config/IMG_5563_hu_90f92def47078a68.jpg 2x,https://michael.stapelberg.ch/posts/2025-07-13-nixos-nas-network-storage-config/IMG_5563_hu_fbda205f2b2f2fa9.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2025-07-13-nixos-nas-network-storage-config/IMG_5563_hu_dfffd317a819e211.jpg"
+  alt="PC NAS build from 2023" title="PC NAS build from 2023"
+  width="600"
+  height="479"
+  style="
+
+border: 1px solid #000;
+
+"
+  
+  loading="lazy"></a>
+
+
+
+<h2 id="history">Context/History</h2>
+<p>Over the last decade, I used a number of different operating systems for my
+NAS needs. Here’s an overview of the 2 NAS systems storage2 and storage3:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Year</th>
+          <th>storage2</th>
+          <th>storage3</th>
+          <th>Details (blog post)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2013</td>
+          <td>Debian on qnap</td>
+          <td>Debian on qnap</td>
+          <td><a href="/posts/2014-01-28-qnap_ts119_wol/">Wake-On-LAN with Debian on a qnap TS-119P2+</a></td>
+      </tr>
+      <tr>
+          <td>2016</td>
+          <td>CoreOS on PC</td>
+          <td>CoreOS on PC</td>
+          <td><a href="/posts/2016-11-21-gigabit-nas-coreos/">Gigabit NAS (running CoreOS)</a></td>
+      </tr>
+      <tr>
+          <td>2023</td>
+          <td>CoreOS on PC</td>
+          <td>Ubuntu+ZFS on PC</td>
+          <td><a href="/posts/2023-10-25-my-all-flash-zfs-network-storage-build/">My all-flash ZFS NAS build</a></td>
+      </tr>
+      <tr>
+          <td>2025</td>
+          <td>NixOS on PC</td>
+          <td>Ubuntu+ZFS on PC</td>
+          <td>→ you are here ←</td>
+      </tr>
+      <tr>
+          <td>?</td>
+          <td>NixOS on PC</td>
+          <td>NixOS+ZFS on PC</td>
+          <td>Converting more PCs to NixOS seems inevitable ;)</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="software-requirements">My NAS Software Requirements</h2>
+<ul>
+<li>(This post is only about software! For my usage patterns and requirements
+regarding hardware selection, see <a href="/posts/2023-10-25-my-all-flash-zfs-network-storage-build/#design-goals">“Design Goals” in my My all-flash ZFS NAS
+build post
+(2023)</a>.)</li>
+<li><strong>Remote management:</strong> I really like the model of having the configuration of
+my network storage builds version-controlled and managed on my main PC. It’s a
+nice property that I can regain access to my backup setup by re-installing my
+NAS from my PC within minutes.</li>
+<li><strong>Automated updates, with easy rollback:</strong> Updating all my installations
+manually is not my idea of a good time. Hence, automated updates are a must —
+but when the update breaks, a quick and easy path to recovery is also a
+must.
+<ul>
+<li>CoreOS/Flatcar achieved that with an A/B updating scheme (update failed?
+boot the old partition), whereas NixOS achieves that with its concept of a
+“generation” (update failed? select the old generation), which is
+finer-grained.</li>
+</ul>
+</li>
+</ul>
+<h2 id="why-migrate">Why migrate from CoreOS/Flatcar to NixOS?</h2>
+<p>When I started using CoreOS, Docker was pretty new technology. I liked that
+using Docker containers allowed you to treat services uniformly — ultimately,
+they all expose a port of some sort (speaking HTTP, or Postgres, or…), so you
+got the flexibility to run much more recent versions of software on a stable OS,
+or older versions in case an update broke something.</p>
+<p>Over a decade later, Docker is established tech. People nowadays take for
+granted the various benefits of the container approach.</p>
+<p>So, here’s my list of reasons why I wasn’t satisfied with Flatcar Linux anymore.</p>
+<h4 id="cloud-init">R1. cloud-init is deprecated</h4>
+<p>The <a href="https://github.com/coreos/coreos-cloudinit">CoreOS cloud-init</a> project was
+deprecated at some point in favor of
+<a href="https://github.com/coreos/ignition">Ignition</a>, which is clearly more powerful,
+but also more cumbersome to get started with as a hobbyist. As far as I can
+tell, I must host my config at some URL that I then provide via a kernel
+parameter. The old way of just copying a file seems to no longer be supported.</p>
+<p>Ignition also seems less convenient in other ways: YAML is no longer supported,
+only JSON, which I don’t enjoy writing by hand. Also, the format seems to
+<a href="https://coreos.github.io/ignition/migrating-configs/">change quite a bit</a>.</p>
+<p>As a result, I never made the jump from cloud-init to Ignition, and it’s not
+good to be reliant on a long-deprecated way to use your OS of choice.</p>
+<h4 id="container-bitrot">R2. Container Bitrot</h4>
+<p>At some point, I did an audit of all my containers on the Docker Hub and noticed
+that most of them were quite outdated. For a while, Docker Hub offered automated
+builds based on a <code>Dockerfile</code> obtained from GitHub. However, automated builds
+now require a subscription, and I will not accept a subscription just to use my
+own computers.</p>
+<h4 id="r3-dependency-on-a-central-service">R3. Dependency on a central service</h4>
+<p>If Docker at some point ceases operation of the Docker Hub, I am unable to
+deploy software to my NAS. This isn’t a very hypothetical concern: In 2023,
+Docker Hub <a href="https://news.ycombinator.com/item?id=35154025">announced the end of organizations on the Free
+tier</a> and then backpedaled after
+community backlash.</p>
+<p>Who knows how long they can still provide free services to hobbyists like myself.</p>
+<h4 id="no-immich">R4. Could not try Immich on Flatcar</h4>
+<p>The final nail in the coffin was when I noticed that I could not try Immich on
+my NAS system! Modern web applications like Immich need multiple Docker
+containers (for Postgres, Redis, etc.) and hence only offer <a href="https://immich.app/docs/install/docker-compose">Docker
+Compose</a> as a supported way of
+installation.</p>
+<p>Unfortunately, Flatcar <a href="https://github.com/flatcar/Flatcar/issues/894">does not include Docker
+Compose</a>.</p>
+<p>I was not in the mood to re-package Immich for non-Docker-Compose systems on an
+ongoing basis, so I decided that a system on which I can neither run software
+like Immich directly, nor even run Docker Compose, is not sufficient for my
+needs anymore.</p>
+<h4 id="reason-summary">Reason Summary</h4>
+<p>With all of the above reasons, I would have had to set up automated container
+builds, run my own central registry and would still be unable to run well-known
+Open Source software like Immich.</p>
+<p>Instead, I decided to try NixOS again (after a 10 year break) because it seems
+like the most popular declarative solution nowadays, with a large community and
+large selection of packages.</p>
+<p>How does NixOS compare for my situation?</p>
+<ul>
+<li>Same: I also need to set up an automated job to update my NixOS systems.
+<ul>
+<li>I already have such a job for updating my <a href="https://gokrazy.org">gokrazy</a> devices.</li>
+<li>Docker push is asynchronous: After a successful push, I still need extra
+automation for pulling the updated containers on the target host and
+restarting the affected services, whereas NixOS includes all of that.</li>
+</ul>
+</li>
+<li>Better: There is no central registry. With NixOS, I can push the build result
+directly to the target host via SSH.</li>
+<li>Better: The corpus of available software in NixOS is much larger (including
+Immich, for example) and the NixOS modules generally seem to be expressed at a
+higher level of abstraction than individual Docker containers, meaning you can
+configure more features with fewer lines of config.</li>
+</ul>
+<h2 id="vm-prototyping">Prototyping in a VM</h2>
+<p>My NAS setup needs to work every day, so I wanted to prototype my desired
+configuration in a VM before making changes to my system. This is not only
+safer, it also allows me to discover any roadblocks, and what working with NixOS
+feels like without making any commitments.</p>
+<p>I copied my NixOS configuration from a previous test installation (see <a href="/posts/2025-06-01-nixos-installation-declarative/">“How I
+like to install NixOS
+(declaratively)”</a>) and used
+the following command to build a VM image and start it in QEMU:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>nix build .#nixosConfigurations.storage2.config.system.build.vm
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020">export</span> <span style="color:#bb60d5">QEMU_NET_OPTS</span><span style="color:#666">=</span><span style="color:#bb60d5">hostfwd</span><span style="color:#666">=</span>tcp::2222-:22
+</span></span><span style="display:flex;"><span><span style="color:#007020">export</span> <span style="color:#bb60d5">QEMU_KERNEL_PARAMS</span><span style="color:#666">=</span><span style="color:#bb60d5">console</span><span style="color:#666">=</span>ttyS0
+</span></span><span style="display:flex;"><span>./result/bin/run-nixplay-vm
+</span></span></code></pre></div><p>The configuration instructions below can be tried out in this VM, and once
+you’re happy enough with what you have, you can repeat the steps on the actual
+machine to migrate.</p>
+<h2 id="migrating">Migrating</h2>
+<p>For the migration of my actual system, I defined the following milestones that
+should be achievable within a typical session of about an hour (after
+prototyping them in a VM):</p>
+<ul>
+<li>M1. Install NixOS</li>
+<li>M2. Set up remote disk unlock</li>
+<li>M3. Set up Samba for access</li>
+<li>M4. Set up SSH/rsync for backups</li>
+<li>Everything extra is nice-to-have and could be deferred to a future session on
+another day.</li>
+</ul>
+<p>In practice, this worked out exactly as planned: the actual installation of
+NixOS and setting up my config to milestone M4 took a little over one hour. All
+the other nice-to-haves were done over the following days and weeks as time
+permitted.</p>
+<p><strong>Tip:</strong> After losing data due to an installer bug in the 2000s, I have adopted
+the habit of physically disconnecting all data disks (= pulling out the SATA
+cable) when re-installing the system disk.</p>
+<h3 id="m1-install-nixos">M1. Install NixOS</h3>
+<p>After following <a href="/posts/2025-06-01-nixos-installation-declarative/">“How I like to install NixOS
+(declaratively)”</a>, this is
+my initial <code>configuration.nix</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{ modulesPath<span style="color:#666">,</span> lib<span style="color:#666">,</span> pkgs<span style="color:#666">,</span> <span style="color:#666">...</span> }:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  imports <span style="color:#666">=</span>
+</span></span><span style="display:flex;"><span>    [
+</span></span><span style="display:flex;"><span>      (modulesPath <span style="color:#666">+</span> <span style="color:#4070a0">&#34;/installer/scan/not-detected.nix&#34;</span>)
+</span></span><span style="display:flex;"><span>      <span style="color:#235388">./hardware-configuration.nix</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#235388">./disk-config.nix</span>
+</span></span><span style="display:flex;"><span>    ];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  <span style="color:#60a0b0;font-style:italic"># Adding michael as trusted user means</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  <span style="color:#60a0b0;font-style:italic"># we can upgrade the system via SSH (see Makefile).</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  nix<span style="color:#666">.</span>settings<span style="color:#666">.</span>trusted-users <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;michael&#34;</span> <span style="color:#4070a0">&#34;root&#34;</span> ];
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  <span style="color:#60a0b0;font-style:italic"># Clean the Nix store every week.</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  nix<span style="color:#666">.</span>gc <span style="color:#666">=</span> {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    automatic <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    dates <span style="color:#666">=</span> <span style="color:#4070a0">&#34;weekly&#34;</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    options <span style="color:#666">=</span> <span style="color:#4070a0">&#34;--delete-older-than 7d&#34;</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  };
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  boot<span style="color:#666">.</span>loader<span style="color:#666">.</span>systemd-boot <span style="color:#666">=</span> {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    configurationLimit <span style="color:#666">=</span> <span style="color:#40a070">10</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  };
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  boot<span style="color:#666">.</span>loader<span style="color:#666">.</span>efi<span style="color:#666">.</span>canTouchEfiVariables <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  networking<span style="color:#666">.</span>hostName <span style="color:#666">=</span> <span style="color:#4070a0">&#34;storage2&#34;</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  time<span style="color:#666">.</span>timeZone <span style="color:#666">=</span> <span style="color:#4070a0">&#34;Europe/Zurich&#34;</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  <span style="color:#60a0b0;font-style:italic"># Use systemd for networking</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  services<span style="color:#666">.</span>resolved<span style="color:#666">.</span>enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  networking<span style="color:#666">.</span>useDHCP <span style="color:#666">=</span> <span style="color:#60add5">false</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  systemd<span style="color:#666">.</span>network<span style="color:#666">.</span>enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  systemd<span style="color:#666">.</span>network<span style="color:#666">.</span>networks<span style="color:#666">.</span><span style="color:#4070a0">&#34;10-e&#34;</span> <span style="color:#666">=</span> {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    matchConfig<span style="color:#666">.</span>Name <span style="color:#666">=</span> <span style="color:#4070a0">&#34;e*&#34;</span>;  <span style="color:#60a0b0;font-style:italic"># enp9s0 (10G) or enp8s0 (1G)</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    networkConfig <span style="color:#666">=</span> {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>      IPv6AcceptRA <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>      DHCP <span style="color:#666">=</span> <span style="color:#4070a0">&#34;yes&#34;</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    };
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  };
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  i18n<span style="color:#666">.</span>supportedLocales <span style="color:#666">=</span> [
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    <span style="color:#4070a0">&#34;en_DK.UTF-8/UTF-8&#34;</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    <span style="color:#4070a0">&#34;de_DE.UTF-8/UTF-8&#34;</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    <span style="color:#4070a0">&#34;de_CH.UTF-8/UTF-8&#34;</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    <span style="color:#4070a0">&#34;en_US.UTF-8/UTF-8&#34;</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  ];
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  i18n<span style="color:#666">.</span>defaultLocale <span style="color:#666">=</span> <span style="color:#4070a0">&#34;en_US.UTF-8&#34;</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  users<span style="color:#666">.</span>mutableUsers <span style="color:#666">=</span> <span style="color:#60add5">false</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  security<span style="color:#666">.</span>sudo<span style="color:#666">.</span>wheelNeedsPassword <span style="color:#666">=</span> <span style="color:#60add5">false</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  users<span style="color:#666">.</span>users<span style="color:#666">.</span>michael <span style="color:#666">=</span> {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    openssh<span style="color:#666">.</span>authorizedKeys<span style="color:#666">.</span>keys <span style="color:#666">=</span> [
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>      <span style="color:#4070a0">&#34;ssh-ed25519 AAAAC3NzaC1lZDI1NTE5secret&#34;</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>      <span style="color:#4070a0">&#34;ssh-ed25519 AAAAC3NzaC1lZDI1NTE5key&#34;</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    ];
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    isNormalUser <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    description <span style="color:#666">=</span> <span style="color:#4070a0">&#34;Michael Stapelberg&#34;</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    extraGroups <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;networkmanager&#34;</span> <span style="color:#4070a0">&#34;wheel&#34;</span> ];
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    initialPassword <span style="color:#666">=</span> <span style="color:#4070a0">&#34;secret&#34;</span>;  <span style="color:#60a0b0;font-style:italic"># XXX: change!</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    shell <span style="color:#666">=</span> pkgs<span style="color:#666">.</span>zsh;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    packages <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">with</span> pkgs; [];
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  };
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  environment<span style="color:#666">.</span>systemPackages <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">with</span> pkgs; [
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    git  <span style="color:#60a0b0;font-style:italic"># for checking out github.com/stapelberg/configfiles</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    rsync
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    zsh
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    vim
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    emacs
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    wget
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    curl
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  ];
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  programs<span style="color:#666">.</span>zsh<span style="color:#666">.</span>enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  services<span style="color:#666">.</span>openssh<span style="color:#666">.</span>enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># This value determines the NixOS release from which the default</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># settings for stateful data, like file locations and database versions</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># on your system were taken. It‘s perfectly fine and recommended to leave</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># this value at the release version of the first install of this system.</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># Before changing this value read the documentation for this option</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).</span>
+</span></span><span style="display:flex;"><span>  system<span style="color:#666">.</span>stateVersion <span style="color:#666">=</span> <span style="color:#4070a0">&#34;25.05&#34;</span>; <span style="color:#60a0b0;font-style:italic"># Did you read the comment?</span>
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+<p>All following sections describe changes within this <code>configuration.nix</code>.</p>
+<p>All devices in my home network obtain their IP address via DHCP. If I want to
+make an IP address static, I configure it accordingly on my router.</p>
+<p>My NAS PCs have one specialty with regards to IP addressing: They are reachable
+via IPv4 and IPv6, and the IPv6 address can be derived from the IPv4 address.</p>
+<p>Hence, I changed the systemd-networkd configuration from above such that it
+configures a static IPv6 address in a dynamically configured IPv6 network:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  systemd<span style="color:#666">.</span>network<span style="color:#666">.</span>networks<span style="color:#666">.</span><span style="color:#4070a0">&#34;10-e&#34;</span> <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    matchConfig<span style="color:#666">.</span>Name <span style="color:#666">=</span> <span style="color:#4070a0">&#34;e*&#34;</span>;  <span style="color:#60a0b0;font-style:italic"># enp9s0 (10G) or enp8s0 (1G)</span>
+</span></span><span style="display:flex;"><span>    networkConfig <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>      IPv6AcceptRA <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex;"><span>      DHCP <span style="color:#666">=</span> <span style="color:#4070a0">&#34;yes&#34;</span>;
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    ipv6AcceptRAConfig <span style="color:#666">=</span> {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>      Token <span style="color:#666">=</span> <span style="color:#4070a0">&#34;::10:0:0:252&#34;</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    };
+</span></span><span style="display:flex;"><span>  };</span></span></code></pre></div>
+<p>✅ This fulfills milestone M1.</p>
+<h3 id="m2-set-up-remote-disk-unlock">M2. Set up remote disk unlock</h3>
+<p>To unlock my encrypted disks on boot, I have a custom systemd service unit that
+uses <a href="https://manpages.debian.org/wget.1"><code>wget(1)</code></a>
+ and <a href="https://manpages.debian.org/cryptsetup.8"><code>cryptsetup(8)</code></a>
+ to split the key file between the NAS and a remote server (= an
+attacker needs both pieces to unlock).</p>
+<p>With CoreOS/Flatcar, my <code>cloud-init</code> configuration looked as follows:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">coreos</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">units</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>unlock.service<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">command</span>:<span style="color:#bbb"> </span>start<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        [Unit]
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Description=unlock hard drive
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Wants=network.target
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        After=systemd-networkd-wait-online.service
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Before=samba.service
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        [Service]
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Type=oneshot
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        RemainAfterExit=yes
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        # Wait until the host is actually reachable.
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStart=/bin/sh -c &#34;c=0; while [ $c -lt 5 ]; do /bin/ping6 -n -c 1 r.zekjur.net &amp;&amp; break; c=$((c+1)); sleep 1; done&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStart=/bin/sh -c &#34;[ -e \&#34;/dev/mapper/S5SSNF0T205183F_crypt\&#34; ] || (echo -n my_local_secret &amp;&amp; wget --retry-connrefused --ca-directory=/dev/null --ca-certificate=/etc/ssl/certs/r.zekjur.net.crt -qO - https://r.zekjur.net:8443/nascrypto) | /sbin/cryptsetup --key-file=- luksOpen /dev/disk/by-id/ata-Samsung_SSD_870_QVO_8TB_S5SSNF0T205183F S5SSNF0T205183F_crypt&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStart=/bin/sh -c &#34;[ -e \&#34;/dev/mapper/S5SSNJ0T205991B_crypt\&#34; ] || (echo -n my_local_secret &amp;&amp; wget --retry-connrefused --ca-directory=/dev/null --ca-certificate=/etc/ssl/certs/r.zekjur.net.crt -qO - https://r.zekjur.net:8443/nascrypto) | /sbin/cryptsetup --key-file=- luksOpen /dev/disk/by-id/ata-Samsung_SSD_870_QVO_8TB_S5SSNJ0T205991B S5SSNJ0T205991B_crypt&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStart=/bin/sh -c &#34;vgchange -ay&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStart=/bin/mount /dev/mapper/data-data /srv</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">write_files</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">path</span>:<span style="color:#bbb"> </span>/etc/ssl/certs/r.zekjur.net.crt<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      -----BEGIN CERTIFICATE-----
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      MIID8TCCAlmgAwIBAgIRAPWwvYWpoH+lGKv6rxZvC4MwDQYJKoZIhvcNAQELBQAw
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      […]
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      -----END CERTIFICATE-----</span><span style="color:#bbb">
+</span></span></span></code></pre></div><p>I converted it into the following NixOS configuration:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  systemd<span style="color:#666">.</span>services<span style="color:#666">.</span>unlock <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    wantedBy <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;multi-user.target&#34;</span> ];
+</span></span><span style="display:flex;"><span>    description <span style="color:#666">=</span> <span style="color:#4070a0">&#34;unlock hard drive&#34;</span>;
+</span></span><span style="display:flex;"><span>    wants <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;network.target&#34;</span> ];
+</span></span><span style="display:flex;"><span>    after <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;systemd-networkd-wait-online.service&#34;</span> ];
+</span></span><span style="display:flex;"><span>    serviceConfig <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>      Type <span style="color:#666">=</span> <span style="color:#4070a0">&#34;oneshot&#34;</span>;
+</span></span><span style="display:flex;"><span>      RemainAfterExit <span style="color:#666">=</span> <span style="color:#4070a0">&#34;yes&#34;</span>;
+</span></span><span style="display:flex;"><span>      ExecStart <span style="color:#666">=</span> [
+</span></span><span style="display:flex;"><span>        <span style="color:#60a0b0;font-style:italic"># Wait until the host is actually reachable.</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#39;&#39;/bin/sh -c &#34;c=0; while [ $c -lt 5 ]; do </span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>iputils<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/ping -n -c 1 r.zekjur.net &amp;&amp; break; c=$((c+1)); sleep 1; done&#34;&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#39;&#39;/bin/sh -c &#34;[ -e \&#34;/dev/mapper/S5SSNF0T205183F_crypt\&#34; ] || (echo -n my_local_secret &amp;&amp; </span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>wget<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/wget --retry-connrefused --ca-directory=/dev/null --ca-certificate=/etc/ssl/certs/r.zekjur.net.crt -qO - https://r.zekjur.net:8443/sdb2_crypt) | </span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>cryptsetup<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/cryptsetup --key-file=- luksOpen /dev/disk/by-id/ata-Samsung_SSD_870_QVO_8TB_S5SSNF0T205183F S5SSNF0T205183F_crypt&#34;&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#39;&#39;/bin/sh -c &#34;[ -e \&#34;/dev/mapper/S5SSNJ0T205991B_crypt\&#34; ] || (echo -n my_local_secret &amp;&amp; </span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>wget<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/wget --retry-connrefused --ca-directory=/dev/null --ca-certificate=/etc/ssl/certs/r.zekjur.net.crt -qO - https://r.zekjur.net:8443/sdc2_crypt) | </span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>cryptsetup<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/cryptsetup --key-file=- luksOpen /dev/disk/by-id/ata-Samsung_SSD_870_QVO_8TB_S5SSNJ0T205991B S5SSNJ0T205991B_crypt&#34;&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#39;&#39;/bin/sh -c &#34;</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>lvm2<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/vgchange -ay&#34;&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#39;&#39;/run/wrappers/bin/mount /dev/mapper/data-data /srv&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>      ];
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  };
+</span></span></code></pre></div><p>We’ll also need to store the custom TLS certificate file on disk. For that, we
+can use the <code>environment.</code> configuration:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  environment<span style="color:#666">.</span>etc<span style="color:#666">.</span><span style="color:#4070a0">&#34;ssl/certs/r.zekjur.net.crt&#34;</span><span style="color:#666">.</span>text <span style="color:#666">=</span> <span style="color:#4070a0">&#39;&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">-----BEGIN CERTIFICATE-----
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">MIID8TCCAlmgAwIBAgIRAPWwvYWpoH+lGKv6rxZvC4MwDQYJKoZIhvcNAQELBQAw
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">[…]
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">-----END CERTIFICATE-----
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">&#39;&#39;</span>;
+</span></span></code></pre></div><p>The references like <code>${pkgs.wget}</code> will be replaced with a path to the Nix store
+(<a href="https://nix.dev/tutorials/nix-language.html#paths">→ nix.dev
+documentation</a>). On
+CoreOS/Flatcar, I was limited to using just the (minimal set of) software
+included in the base image, or I had to reach for Docker. On NixOS, we can use
+all packages available in nixpkgs.</p>
+<p>After <a href="/posts/2025-06-01-nixos-installation-declarative/#making-changes">deploying</a>
+and <code>reboot</code>ing, I can access my unlocked disk under <code>/srv</code>! 🎉</p>
+<pre tabindex="0"><code>% df -h /srv
+Filesystem             Size  Used Avail Use% Mounted on
+/dev/mapper/data-data   15T   14T  342G  98% /srv
+</code></pre><p>When listing my files, I noticed that the group id was different between my old
+system and the new system. This can be fixed by explicitly specifying the
+desired group id:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  users<span style="color:#666">.</span>groups<span style="color:#666">.</span>michael <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    gid <span style="color:#666">=</span> <span style="color:#40a070">1000</span>;  <span style="color:#60a0b0;font-style:italic"># for consistency with storage3</span>
+</span></span><span style="display:flex;"><span>  };
+</span></span></code></pre></div><p>✅ M2 is complete.</p>
+<h3 id="m3-set-up-samba-for-access">M3. Set up Samba for access</h3>
+<p>Whereas I want to configure remote disk unlock at the systemd service level, for
+Samba I want to use Docker: I wanted to first transfer my old (working)
+Docker-based setups as they are, and only later convert them to Nix.</p>
+<p>We enable the <a href="https://search.nixos.org/options?query=virtualisation.docker.enable">Docker NixOS
+module</a>
+which sets up the daemons that Docker needs and whatever else is needed to make
+it work:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  virtualisation<span style="color:#666">.</span>docker<span style="color:#666">.</span>enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span></code></pre></div><p>This is already sufficient for other services to use Docker, but I also want to
+be able to run the <code>docker</code> command interactively for debugging. Therefore, I
+added <code>docker</code> to <code>systemPackages</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  environment<span style="color:#666">.</span>systemPackages <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">with</span> pkgs; [
+</span></span><span style="display:flex;"><span>    git  <span style="color:#60a0b0;font-style:italic"># for checking out github.com/stapelberg/configfiles</span>
+</span></span><span style="display:flex;"><span>    rsync
+</span></span><span style="display:flex;"><span>    zsh
+</span></span><span style="display:flex;"><span>    vim
+</span></span><span style="display:flex;"><span>    emacs
+</span></span><span style="display:flex;"><span>    wget
+</span></span><span style="display:flex;"><span>    curl
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    docker
+</span></span><span style="display:flex;"><span>  ];</span></span></code></pre></div>
+<p>After deploying this configuration, I can run <code>docker run -ti debian</code> to verify things work.</p>
+<p>The <code>cloud-init</code> version of samba looked like this:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">coreos</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">units</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>samba.service<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">command</span>:<span style="color:#bbb"> </span>start<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        [Unit]
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Description=samba server
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        After=docker.service unlock.mount
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Requires=docker.service unlock.mount
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        [Service]
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Restart=always
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        StartLimitInterval=0
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        # Always pull the latest version (bleeding edge).
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=-/usr/bin/docker pull stapelberg/docker-samba:latest
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        # Set up samba users (cannot be done in the (public) Dockerfile because
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        # users/passwords are sensitive information).
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=-/usr/bin/docker kill smb
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=-/usr/bin/docker rm smb
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=-/usr/bin/docker rm smb-prep
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=/usr/bin/docker run --name smb-prep stapelberg/docker-samba sh -c &#39;adduser --quiet --disabled-password --gecos &#34;&#34; --uid 29901 michael &amp;&amp; sed -i &#34;s,\\[global\\],[global]\\nserver multi channel support = yes\\naio read size = 1\\naio write size = 1,g&#34; /etc/samba/smb.conf&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=/usr/bin/docker commit smb-prep smb-prepared
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=/usr/bin/docker rm smb-prep
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=/usr/bin/docker run --name smb-prep smb-prepared /bin/sh -c &#34;echo \&#34;secret\nsecret\n&#34; | tee - | smbpasswd -a -s michael&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=/usr/bin/docker commit smb-prep smb-prepared
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStart=/usr/bin/docker run \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          -p 137:137 \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          -p 138:138 \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          -p 139:139 \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          -p 445:445 \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          --tmpfs=/run \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          -v /srv/data:/srv/data \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          --name smb \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          -t \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">          smb-prepared \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">            /usr/sbin/smbd --foreground --debug-stdout --no-process-group</span><span style="color:#bbb">
+</span></span></span></code></pre></div><p>We can translate this 1:1 to NixOS:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  systemd<span style="color:#666">.</span>services<span style="color:#666">.</span>samba <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    wantedBy <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;multi-user.target&#34;</span> ];
+</span></span><span style="display:flex;"><span>    description <span style="color:#666">=</span> <span style="color:#4070a0">&#34;samba server&#34;</span>;
+</span></span><span style="display:flex;"><span>    after <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;unlock.service&#34;</span> ];
+</span></span><span style="display:flex;"><span>    requires <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;unlock.service&#34;</span> ];
+</span></span><span style="display:flex;"><span>    serviceConfig <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>      Restart <span style="color:#666">=</span> <span style="color:#4070a0">&#34;always&#34;</span>;
+</span></span><span style="display:flex;"><span>      StartLimitInterval <span style="color:#666">=</span> <span style="color:#40a070">0</span>;
+</span></span><span style="display:flex;"><span>      ExecStartPre <span style="color:#666">=</span> [
+</span></span><span style="display:flex;"><span>        <span style="color:#60a0b0;font-style:italic"># Always pull the latest version.</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#39;&#39;-</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>docker<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/docker pull stapelberg/docker-samba:latest&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#60a0b0;font-style:italic"># Set up samba users (cannot be done in the (public) Dockerfile because</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#60a0b0;font-style:italic"># users/passwords are sensitive information).</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#39;&#39;-</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>docker<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/docker kill smb&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#39;&#39;-</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>docker<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/docker rm smb&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#39;&#39;-</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>docker<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/docker rm smb-prep&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#39;&#39;-</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>docker<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/docker run --name smb-prep stapelberg/docker-samba sh -c &#39;adduser --quiet --disabled-password --gecos &#34;&#34; --uid 29901 michael &amp;&amp; sed -i &#34;s,\\[global\\],[global]\\nserver multi channel support = yes\\naio read size = 1\\naio write size = 1,g&#34; /etc/samba/smb.conf&#39; &#39;&#39;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#39;&#39;-</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>docker<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/docker commit smb-prep smb-prepared&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#39;&#39;-</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>docker<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/docker rm smb-prep&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#39;&#39;-</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>docker<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/docker run --name smb-prep smb-prepared /bin/sh -c &#34;echo \&#34;secret\nsecret\n&#34; | tee - | smbpasswd -a -s michael&#34;&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#39;&#39;-</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>docker<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/docker commit smb-prep smb-prepared&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>      ];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      ExecStart <span style="color:#666">=</span> <span style="color:#4070a0">&#39;&#39;-</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>docker<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/docker run \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">           -p 137:137 \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">           -p 138:138 \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">           -p 139:139 \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">           -p 445:445 \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">           --tmpfs=/run \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">           -v /srv/data:/srv/data \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">           --name smb \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">           -t \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">           smb-prepared \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">             /usr/sbin/smbd --foreground --debug-stdout --no-process-group
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">             &#39;&#39;</span>;
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span><span style="">}</span>
+</span></span></code></pre></div><p>✅ Now I can manage my files over the network, which completes M3!</p>
+<p>See also: <a href="#samba-nixos">Nice-to-haves: N5. samba from NixOS</a></p>
+<h3 id="m4-set-up-sshrsync-for-backups">M4. Set up SSH/rsync for backups</h3>
+<p>For backing up data, I use rsync over SSH. I restrict this SSH access to run
+only rsync commands by using <code>rrsync</code> (in a Docker container). To configure the
+SSH <a href="https://manpages.debian.org/authorized_keys.5"><code>authorized_keys(5)</code></a>
+, we set:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  users<span style="color:#666">.</span>users<span style="color:#666">.</span>root<span style="color:#666">.</span>openssh<span style="color:#666">.</span>authorizedKeys<span style="color:#666">.</span>keys <span style="color:#666">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#4070a0">&#39;&#39;command=&#34;</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>docker<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/docker run --log-driver none -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/midna:/srv/backup/midna stapelberg/docker-rsync /srv/backup/midna&#34; ssh-rsa AAAAB3Npublickey root@midna&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>  <span style="">}</span>;
+</span></span></code></pre></div><p>✅ A successful test backup run completes milestone M4!</p>
+<p>See also: <a href="#rrsync-nixos">Nice-to-haves: N6. rrsync from NixOS</a></p>
+<h2 id="nice-to-haves">Nice-to-haves</h2>
+<h3 id="prometheus-node-exporter">N1. Prometheus Node Exporter</h3>
+<p>I like to monitor all my machines with <a href="https://prometheus.io">Prometheus</a> (and
+Grafana). For network connectivity and authentication, I use the Tailscale mesh
+VPN.</p>
+<p>To install Tailscale, I <a href="https://search.nixos.org/options?query=services.tailscale.enable">enable its NixOS
+module</a> and
+make the <code>tailscale</code> command available:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  services<span style="color:#666">.</span>tailscale<span style="color:#666">.</span>enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex;"><span>  environment<span style="color:#666">.</span>systemPackages <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">with</span> pkgs; [ tailscale ];
+</span></span></code></pre></div><p>After deploying, I run <code>sudo tailscale up</code> and open the login link in my browser.</p>
+<p>The Prometheus Node Exporter can also easily be enabled <a href="https://search.nixos.org/options?query=services.prometheus.exporters.node.enable">through its NixOS
+module</a>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  services<span style="color:#666">.</span>prometheus<span style="color:#666">.</span>exporters<span style="color:#666">.</span>node <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex;"><span>    listenAddress <span style="color:#666">=</span> <span style="color:#4070a0">&#34;storage2.example.ts.net&#34;</span>;
+</span></span><span style="display:flex;"><span>  };
+</span></span></code></pre></div><p>However, this isn’t reliable yet: When Tailscale’s startup takes a while during
+system boot, the Node Exporter might burn through its entire restart budget when
+it cannot listen on the Tailscale IP address yet. We can enable <a href="/posts/2024-01-17-systemd-indefinite-service-restarts/">indefinite
+restarts</a> for the
+service to eventually come up:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  systemd<span style="color:#666">.</span>services<span style="color:#666">.</span><span style="color:#4070a0">&#34;prometheus-node-exporter&#34;</span> <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    startLimitIntervalSec <span style="color:#666">=</span> <span style="color:#40a070">0</span>;
+</span></span><span style="display:flex;"><span>    serviceConfig <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>      Restart <span style="color:#666">=</span> <span style="color:#4070a0">&#34;always&#34;</span>;
+</span></span><span style="display:flex;"><span>      RestartSec <span style="color:#666">=</span> <span style="color:#40a070">1</span>;
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>  };
+</span></span></code></pre></div><h3 id="reliable-mount">N2. Reliable mounting</h3>
+<p>While migrating my setup, I noticed that calling <a href="https://manpages.debian.org/mount.8"><code>mount(8)</code></a>
+ from <code>unlock.service</code> directly is not reliable, and it’s better
+to let systemd manage the mounting:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  fileSystems<span style="color:#666">.</span><span style="color:#4070a0">&#34;/srv&#34;</span> <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    device <span style="color:#666">=</span> <span style="color:#4070a0">&#34;/dev/mapper/data-data&#34;</span>;
+</span></span><span style="display:flex;"><span>    fsType <span style="color:#666">=</span> <span style="color:#4070a0">&#34;ext4&#34;</span>;
+</span></span><span style="display:flex;"><span>    options <span style="color:#666">=</span> [
+</span></span><span style="display:flex;"><span>      <span style="color:#4070a0">&#34;nofail&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#4070a0">&#34;x-systemd.requires=unlock.service&#34;</span>
+</span></span><span style="display:flex;"><span>    ];
+</span></span><span style="display:flex;"><span>  };
+</span></span></code></pre></div><p>Afterwards, I could just remove the <a href="https://manpages.debian.org/mount.8"><code>mount(8)</code></a>
+ call
+from <code>unlock.service</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -247,7 +247,10 @@ fry/U6A=
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>         &#39;&#39;/bin/sh -c &#34;${pkgs.lvm2.bin}/bin/vgchange -ay&#34;&#39;&#39;
+</span></span><span style="display:flex;"><span><span style="color:#a00000">-        &#39;&#39;/run/wrappers/bin/mount /dev/mapper/data-data /srv&#39;&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+        # Let systemd mount /srv based on the fileSystems./srv
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+        # declaration to prevent race conditions: mount
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+        # might not succeed while the fsck is still in progress,
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+        # for example, which otherwise makes unlock.service fail.
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>       ];
+</span></span><span style="display:flex;"><span>     };
+</span></span></code></pre></div><p>In systemd services, I can now depend on the <code>/srv</code> mount unit:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  systemd<span style="color:#666">.</span>services<span style="color:#666">.</span>jellyfin <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    unitConfig<span style="color:#666">.</span>RequiresMountsFor <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;/srv&#34;</span> ];
+</span></span><span style="display:flex;"><span>    wantedBy <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;srv.mount&#34;</span> ];
+</span></span><span style="display:flex;"><span>  };
+</span></span></code></pre></div><h3 id="nginx-healthz">N3. nginx-healthz</h3>
+<p>To save power, I turn off my NAS when they are not in use.</p>
+<p>My backup orchestration uses Wake-on-LAN to start a wakeup and needs to wait
+until the NAS is fully booted up and has mounted its <code>/srv</code> mount before it
+can start backup jobs.</p>
+<p>For this purpose, I have configured a web server (without any files) that
+depends on the <code>/srv</code> mount. So, once the web server responds to HTTP requests,
+we know <code>/srv</code> is mounted.</p>
+<p>The <code>cloud-init</code> config looked as follows:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">coreos</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">units</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>healthz.service<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">command</span>:<span style="color:#bbb"> </span>start<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        [Unit]
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Description=nginx for /srv health check
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Wants=network.target
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        After=srv.mount
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Requires=srv.mount
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        StartLimitInterval=0
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        [Service]
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        Restart=always
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=/bin/sh -c &#39;systemctl is-active docker.service&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=/usr/bin/docker pull nginx:1
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=-/usr/bin/docker kill nginx-healthz
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStartPre=-/usr/bin/docker rm -f nginx-healthz
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        ExecStart=/usr/bin/docker run \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">            --name nginx-healthz \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">            --publish 10.0.0.252:8200:80 \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">            --log-driver=journald \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">            nginx:1</span><span style="color:#bbb">
+</span></span></span></code></pre></div><p>The Docker version (ported from Flatcar Linux) looks like this:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  systemd<span style="color:#666">.</span>services<span style="color:#666">.</span>healthz <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    description <span style="color:#666">=</span> <span style="color:#4070a0">&#34;nginx for /srv health check&#34;</span>;
+</span></span><span style="display:flex;"><span>    wants <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;network.target&#34;</span> ];
+</span></span><span style="display:flex;"><span>    unitConfig<span style="color:#666">.</span>RequiresMountsFor <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;/srv&#34;</span> ];
+</span></span><span style="display:flex;"><span>    wantedBy <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;srv.mount&#34;</span> ];
+</span></span><span style="display:flex;"><span>    startLimitIntervalSec <span style="color:#666">=</span> <span style="color:#40a070">0</span>;
+</span></span><span style="display:flex;"><span>    serviceConfig <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>      Restart <span style="color:#666">=</span> <span style="color:#4070a0">&#34;always&#34;</span>;
+</span></span><span style="display:flex;"><span>      ExecStartPre <span style="color:#666">=</span> [
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#39;&#39;/bin/sh -c &#39;systemctl is-active docker.service&#39; &#39;&#39;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#39;&#39;-</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>docker<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/docker pull nginx:1&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#39;&#39;-</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>docker<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/docker kill nginx-healthz&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#39;&#39;-</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>docker<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/docker rm -f nginx-healthz&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>      ];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      ExecStart <span style="color:#666">=</span> [
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#39;&#39;-</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>docker<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/docker run \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">            --name nginx-healthz \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">            --publish 10.0.0.252:8200:80 \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">            --log-driver=journald \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">            nginx:1
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">        &#39;&#39;</span>
+</span></span><span style="display:flex;"><span>      ];
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>  };
+</span></span></code></pre></div><p>This configuration gets a lot simpler when migrating it from Docker to NixOS:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># Signal readiness on HTTP port 8200 once /srv is mounted:</span>
+</span></span><span style="display:flex;"><span>  networking<span style="color:#666">.</span>firewall<span style="color:#666">.</span>allowedTCPPorts <span style="color:#666">=</span> [ <span style="color:#40a070">8200</span> ];
+</span></span><span style="display:flex;"><span>  services<span style="color:#666">.</span>caddy <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex;"><span>    virtualHosts<span style="color:#666">.</span><span style="color:#4070a0">&#34;http://10.0.0.252:8200&#34;</span><span style="color:#666">.</span>extraConfig <span style="color:#666">=</span> <span style="color:#4070a0">&#39;&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">      respond &#34;ok&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">    &#39;&#39;</span>;
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>  systemd<span style="color:#666">.</span>services<span style="color:#666">.</span>caddy <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    unitConfig<span style="color:#666">.</span>RequiresMountsFor <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;/srv&#34;</span> ];
+</span></span><span style="display:flex;"><span>    wantedBy <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;srv.mount&#34;</span> ];
+</span></span><span style="display:flex;"><span>  };
+</span></span></code></pre></div><h3 id="jellyfin">N4. NixOS Jellyfin</h3>
+<p>The Docker version (ported from Flatcar Linux) looks like this:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  networking<span style="color:#666">.</span>firewall<span style="color:#666">.</span>allowedTCPPorts <span style="color:#666">=</span> [ <span style="color:#40a070">4414</span> <span style="color:#40a070">8096</span> ];
+</span></span><span style="display:flex;"><span>  systemd<span style="color:#666">.</span>services<span style="color:#666">.</span>jellyfin <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    wantedBy <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;multi-user.target&#34;</span> ];
+</span></span><span style="display:flex;"><span>    description <span style="color:#666">=</span> <span style="color:#4070a0">&#34;jellyfin&#34;</span>;
+</span></span><span style="display:flex;"><span>    after <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;docker.service&#34;</span> <span style="color:#4070a0">&#34;srv.mount&#34;</span> ];
+</span></span><span style="display:flex;"><span>    requires <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;docker.service&#34;</span> <span style="color:#4070a0">&#34;srv.mount&#34;</span> ];
+</span></span><span style="display:flex;"><span>    startLimitIntervalSec <span style="color:#666">=</span> <span style="color:#40a070">0</span>;
+</span></span><span style="display:flex;"><span>    serviceConfig <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>      Restart <span style="color:#666">=</span> <span style="color:#4070a0">&#34;always&#34;</span>;
+</span></span><span style="display:flex;"><span>      ExecStartPre <span style="color:#666">=</span> [
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#39;&#39;-</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>docker<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/docker pull lscr.io/linuxserver/jellyfin:latest&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#39;&#39;-</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>docker<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/docker rm jellyfin&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>      ];
+</span></span><span style="display:flex;"><span>      ExecStart <span style="color:#666">=</span> [
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#39;&#39;-</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>docker<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/docker run \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">          --rm \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">          --net=host \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">          --name=jellyfin \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">          -e TZ=Europe/Zurich \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">          -v /srv/jellyfin/config:/config \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">          -v /srv/data/movies:/data/movies:ro \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">          -v /srv/data/series:/data/series:ro \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">          -v /srv/data/mp3:/data/mp3:ro \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">          lscr.io/linuxserver/jellyfin:latest
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">        &#39;&#39;</span>
+</span></span><span style="display:flex;"><span>      ];
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>  };
+</span></span></code></pre></div><p>As before, when using jellyfin from NixOS, the configuration gets simpler:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  services<span style="color:#666">.</span>jellyfin <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex;"><span>    openFirewall <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>  systemd<span style="color:#666">.</span>services<span style="color:#666">.</span>jellyfin <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    unitConfig<span style="color:#666">.</span>RequiresMountsFor <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;/srv&#34;</span> ];
+</span></span><span style="display:flex;"><span>    wantedBy <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;srv.mount&#34;</span> ];
+</span></span><span style="display:flex;"><span>  };
+</span></span></code></pre></div><p>For a while, I had also set up compatibility symlinks that map the old location
+(<code>/data/movies</code>, inside the Docker container) to the new location
+(<code>/srv/data/movies</code>), but I encountered strange issues in Jellyfin and ended up
+just re-initializing my whole Jellyfin state. While the required configuration
+had more lines, I found it neat to move it into its own file, so here is how to
+do that:</p>
+<p>Remove the lines above from <code>configuration.nix</code> and move them into
+<code>jellyfin.nix</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  config<span style="color:#666">,</span>
+</span></span><span style="display:flex;"><span>  lib<span style="color:#666">,</span>
+</span></span><span style="display:flex;"><span>  pkgs<span style="color:#666">,</span>
+</span></span><span style="display:flex;"><span>  modulesPath<span style="color:#666">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#666">...</span>
+</span></span><span style="display:flex;"><span>}:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  services<span style="color:#666">.</span>jellyfin <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex;"><span>    openFirewall <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex;"><span>    dataDir <span style="color:#666">=</span> <span style="color:#4070a0">&#34;/srv/jellyfin&#34;</span>;
+</span></span><span style="display:flex;"><span>    cacheDir <span style="color:#666">=</span> <span style="color:#4070a0">&#34;/srv/jellyfin/config/cache&#34;</span>;
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>  systemd<span style="color:#666">.</span>services<span style="color:#666">.</span>jellyfin <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    unitConfig<span style="color:#666">.</span>RequiresMountsFor <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;/srv&#34;</span> ];
+</span></span><span style="display:flex;"><span>    wantedBy <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;srv.mount&#34;</span> ];
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Then, in <code>configuration.nix</code>, add <code>jellyfin.nix</code> to the <code>imports</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>   imports <span style="color:#666">=</span> [
+</span></span><span style="display:flex;"><span>     <span style="color:#235388">./hardware-configuration.nix</span>
+</span></span><span style="display:flex;"><span>     <span style="color:#235388">./jellyfin.nix</span>
+</span></span><span style="display:flex;"><span>   ];
+</span></span></code></pre></div><h3 id="samba-nixos">N5. NixOS samba</h3>
+<p>To use Samba from NixOS, I replaced my <code>systemd.services.samba</code> config from M3
+with this:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  services<span style="color:#666">.</span>samba <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex;"><span>    openFirewall <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex;"><span>    settings <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#4070a0">&#34;global&#34;</span> <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#34;map to guest&#34;</span> <span style="color:#666">=</span> <span style="color:#4070a0">&#34;bad user&#34;</span>;
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>      <span style="color:#4070a0">&#34;data&#34;</span> <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#34;path&#34;</span> <span style="color:#666">=</span> <span style="color:#4070a0">&#34;/srv/data&#34;</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#34;comment&#34;</span> <span style="color:#666">=</span> <span style="color:#4070a0">&#34;public data&#34;</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#34;read only&#34;</span> <span style="color:#666">=</span> <span style="color:#4070a0">&#34;no&#34;</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#34;create mask&#34;</span> <span style="color:#666">=</span> <span style="color:#4070a0">&#34;0775&#34;</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#34;directory mask&#34;</span> <span style="color:#666">=</span> <span style="color:#4070a0">&#34;0775&#34;</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#4070a0">&#34;guest ok&#34;</span> <span style="color:#666">=</span> <span style="color:#4070a0">&#34;yes&#34;</span>;
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>  system<span style="color:#666">.</span>activationScripts<span style="color:#666">.</span>samba_user_create <span style="color:#666">=</span> <span style="color:#4070a0">&#39;&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">      smb_password=&#34;secret&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">      echo -e &#34;$smb_password\n$smb_password\n&#34; | </span><span style="color:#70a0d0">${</span>lib<span style="color:#666">.</span>getExe&#39; pkgs<span style="color:#666">.</span>samba <span style="color:#4070a0">&#34;smbpasswd&#34;</span><span style="color:#70a0d0">}</span><span style="color:#4070a0"> -a -s michael
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">    &#39;&#39;</span>;
+</span></span></code></pre></div><p>Note: Setting the samba password in the activation script works for small
+setups, but if you want to keep your samba passwords out of the Nix store,
+you’ll need to use a different approach. On a different machine, I use
+<a href="https://github.com/Mic92/sops-nix">sops-nix</a> to manage secrets and found that
+refactoring the <code>smbpasswd</code> call like so works reliably:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">let</span>
+</span></span><span style="display:flex;"><span>  setPasswords <span style="color:#666">=</span> pkgs<span style="color:#666">.</span>writeShellScript <span style="color:#4070a0">&#34;samba-set-passwords&#34;</span> <span style="color:#4070a0">&#39;&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">    set -euo pipefail
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">    for user in michael; do
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">        smb_password=&#34;$(cat /run/secrets/samba_passwords/$user)&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">        echo -e &#34;$smb_password\n$smb_password\n&#34; | </span><span style="color:#70a0d0">${</span>lib<span style="color:#666">.</span>getExe&#39; pkgs<span style="color:#666">.</span>samba <span style="color:#4070a0">&#34;smbpasswd&#34;</span><span style="color:#70a0d0">}</span><span style="color:#4070a0"> -a -s $user
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">    done
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">  &#39;&#39;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">in</span>
+</span></span><span style="display:flex;"><span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># …</span>
+</span></span><span style="display:flex;"><span>  services<span style="color:#666">.</span>samba <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic"># …as above…</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  systemd<span style="color:#666">.</span>services<span style="color:#666">.</span>samba-smbd<span style="color:#666">.</span>serviceConfig<span style="color:#666">.</span>ExecStartPre <span style="color:#666">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#4070a0">&#34;</span><span style="color:#70a0d0">${</span>setPasswords<span style="color:#70a0d0">}</span><span style="color:#4070a0">&#34;</span>
+</span></span><span style="display:flex;"><span>  ];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  sops<span style="color:#666">.</span>secrets<span style="color:#666">.</span><span style="color:#4070a0">&#34;samba_passwords/michael&#34;</span> <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    restartUnits <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;samba-smbd.service&#34;</span> ];
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>I also noticed that NixOS does not create a group for each user by default, but
+I am used to managing my permissions like that. We can easily declare a group
+like so:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  users<span style="color:#666">.</span>groups<span style="color:#666">.</span>michael <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    gid <span style="color:#666">=</span> <span style="color:#40a070">1000</span>; <span style="color:#60a0b0;font-style:italic"># for consistency with storage3</span>
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>  users<span style="color:#666">.</span>users<span style="color:#666">.</span>michael <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    extraGroups <span style="color:#666">=</span> [
+</span></span><span style="display:flex;"><span>      <span style="color:#4070a0">&#34;wheel&#34;</span> <span style="color:#60a0b0;font-style:italic"># Enable ‘sudo’ for the user.</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#4070a0">&#34;docker&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#60a0b0;font-style:italic"># By default, NixOS does not add users to their own group:</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#60a0b0;font-style:italic"># https://github.com/NixOS/nixpkgs/issues/198296</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#4070a0">&#34;michael&#34;</span>
+</span></span><span style="display:flex;"><span>    ];
+</span></span><span style="display:flex;"><span>  };
+</span></span></code></pre></div><h3 id="rrsync-nixos">N6. NixOS rrsync</h3>
+<p>The Docker version (ported from Flatcar Linux) looks like this:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  users<span style="color:#666">.</span>users<span style="color:#666">.</span>root<span style="color:#666">.</span>openssh<span style="color:#666">.</span>authorizedKeys<span style="color:#666">.</span>keys <span style="color:#666">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#4070a0">&#39;&#39;command=&#34;</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>docker<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/docker run --log-driver none -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/midna:/srv/backup/midna stapelberg/docker-rsync /srv/backup/midna&#34; ssh-rsa AAAAB3Npublickey root@midna&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>  ];
+</span></span></code></pre></div><p>To use <code>rrsync</code> from NixOS, I changed the configuration like so:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  users<span style="color:#666">.</span>users<span style="color:#666">.</span>root<span style="color:#666">.</span>openssh<span style="color:#666">.</span>authorizedKeys<span style="color:#666">.</span>keys <span style="color:#666">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#4070a0">&#39;&#39;command=&#34;</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>rrsync<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/rrsync /srv/backup/midna&#34; ssh-rsa AAAAB3Npublickey root@midna&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>  ];
+</span></span></code></pre></div><h3 id="syncpl-nixos">N7. sync.pl script</h3>
+<p>The Docker version (ported from Flatcar Linux) looks like this:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  users<span style="color:#666">.</span>users<span style="color:#666">.</span>root<span style="color:#666">.</span>openssh<span style="color:#666">.</span>authorizedKeys<span style="color:#666">.</span>keys <span style="color:#666">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#4070a0">&#39;&#39;command=&#34;</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>docker<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/docker run --log-driver none -i -e SSH_ORIGINAL_COMMAND -v /srv/data:/srv/data -v /root/.ssh:/root/.ssh:ro -v /etc/ssh:/etc/ssh:ro -v /etc/static/ssh:/etc/static/ssh:ro -v /nix/store:/nix/store:ro stapelberg/docker-sync&#34;,no-port-forwarding,no-X11-forwarding ssh-ed25519 AAAAC3Npublickey sync@dr&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>  ];
+</span></span></code></pre></div><p>I wanted to stop managing the following <code>Dockerfile</code> to ship <code>sync.pl</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">FROM</span><span style="color:#4070a0"> debian:stable</span><span style="">
+</span></span></span><span style="display:flex;"><span><span style="">
+</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#60a0b0;font-style:italic"># Install full perl for Data::Dumper</span><span style="">
+</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">RUN</span> apt-get update <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>    <span style="color:#666">&amp;&amp;</span> apt-get install -y rsync ssh perl<span style="">
+</span></span></span><span style="display:flex;"><span><span style="">
+</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">ADD</span> sync.pl /usr/bin/<span style="">
+</span></span></span><span style="display:flex;"><span><span style="">
+</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">ENTRYPOINT</span> [<span style="color:#4070a0">&#34;/usr/bin/sync.pl&#34;</span>]<span style="">
+</span></span></span></code></pre></div><p>To get rid of the Docker container, I translated the <code>sync.pl</code> file into a Nix
+expression that writes the <code>sync.pl</code> Perl script to the Nix store:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{ pkgs }:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># For string literal escaping rules (&#39;&#39;${), see:</span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># https://nix.dev/manual/nix/2.26/language/string-literals#string-literals</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># For writers.writePerlBin, see https://wiki.nixos.org/wiki/Nix-writers</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>pkgs<span style="color:#666">.</span>writers<span style="color:#666">.</span>writePerlBin <span style="color:#4070a0">&#34;syncpl&#34;</span> { libraries <span style="color:#666">=</span> []; } <span style="color:#4070a0">&#39;&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0"># This script is run via ssh from dornröschen.
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">use strict;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">use warnings;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">use Data::Dumper;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">if (my ($destination) = ($ENV{SSH_ORIGINAL_COMMAND} =~ /^([a-z0-9.]+)$/)) {
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">    print STDERR &#34;rsync version: &#34; . `</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>rsync<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/rsync --version` . &#34;\n\n&#34;;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">    my @rsync = (
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">        &#34;</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>rsync<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/rsync&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">        &#34;-e&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">        &#34;ssh&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">        &#34;--max-delete=-1&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">        &#34;--verbose&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">        &#34;--stats&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">        # Intentionally not setting -X for my data sync,
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">        # where there are no full system backups; mostly media files.
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">        &#34;-ax&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">        &#34;--ignore-existing&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">        &#34;--omit-dir-times&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">        &#34;/srv/data/&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">        &#34;</span><span style="color:#4070a0;font-weight:bold">&#39;&#39;$</span><span style="color:#4070a0">{destination}:/&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">    );
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">    print STDERR &#34;running: &#34; . Dumper(\@rsync) . &#34;\n&#34;;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">    exec @rsync;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">} else {
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">    print STDERR &#34;Could not parse SSH_ORIGINAL_COMMAND.\n&#34;;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">}
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">&#39;&#39;</span>
+</span></span></code></pre></div><p>I can then reference this file by importing it in my <code>configuration.nix</code> and
+pointing it to the <code>pkgs</code> expression of my NixOS configuration:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{ modulesPath<span style="color:#666">,</span> lib<span style="color:#666">,</span> pkgs<span style="color:#666">,</span> <span style="color:#666">...</span> }:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#007020;font-weight:bold">let</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  syncpl <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">import</span> <span style="color:#235388">./syncpl.nix</span> { pkgs <span style="color:#666">=</span> pkgs; };
+</span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#007020;font-weight:bold">in</span> {
+</span></span><span style="display:flex;"><span>  imports <span style="color:#666">=</span> [ <span style="color:#235388">./hardware-configuration.nix</span> ];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  users<span style="color:#666">.</span>users<span style="color:#666">.</span>root<span style="color:#666">.</span>openssh<span style="color:#666">.</span>authorizedKeys<span style="color:#666">.</span>keys <span style="color:#666">=</span> [
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    <span style="color:#4070a0">&#39;&#39;command=&#34;</span><span style="color:#70a0d0">${</span>syncpl<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/syncpl&#34;,no-port-forwarding,no-X11-forwarding ssh-ed25519 AAAAC3Npublickey sync@dr&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>  ];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># For interactive usage (when debugging):</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  environment<span style="color:#666">.</span>systemPackages <span style="color:#666">=</span> [ syncpl ];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># …</span>
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+<p>This works, but is it the best approach? Here are some thoughts:</p>
+<ul>
+<li>By managing this script in a Nix expression, I can no longer use my editor’s
+Perl support.
+<ul>
+<li>I could probably also keep <code>sync.pl</code> as a separate file and use string
+interpolation in my Nix expression to inject an absolute path to the <code>rsync</code>
+binary into the script.</li>
+</ul>
+</li>
+<li>Another alternative would be to add a wrapper script to my Nix expression
+which ensures that <code>$PATH</code> contains <code>rsync</code> and then the script wouldn’t need
+an absolute path anymore.</li>
+<li>For small glue scripts like this one, I consider it easier to manage the
+contents “inline” in the Nix expression, because it means one fewer file in my
+config directory.</li>
+</ul>
+<h3 id="flakes">N8. Sharing configs</h3>
+<p>I want to configure all my NixOS systems such that my user settings are
+identical everywhere.</p>
+<p>To achieve that, I can extract parts of my <code>configuration.nix</code> into a
+<a href="https://github.com/stapelberg/nix/blob/main/user-settings.nix"><code>user-settings.nix</code></a>
+and then <a href="https://github.com/stapelberg/nix/blob/30cdd7db9e0ab4b7cc3a38b7953e1b7e1e238d75/flake.nix#L7">declare an accompanying
+<code>flake.nix</code></a>
+that provides this expression as an output.</p>
+<p>After publishing these files in a git repository, I can reference said
+repository in my <code>flake.nix</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  inputs <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    nixpkgs<span style="color:#666">.</span>url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:nixos/nixpkgs/nixos-25.05&#34;</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    stapelbergnix<span style="color:#666">.</span>url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:stapelberg/nix&#34;</span>;
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  outputs <span style="color:#666">=</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      self<span style="color:#666">,</span>
+</span></span><span style="display:flex;"><span>      nixpkgs<span style="color:#666">,</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>	  stapelbergnix<span style="color:#666">,</span>
+</span></span><span style="display:flex;"><span>    }:
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">let</span>
+</span></span><span style="display:flex;"><span>      system <span style="color:#666">=</span> <span style="color:#4070a0">&#34;x86_64-linux&#34;</span>;
+</span></span><span style="display:flex;"><span>      pkgs <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">import</span> nixpkgs {
+</span></span><span style="display:flex;"><span>        <span style="color:#007020;font-weight:bold">inherit</span> system;
+</span></span><span style="display:flex;"><span>        config<span style="color:#666">.</span>allowUnfree <span style="color:#666">=</span> <span style="color:#60add5">false</span>;
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">in</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      nixosConfigurations<span style="color:#666">.</span>storage2 <span style="color:#666">=</span> nixpkgs<span style="color:#666">.</span>lib<span style="color:#666">.</span>nixosSystem {
+</span></span><span style="display:flex;"><span>        <span style="color:#007020;font-weight:bold">inherit</span> system;
+</span></span><span style="display:flex;"><span>        <span style="color:#007020;font-weight:bold">inherit</span> pkgs;
+</span></span><span style="display:flex;"><span>        modules <span style="color:#666">=</span> [
+</span></span><span style="display:flex;"><span>          <span style="color:#235388">./configuration.nix</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>          stapelbergnix<span style="color:#666">.</span>lib<span style="color:#666">.</span>userSettings
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>          <span style="color:#60a0b0;font-style:italic"># Not on this machine; We have our own networking config:</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>          <span style="color:#60a0b0;font-style:italic"># stapelbergnix.lib.systemdNetwork</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>          <span style="color:#60a0b0;font-style:italic"># Use systemd-boot as bootloader</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>          stapelbergnix<span style="color:#666">.</span>lib<span style="color:#666">.</span>systemdBoot
+</span></span><span style="display:flex;"><span>        ];
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>      formatter<span style="color:#666">.</span><span style="color:#70a0d0">${</span>system<span style="color:#70a0d0">}</span> <span style="color:#666">=</span> pkgs<span style="color:#666">.</span>nixfmt-tree;
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+<p>Everything <a href="https://github.com/stapelberg/nix/blob/main/user-settings.nix">declared in the
+<code>user-settings.nix</code></a>
+can now be removed from <code>configuration.nix</code>!</p>
+<h3 id="immich-nixos">N9. Trying immich!</h3>
+<p>One of the motivating reasons for switching away from CoreOS/Flatcar was that I
+couldn’t try Immich, so let’s give it a shot on NixOS:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  services<span style="color:#666">.</span>immich <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex;"><span>    host <span style="color:#666">=</span> <span style="color:#4070a0">&#34;10.0.0.252&#34;</span>;
+</span></span><span style="display:flex;"><span>    port <span style="color:#666">=</span> <span style="color:#40a070">2283</span>;
+</span></span><span style="display:flex;"><span>    openFirewall <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex;"><span>    mediaLocation <span style="color:#666">=</span> <span style="color:#4070a0">&#34;/srv/immich&#34;</span>;
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># Because /srv is a separate file system, we need to declare:</span>
+</span></span><span style="display:flex;"><span>  systemd<span style="color:#666">.</span>services<span style="color:#666">.</span><span style="color:#4070a0">&#34;immich-server&#34;</span> <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    unitConfig<span style="color:#666">.</span>RequiresMountsFor <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;/srv&#34;</span> ];
+</span></span><span style="display:flex;"><span>    wantedBy <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;srv.mount&#34;</span> ];
+</span></span><span style="display:flex;"><span>  };
+</span></span></code></pre></div><h2 id="conclusion">Conclusion</h2>
+<p>You can find the <a href="https://github.com/stapelberg/zkj-nas-tools/tree/master/_2025-07-nixos-nas-configs">full configuration directory on
+GitHub</a>.</p>
+<p>I am pretty happy with this NixOS setup! Previously (with CoreOS/Flatcar), I
+could declaratively manage my base system, but had to manage tons of Docker
+containers in addition. With NixOS, I can declaratively manage <em>everything</em> (or
+as much as makes sense).</p>
+<p>Custom configuration like my SSH+rsync-based backup infrastructure can be
+expressed cleanly, in one place, and structured at the desired level of
+abstraction/reuse.</p>
+<p>If you’re considering managing at least one other system with NixOS, I would
+recommend it! One of my follow-up projects is to convert storage3 (my other NAS
+build) from Ubuntu Server to NixOS as well to cut down on manual
+management. Being able to just copy the entire config to set up another system,
+or try out an idea in a throwaway VM, is just such a nice workflow 🥰</p>
+<p>…but if you have just a single system to manage, probably all of this is too
+complicated.</p>
+<div id="bmc">
+  <p>
+    I run a blog since 2005, spreading knowledge and experience for over 20 years! :)
+  </p>
+  <p>
+    If you want to support my work, you
+    can <a href="https://www.buymeacoffee.com/stapelberg">buy me a coffee</a>.
+  </p>
+  <p>
+    Thank you for your support! ❤️
+  </p>
+</div>
+
+</div>
+
+      </div>
+<div id="ms_toc">
+  <div>
+    <strong>Table Of Contents</strong>
+
+    <nav class="TableOfContents">
+  <ul>
+    <li><a href="#history">Context/History</a></li>
+    <li><a href="#software-requirements">My NAS Software Requirements</a></li>
+    <li><a href="#why-migrate">Why migrate from CoreOS/Flatcar to NixOS?</a>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+    <li><a href="#vm-prototyping">Prototyping in a VM</a></li>
+    <li><a href="#migrating">Migrating</a>
+      <ul>
+        <li><a href="#m1-install-nixos">M1. Install NixOS</a></li>
+        <li><a href="#m2-set-up-remote-disk-unlock">M2. Set up remote disk unlock</a></li>
+        <li><a href="#m3-set-up-samba-for-access">M3. Set up Samba for access</a></li>
+        <li><a href="#m4-set-up-sshrsync-for-backups">M4. Set up SSH/rsync for backups</a></li>
+      </ul>
+    </li>
+    <li><a href="#nice-to-haves">Nice-to-haves</a>
+      <ul>
+        <li><a href="#prometheus-node-exporter">N1. Prometheus Node Exporter</a></li>
+        <li><a href="#reliable-mount">N2. Reliable mounting</a></li>
+        <li><a href="#nginx-healthz">N3. nginx-healthz</a></li>
+        <li><a href="#jellyfin">N4. NixOS Jellyfin</a></li>
+        <li><a href="#samba-nixos">N5. NixOS samba</a></li>
+        <li><a href="#rrsync-nixos">N6. NixOS rrsync</a></li>
+        <li><a href="#syncpl-nixos">N7. sync.pl script</a></li>
+        <li><a href="#flakes">N8. Sharing configs</a></li>
+        <li><a href="#immich-nixos">N9. Trying immich!</a></li>
+      </ul>
+    </li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+
+    </main><div id="ms_footer">
+  © 2025 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

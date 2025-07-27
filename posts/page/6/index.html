@@ -239,6 +239,36 @@
   <br>
 
     
+  <h2>2013 › March</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-03-08-bts-notmuch-reply/"><h3>Replying to Debian BTS messages in notmuch</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<p>
+	   Previously, my workflow regarding replying to bugreports outside my own packages was very uncomfortable: I first downloaded the mbox archive from the BTS, then imported that in claws-mail, hit reply all, remove submit@, add bugnumber@, then send the email. Therefore, I decided to hack up a little elisp function to automate this process for notmuch. It first downloads the message from the BTS, adds it to the notmuch database, then calls notmuch-mua-reply on the message and fixes the To: header: 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-03-08-bts-notmuch-reply/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
   <h2>2013 › February</h2>
   <ul class="ArticleList">
     
@@ -944,25 +974,6 @@ I tracked down the cause of a deadlock at boot time when dhcp hooks call invoke-
 	<p>
 	   Because it is insanely hard to google this, here is how to disable auto-reload of PDF files within Evince (&gt;= v3.4.0): gsettings set org.gnome.Evince auto-reload false 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-08-16-evince-auto-reload/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2012-08-11-rescuing_webservers_with_nginx_as_cache/"><h3>Rescuing webservers with nginx as a cache</h3></a>
-	
-	<div class="tags"></div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	
-	<p>
-	   First of all, I know that there already are a gazillion of websites out there which praise nginx and other caching HTTP wonders. This one is a tad different in that it contains a few nifty tricks (tl;dr: force caching, selective GET parameter caching, iptables traffic redirection, monitoring nginx with collectd)… 
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-08-11-rescuing_webservers_with_nginx_as_cache/">Read more →</a></span>
 	</p>
       </div>
     </li>

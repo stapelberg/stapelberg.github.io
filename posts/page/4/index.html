@@ -244,6 +244,25 @@
     
     <li>
       <div>
+	<a href="https://michael.stapelberg.ch/posts/2017-01-28-font-loading/"><h3>Webfont loading with FOUT</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<p>
+	   For manpages.debian.org, I looked at loading webfonts. I considered the following scenarios: # local? cached? Network Expected Observed 1 Yes / / perfect render perfect render 2 No Yes / perfect render perfect render 3 No No Fast FOUT FOIT 4 No No Slow FOUT some FOUT, some FOIT Scenario #1 and #2 are easy: the font is available, so if we inline the CSS into the HTML page, the browser should be able to render the page perfectly on the first try. Unfortunately, the more common scenarios are #3 and #4, since many people reach manpages.debian.org through a link to an individual manpage. 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-01-28-font-loading/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
 	<a href="https://michael.stapelberg.ch/posts/2017-01-18-manpages-debian-org/"><h3>manpages.debian.org has been modernized</h3></a>
 	
 	<div class="tags">
@@ -981,36 +1000,6 @@
 	<p>
 	   Recently, together with a couple friends of mine, we rented a rack in a datacenter. Not just any datacenter, but that’s a story for another time ;-). Each participant can hang up a 1U server in that rack, so I needed to build one. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-01-11-building_supermicro_1u_server/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-  </ul>
-
-  
-  <h2>2013 › December</h2>
-  <ul class="ArticleList">
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2013-12-25-codesearch-rackspace/"><h3>Hosting for Debian Code Search provided by Rackspace</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	
-	<p>
-	   For a number of weeks now, I have been forwarding traffic being sent to codesearch.debian.net to an instance of Debian Code Search running at Rackspace’s public cloud offering. I feel like it’s overdue to announce how they have been supporting the project and what that means. 
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-12-25-codesearch-rackspace/">Read more →</a></span>
 	</p>
       </div>
     </li>

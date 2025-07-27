@@ -8,6 +8,381 @@
   <id>https://michael.stapelberg.ch/posts/tags/nix/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[Development shells with Nix: four quick examples]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2025-07-27-dev-shells-with-nix-4-quick-examples/"/>
+    <id>https://michael.stapelberg.ch/posts/2025-07-27-dev-shells-with-nix-4-quick-examples/</id>
+    <published>2025-07-27T08:50:00+02:00</published>
+    <content type="html"><![CDATA[<p>I wanted to use <a href="https://gocv.io/">GoCV</a> for one of my projects (to find and
+extract paper documents from within a larger scan), without permanently having
+OpenCV on my system.</p>
+<p>This seemed like a good example use-case to demonstrate a couple of Nix commands
+I like to use, covering quick interactive one-off dev shells to fully
+declarative, hermetic, reproducible, shareable dev shells.</p>
+<p>Notably, you don’t need to use NixOS to run these commands! You can <a href="/posts/2025-06-01-nixos-installation-declarative/#setup-nix">install and
+use Nix</a> on any
+Linux system like Debian, Arch, etc., as long as you set a Nix path or use
+Flakes (see <a href="#setup">setup</a>).</p>
+<h2 id="debian-way">For comparison: The Debian Way</h2>
+<p>Before we start looking at Nix, I will show how to get GoCV running on Debian.</p>
+<p>Let’s create a minimal Go program which uses a GoCV function like
+<code>gocv.NewMat()</code>, just to verify that we can compile this program:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span> main
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;gocv.io/x/gocv&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
+</span></span><span style="display:flex;"><span>  gocv.<span style="color:#06287e">NewMat</span>()
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>If we try to build this on a Debian system, we get:</p>
+<pre tabindex="0"><code>debian % mkdir -p /tmp/minimal
+debian % cd /tmp/minimal
+
+debian % cat &gt; minimal.go &lt;&lt;&#39;EOT&#39;
+package main
+import &#34;gocv.io/x/gocv&#34;
+func main() { gocv.NewMat(); }
+EOT
+
+debian % go mod init minimal
+go: creating new go.mod: module minimal
+go: to add module requirements and sums:
+	go mod tidy
+
+debian % go mod tidy
+go: finding module for package gocv.io/x/gocv
+go: downloading gocv.io/x/gocv v0.41.0
+go: found gocv.io/x/gocv in gocv.io/x/gocv v0.41.0
+
+debian % go build
+# gocv.io/x/gocv
+# [pkg-config --cflags  -- opencv4]
+Package opencv4 was not found in the pkg-config search path.
+Perhaps you should add the directory containing `opencv4.pc&#39;
+to the PKG_CONFIG_PATH environment variable
+Package &#39;opencv4&#39;, required by &#39;virtual:world&#39;, not found
+</code></pre><p>On Debian, we can install OpenCV as follows:</p>
+<pre tabindex="0"><code>debian % sudo apt install libopencv-dev
+
+[…]
+
+Summary:
+  Upgrading: 7, Installing: 512, Removing: 0, Not Upgrading: 27
+  Download size: 367 MB
+  Space needed: 1590 MB / 281 GB available
+
+Continue? [Y/n]
+</code></pre><p>Saying “yes” to this prompt downloads and installs over 500 packages (takes a
+few minutes).</p>
+<p>Now the build works:</p>
+<pre tabindex="0"><code>debian % go build
+debian % file minimal
+minimal: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), […]
+</code></pre><p>…but we have over 500 extra packages on our system that will now need to be
+updated in all eternity, therefore I would like to separate this one-off
+experiment from my usual system.</p>
+<p>We could use Docker to start a Debian container and work inside that container,
+but, depending on the task, this can be cumbersome precisely because it’s a
+separate environment. For this example, I would need to specify a volume mount
+to make my input files available to the Docker container, and I would need to
+set up environment variables before programs inside the Docker container can
+open graphical windows on the host…</p>
+<p>Let’s look at how we can use Nix to help us with that!</p>
+<h2 id="setup">Setup: Nix-on-Debian (or Nix-on-Arch, or…)</h2>
+<p>Users of NixOS can skip this section, as NixOS systems include a ready-to-use
+Nix.</p>
+<p>Before you can try the examples on your own computer, you need to complete these
+three steps:</p>
+<ol>
+<li>Install Nix</li>
+<li>Enable Flakes</li>
+<li>Set a Nix path</li>
+</ol>
+<h3 id="setup-install">Step 1: Install Nix</h3>
+<p>Users of Debian, Arch, Fedora, or other Linux systems first need to install
+Nix. Luckily, Nix is available for many popular Linux distributions:</p>
+<ul>
+<li>Debian ships <a href="https://packages.debian.org/trixie/nix-setup-systemd">nix-setup-systemd</a></li>
+<li>Arch Linux packages <a href="https://archlinux.org/packages/extra/x86_64/nix/">nix</a>
+and provides documentation <a href="https://wiki.archlinux.org/title/Nix">on the Nix Arch Wiki
+page</a>. In practice, I installed the
+package and <a href="/posts/2025-06-01-nixos-installation-declarative/#setup-nix">configured a couple of <code>nixbld</code>
+users</a>.</li>
+<li>More generally, there are Nix builds (rpm, deb, pacman) available for a number
+of distributions: <a href="https://github.com/nix-community/nix-installers">https://github.com/nix-community/nix-installers</a></li>
+</ul>
+<h3 id="setup-flakes">Step 2: Enable Flakes</h3>
+<p>Nix flakes are <a href="https://determinate.systems/posts/flake-schemas/">“a generic way to package Nix
+artifacts”</a>.</p>
+<p>Examples 3 and 4 use Nix flakes to pin dependencies, so we need to <a href="/posts/2025-06-01-nixos-installation-declarative/#enabling-flakes">enable Nix
+flakes</a>.</p>
+<h3 id="setup-nix-path">Step 3: Set a Nix path</h3>
+<p>For example 1 and 2, we want to use the Nix expression <code>import &lt;nixpkgs&gt;</code>.</p>
+<p>On NixOS, this expression will follow the system version, meaning if you use
+<code>import &lt;nixpkgs&gt;</code> on a NixOS 25.05 installation, that will reference <a href="https://github.com/NixOS/nixpkgs/tree/nixos-25.05/">nixpkgs
+in version nixos-25.05</a>.</p>
+<p>On other Linux systems, you’ll see an error message like this:</p>
+<pre tabindex="0"><code>debian-server % nix-shell -p pkg-config opencv
+error: file &#39;nixpkgs&#39; was not found in the Nix search path (add it using $NIX_PATH or -I)
+
+       at «string»:1:25:
+
+            1| {...}@args: with import &lt;nixpkgs&gt; args; (pkgs.runCommandCC or pkgs.runCommand) &#34;shell&#34; { buildInputs = [ (pkg-config) (opencv) ]; } &#34;&#34;
+             |                         ^
+(use &#39;--show-trace&#39; to show detailed location information)
+</code></pre><p>We need to tell Nix which version of <code>nixpkgs</code> to use by setting the <a href="https://nixos.org/guides/nix-pills/15-nix-search-paths.html">Nix search
+path</a>:</p>
+<pre tabindex="0"><code>debian-server % export NIX_PATH=nixpkgs=channel:nixos-25.05
+debian-server % nix-shell -p pkg-config opencv
+[nix-shell:/tmp/opencv]#
+</code></pre><p>Alright! Now we are set up. Let’s jump into the first example!</p>
+<h2 id="nix-shell">Example 1: Interactive one-offs: nix-shell</h2>
+<p>Nix provides a middle-ground between installing OpenCV on your system (<code>apt install</code> like in the example above) and installing OpenCV in a separate Docker
+container: Nix can make available OpenCV without permanently installing it.</p>
+<p>We can run <a href="https://manpages.debian.org/nix-shell.1"><code>nix-shell(1)</code></a>
+ to start a bash shell in
+which the specified packages are available. To successfully build Go code that
+uses GoCV, we need to have OpenCV available:</p>
+<pre tabindex="0"><code>% nix-shell -p pkg-config opencv
+these 194 paths will be fetched (175.80 MiB download, 764.10 MiB unpacked):
+  /nix/store/ig2nk0hsha9xaailhaj69yv677nv95q4-abseil-cpp-20210324.2
+  /nix/store/yw5xqn8lqinrifm9ij80nrmf0i6fdcbx-alsa-lib-1.2.13
+[…]
+
+[nix-shell:/tmp/opencv]$ pkg-config --cflags opencv4
+-I/nix/store/mh5b1dx2ifv4jkp9a8lgssxwhzxssb96-opencv-4.11.0/include/opencv4
+</code></pre><p>In case you were wondering: Yes, we do need to specify <code>pkg-config</code> in this
+<code>nix-shell</code> command explicitly, otherwise running <code>pkg-config</code> will run the host
+version (outside the dev shell), which cannot find <code>opencv4.pc</code>.</p>
+<h2 id="shell.nix">Example 2: nix-shell config file: shell.nix</h2>
+<p>Once we have a combination of packages that work for our project (in our
+example, just <code>pkg-config</code> and <code>opencv</code>), we can create a <code>shell.nix</code> (in any
+directory, but usually in the root of a project) which <code>nix-shell</code> (without the
+<code>-p</code> flag) will read:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  pkgs <span style="color:#666">?</span> <span style="color:#007020;font-weight:bold">import</span> <span style="color:#235388">&lt;nixpkgs&gt;</span> { }<span style="color:#666">,</span>
+</span></span><span style="display:flex;"><span>}:
+</span></span><span style="display:flex;"><span>pkgs<span style="color:#666">.</span>mkShell {
+</span></span><span style="display:flex;"><span>  packages <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">with</span> pkgs; [
+</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic"># Explicitly list pkg-config so that mkShell will arrange</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic"># for the PKG_CONFIG_PATH to find the .pc files.</span>
+</span></span><span style="display:flex;"><span>    pkg-config
+</span></span><span style="display:flex;"><span>    opencv
+</span></span><span style="display:flex;"><span>  ];
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>…and then, we just run <code>nix-shell</code>:</p>
+<pre tabindex="0"><code>% nix-shell
+[nix-shell:/tmp/opencv]$ pkg-config --cflags opencv4
+-I/nix/store/mh5b1dx2ifv4jkp9a8lgssxwhzxssb96-opencv-4.11.0/include/opencv4
+</code></pre><p>If you’re curious, here are a couple of documentation pointers regarding the
+boilerplate around the list of packages:</p>
+<ul>
+<li>Line 1 to 3 <a href="https://nixos.org/guides/nix-pills/05-functions-and-imports.html">declare a
+function</a>
+with an argument set — this is the required structure for <code>nix-shell</code> to be
+able to call your <code>shell.nix</code> file.</li>
+<li><a href="https://nixos.org/manual/nixpkgs/stable/#sec-pkgs-mkShell"><code>pkgs.mkShell</code></a> is
+a convenience helper for use with <code>nix-shell</code>.</li>
+<li>The <code>with pkgs;</code> part allows us to write <code>opencv</code> instead of <code>pkgs.opencv</code>.</li>
+</ul>
+<p>By the way: With the <a href="https://github.com/nix-community/nixd">nixd language
+server</a>, editors with <a href="https://en.wikipedia.org/wiki/Language_Server_Protocol">LSP
+support</a> can show the
+versions that packages resolve to, point out your spelling mistakes, or provide
+features like “jump to definition”.</p>
+<p>For example, in this screenshot, I was editing <code>shell.nix</code> in Emacs and was
+curious how the Nix source of the <code>opencv</code> package looked like. By pressing
+<code>M-.</code> (<code>xref-find-definitions</code>) with
+<a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Point.html">“point”</a>
+over <code>opencv</code>, I got to <code>opencv/4.x.nix</code> in my local Nix store:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2025-07-27-dev-shells-with-nix-4-quick-examples/2025-07-19-emacs-nix-shell.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2025-07-27-dev-shells-with-nix-4-quick-examples/2025-07-19-emacs-nix-shell_hu_6ca6f897c44d3994.jpg 2x,https://michael.stapelberg.ch/posts/2025-07-27-dev-shells-with-nix-4-quick-examples/2025-07-19-emacs-nix-shell_hu_ebe840dd6e5fb84c.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2025-07-27-dev-shells-with-nix-4-quick-examples/2025-07-19-emacs-nix-shell_hu_9fd651da07f25ae.jpg"
+  alt="Emacs showing opencv/4.x.nix after jumping to definition of opencv" title="Emacs showing opencv/4.x.nix after jumping to definition of opencv"
+  width="600"
+  height="374"
+  style="
+
+border: 1px solid #000;
+
+"
+  
+  loading="lazy"></a>
+
+
+
+<h2 id="nix-flakes">Example 3: Hermetic, pinned devShells: Nix Flakes</h2>
+<p>The previous examples used nixpkgs from your system (or Nix path), which means
+you don’t need to change the <code>.nix</code> file when you upgrade your system —
+depending on the use-case, I see this behavior as either convenient or
+terrifying.</p>
+<p>For use-cases where it is important that the <code>.nix</code> file is built exactly the
+same way, no matter what version the surrounding OS uses, we can use <a href="https://wiki.nixos.org/wiki/Flakes">Nix
+Flakes</a> to build in a hermetic way, with
+dependency versions pinned in the <code>flake.lock</code> file.</p>
+<p>A <code>flake.nix</code> contains the same <code>mkShell</code> expression as above, but declares
+structure around it: The <code>mkShell</code> expression goes into the
+<code>outputs.devShells.x86_64-linux.default</code> attribute and the <code>inputs</code> attribute
+contains <a href="https://nix.dev/manual/nix/2.28/command-ref/new-cli/nix3-flake.html#flake-references">Flake
+references</a>
+that are available to this build:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  inputs<span style="color:#666">.</span>nixpkgs<span style="color:#666">.</span>url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:NixOS/nixpkgs/nixos-25.05&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  outputs <span style="color:#666">=</span>
+</span></span><span style="display:flex;"><span>    { self<span style="color:#666">,</span> nixpkgs }:
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      devShells<span style="color:#666">.</span>x86_64-linux<span style="color:#666">.</span>default <span style="color:#666">=</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#007020;font-weight:bold">let</span>
+</span></span><span style="display:flex;"><span>          pkgs <span style="color:#666">=</span> nixpkgs<span style="color:#666">.</span>legacyPackages<span style="color:#666">.</span>x86_64-linux;
+</span></span><span style="display:flex;"><span>        <span style="color:#007020;font-weight:bold">in</span>
+</span></span><span style="display:flex;"><span>        pkgs<span style="color:#666">.</span>mkShell {
+</span></span><span style="display:flex;"><span>          packages <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">with</span> pkgs; [
+</span></span><span style="display:flex;"><span>            <span style="color:#60a0b0;font-style:italic"># Explicitly list pkg-config so that mkShell will arrange</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#60a0b0;font-style:italic"># for the PKG_CONFIG_PATH to find the .pc files.</span>
+</span></span><span style="display:flex;"><span>            pkg-config
+</span></span><span style="display:flex;"><span>            opencv
+</span></span><span style="display:flex;"><span>          ];
+</span></span><span style="display:flex;"><span>        };
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>By the way: Despite the name, it is a best practice to use
+<code>nixpkgs.legacyPackages</code>, which conceptually provides a single <code>import nixpkgs</code>
+result (<a href="https://discourse.nixos.org/t/using-nixpkgs-legacypackages-system-vs-import/17462/8">for
+efficiency</a>).</p>
+<p>Now, I can use <code>nix develop</code> to get a shell with OpenCV:</p>
+<pre tabindex="0"><code>% nix develop
+michael@midna$ pkg-config --cflags opencv4
+-I/nix/store/mh5b1dx2ifv4jkp9a8lgssxwhzxssb96-opencv-4.11.0/include/opencv4
+</code></pre><p>The first <code>nix develop</code> run creates a <code>flake.lock</code> file, so running <code>nix develop</code> later will get us exactly the same environment. To update to newer
+versions, use <code>nix flake update</code>.</p>
+<p><strong>Tip:</strong> Instead of a shell, <code>nix develop --command=emacs</code> is also a useful variant.</p>
+<h2 id="system-indep-flake">Example 4: Making the Flake system-independent</h2>
+<p>Unfortunately, the above <code>flake.nix</code> hard-codes <code>x86_64-linux</code>, so it will not
+be usable on, say, an <code>aarch64-linux</code> (ARM) computer, or on a <code>x86_64-darwin</code>
+(Mac).</p>
+<p>Having to explicitly specify the <code>system</code> by default is a long-standing
+criticism of Nix Flakes.</p>
+<p>There are a number of workarounds. For example, we can use
+<a href="https://github.com/numtide/flake-utils">numtide/flake-utils</a> and refactor our
+<code>flake.nix</code> to use its
+<a href="https://github.com/numtide/flake-utils?tab=readme-ov-file#eachdefaultsystem--system---attrs"><code>eachDefaultSystem</code></a>
+convenience function:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  inputs <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    nixpkgs<span style="color:#666">.</span>url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:nixos/nixpkgs/nixos-25.05&#34;</span>;
+</span></span><span style="display:flex;"><span>    flake-utils<span style="color:#666">.</span>url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:numtide/flake-utils&#34;</span>;
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  outputs <span style="color:#666">=</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      self<span style="color:#666">,</span>
+</span></span><span style="display:flex;"><span>      nixpkgs<span style="color:#666">,</span>
+</span></span><span style="display:flex;"><span>      flake-utils<span style="color:#666">,</span>
+</span></span><span style="display:flex;"><span>    }:
+</span></span><span style="display:flex;"><span>    flake-utils<span style="color:#666">.</span>lib<span style="color:#666">.</span>eachDefaultSystem (
+</span></span><span style="display:flex;"><span>      system:
+</span></span><span style="display:flex;"><span>      <span style="color:#007020;font-weight:bold">let</span>
+</span></span><span style="display:flex;"><span>        pkgs <span style="color:#666">=</span> nixpkgs<span style="color:#666">.</span>legacyPackages<span style="color:#666">.</span><span style="color:#70a0d0">${</span>system<span style="color:#70a0d0">}</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#007020;font-weight:bold">in</span>
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        formatter <span style="color:#666">=</span> pkgs<span style="color:#666">.</span>nixfmt-tree;
+</span></span><span style="display:flex;"><span>        devShells<span style="color:#666">.</span>default <span style="color:#666">=</span> pkgs<span style="color:#666">.</span>mkShell {
+</span></span><span style="display:flex;"><span>          packages <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">with</span> pkgs; [
+</span></span><span style="display:flex;"><span>            <span style="color:#60a0b0;font-style:italic"># Explicitly list pkg-config so that mkShell will arrange</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#60a0b0;font-style:italic"># for the PKG_CONFIG_PATH to find the .pc files.</span>
+</span></span><span style="display:flex;"><span>            pkg-config
+</span></span><span style="display:flex;"><span>            opencv
+</span></span><span style="display:flex;"><span>          ];
+</span></span><span style="display:flex;"><span>        };
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Or we could use <a href="https://github.com/numtide/blueprint">numtide/blueprint</a>,
+its spiritual successor.</p>
+<p>LucPerkins’s dev-templates <a href="https://github.com/the-nix-way/dev-templates/blob/main/go/flake.nix">have effectively
+inlined</a> a
+version of this technique.</p>
+<p>For a solution that isn’t part of Nix, but Nix-adjacent:
+<a href="https://devenv.sh/">devenv</a> is a separate tool that is built on Nix (no longer
+using the CppNix implementation, but <a href="https://devenv.sh/blog/2024/10/22/devenv-is-switching-its-nix-implementation-to-tvix/">tvix
+actually</a>),
+but with its own .nix files.</p>
+<h2 id="profile-install">Tip: Keeping packages around</h2>
+<p>If you notice that <code>nix develop</code> or similar commands fetch packages despite the
+<code>flake.lock</code> not having changed, you can install the Flake into your profile to
+<a href="https://nixos.org/guides/nix-pills/11-garbage-collector.html">declare it as a gcroot to
+Nix</a>:</p>
+<pre tabindex="0"><code>% nix profile install .#devShells.x86_64-linux.default
+</code></pre><p>But wait, isn’t that getting us into the same state as <a href="#debian-way">with The Debian
+Way</a>? No! While OpenCV will remain available indefinitely if you
+install the flake into your profile, there still is a layer of separation:
+Within your system, OpenCV isn’t available, only when you start a development
+shell with <code>nix-shell</code> or <code>nix develop</code>.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>How do the four examples above compare? Here’s an overview:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Example</th>
+          <th>Boilerplate</th>
+          <th>Pinned?</th>
+          <th>System-dependent?</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><a href="#nix-shell">Ex 1</a>: <code>nix-shell -p …</code></td>
+          <td>😊</td>
+          <td>no</td>
+          <td>no</td>
+      </tr>
+      <tr>
+          <td><a href="#shell.nix">Ex 2</a>: <code>shell.nix</code></td>
+          <td>🙂</td>
+          <td>no</td>
+          <td>no</td>
+      </tr>
+      <tr>
+          <td><a href="#nix-flakes">Ex 3</a>: <code>flake.nix</code></td>
+          <td>😲</td>
+          <td>yes</td>
+          <td>yes</td>
+      </tr>
+      <tr>
+          <td><a href="#system-indep-flake">Ex 4</a>: system-independent <code>flake.nix</code></td>
+          <td>🤨</td>
+          <td>yes</td>
+          <td>no</td>
+      </tr>
+  </tbody>
+</table>
+<p>For personal one-off experiments, I use <code>nix-shell</code>.</p>
+<p>Once the experiment works, I typically want to pin the dependencies, so I use a
+<code>flake.nix</code>.</p>
+<p>If this is software that isn’t just versioned, but also published (or worked on
+with multiple people/systems), I go through the effort of making it a
+system-independent <code>flake.nix</code>.</p>
+<p>I hope in the future, it will become easier to write a system-independent flake.</p>
+<p>Despite the rough edges, I appreciate the reproducibility and control that Nix
+gives me!</p>
+]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[Migrating my NAS from CoreOS/Flatcar Linux to NixOS]]></title>
     <link href="https://michael.stapelberg.ch/posts/2025-07-13-nixos-nas-network-storage-config/"/>
     <id>https://michael.stapelberg.ch/posts/2025-07-13-nixos-nas-network-storage-config/</id>

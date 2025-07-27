@@ -239,6 +239,37 @@
   <br>
 
     
+  <h2>2019 › March</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2019-03-10-debian-winding-down/"><h3>Winding down my Debian involvement</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<p>
+	  This post is hard to write, both in the emotional sense but also in the “I would have written a shorter letter, but I didn’t have the time” sense. Hence, please assume the best of intentions when reading it—it is not my intention to make anyone feel bad about their contributions, but rather to provide some insight into why my frustration level ultimately exceeded the threshold.
+
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-03-10-debian-winding-down/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
   <h2>2019 › February</h2>
   <ul class="ArticleList">
     
@@ -1033,25 +1064,6 @@ However, recently I was asked a couple of times why I like and use a lot of Go, 
 	<p>
 	   NOTE that the documented assumptions about fsync skipping are incorrect in the code below. Prefer using the renameio package. Writing files is simple, but correctly writing files atomically in a performant way might not be as trivial as one might think. Here’s an extensively commented function to atomically write compressed files (taken from debiman, the software behind manpages.debian.org): package main import ( "bufio" "compress/gzip" "io" "io/ioutil" "log" "os" "path/filepath" ) func tempDir(dest string) string { tempdir := os.Getenv("TMPDIR") if tempdir == "" { // Convenient for development: decreases the chance that we // cannot move files due to TMPDIR being on a different file // system than dest. tempdir = filepath.Dir(dest) } return tempdir } func writeAtomically(dest string, compress bool, write func(w io.Writer) error) (err error) { f, err := ioutil.TempFile(tempDir(dest), "atomic-") if err != nil { return err } defer func() { // Clean up (best effort) in case we are returning with an error: if err != nil { // Prevent file descriptor leaks. f.Close() // Remove the tempfile to avoid filling up the file system. os.Remove(f.Name()) } }() // Use a buffered writer to minimize write(2) syscalls. bufw := bufio.NewWriter(f) w := io.Writer(bufw) var gzipw *gzip.Writer if compress { // NOTE: gzip’s decompression phase takes the same time, // regardless of compression level. Hence, we invest the // maximum CPU time once to achieve the best compression. gzipw, err = gzip.NewWriterLevel(bufw, gzip.BestCompression) if err != nil { return err } defer gzipw.Close() w = gzipw } if err := write(w); err != nil { return err } if compress { if err := gzipw.Close(); err != nil { return err } } if err := bufw.Flush(); err != nil { return err } // Chmod the file world-readable (ioutil.TempFile creates files with // mode 0600) before renaming. if err := f.Chmod(0644); err != nil { return err } // fsync(2) after fchmod(2) orders writes as per // https://lwn.net/Articles/270891/. Can be skipped for performance // for idempotent applications (which only ever atomically write new // files and tolerate file loss) on an ordered file systems. ext3, // ext4, XFS, Btrfs, ZFS are ordered by default. f.Sync() if err := f.Close(); err != nil { return err } return os.Rename(f.Name(), dest) } func main() { if err := writeAtomically("demo.txt.gz", true, func(w io.Writer) error { _, err := w.Write([]byte("demo")) return err }); err != nil { log.Fatal(err) } } rsync(1) will fail when it lacks permission to read files. Hence, if you are synchronizing a repository of files while updating it, you’ll need to set TMPDIR to point to a directory on the same file system (for rename(2) to work) which is not covered by your rsync(1) invocation. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-01-28-golang_atomically_writing/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2017-01-28-font-loading/"><h3>Webfont loading with FOUT</h3></a>
-	
-	<div class="tags"></div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	
-	<p>
-	   For manpages.debian.org, I looked at loading webfonts. I considered the following scenarios: # local? cached? Network Expected Observed 1 Yes / / perfect render perfect render 2 No Yes / perfect render perfect render 3 No No Fast FOUT FOIT 4 No No Slow FOUT some FOUT, some FOIT Scenario #1 and #2 are easy: the font is available, so if we inline the CSS into the HTML page, the browser should be able to render the page perfectly on the first try. Unfortunately, the more common scenarios are #3 and #4, since many people reach manpages.debian.org through a link to an individual manpage. 
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-01-28-font-loading/">Read more →</a></span>
 	</p>
       </div>
     </li>

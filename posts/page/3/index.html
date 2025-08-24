@@ -239,6 +239,37 @@
   <br>
 
     
+  <h2>2019 › May</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2019-05-23-optional-dependencies/"><h3>Optional dependencies don’t work</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<p>
+	  In the i3 projects, we have always tried hard to avoid optional dependencies. There are a number of reasons behind it, and as I have recently encountered some of the downsides of optional dependencies firsthand, I summarized my thoughts in this article.
+
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2019-05-23-optional-dependencies/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
   <h2>2019 › March</h2>
   <ul class="ArticleList">
     
@@ -1034,36 +1065,6 @@ However, recently I was asked a couple of times why I like and use a lot of Go, 
 	<p>
 	   I previously wrote about my Debian stretch preview image for the Raspberry Pi 3. Now, I’m publishing an updated version, containing the following changes: A new version of the upstream firmware makes the Ethernet MAC address persist across reboots. Updated initramfs files (without updating the kernel) are now correctly copied to the VFAT boot partition. The initramfs’s file system check now works as the required fsck binaries are now available. The root file system is now resized to fill the available space of the SD card on first boot. SSH access is now enabled, restricted via iptables to local network source addresses only. The image uses the linux-image-4.9.0-2-arm64 4.9.13-1 kernel. A couple of issues remain, notably the lack of HDMI, WiFi and bluetooth support (see wiki:RaspberryPi3 for details. Any help with fixing these issues is very welcome! 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-03-22-raspberry-pi-3/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-  </ul>
-
-  
-  <h2>2017 › January</h2>
-  <ul class="ArticleList">
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2017-01-28-golang_atomically_writing/"><h3>Atomically writing files in Go</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	
-	<p>
-	   NOTE that the documented assumptions about fsync skipping are incorrect in the code below. Prefer using the renameio package. Writing files is simple, but correctly writing files atomically in a performant way might not be as trivial as one might think. Here’s an extensively commented function to atomically write compressed files (taken from debiman, the software behind manpages.debian.org): package main import ( "bufio" "compress/gzip" "io" "io/ioutil" "log" "os" "path/filepath" ) func tempDir(dest string) string { tempdir := os.Getenv("TMPDIR") if tempdir == "" { // Convenient for development: decreases the chance that we // cannot move files due to TMPDIR being on a different file // system than dest. tempdir = filepath.Dir(dest) } return tempdir } func writeAtomically(dest string, compress bool, write func(w io.Writer) error) (err error) { f, err := ioutil.TempFile(tempDir(dest), "atomic-") if err != nil { return err } defer func() { // Clean up (best effort) in case we are returning with an error: if err != nil { // Prevent file descriptor leaks. f.Close() // Remove the tempfile to avoid filling up the file system. os.Remove(f.Name()) } }() // Use a buffered writer to minimize write(2) syscalls. bufw := bufio.NewWriter(f) w := io.Writer(bufw) var gzipw *gzip.Writer if compress { // NOTE: gzip’s decompression phase takes the same time, // regardless of compression level. Hence, we invest the // maximum CPU time once to achieve the best compression. gzipw, err = gzip.NewWriterLevel(bufw, gzip.BestCompression) if err != nil { return err } defer gzipw.Close() w = gzipw } if err := write(w); err != nil { return err } if compress { if err := gzipw.Close(); err != nil { return err } } if err := bufw.Flush(); err != nil { return err } // Chmod the file world-readable (ioutil.TempFile creates files with // mode 0600) before renaming. if err := f.Chmod(0644); err != nil { return err } // fsync(2) after fchmod(2) orders writes as per // https://lwn.net/Articles/270891/. Can be skipped for performance // for idempotent applications (which only ever atomically write new // files and tolerate file loss) on an ordered file systems. ext3, // ext4, XFS, Btrfs, ZFS are ordered by default. f.Sync() if err := f.Close(); err != nil { return err } return os.Rename(f.Name(), dest) } func main() { if err := writeAtomically("demo.txt.gz", true, func(w io.Writer) error { _, err := w.Write([]byte("demo")) return err }); err != nil { log.Fatal(err) } } rsync(1) will fail when it lacks permission to read files. Hence, if you are synchronizing a repository of files while updating it, you’ll need to set TMPDIR to point to a directory on the same file system (for rename(2) to work) which is not covered by your rsync(1) invocation. 
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-01-28-golang_atomically_writing/">Read more →</a></span>
 	</p>
       </div>
     </li>

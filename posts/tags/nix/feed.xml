@@ -8,6 +8,365 @@
   <id>https://michael.stapelberg.ch/posts/tags/nix/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[Secret Management on NixOS with sops-nix]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2025-08-24-secret-management-with-sops-nix/"/>
+    <id>https://michael.stapelberg.ch/posts/2025-08-24-secret-management-with-sops-nix/</id>
+    <published>2025-08-24T09:56:00+02:00</published>
+    <content type="html"><![CDATA[<p>Passwords and secrets like cryptographic key files are everywhere in
+computing. When configuring a Linux system, sooner or later you will need to put
+a password somewhere — for example, when I <a href="/posts/2025-07-13-nixos-nas-network-storage-config/">migrated my existing Linux Network
+Storage (NAS) setup to
+NixOS</a>, I needed to specify
+the desired Samba passwords in my NixOS config (or manage them manually, outside
+of NixOS). For personal computers, this is fine, but if the goal is to share
+system configurations (for example in a Git repository), we need a different
+solution: Secret Management.</p>
+<h2 id="what-is-secret-management">What is Secret Management?</h2>
+<p>The basic idea behind Secret Management systems is to <em>encrypt</em> the secrets at
+rest, meaning if somebody clones the git repository containing your NixOS system
+configurations, they cannot access (and therefore, also not deploy) the
+encrypted secrets.</p>
+<p>Conceptually, we need to:</p>
+<ol>
+<li>Encrypt the secrets such that the target system can decrypt them.</li>
+<li>Encrypt the secrets such that other people working on this config can decrypt
+them.</li>
+<li>Have the target system decrypt secrets at runtime.</li>
+<li>Tell our software where to access the decrypted secrets.</li>
+</ol>
+<h2 id="sops-nix-setup">sops-nix setup</h2>
+<p>In this article, I will show how to accomplish the above using sops-nix. Here’s
+a quick overview of the three different building blocks we will use:</p>
+<ul>
+<li><a href="https://getsops.io/">sops</a> is a tool to version-control secrets in git, in
+their encrypted form.
+<ul>
+<li>sops makes it easy to re-encrypt these secrets when adding/removing authorized keys.</li>
+<li>sops is very flexible and can work with tons of other tools/providers.</li>
+</ul>
+</li>
+<li><a href="https://github.com/Mic92/sops-nix">sops-nix</a> provides a way to integrate sops
+with Nix/NixOS</li>
+<li>Using sops with <a href="https://manpages.debian.org/age.1"><code>age(1)</code></a>
+ allows us to use our
+existing SSH private key (humans) or SSH host private key (machines) instead
+of managing a separate set of key files.</li>
+</ul>
+<p>You might wonder why I chose sops-nix over
+<a href="https://github.com/ryantm/agenix">agenix</a>, the other contender? The
+instructions for setting up sops-nix made more sense to me when I first looked
+at it, and I wanted to have the option to use sops in other ways, not just with
+age. If you’re curious about agenix, <a href="https://www.splitbrain.org/blog/2025-07/27-agenix">check out Andreas Gohr’s blog post about
+agenix</a>.</p>
+<h3 id="step-1-preparation">Step 1. Preparation</h3>
+<p>I ran the following instructions on an <a href="/posts/2025-07-27-dev-shells-with-nix-4-quick-examples/#setup">Arch Linux machine on which I installed
+the Nix tool and enabled Nix
+Flakes</a>. Follow
+the link for instructions also for other systems like Debian or Fedora.</p>
+<h3 id="step-2-obtain-an-age-identity-from-your-personal-ssh-key">Step 2. Obtain an age identity from your personal SSH key</h3>
+<p>I don’t want to manage an extra key file, so I’ll use <code>ssh-to-age</code> to derive a
+key from my SSH private key file, which I already take good care of to back up:</p>
+<pre tabindex="0"><code>midna % mkdir -p $HOME/.config/sops/age/
+midna % read -s SSH_TO_AGE_PASSPHRASE; export SSH_TO_AGE_PASSPHRASE
+midna % nix run nixpkgs#ssh-to-age -- \
+  -private-key \
+  -i $HOME/.ssh/id_ed25519 \
+  -o $HOME/.config/sops/age/keys.txt
+</code></pre><p>(The <code>SSH_TO_AGE_PASSPHRASE</code> option is documented in the <a href="https://github.com/Mic92/ssh-to-age/blob/main/README.md#usage">ssh-to-age
+README</a>.)</p>
+<p>To display the age recipient (public key) of this age identity (private key), I
+used:</p>
+<pre tabindex="0"><code>midna % nix shell nixpkgs#age
+midna 2 % age-keygen -y $HOME/.config/sops/age/keys.txt
+age10e9tt2qwq90y5hvl35dau0sm5cm4qvegtw2a70v7sz5fy99de42s9d5nkf
+</code></pre><h3 id="step-3-obtain-an-age-recipient-for-the-remote-machine">Step 3. Obtain an age recipient for the remote machine</h3>
+<p>Similarly, I will derive an age recipient from the SSH host key of the remote
+system:</p>
+<pre tabindex="0"><code>batchn % cat /etc/ssh/ssh_host_ed25519_key.pub | nix run nixpkgs#ssh-to-age
+age1wnwfnrqhewjh39pmtyc8zhqw606znskt4h5p9s3pve4apd67gapqj6tr0k
+</code></pre><h3 id="step-4-configure-sops-for-your-git-repository">Step 4. Configure sops for your git repository</h3>
+<p>In my git repository (nix-configs), I have one subdirectory per NixOS system,
+i.e. <a href="https://manpages.debian.org/tree.1"><code>tree(1)</code></a>
+ shows:</p>
+<pre tabindex="0"><code>├── batchn
+│   ├── configuration.nix
+│   ├── disk-config.nix
+│   ├── flake.lock
+│   ├── flake.nix
+│   ├── hardware-configuration.nix
+│   ├── Makefile
+│   ├── secrets
+│   │   └── example.yaml
+├── wiki
+│   ├── configuration.nix
+│   ├── disk-config.nix
+│   ├── flake.lock
+│   ├── flake.nix
+│   ├── hardware-configuration.nix
+│   ├── Makefile
+…
+</code></pre><p>In the root of the git repository (next to the <code>batchn</code> directory), I create
+<code>.sops.yaml</code> like so:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">keys</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#007020">&amp;admin_michael</span><span style="color:#bbb"> </span>age10e9tt2qwq90y5hvl35dau0sm5cm4qvegtw2a70v7sz5fy99de42s9d5nkf<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#007020">&amp;server_batchn</span><span style="color:#bbb"> </span>age1wnwfnrqhewjh39pmtyc8zhqw606znskt4h5p9s3pve4apd67gapqj6tr0k<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#60a0b0;font-style:italic"># …more server keys go here…</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">creation_rules</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">path_regex</span>:<span style="color:#bbb"> </span>batchn/secrets/[^/]+\.(yaml|json|env|ini)$<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">key_groups</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- <span style="color:#062873;font-weight:bold">age</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>- <span style="color:#007020">*admin_michael</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>- <span style="color:#007020">*server_batchn</span><span style="color:#bbb">
+</span></span></span></code></pre></div><p>The more systems I manage, the more <code>keys</code> and <code>creation_rules</code> I will need to
+configure.</p>
+<p>The creation rules tell sops which keys to use when encrypting a file. In my
+setups, I typically use only a single file per system, but I could imagine
+splitting out some secrets into a separate file if I wanted to collaborate with
+someone on just one aspect of the system.</p>
+<h3 id="step-5-manage-some-secrets-with-sops">Step 5. Manage some secrets with sops</h3>
+<p>Now that we told sops which recipients to encrypt for, we can decrypt and edit
+<code>secrets/example.yaml</code> in our configured editor by running:</p>
+<pre tabindex="0"><code>midna ~/nix-configs/batchn % nix run nixpkgs#sops secrets/example.yaml
+</code></pre><p>The simplest key file contains just one key, for example:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">api-key</span>:<span style="color:#bbb"> </span>hello world :)<span style="color:#bbb">
+</span></span></span></code></pre></div><p>After saving and exiting your editor, sops will update the encrypted
+secrets/example.yaml.</p>
+<h3 id="step-6-configure-sops-in-nixos">Step 6. Configure sops in NixOS</h3>
+<p>Now, we need to reference the encrypted file in NixOS and enable <code>sops-nix</code>
+integration to make the decrypted secrets available on the system.</p>
+<p>In <code>flake.nix</code>, I added <code>sops-nix</code> to the <code>inputs</code> section and added the NixOS
+module. I show the entire diff because the places where the lines go are just as
+important as what the lines say:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#a00000">--- c/batchn/flake.nix
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ i/batchn/flake.nix
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -1,85 +1,93 @@
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span> {
+</span></span><span style="display:flex;"><span>   inputs = {
+</span></span><span style="display:flex;"><span>     nixpkgs.url = &#34;github:nixos/nixpkgs/nixos-25.05&#34;;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>     disko.url = &#34;github:nix-community/disko&#34;;
+</span></span><span style="display:flex;"><span>     # Use the same version as nixpkgs
+</span></span><span style="display:flex;"><span>     disko.inputs.nixpkgs.follows = &#34;nixpkgs&#34;;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>     stapelbergnix.url = &#34;github:stapelberg/nix&#34;;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>     zkjnastools.url = &#34;github:stapelberg/zkj-nas-tools&#34;;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#00a000">+    sops-nix = {
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+      url = &#34;github:Mic92/sops-nix&#34;;
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+      inputs.nixpkgs.follows = &#34;nixpkgs&#34;;
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+    };
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>   };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>   outputs =
+</span></span><span style="display:flex;"><span>     {
+</span></span><span style="display:flex;"><span>       nixpkgs,
+</span></span><span style="display:flex;"><span>       disko,
+</span></span><span style="display:flex;"><span>       stapelbergnix,
+</span></span><span style="display:flex;"><span>       zkjnastools,
+</span></span><span style="display:flex;"><span><span style="color:#00a000">+      sops-nix,
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>       ...
+</span></span><span style="display:flex;"><span>     }:
+</span></span><span style="display:flex;"><span>     let
+</span></span><span style="display:flex;"><span>       system = &#34;x86_64-linux&#34;;
+</span></span><span style="display:flex;"><span>       pkgs = import nixpkgs {
+</span></span><span style="display:flex;"><span>         inherit system;
+</span></span><span style="display:flex;"><span>         config.allowUnfree = false;
+</span></span><span style="display:flex;"><span>       };
+</span></span><span style="display:flex;"><span>     in
+</span></span><span style="display:flex;"><span>     {
+</span></span><span style="display:flex;"><span>       nixosConfigurations.batchn = nixpkgs.lib.nixosSystem {
+</span></span><span style="display:flex;"><span>         inherit system;
+</span></span><span style="display:flex;"><span>         inherit pkgs;
+</span></span><span style="display:flex;"><span>         modules = [
+</span></span><span style="display:flex;"><span>           disko.nixosModules.disko
+</span></span><span style="display:flex;"><span>           ./configuration.nix
+</span></span><span style="display:flex;"><span>           stapelbergnix.lib.userSettings
+</span></span><span style="display:flex;"><span>           # Use systemd for network configuration
+</span></span><span style="display:flex;"><span>           stapelbergnix.lib.systemdNetwork
+</span></span><span style="display:flex;"><span>           # Use systemd-boot as bootloader
+</span></span><span style="display:flex;"><span>           stapelbergnix.lib.systemdBoot
+</span></span><span style="display:flex;"><span>           # Run prometheus node exporter in tailnet
+</span></span><span style="display:flex;"><span>           stapelbergnix.lib.prometheusNode
+</span></span><span style="display:flex;"><span>           zkjnastools.nixosModules.zkjbackup
+</span></span><span style="display:flex;"><span><span style="color:#00a000">+          sops-nix.nixosModules.sops
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>         ];
+</span></span><span style="display:flex;"><span>       };
+</span></span><span style="display:flex;"><span>       formatter.${system} = pkgs.nixfmt-tree;
+</span></span><span style="display:flex;"><span>     };
+</span></span><span style="display:flex;"><span> }
+</span></span></code></pre></div><p>Then, in <code>configuration.nix</code>, we tell <code>sops-nix</code> to use the SSH host key as
+identity, where sops will find our secrets and which secrets <code>sops-nix</code> should
+realize on the remote system:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  sops<span style="color:#666">.</span>age<span style="color:#666">.</span>sshKeyPaths <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;/etc/ssh/ssh_host_ed25519_key&#34;</span> ];
+</span></span><span style="display:flex;"><span>  sops<span style="color:#666">.</span>defaultSopsFile <span style="color:#666">=</span> <span style="color:#235388">./secrets/example.yaml</span>;
+</span></span><span style="display:flex;"><span>  sops<span style="color:#666">.</span>secrets<span style="color:#666">.</span><span style="color:#4070a0">&#34;api-key&#34;</span> <span style="color:#666">=</span> { };
+</span></span></code></pre></div><p>After deploying, we can access the secret on the running system:</p>
+<pre tabindex="0"><code>batchn ~ % sudo cat /run/secrets/api-key
+hello world :)%
+batchn ~ %
+</code></pre><p>Of course, even after rebooting the machine, the secrets remain available without a re-deploy:</p>
+<pre tabindex="0"><code>batchn ~ % uptime
+ 22:09:23  up   0:00,  1 user,  load average: 0,32, 0,08, 0,03
+batchn ~ % sudo cat /run/secrets/api-key
+hello world :)%
+batchn ~ %
+</code></pre><h2 id="usage-examples">Usage Examples</h2>
+<p>Now that we have secrets stored in files under <code>/run/secrets</code>, how can we use
+these secrets?</p>
+<p>The following sections show a few common ways.</p>
+<h3 id="usage-example-command-line-flags-execstart-wrapper">Usage Example: command-line flags (ExecStart wrapper)</h3>
+<p>Let’s assume you have deployed a custom Go server as a systemd service on NixOS
+as follows, and you want to start managing the cleartext secret passed via the
+<code>-securecookie_hash_key</code> and <code>-securecookie_block_key</code> command-line flags:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  users<span style="color:#666">.</span>groups<span style="color:#666">.</span>fortuneserver <span style="color:#666">=</span> { };
+</span></span><span style="display:flex;"><span>  users<span style="color:#666">.</span>users<span style="color:#666">.</span>fortuneserver <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    isSystemUser <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex;"><span>    group <span style="color:#666">=</span> <span style="color:#4070a0">&#34;fortuneserver&#34;</span>;
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  systemd<span style="color:#666">.</span>services<span style="color:#666">.</span>fortuneserver <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    description <span style="color:#666">=</span> <span style="color:#4070a0">&#34;fortuneserver&#34;</span>;
+</span></span><span style="display:flex;"><span>    documentation <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;https://michael.stapelberg.ch&#34;</span> ];
+</span></span><span style="display:flex;"><span>    wantedBy <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;multi-user.target&#34;</span> ];
+</span></span><span style="display:flex;"><span>    serviceConfig <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>      User <span style="color:#666">=</span> <span style="color:#4070a0">&#34;fortuneserver&#34;</span>;
+</span></span><span style="display:flex;"><span>      Group <span style="color:#666">=</span> <span style="color:#4070a0">&#34;fortuneserver&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      ExecStart <span style="color:#666">=</span> <span style="color:#4070a0">&#39;&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">        &#34;</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>fortuneserver<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/fortuneserver&#34; \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">          -securecookie_hash_key=&#34;some-secret-key&#34; \
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">          -securecookie_block_key=&#34;a-different-secret-key&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">      &#39;&#39;</span>;
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>With the following sops secrets:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">fortuneserver</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">securecookie_hash_key</span>:<span style="color:#bbb"> </span>some-secret-key<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">securecookie_block_key</span>:<span style="color:#bbb"> </span>a-different-secret-key<span style="color:#bbb">
+</span></span></span></code></pre></div><p>…we need to adjust our NixOS config to read these secret files at
+runtime. Because the <code>ExecStart</code> directive is interpreted by systemd and not
+passed through a shell, we use the <a href="https://nixos.org/manual/nixpkgs/stable/#trivial-builder-writeShellScript"><code>writeShellScript</code>
+helper</a>
+and then just <code>cat</code> the files:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  sops<span style="color:#666">.</span>secrets<span style="color:#666">.</span><span style="color:#4070a0">&#34;fortuneserver/securecookie_hash_key&#34;</span> <span style="color:#666">=</span> {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    owner <span style="color:#666">=</span> <span style="color:#4070a0">&#34;fortuneserver&#34;</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    restartUnits <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;fortuneserver.service&#34;</span> ];
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  };
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  sops<span style="color:#666">.</span>secrets<span style="color:#666">.</span><span style="color:#4070a0">&#34;fortuneserver/securecookie_block_key&#34;</span> <span style="color:#666">=</span> {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    owner <span style="color:#666">=</span> <span style="color:#4070a0">&#34;fortuneserver&#34;</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    restartUnits <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;fortuneserver.service&#34;</span> ];
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  users<span style="color:#666">.</span>groups<span style="color:#666">.</span>fortuneserver <span style="color:#666">=</span> { };
+</span></span><span style="display:flex;"><span>  users<span style="color:#666">.</span>users<span style="color:#666">.</span>fortuneserver <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    isSystemUser <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex;"><span>    group <span style="color:#666">=</span> <span style="color:#4070a0">&#34;fortuneserver&#34;</span>;
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  systemd<span style="color:#666">.</span>services<span style="color:#666">.</span>fortuneserver <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    description <span style="color:#666">=</span> <span style="color:#4070a0">&#34;fortuneserver&#34;</span>;
+</span></span><span style="display:flex;"><span>    documentation <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;https://michael.stapelberg.ch&#34;</span> ];
+</span></span><span style="display:flex;"><span>    wantedBy <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;multi-user.target&#34;</span> ];
+</span></span><span style="display:flex;"><span>    serviceConfig <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>      User <span style="color:#666">=</span> <span style="color:#4070a0">&#34;fortuneserver&#34;</span>;
+</span></span><span style="display:flex;"><span>      Group <span style="color:#666">=</span> <span style="color:#4070a0">&#34;fortuneserver&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>      ExecStart <span style="color:#666">=</span> pkgs<span style="color:#666">.</span>writeShellScript <span style="color:#4070a0">&#34;fortuneserver-execstart&#34;</span> <span style="color:#4070a0">&#39;&#39;
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#4070a0">        &#34;</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>fortuneserver<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/fortuneserver&#34; \
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#4070a0">          -securecookie_hash_key=&#34;$(cat /run/secrets/fortuneserver/securecookie_hash_key)&#34; \
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#4070a0">          -securecookie_block_key=&#34;$(cat /run/secrets/fortuneserver/securecookie_block_key)&#34;
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#4070a0">      &#39;&#39;</span>;
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+<h3 id="usage-example-environment-variable-files">Usage Example: environment variable files</h3>
+<p>What if the service in question does not use command-line flags, but environment
+variables for configuring secrets? We can put an environment variable file into
+a sops-managed secret:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">translate-fe</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">env</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        DEEPL_AUTH_KEY=my-deepl-key</span><span style="color:#bbb">
+</span></span></span></code></pre></div><p>…and then we make systemd apply these environment variables from the secrets file:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  sops<span style="color:#666">.</span>secrets<span style="color:#666">.</span><span style="color:#4070a0">&#34;translate-fe/env&#34;</span> <span style="color:#666">=</span> {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    owner <span style="color:#666">=</span> <span style="color:#4070a0">&#34;translatefe&#34;</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    restartUnits <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;translate-fe.service&#34;</span> ];
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  systemd<span style="color:#666">.</span>services<span style="color:#666">.</span>translate-fe <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    documentation <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;https://michael.stapelberg.ch&#34;</span> ];
+</span></span><span style="display:flex;"><span>    wantedBy <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;multi-user.target&#34;</span> ];
+</span></span><span style="display:flex;"><span>    serviceConfig <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>      User <span style="color:#666">=</span> <span style="color:#4070a0">&#34;translatefe&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>      EnvironmentFile <span style="color:#666">=</span> [ config<span style="color:#666">.</span>sops<span style="color:#666">.</span>secrets<span style="color:#666">.</span><span style="color:#4070a0">&#34;translate-fe/env&#34;</span><span style="color:#666">.</span>path ];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      ExecStart <span style="color:#666">=</span> <span style="color:#4070a0">&#34;</span><span style="color:#70a0d0">${</span>translatefeExecstart<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/translate-fe&#34;</span>;
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+<p>If you are configuring a NixOS module (instead of declaring a custom service),
+the option might not always be called <code>EnvironmentFile</code>. For example, for the
+oauth2-proxy service, you would need to configure the
+<a href="https://search.nixos.org/options?channel=25.05&amp;show=services.oauth2-proxy.keyFile&amp;from=0&amp;size=50&amp;sort=relevance&amp;type=packages&amp;query=oauth2-proxy"><code>services.oauth2-proxy.keyFile</code>
+option</a>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  services<span style="color:#666">.</span>oauth2-proxy <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    keyFile <span style="color:#666">=</span> config<span style="color:#666">.</span>sops<span style="color:#666">.</span>secrets<span style="color:#666">.</span><span style="color:#4070a0">&#34;oauth2-proxy/env&#34;</span><span style="color:#666">.</span>path;
+</span></span><span style="display:flex;"><span>    enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic"># …</span>
+</span></span><span style="display:flex;"><span>  };
+</span></span></code></pre></div><h3 id="usage-example-systemd-credentials">Usage Example: systemd credentials</h3>
+<p>In the previous examples, we configured the <code>owner</code> of each secret to the user
+account under which the service is running. But what if there is no such user
+account, because the service use systemd’s <code>DynamicUser</code> feature?</p>
+<p>We can use systemd’s <code>LoadCredential</code> feature! For example, I supply the SMTP
+password to my Prometheus Alertmanager as follows:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  sops<span style="color:#666">.</span>secrets<span style="color:#666">.</span><span style="color:#4070a0">&#34;alertmanager/smtp_pw&#34;</span> <span style="color:#666">=</span> {
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    restartUnits <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;alertmanager.service&#34;</span> ];
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  systemd<span style="color:#666">.</span>services<span style="color:#666">.</span>alertmanager<span style="color:#666">.</span>serviceConfig<span style="color:#666">.</span>LoadCredential <span style="color:#666">=</span> [
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>    <span style="color:#4070a0">&#34;smtp_pw:</span><span style="color:#70a0d0">${</span>config<span style="color:#666">.</span>sops<span style="color:#666">.</span>secrets<span style="color:#666">.</span><span style="color:#4070a0">&#34;alertmanager/smtp_pw&#34;</span><span style="color:#666">.</span>path<span style="color:#70a0d0">}</span><span style="color:#4070a0">&#34;</span>
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>  ];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  services<span style="color:#666">.</span>prometheus<span style="color:#666">.</span>alertmanager <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    configuration <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>      global <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>        smtp_smarthost <span style="color:#666">=</span> <span style="color:#4070a0">&#34;smtp.gmail.com:587&#34;</span>;
+</span></span><span style="display:flex;"><span>        smtp_from <span style="color:#666">=</span> <span style="color:#4070a0">&#34;alerts@example.net&#34;</span>;
+</span></span><span style="display:flex;"><span>        smtp_auth_username <span style="color:#666">=</span> <span style="color:#4070a0">&#34;alerts@example.net&#34;</span>;
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>        smtp_auth_password_file <span style="color:#666">=</span> <span style="color:#4070a0">&#34;/run/credentials/alertmanager.service/smtp_pw&#34;</span>;
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#60a0b0;font-style:italic"># …remaining config goes here…</span>
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+<h3 id="usage-example-samba-userspasswords">Usage Example: samba users/passwords</h3>
+<p>In my blog post <a href="/posts/2025-07-13-nixos-nas-network-storage-config/#samba-nixos">“Migrating my NAS from CoreOS/Flatcar Linux to
+NixOS”</a>, I
+describe how to configure samba users and passwords (from sops-managed secrets)
+with an <code>ExecStartPre</code> shell script (which is very similar to the techniques
+already explained).</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>Managing secrets as separately-encrypted files in your config repository makes
+sense to me!</p>
+<p>age’s ability to work with SSH keys makes for a really convenient setup, in my
+opinion. Encrypting secrets for the destination system’s SSH host key feels very
+elegant.</p>
+<p>I hope the examples above are sufficient for you to efficiently configure
+secrets in NixOS!</p>
+]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[Development shells with Nix: four quick examples]]></title>
     <link href="https://michael.stapelberg.ch/posts/2025-07-27-dev-shells-with-nix-4-quick-examples/"/>
     <id>https://michael.stapelberg.ch/posts/2025-07-27-dev-shells-with-nix-4-quick-examples/</id>

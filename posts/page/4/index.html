@@ -244,6 +244,30 @@
     
     <li>
       <div>
+	<a href="https://michael.stapelberg.ch/posts/2017-01-28-golang_atomically_writing/"><h3>Atomically writing files in Go</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<p>
+	   NOTE that the documented assumptions about fsync skipping are incorrect in the code below. Prefer using the renameio package. Writing files is simple, but correctly writing files atomically in a performant way might not be as trivial as one might think. Here’s an extensively commented function to atomically write compressed files (taken from debiman, the software behind manpages.debian.org): package main import ( "bufio" "compress/gzip" "io" "io/ioutil" "log" "os" "path/filepath" ) func tempDir(dest string) string { tempdir := os.Getenv("TMPDIR") if tempdir == "" { // Convenient for development: decreases the chance that we // cannot move files due to TMPDIR being on a different file // system than dest. tempdir = filepath.Dir(dest) } return tempdir } func writeAtomically(dest string, compress bool, write func(w io.Writer) error) (err error) { f, err := ioutil.TempFile(tempDir(dest), "atomic-") if err != nil { return err } defer func() { // Clean up (best effort) in case we are returning with an error: if err != nil { // Prevent file descriptor leaks. f.Close() // Remove the tempfile to avoid filling up the file system. os.Remove(f.Name()) } }() // Use a buffered writer to minimize write(2) syscalls. bufw := bufio.NewWriter(f) w := io.Writer(bufw) var gzipw *gzip.Writer if compress { // NOTE: gzip’s decompression phase takes the same time, // regardless of compression level. Hence, we invest the // maximum CPU time once to achieve the best compression. gzipw, err = gzip.NewWriterLevel(bufw, gzip.BestCompression) if err != nil { return err } defer gzipw.Close() w = gzipw } if err := write(w); err != nil { return err } if compress { if err := gzipw.Close(); err != nil { return err } } if err := bufw.Flush(); err != nil { return err } // Chmod the file world-readable (ioutil.TempFile creates files with // mode 0600) before renaming. if err := f.Chmod(0644); err != nil { return err } // fsync(2) after fchmod(2) orders writes as per // https://lwn.net/Articles/270891/. Can be skipped for performance // for idempotent applications (which only ever atomically write new // files and tolerate file loss) on an ordered file systems. ext3, // ext4, XFS, Btrfs, ZFS are ordered by default. f.Sync() if err := f.Close(); err != nil { return err } return os.Rename(f.Name(), dest) } func main() { if err := writeAtomically("demo.txt.gz", true, func(w io.Writer) error { _, err := w.Write([]byte("demo")) return err }); err != nil { log.Fatal(err) } } rsync(1) will fail when it lacks permission to read files. Hence, if you are synchronizing a repository of files while updating it, you’ll need to set TMPDIR to point to a directory on the same file system (for rename(2) to work) which is not covered by your rsync(1) invocation. 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-01-28-golang_atomically_writing/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
 	<a href="https://michael.stapelberg.ch/posts/2017-01-28-font-loading/"><h3>Webfont loading with FOUT</h3></a>
 	
 	<div class="tags"></div>
@@ -981,25 +1005,6 @@
 	<p>
 	   As explained in more detail in my my last blog post, Rackspace is providing hosting for Debian Code Search. For those of you who don’t know, Rackspace is a cloud company that provides (among other services) a public cloud based on OpenStack. That means you can easily (and programmatically, if you want) bring up virtual servers, block storage volumes, configure the network between them, etc. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-01-17-debmirror-rackspace/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2014-01-11-building_supermicro_1u_server/"><h3>Building a SuperMicro 1U server (with IPMI)</h3></a>
-	
-	<div class="tags"></div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	
-	<p>
-	   Recently, together with a couple friends of mine, we rented a rack in a datacenter. Not just any datacenter, but that’s a story for another time ;-). Each participant can hang up a 1U server in that rack, so I needed to build one. 
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-01-11-building_supermicro_1u_server/">Read more →</a></span>
 	</p>
       </div>
     </li>

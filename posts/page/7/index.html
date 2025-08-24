@@ -244,6 +244,25 @@
     
     <li>
       <div>
+	<a href="https://michael.stapelberg.ch/posts/2012-08-16-evince-auto-reload/"><h3>Disabling auto-reload in Evince</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<p>
+	   Because it is insanely hard to google this, here is how to disable auto-reload of PDF files within Evince (&gt;= v3.4.0): gsettings set org.gnome.Evince auto-reload false 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-08-16-evince-auto-reload/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
 	<a href="https://michael.stapelberg.ch/posts/2012-08-11-rescuing_webservers_with_nginx_as_cache/"><h3>Rescuing webservers with nginx as a cache</h3></a>
 	
 	<div class="tags"></div>
@@ -867,31 +886,6 @@
 	<p>
 	   i3status ist ein Programm, welches Systeminformationen wie die aktuelle IP-Adresse, freien Speicherplatz und auch die Uhrzeit ausgibt. Merovius bemerkte vor einer Weile den Bug, dass die Uhrzeit unter bestimmten Umständen doppelt ausgegeben wird. Das lag daran, dass die Uhrzeit zuletzt ausgegeben wurde (also nachdem alle anderen Systeminformationen ermittelt wurden). Wenn diese Ermittlung zu lange dauert, resultiert das in einer falschen Zeitausgabe. Behoben wurde dieser Fehler also, indem man die Uhrzeit als allererstes speichert und dann später ausgibt. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2011-04-27-threadsafe-funktionen-in-single-thread-programmen/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-  </ul>
-
-  
-  <h2>2011 › March</h2>
-  <ul class="ArticleList">
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2011-03-31-fetchmail-untersttzt-zwar-pr/"><h3> fetchmail unterstützt zwar pr…</h3></a>
-	
-	<div class="tags"></div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	
-	<p>
-	   fetchmail unterstützt zwar prinzipiell die IDLE-Funktion von IMAP um bei neuen Nachrichten sofort benachrichtigt zu werden (im Vergleich zu periodischem Nachfragen), aber nicht wenn man mehrere Accounts konfiguriert hat. Abhilfe schafft ein kleines Script und n einzelne fetchmail-Prozesse: #!/bin/sh for config in $(ls /home/michael/.fetchmail) do fetchmail -f /home/michael/.fetchmail/$config --pidfile /tmp/fetchmail.$config.pid --idle done Anschließend darf man sich über nahezu sofortige E-Mail-Zustellung freuen ;-). 
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2011-03-31-fetchmail-untersttzt-zwar-pr/">Read more →</a></span>
 	</p>
       </div>
     </li>

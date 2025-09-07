@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Bye Intel, hi AMD! I’m done after 2 dead Intels - Michael Stapelberg</title>
+
+  <meta property="og:site_name" content="Michael Stapelberg">
+  <meta property="og:title" content="Bye Intel, hi AMD! I’m done after 2 dead Intels">
+  <meta property="og:description" content="The Intel 285K CPU in my high-end 2025 Linux PC died again! 😡 Notably, this was the replacement CPU for the original 285K that died in March, and after reading through the reviews of Intel CPUs on my electronics store of choice, many of which (!) mention CPU replacements, I am getting the impression that Intel’s current CPUs just are not stable 😞. Therefore, I am giving up on Intel for the coming years and have bought an AMD Ryzen 9950X3D CPU instead.
+">
+  
+  
+  
+  
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2025-09-07-bye-intel-hi-amd-9950x3d/2025-07-19-cpu_hu_a707786e21b93f32.jpg">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <meta name="description" content="The Intel 285K CPU in my high-end 2025 Linux PC died again! 😡 Notably, this was the replacement CPU for the original 285K that died in March, and after reading through the reviews of Intel CPUs on my electronics store of choice, many of which (!) mention CPU replacements, I am getting the impression that Intel’s current CPUs just are not stable 😞. Therefore, I am giving up on Intel for the coming years and have bought an AMD Ryzen 9950X3D CPU instead.
+">
+  <link rel="canonical" href="https://michael.stapelberg.ch/posts/2025-09-07-bye-intel-hi-amd-9950x3d/">
+  <meta name="author" content="Michael Stapelberg">
+  <style type="text/css">
+    @font-face {
+	font-family: 'Roboto Mono';
+	src: url('/font/subset-RobotoMono-Regular.eot');
+	src: local('Roboto Mono Regular'), local('RobotoMono-Regular'),
+        url('/font/subset-RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-RobotoMono-Regular.woff2') format('woff2'),
+        url('/font/subset-RobotoMono-Regular.woff') format('woff'),
+        url('/font/subset-RobotoMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Bold.eot');
+	src: local('Roboto Bold'), local('Roboto-Bold'),
+        url('/font/subset-Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Bold.woff2') format('woff2'),
+        url('/font/subset-Roboto-Bold.woff') format('woff'),
+        url('/font/subset-Roboto-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Roboto';
+	src: url('/font/subset-Roboto-Regular.eot');
+	src: local('Roboto'), local('Roboto-Regular'),
+        url('/font/subset-Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Roboto-Regular.woff2') format('woff2'),
+        url('/font/subset-Roboto-Regular.woff') format('woff'),
+        url('/font/subset-Roboto-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    @font-face {
+	font-family: 'Lato';
+	src: url('/font/subset-Lato-Bold.eot');
+	src: local('Lato Bold'), local('Lato-Bold'),
+        url('/font/subset-Lato-Bold.eot?#iefix') format('embedded-opentype'),
+        url('/font/subset-Lato-Bold.woff2') format('woff2'),
+        url('/font/subset-Lato-Bold.woff') format('woff'),
+        url('/font/subset-Lato-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+    }
+
+    body, td, th {
+	font-family: 'Roboto';
+	font-size: 16px;
+	line-height: 150%;
+	color: #000;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+	font-family: 'Lato';
+	font-weight: bold;
+	font-variant-ligatures: none;
+	color: #000;
+    }
+  </style>
+
+  
+  <link rel="preload" href="/font/subset-Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/font/subset-Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+
+  
+
+  
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-MmDletsiVVexqmh4i3stLXAHVECuOzqin3b%2babGWq5wv%2fwd%2f9IdQTTMV1IZowrB21EMrM9N1VHI17hmnyeCskw%3d%3d" type="text/css">
+  <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
+</head>
+<body>
+
+
+
+<header id="ms_navbar">
+  <a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+</a>
+  <div>
+    <a href="/"><h1>Michael Stapelberg</h1></a>
+    <nav id="ms_desktopnav">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </nav>
+  </div>
+
+  <div id="ms_burger_open">
+    <label for="ms_burger"><svg viewBox="0 0 100 80" width="24" height="24">
+	<rect width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="30" width="100" height="17" rx="8" fill="white"></rect>
+	<rect y="60" width="100" height="17" rx="8" fill="white"></rect>
+    </svg></label>
+  </div>
+
+  <input type="checkbox" id="ms_burger">
+
+  <nav id="ms_navdrawer">
+    <div id="ms_navdrawer_top">
+      <div id="ms_navdrawer_search">
+	<a href="/">
+<img
+    src="/logo1x.jpg"
+    srcset="/logo2x.jpg 2x, /logo3x.jpg 3x"
+    width="42"
+    height="52"
+    alt="profile picture"
+    title="profile picture">
+
+	<h1>Michael Stapelberg</h1></a>
+      </div>
+      <div id="ms_burger_close">
+	<label for="ms_burger"><svg viewBox="0 0 110 110" width="24" height="24">
+	    <line x1="10" y1="10" x2="100" y2="100" stroke="#047bc2" stroke-width="20" />
+	    <line x1="100" y1="10" x2="10" y2="100" stroke="#047bc2" stroke-width="20" />
+	</svg></label>
+      </div>
+    </div>
+
+    <div id="ms_navdrawer_content">
+      <ul>
+	
+    <li><a href="/" >About</a></li>
+    <li><a href="/posts/" class="active">Blog</a></li>
+    <li><a href="/talks/" >Talks</a></li>
+    <li><a href="/series/" >Series</a></li>
+
+      </ul>
+    </div>
+  </nav>
+</header>
+<main>
+      <div><h1 class="ms_title">Bye Intel, hi AMD! I’m done after 2 dead Intels</h1>
+
+<div class="ms_meta">
+  <div id="ms_date">published 2025-09-07</div>
+  
+  
+  <div id="ms_tags">
+  
+  in tag
+  
+  
+  <span class="ms_tag"><a href="/posts/tags/pc/">pc</a></span>
+  
+  </div>
+  
+  <div>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2025-09-07-bye-intel-hi-amd-9950x3d/index.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+  </div>
+  
+</div>
+<div class="Artikel" id="content">
+  <style type="text/css">
+    .TableOfContents > ul, .TableOfContents > ul > li > ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+    }
+    .TableOfContents > ul > li > ul {
+	margin: 1em;
+    }
+    .TableOfContents li {
+	margin-bottom: 1rem;
+    }
+  </style>
+  <details class="ms_toc_details">
+    <summary>Table of contents</summary>
+    <nav class="TableOfContents">
+  <ul>
+    <li><a href="#what-happened-or-the-batch-job-of-death">What happened? Or: the batch job of death</a></li>
+    <li><a href="#no-it-wasnt-the-heat-wave">No, it wasn’t the heat wave</a></li>
+    <li><a href="#which-amd-cpu-to-buy">Which AMD CPU to buy?</a></li>
+    <li><a href="#performance">Performance</a></li>
+    <li><a href="#power-consumption">Power consumption</a></li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+  </details>
+  <p>The Intel 285K CPU in my <a href="/posts/2025-05-15-my-2025-high-end-linux-pc/">high-end 2025 Linux
+PC</a> died <strong>again</strong>! 😡 Notably,
+this was the replacement CPU for the original 285K that <a href="/posts/2025-03-19-intel-core-ultra-9-285k-on-asus-z890-not-stable/">died in
+March</a>, and
+after reading through the reviews of Intel CPUs on my electronics store of
+choice, many of which (!) mention CPU replacements, I am getting the impression
+that Intel’s current CPUs just are not stable 😞. Therefore, I am giving up on
+Intel for the coming years and have bought an AMD Ryzen 9950X3D CPU instead.</p>
+<h2 id="what-happened-or-the-batch-job-of-death">What happened? Or: the batch job of death</h2>
+<p>On the 9th of July, I set out to experiment with
+<a href="https://layout-parser.github.io/">layout-parser</a> and
+<a href="https://en.wikipedia.org/wiki/Tesseract_(software)">tesseract</a> in order to
+convert a collection of scanned paper documents from images into text.</p>
+<p>I expected that offloading this task to the GPU would result in a drastic
+speed-up, so I attempted to build layout-parser with
+<a href="https://en.wikipedia.org/wiki/CUDA">CUDA</a>. Usually, it’s not required to
+compile software yourself on <a href="https://nixos.org/">NixOS</a>, but CUDA is non-free,
+so the default NixOS cache does not compile software with CUDA. (Tip: Enable the
+<a href="https://nix-community.org/cache/">Nix Community Cache</a>, which contains prebuilt
+CUDA packages, too!)</p>
+<p>This lengthy compilation attempt failed with a weird symptom: I left for work,
+and after a while, my PC was no longer reachable over the network, but fans kept
+spinning at 100%! 😳 At first, <a href="https://mas.to/@zekjur/114822353514097399">I suspected a Linux
+bug</a>, but now I am thinking this was
+the first sign of the CPU being unreliable.</p>
+<p>When the CUDA build failed, I ran the batch job without GPU offloading
+instead. It took about 4 hours and consumed roughly 300W constantly. You can see
+it on this CPU usage graph:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2025-09-07-bye-intel-hi-amd-9950x3d/2025-07-19-cpu.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2025-09-07-bye-intel-hi-amd-9950x3d/2025-07-19-cpu_hu_9a0c4beab08cd5e4.jpg 2x,https://michael.stapelberg.ch/posts/2025-09-07-bye-intel-hi-amd-9950x3d/2025-07-19-cpu_hu_e2bc3f9689ff66b8.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2025-09-07-bye-intel-hi-amd-9950x3d/2025-07-19-cpu_hu_d1235bb0543c21b1.jpg"
+  alt="CPU usage (measured with Prometheus)" title="CPU usage (measured with Prometheus)"
+  width="600"
+  height="195"
+  style="
+
+border: 1px solid #000;
+
+"
+  
+  loading="lazy"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2025-09-07-bye-intel-hi-amd-9950x3d/2025-07-19-temp.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2025-09-07-bye-intel-hi-amd-9950x3d/2025-07-19-temp_hu_c6884625e3a8a3cf.jpg 2x,https://michael.stapelberg.ch/posts/2025-09-07-bye-intel-hi-amd-9950x3d/2025-07-19-temp_hu_8a99527dfded461e.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2025-09-07-bye-intel-hi-amd-9950x3d/2025-07-19-temp_hu_1197124e615ec242.jpg"
+  alt="CPU temperature (measured with Prometheus)" title="CPU temperature (measured with Prometheus)"
+  width="600"
+  height="196"
+  style="
+
+border: 1px solid #000;
+
+"
+  
+  loading="lazy"></a>
+
+
+
+<p>On the evening of the 9th, the computer still seemed to work fine.</p>
+<p>But the next day, when I wanted to wake up my PC from suspend-to-RAM as usual,
+it wouldn’t wake up. Worse, even after removing the power cord and waiting a few
+seconds, there was no reaction to pressing the power button.</p>
+<p>Later, I diagnosed the problem to either the mainboard and/or the CPU. The Power
+Supply, RAM and disk all work with different hardware. I ended up returning both
+the CPU and the mainboard, as I couldn’t further diagnose which of the two is
+broken.</p>
+<p>To be clear: I am not saying the batch job killed the CPU. The computer was
+acting strangely in the morning already. But the batch job might have been what
+really sealed the deal.</p>
+<h2 id="no-it-wasnt-the-heat-wave">No, it wasn’t the heat wave</h2>
+<p><a href="https://www.tomshardware.com/pc-components/cpus/firefox-dev-says-intel-raptor-lake-crashes-are-increasing-with-rising-temperatures-in-record-european-heat-wave-mozilla-staffs-tracking-overwhelmed-by-intel-crash-reports-team-disables-the-function">Tom’s Hardware recently
+reported</a>
+that “Intel Raptor Lake crashes are increasing with rising temperatures in
+record European heat wave”, which prompted some folks to blame Europe’s general
+lack of Air Conditioning.</p>
+<p>But in this case, I actually <strong>did air-condition the room</strong> about half-way
+through the job (at about 16:00), when I noticed the room was getting
+hot. Here’s the temperature graph:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2025-09-07-bye-intel-hi-amd-9950x3d/2025-07-19-roomtemp.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2025-09-07-bye-intel-hi-amd-9950x3d/2025-07-19-roomtemp_hu_1c38592935786593.jpg 2x,https://michael.stapelberg.ch/posts/2025-09-07-bye-intel-hi-amd-9950x3d/2025-07-19-roomtemp_hu_6501c7c4a99a9259.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2025-09-07-bye-intel-hi-amd-9950x3d/2025-07-19-roomtemp_hu_f4d3a15f7c3ae485.jpg"
+  alt="temperature graph (measured with HomeMatic sensors)" title="temperature graph (measured with HomeMatic sensors)"
+  width="600"
+  height="215"
+  style="
+
+border: 1px solid #000;
+
+"
+  
+  loading="lazy"></a>
+
+
+
+<p>I would say that 25 to 28 degrees celsius are normal temperatures for computers.</p>
+<p>I also double-checked if the CPU temperature of about 100 degrees celsius is too
+high, but no: <a href="https://www.tomshardware.com/pc-components/cooling/intel-core-ultra-9-285k-cooling-testing-how-much-does-it-take-to-keep-arrow-lake-cool-in-msis-mpg-gungnir-300r-airflow-pc-case/2">this Tom’s Hardware
+article</a>
+shows even higher temperatures, and Intel specifies a maximum of 110
+degrees. So, running at “only” 100 degrees for a few hours should be fine.</p>
+<p>Lastly, even if Intel CPUs were prone to <em>crashing</em> under high heat, they should
+<em>never die</em>.</p>
+<h2 id="which-amd-cpu-to-buy">Which AMD CPU to buy?</h2>
+<p>I wanted the fastest AMD CPU (for desktops, not for servers), which currently is
+the Ryzen 9 9950X, but there is also the Ryzen 9 9950X<strong>3D</strong>, a variant with 3D
+V-Cache. Depending on the use-case, the variant with or without 3D V-Cache is
+faster, see <a href="https://www.phoronix.com/review/amd-ryzen-9-9950x3d-linux/10">the comparison on
+Phoronix</a>.</p>
+<p>Ultimately, I decided for the 9950X3D model, not just because it performs better
+in many of the benchmarks, but also because Linux 6.13 and newer <a href="https://www.phoronix.com/review/amd-3d-vcache-optimizer-9950x3d">let you
+control whether to prefer the CPU cores with larger V-Cache or higher
+frequency</a>,
+which sounds like an interesting capability: By changing this setting, maybe one
+can see how sensitive certain workloads are to extra cache.</p>
+<p>Aside from the CPU, I also needed a new mainboard (for AMD’s socket AM5), but I
+kept all the other components. I ended up selecting the <a href="https://www.asus.com/ch-en/motherboards-components/motherboards/tuf-gaming/tuf-gaming-x870-plus-wifi/">ASUS TUF
+X870+</a>
+mainboard. I usually look for low power usage in a mainboard, so I made sure to
+go with an X870 mainboard instead of an X870E one, because the X870E has two
+chipsets (both of which consume power and need cooling)! Given the context of
+this hardware replacement, I also like the TUF line’s focus on endurance…</p>
+<h2 id="performance">Performance</h2>
+<p>The performance of the AMD 9950X3D seems to be slightly better than the Intel
+285K:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Workload</th>
+          <th><a href="/posts/2022-01-15-high-end-linux-pc/">12900K (2022)</a></th>
+          <th><a href="/posts/2025-05-15-my-2025-high-end-linux-pc/">285K (2025)</a></th>
+          <th>9950X3D (2025)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><a href="https://go.dev/dl/">build Go 1.24.3</a></td>
+          <td>≈35s</td>
+          <td>≈26s</td>
+          <td>≈24s</td>
+      </tr>
+      <tr>
+          <td><a href="https://github.com/gokrazy/rsync/tree/0c5ac23ecf8b337dd5672c2ae9f945defa5d0b7f">gokrazy/rsync tests</a></td>
+          <td>≈0.5s</td>
+          <td>≈0.4s</td>
+          <td>≈0.5s</td>
+      </tr>
+      <tr>
+          <td><a href="https://github.com/gokrazy/kernel/tree/699ad7a064b8702dbe91b801ea21c2da2f0e9737">gokrazy Linux compile</a></td>
+          <td>3m 13s</td>
+          <td>2m 7s</td>
+          <td>1m 56s</td>
+      </tr>
+  </tbody>
+</table>
+<p>In case you’re curious, the commands used for each workload are:</p>
+<ol>
+<li><code>cd src; ./make.bash</code></li>
+<li><code>make test</code></li>
+<li><code>gokr-rebuild-kernel -cross=arm64</code></li>
+</ol>
+<p>(I have not included the gokrazy UEFI integration tests because I think there is
+an unrelated difference that prevents comparison of my old results with how the
+test runs currently.)</p>
+<h2 id="power-consumption">Power consumption</h2>
+<p>In my <a href="/posts/2025-05-15-my-2025-high-end-linux-pc/">high-end 2025 Linux PC</a> I
+explained that I chose the Intel 285K CPU for its lower idle power consumption,
+and some folks were skeptical if AMD CPUs are really worse in that regard.</p>
+<p>Having switched between 3 different PCs, but with identical peripherals, I can
+now answer the question of how the top CPUs differ in power consumption!</p>
+<p>I picked a few representative point-in-time power values from a couple of days
+of usage:</p>
+<table>
+  <thead>
+      <tr>
+          <th>CPU</th>
+          <th>Mainboard</th>
+          <th>idle power</th>
+          <th>idle power with monitor</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Intel 12900k</td>
+          <td>ASUS PRIME Z690-A</td>
+          <td>40W</td>
+          <td>60W</td>
+      </tr>
+      <tr>
+          <td>Intel 285k</td>
+          <td>ASUS PRIME Z890-P</td>
+          <td>46W</td>
+          <td>65W</td>
+      </tr>
+      <tr>
+          <td>AMD 9950X3D</td>
+          <td>ASUS TUF GAMING X870-PLUS WIFI</td>
+          <td>55W</td>
+          <td>80W</td>
+      </tr>
+  </tbody>
+</table>
+<p>Looking at two typical evenings, here is the power consumption of the Intel 285K:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2025-09-07-bye-intel-hi-amd-9950x3d/2025-09-01-power-285k.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2025-09-07-bye-intel-hi-amd-9950x3d/2025-09-01-power-285k_hu_7236808eb271f880.jpg 2x,https://michael.stapelberg.ch/posts/2025-09-07-bye-intel-hi-amd-9950x3d/2025-09-01-power-285k_hu_f394efdd55708e71.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2025-09-07-bye-intel-hi-amd-9950x3d/2025-09-01-power-285k_hu_b51bdfb7439fc3e4.jpg"
+  alt="Power consumption of the Intel 285K-based PC" title="Power consumption of the Intel 285K-based PC"
+  width="600"
+  height="250"
+  style="
+
+border: 1px solid #000;
+
+"
+  
+  loading="lazy"></a>
+
+
+
+<p>…and here is the same PC setup, but with the AMD 9950X3D:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2025-09-07-bye-intel-hi-amd-9950x3d/2025-09-01-power-9950x3d.jpg"><img
+  srcset="https://michael.stapelberg.ch/posts/2025-09-07-bye-intel-hi-amd-9950x3d/2025-09-01-power-9950x3d_hu_15d057b3b8ad161d.jpg 2x,https://michael.stapelberg.ch/posts/2025-09-07-bye-intel-hi-amd-9950x3d/2025-09-01-power-9950x3d_hu_58469d76dc5fb4e.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2025-09-07-bye-intel-hi-amd-9950x3d/2025-09-01-power-9950x3d_hu_54a6909b22e1209f.jpg"
+  alt="Power consumption of the AMD 9950X3D-based PC" title="Power consumption of the AMD 9950X3D-based PC"
+  width="600"
+  height="254"
+  style="
+
+border: 1px solid #000;
+
+"
+  
+  loading="lazy"></a>
+
+
+
+<p>I get the general impression that the AMD CPU has higher power consumption in
+all regards: the baseline is higher, the spikes are higher (peak consumption)
+and it spikes more often / for longer.</p>
+<p>Looking at my energy meter statistics, I usually ended up at about 9.x kWh per
+day for a two-person household, cooking with induction.</p>
+<p>After switching my PC from Intel to AMD, I end up at 10-11 kWh per day.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>I started buying Intel CPUs because they allowed me to build high-performance
+computers that ran Linux flawlessly and produced little noise. This formula
+worked for me over many years:</p>
+<ul>
+<li>Back in 2008, I <a href="/posts/2008-04-02-startschwierigkeiten_2008/">bought a mobile Intel CPU in a desktop case (article in
+German)</a>.</li>
+<li>Then, in 2012, I could just <a href="/posts/2012-06-24-buying_linux_computer_2012/">buy a regular Intel CPU (i7-2600K) for my Linux
+PC</a>, because they had gotten so
+much better in terms of power saving.</li>
+<li>Over the years, I bought an i7-8700K, and later an i9-9900K.</li>
+<li>The last time this formula worked out for me was <a href="/posts/2022-01-15-high-end-linux-pc/">with my 2022 high-end Linux
+PC</a>.</li>
+</ul>
+<p>On the one hand, I’m a little sad that this era has ended. On the other hand, I
+have had a soft spot for AMD since I had one of their K6 CPUs in one of my early
+PCs and in fact, I have never stopped buying AMD CPUs (e.g. for my <a href="/posts/2024-07-02-ryzen-7-mini-pc-low-power-proxmox-hypervisor/">Ryzen
+7-based Mini
+Server</a>).</p>
+<p>Maybe AMD could further improve their idle power usage in upcoming models? And,
+if Intel survives for long enough, maybe they succeed at stabilizing their CPU
+designs again? I certainly would love to see some competition in the CPU market.</p>
+<div id="bmc">
+  <p>
+    Did you like this
+    post? <a href="https://michael.stapelberg.ch/feed.xml">Subscribe to this
+      blog’s RSS feed</a> to not miss any new posts!
+  </p>
+  <p>
+    I run a blog since 2005, spreading knowledge and experience for over 20 years! :)
+  </p>
+  <p>
+    If you want to support my work, you
+    can <a href="https://www.buymeacoffee.com/stapelberg">buy me a coffee</a>.
+  </p>
+  <p>
+    Thank you for your support! ❤️
+  </p>
+</div>
+
+</div>
+
+      </div>
+<div id="ms_toc">
+  <div>
+    <strong>Table Of Contents</strong>
+
+    <nav class="TableOfContents">
+  <ul>
+    <li><a href="#what-happened-or-the-batch-job-of-death">What happened? Or: the batch job of death</a></li>
+    <li><a href="#no-it-wasnt-the-heat-wave">No, it wasn’t the heat wave</a></li>
+    <li><a href="#which-amd-cpu-to-buy">Which AMD CPU to buy?</a></li>
+    <li><a href="#performance">Performance</a></li>
+    <li><a href="#power-consumption">Power consumption</a></li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+
+    </main><div id="ms_footer">
+  © 2025 Michael Stapelberg • all articles under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons CC-BY license</a>
+</div>
+</body>
+</html>

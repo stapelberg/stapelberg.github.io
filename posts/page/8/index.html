@@ -239,6 +239,31 @@
   <br>
 
     
+  <h2>2011 › April</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2011-04-27-threadsafe-funktionen-in-single-thread-programmen/"><h3>Threadsafe Funktionen in Single-Thread-Programmen</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<p>
+	   i3status ist ein Programm, welches Systeminformationen wie die aktuelle IP-Adresse, freien Speicherplatz und auch die Uhrzeit ausgibt. Merovius bemerkte vor einer Weile den Bug, dass die Uhrzeit unter bestimmten Umständen doppelt ausgegeben wird. Das lag daran, dass die Uhrzeit zuletzt ausgegeben wurde (also nachdem alle anderen Systeminformationen ermittelt wurden). Wenn diese Ermittlung zu lange dauert, resultiert das in einer falschen Zeitausgabe. Behoben wurde dieser Fehler also, indem man die Uhrzeit als allererstes speichert und dann später ausgibt. 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2011-04-27-threadsafe-funktionen-in-single-thread-programmen/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
   <h2>2011 › March</h2>
   <ul class="ArticleList">
     
@@ -837,31 +862,6 @@ Hello…</h3></a>
 	<p>
 	   Meine erste grafische Maemo-Anwendung ist fertig: http://michael.stapelberg.de/moodlampctl (damit kann man eine moodlamp steuern). 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-06-05-meine-erste-grafische-maemo-a/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-  </ul>
-
-  
-  <h2>2010 › May</h2>
-  <ul class="ArticleList">
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2010-05-31-da-ich-mich-hufig-dabei-erwi/"><h3> Da ich mich häufig dabei erwi…</h3></a>
-	
-	<div class="tags"></div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	
-	<p>
-	   Da ich mich häufig dabei erwische, im aktuellen Verzeichnis nach dem letzten Coredump zu suchen um ihn inklusive zugehörigem Programm in den Debugger zu laden, habe ich diese Aufgabe in ein Script ausgelagert. Die folgenden Zeilen Perl suchen den letzten Coredump (dazu muss das Coredump-Pattern mit sysctl -w kernel.core_pattern = %e.core.%p sinnvoll definiert sein) und starten gdb mit den passenden Optionen: 
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-05-31-da-ich-mich-hufig-dabei-erwi/">Read more →</a></span>
 	</p>
       </div>
     </li>

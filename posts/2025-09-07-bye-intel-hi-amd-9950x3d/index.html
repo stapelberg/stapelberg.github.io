@@ -182,7 +182,7 @@
       <div><h1 class="ms_title">Bye Intel, hi AMD! I’m done after 2 dead Intels</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2025-09-07</div>
+  <div id="ms_date">published 2025-09-07, last modified 2025-09-08</div>
   
   
   <div id="ms_tags">
@@ -253,7 +253,8 @@ bug</a>, but now I am thinking this was
 the first sign of the CPU being unreliable.</p>
 <p>When the CUDA build failed, I ran the batch job without GPU offloading
 instead. It took about 4 hours and consumed roughly 300W constantly. You can see
-it on this CPU usage graph:</p>
+it on this CPU usage graph (screenshot of a <a href="https://grafana.com/">Grafana</a>
+dashboard showing metrics collected by <a href="https://prometheus.io/">Prometheus</a>):</p>
 
 
 
@@ -474,7 +475,10 @@ of usage:</p>
       </tr>
   </tbody>
 </table>
-<p>Looking at two typical evenings, here is the power consumption of the Intel 285K:</p>
+<p>Looking at two typical evenings, here is the power consumption of the Intel 285K
+(measured using a <a href="https://mystrom.com/de/produkt/mystrom-wifi-switch-eu/">myStrom WiFi switch smart
+plug</a>, which comes with
+a REST API):</p>
 
 
 

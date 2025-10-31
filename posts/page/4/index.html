@@ -239,6 +239,36 @@
   <br>
 
     
+  <h2>2017 › April</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2017-04-09-manpages-debian-org-news/"><h3>manpages.debian.org: what’s new since the launch?</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<p>
+	   On 2017-01-18, I announced that https://manpages.debian.org had been modernized. Let me catch you up on a few things which happened in the meantime: Debian experimental was added to manpages.debian.org. I was surprised to learn that adding experimental only required 52MB of disk usage. Further, Debian contrib was added after realizing that contrib licenses are compatible with the DFSG. Indentation in some code examples was fixed upstream in mandoc. Address-bar search should now also work in Firefox, which apparently requires a title attribute on the opensearch XML file reference. manpages now specify their language in the HTML tag so that search engines can offer users the most appropriate version of the manpage. I contributed mandocd(8) to the mandoc project, which debiman now uses for significantly faster manpage conversion (useful for disaster recovery/development). An entire run previously took 2 hours on my workstation. With this change, it takes merely 22 minutes. The effects are even more pronounced on manziarly, the VM behind manpages.debian.org. Thanks to Peter Palfrader (weasel) from the Debian System Administrators (DSA) team, manpages.debian.org is now serving its manpages (and most of its redirects) from Debian’s static mirroring infrastructure. That way, planned maintenance won’t result in service downtime. I contributed README.static-mirroring.txt, which describes the infrastructure in more detail. The list above is not complete, but rather a selection of things I found worth pointing out to the larger public. 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-04-09-manpages-debian-org-news/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
   <h2>2017 › March</h2>
   <ul class="ArticleList">
     
@@ -991,31 +1021,6 @@
 	<p>
 	   Thomas Habets has blogged about using your TPM (Trusted Platform Module) for SSH authentication a few weeks ago. We worked together to get his package simple-tpm-pk11 into Debian, and it has just arrived in unstable :-). Using simple-tpm-pk11, you can let your TPM generate a key, which you then can use for SSH authentication. This key will never leave the TPM, so it is safer than having your key on the filesystem (e.g. ~/.ssh/id_rsa), since file system access is not enough to steal your key anymore. Instead, you’ll need remote code execution. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-02-19-ssh-keys-in-your-tpm/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-  </ul>
-
-  
-  <h2>2014 › January</h2>
-  <ul class="ArticleList">
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2014-01-28-qnap_ts119_wol/"><h3>Wake-On-LAN with Debian on a qnap TS-119P2&#43;</h3></a>
-	
-	<div class="tags"></div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	
-	<p>
-	   The original firmware for the qnap TS-119P2+ supports Wake-On-LAN, meaning you can power down your Network Storage (NAS) when you don’t need it and you can easily wake it up by sending it a magic ethernet packet. This is an awesome feature when you are not at home all the time (say, you have a day job) and want to conserve some power without giving up on convenience. 
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-01-28-qnap_ts119_wol/">Read more →</a></span>
 	</p>
       </div>
     </li>

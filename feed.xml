@@ -2673,6 +2673,7 @@ NixOS) on Arch Linux:</p>
 % for n in $(seq 1 24); do sudo useradd -c &#34;Nix build user $n&#34; \
     -d /var/empty -g nixbld -G nixbld -M -N -r -s &#34;$(which nologin)&#34; \
     nixbld$n; done
+% sudo systemctl enable --now nix-daemon.socket
 </code></pre><p>Now, running <code>nix-shell -p hello</code> should drop you in a new shell in which the
 GNU hello package is installed:</p>
 <pre tabindex="0"><code>% export NIX_PATH=nixpkgs=channel:nixos-25.05

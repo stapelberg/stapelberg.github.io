@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-MmDletsiVVexqmh4i3stLXAHVECuOzqin3b%2babGWq5wv%2fwd%2f9IdQTTMV1IZowrB21EMrM9N1VHI17hmnyeCskw%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-jSHLCP3Yil4Qja%2fQIO7xbf94spm2%2bZ2wrbveDFStqtazAS3VJEYV7ZgXGRCAzIkRGSgWjZXG7BKO%2bNDtxiBCKQ%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -588,17 +588,17 @@ picked up either manually when time-critical, or automatically by virtue of
 CoreOS rebooting to update itself.
 </p>
 <p>rrsync:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">FROM</span><span style="color:#4070a0"> debian:jessie</span><span style="">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">FROM</span><span style="color:#bbb"> </span><span style="color:#4070a0">debian:jessie</span><span style="">
 </span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">RUN</span> apt-get update <span style="color:#4070a0;font-weight:bold">\
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  <span style="color:#666">&amp;&amp;</span> apt-get install -y rsync <span style="color:#4070a0;font-weight:bold">\
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  <span style="color:#666">&amp;&amp;</span> gunzip -c /usr/share/doc/rsync/scripts/rrsync.gz &gt; /usr/bin/rrsync <span style="color:#4070a0;font-weight:bold">\
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  <span style="color:#666">&amp;&amp;</span> chmod +x /usr/bin/rrsync<span style="">
 </span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">ENTRYPOINT</span> [<span style="color:#4070a0">&#34;/usr/bin/rrsync&#34;</span>]<span style="">
 </span></span></span></code></pre></div><p>samba:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">FROM</span><span style="color:#4070a0"> debian:jessie</span><span style="">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">FROM</span><span style="color:#bbb"> </span><span style="color:#4070a0">debian:jessie</span><span style="">
 </span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">RUN</span> apt-get update <span style="color:#666">&amp;&amp;</span> apt-get install -y samba<span style="">
 </span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">ADD</span> smb.conf /etc/samba/smb.conf<span style="">
-</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">EXPOSE</span><span style="color:#4070a0"> 137 138 139 445</span><span style="">
+</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">EXPOSE</span><span style="color:#bbb"> </span><span style="color:#4070a0">137</span> <span style="color:#40a070">138</span> <span style="color:#40a070">139</span> <span style="color:#40a070">445</span><span style="">
 </span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">CMD</span> [<span style="color:#4070a0">&#34;/usr/sbin/smbd&#34;</span>, <span style="color:#4070a0">&#34;-FS&#34;</span>]<span style="">
 </span></span></span></code></pre></div><h3 id="appendix-a-cloud-config">Appendix A: cloud-config</h3>
 <div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">#cloud-config</span><span style="color:#bbb">

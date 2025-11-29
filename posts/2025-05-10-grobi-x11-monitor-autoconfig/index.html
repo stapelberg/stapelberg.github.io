@@ -100,7 +100,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-MmDletsiVVexqmh4i3stLXAHVECuOzqin3b%2babGWq5wv%2fwd%2f9IdQTTMV1IZowrB21EMrM9N1VHI17hmnyeCskw%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-jSHLCP3Yil4Qja%2fQIO7xbf94spm2%2bZ2wrbveDFStqtazAS3VJEYV7ZgXGRCAzIkRGSgWjZXG7BKO%2bNDtxiBCKQ%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -299,132 +299,132 @@ jobs have some time to run before I start using the computer.</p>
  and <code>systemctl suspend</code> that integrates with the
 myStrom switch smart plug to turn off power to the monitor entirely. This is
 worthwhile because the monitor draws 30W even in standby!</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span> main
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> (
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;context&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;flag&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;fmt&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;log&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;net/http&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;net/url&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;os&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;os/exec&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;time&#34;</span>
-</span></span><span style="display:flex;"><span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">var</span> (
-</span></span><span style="display:flex;"><span>	resume = flag.<span style="color:#06287e">Bool</span>(<span style="color:#4070a0">&#34;resume&#34;</span>,
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">false</span>,
-</span></span><span style="display:flex;"><span>		<span style="color:#4070a0">&#34;run resume behavior only (turn on monitor via smart plug)&#34;</span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	noMonitor = flag.<span style="color:#06287e">Bool</span>(<span style="color:#4070a0">&#34;no_monitor&#34;</span>,
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">false</span>,
-</span></span><span style="display:flex;"><span>		<span style="color:#4070a0">&#34;disable turning off/on monitor&#34;</span>)
-</span></span><span style="display:flex;"><span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">monitorPower</span>(ctx context.Context, method, cmnd <span style="color:#902000">string</span>) <span style="color:#902000">error</span> {
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> <span style="color:#666">*</span>noMonitor {
-</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;[monitor power] skipping because -no_monitor flag is set&#34;</span>)
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;[monitor power] command: %v&#34;</span>, cmnd)
-</span></span><span style="display:flex;"><span>	u, err <span style="color:#666">:=</span> url.<span style="color:#06287e">Parse</span>(<span style="color:#4070a0">&#34;http://myStrom-Switch-A46FD0/&#34;</span> <span style="color:#666">+</span> cmnd)
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> err
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">for</span> {
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> ctx.<span style="color:#06287e">Err</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">return</span> err
-</span></span><span style="display:flex;"><span>		}
-</span></span><span style="display:flex;"><span>		req, err <span style="color:#666">:=</span> http.<span style="color:#06287e">NewRequest</span>(method, u.<span style="color:#06287e">String</span>(), <span style="color:#007020;font-weight:bold">nil</span>)
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">return</span> err
-</span></span><span style="display:flex;"><span>		}
-</span></span><span style="display:flex;"><span>		ctx, canc <span style="color:#666">:=</span> context.<span style="color:#06287e">WithTimeout</span>(ctx, <span style="color:#40a070">5</span><span style="color:#666">*</span>time.Second)
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">defer</span> <span style="color:#06287e">canc</span>()
-</span></span><span style="display:flex;"><span>		req = req.<span style="color:#06287e">WithContext</span>(ctx)
-</span></span><span style="display:flex;"><span>		resp, err <span style="color:#666">:=</span> http.DefaultClient.<span style="color:#06287e">Do</span>(req)
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>			log.<span style="color:#06287e">Print</span>(err)
-</span></span><span style="display:flex;"><span>			time.<span style="color:#06287e">Sleep</span>(<span style="color:#40a070">1</span> <span style="color:#666">*</span> time.Second)
-</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">continue</span>
-</span></span><span style="display:flex;"><span>		}
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> resp.StatusCode <span style="color:#666">!=</span> http.StatusOK {
-</span></span><span style="display:flex;"><span>			log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;unexpected HTTP status code: got %v, want %v&#34;</span>, resp.Status, http.StatusOK)
-</span></span><span style="display:flex;"><span>			time.<span style="color:#06287e">Sleep</span>(<span style="color:#40a070">1</span> <span style="color:#666">*</span> time.Second)
-</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">continue</span>
-</span></span><span style="display:flex;"><span>		}
-</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;[monitor power] request succeeded&#34;</span>)
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">nextWakeup</span>(now time.Time) time.Time {
-</span></span><span style="display:flex;"><span>	midnight <span style="color:#666">:=</span> time.<span style="color:#06287e">Date</span>(now.<span style="color:#06287e">Year</span>(), now.<span style="color:#06287e">Month</span>(), now.<span style="color:#06287e">Day</span>(), <span style="color:#40a070">0</span>, <span style="color:#40a070">0</span>, <span style="color:#40a070">0</span>, <span style="color:#40a070">0</span>, time.Local)
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> now.<span style="color:#06287e">Hour</span>() &lt; <span style="color:#40a070">6</span> {
-</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// wake up today</span>
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> midnight.<span style="color:#06287e">Add</span>(<span style="color:#40a070">6</span><span style="color:#666">*</span>time.Hour <span style="color:#666">+</span> <span style="color:#40a070">50</span><span style="color:#666">*</span>time.Minute)
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// wake up tomorrow</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> midnight.<span style="color:#06287e">Add</span>(<span style="color:#40a070">24</span> <span style="color:#666">*</span> time.Hour).<span style="color:#06287e">Add</span>(<span style="color:#40a070">6</span><span style="color:#666">*</span>time.Hour <span style="color:#666">+</span> <span style="color:#40a070">50</span><span style="color:#666">*</span>time.Minute)
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">runResume</span>() <span style="color:#902000">error</span> {
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Retry for up to one minute to give the network some time to come up</span>
-</span></span><span style="display:flex;"><span>	ctx, canc <span style="color:#666">:=</span> context.<span style="color:#06287e">WithTimeout</span>(context.<span style="color:#06287e">Background</span>(), <span style="color:#40a070">1</span><span style="color:#666">*</span>time.Minute)
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">defer</span> <span style="color:#06287e">canc</span>()
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">monitorPower</span>(ctx, <span style="color:#4070a0">&#34;GET&#34;</span>, <span style="color:#4070a0">&#34;relay?state=1&#34;</span>); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Print</span>(err)
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">zleep</span>() <span style="color:#902000">error</span> {
-</span></span><span style="display:flex;"><span>	ctx <span style="color:#666">:=</span> context.<span style="color:#06287e">Background</span>()
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	now <span style="color:#666">:=</span> time.<span style="color:#06287e">Now</span>().<span style="color:#06287e">Truncate</span>(<span style="color:#40a070">1</span> <span style="color:#666">*</span> time.Second)
-</span></span><span style="display:flex;"><span>	wakeup <span style="color:#666">:=</span> <span style="color:#06287e">nextWakeup</span>(now)
-</span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;now   : %v&#34;</span>, now)
-</span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;wakeup: %v&#34;</span>, wakeup)
-</span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;wakeup: %v (timestamp)&#34;</span>, wakeup.<span style="color:#06287e">Unix</span>())
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// assumes hwclock is running in UTC (see timedatectl | grep local)</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Power the monitor off in 15 seconds.</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// mode=on is intentional: https://api.mystrom.ch/#e532f952-36ea-40fb-a180-a57b835f550e</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// - the switch will be turned on (already on, so this is a no-op)</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// - the switch will wait for 15 seconds</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// - the switch will be turned off</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">monitorPower</span>(ctx, <span style="color:#4070a0">&#34;POST&#34;</span>, <span style="color:#4070a0">&#34;timer?mode=on&amp;time=15&#34;</span>); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Print</span>(err)
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	sleep <span style="color:#666">:=</span> exec.<span style="color:#06287e">Command</span>(<span style="color:#4070a0">&#34;sh&#34;</span>, <span style="color:#4070a0">&#34;-c&#34;</span>, fmt.<span style="color:#06287e">Sprintf</span>(<span style="color:#4070a0">&#34;sudo rtcwake -m no --verbose --utc -t %v &amp;&amp; sudo systemctl suspend&#34;</span>, wakeup.<span style="color:#06287e">Unix</span>()))
-</span></span><span style="display:flex;"><span>	sleep.Stdout = os.Stdout
-</span></span><span style="display:flex;"><span>	sleep.Stderr = os.Stderr
-</span></span><span style="display:flex;"><span>	fmt.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;running %v\n&#34;</span>, sleep.Args)
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> sleep.<span style="color:#06287e">Run</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;%v: %v&#34;</span>, sleep.Args, err)
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
-</span></span><span style="display:flex;"><span>	flag.<span style="color:#06287e">Parse</span>()
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> <span style="color:#666">*</span>resume {
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">runResume</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>			log.<span style="color:#06287e">Fatal</span>(err)
-</span></span><span style="display:flex;"><span>		}
-</span></span><span style="display:flex;"><span>	} <span style="color:#007020;font-weight:bold">else</span> {
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">zsleep</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>			log.<span style="color:#06287e">Fatal</span>(err)
-</span></span><span style="display:flex;"><span>		}
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>To turn power to the monitor on after resuming, I placed the following shell
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span><span style="color:#bbb"> </span>main<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">import</span><span style="color:#bbb"> </span>(<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;context&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;flag&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;fmt&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;log&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;net/http&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;net/url&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;os&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;os/exec&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;time&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">var</span><span style="color:#bbb"> </span>(<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>resume<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>flag.<span style="color:#06287e">Bool</span>(<span style="color:#4070a0">&#34;resume&#34;</span>,<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">false</span>,<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#4070a0">&#34;run resume behavior only (turn on monitor via smart plug)&#34;</span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>noMonitor<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>flag.<span style="color:#06287e">Bool</span>(<span style="color:#4070a0">&#34;no_monitor&#34;</span>,<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">false</span>,<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#4070a0">&#34;disable turning off/on monitor&#34;</span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">monitorPower</span>(ctx<span style="color:#bbb"> </span>context.Context,<span style="color:#bbb"> </span>method,<span style="color:#bbb"> </span>cmnd<span style="color:#bbb"> </span><span style="color:#902000">string</span>)<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span><span style="color:#666">*</span>noMonitor<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;[monitor power] skipping because -no_monitor flag is set&#34;</span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;[monitor power] command: %v&#34;</span>,<span style="color:#bbb"> </span>cmnd)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>u,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>url.<span style="color:#06287e">Parse</span>(<span style="color:#4070a0">&#34;http://myStrom-Switch-A46FD0/&#34;</span><span style="color:#bbb"> </span><span style="color:#666">+</span><span style="color:#bbb"> </span>cmnd)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>err<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">for</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>ctx.<span style="color:#06287e">Err</span>();<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">			</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>err<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>req,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>http.<span style="color:#06287e">NewRequest</span>(method,<span style="color:#bbb"> </span>u.<span style="color:#06287e">String</span>(),<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">			</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>err<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>ctx,<span style="color:#bbb"> </span>canc<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>context.<span style="color:#06287e">WithTimeout</span>(ctx,<span style="color:#bbb"> </span><span style="color:#40a070">5</span><span style="color:#666">*</span>time.Second)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">defer</span><span style="color:#bbb"> </span><span style="color:#06287e">canc</span>()<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>req<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>req.<span style="color:#06287e">WithContext</span>(ctx)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>resp,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>http.DefaultClient.<span style="color:#06287e">Do</span>(req)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">			</span>log.<span style="color:#06287e">Print</span>(err)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">			</span>time.<span style="color:#06287e">Sleep</span>(<span style="color:#40a070">1</span><span style="color:#bbb"> </span><span style="color:#666">*</span><span style="color:#bbb"> </span>time.Second)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">			</span><span style="color:#007020;font-weight:bold">continue</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>resp.StatusCode<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span>http.StatusOK<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">			</span>log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;unexpected HTTP status code: got %v, want %v&#34;</span>,<span style="color:#bbb"> </span>resp.Status,<span style="color:#bbb"> </span>http.StatusOK)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">			</span>time.<span style="color:#06287e">Sleep</span>(<span style="color:#40a070">1</span><span style="color:#bbb"> </span><span style="color:#666">*</span><span style="color:#bbb"> </span>time.Second)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">			</span><span style="color:#007020;font-weight:bold">continue</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;[monitor power] request succeeded&#34;</span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">nextWakeup</span>(now<span style="color:#bbb"> </span>time.Time)<span style="color:#bbb"> </span>time.Time<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>midnight<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>time.<span style="color:#06287e">Date</span>(now.<span style="color:#06287e">Year</span>(),<span style="color:#bbb"> </span>now.<span style="color:#06287e">Month</span>(),<span style="color:#bbb"> </span>now.<span style="color:#06287e">Day</span>(),<span style="color:#bbb"> </span><span style="color:#40a070">0</span>,<span style="color:#bbb"> </span><span style="color:#40a070">0</span>,<span style="color:#bbb"> </span><span style="color:#40a070">0</span>,<span style="color:#bbb"> </span><span style="color:#40a070">0</span>,<span style="color:#bbb"> </span>time.Local)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>now.<span style="color:#06287e">Hour</span>()<span style="color:#bbb"> </span>&lt;<span style="color:#bbb"> </span><span style="color:#40a070">6</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#60a0b0;font-style:italic">// wake up today</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>midnight.<span style="color:#06287e">Add</span>(<span style="color:#40a070">6</span><span style="color:#666">*</span>time.Hour<span style="color:#bbb"> </span><span style="color:#666">+</span><span style="color:#bbb"> </span><span style="color:#40a070">50</span><span style="color:#666">*</span>time.Minute)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// wake up tomorrow</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>midnight.<span style="color:#06287e">Add</span>(<span style="color:#40a070">24</span><span style="color:#bbb"> </span><span style="color:#666">*</span><span style="color:#bbb"> </span>time.Hour).<span style="color:#06287e">Add</span>(<span style="color:#40a070">6</span><span style="color:#666">*</span>time.Hour<span style="color:#bbb"> </span><span style="color:#666">+</span><span style="color:#bbb"> </span><span style="color:#40a070">50</span><span style="color:#666">*</span>time.Minute)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">runResume</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// Retry for up to one minute to give the network some time to come up</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>ctx,<span style="color:#bbb"> </span>canc<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>context.<span style="color:#06287e">WithTimeout</span>(context.<span style="color:#06287e">Background</span>(),<span style="color:#bbb"> </span><span style="color:#40a070">1</span><span style="color:#666">*</span>time.Minute)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">defer</span><span style="color:#bbb"> </span><span style="color:#06287e">canc</span>()<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#06287e">monitorPower</span>(ctx,<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;GET&#34;</span>,<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;relay?state=1&#34;</span>);<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>log.<span style="color:#06287e">Print</span>(err)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">zleep</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>ctx<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>context.<span style="color:#06287e">Background</span>()<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>now<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>time.<span style="color:#06287e">Now</span>().<span style="color:#06287e">Truncate</span>(<span style="color:#40a070">1</span><span style="color:#bbb"> </span><span style="color:#666">*</span><span style="color:#bbb"> </span>time.Second)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>wakeup<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#06287e">nextWakeup</span>(now)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;now   : %v&#34;</span>,<span style="color:#bbb"> </span>now)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;wakeup: %v&#34;</span>,<span style="color:#bbb"> </span>wakeup)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;wakeup: %v (timestamp)&#34;</span>,<span style="color:#bbb"> </span>wakeup.<span style="color:#06287e">Unix</span>())<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// assumes hwclock is running in UTC (see timedatectl | grep local)</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// Power the monitor off in 15 seconds.</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// mode=on is intentional: https://api.mystrom.ch/#e532f952-36ea-40fb-a180-a57b835f550e</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// - the switch will be turned on (already on, so this is a no-op)</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// - the switch will wait for 15 seconds</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// - the switch will be turned off</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#06287e">monitorPower</span>(ctx,<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;POST&#34;</span>,<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;timer?mode=on&amp;time=15&#34;</span>);<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>log.<span style="color:#06287e">Print</span>(err)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>sleep<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>exec.<span style="color:#06287e">Command</span>(<span style="color:#4070a0">&#34;sh&#34;</span>,<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;-c&#34;</span>,<span style="color:#bbb"> </span>fmt.<span style="color:#06287e">Sprintf</span>(<span style="color:#4070a0">&#34;sudo rtcwake -m no --verbose --utc -t %v &amp;&amp; sudo systemctl suspend&#34;</span>,<span style="color:#bbb"> </span>wakeup.<span style="color:#06287e">Unix</span>()))<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>sleep.Stdout<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>os.Stdout<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>sleep.Stderr<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>os.Stderr<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>fmt.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;running %v\n&#34;</span>,<span style="color:#bbb"> </span>sleep.Args)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>sleep.<span style="color:#06287e">Run</span>();<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;%v: %v&#34;</span>,<span style="color:#bbb"> </span>sleep.Args,<span style="color:#bbb"> </span>err)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">main</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>flag.<span style="color:#06287e">Parse</span>()<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span><span style="color:#666">*</span>resume<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#06287e">runResume</span>();<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">			</span>log.<span style="color:#06287e">Fatal</span>(err)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">else</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#06287e">zsleep</span>();<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">			</span>log.<span style="color:#06287e">Fatal</span>(err)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span></code></pre></div><p>To turn power to the monitor on after resuming, I placed the following shell
 script in <code>/lib/systemd/system-sleep/zleep.sh</code>:</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#007020">#!/bin/sh
 </span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>

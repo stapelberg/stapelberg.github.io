@@ -108,7 +108,7 @@ But after writing a test for your code, you wonder: how do you best provide Post
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-MmDletsiVVexqmh4i3stLXAHVECuOzqin3b%2babGWq5wv%2fwd%2f9IdQTTMV1IZowrB21EMrM9N1VHI17hmnyeCskw%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-jSHLCP3Yil4Qja%2fQIO7xbf94spm2%2bZ2wrbveDFStqtazAS3VJEYV7ZgXGRCAzIkRGSgWjZXG7BKO%2bNDtxiBCKQ%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -284,33 +284,33 @@ work well in the scenarios this article explains.</p>
 <p>To start an ephemeral PostgreSQL instance before your test functions run, you
 would <a href="https://pkg.go.dev/testing#hdr-Main">declare a custom <code>TestMain</code>
 function</a>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">var</span> pgt <span style="color:#666">*</span>postgrestest.Server
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">TestMain</span>(m <span style="color:#666">*</span>testing.M) {
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">var</span> err <span style="color:#902000">error</span>
-</span></span><span style="display:flex;"><span>	pgt, err = postgrestest.<span style="color:#06287e">Start</span>(context.<span style="color:#06287e">Background</span>())
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		<span style="color:#007020">panic</span>(err)
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">defer</span> pgt.<span style="color:#06287e">Cleanup</span>()
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	m.<span style="color:#06287e">Run</span>()
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>Starting a PostgreSQL instance takes about:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">var</span><span style="color:#bbb"> </span>pgt<span style="color:#bbb"> </span><span style="color:#666">*</span>postgrestest.Server<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">TestMain</span>(m<span style="color:#bbb"> </span><span style="color:#666">*</span>testing.M)<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">var</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>pgt,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>postgrestest.<span style="color:#06287e">Start</span>(context.<span style="color:#06287e">Background</span>())<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020">panic</span>(err)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">defer</span><span style="color:#bbb"> </span>pgt.<span style="color:#06287e">Cleanup</span>()<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>m.<span style="color:#06287e">Run</span>()<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span></code></pre></div><p>Starting a PostgreSQL instance takes about:</p>
 <ul>
 <li>300ms on my <a href="/posts/2022-01-15-high-end-linux-pc/">Intel Core i9 12900K CPU</a> (from 2022)</li>
 <li>800ms on my <a href="/posts/2021-11-28-macbook-air-m1/">MacBook Air M1</a> (from 2020)</li>
 </ul>
 <p>Then, you can create a separate database for each test on this ephemeral
 Postgres instance:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">TestSignupForm</span>(t <span style="color:#666">*</span>testing.T) {
-</span></span><span style="display:flex;"><span>	pgurl, err <span style="color:#666">:=</span> pgt.<span style="color:#06287e">CreateDatabase</span>(context.<span style="color:#06287e">Background</span>())
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		t.<span style="color:#06287e">Fatal</span>(err)
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// test goes here…</span>
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>Each CreateDatabase call takes about:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">TestSignupForm</span>(t<span style="color:#bbb"> </span><span style="color:#666">*</span>testing.T)<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>pgurl,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>pgt.<span style="color:#06287e">CreateDatabase</span>(context.<span style="color:#06287e">Background</span>())<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>t.<span style="color:#06287e">Fatal</span>(err)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// test goes here…</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span></code></pre></div><p>Each CreateDatabase call takes about:</p>
 <ul>
 <li>5-10ms on my <a href="/posts/2022-01-15-high-end-linux-pc/">Intel Core i9 12900K CPU</a> (from 2022)</li>
 <li>20ms on my <a href="/posts/2021-11-28-macbook-air-m1/">MacBook Air M1</a> (from 2020)</li>
@@ -382,14 +382,14 @@ run in parallel (in batches of size <code>-parallel</code>).</li>
 […]
 </code></pre><p>To print <code>GOMAXPROCS</code> on a given machine, we can run a test program like this
 <code>gomaxprocs.go</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span> main
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> <span style="color:#4070a0">&#34;runtime&#34;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
-</span></span><span style="display:flex;"><span>	<span style="color:#007020">print</span>(runtime.<span style="color:#06287e">GOMAXPROCS</span>(<span style="color:#40a070">0</span>))
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>For me, <code>GOMAXPROCS</code> defaults to the <a href="https://ark.intel.com/content/www/us/en/ark/products/134597/intel-core-i9-12900-processor-30m-cache-up-to-5-10-ghz.html">24 <em>threads</em> of my Intel Core i9 12900K
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span><span style="color:#bbb"> </span>main<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">import</span><span style="color:#bbb"> </span><span style="color:#4070a0">&#34;runtime&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">main</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020">print</span>(runtime.<span style="color:#06287e">GOMAXPROCS</span>(<span style="color:#40a070">0</span>))<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span></code></pre></div><p>For me, <code>GOMAXPROCS</code> defaults to the <a href="https://ark.intel.com/content/www/us/en/ark/products/134597/intel-core-i9-12900-processor-30m-cache-up-to-5-10-ghz.html">24 <em>threads</em> of my Intel Core i9 12900K
 CPU</a>,
 which has 16 <em>cores</em> (8 Performance, 8 Efficiency; only the Performance cores
 have Hyper Threading):</p>
@@ -411,94 +411,94 @@ to using a
 <a href="https://pkg.go.dev/github.com/stapelberg/postgrestest#DBCreator"><code>DBCreator</code></a>
 for a database identified by a URL. The old code still needs to remain so that
 you can run a single test without bothering with <code>PGURL</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">var</span> dbc <span style="color:#666">*</span>postgrestest.DBCreator
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">TestMain</span>(m <span style="color:#666">*</span>testing.M) {
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>	<span style="color:#60a0b0;font-style:italic">// It is best to specify the PGURL environment variable so that only</span>
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>	<span style="color:#60a0b0;font-style:italic">// one PostgreSQL instance is used for all tests.</span>
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>	pgurl <span style="color:#666">:=</span> os.<span style="color:#06287e">Getenv</span>(<span style="color:#4070a0">&#34;PGURL&#34;</span>)
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>	<span style="color:#007020;font-weight:bold">if</span> pgurl <span style="color:#666">==</span> <span style="color:#4070a0">&#34;&#34;</span> {
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>		<span style="color:#60a0b0;font-style:italic">// &#39;go test&#39; was started directly, start one Postgres per process:</span>
-</span></span><span style="display:flex;"><span>		pgt, err <span style="color:#666">:=</span> postgrestest.<span style="color:#06287e">Start</span>(context.<span style="color:#06287e">Background</span>())
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>			<span style="color:#007020">panic</span>(err)
-</span></span><span style="display:flex;"><span>		}
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">defer</span> pgt.<span style="color:#06287e">Cleanup</span>()
-</span></span><span style="display:flex;"><span>		pgurl = pgt.<span style="color:#06287e">DefaultDatabase</span>()
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>	<span style="color:#007020;font-weight:bold">var</span> err <span style="color:#902000">error</span>
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>	dbc, err = postgrestest.<span style="color:#06287e">NewDBCreator</span>(pgurl)
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>		<span style="color:#007020">panic</span>(err)
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>	}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	m.<span style="color:#06287e">Run</span>()
-</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">var</span><span style="color:#bbb"> </span>dbc<span style="color:#bbb"> </span><span style="color:#666">*</span>postgrestest.DBCreator<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">TestMain</span>(m<span style="color:#bbb"> </span><span style="color:#666">*</span>testing.M)<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// It is best to specify the PGURL environment variable so that only</span><span style="color:#bbb">
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// one PostgreSQL instance is used for all tests.</span><span style="color:#bbb">
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">	</span>pgurl<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>os.<span style="color:#06287e">Getenv</span>(<span style="color:#4070a0">&#34;PGURL&#34;</span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>pgurl<span style="color:#bbb"> </span><span style="color:#666">==</span><span style="color:#bbb"> </span><span style="color:#4070a0">&#34;&#34;</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">		</span><span style="color:#60a0b0;font-style:italic">// &#39;go test&#39; was started directly, start one Postgres per process:</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>pgt,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>postgrestest.<span style="color:#06287e">Start</span>(context.<span style="color:#06287e">Background</span>())<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">			</span><span style="color:#007020">panic</span>(err)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">defer</span><span style="color:#bbb"> </span>pgt.<span style="color:#06287e">Cleanup</span>()<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>pgurl<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>pgt.<span style="color:#06287e">DefaultDatabase</span>()<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">var</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb">
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">	</span>dbc,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>postgrestest.<span style="color:#06287e">NewDBCreator</span>(pgurl)<span style="color:#bbb">
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">		</span><span style="color:#007020">panic</span>(err)<span style="color:#bbb">
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>m.<span style="color:#06287e">Run</span>()<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}</span></span></code></pre></div>
 <p>Inside the test function(s), we only need to update the <code>CreateDatabase</code>
 receiver name:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">TestSignupForm</span>(t <span style="color:#666">*</span>testing.T) {
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>	pgurl, err <span style="color:#666">:=</span> dbc.<span style="color:#06287e">CreateDatabase</span>(context.<span style="color:#06287e">Background</span>())
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		t.<span style="color:#06287e">Fatal</span>(err)
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// test goes here…</span>
-</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">TestSignupForm</span>(t<span style="color:#bbb"> </span><span style="color:#666">*</span>testing.T)<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">	</span>pgurl,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>dbc.<span style="color:#06287e">CreateDatabase</span>(context.<span style="color:#06287e">Background</span>())<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>t.<span style="color:#06287e">Fatal</span>(err)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// test goes here…</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}</span></span></code></pre></div>
 <p>Then, we create a new wrapper program (e.g. <code>internal/cmd/initpg/initpg.go</code>)
 which calls <code>postgrestest.Start</code> and passes the <code>PGURL</code> environment variable to
 the process(es) it starts:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// initpg is a small test helper command which starts a Postgres</span>
-</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// instance and makes it available to the wrapped &#39;go test&#39; command.</span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span> main
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> (
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;context&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;fmt&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;log&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;os&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;os/exec&#34;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;github.com/stapelberg/postgrestest&#34;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Use the same database driver as in the rest of your project.</span>
-</span></span><span style="display:flex;"><span>	_ <span style="color:#4070a0">&#34;github.com/lib/pq&#34;</span>
-</span></span><span style="display:flex;"><span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">runWrappedCommand</span>(pgurl <span style="color:#902000">string</span>) <span style="color:#902000">error</span> {
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// os.Args[0] is initpg</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// os.Args[1] is --</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// os.Args[2] is go</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// os.Args[3] is test</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// etc.</span>
-</span></span><span style="display:flex;"><span>	wrapped <span style="color:#666">:=</span> exec.<span style="color:#06287e">Command</span>(os.Args[<span style="color:#40a070">2</span>], os.Args[<span style="color:#40a070">3</span>:]<span style="color:#666">...</span>)
-</span></span><span style="display:flex;"><span>	wrapped.Stdin = os.Stdin
-</span></span><span style="display:flex;"><span>	wrapped.Stdout = os.Stdout
-</span></span><span style="display:flex;"><span>	wrapped.Stderr = os.Stderr
-</span></span><span style="display:flex;"><span>	wrapped.Env = <span style="color:#007020">append</span>(os.<span style="color:#06287e">Environ</span>(), <span style="color:#4070a0">&#34;PGURL=&#34;</span><span style="color:#666">+</span>pgurl)
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> wrapped.<span style="color:#06287e">Run</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;%v: %v&#34;</span>, wrapped.Args, err)
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">initpg</span>() <span style="color:#902000">error</span> {
-</span></span><span style="display:flex;"><span>	pgt, err <span style="color:#666">:=</span> postgrestest.<span style="color:#06287e">Start</span>(context.<span style="color:#06287e">Background</span>())
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// NOTE: keep reading the article, do not submit as-is</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> err
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">defer</span> pgt.<span style="color:#06287e">Cleanup</span>()
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Run the wrapped command (&#39;go test&#39;, typically)</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#06287e">runWrappedCommand</span>(pgt.<span style="color:#06287e">DefaultDatabase</span>())
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">initpg</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Fatal</span>(err)
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="running-the-initpg-wrapper-program">Running the initpg wrapper program</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// initpg is a small test helper command which starts a Postgres</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#60a0b0;font-style:italic">// instance and makes it available to the wrapped &#39;go test&#39; command.</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">package</span><span style="color:#bbb"> </span>main<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">import</span><span style="color:#bbb"> </span>(<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;context&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;fmt&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;log&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;os&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;os/exec&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;github.com/stapelberg/postgrestest&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// Use the same database driver as in the rest of your project.</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>_<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;github.com/lib/pq&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">runWrappedCommand</span>(pgurl<span style="color:#bbb"> </span><span style="color:#902000">string</span>)<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// os.Args[0] is initpg</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// os.Args[1] is --</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// os.Args[2] is go</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// os.Args[3] is test</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// etc.</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>wrapped<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>exec.<span style="color:#06287e">Command</span>(os.Args[<span style="color:#40a070">2</span>],<span style="color:#bbb"> </span>os.Args[<span style="color:#40a070">3</span>:]<span style="color:#666">...</span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>wrapped.Stdin<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>os.Stdin<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>wrapped.Stdout<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>os.Stdout<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>wrapped.Stderr<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>os.Stderr<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>wrapped.Env<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span><span style="color:#007020">append</span>(os.<span style="color:#06287e">Environ</span>(),<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;PGURL=&#34;</span><span style="color:#666">+</span>pgurl)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>wrapped.<span style="color:#06287e">Run</span>();<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;%v: %v&#34;</span>,<span style="color:#bbb"> </span>wrapped.Args,<span style="color:#bbb"> </span>err)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">initpg</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>pgt,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>postgrestest.<span style="color:#06287e">Start</span>(context.<span style="color:#06287e">Background</span>())<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// NOTE: keep reading the article, do not submit as-is</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>err<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">defer</span><span style="color:#bbb"> </span>pgt.<span style="color:#06287e">Cleanup</span>()<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// Run the wrapped command (&#39;go test&#39;, typically)</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#06287e">runWrappedCommand</span>(pgt.<span style="color:#06287e">DefaultDatabase</span>())<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">main</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#06287e">initpg</span>();<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>log.<span style="color:#06287e">Fatal</span>(err)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span></code></pre></div><h3 id="running-the-initpg-wrapper-program">Running the initpg wrapper program</h3>
 <p>While we could use <code>go run ./internal/cmd/initpg</code> to compile and run this
 wrapper program, it is a bit wasteful to recompile this program over and over
 when it rarely changes.</p>
@@ -596,21 +596,21 @@ means we cannot use a randomly generated name for the Postgres data directory,
 but instead need to use a fixed name.</p>
 <p>My <code>postgrestest</code> package offers convenient support for specifying the desired
 directory:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">initpg</span>() <span style="color:#902000">error</span> {
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>	cacheDir, err <span style="color:#666">:=</span> os.<span style="color:#06287e">UserCacheDir</span>()
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>		<span style="color:#007020;font-weight:bold">return</span> err
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>	}
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>	pgt, err <span style="color:#666">:=</span> postgrestest.<span style="color:#06287e">Start</span>(context.<span style="color:#06287e">Background</span>(),
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>		postgrestest.<span style="color:#06287e">WithDir</span>(filepath.<span style="color:#06287e">Join</span>(cacheDir, <span style="color:#4070a0">&#34;initpg.gus&#34;</span>)))
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> err
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">defer</span> pgt.<span style="color:#06287e">Cleanup</span>()
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Run the wrapped command (&#39;go test&#39;, typically)</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#06287e">runWrappedCommand</span>(pgt.<span style="color:#06287e">DefaultDatabase</span>())
-</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">initpg</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">	</span>cacheDir,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>os.<span style="color:#06287e">UserCacheDir</span>()<span style="color:#bbb">
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>err<span style="color:#bbb">
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">	</span>pgt,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>postgrestest.<span style="color:#06287e">Start</span>(context.<span style="color:#06287e">Background</span>(),<span style="color:#bbb">
+</span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">		</span>postgrestest.<span style="color:#06287e">WithDir</span>(filepath.<span style="color:#06287e">Join</span>(cacheDir,<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;initpg.gus&#34;</span>)))<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>err<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">defer</span><span style="color:#bbb"> </span>pgt.<span style="color:#06287e">Cleanup</span>()<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// Run the wrapped command (&#39;go test&#39;, typically)</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#06287e">runWrappedCommand</span>(pgt.<span style="color:#06287e">DefaultDatabase</span>())<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}</span></span></code></pre></div>
 <p>When running the tests now, starting with the second run (without any changes),
 you should see a “ (cached)” suffix printed behind tests that were successfully
 cached, and the test runtime should be much shorter — under a second in my

@@ -49,49 +49,49 @@ documentation</a>.</p>
 <h2 id="code-example-go">Code example (Go)</h2>
 <p>Here’s an example program that demonstrates how to set up an auto-generated Go
 client for the Debian Code Search OpenAPI, run a query, and aggregate the results:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">burndown</span>() <span style="color:#902000">error</span> {
-</span></span><span style="display:flex;"><span>	cfg <span style="color:#666">:=</span> openapiclient.<span style="color:#06287e">NewConfiguration</span>()
-</span></span><span style="display:flex;"><span>	cfg.<span style="color:#06287e">AddDefaultHeader</span>(<span style="color:#4070a0">&#34;x-dcs-apikey&#34;</span>, apiKey)
-</span></span><span style="display:flex;"><span>	client <span style="color:#666">:=</span> openapiclient.<span style="color:#06287e">NewAPIClient</span>(cfg)
-</span></span><span style="display:flex;"><span>	ctx <span style="color:#666">:=</span> context.<span style="color:#06287e">Background</span>()
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Search through the full Debian Code Search corpus, blocking until all</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// results are available:</span>
-</span></span><span style="display:flex;"><span>	results, _, err <span style="color:#666">:=</span> client.SearchApi.<span style="color:#06287e">Search</span>(ctx, <span style="color:#4070a0">&#34;fmt.Sprint(err)&#34;</span>, <span style="color:#666">&amp;</span>openapiclient.SearchApiSearchOpts{
-</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// Literal searches are faster and do not require escaping special</span>
-</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// characters, regular expression searches are more powerful.</span>
-</span></span><span style="display:flex;"><span>		MatchMode: optional.<span style="color:#06287e">NewString</span>(<span style="color:#4070a0">&#34;literal&#34;</span>),
-</span></span><span style="display:flex;"><span>	})
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> err
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">// Print to stdout a CSV file with the path and number of occurrences:</span>
-</span></span><span style="display:flex;"><span>	wr <span style="color:#666">:=</span> csv.<span style="color:#06287e">NewWriter</span>(os.Stdout)
-</span></span><span style="display:flex;"><span>	header <span style="color:#666">:=</span> []<span style="color:#902000">string</span>{<span style="color:#4070a0">&#34;path&#34;</span>, <span style="color:#4070a0">&#34;number of occurrences&#34;</span>}
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> wr.<span style="color:#06287e">Write</span>(header); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">return</span> err
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>	occurrences <span style="color:#666">:=</span> <span style="color:#007020">make</span>(<span style="color:#007020;font-weight:bold">map</span>[<span style="color:#902000">string</span>]<span style="color:#902000">int</span>)
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">for</span> _, result <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> results {
-</span></span><span style="display:flex;"><span>		occurrences[result.Path]<span style="color:#666">++</span>
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">for</span> _, result <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> results {
-</span></span><span style="display:flex;"><span>		o, ok <span style="color:#666">:=</span> occurrences[result.Path]
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> !ok {
-</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">continue</span>
-</span></span><span style="display:flex;"><span>		}
-</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// Print one CSV record per path:</span>
-</span></span><span style="display:flex;"><span>		<span style="color:#007020">delete</span>(occurrences, result.Path)
-</span></span><span style="display:flex;"><span>		record <span style="color:#666">:=</span> []<span style="color:#902000">string</span>{result.Path, strconv.<span style="color:#06287e">Itoa</span>(o)}
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> wr.<span style="color:#06287e">Write</span>(record); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">return</span> err
-</span></span><span style="display:flex;"><span>		}
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>	wr.<span style="color:#06287e">Flush</span>()
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> wr.<span style="color:#06287e">Error</span>()
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>The full example can be found under
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">burndown</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>cfg<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>openapiclient.<span style="color:#06287e">NewConfiguration</span>()<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>cfg.<span style="color:#06287e">AddDefaultHeader</span>(<span style="color:#4070a0">&#34;x-dcs-apikey&#34;</span>,<span style="color:#bbb"> </span>apiKey)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>client<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>openapiclient.<span style="color:#06287e">NewAPIClient</span>(cfg)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>ctx<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>context.<span style="color:#06287e">Background</span>()<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// Search through the full Debian Code Search corpus, blocking until all</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// results are available:</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>results,<span style="color:#bbb"> </span>_,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>client.SearchApi.<span style="color:#06287e">Search</span>(ctx,<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;fmt.Sprint(err)&#34;</span>,<span style="color:#bbb"> </span><span style="color:#666">&amp;</span>openapiclient.SearchApiSearchOpts{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#60a0b0;font-style:italic">// Literal searches are faster and do not require escaping special</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#60a0b0;font-style:italic">// characters, regular expression searches are more powerful.</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>MatchMode:<span style="color:#bbb"> </span>optional.<span style="color:#06287e">NewString</span>(<span style="color:#4070a0">&#34;literal&#34;</span>),<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>})<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>err<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// Print to stdout a CSV file with the path and number of occurrences:</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>wr<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>csv.<span style="color:#06287e">NewWriter</span>(os.Stdout)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>header<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>[]<span style="color:#902000">string</span>{<span style="color:#4070a0">&#34;path&#34;</span>,<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;number of occurrences&#34;</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>wr.<span style="color:#06287e">Write</span>(header);<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>err<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>occurrences<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#007020">make</span>(<span style="color:#007020;font-weight:bold">map</span>[<span style="color:#902000">string</span>]<span style="color:#902000">int</span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">for</span><span style="color:#bbb"> </span>_,<span style="color:#bbb"> </span>result<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">range</span><span style="color:#bbb"> </span>results<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>occurrences[result.Path]<span style="color:#666">++</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">for</span><span style="color:#bbb"> </span>_,<span style="color:#bbb"> </span>result<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">range</span><span style="color:#bbb"> </span>results<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>o,<span style="color:#bbb"> </span>ok<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>occurrences[result.Path]<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>!ok<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">			</span><span style="color:#007020;font-weight:bold">continue</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#60a0b0;font-style:italic">// Print one CSV record per path:</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020">delete</span>(occurrences,<span style="color:#bbb"> </span>result.Path)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>record<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>[]<span style="color:#902000">string</span>{result.Path,<span style="color:#bbb"> </span>strconv.<span style="color:#06287e">Itoa</span>(o)}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>wr.<span style="color:#06287e">Write</span>(record);<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">			</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>err<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>wr.<span style="color:#06287e">Flush</span>()<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>wr.<span style="color:#06287e">Error</span>()<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span></code></pre></div><p>The full example can be found under
 <a href="https://github.com/Debian/dcs/blob/3d6a18f010e915f77b4833189286100308c539cb/_example/burndown.go"><code>burndown.go</code></a>.</p>
 <h2 id="feedback">Feedback?</h2>
 <p>File a <a href="https://github.com/Debian/dcs/issues">GitHub issue on

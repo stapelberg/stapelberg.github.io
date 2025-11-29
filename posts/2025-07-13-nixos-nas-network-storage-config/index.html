@@ -105,7 +105,7 @@ I will show in detail how the previous CoreOS setup looked like (lots of systemd
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-MmDletsiVVexqmh4i3stLXAHVECuOzqin3b%2babGWq5wv%2fwd%2f9IdQTTMV1IZowrB21EMrM9N1VHI17hmnyeCskw%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-jSHLCP3Yil4Qja%2fQIO7xbf94spm2%2bZ2wrbveDFStqtazAS3VJEYV7ZgXGRCAzIkRGSgWjZXG7BKO%2bNDtxiBCKQ%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -1068,7 +1068,7 @@ like so:</p>
 </span></span><span style="display:flex;"><span>    <span style="color:#4070a0">&#39;&#39;command=&#34;</span><span style="color:#70a0d0">${</span>pkgs<span style="color:#666">.</span>docker<span style="color:#70a0d0">}</span><span style="color:#4070a0">/bin/docker run --log-driver none -i -e SSH_ORIGINAL_COMMAND -v /srv/data:/srv/data -v /root/.ssh:/root/.ssh:ro -v /etc/ssh:/etc/ssh:ro -v /etc/static/ssh:/etc/static/ssh:ro -v /nix/store:/nix/store:ro stapelberg/docker-sync&#34;,no-port-forwarding,no-X11-forwarding ssh-ed25519 AAAAC3Npublickey sync@dr&#39;&#39;</span>
 </span></span><span style="display:flex;"><span>  ];
 </span></span></code></pre></div><p>I wanted to stop managing the following <code>Dockerfile</code> to ship <code>sync.pl</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">FROM</span><span style="color:#4070a0"> debian:stable</span><span style="">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">FROM</span><span style="color:#bbb"> </span><span style="color:#4070a0">debian:stable</span><span style="">
 </span></span></span><span style="display:flex;"><span><span style="">
 </span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#60a0b0;font-style:italic"># Install full perl for Data::Dumper</span><span style="">
 </span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">RUN</span> apt-get update <span style="color:#4070a0;font-weight:bold">\

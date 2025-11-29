@@ -723,15 +723,15 @@ slice contents of <code>in.Name</code> to <code>/tmp/name.raw</code>:</p>
 (instead of a gRPC server, as above), you will notice that panics in your HTTP
 handlers do not actually result in a core dump! This code in
 <code>go/src/net/http/server.go</code> recovers panics and logs a stack trace:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">defer</span> <span style="color:#007020;font-weight:bold">func</span>() {
-</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#007020">recover</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> <span style="color:#666">&amp;&amp;</span> err <span style="color:#666">!=</span> ErrAbortHandler {
-</span></span><span style="display:flex;"><span>        <span style="color:#007020;font-weight:bold">const</span> size = <span style="color:#40a070">64</span> <span style="color:#666">&lt;&lt;</span> <span style="color:#40a070">10</span>
-</span></span><span style="display:flex;"><span>        buf <span style="color:#666">:=</span> <span style="color:#007020">make</span>([]<span style="color:#902000">byte</span>, size)
-</span></span><span style="display:flex;"><span>        buf = buf[:runtime.<span style="color:#06287e">Stack</span>(buf, <span style="color:#007020;font-weight:bold">false</span>)]
-</span></span><span style="display:flex;"><span>        c.server.<span style="color:#06287e">logf</span>(<span style="color:#4070a0">&#34;http: panic serving %v: %v\n%s&#34;</span>, c.remoteAddr, err, buf)
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>}()
-</span></span></code></pre></div><p>Or, in other words: the <code>GOTRACEBACK=crash</code> environment variable configures what
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">defer</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">func</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#007020">recover</span>();<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span><span style="color:#666">&amp;&amp;</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span>ErrAbortHandler<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span><span style="color:#007020;font-weight:bold">const</span><span style="color:#bbb"> </span>size<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span><span style="color:#40a070">64</span><span style="color:#bbb"> </span><span style="color:#666">&lt;&lt;</span><span style="color:#bbb"> </span><span style="color:#40a070">10</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>buf<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#007020">make</span>([]<span style="color:#902000">byte</span>,<span style="color:#bbb"> </span>size)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>buf<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>buf[:runtime.<span style="color:#06287e">Stack</span>(buf,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">false</span>)]<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>c.server.<span style="color:#06287e">logf</span>(<span style="color:#4070a0">&#34;http: panic serving %v: %v\n%s&#34;</span>,<span style="color:#bbb"> </span>c.remoteAddr,<span style="color:#bbb"> </span>err,<span style="color:#bbb"> </span>buf)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}()<span style="color:#bbb">
+</span></span></span></code></pre></div><p>Or, in other words: the <code>GOTRACEBACK=crash</code> environment variable configures what
 happens for unhandled signals, but this signal is handled with the <code>recover()</code>
 call, so no core is dumped.</p>
 <p>This default behavior of <code>net/http</code> servers <a href="https://github.com/golang/go/issues/25245">is now considered regrettable but
@@ -746,33 +746,33 @@ called), but then how do we produce a core dump from our own handler?</p>
 <code>signal_unix.go</code> and <a href="https://cs.opensource.google/go/go/+/refs/tags/go1.23.2:src/runtime/signal_unix.go;l=938">sends signal <code>SIGABRT</code> with the <code>dieFromSignal</code>
 function</a>
 to the current thread:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">//go:nosplit</span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">crash</span>() {
-</span></span><span style="display:flex;"><span>        <span style="color:#06287e">dieFromSignal</span>(_SIGABRT)
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>The default action for <code>SIGABRT</code> is to “terminate the process and dump core”,
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020">//go:nosplit</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">crash</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span><span style="color:#06287e">dieFromSignal</span>(_SIGABRT)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span></code></pre></div><p>The default action for <code>SIGABRT</code> is to “terminate the process and dump core”,
 see <a href="https://manpages.debian.org/signal.7"><code>signal(7)</code></a>
 .</p>
 <p>We can follow the same strategy and send <code>SIGABRT</code> to our process:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
-</span></span><span style="display:flex;"><span>	http.<span style="color:#06287e">HandleFunc</span>(<span style="color:#4070a0">&#34;/&#34;</span>, <span style="color:#007020;font-weight:bold">func</span>(w http.ResponseWriter, r <span style="color:#666">*</span>http.Request) {
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">defer</span> <span style="color:#007020;font-weight:bold">func</span>() {
-</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#007020">recover</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>				proc, err <span style="color:#666">:=</span> os.<span style="color:#06287e">FindProcess</span>(syscall.<span style="color:#06287e">Getpid</span>())
-</span></span><span style="display:flex;"><span>				<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>					<span style="color:#007020">panic</span>(fmt.<span style="color:#06287e">Sprintf</span>(<span style="color:#4070a0">&#34;could not find own process (pid %d): %v&#34;</span>, syscall.<span style="color:#06287e">Getpid</span>(), err))
-</span></span><span style="display:flex;"><span>				}
-</span></span><span style="display:flex;"><span>				proc.<span style="color:#06287e">Signal</span>(syscall.SIGABRT)
-</span></span><span style="display:flex;"><span>				<span style="color:#60a0b0;font-style:italic">// Ensure the stack triggering the core dump sticks around</span>
-</span></span><span style="display:flex;"><span>				proc.<span style="color:#06287e">Wait</span>()
-</span></span><span style="display:flex;"><span>			}
-</span></span><span style="display:flex;"><span>		}()
-</span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// …buggy handler code goes here; for illustration we panic</span>
-</span></span><span style="display:flex;"><span>		<span style="color:#007020">panic</span>(<span style="color:#4070a0">&#34;this should result in a core dump&#34;</span>)
-</span></span><span style="display:flex;"><span>	})
-</span></span><span style="display:flex;"><span>	log.<span style="color:#06287e">Fatal</span>(http.<span style="color:#06287e">ListenAndServe</span>(<span style="color:#4070a0">&#34;:8080&#34;</span>, <span style="color:#007020;font-weight:bold">nil</span>))
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>There is one caveat: If you have any non-Go threads running in your program,
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">main</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>http.<span style="color:#06287e">HandleFunc</span>(<span style="color:#4070a0">&#34;/&#34;</span>,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">func</span>(w<span style="color:#bbb"> </span>http.ResponseWriter,<span style="color:#bbb"> </span>r<span style="color:#bbb"> </span><span style="color:#666">*</span>http.Request)<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">defer</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">func</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">			</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#007020">recover</span>();<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">				</span>proc,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>os.<span style="color:#06287e">FindProcess</span>(syscall.<span style="color:#06287e">Getpid</span>())<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">				</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">					</span><span style="color:#007020">panic</span>(fmt.<span style="color:#06287e">Sprintf</span>(<span style="color:#4070a0">&#34;could not find own process (pid %d): %v&#34;</span>,<span style="color:#bbb"> </span>syscall.<span style="color:#06287e">Getpid</span>(),<span style="color:#bbb"> </span>err))<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">				</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">				</span>proc.<span style="color:#06287e">Signal</span>(syscall.SIGABRT)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">				</span><span style="color:#60a0b0;font-style:italic">// Ensure the stack triggering the core dump sticks around</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">				</span>proc.<span style="color:#06287e">Wait</span>()<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">			</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>}()<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#60a0b0;font-style:italic">// …buggy handler code goes here; for illustration we panic</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020">panic</span>(<span style="color:#4070a0">&#34;this should result in a core dump&#34;</span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>})<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>log.<span style="color:#06287e">Fatal</span>(http.<span style="color:#06287e">ListenAndServe</span>(<span style="color:#4070a0">&#34;:8080&#34;</span>,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span>))<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span></code></pre></div><p>There is one caveat: If you have any non-Go threads running in your program,
 e.g. by using cgo, they might pick up the signal, so ensure they do not install
 a <code>SIGABRT</code> handler (see also: <a href="https://pkg.go.dev/os/signal#hdr-Go_programs_that_use_cgo_or_SWIG">cgo-related documentation in
 <code>os/signal</code></a>).</p>

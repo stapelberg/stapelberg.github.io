@@ -98,7 +98,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-MmDletsiVVexqmh4i3stLXAHVECuOzqin3b%2babGWq5wv%2fwd%2f9IdQTTMV1IZowrB21EMrM9N1VHI17hmnyeCskw%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-jSHLCP3Yil4Qja%2fQIO7xbf94spm2%2bZ2wrbveDFStqtazAS3VJEYV7ZgXGRCAzIkRGSgWjZXG7BKO%2bNDtxiBCKQ%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -241,6 +241,25 @@
     
   <h2>2010 › June</h2>
   <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2010-06-23-xen_to_kvm/"><h3>Mini-Howto: Xen nach KVM migrieren</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<p>
+	   Da Xen wohl auch in Zukunft nicht in den Linux-Kernel aufgenommen wird und stattdessen KVM bereits verfügbar ist, habe ich meinen Server von Xen auf KVM migriert. Da die Migration ziemlich stressfrei lief (wenn man weiß, wo man drehen muss), möchte ich hier kurz den Verlauf schildern. Ich gehe davon aus, dass in der bestehenden Xen-Installation die Daten auf Logical Volumes abgelegt wurden. 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2010-06-23-xen_to_kvm/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
     
     <li>
       <div>
@@ -850,31 +869,6 @@ Ich denke, dass man mit vielen Dingen effizienter arbeiten kann, als es viele Le
 	<p>
 	   Da alle Tunnelanbieter, die ich bisher probierte (SixXS, tunnelbroker.net, go6.net) entweder langsam waren oder gelegentlich nicht erreichbar (das ist echt nervig, wenn man die Websites, die man am häufigsten besucht, via IPv6 erreicht), habe ich mir meinen eigenen IPv6-Tunnel gebaut. Hier nun die Anleitung, wie das funktioniert: 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2008-11-02-ipv6_tunnel/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-  </ul>
-
-  
-  <h2>2008 › October</h2>
-  <ul class="ArticleList">
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2008-10-31-xen_resize/"><h3>Kurztipp: Vergrößern einer NetBSD-domU (mit NetBSD-dom0)</h3></a>
-	
-	<div class="tags"></div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	
-	<p>
-	   Vor kurzem hatte ich das Problem, dass ich einer domU zu wenig Festplattenspeicher zugewiesen habe. Hinterher ist man immer schlauer, und merkt dann auch, dass man mit 256 MB swap nicht weit kommt, wenn man die domU auslastet ;-). Blöderweise hat NetBSD (noch) kein funktionierendes Programm um das Dateisystem live zu verkleinern/vergrößern, sonst wäre die Änderung relativ kurz und schmerzlos. 
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2008-10-31-xen_resize/">Read more →</a></span>
 	</p>
       </div>
     </li>

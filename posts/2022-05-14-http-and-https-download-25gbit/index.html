@@ -104,7 +104,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-MmDletsiVVexqmh4i3stLXAHVECuOzqin3b%2babGWq5wv%2fwd%2f9IdQTTMV1IZowrB21EMrM9N1VHI17hmnyeCskw%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-jSHLCP3Yil4Qja%2fQIO7xbf94spm2%2bZ2wrbveDFStqtazAS3VJEYV7ZgXGRCAzIkRGSgWjZXG7BKO%2bNDtxiBCKQ%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -616,41 +616,41 @@ client and server.</p>
 <h2 id="appendix">Appendix</h2>
 <details>
 <summary>Go <code>net/http</code> test program <code>httpget25.go</code></summary>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span> main
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span> (
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;crypto/tls&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;flag&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;fmt&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;io&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;io/ioutil&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;log&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#4070a0">&#34;net/http&#34;</span>
-</span></span><span style="display:flex;"><span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">httpget25</span>() <span style="color:#902000">error</span> {
-</span></span><span style="display:flex;"><span>	http.DefaultTransport.(<span style="color:#666">*</span>http.Transport).TLSClientConfig = <span style="color:#666">&amp;</span>tls.Config{InsecureSkipVerify: <span style="color:#007020;font-weight:bold">true</span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">for</span> _, arg <span style="color:#666">:=</span> <span style="color:#007020;font-weight:bold">range</span> flag.<span style="color:#06287e">Args</span>() {
-</span></span><span style="display:flex;"><span>		resp, err <span style="color:#666">:=</span> http.<span style="color:#06287e">Get</span>(arg)
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">return</span> err
-</span></span><span style="display:flex;"><span>		}
-</span></span><span style="display:flex;"><span>		<span style="color:#007020;font-weight:bold">if</span> resp.StatusCode <span style="color:#666">!=</span> http.StatusOK {
-</span></span><span style="display:flex;"><span>			<span style="color:#007020;font-weight:bold">return</span> fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;unexpected HTTP status code: want %v, got %v&#34;</span>, http.StatusOK, resp.Status)
-</span></span><span style="display:flex;"><span>		}
-</span></span><span style="display:flex;"><span>		io.<span style="color:#06287e">Copy</span>(ioutil.Discard, resp.Body)
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">return</span> <span style="color:#007020;font-weight:bold">nil</span>
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span> <span style="color:#06287e">main</span>() {
-</span></span><span style="display:flex;"><span>	flag.<span style="color:#06287e">Parse</span>()
-</span></span><span style="display:flex;"><span>	<span style="color:#007020;font-weight:bold">if</span> err <span style="color:#666">:=</span> <span style="color:#06287e">httpget25</span>(); err <span style="color:#666">!=</span> <span style="color:#007020;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		log.<span style="color:#06287e">Fatal</span>(err)
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div></details>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span><span style="color:#bbb"> </span>main<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">import</span><span style="color:#bbb"> </span>(<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;crypto/tls&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;flag&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;fmt&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;io&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;io/ioutil&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;log&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;net/http&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">httpget25</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>http.DefaultTransport.(<span style="color:#666">*</span>http.Transport).TLSClientConfig<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span><span style="color:#666">&amp;</span>tls.Config{InsecureSkipVerify:<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">true</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">for</span><span style="color:#bbb"> </span>_,<span style="color:#bbb"> </span>arg<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">range</span><span style="color:#bbb"> </span>flag.<span style="color:#06287e">Args</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>resp,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>http.<span style="color:#06287e">Get</span>(arg)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">			</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>err<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>resp.StatusCode<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span>http.StatusOK<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">			</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;unexpected HTTP status code: want %v, got %v&#34;</span>,<span style="color:#bbb"> </span>http.StatusOK,<span style="color:#bbb"> </span>resp.Status)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>io.<span style="color:#06287e">Copy</span>(ioutil.Discard,<span style="color:#bbb"> </span>resp.Body)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">main</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>flag.<span style="color:#06287e">Parse</span>()<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#06287e">httpget25</span>();<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>log.<span style="color:#06287e">Fatal</span>(err)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span></code></pre></div></details>
 <details>
 <summary>Caddy config file <code>Caddyfile</code></summary>
 <pre tabindex="0"><code>{

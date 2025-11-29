@@ -98,7 +98,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-MmDletsiVVexqmh4i3stLXAHVECuOzqin3b%2babGWq5wv%2fwd%2f9IdQTTMV1IZowrB21EMrM9N1VHI17hmnyeCskw%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-jSHLCP3Yil4Qja%2fQIO7xbf94spm2%2bZ2wrbveDFStqtazAS3VJEYV7ZgXGRCAzIkRGSgWjZXG7BKO%2bNDtxiBCKQ%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -241,6 +241,25 @@
     
   <h2>2017 › April</h2>
   <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2017-04-16-homematic-reimplementation/"><h3>HomeMatic re-implementation</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<p>
+	   A while ago, I got myself a bunch of HomeMatic home automation gear (valve drives, temperature and humidity sensors, power switches). The gear itself works reasonably well, but I found the management software painfully lacking. Hence, I re-implemented my own management software. In this article, I’ll describe my method, in the hope that others will pick up a few nifty tricks to make future re-implementation projects easier. 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-04-16-homematic-reimplementation/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
     
     <li>
       <div>
@@ -991,36 +1010,6 @@
 	<p>
 	   I’ve been travelling a bit to foreign countries lately and noticed that all of the places I’ve stayed at (low to medium price range hotels) have one thing in common: their WiFi is absolutely horrible. Even worse, it seems like the more money you pay, the more horrible the WiFi gets. As an example, I’ve stayed at the NH city centre in Amsterdam recently. Curiously, swisscom runs the WiFi there — I didn’t even know they do more than access and mobile network in Switzerland. We booked a double room (so the hotel knew there are two people staying in the room), but swisscom only allows one login. I’ll repeat: one (1) login. In 2014. Where people travel with smartphones, tablets and notebooks. Per person. Even better: every time you lose connection, you need to re-acknowledge the terms of service. Of course this breaks automated updates of Android smartphones because they try to save battery and connect to the WiFi only sporadically. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-05-15-horrible_wifi_in_hotels/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-  </ul>
-
-  
-  <h2>2014 › February</h2>
-  <ul class="ArticleList">
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2014-02-19-ssh-keys-in-your-tpm/"><h3>Using your TPM for SSH authentication</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	
-	<p>
-	   Thomas Habets has blogged about using your TPM (Trusted Platform Module) for SSH authentication a few weeks ago. We worked together to get his package simple-tpm-pk11 into Debian, and it has just arrived in unstable :-). Using simple-tpm-pk11, you can let your TPM generate a key, which you then can use for SSH authentication. This key will never leave the TPM, so it is safer than having your key on the filesystem (e.g. ~/.ssh/id_rsa), since file system access is not enough to steal your key anymore. Instead, you’ll need remote code execution. 
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-02-19-ssh-keys-in-your-tpm/">Read more →</a></span>
 	</p>
       </div>
     </li>

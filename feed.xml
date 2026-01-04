@@ -397,8 +397,13 @@ and font-hinting settings, but I tried experimenting with the following settings
 couldn’t get things to render like they did before:</p>
 <pre tabindex="0"><code>gsettings set org.gnome.desktop.interface font-antialiasing &#39;rgba&#39;
 gsettings set org.gnome.desktop.interface font-hinting &#39;full&#39;
-</code></pre><p>Any tips?</p>
-<h3 id="swaylock">Screen locker: swaylock</h3>
+</code></pre><p><strong>Update</strong>: Thanks to
+<a href="https://fosstodon.org/@whynothugo/115836011150423009">Hugo</a> for pointing out
+that under Wayland, GTK3 ignores the <code>~/.config/gtk-3.0/settings.ini</code>
+configuration file and uses dconf exclusively! Setting the following dconf
+setting makes the font rendering match:</p>
+<pre tabindex="0"><code>gsettings set org.gnome.desktop.interface font-name &#39;Cantarell 11&#39;
+</code></pre><h3 id="swaylock">Screen locker: swaylock</h3>
 <p>The obvious replacement for <a href="http://i3wm.org/i3lock/"><code>i3lock</code></a> is
 <a href="https://github.com/swaywm/swaylock"><code>swaylock</code></a>.</p>
 <p>I quickly ran into a difference in architecture between the two programs:</p>

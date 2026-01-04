@@ -10,6 +10,9 @@
   
   
   
+  
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2026-01-02-microvm/2025-12-21%20at%2013.53.49%20microvm%20setup%20rsync_hu_906f1f2dd98657d6.png">
+  
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
   <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
@@ -239,6 +242,31 @@
   <br>
 
     
+  <h2>2013 › May</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2013-05-20-galaxy-nexus-slowness/"><h3>Galaxy Nexus slowness</h3></a>
+	
+	<div class="tags"></div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<p>
+	   My Galaxy Nexus was getting really slow over the last few weeks, meaning simple things like going to the homescreen took multiple seconds. Turns out that the problem is the SD card filesystem / controller getting really slow once the SD card gets nearly filled up. You can verify this by running Androbench, a storage benchmark app. You should get a sequential write performance of a few MB/s (e.g. 8 MB/s), but when affected by the problem, you get about 0.x MB/s. 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2013-05-20-galaxy-nexus-slowness/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
   <h2>2013 › March</h2>
   <ul class="ArticleList">
     
@@ -949,30 +977,6 @@ I tracked down the cause of a deadlock at boot time when dhcp hooks call invoke-
 	<p>
 	   In July, I was looking for a new android phone. My HTC Desire Z was feeling pretty slow and after seeing how well Android 4.1 (Jelly Bean) performed on my friend’s devices, I decided to upgrade. I’ve read a few reviews back then and it seemed like the Samsung Galaxy S3 was the best phone at the time: Its hardware is stunning, it’s faster than every other phone and it looks okay. I checked that you can root it, install custom ROMs and that CyanogenMod is available. After using it for a few months, I have come to the conclusion that I don’t want to keep it. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-09-29-from_galaxy_s3_to_nexus/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2012-09-27-cgo_uint32/"><h3>golang: types such as []uint32 and cgo</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	
-	<p>
-	   There is official documentation on the Go C language interface (or cgo in golang terminology), but the things it covers are relatively simple. I have used cgo recently in a real-world project and I want to share my experiences in this short article, that is, how to use types properly (avoiding the void* equivalent unsafe.Pointer) and how to deal with Go’s data structures such as slices. 
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2012-09-27-cgo_uint32/">Read more →</a></span>
 	</p>
       </div>
     </li>

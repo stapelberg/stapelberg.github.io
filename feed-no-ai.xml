@@ -1,639 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>Michael Stapelbergs Website</title>
-  <link href="https://michael.stapelberg.ch/feed.xml" rel="self"/>
+  <title>Michael Stapelbergs Website (Feed without AI posts)</title>
+  <link href="https://michael.stapelberg.ch/feed-no-ai.xml" rel="self"/>
   <link href="https://michael.stapelberg.ch/"/>
-  <id>https://michael.stapelberg.ch/</id>
+  <id>https://michael.stapelberg.ch/feed-no-ai.xml</id>
   <generator>Hugo -- gohugo.io</generator>
-  <entry>
-    <title type="html"><![CDATA[Coding Agent VMs on NixOS with microvm.nix]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2026-02-01-coding-agent-microvm-nix/"/>
-    <id>https://michael.stapelberg.ch/posts/2026-02-01-coding-agent-microvm-nix/</id>
-    <published>2026-02-01T09:00:00+01:00</published>
-    <content type="html"><![CDATA[<p>I have come to appreciate <a href="https://en.wikipedia.org/wiki/AI-assisted_software_development">coding
-agents</a> to be
-valuable tools for working with computer program code in any capacity, such as
-learning about any program’s architecture, diagnosing bugs or developing proofs
-of concept. Depending on the use-case, reviewing each command the agent wants to
-run can get tedious and time-consuming very quickly. To safely run a coding
-agent without review, I wanted a Virtual Machine (VM) solution where the agent
-has no access to my personal files and where it’s no big deal if the agent gets
-compromised by malware: I can just throw away the VM and start over.</p>
-<p>Instead of setting up a stateful VM and re-installing it when needed (ugh!), I
-prefer the model of ephemeral VMs where nothing persists on disk, except for
-what is explicitly shared with the host.</p>
-<p>The <a href="https://github.com/microvm-nix/microvm.nix"><code>microvm.nix</code> project</a> makes it
-easy to create such VMs on NixOS, and this article shows you how I like to set
-up my VMs.</p>
-<h2 id="see-also">See also</h2>
-<p>If you haven’t heard of NixOS before, check out <a href="https://en.wikipedia.org/wiki/NixOS">the NixOS Wikipedia
-page</a> and
-<a href="https://nixos.org/">nixos.org</a>. I <a href="/talks/#2025">spoke about why I switched to Nix in
-2025</a> and have published a <a href="/posts/tags/nix/">few blog posts about
-Nix</a>.</p>
-<p>For understanding the threat model of AI agents, read <a href="https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/">Simon Willison’s “The
-lethal trifecta for AI agents: private data, untrusted content, and external
-communication” (June
-2025)</a>. This
-article’s approach to working with the threat model is to remove the “private
-data” part from the equation.</p>
-<p>If you want to learn about the whole field of sandboxing, check out <a href="https://www.luiscardoso.dev/blog/sandboxes-for-ai">Luis
-Cardoso’s “A field guide to sandboxes for AI” (Jan
-2026)</a>. I will not be
-comparing different solutions in this article, I will just show you one possible
-path.</p>
-<p>And lastly, maybe you’re not in the mood to build/run sandboxing infrastructure
-yourself. Good news: Sandboxing is a hot topic and there are many commercial
-offerings popping up that address this need. For example, David Crawshaw and
-Josh Bleecher Snyder (I know both from the Go community) recently launched
-<a href="https://blog.exe.dev/meet-exe.dev">exe.dev</a>, an agent-friendly VM hosting
-service. Another example is <a href="https://fly.io/blog/code-and-let-live/">Fly.io, who launched
-Sprites</a>.</p>
-<h2 id="setting-up-microvmnix">Setting up microvm.nix</h2>
-<p>Let’s jump right in! The next sections walk you through how I set up my config.</p>
-<h3 id="step-1-network-prep">Step 1: network prep</h3>
-<p>First, I created a new <code>microbr</code> bridge which uses <code>192.168.33.1/24</code> as IP address range and NATs out of the <code>eno1</code> network interface. All <code>microvm*</code> interfaces will be added to that bridge:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>systemd<span style="color:#666">.</span>network<span style="color:#666">.</span>netdevs<span style="color:#666">.</span><span style="color:#4070a0">&#34;20-microbr&#34;</span><span style="color:#666">.</span>netdevConfig <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>  Kind <span style="color:#666">=</span> <span style="color:#4070a0">&#34;bridge&#34;</span>;
-</span></span><span style="display:flex;"><span>  Name <span style="color:#666">=</span> <span style="color:#4070a0">&#34;microbr&#34;</span>;
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>systemd<span style="color:#666">.</span>network<span style="color:#666">.</span>networks<span style="color:#666">.</span><span style="color:#4070a0">&#34;20-microbr&#34;</span> <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>  matchConfig<span style="color:#666">.</span>Name <span style="color:#666">=</span> <span style="color:#4070a0">&#34;microbr&#34;</span>;
-</span></span><span style="display:flex;"><span>  addresses <span style="color:#666">=</span> [ { Address <span style="color:#666">=</span> <span style="color:#4070a0">&#34;192.168.83.1/24&#34;</span>; } ];
-</span></span><span style="display:flex;"><span>  networkConfig <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>    ConfigureWithoutCarrier <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
-</span></span><span style="display:flex;"><span>  };
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>systemd<span style="color:#666">.</span>network<span style="color:#666">.</span>networks<span style="color:#666">.</span><span style="color:#4070a0">&#34;21-microvm-tap&#34;</span> <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>  matchConfig<span style="color:#666">.</span>Name <span style="color:#666">=</span> <span style="color:#4070a0">&#34;microvm*&#34;</span>;
-</span></span><span style="display:flex;"><span>  networkConfig<span style="color:#666">.</span>Bridge <span style="color:#666">=</span> <span style="color:#4070a0">&#34;microbr&#34;</span>;
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>networking<span style="color:#666">.</span>nat <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>  enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
-</span></span><span style="display:flex;"><span>  internalInterfaces <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;microbr&#34;</span> ];
-</span></span><span style="display:flex;"><span>  externalInterface <span style="color:#666">=</span> <span style="color:#4070a0">&#34;eno1&#34;</span>;
-</span></span><span style="display:flex;"><span>};
-</span></span></code></pre></div><h3 id="step-2-flakenix">Step 2: <code>flake.nix</code></h3>
-<p>Then, I added the <code>microvm</code> module as a new input to my <code>flake.nix</code> (check out
-the <a href="https://microvm-nix.github.io/microvm.nix/">microvm.nix documentation</a> for
-details) and enabled the <code>microvm.nixosModules.host</code> module on the NixOS
-configuration for my PC (midna). I also created a new <code>microvm.nix</code> file, in
-which I declare all my VMs. Here’s what my <code>flake.nix</code> looks like:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>  inputs <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>    nixpkgs <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>      url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:nixos/nixpkgs/nixos-25.11&#34;</span>;
-</span></span><span style="display:flex;"><span>    };
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>    <span style="color:#60a0b0;font-style:italic"># For more recent claude-code</span>
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>    nixpkgs-unstable <span style="color:#666">=</span> {
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>      url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:nixos/nixpkgs/nixos-unstable&#34;</span>;
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>    };
-</span></span><span style="display:flex;"><span>    stapelbergnix <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>      url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:stapelberg/nix&#34;</span>;
-</span></span><span style="display:flex;"><span>      inputs<span style="color:#666">.</span>nixpkgs<span style="color:#666">.</span>follows <span style="color:#666">=</span> <span style="color:#4070a0">&#34;nixpkgs&#34;</span>;
-</span></span><span style="display:flex;"><span>    };
-</span></span><span style="display:flex;"><span>    zkjnastools <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>      url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:stapelberg/zkj-nas-tools&#34;</span>;
-</span></span><span style="display:flex;"><span>      inputs<span style="color:#666">.</span>nixpkgs<span style="color:#666">.</span>follows <span style="color:#666">=</span> <span style="color:#4070a0">&#34;nixpkgs&#34;</span>;
-</span></span><span style="display:flex;"><span>    };
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>    microvm <span style="color:#666">=</span> {
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>      url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:microvm-nix/microvm.nix&#34;</span>;
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>      inputs<span style="color:#666">.</span>nixpkgs<span style="color:#666">.</span>follows <span style="color:#666">=</span> <span style="color:#4070a0">&#34;nixpkgs&#34;</span>;
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>    };
-</span></span><span style="display:flex;"><span>    home-manager <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>      url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:nix-community/home-manager/release-25.11&#34;</span>;
-</span></span><span style="display:flex;"><span>      inputs<span style="color:#666">.</span>nixpkgs<span style="color:#666">.</span>follows <span style="color:#666">=</span> <span style="color:#4070a0">&#34;nixpkgs&#34;</span>;
-</span></span><span style="display:flex;"><span>    };
-</span></span><span style="display:flex;"><span>    configfiles <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>      url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:stapelberg/configfiles&#34;</span>;
-</span></span><span style="display:flex;"><span>      flake <span style="color:#666">=</span> <span style="color:#60add5">false</span>; <span style="color:#60a0b0;font-style:italic"># repo is not a flake</span>
-</span></span><span style="display:flex;"><span>    };
-</span></span><span style="display:flex;"><span>  };
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  outputs <span style="color:#666">=</span>
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>      self<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>      stapelbergnix<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>      zkjnastools<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>      nixpkgs<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>      nixpkgs-unstable<span style="color:#666">,</span>
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>      microvm<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>      home-manager<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>      configfiles<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>    }<span style="color:#666">@</span>inputs:
-</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">let</span>
-</span></span><span style="display:flex;"><span>      system <span style="color:#666">=</span> <span style="color:#4070a0">&#34;x86_64-linux&#34;</span>;
-</span></span><span style="display:flex;"><span>      pkgs <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">import</span> nixpkgs {
-</span></span><span style="display:flex;"><span>        <span style="color:#007020;font-weight:bold">inherit</span> system;
-</span></span><span style="display:flex;"><span>        config<span style="color:#666">.</span>allowUnfree <span style="color:#666">=</span> <span style="color:#60add5">false</span>;
-</span></span><span style="display:flex;"><span>      };
-</span></span><span style="display:flex;"><span>      pkgs-unstable <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">import</span> nixpkgs-unstable {
-</span></span><span style="display:flex;"><span>        <span style="color:#007020;font-weight:bold">inherit</span> system;
-</span></span><span style="display:flex;"><span>        config<span style="color:#666">.</span>allowUnfree <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
-</span></span><span style="display:flex;"><span>      };
-</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">in</span>
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>      nixosConfigurations <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>        midna <span style="color:#666">=</span> nixpkgs<span style="color:#666">.</span>lib<span style="color:#666">.</span>nixosSystem {
-</span></span><span style="display:flex;"><span>          system <span style="color:#666">=</span> <span style="color:#4070a0">&#34;x86_64-linux&#34;</span>;
-</span></span><span style="display:flex;"><span>          specialArgs <span style="color:#666">=</span> { <span style="color:#007020;font-weight:bold">inherit</span> inputs; };
-</span></span><span style="display:flex;"><span>          modules <span style="color:#666">=</span> [
-</span></span><span style="display:flex;"><span>            (<span style="color:#007020;font-weight:bold">import</span> <span style="color:#235388">./configuration.nix</span>)
-</span></span><span style="display:flex;"><span>            stapelbergnix<span style="color:#666">.</span>lib<span style="color:#666">.</span>userSettings
-</span></span><span style="display:flex;"><span>            <span style="color:#60a0b0;font-style:italic"># Use systemd for network configuration</span>
-</span></span><span style="display:flex;"><span>            stapelbergnix<span style="color:#666">.</span>lib<span style="color:#666">.</span>systemdNetwork
-</span></span><span style="display:flex;"><span>            <span style="color:#60a0b0;font-style:italic"># Use systemd-boot as bootloader</span>
-</span></span><span style="display:flex;"><span>            stapelbergnix<span style="color:#666">.</span>lib<span style="color:#666">.</span>systemdBoot
-</span></span><span style="display:flex;"><span>            <span style="color:#60a0b0;font-style:italic"># Run prometheus node exporter in tailnet</span>
-</span></span><span style="display:flex;"><span>            stapelbergnix<span style="color:#666">.</span>lib<span style="color:#666">.</span>prometheusNode
-</span></span><span style="display:flex;"><span>            zkjnastools<span style="color:#666">.</span>nixosModules<span style="color:#666">.</span>zkjbackup
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>            microvm<span style="color:#666">.</span>nixosModules<span style="color:#666">.</span>host
-</span></span><span style="display:flex; background-color:#d8d8d8"><span>            <span style="color:#235388">./microvm.nix</span>
-</span></span><span style="display:flex;"><span>          ];
-</span></span><span style="display:flex;"><span>        };
-</span></span><span style="display:flex;"><span>      };
-</span></span><span style="display:flex;"><span>    };
-</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
-<h3 id="step-3-microvmnix">Step 3: <code>microvm.nix</code></h3>
-<p>The following <code>microvm.nix</code> declares two microvms, one for Emacs (about which I wanted to learn more) and one for Go Protobuf, a code base I am familiar with and can use to understand Claude’s capabilities:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>  config<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>  lib<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>  pkgs<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>  inputs<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#666">...</span>
-</span></span><span style="display:flex;"><span>}:
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">let</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">inherit</span> (inputs)
-</span></span><span style="display:flex;"><span>    nixpkgs-unstable
-</span></span><span style="display:flex;"><span>    stapelbergnix
-</span></span><span style="display:flex;"><span>    microvm
-</span></span><span style="display:flex;"><span>    configfiles
-</span></span><span style="display:flex;"><span>    home-manager
-</span></span><span style="display:flex;"><span>    ;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  microvmBase <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">import</span> <span style="color:#235388">./microvm-base.nix</span>;
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">in</span>
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>  microvm<span style="color:#666">.</span>vms<span style="color:#666">.</span>emacsvm <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>    autostart <span style="color:#666">=</span> <span style="color:#60add5">false</span>;
-</span></span><span style="display:flex;"><span>    config <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>      imports <span style="color:#666">=</span> [
-</span></span><span style="display:flex;"><span>        stapelbergnix<span style="color:#666">.</span>lib<span style="color:#666">.</span>userSettings
-</span></span><span style="display:flex;"><span>        microvm<span style="color:#666">.</span>nixosModules<span style="color:#666">.</span>microvm
-</span></span><span style="display:flex;"><span>        (microvmBase {
-</span></span><span style="display:flex;"><span>          hostName <span style="color:#666">=</span> <span style="color:#4070a0">&#34;emacsvm&#34;</span>;
-</span></span><span style="display:flex;"><span>          ipAddress <span style="color:#666">=</span> <span style="color:#4070a0">&#34;192.168.83.6&#34;</span>;
-</span></span><span style="display:flex;"><span>          tapId <span style="color:#666">=</span> <span style="color:#4070a0">&#34;microvm4&#34;</span>;
-</span></span><span style="display:flex;"><span>          mac <span style="color:#666">=</span> <span style="color:#4070a0">&#34;02:00:00:00:00:05&#34;</span>;
-</span></span><span style="display:flex;"><span>          workspace <span style="color:#666">=</span> <span style="color:#4070a0">&#34;/home/michael/microvm/emacs&#34;</span>;
-</span></span><span style="display:flex;"><span>          <span style="color:#007020;font-weight:bold">inherit</span>
-</span></span><span style="display:flex;"><span>            nixpkgs-unstable
-</span></span><span style="display:flex;"><span>            configfiles
-</span></span><span style="display:flex;"><span>            home-manager
-</span></span><span style="display:flex;"><span>            stapelbergnix
-</span></span><span style="display:flex;"><span>            ;
-</span></span><span style="display:flex;"><span>        })
-</span></span><span style="display:flex;"><span>        <span style="color:#235388">./microvms/emacs.nix</span>
-</span></span><span style="display:flex;"><span>      ];
-</span></span><span style="display:flex;"><span>    };
-</span></span><span style="display:flex;"><span>  };
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  microvm<span style="color:#666">.</span>vms<span style="color:#666">.</span>goprotobufvm <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>    autostart <span style="color:#666">=</span> <span style="color:#60add5">false</span>;
-</span></span><span style="display:flex;"><span>    config <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>      imports <span style="color:#666">=</span> [
-</span></span><span style="display:flex;"><span>        stapelbergnix<span style="color:#666">.</span>lib<span style="color:#666">.</span>userSettings
-</span></span><span style="display:flex;"><span>        microvm<span style="color:#666">.</span>nixosModules<span style="color:#666">.</span>microvm
-</span></span><span style="display:flex;"><span>        (microvmBase {
-</span></span><span style="display:flex;"><span>          hostName <span style="color:#666">=</span> <span style="color:#4070a0">&#34;goprotobufvm&#34;</span>;
-</span></span><span style="display:flex;"><span>          ipAddress <span style="color:#666">=</span> <span style="color:#4070a0">&#34;192.168.83.7&#34;</span>;
-</span></span><span style="display:flex;"><span>          tapId <span style="color:#666">=</span> <span style="color:#4070a0">&#34;microvm5&#34;</span>;
-</span></span><span style="display:flex;"><span>          mac <span style="color:#666">=</span> <span style="color:#4070a0">&#34;02:00:00:00:00:06&#34;</span>;
-</span></span><span style="display:flex;"><span>          workspace <span style="color:#666">=</span> <span style="color:#4070a0">&#34;/home/michael/microvm/goprotobuf&#34;</span>;
-</span></span><span style="display:flex;"><span>          <span style="color:#007020;font-weight:bold">inherit</span>
-</span></span><span style="display:flex;"><span>            nixpkgs-unstable
-</span></span><span style="display:flex;"><span>            configfiles
-</span></span><span style="display:flex;"><span>            home-manager
-</span></span><span style="display:flex;"><span>            stapelbergnix
-</span></span><span style="display:flex;"><span>            ;
-</span></span><span style="display:flex;"><span>          extraZshInit <span style="color:#666">=</span> <span style="color:#4070a0">&#39;&#39;
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">            export GOPATH=$HOME/go
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">            export PATH=$GOPATH/bin:$PATH
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">          &#39;&#39;</span>;
-</span></span><span style="display:flex;"><span>        })
-</span></span><span style="display:flex;"><span>        <span style="color:#235388">./microvms/goprotobuf.nix</span>
-</span></span><span style="display:flex;"><span>      ];
-</span></span><span style="display:flex;"><span>    };
-</span></span><span style="display:flex;"><span>  };
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="step-4-microvm-basenix">Step 4: <code>microvm-base.nix</code></h3>
-<p>The <code>microvm-base.nix</code> module takes these parameters and declares:</p>
-<ul>
-<li>Network settings: I like using <a href="https://manpages.debian.org/systemd-networkd.8"><code>systemd-networkd(8)</code></a>
- and <a href="https://manpages.debian.org/systemd-resolved.8"><code>systemd-resolved(8)</code></a>
-.</li>
-<li>Shared directories for:
-<ul>
-<li>the workspace directory, e.g. <code>~/microvm/emacs</code></li>
-<li>the host’s Nix store, so the VM can access software from cache (often)</li>
-<li>this VM’s SSH host keys</li>
-<li><code>~/claude-microvm</code>, which is a separate state directory, used only on the microvms.</li>
-</ul>
-</li>
-<li>an 8 GB disk overlay (var.img), stored in <code>/var/lib/microvms/&lt;name&gt;</code></li>
-<li><code>cloud-hypervisor</code> (QEMU also works well!) as the hypervisor, with 8 vCPUs and 4 GB RAM.</li>
-<li>A workaround for systemd trying to unmount <code>/nix/store</code> (which causes a deadlock).</li>
-</ul>
-<details>
-<summary>Expand full <code>microvm-base.nix</code> code</summary>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>  hostName<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>  ipAddress<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>  tapId<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>  mac<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>  workspace<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>  nixpkgs-unstable<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>  configfiles<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>  home-manager<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>  stapelbergnix<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>  extraZshInit <span style="color:#666">?</span> <span style="color:#4070a0">&#34;&#34;</span><span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>}:
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>  config<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>  lib<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>  pkgs<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#666">...</span>
-</span></span><span style="display:flex;"><span>}:
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">let</span>
-</span></span><span style="display:flex;"><span>  system <span style="color:#666">=</span> pkgs<span style="color:#666">.</span>stdenv<span style="color:#666">.</span>hostPlatform<span style="color:#666">.</span>system;
-</span></span><span style="display:flex;"><span>  pkgsUnstable <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">import</span> nixpkgs-unstable {
-</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">inherit</span> system;
-</span></span><span style="display:flex;"><span>    config<span style="color:#666">.</span>allowUnfree <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
-</span></span><span style="display:flex;"><span>  };
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">in</span>
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>  imports <span style="color:#666">=</span> [ home-manager<span style="color:#666">.</span>nixosModules<span style="color:#666">.</span>home-manager ];
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># home-manager configuration</span>
-</span></span><span style="display:flex;"><span>  home-manager<span style="color:#666">.</span>useGlobalPkgs <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
-</span></span><span style="display:flex;"><span>  home-manager<span style="color:#666">.</span>useUserPackages <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
-</span></span><span style="display:flex;"><span>  home-manager<span style="color:#666">.</span>extraSpecialArgs <span style="color:#666">=</span> { <span style="color:#007020;font-weight:bold">inherit</span> configfiles stapelbergnix; };
-</span></span><span style="display:flex;"><span>  home-manager<span style="color:#666">.</span>users<span style="color:#666">.</span>michael <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>    imports <span style="color:#666">=</span> [ <span style="color:#235388">./microvm-home.nix</span> ];
-</span></span><span style="display:flex;"><span>    microvm<span style="color:#666">.</span>extraZshInit <span style="color:#666">=</span> extraZshInit;
-</span></span><span style="display:flex;"><span>  };
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># Claude Code CLI (from nixpkgs-unstable, unfree)</span>
-</span></span><span style="display:flex;"><span>  environment<span style="color:#666">.</span>systemPackages <span style="color:#666">=</span> [
-</span></span><span style="display:flex;"><span>    pkgsUnstable<span style="color:#666">.</span>claude-code
-</span></span><span style="display:flex;"><span>  ];
-</span></span><span style="display:flex;"><span>  networking<span style="color:#666">.</span>hostName <span style="color:#666">=</span> hostName;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  system<span style="color:#666">.</span>stateVersion <span style="color:#666">=</span> <span style="color:#4070a0">&#34;25.11&#34;</span>;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  services<span style="color:#666">.</span>openssh<span style="color:#666">.</span>enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># To match midna (host)</span>
-</span></span><span style="display:flex;"><span>  users<span style="color:#666">.</span>groups<span style="color:#666">.</span>michael <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>    gid <span style="color:#666">=</span> <span style="color:#40a070">1000</span>;
-</span></span><span style="display:flex;"><span>  };
-</span></span><span style="display:flex;"><span>  users<span style="color:#666">.</span>users<span style="color:#666">.</span>michael <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>    group <span style="color:#666">=</span> <span style="color:#4070a0">&#34;michael&#34;</span>;
-</span></span><span style="display:flex;"><span>  };
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  services<span style="color:#666">.</span>resolved<span style="color:#666">.</span>enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
-</span></span><span style="display:flex;"><span>  networking<span style="color:#666">.</span>useDHCP <span style="color:#666">=</span> <span style="color:#60add5">false</span>;
-</span></span><span style="display:flex;"><span>  networking<span style="color:#666">.</span>useNetworkd <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
-</span></span><span style="display:flex;"><span>  networking<span style="color:#666">.</span>tempAddresses <span style="color:#666">=</span> <span style="color:#4070a0">&#34;disabled&#34;</span>;
-</span></span><span style="display:flex;"><span>  systemd<span style="color:#666">.</span>network<span style="color:#666">.</span>enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
-</span></span><span style="display:flex;"><span>  systemd<span style="color:#666">.</span>network<span style="color:#666">.</span>networks<span style="color:#666">.</span><span style="color:#4070a0">&#34;10-e&#34;</span> <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>    matchConfig<span style="color:#666">.</span>Name <span style="color:#666">=</span> <span style="color:#4070a0">&#34;e*&#34;</span>;
-</span></span><span style="display:flex;"><span>    addresses <span style="color:#666">=</span> [ { Address <span style="color:#666">=</span> <span style="color:#4070a0">&#34;</span><span style="color:#70a0d0">${</span>ipAddress<span style="color:#70a0d0">}</span><span style="color:#4070a0">/24&#34;</span>; } ];
-</span></span><span style="display:flex;"><span>    routes <span style="color:#666">=</span> [ { Gateway <span style="color:#666">=</span> <span style="color:#4070a0">&#34;192.168.83.1&#34;</span>; } ];
-</span></span><span style="display:flex;"><span>  };
-</span></span><span style="display:flex;"><span>  networking<span style="color:#666">.</span>nameservers <span style="color:#666">=</span> [
-</span></span><span style="display:flex;"><span>    <span style="color:#4070a0">&#34;8.8.8.8&#34;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#4070a0">&#34;1.1.1.1&#34;</span>
-</span></span><span style="display:flex;"><span>  ];
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># Disable firewall for faster boot and less hassle;</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># we are behind a layer of NAT anyway.</span>
-</span></span><span style="display:flex;"><span>  networking<span style="color:#666">.</span>firewall<span style="color:#666">.</span>enable <span style="color:#666">=</span> <span style="color:#60add5">false</span>;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  systemd<span style="color:#666">.</span>settings<span style="color:#666">.</span>Manager <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic"># fast shutdowns/reboots! https://mas.to/@zekjur/113109742103219075</span>
-</span></span><span style="display:flex;"><span>    DefaultTimeoutStopSec <span style="color:#666">=</span> <span style="color:#4070a0">&#34;5s&#34;</span>;
-</span></span><span style="display:flex;"><span>  };
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># Fix for microvm shutdown hang (issue #170):</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># Without this, systemd tries to unmount /nix/store during shutdown,</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># but umount lives in /nix/store, causing a deadlock.</span>
-</span></span><span style="display:flex;"><span>  systemd<span style="color:#666">.</span>mounts <span style="color:#666">=</span> [
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>      what <span style="color:#666">=</span> <span style="color:#4070a0">&#34;store&#34;</span>;
-</span></span><span style="display:flex;"><span>      where <span style="color:#666">=</span> <span style="color:#4070a0">&#34;/nix/store&#34;</span>;
-</span></span><span style="display:flex;"><span>      overrideStrategy <span style="color:#666">=</span> <span style="color:#4070a0">&#34;asDropin&#34;</span>;
-</span></span><span style="display:flex;"><span>      unitConfig<span style="color:#666">.</span>DefaultDependencies <span style="color:#666">=</span> <span style="color:#60add5">false</span>;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>  ];
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># Use SSH host keys mounted from outside the VM (remain identical).</span>
-</span></span><span style="display:flex;"><span>  services<span style="color:#666">.</span>openssh<span style="color:#666">.</span>hostKeys <span style="color:#666">=</span> [
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>      path <span style="color:#666">=</span> <span style="color:#4070a0">&#34;/etc/ssh/host-keys/ssh_host_ed25519_key&#34;</span>;
-</span></span><span style="display:flex;"><span>      type <span style="color:#666">=</span> <span style="color:#4070a0">&#34;ed25519&#34;</span>;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>  ];
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  microvm <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic"># Enable writable nix store overlay so nix-daemon works.</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic"># This is required for home-manager activation.</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic"># Uses tmpfs by default (ephemeral), which is fine since we</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic"># don&#39;t build anything in the VM.</span>
-</span></span><span style="display:flex;"><span>    writableStoreOverlay <span style="color:#666">=</span> <span style="color:#4070a0">&#34;/nix/.rw-store&#34;</span>;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    volumes <span style="color:#666">=</span> [
-</span></span><span style="display:flex;"><span>      {
-</span></span><span style="display:flex;"><span>        mountPoint <span style="color:#666">=</span> <span style="color:#4070a0">&#34;/var&#34;</span>;
-</span></span><span style="display:flex;"><span>        image <span style="color:#666">=</span> <span style="color:#4070a0">&#34;var.img&#34;</span>;
-</span></span><span style="display:flex;"><span>        size <span style="color:#666">=</span> <span style="color:#40a070">8192</span>; <span style="color:#60a0b0;font-style:italic"># MB</span>
-</span></span><span style="display:flex;"><span>      }
-</span></span><span style="display:flex;"><span>    ];
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    shares <span style="color:#666">=</span> [
-</span></span><span style="display:flex;"><span>      {
-</span></span><span style="display:flex;"><span>        <span style="color:#60a0b0;font-style:italic"># use proto = &#34;virtiofs&#34; for MicroVMs that are started by systemd</span>
-</span></span><span style="display:flex;"><span>        proto <span style="color:#666">=</span> <span style="color:#4070a0">&#34;virtiofs&#34;</span>;
-</span></span><span style="display:flex;"><span>        tag <span style="color:#666">=</span> <span style="color:#4070a0">&#34;ro-store&#34;</span>;
-</span></span><span style="display:flex;"><span>        <span style="color:#60a0b0;font-style:italic"># a host&#39;s /nix/store will be picked up so that no</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#60a0b0;font-style:italic"># squashfs/erofs will be built for it.</span>
-</span></span><span style="display:flex;"><span>        source <span style="color:#666">=</span> <span style="color:#4070a0">&#34;/nix/store&#34;</span>;
-</span></span><span style="display:flex;"><span>        mountPoint <span style="color:#666">=</span> <span style="color:#4070a0">&#34;/nix/.ro-store&#34;</span>;
-</span></span><span style="display:flex;"><span>      }
-</span></span><span style="display:flex;"><span>      {
-</span></span><span style="display:flex;"><span>        proto <span style="color:#666">=</span> <span style="color:#4070a0">&#34;virtiofs&#34;</span>;
-</span></span><span style="display:flex;"><span>        tag <span style="color:#666">=</span> <span style="color:#4070a0">&#34;ssh-keys&#34;</span>;
-</span></span><span style="display:flex;"><span>        source <span style="color:#666">=</span> <span style="color:#4070a0">&#34;</span><span style="color:#70a0d0">${</span>workspace<span style="color:#70a0d0">}</span><span style="color:#4070a0">/ssh-host-keys&#34;</span>;
-</span></span><span style="display:flex;"><span>        mountPoint <span style="color:#666">=</span> <span style="color:#4070a0">&#34;/etc/ssh/host-keys&#34;</span>;
-</span></span><span style="display:flex;"><span>      }
-</span></span><span style="display:flex;"><span>      {
-</span></span><span style="display:flex;"><span>        proto <span style="color:#666">=</span> <span style="color:#4070a0">&#34;virtiofs&#34;</span>;
-</span></span><span style="display:flex;"><span>        tag <span style="color:#666">=</span> <span style="color:#4070a0">&#34;claude-credentials&#34;</span>;
-</span></span><span style="display:flex;"><span>        source <span style="color:#666">=</span> <span style="color:#4070a0">&#34;/home/michael/claude-microvm&#34;</span>;
-</span></span><span style="display:flex;"><span>        mountPoint <span style="color:#666">=</span> <span style="color:#4070a0">&#34;/home/michael/claude-microvm&#34;</span>;
-</span></span><span style="display:flex;"><span>      }
-</span></span><span style="display:flex;"><span>      {
-</span></span><span style="display:flex;"><span>        proto <span style="color:#666">=</span> <span style="color:#4070a0">&#34;virtiofs&#34;</span>;
-</span></span><span style="display:flex;"><span>        tag <span style="color:#666">=</span> <span style="color:#4070a0">&#34;workspace&#34;</span>;
-</span></span><span style="display:flex;"><span>        source <span style="color:#666">=</span> workspace;
-</span></span><span style="display:flex;"><span>        mountPoint <span style="color:#666">=</span> workspace;
-</span></span><span style="display:flex;"><span>      }
-</span></span><span style="display:flex;"><span>    ];
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    interfaces <span style="color:#666">=</span> [
-</span></span><span style="display:flex;"><span>      {
-</span></span><span style="display:flex;"><span>        type <span style="color:#666">=</span> <span style="color:#4070a0">&#34;tap&#34;</span>;
-</span></span><span style="display:flex;"><span>        id <span style="color:#666">=</span> tapId;
-</span></span><span style="display:flex;"><span>        mac <span style="color:#666">=</span> mac;
-</span></span><span style="display:flex;"><span>      }
-</span></span><span style="display:flex;"><span>    ];
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    hypervisor <span style="color:#666">=</span> <span style="color:#4070a0">&#34;cloud-hypervisor&#34;</span>;
-</span></span><span style="display:flex;"><span>    vcpu <span style="color:#666">=</span> <span style="color:#40a070">8</span>;
-</span></span><span style="display:flex;"><span>    mem <span style="color:#666">=</span> <span style="color:#40a070">4096</span>;
-</span></span><span style="display:flex;"><span>    socket <span style="color:#666">=</span> <span style="color:#4070a0">&#34;control.socket&#34;</span>;
-</span></span><span style="display:flex;"><span>  };
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div></details>
-<h3 id="step-5-microvm-homenix">Step 5: <code>microvm-home.nix</code></h3>
-<p><code>microvm-base.nix</code> in turn pulls in <code>microvm-home.nix</code>, which sets up home-manager to:</p>
-<ul>
-<li>Set up Zsh with my configuration</li>
-<li>Set up Emacs with my configuration</li>
-<li>Set up Claude Code in shared directory <code>~/claude-microvm</code>.</li>
-</ul>
-<details>
-<summary>Expand full <code>microvm-home.nix</code> code</summary>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>  config<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>  pkgs<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>  lib<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>  configfiles<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>  stapelbergnix<span style="color:#666">,</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#666">...</span>
-</span></span><span style="display:flex;"><span>}:
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>  options<span style="color:#666">.</span>microvm <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>    extraZshInit <span style="color:#666">=</span> lib<span style="color:#666">.</span>mkOption {
-</span></span><span style="display:flex;"><span>      type <span style="color:#666">=</span> lib<span style="color:#666">.</span>types<span style="color:#666">.</span>lines;
-</span></span><span style="display:flex;"><span>      default <span style="color:#666">=</span> <span style="color:#4070a0">&#34;&#34;</span>;
-</span></span><span style="display:flex;"><span>      description <span style="color:#666">=</span> <span style="color:#4070a0">&#34;Extra lines to add to zsh initContent&#34;</span>;
-</span></span><span style="display:flex;"><span>    };
-</span></span><span style="display:flex;"><span>  };
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  config <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>    home<span style="color:#666">.</span>username <span style="color:#666">=</span> <span style="color:#4070a0">&#34;michael&#34;</span>;
-</span></span><span style="display:flex;"><span>    home<span style="color:#666">.</span>homeDirectory <span style="color:#666">=</span> <span style="color:#4070a0">&#34;/home/michael&#34;</span>;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    programs<span style="color:#666">.</span>zsh <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>      enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
-</span></span><span style="display:flex;"><span>      history <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>        size <span style="color:#666">=</span> <span style="color:#40a070">4000</span>;
-</span></span><span style="display:flex;"><span>        save <span style="color:#666">=</span> <span style="color:#40a070">10000000</span>;
-</span></span><span style="display:flex;"><span>        ignoreDups <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
-</span></span><span style="display:flex;"><span>        share <span style="color:#666">=</span> <span style="color:#60add5">false</span>;
-</span></span><span style="display:flex;"><span>        append <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
-</span></span><span style="display:flex;"><span>      };
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>      initContent <span style="color:#666">=</span> <span style="color:#4070a0">&#39;&#39;
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">        </span><span style="color:#70a0d0">${</span><span style="color:#007020">builtins</span><span style="color:#666">.</span>readFile <span style="color:#4070a0">&#34;</span><span style="color:#70a0d0">${</span>configfiles<span style="color:#70a0d0">}</span><span style="color:#4070a0">/zshrc&#34;</span><span style="color:#70a0d0">}</span><span style="color:#4070a0">
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">        export CLAUDE_CONFIG_DIR=/home/michael/claude-microvm
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">        </span><span style="color:#70a0d0">${</span>config<span style="color:#666">.</span>microvm<span style="color:#666">.</span>extraZshInit<span style="color:#70a0d0">}</span><span style="color:#4070a0">
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0">      &#39;&#39;</span>;
-</span></span><span style="display:flex;"><span>    };
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    programs<span style="color:#666">.</span>emacs <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>      enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
-</span></span><span style="display:flex;"><span>      package <span style="color:#666">=</span> stapelbergnix<span style="color:#666">.</span>lib<span style="color:#666">.</span>emacsWithPackages { <span style="color:#007020;font-weight:bold">inherit</span> pkgs; };
-</span></span><span style="display:flex;"><span>    };
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    home<span style="color:#666">.</span>file<span style="color:#666">.</span><span style="color:#4070a0">&#34;.config/emacs&#34;</span> <span style="color:#666">=</span> {
-</span></span><span style="display:flex;"><span>      source <span style="color:#666">=</span> <span style="color:#4070a0">&#34;</span><span style="color:#70a0d0">${</span>configfiles<span style="color:#70a0d0">}</span><span style="color:#4070a0">/config/emacs&#34;</span>;
-</span></span><span style="display:flex;"><span>    };
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    home<span style="color:#666">.</span>stateVersion <span style="color:#666">=</span> <span style="color:#4070a0">&#34;25.11&#34;</span>;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    programs<span style="color:#666">.</span>home-manager<span style="color:#666">.</span>enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
-</span></span><span style="display:flex;"><span>  };
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div></details>
-<h3 id="step-6-goprotobufnix">Step 6: <code>goprotobuf.nix</code></h3>
-<p>The <code>goprotobuf.nix</code> makes available a bunch of required and convenient packages:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Project-specific configuration for goprotobufvm</span>
-</span></span><span style="display:flex;"><span>{ pkgs<span style="color:#666">,</span> <span style="color:#666">...</span> }:
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># Development environment for Go Protobuf</span>
-</span></span><span style="display:flex;"><span>  environment<span style="color:#666">.</span>systemPackages <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">with</span> pkgs; [
-</span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic"># Go toolchain</span>
-</span></span><span style="display:flex;"><span>    go
-</span></span><span style="display:flex;"><span>    gopls
-</span></span><span style="display:flex;"><span>    delve
-</span></span><span style="display:flex;"><span>    protobuf
-</span></span><span style="display:flex;"><span>    gnumake
-</span></span><span style="display:flex;"><span>    gcc
-</span></span><span style="display:flex;"><span>    git
-</span></span><span style="display:flex;"><span>    ripgrep
-</span></span><span style="display:flex;"><span>  ];
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="running-the-vm">Running the VM</h3>
-<p>Let’s create the workspace directory and create an SSH host key:</p>
-<pre tabindex="0"><code>mkdir -p ~/microvm/emacs/ssh-host-keys
-ssh-keygen -t ed25519 -N &#34;&#34; \
-  -f ~/microvm/emacs/ssh-host-keys/ssh_host_ed25519_key
-</code></pre><p>Now we can start the VM:</p>
-<pre tabindex="0"><code>sudo systemctl start microvm@emacsvm
-</code></pre><p>It boots and responds to pings within a few seconds.</p>
-<p>Then, SSH into the VM (perhaps in a <a href="https://manpages.debian.org/tmux.1"><code>tmux(1)</code></a>
- session) and run Claude
-(or your Coding Agent of choice) without permission prompts in the shared
-workspace directory:</p>
-<pre tabindex="0"><code>% ssh 192.168.83.2
-emacsvm% cd microvm/emacs
-emacsvm% claude --dangerously-skip-permissions
-</code></pre><p>This is what running Claude in such a setup looks like:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<a href="https://michael.stapelberg.ch/posts/2026-02-01-coding-agent-microvm-nix/2026-01-28-neofetch-featured.png"><img
-  srcset="https://michael.stapelberg.ch/posts/2026-02-01-coding-agent-microvm-nix/2026-01-28-neofetch-featured_hu_51eebb097010a828.png 2x,https://michael.stapelberg.ch/posts/2026-02-01-coding-agent-microvm-nix/2026-01-28-neofetch-featured_hu_9f1cbedec722fa16.png 3x"
-  src="https://michael.stapelberg.ch/posts/2026-02-01-coding-agent-microvm-nix/2026-01-28-neofetch-featured_hu_d06e7aa7176833b3.png"
-  alt="Claude Code in “bypass permissions” mode" title="Claude Code in “bypass permissions” mode"
-  width="600"
-  height="479"
-  style="
-
-border: 1px solid #000;
-
-"
-  
-  loading="lazy"></a>
-
-
-
-<h2 id="creating-vms-with-claude">Creating VMs with Claude</h2>
-<p>After going through the process of setting up a MicroVM once, it becomes tedious.</p>
-<p>I was curious if <a href="https://code.claude.com/docs/en/skills">Claude Skills</a> could
-help with a task like this. Skills are markdown files that instruct Claude to do
-certain steps in certain situations.</p>
-<p>I created <code>.claude/skills/create-microvm/SKILL.md</code> as follows:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span>---
-</span></span><span style="display:flex;"><span>name: create-microvm
-</span></span><span style="display:flex;"><span>description: Creates a new microvm Virtual Machine on midna for running Claude in, with source code repositories and build dependencies available inside the microvm. Use when the user asks to create a new microvm.
-</span></span><span style="display:flex;"><span>---
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>Inspect the existing structure at ~/machines/midna (NixOS configuration using Flakes), which includes several MicroVMs in the ~/machines/midna/microvms/ directory.
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>Then, create a similar structure for the microvm the user asked to create. Be sure to consider:
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">1.</span> Create a new subdirectory for this microvm, named NAME (the microvm name).
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">2.</span> Create an entry in microvm.nix similar to an existing microvm&#39;s, but:
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">3.</span> Change hostname to NAME
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">4.</span> Change IP address (e.g., 192.168.83.3): find used ones and chose next free
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">5.</span> Change workspace share to /home/michael/microvm/NAME
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">6.</span> Include build dependencies for the new microvm based on user request
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">7.</span> Create ssh-host-keys directory
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">8.</span> Generate SSH host keys
-</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">9.</span> Clone/download source code repositories into this microvm based on user request
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>Once the microvm is defined, update ~/machines/midna to pull it in. To verify, build the config (but do not deploy).
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>You need to git-commit changes to the microvm before ~/machines/midna can see them.
-</span></span></code></pre></div><p>When using this skill with Claude Code (tested version: v2.0.76 and v2.1.15), with the <a href="https://www.anthropic.com/news/claude-opus-4-5">Opus 4.5 model</a>, I can send a prompt like this:</p>
-<blockquote>
-<p>please set up a microvm for Debian Code Search (dcs). see ~/dcs for the source code (but clone from <a href="https://github.com/Debian/dcs">https://github.com/Debian/dcs</a>)</p>
-</blockquote>
-<p>Now Claude churns for a few minutes, possibly asking a clarification question
-before that. Afterwards, Claude reports back with:</p>
-<blockquote>
-<p>The dcsvm microvm has been set up successfully. Here&rsquo;s what was created:</p>
-<p>Configuration:</p>
-<ul>
-<li>/home/michael/machines/midna/microvms/dcs.nix - Project-specific packages (Go toolchain, protobuf tools, uglify-js, yuicompressor,
-zopfli)</li>
-<li>Updated /home/michael/machines/midna/microvm.nix to include dcsvm with:
-<ul>
-<li>IP: 192.168.83.8</li>
-<li>tapId: microvm6</li>
-<li>mac: 02:00:00:00:00:07</li>
-</ul>
-</li>
-</ul>
-<p>Workspace:</p>
-<ul>
-<li>/home/michael/microvm/dcs/ - Workspace directory</li>
-<li>/home/michael/microvm/dcs/ssh-host-keys/ - SSH host keys (ed25519)</li>
-<li>/home/michael/microvm/dcs/dcs/ - Cloned repository from <a href="https://github.com/Debian/dcs">https://github.com/Debian/dcs</a></li>
-</ul>
-<p>Build verified - The configuration builds successfully.</p>
-<p>To start the microvm after deploying:
-<code>systemctl start microvm@dcsvm</code></p>
-<p>To SSH into it:
-<code>ssh michael@192.168.83.8</code></p>
-</blockquote>
-<p>Wonderful! In my experience, Claude always got the VM creation correct.</p>
-<h2 id="replicating-this-setup-with-claude-code">Replicating this setup with Claude Code</h2>
-<p>In fact, you can go one step further: Instead of just asking Claude to create
-new MicroVMs, you can also ask Claude to replicate this entire setup into your
-NixOS configuration!</p>
-<p>Try a prompt like this:</p>
-<blockquote>
-<p>read
-<a href="https://michael.stapelberg.ch/posts/2026-02-01-coding-agent-microvm-nix/">https://michael.stapelberg.ch/posts/2026-02-01-coding-agent-microvm-nix/</a>
-— I want the exact same setup in my midna NixOS configuration please!</p>
-</blockquote>
-<h2 id="conclusion">Conclusion</h2>
-<p>NixOS has a reputation of being hard to adopt, but once you are using NixOS, you
-can do powerful things like spinning up ephemeral MicroVMs for a new project
-within minutes.</p>
-<p>The maintenance effort is minimal: When I update my personal PC, my MicroVM
-configurations start using the new software versions, too. Customization is easy
-if needed.</p>
-<p>This actually mirrors my experience with Coding Agents: I don’t feel like
-they’re <em>automatically</em> making existing tasks more efficient, I feel that they
-make things possible that were previously out of reach (similar to <a href="https://en.wikipedia.org/wiki/Jevons_paradox">Jevons
-paradox</a>).</p>
-<p>It was fascinating (and scary!) to experience the quality increase of Coding
-Agents during 2025. At the beginning of 2025 I thought that LLMs are an
-overhyped toy, and felt it was almost insulting when people showed me text or
-code produced by these models. But almost every new frontier model release got
-significantly better, and by now I have been positively surprised by Claude
-Code’s capabilities and quality many times. It has produced code that handles
-legitimate edge cases I would not have considered.</p>
-<p>With this article, I showed one possible way to run Coding Agents safely (or any
-workload that shouldn’t access your private data, really) that you can adjust in
-many ways for your needs.</p>
-]]></content>
-  </entry>
   <entry>
     <title type="html"><![CDATA[Can I finally start using Wayland in 2026?]]></title>
     <link href="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/"/>
@@ -8180,6 +7551,301 @@ API. In case you do encounter any issues after all, please <a href="https://gith
 Go Protobuf issue tracker</a>.</p>
 <p>Reference documentation for Go Protobuf can be found on <a href="https://protobuf.dev/reference/go/">protobuf.dev → Go
 Reference</a>.</p>
+]]></content>
+  </entry>
+  <entry>
+    <title type="html"><![CDATA[Get a solar panel for your balcony now ☀️]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2024-12-10-solar-panel-for-your-balcony/"/>
+    <id>https://michael.stapelberg.ch/posts/2024-12-10-solar-panel-for-your-balcony/</id>
+    <published>2024-12-10T17:13:00+01:00</published>
+    <content type="html"><![CDATA[<p>A year ago, I got a solar panel for my balcony — an easy way to vote with your
+wallet to convert more of the world’s energy usage to solar power. That was a
+great decision and I would recommend everyone get a solar panel (or two)!</p>
+<h2 id="its-called-plug-in-solar-panel-because-you-can-just-plug-it-in">It’s called plug-in solar panel because you can just plug it in</h2>
+<p>In my experience, many people are surprised about the basics of how power works:
+You do not need to connect devices to a battery in order to enjoy solar
+power. You can just plug in the solar panel into your household electricity
+setup. Any of your consumers (like a TV, or electric cooktop) will now use the
+power that your solar panel produces before consuming power from the grid.</p>
+<p>Here’s the panel I have (Weber barbecue for scale). As you can see, the panel is
+not yet mounted at an angle, just hung over the balcony. The black box at the
+back of the panel is the inverter (“Wechselrichter”). You connect the panel on
+one side and get electricity out the other side.</p>
+<p><img src="IMG_2882.jpg" alt=""></p>
+<h2 id="which-solar-panel-to-buy">Which solar panel to buy?</h2>
+<p>There are two big questions to answer when chosing a solar panel: what peak
+capacity should your panel(s) have and which company / seller do you buy from?</p>
+<p>Regarding panel capacity: When I look at my energy usage, I see about 100 watts
+of baseline load. This includes always-on servers and other home automation
+devices. During working hours, running a PC and (power-hungry) monitor adds
+another 100 watts or so. Around noon, there is quite a spike in usage when
+cooking with my induction cooktop.</p>
+<p>Hence, I figured a plug &amp; play solar panel with the smallest size of 385 Wp
+would be well equipped to cover baseline usage, compared to the next bigger unit
+with 780 Wp, which seems oversized for my usage. Note that a peak capacity of
+385 Wp will not necessarily mean that you will measure 380W of output. I did
+repeatedly measure energy production exceeding 300W.</p>
+<p>Regarding the company, the best offer I found in Switzerland was a small company
+called <a href="https://www.erneuer.bar/">erneuer.bar</a>, which means “renewable” in
+German. They ship the panels with barely any packaging in fully electric
+vehicles and their offer is eligible for <a href="https://www.topten.ch/private/page/ewz">the topten bonus program from
+EWZ</a>, meaning you’ll get back 200 CHF if
+you fill in a form.</p>
+<p>The specific model I ordered was called “385 Wp Plug &amp; Play Solar (DE)”. Here’s
+the bill:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Produkt</th>
+          <th>Preis</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>385 Wp Plug &amp; Play Solar (DE)</td>
+          <td>CHF 520.00</td>
+      </tr>
+      <tr>
+          <td>Mounting kit: balcony, 1 panel</td>
+          <td>CHF 75.00</td>
+      </tr>
+      <tr>
+          <td>Pre-mount: mounting kit balcony</td>
+          <td>CHF 60.00</td>
+      </tr>
+      <tr>
+          <td>WiFi measurement myStrom</td>
+          <td>CHF 55.00</td>
+      </tr>
+      <tr>
+          <td>Shipping</td>
+          <td>CHF 68.00</td>
+      </tr>
+      <tr>
+          <td>Total</td>
+          <td>CHF 778.00</td>
+      </tr>
+  </tbody>
+</table>
+<p>Of course, you can save some money in various ways. For example, the measurement
+device and pre-mount option are both not required, but convenient. Similarly,
+you can probably find solar panels for cheaper, but the offer that erneuer.bar
+has put together truly is very convenient and works well, and to me that’s worth
+some money.</p>
+<p>One mistake I made when ordering is selecting a 5m cable. It turned out I needed
+a 10m cable, so I recommend you measure better than I did (or just select the
+longer cable). On the plus side, customer service was excellent: I quickly
+received an email response and could just send back my cable in exchange for a
+new one.</p>
+<h2 id="amortization-who-cares">Amortization? Who cares!</h2>
+<p>Many people seem to consider <strong>only the financial aspect</strong> of buying a solar
+panel and calculate when the solar panel will have paid for itself. I don’t
+care. My goal is to convert more energy usage to green energy, not to save
+money.</p>
+<p>Similarly, some people install batteries so that they can use “their” energy for
+themselves, in case the solar panel produces more than they use at that
+moment. I couldn’t care less who uses the energy I produce — as long as it’s
+green energy, anyone is welcome to consume it.</p>
+<p>(Of course I understand these questions become more important the larger a solar
+installation gets. But we’re talking about one balcony and one solar panel (or
+two) covering someone’s baseline residential household electricity load. Don’t
+overthink it!)</p>
+<h2 id="requirement-balcony-power-socket">Requirement: balcony power socket</h2>
+<p>Aside from having a balcony, there is only one hard requirement: you need a
+power socket.</p>
+<p>This requirement is either trivially fulfilled if you already have an outdoor
+power socket on your balcony (lucky you!), or might turn out to be the most
+involved part of the project. Either way, because an electrician needs to
+install power sockets, all you can do is get permission from your landlord and
+make an appointment with your electrician of choice.</p>
+<p>In terms of cost, you will probably spend a few hundred bucks, depending on your
+area’s cost of living. A good idea that did not occur to me back then: Ask
+around in your house if any neighbors would be interested in getting a balcony
+power socket, too, and do it all in one go (for cheaper).</p>
+<h2 id="bureaucracy">Bureaucracy</h2>
+<p>One can easily find stories online about electricity providers and landlords not
+permitting the installation of solar panels for… rather questionable
+reasons. For example, some claimed that solar panels could overload the house
+electricity infrastructure! A drastic-sounding claim, but nonsense in
+practice. Luckily, law makers are recognizing this and are removing barriers.</p>
+<h3 id="electricity-provider-and-the-law">Electricity provider and the law</h3>
+<p>In Switzerland 🇨🇭, you can connect panels producing up to 600W without an
+electrician, but you need to notify your electricity provider.</p>
+<p>In Germany 🇩🇪, you can connect panels producing up to 800W (as of May 16th 2024)
+without an electrician, but <a href="https://www.adac.de/rund-ums-haus/energie/versorgung/balkonkraftwerk-anmelden/">you need to register with the
+Bundesnetzagentur</a>.</p>
+<p>Be sure to check your country’s laws and your electricity provider’s rules and
+processes.</p>
+<h3 id="landlord-and-neighbors">Landlord and neighbors</h3>
+<p>In Switzerland 🇨🇭, you need to <a href="https://www.mieterverband.ch/mv/politik-positionen/news/2024/mustervereinbarung-fuer-bewilligung-von-balkonsolaranlagen.html">ask your landlord for
+permission</a>
+because if your solar panel were to fall down from the balcony, the landlord
+would be liable. Usually, the landlord insists on proper mounting and the tenant
+taking over liability. In my case, the landlord also asked me to ensure the
+neighbors wouldn’t mind. I put up a letter, nobody complained, the landlord
+accepted.</p>
+<p>In Germany 🇩🇪, you do need to ask your landlord for permission, but the landlord
+pretty much has to agree (<a href="https://www.computerbild.de/artikel/cb-News-Energie-Bundeskabinett-Balkonkraftwerk-Wohnung-Privileg-36684829.html">as of October 17th
+2024</a>). The
+question is not “if”, but “how” the landlord wants you to install the solar
+panel.</p>
+<h2 id="optimizing-the-installation-angle">Optimizing the installation angle</h2>
+<p>Earlier I wrote that you can just hang the solar panel onto your balcony and
+plug it in. While this is true, there is one factor that is worth optimizing (as
+time permits): the installation angle.</p>
+<p>If you want more details about the physics background and various considerations
+that go into chasing the optimal angle, check out these (German) articles about
+<a href="https://www.golem.de/news/balkonkraftwerke-was-bringt-der-neigungswinkel-fuer-den-stromertrag-2405-185599-2.html">optimizing the installation angle (at
+Golem)</a>
+or <a href="https://www.heise.de/ratgeber/Photovoltaik-Anlagen-dimensionieren-Wirtschaftlichkeit-berechnen-9688108.html?seite=2">sizing solar installations (at
+Heise)</a>. I’ll
+summarize: the angle is important and can result in twice as much energy
+production! Any angle is usually better than no angle.</p>
+<p>In my case, I first “installed” the solar panel (no angle) at 2023-09-30.</p>
+<p>Then, about a month later, I installed it at an angle at 2023-10-28.</p>
+<p><img src="IMG_2996.jpg" alt=""></p>
+<p>I unfortunately don’t have a great before/after graph because after I installed
+the proper angle mount, there were almost no sunny days.</p>
+<p>Instead, I will show you data from a comparable time range (early October) in
+2023 (before mounting the panel at an angle) and in 2024 (with a properly
+mounted panel). As you can see, the difference is not that huge, but clearly
+visible: without an angle mount, I could never exceed 300 Wh per day. With a
+proper mount, a number of days exceed 300 Wh:</p>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th>1st</th>
+          <th>2nd</th>
+          <th>3rd</th>
+          <th>4th</th>
+          <th>5th</th>
+          <th>6th</th>
+          <th>7th</th>
+          <th>8th</th>
+          <th>9th</th>
+          <th>10th</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2023 🌞 Wh</td>
+          <td>133</td>
+          <td>268</td>
+          <td>262</td>
+          <td>208</td>
+          <td>271</td>
+          <td>255</td>
+          <td>274</td>
+          <td>277</td>
+          <td>275</td>
+          <td>194</td>
+      </tr>
+      <tr>
+          <td>2024 🌞 Wh</td>
+          <td>529</td>
+          <td>119</td>
+          <td>246</td>
+          <td>205</td>
+          <td>160</td>
+          <td>324</td>
+          <td>265</td>
+          <td>335</td>
+          <td>73</td>
+          <td>444</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="how-much-electricity-does-my-panel-generate">How much electricity does my panel generate?</h2>
+<p>The exact electricity production numbers depend on how much sun ends up on the
+solar panel. This in turn depends on the weather and how obstructed the solar
+panel is (neighbors, trees, …).</p>
+<p>I like measuring things, so I will share some measurements to give you a rough
+idea. But note that measuring your solar panel is strictly optional.</p>
+<p>On the best recorded day, my panel produced about 1.680 kWh of energy:</p>
+<p><img src="2024-06-05-1680Wh.jpg" alt=""></p>
+<p>The missing parts before 14:00 are caused by the neighbor’s house blocking the sun.</p>
+<p>Now, compare this best case with the worst case, a January day with little sun
+(&lt; 50 Wh):</p>
+<p><img src="2024-12-04-solar-january-14th.jpg" alt=""></p>
+<p>Let’s zoom out a bit and consider an entire year instead.</p>
+<p>In 2024, the panel produced over 177 kWh so far, or, averaged to the daily
+value, ≈0.5 kWh/day:</p>
+<p><img src="2024-12-04-solar-whole-year.jpg" alt=""></p>
+<p>Or, in numeric form (all numbers in kWh):</p>
+<table>
+  <thead>
+      <tr>
+          <th>Jan</th>
+          <th>Feb</th>
+          <th>Mar</th>
+          <th>Apr</th>
+          <th>May</th>
+          <th>Jun</th>
+          <th>Jul</th>
+          <th>Aug</th>
+          <th>Sep</th>
+          <th>Oct</th>
+          <th>Nov</th>
+          <th>Dec</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2.9</td>
+          <td>6.6</td>
+          <td>10.9</td>
+          <td>18.4</td>
+          <td>29.1</td>
+          <td>27.7</td>
+          <td>37.6</td>
+          <td>22.1</td>
+          <td>12.0</td>
+          <td>6.5</td>
+          <td>3.3</td>
+          <td>n/a</td>
+      </tr>
+  </tbody>
+</table>
+<!--
+
+% for f in *.csv; do head -2 "$f"; (IFS=$'\n'; for measure in $(cut -d, -f2 "$f" |grep Wh); do units -t "$measure" Wh; done | tr '\n' '+'; echo 0) | bc; done 
+
+| Month   | Solar energy (kWh) |
+|---------|--------------------|
+| 2024-01 | 2.901              |
+| 2024-02 | 6.614              |
+| 2024-03 | 10.956             |
+| 2024-04 | 18.451             |
+| 2024-05 | 29.150             |
+| 2024-06 | 27.743             |
+| 2024-07 | 37.683             |
+| 2024-08 | 22.128             |
+| 2024-09 | 12.074             |
+| 2024-10 | 6.521              |
+| 2024-11 | 3.361              |
+
+-->
+<h2 id="conclusion">Conclusion</h2>
+<p>A solar panel is a great project to make incremental progress on. It’s just 3 to
+4 simple steps, each of which is valuable on its own:</p>
+<ol>
+<li>Check with your landlord that installing an outdoor power socket and solar panel is okay.
+<ul>
+<li>Even if you personally do not go any further with your project, you can
+share the result with your neighbors, who might…</li>
+</ul>
+</li>
+<li>Order an outdoor power socket from your (or your landlord’s) preferred electrician.
+<ul>
+<li>Power will come in handy for lighting when spending summer evenings on the
+balcony.</li>
+</ul>
+</li>
+<li>Order a solar panel and plug it in.</li>
+<li>Optional, but recommended: Optimize the mounting angle later.</li>
+</ol>
+<p>That’s it! Come on, get started right away 🌞</p>
 ]]></content>
   </entry>
 </feed>

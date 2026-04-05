@@ -241,6 +241,36 @@
   <br>
 
     
+  <h2>2017 › October</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2017-10-08-raspberry-pi-3/"><h3>Debian stretch on the Raspberry Pi 3 (update)</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<p>
+	   I previously wrote about my Debian stretch preview image for the Raspberry Pi 3. Now, I’m publishing an updated version, containing the following changes: SSH host keys are generated on first boot. Old kernel versions are now removed from /boot/firmware when purged. The image is built with vmdb2, the successor to vmdebootstrap. The input files are available at https://github.com/Debian/raspi3-image-spec. The image uses the linux-image-arm64 4.13.4-3 kernel, which provides HDMI output. The image is now compressed using bzip2, reducing its size to 220M. A couple of issues remain, notably the lack of WiFi and bluetooth support (see wiki:RaspberryPi3 for details. Any help with fixing these issues is very welcome! 
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-10-08-raspberry-pi-3/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
   <h2>2017 › August</h2>
   <ul class="ArticleList">
     
@@ -995,30 +1025,6 @@ However, recently I was asked a couple of times why I like and use a lot of Go, 
 	<p>
 	   I run multiple web services, mostly related to i3wm.org. All of them use PostgreSQL as their database, so the data that is stored in that PostgreSQL database is pretty important to me and the users of these services. Since a while now, I have been thinking about storing that data in a more reliable way. Currently, it is stored on a single server, and is backed up to two different locations (one on-site, one off-site) every day. The server in question has a RAID-1 of course, but still: the setup implies that if that one server dies, the last backup may be about a day old in the worst case, and also it could take me significant time to get the services back up. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-08-31-replicated_postgresql_with_pgpool/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2014-08-11-fiber7_ubnt_erlite/"><h3>Configuring a Ubiquiti EdgeRouter Lite (Erlite-3) for Fiber7</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/fiber/">fiber</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	
-	<p>
-	   I immediately ordered a fiber7 internet connection once it became available, and I’ve been connected since a few weeks. They offer a 1 Gbps symmetrical fiber connection, with native (static) IPv6 and no traffic limit — for 65 CHF per month (about 54 €). 
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2014-08-11-fiber7_ubnt_erlite/">Read more →</a></span>
 	</p>
       </div>
     </li>

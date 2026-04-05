@@ -246,6 +246,35 @@
     
     <li>
       <div>
+	<a href="https://michael.stapelberg.ch/posts/2022-06-18-rsync-article-1-scenarios/"><h3>rsync, article 1: Scenarios</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/rsync/">rsync</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	
+	<a href="https://michael.stapelberg.ch/posts/2022-06-18-rsync-article-1-scenarios/" style="min-width: 200px; margin-right: 1.5rem; margin-bottom: 1.5rem"><img src="https://michael.stapelberg.ch/posts/2022-06-18-rsync-article-1-scenarios/2022-05-29-backup-architecture-featured_hu_7c2748f58b87b2b.png" width="200" height="108"/></a>
+	
+	<p>
+	  This post is the first article in a series of blog posts about rsync, see the Series Overview.
+To motivate why it makes sense to look at rsync, I present three scenarios for which I have come to appreciate rsync: DokuWiki transfers, Software deployment and Backups.
+
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2022-06-18-rsync-article-1-scenarios/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+    <li>
+      <div>
 	<a href="https://michael.stapelberg.ch/posts/2022-06-18-rsync-overview/"><h3>rsync: Series Overview</h3></a>
 	
 	<div class="tags">
@@ -1094,38 +1123,6 @@ performance improvements in all areas (starting programs, building distri packag
 For example, if package libusb-amd64-1.0.22-7 is available at build time, the package will always use that same version, even after the newer libusb-amd64-1.0.23-8 will be installed into the package store.
 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-05-09-distri-hermetic-packages/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-  </ul>
-
-  
-  <h2>2020 › February</h2>
-  <ul class="ArticleList">
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2020-02-02-readiness-notifications-in-golang/"><h3>Readiness notifications in Go</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	
-	<p>
-	  When spawning a child program, for example in an integration test, it is often helpful to know when the child program is ready to receive requests.
-Delaying A brittle strategy is to just add a delay (say, time.Sleep(2 * time.Second)) and hope the child program finishes initialization in that time. This is brittle because it depends on timing, so when the computer running the test is slow for whichever reason, your test starts failing. Many CI/CD systems have less capacity (and/or are more heavily utilized) than developer machines, so timeouts frequently need to be adjusted.
-
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-02-02-readiness-notifications-in-golang/">Read more →</a></span>
 	</p>
       </div>
     </li>

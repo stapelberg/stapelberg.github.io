@@ -241,6 +241,38 @@
   <br>
 
     
+  <h2>2020 › February</h2>
+  <ul class="ArticleList">
+    
+    <li>
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2020-02-02-readiness-notifications-in-golang/"><h3>Readiness notifications in Go</h3></a>
+	
+	<div class="tags">
+	  Tags:
+	
+	<span class="ms_tag"><a href="/posts/tags/golang/">golang</a></span>
+	
+	</div>
+	
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<p>
+	  When spawning a child program, for example in an integration test, it is often helpful to know when the child program is ready to receive requests.
+Delaying A brittle strategy is to just add a delay (say, time.Sleep(2 * time.Second)) and hope the child program finishes initialization in that time. This is brittle because it depends on timing, so when the computer running the test is slow for whichever reason, your test starts failing. Many CI/CD systems have less capacity (and/or are more heavily utilized) than developer machines, so timeouts frequently need to be adjusted.
+
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2020-02-02-readiness-notifications-in-golang/">Read more →</a></span>
+	</p>
+      </div>
+    </li>
+    
+  </ul>
+
+  
   <h2>2020 › January</h2>
   <ul class="ArticleList">
     
@@ -1076,30 +1108,6 @@ in other words: the component which verifies usernames and passwords.
 	<p>
 	   UNIX distributions used to come with the system source code in /usr/src. This is a concept which fascinates me: if you want to change something in any part of your system, just make your change in the corresponding directory, recomile, reinstall, and you can immediately see your changes in action. 
 	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-10-21-pk4/">Read more →</a></span>
-	</p>
-      </div>
-    </li>
-    
-    <li>
-      <div>
-	<a href="https://michael.stapelberg.ch/posts/2017-10-08-raspberry-pi-3/"><h3>Debian stretch on the Raspberry Pi 3 (update)</h3></a>
-	
-	<div class="tags">
-	  Tags:
-	
-	<span class="ms_tag"><a href="/posts/tags/debian/">debian</a></span>
-	
-	</div>
-	
-      </div>
-      <div class="summary">
-	
-	
-	
-	
-	<p>
-	   I previously wrote about my Debian stretch preview image for the Raspberry Pi 3. Now, I’m publishing an updated version, containing the following changes: SSH host keys are generated on first boot. Old kernel versions are now removed from /boot/firmware when purged. The image is built with vmdb2, the successor to vmdebootstrap. The input files are available at https://github.com/Debian/raspi3-image-spec. The image uses the linux-image-arm64 4.13.4-3 kernel, which provides HDMI output. The image is now compressed using bzip2, reducing its size to 220M. A couple of issues remain, notably the lack of WiFi and bluetooth support (see wiki:RaspberryPi3 for details. Any help with fixing these issues is very welcome! 
-	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-10-08-raspberry-pi-3/">Read more →</a></span>
 	</p>
       </div>
     </li>

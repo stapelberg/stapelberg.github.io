@@ -6,6 +6,1150 @@
   <id>https://michael.stapelberg.ch/feed-no-ai.xml</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[Stamp It! All Programs Must Report Their Version]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/"/>
+    <id>https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/</id>
+    <published>2026-04-05T16:20:00+02:00</published>
+    <content type="html"><![CDATA[<p>Recently, during a production incident response, I guessed the root cause of an
+outage correctly within less than an hour (cool!) and submitted a fix just to
+rule it out, only to then spend many hours fumbling in the dark because we
+lacked visibility into version numbers and rollouts… 😞</p>
+<p>This experience made me think about software versioning again, or more
+specifically about build info (build versioning, version stamping, however you
+want to call it) and version reporting. I realized that for the i3 window
+manager, I had solved this problem well over a decade ago, so it was really
+unexpected that the problem was decidedly not solved at work.</p>
+<p>In this article, I’ll explain how 3 simple steps (Stamp it! Plumb it! Report
+it!) are sufficient to save you hours of delays and stress during incident
+response.</p>
+<h2 id="low-versioning-standards">Why are our versioning standards so low?!</h2>
+<p>Every household appliance has incredibly detailed versioning! Consider this
+dishwasher:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-04-feuermurmel-dishwasher-versioning.png"><img
+  srcset="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-04-feuermurmel-dishwasher-versioning_hu_81558fb5648097f.png 2x,https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-04-feuermurmel-dishwasher-versioning_hu_842f7962dbfbee64.png 3x"
+  src="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-04-feuermurmel-dishwasher-versioning_hu_b19004a896832878.png"
+  alt="a dishwasher, with many precise bits of version information" title="a dishwasher, with many precise bits of version information"
+  width="600"
+  height="450"
+  style="
+
+border: 1px solid #000;
+
+"
+  
+  loading="lazy"></a>
+
+
+
+<p><em>(Thank you Feuermurmel for sending me this lovely example!)</em></p>
+<p>I observed a couple household appliance repairs and am under the impression that
+if a repair person cannot identify the appliance, they would most likely refuse
+to even touch it.</p>
+<p>So why are our standards so low in computers, in comparison? Sure, consumer
+products are typically versioned <em>somehow</em> and that’s typically good enough
+(except for, say, USB 3.2 Gen 1×2!). But recently, I have encountered too many
+developer builds that were not adequately versioned!</p>
+<h2 id="software-versioning">Software Versioning</h2>
+<p>Unlike a physical household appliance with a stamped metal plate, software is
+constantly updated and runs in places and structures we often cannot even see.</p>
+<p>Let’s dig into what we need to increase our versioning standard!</p>
+<p>Usually, software has a <strong>name</strong> and some <strong>version number</strong> of varying granularity:</p>
+<ul>
+<li>Chrome</li>
+<li>Chrome 146</li>
+<li>Chrome 146.0.7680.80</li>
+<li>Chrome f08938029c887ea624da7a1717059788ed95034d-refs/branch-heads/7680_65@{#34}</li>
+</ul>
+<p>All of these identify the Chrome browser on my computer, but each at different
+granularity.</p>
+<p>All are correct and useful, depending on the context. Here’s an example for each:</p>
+<ol>
+<li>“This works in Chrome for me, did you test in Firefox?”</li>
+<li>“Chrome 146 contains broken middle-click-to-paste-and-navigate”</li>
+<li>“I run Chrome 146.0.7680.80 and cannot reproduce your issue”</li>
+<li>“Apply this patch on top of Chrome f08938029c887ea624da7a1717059788ed95034d-refs/branch-heads/7680_65@{#34} and follow these steps to reproduce: […]”</li>
+</ol>
+<p>After creating the <a href="https://i3wm.org">i3 window manager</a>, I quickly learned that
+for user support, it is very valuable for programs to clearly identify
+themselves. Let me illustrate with the following case study.</p>
+<h2 id="i3-moreversion">Case Study: i3’s <code>--version</code> and <code>--moreversion</code></h2>
+<p>When running <code>i3 --version</code>, you will see output like this:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% i3 --version
+</span></span><span style="display:flex;"><span>i3 version 4.24 (2024-11-06) © 2009 Michael Stapelberg and contributors
+</span></span></code></pre></div><p>Each word was carefully deliberated and placed. Let me dissect:</p>
+<ol>
+<li><code>i3 version 4.24</code>: I could have shortened this to <code>i3 4.24</code> or maybe <code>i3 v4.24</code>, but I figured it would be helpful to be explicit because <code>i3</code> is such
+a short name. Users might mumble aloud “What’s an i-3-4-2-4?”, but when
+putting “version” in there, the implication is that i3 is some computer thing
+(→ a computer program) that exists in version 4.24.</li>
+<li><code>(2024-11-06)</code> is the release date so that you can immediately tell if
+“<code>4.24</code>” is recent.</li>
+<li><code>© 2009 Michael Stapelberg</code> signals when the project was started and who is
+the main person behind it.</li>
+<li><code>and contributors</code> gives credit to the many people who helped. i3 was never a
+one-person project; it was always a group effort.</li>
+</ol>
+<p>When doing user support, there are a couple of questions that are conceptually
+easy to ask the affected user and produce very valuable answers for the
+developer:</p>
+<ol>
+<li>Question: “Which version of i3 are you using?”
+<ul>
+<li>Since i3 is not a typical program that runs in a window (but a window
+manager / desktop environment), there is no Help → About menu
+option.</li>
+<li>Instead, we started asking: What is the output of <code>i3 --version</code>?</li>
+</ul>
+</li>
+<li>Question: “<em>Are you reporting a new issue or a preexisting issue? To confirm,
+can you try going back to the version of i3 you used previously?</em>”. The
+technical terms for “going back” are downgrade, rollback or revert.
+<ul>
+<li>Depending on the Linux distribution, this is either trivial or a nightmare.</li>
+<li>With NixOS, it’s trivial: you just boot into an older system “generation”
+by selecting that version in the bootloader. Or you revert in git, if your
+configs are version-controlled.</li>
+<li>With imperative Linux distributions like Debian Linux or Arch Linux, if
+you did not take a file system-level snapshot, there is no easy and
+reliable way to go back after upgrading your system. If you are lucky, you
+can just <code>apt install</code> the older version of i3. But you might run into
+dependency conflicts (“version hell”).</li>
+<li>I know that it is <em>possible</em> to run older versions of Debian using
+<a href="https://snapshot.debian.org/">snapshot.debian.org</a>, but it is just not
+very practical, at least when I last tried.</li>
+</ul>
+</li>
+<li>Can you check if the issue is still present in the latest i3 development version?
+<ul>
+<li>Of course, I could also try reproducing the user issue with the latest
+release version, and <strong>then one additional time</strong> on the latest
+development version.</li>
+<li>But this way, the verification step moves to the affected user, which is
+good because it filters for highly-motivated bug reporters (higher chance
+the bug report actually results in a fix!) and it makes the user reproduce
+the bug <em>twice</em>, figuring out if it’s a flaky issue, hard-to-reproduce, if
+the reproduction instructions are correct, etc.</li>
+<li>A natural follow-up question: “<em>Does this code change make the issue go
+away?</em>” This is easy to test for the affected user who now has a
+development environment.</li>
+</ul>
+</li>
+</ol>
+<p>Based on my experiences with asking these questions many times, I noticed a few
+patterns in how these debugging sessions went. In response, I introduced another
+way for i3 to report its version in i3 v4.3 (released in September 2012): a
+<code>--moreversion</code> flag! Now I could ask users a small variation of the first
+question: What is the output of <code>i3 --moreversion</code>? Note how this also transfers
+well over spoken word, for example at a computer meetup:</p>
+<blockquote>
+<p><strong>Michael:</strong> Which version are you using?</p>
+<p><strong>User:</strong> How can I check?</p>
+<p><strong>Michael:</strong> Run this command: <code>i3 --version</code></p>
+<p><strong>User:</strong> It says 4.24.</p>
+<p><strong>Michael:</strong> Good, that is recent enough to include the bug fix. Now, we need
+more version info! Run <code>i3 --moreversion</code> please and tell me what you see.</p>
+</blockquote>
+<p>When you run <code>i3 --moreversion</code>, it does not just report the version of the i3
+program you called, it also connects to the running i3 window manager process in
+your X11 session using <a href="https://i3wm.org/docs/ipc.html">its IPC (interprocess communication)
+interface</a> and reports the running i3 process’s
+version, alongside other key details that are helpful to show the user, like
+which configuration file is loaded and when it was last changed:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% i3 --moreversion
+</span></span><span style="display:flex;"><span>Binary i3 version:  4.24 (2024-11-06) © 2009 Michael Stapelberg and…
+</span></span><span style="display:flex;"><span>Running i3 version: 4.24 (2024-11-06) (pid 2521)
+</span></span><span style="display:flex;"><span>Loaded i3 config:
+</span></span><span style="display:flex;"><span>  /home/michael/.config/i3/config (main)
+</span></span><span style="display:flex;"><span>  (last modified: 2026-03-15T23:09:27 CET, 1101585 seconds ago)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>The i3 binary you just called:
+</span></span><span style="display:flex;"><span>/nix/store/0zn9r4263fjpqah6vdzlalfn0ahp8xc2-i3-4.24/bin/i3
+</span></span><span style="display:flex;"><span>The i3 binary you are running: i3
+</span></span></code></pre></div><p>This might look like a lot of detail on first glance, but let me spell out why
+this output is such a valuable debugging tool:</p>
+<ol>
+<li>
+<p>Connecting to i3 via the IPC interface is an interesting test in and of
+itself. If a user sees <code>i3 --moreversion</code> output, that implies they will also
+be able to run debugging commands like (for example) <code>i3-msg -t get_tree &gt; /tmp/tree.json</code> to capture the full layout state.</p>
+</li>
+<li>
+<p>During a debugging session, running <code>i3 --moreversion</code> is an easy check to
+see if the version you just built is actually effective (see the <code>Running i3 version</code> line).</p>
+<ul>
+<li>Note that this is the same check that is relevant during production
+incidents: verifying that <em>effectively running</em> matches <em>supposed to be
+running</em> versions.</li>
+</ul>
+</li>
+<li>
+<p>Showing the full path to the loaded config file will make it obvious if the
+user has been editing the wrong file. If the path alone is not sufficient,
+the modification time (displayed both absolute and relative) will flag
+editing the wrong file.</p>
+</li>
+</ol>
+<p>I use NixOS, BTW, so I automatically get a stable identifier
+(<code>0zn9r4263fjpqah6vdzlalfn0ahp8xc2-i3-4.24</code>) for <em>the specific build</em> of i3.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% ls -l $(which i3)
+</span></span><span style="display:flex;"><span>lrwxrwxrwx 1 root root 58 1970-01-01 01:00 /run/current-system/sw/bin/i3
+</span></span><span style="display:flex;"><span>-&gt; /nix/store/0zn9r4263fjpqah6vdzlalfn0ahp8xc2-i3-4.24/bin/i3
+</span></span></code></pre></div><p>To see the build recipe (“derivation” in Nix terminology) which produced this
+Nix store output (<code>0zn9r4263…-i3-4.24</code>), I can run <code>nix derivation show</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% nix derivation show /nix/store/0zn9r4263fjpqah6vdzlalfn0ahp8xc2-i3-4.24
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  &#34;/nix/store/z7ly4kvgixf29rlz01ji4nywbajfifk4-i3-4.24.drv&#34;: {
+</span></span><span style="display:flex;"><span>[…]
+</span></span></code></pre></div><details>
+<summary>Click here to expand the full <code>nix derivation show</code> output if you are curious</summary>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% nix derivation show /nix/store/0zn9r4263fjpqah6vdzlalfn0ahp8xc2-i3-4.24
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  &#34;/nix/store/z7ly4kvgixf29rlz01ji4nywbajfifk4-i3-4.24.drv&#34;: {
+</span></span><span style="display:flex;"><span>    &#34;args&#34;: [
+</span></span><span style="display:flex;"><span>      &#34;-e&#34;,
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/l622p70vy8k5sh7y5wizi5f2mic6ynpg-source-stdenv.sh&#34;,
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/shkw4qm9qcw5sc5n1k5jznc83ny02r39-default-builder.sh&#34;
+</span></span><span style="display:flex;"><span>    ],
+</span></span><span style="display:flex;"><span>    &#34;builder&#34;: &#34;/nix/store/6ph0zypyfc09fw6hlc1ygjvk2hv4j9vd-bash-5.3p3/bin/bash&#34;,
+</span></span><span style="display:flex;"><span>    &#34;env&#34;: {
+</span></span><span style="display:flex;"><span>      &#34;NIX_MAIN_PROGRAM&#34;: &#34;i3&#34;,
+</span></span><span style="display:flex;"><span>      &#34;__structuredAttrs&#34;: &#34;&#34;,
+</span></span><span style="display:flex;"><span>      &#34;buildInputs&#34;: &#34;/nix/store/58q0dn2lbm2p04qmds0aymwdd1fr5j67-libxcb-1.17.0-dev /nix/store/3fcfw014z5i05ay1ag0hfr6p81mb1kzw-libxcb-keysyms-0.4.1-dev /nix/store/2cdrqvd3av1dmxna9xjqv1jccibpvg6m-libxcb-util-0.4.1-dev /nix/store/256alp82fhdgbxx475dp7mk8m29y53rh-libxcb-wm-0.4.2-dev /nix/store/nr44nfhj48abr3s6afqy1fjq4qmr23lz-xcb-util-xrm-1.3 /nix/store/ml4cfhhw6af6qq6g3dn7g5j5alrnii88-libxkbcommon-1.11.0-dev /nix/store/6hnzjg09fd5xkkrdj437wyaj952nlg45-libstartup-notification-0.12 /nix/store/9m0938zahq7kcfzzix4kkpm8d1iz3nmq-libx11-1.8.12-dev /nix/store/vz5gd0rv0m2kjca50gacz0zq9qh7i8xf-pcre2-10.46-dev /nix/store/334cvqpqc9f0plv0aks71g352w6hai0c-libev-4.33 /nix/store/6s3fw10c0441wv53bybjg50fh8ag1561-yajl-2.1.0-unstable-2024-02-01 /nix/store/d6aw2004h90dwlsfcsygzzj4pzm1s31a-libxcb-cursor-0.1.6-dev /nix/store/84mhqfj9amzyvxhp37yh3b0zd8sq0a7p-perl-5.40.0 /nix/store/l6bslkrp59gaknypf1jrs5vbb2xmcwym-pango-1.57.0-dev /nix/store/7s7by82nq8bahsh195qr0mnn9ac8ljmm-perl5.40.0-AnyEvent-I3-0.19 /nix/store/9ml0p4x1cx5k1lla91bxgramc0amsfkf-perl5.40.0-X11-XCB-0.20 /nix/store/67j1sx7qcn6f7qvq1kh3z8i5mpajgq3r-perl5.40.0-IPC-Run-20231003.0 /nix/store/859x84mz38bcq0r7hwksk4b5apcsmf2w-perl5.40.0-ExtUtils-PkgConfig-1.16 /nix/store/q1qydg6frfpq9jkhnymfsjzf71x9jswr-perl5.40.0-Inline-C-0.82&#34;,
+</span></span><span style="display:flex;"><span>      &#34;builder&#34;: &#34;/nix/store/6ph0zypyfc09fw6hlc1ygjvk2hv4j9vd-bash-5.3p3/bin/bash&#34;,
+</span></span><span style="display:flex;"><span>      &#34;checkPhase&#34;: &#34;runHook preCheck\n\ntest_failed=\n# \&#34;| cat\&#34; disables fancy progress reporting which makes the log unreadable.\n./complete-run.pl -p 1 --keep-xserver-output | cat || test_failed=\&#34;complete-run.pl returned $?\&#34;\nif [ -z \&#34;$test_failed\&#34; ]; then\n  # Apparently some old versions of `complete-run.pl` did not return a\n  # proper exit code, so check the log for signs of errors too.\n  grep -q &#39;^not ok&#39; latest/complete-run.log &amp;&amp; test_failed=\&#34;test log contains errors\&#34; ||:\nfi\nif [ -n \&#34;$test_failed\&#34; ]; then\n  echo \&#34;***** Error: $test_failed\&#34;\n  echo \&#34;===== Test log =====\&#34;\n  cat latest/complete-run.log\n  echo \&#34;===== End of test log =====\&#34;\n  false\nfi\n\nrunHook postCheck\n&#34;,
+</span></span><span style="display:flex;"><span>      &#34;cmakeFlags&#34;: &#34;&#34;,
+</span></span><span style="display:flex;"><span>      &#34;configureFlags&#34;: &#34;&#34;,
+</span></span><span style="display:flex;"><span>      &#34;debug&#34;: &#34;/nix/store/20rgxn6fpywd229vka9dnjiaprypxirh-i3-4.24-debug&#34;,
+</span></span><span style="display:flex;"><span>      &#34;depsBuildBuild&#34;: &#34;&#34;,
+</span></span><span style="display:flex;"><span>      &#34;depsBuildBuildPropagated&#34;: &#34;&#34;,
+</span></span><span style="display:flex;"><span>      &#34;depsBuildTarget&#34;: &#34;&#34;,
+</span></span><span style="display:flex;"><span>      &#34;depsBuildTargetPropagated&#34;: &#34;&#34;,
+</span></span><span style="display:flex;"><span>      &#34;depsHostHost&#34;: &#34;&#34;,
+</span></span><span style="display:flex;"><span>      &#34;depsHostHostPropagated&#34;: &#34;&#34;,
+</span></span><span style="display:flex;"><span>      &#34;depsTargetTarget&#34;: &#34;&#34;,
+</span></span><span style="display:flex;"><span>      &#34;depsTargetTargetPropagated&#34;: &#34;&#34;,
+</span></span><span style="display:flex;"><span>      &#34;doCheck&#34;: &#34;1&#34;,
+</span></span><span style="display:flex;"><span>      &#34;doInstallCheck&#34;: &#34;&#34;,
+</span></span><span style="display:flex;"><span>      &#34;mesonFlags&#34;: &#34;-Ddocs=true -Dmans=true&#34;,
+</span></span><span style="display:flex;"><span>      &#34;name&#34;: &#34;i3-4.24&#34;,
+</span></span><span style="display:flex;"><span>      &#34;nativeBuildInputs&#34;: &#34;/nix/store/x06h0jfzv99c3dmb8pj8wbmy0v9wj6bd-pkg-config-wrapper-0.29.2 /nix/store/pcdnznc797nmf9svii18k3c5v22sqihs-make-shell-wrapper-hook /nix/store/nzg469dkg5dj7lv4p50pi8zmwzxx73hr-meson-1.9.1 /nix/store/rlcn0x0j22nbhhf8wfp8cwfxgh65l82r-ninja-1.13.1 /nix/store/hs4pgi40k5nbl0fpf0jx8i5f6zrdv63v-install-shell-files /nix/store/84mhqfj9amzyvxhp37yh3b0zd8sq0a7p-perl-5.40.0 /nix/store/xiqlw1h0i6a6v59skrg9a7rg3qpanqy7-asciidoc-10.2.1 /nix/store/300facd5m37fwqrypjcikn09vqs488zv-xmlto-0.0.29 /nix/store/yk7avh2szvm6bi5dwgzz4c2iciaipj2p-docbook-xml-4.5 /nix/store/d5qdxn0rjl9s7xfc1rca33gya0fhcvkm-docbook-xsl-nons-1.79.2 /nix/store/2y1r1cpza3lpk7v6y9mf75ak0pswilwi-find-xml-catalogs-hook /nix/store/r989dk196nl9frhnfsa1lb7knhbyjxw6-separate-debug-info.sh /nix/store/xlhipdkyqksxvp73cznnij5q6ilbbqd9-xorg-server-21.1.21-dev /nix/store/i8nxxmw5rzhxlx3n12s3lvplwwap6mpc-xvfb-run-1+g87f6705 /nix/store/a198i9cnhn6y5cajkdxg0hhcrmalazjr-xdotool-3.20211022.1 /nix/store/b4dnjyq2i4kjg8xswkjd7lwfcdps94j8-setxkbmap-1.3.4 /nix/store/cxdbw6iqj1a1r69wb55xl5nwi7abfllb-xrandr-1.5.3 /nix/store/5k4mv2a1qrciv12wywlkgpslc6swyv58-which-2.23&#34;,
+</span></span><span style="display:flex;"><span>      &#34;out&#34;: &#34;/nix/store/0zn9r4263fjpqah6vdzlalfn0ahp8xc2-i3-4.24&#34;,
+</span></span><span style="display:flex;"><span>      &#34;outputs&#34;: &#34;out debug&#34;,
+</span></span><span style="display:flex;"><span>      &#34;patches&#34;: &#34;&#34;,
+</span></span><span style="display:flex;"><span>      &#34;pname&#34;: &#34;i3&#34;,
+</span></span><span style="display:flex;"><span>      &#34;postInstall&#34;: &#34;wrapProgram \&#34;$out/bin/i3-save-tree\&#34; --prefix PERL5LIB \&#34;:\&#34; \&#34;$PERL5LIB\&#34;\nfor program in $out/bin/i3-sensible-*; do\n  sed -i &#39;s/which/command -v/&#39; $program\ndone\n\ninstallManPage man/*.1\n&#34;,
+</span></span><span style="display:flex;"><span>      &#34;postPatch&#34;: &#34;patchShebangs .\n\n# This testcase generates a Perl executable file with a shebang, and\n# patchShebangs can&#39;t replace a shebang in the middle of a file.\nif [ -f testcases/t/318-i3-dmenu-desktop.t ]; then\n  substituteInPlace testcases/t/318-i3-dmenu-desktop.t \\\n    --replace-fail \&#34;#!/usr/bin/env perl\&#34; \&#34;#!/nix/store/84mhqfj9amzyvxhp37yh3b0zd8sq0a7p-perl-5.40.0/bin/perl\&#34;\nfi\n&#34;,
+</span></span><span style="display:flex;"><span>      &#34;propagatedBuildInputs&#34;: &#34;&#34;,
+</span></span><span style="display:flex;"><span>      &#34;propagatedNativeBuildInputs&#34;: &#34;&#34;,
+</span></span><span style="display:flex;"><span>      &#34;separateDebugInfo&#34;: &#34;1&#34;,
+</span></span><span style="display:flex;"><span>      &#34;src&#34;: &#34;/nix/store/qx48i7zf9n69yla8gfbif6dskysk0l1w-source&#34;,
+</span></span><span style="display:flex;"><span>      &#34;stdenv&#34;: &#34;/nix/store/43dbh9z6v997g6njz4yqmcrj26zic9ds-stdenv-linux&#34;,
+</span></span><span style="display:flex;"><span>      &#34;strictDeps&#34;: &#34;&#34;,
+</span></span><span style="display:flex;"><span>      &#34;system&#34;: &#34;x86_64-linux&#34;,
+</span></span><span style="display:flex;"><span>      &#34;version&#34;: &#34;4.24&#34;
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    &#34;inputDrvs&#34;: {
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/0h97zzsaf4ggiiwi0rbdjl3fzjj8vhj0-meson-1.9.1.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/0r073sy0685h3gycpl8kpkgmv5p87rw4-libxcb-1.17.0.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;dev&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/0rjr80q4lpigwjwaxw089wcrrag7p46m-xmlto-0.0.29.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/14wsbyw3j1h9blcxr16c9663w0piq0p2-bash-5.3p3.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/165y3ip2cqlnqd6qrgh6lzklv21xy11w-make-shell-wrapper-hook.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/1abxvpwsry6q5pijb2j91aryh2ilp929-pango-1.57.0.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;dev&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/2sjcj6l2959dvd5vlicmkf1sdr0hwqx5-perl5.40.0-ExtUtils-PkgConfig-1.16.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/3jnvpbpi95g6zp8vjq1qafh20lz6kwi3-perl5.40.0-X11-XCB-0.20.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/45szhbhybqh4fkcpmx7sqpcrpwpadvgv-pkg-config-wrapper-0.29.2.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/4r5bd9g98fq40hjbfc7sbnp42jhnzg5h-yajl-2.1.0-unstable-2024-02-01.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/4yw0g3zqw4gn1szw8bqrvgmz5b6qm8s5-stdenv-linux.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/53gin0imc257fibkbyvl0jsi0pm1zvbl-docbook-xml-4.5.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/54q42ddy9jb24v4mbx0f19faqqsw5jga-libxkbcommon-1.11.0.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;dev&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/56dg95jlnwp6kkifyqh94f548r5cha9b-xrandr-1.5.3.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/6srgz2k17vc6x85s3paccdbgg9rv0bia-asciidoc-10.2.1.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/7xpmbw1xzzwxcd1rnx6qid7zhqnzq3jh-setxkbmap-1.3.4.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/87b385i529h64dzrycf16ksv0jcbzs29-libev-4.33.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/9l94a5gr0wbhaq6zyl30wpqygp1cffrx-pcre2-10.46.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;dev&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/b8hhyx6rpy47hkbq5wlhrvfrfv3yn7j8-xvfb-run-1+g87f6705.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/bxrnxv90lrpvq06rja47986h057rhwcc-libxcb-cursor-0.1.6.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;dev&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/cgdz2idkz91w2k7hpb2dymv80938cz9w-libxcb-wm-0.4.2.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;dev&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/ddvlvaj43mls902nay7ddjrg01d6c2la-perl-5.40.0.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/ddxlvkpjlg6ycayb6az23ldjdr21xlnf-which-2.23.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/ds5ss96inhkj9x2gbd7shinvbiid6v6b-xorg-server-21.1.21.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;dev&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/f0yqdlwz2vwsx51wlgmi9pjqpdhbprkx-ninja-1.13.1.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/gm613dry4hkv26m7ml49fq60z8p0r0gf-perl5.40.0-IPC-Run-20231003.0.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/h3sjzf7hg9ghbh4hzdg6c4byfky2fjng-libx11-1.8.12.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;dev&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/j5ji7yjwizrma9h72h2pqgi8ir6ah6q8-libstartup-notification-0.12.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/k2jxg4mck2f4pqlisp6slwhyd3pva8wz-source.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/n19ll9p9ivkni2y9l9i2rypyi5gi8z58-perl5.40.0-Inline-C-0.82.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/nm7v937f2z7srs54idjwc7sl6azc1slj-xdotool-3.20211022.1.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/qzg3b7p4gf4izfjbkc42bjyrvp8vz99k-xcb-util-xrm-1.3.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/rjmh0kp3w170bii9i57z5anlshzm2gll-install-shell-files.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/rrsm8jbqqf58k30cm2lxmgk43fkxsgqp-find-xml-catalogs-hook.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/s4wl1ny41k50rkxw0x0wdjf9l5mjqyv0-libxcb-util-0.4.1.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;dev&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/vxckbgl5kwf5ikz0ma0fkavsnh683ry0-libxcb-keysyms-0.4.1.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;dev&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/xxb7x7j73p3sxf03hb1hzaz588avd3yw-docbook-xsl-nons-1.79.2.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/yik59jhh69af5fcvddmxlhfwya69pnzw-perl5.40.0-AnyEvent-I3-0.19.drv&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;dynamicOutputs&#34;: {},
+</span></span><span style="display:flex;"><span>        &#34;outputs&#34;: [
+</span></span><span style="display:flex;"><span>          &#34;out&#34;
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    &#34;inputSrcs&#34;: [
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/l622p70vy8k5sh7y5wizi5f2mic6ynpg-source-stdenv.sh&#34;,
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/r989dk196nl9frhnfsa1lb7knhbyjxw6-separate-debug-info.sh&#34;,
+</span></span><span style="display:flex;"><span>      &#34;/nix/store/shkw4qm9qcw5sc5n1k5jznc83ny02r39-default-builder.sh&#34;
+</span></span><span style="display:flex;"><span>    ],
+</span></span><span style="display:flex;"><span>    &#34;name&#34;: &#34;i3-4.24&#34;,
+</span></span><span style="display:flex;"><span>    &#34;outputs&#34;: {
+</span></span><span style="display:flex;"><span>      &#34;debug&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;path&#34;: &#34;/nix/store/20rgxn6fpywd229vka9dnjiaprypxirh-i3-4.24-debug&#34;
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;out&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;path&#34;: &#34;/nix/store/0zn9r4263fjpqah6vdzlalfn0ahp8xc2-i3-4.24&#34;
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    &#34;system&#34;: &#34;x86_64-linux&#34;
+</span></span><span style="display:flex;"><span>  }
+</span></span></code></pre></div></details>
+<p>Unfortunately, I am not aware of a way to go from the derivation to the <code>.nix</code>
+source, but at least one can check that a certain source results in an identical
+derivation.</p>
+<h3 id="developer-builds">Developer builds</h3>
+<p>The versioning I have described so far is sufficient for most users, who will
+not be interested in tracking intermediate versions of software, but only the
+released versions.</p>
+<p>But what about developers, or any kind of user who needs more precision?</p>
+<p>When building i3 from git, it reports the git revision it was built from, using
+<a href="https://manpages.debian.org/git-describe.1"><code>git-describe(1)</code></a>
+:</p>
+<pre tabindex="0"><code>~/i3/build % git describe
+4.25-23-g98f23f54
+~/i3/build % ninja
+[110/110] Linking target i3
+~/i3/build % ./i3 --version
+i3 version 4.25-23-g98f23f54 © 2009 Michael Stapelberg and contributors
+</code></pre><p>A modified working copy gets represented by a <code>+</code> after the revision:</p>
+<pre tabindex="0"><code>~/i3/build % echo &#39;// dirty working copy&#39; &gt;&gt; ../src/main.c &amp;&amp; ninja
+[104/104] Linking target i3bar
+~/i3/build % ./i3 --version
+i3 version 4.25-23-g98f23f54+ © 2009 Michael Stapelberg and contributors
+</code></pre><p>Reporting the git revision (or VCS revision, generally speaking) is the most
+useful choice.</p>
+<p>This way, we catch the following common mistakes:</p>
+<ul>
+<li>People build from the wrong revision.</li>
+<li>People build, but forget to install.</li>
+<li>People install, but their session does not pick it up (wrong location?).</li>
+</ul>
+<h2 id="useful-stamp-vcs-rev">Most Useful: Stamp The VCS Revision</h2>
+<p>As we have seen above, the single most useful piece of version information is
+the VCS revision. We can fetch all other details (version numbers, dates,
+authors, …) from the VCS repository.</p>
+<p>Now, let’s demonstrate the best case scenario by looking at how Go does it!</p>
+<h3 id="go-vcs">Go always stamps! 🥳</h3>
+<p>Go has become my favorite programming language over the years, in big part
+because of the good taste and style of the Go developers, and of course also
+because of the high-quality tooling:</p>
+
+
+
+  <div class="postlink">
+      <div>
+	<a href="https://michael.stapelberg.ch/posts/2017-08-19-golang_favorite/"><h3>Why Go is my favorite programming language</h3></a>
+      </div>
+      <div class="summary">
+	
+	
+	
+	
+	<p>
+	  <a href="https://michael.stapelberg.ch/posts/2017-08-19-golang_favorite/">
+	  I strive to respect everybody’s personal preferences, so I usually steer clear of debates about which is the best programming language, text editor or operating system.
+However, recently I was asked a couple of times why I like and use a lot of Go, so here is a coherent article to fill in the blanks of my ad-hoc in-person ramblings :-).
+
+	  <span class="readmore"><a href="https://michael.stapelberg.ch/posts/2017-08-19-golang_favorite/">Read more →</a></span>
+	  </a>
+	</p>
+      </div>
+  </div>
+
+
+<p>Therefore, I am pleased to say that Go implements the gold standard with regard
+to software versioning: it stamps VCS buildinfo by default! 🥳 This was
+introduced in <a href="https://go.dev/doc/go1.18#debug_buildinfo">Go 1.18 (March 2022)</a>:</p>
+<blockquote>
+<p>Additionally, the go command embeds information about the build, including
+build and tool tags (set with -tags), compiler, assembler, and linker flags
+(like -gcflags), whether cgo was enabled, and if it was, the values of the cgo
+environment variables (like CGO_CFLAGS).</p>
+<p>Both VCS and build information may be read together with module information
+using <code>go version -m file</code> or
+<a href="https://pkg.go.dev/runtime/debug#ReadBuildInfo">runtime/debug.ReadBuildInfo</a>
+(for the currently running binary) or the new
+<a href="https://pkg.go.dev/debug/buildinfo">debug/buildinfo</a> package.</p>
+</blockquote>
+<aside class="admonition note">
+  <div class="note-container">
+    <div class="note-icon" style="width: 20px; height: 20px">
+      <svg id="exclamation-icon" width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <path d="M0,0L24,0L24,24L0,24L0,0Z" style="fill:none;"/>
+    <g transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+        <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM13,17L11,17L11,15L13,15L13,17ZM13,13L11,13L11,7L13,7L13,13Z" style="fill-rule:nonzero;"/>
+    </g>
+</svg>
+
+    </div>
+    <div class="admonition-content"><strong>Note:</strong> Before Go 1.18, the standard approach was to use <code>-ldflags -X main.version=$(git describe)</code> or similar explicit injection. This setup works
+(and can still be seen in many places) but requires making changes to the
+application code, whereas the Go 1.18+ stamping requires no extra steps.</div>
+  </div>
+</aside>
+
+<p>What does this mean in practice? Here is a diagram for the common case: building
+from git:</p>
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-05-lea-common-case-build-from-git.svg"><img
+  src="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-05-lea-common-case-build-from-git.svg"
+  alt="diagram showing going from git repository to binary by invoking go build / go install" title="diagram showing going from git repository to binary by invoking go build / go install"
+  style="
+
+border: 1px solid #000;
+
+margin-right: 1rem"
+  
+  loading="lazy"></a>
+
+
+<p>This covers most of my hobby projects!</p>
+<p>Many tools I just <code>go install</code>, or <code>CGO_ENABLED=0 go install</code> if I want to
+easily copy them around to other computers. Although, I am managing more and
+more of my software in NixOS.</p>
+<p>When I find a program that is not yet fully managed, I can use <code>gops</code> and the
+<code>go</code> tool to identify it:</p>
+<div style="font-size: 85%">
+<pre tabindex="0"><code>root@ax52 ~ % nix run nixpkgs#gops
+2573594 1       dcs-package-importer  go1.26.1 /nix/store/clby54zb003ibai8j70pwad629lhqfly-dcs-unstable/bin/dcs-package-importer
+2573576 1       dcs-source-backend    go1.26.1 /nix/store/clby54zb003ibai8j70pwad629lhqfly-dcs-unstable/bin/dcs-source-backend
+2573566 1       debiman               go1.25.5 /srv/man/bin/debiman
+[…]
+root@ax52 ~ % nix run nixpkgs#go -- version -m /srv/man/bin/debiman
+/srv/man/bin/debiman: go1.25.5
+  path	github.com/Debian/debiman/cmd/debiman
+  mod	github.com/Debian/debiman	v0.0.0-20251230101540-ac8f5391b43b+dirty
+  […]
+  dep	pault.ag/go/debian	v0.18.0	h1:nr0iiyOU5QlG1VPnhZLNhnCcHx58kukvBJp+dvaM6CQ=
+  dep	pault.ag/go/topsort	v0.1.1	h1:L0QnhUly6LmTv0e3DEzbN2q6/FGgAcQvaEw65S53Bg4=
+  build	-buildmode=exe
+  build	-compiler=gc
+  build	DefaultGODEBUG=containermaxprocs=0,decoratemappings=0,tlssha1=1,updatemaxprocs=0,x509sha256skid=0
+  build	CGO_ENABLED=0
+  build	GOARCH=amd64
+  build	GOOS=linux
+  build	GOAMD64=v1
+  build	vcs=git
+  build	vcs.revision=ac8f5391b43bc1a9dbdc99f6179e2fb7d7414a04
+  build	vcs.time=2025-12-30T10:15:40Z
+  build	vcs.modified=true
+root@ax52 ~ %
+</code></pre></div>
+<p>It’s very cool that Go does the right thing by default!</p>
+<p>Systems that consist of 100% Go software (like my <a href="https://gokrazy.org/">gokrazy Go appliance
+platform</a>) are fully stamped! For example, the gokrazy web
+interface shows me exactly which version and dependencies went into the
+<code>gokrazy/rsync</code> build on my <a href="https://github.com/stapelberg/scan2drive">scan2drive
+appliance</a>.</p>
+<p>Despite being fully stamped, note that gokrazy only shows the module versions,
+and no VCS buildinfo, because it currently suffers from the same gap as Nix:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-03-29-gokrazy-scan2drive-rsync.png"><img
+  srcset="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-03-29-gokrazy-scan2drive-rsync_hu_b9f20b08c5492d94.png 2x,https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-03-29-gokrazy-scan2drive-rsync_hu_ec0d408518026341.png 3x"
+  src="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-03-29-gokrazy-scan2drive-rsync_hu_16984c2d1be3db9c.png"
+  alt="gokrazy scan2drive rsync" title="gokrazy scan2drive rsync"
+  width="600"
+  height="433"
+  style="
+
+border: 1px solid #000;
+
+"
+  
+  loading="lazy"></a>
+
+
+
+<h3 id="go-version-reporting">Go Version Reporting</h3>
+<p>For the gokrazy packer, which follows a rolling release model (no version
+numbers), I ended up with a few lines of Go code (see below) to display a git
+revision, no matter if you installed the packer from a Go module or from a git
+working copy.</p>
+<p>The code either displays <code>vcs.revision</code> (the easy case; built from git) or
+extracts the revision from the Go module version of the main module
+(<a href="https://pkg.go.dev/runtime/debug#BuildInfo"><code>BuildInfo.Main.Version</code></a>):</p>
+<p>What are the other cases? These examples illustrate the scenarios I usually deal
+with:</p>
+<table>
+  <thead>
+      <tr>
+          <th>source (built from)</th>
+          <th>buildinfo (stamped into program)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>directory (no git)</td>
+          <td>module <code>(devel)</code></td>
+      </tr>
+      <tr>
+          <td>Go module</td>
+          <td>module <code>v0.3.1-0.20260105212325-5347ac5f5bcb</code></td>
+      </tr>
+      <tr>
+          <td>directory (git)</td>
+          <td>module <code>v0.0.0-20260131174001-ccb1d233f2a4+dirty</code></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td><code>vcs.revision=ccb1d233f2a43e9118b9146b3c9a5ded1efb7551</code></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td><code>vcs.time=2026-01-31T17:40:01Z</code></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td><code>vcs.modified=true</code></td>
+      </tr>
+  </tbody>
+</table>
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-05-lea-go-install-git-vs-module.svg"><img
+  src="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-05-lea-go-install-git-vs-module.svg"
+  alt="diagram showing the two cases with go build info stamping: building from a git checkout or installing from a Go module" title="diagram showing the two cases with go build info stamping: building from a git checkout or installing from a Go module"
+  style="
+
+border: 1px solid #000;
+
+margin-right: 1rem"
+  
+  loading="lazy"></a>
+
+
+<details>
+<summary>Go code to programmatically read the version</summary>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span><span style="color:#bbb"> </span>version<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">import</span><span style="color:#bbb"> </span>(<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;runtime/debug&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;strings&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">readParts</span>()<span style="color:#bbb"> </span>(revision<span style="color:#bbb"> </span><span style="color:#902000">string</span>,<span style="color:#bbb"> </span>modified,<span style="color:#bbb"> </span>ok<span style="color:#bbb"> </span><span style="color:#902000">bool</span>)<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>info,<span style="color:#bbb"> </span>ok<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>debug.<span style="color:#06287e">ReadBuildInfo</span>()<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>!ok<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#4070a0">&#34;&#34;</span>,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">false</span>,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">false</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>settings<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#007020">make</span>(<span style="color:#007020;font-weight:bold">map</span>[<span style="color:#902000">string</span>]<span style="color:#902000">string</span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">for</span><span style="color:#bbb"> </span>_,<span style="color:#bbb"> </span>s<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">range</span><span style="color:#bbb"> </span>info.Settings<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>settings[s.Key]<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>s.Value<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// When built from a local VCS directory, we can use vcs.revision directly.</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>rev,<span style="color:#bbb"> </span>ok<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>settings[<span style="color:#4070a0">&#34;vcs.revision&#34;</span>];<span style="color:#bbb"> </span>ok<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>rev,<span style="color:#bbb"> </span>settings[<span style="color:#4070a0">&#34;vcs.modified&#34;</span>]<span style="color:#bbb"> </span><span style="color:#666">==</span><span style="color:#bbb"> </span><span style="color:#4070a0">&#34;true&#34;</span>,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">true</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// When built as a Go module (not from a local VCS directory),</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// info.Main.Version is something like v0.0.0-20230107144322-7a5757f46310.</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>v<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>info.Main.Version<span style="color:#bbb"> </span><span style="color:#60a0b0;font-style:italic">// for convenience</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>idx<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>strings.<span style="color:#06287e">LastIndexByte</span>(v,<span style="color:#bbb"> </span><span style="color:#4070a0">&#39;-&#39;</span>);<span style="color:#bbb"> </span>idx<span style="color:#bbb"> </span>&gt;<span style="color:#bbb"> </span><span style="color:#666">-</span><span style="color:#40a070">1</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>v[idx<span style="color:#666">+</span><span style="color:#40a070">1</span>:],<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">false</span>,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">true</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#4070a0">&#34;&lt;BUG&gt;&#34;</span>,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">false</span>,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">false</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">Read</span>()<span style="color:#bbb"> </span><span style="color:#902000">string</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>revision,<span style="color:#bbb"> </span>modified,<span style="color:#bbb"> </span>ok<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#06287e">readParts</span>()<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>!ok<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#4070a0">&#34;&lt;not okay&gt;&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>modifiedSuffix<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#4070a0">&#34;&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>modified<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>modifiedSuffix<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span><span style="color:#4070a0">&#34; (modified)&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#4070a0">&#34;https://github.com/gokrazy/tools/commit/&#34;</span><span style="color:#bbb"> </span><span style="color:#666">+</span><span style="color:#bbb"> </span>revision<span style="color:#bbb"> </span><span style="color:#666">+</span><span style="color:#bbb"> </span>modifiedSuffix<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span></code></pre></div></details>
+<p>This is what it looks like in practice:</p>
+<pre tabindex="0"><code>% go install github.com/gokrazy/tools/cmd/gok@latest
+% gok --version
+https://github.com/gokrazy/tools/commit/8ed49b4fafc7
+</code></pre><p>But a version built from git has the full revision available (→ you can tell them apart):</p>
+<pre tabindex="0"><code>% (cd ~gokrazy/../tools &amp;&amp; go install ./cmd/...)
+% gok --version
+https://github.com/gokrazy/tools/commit/ba6a8936f4a88ddcf20a3b8f625e323e65664aa6 (modified)
+</code></pre><h2 id="vcs-rev-with-nixos">VCS rev with NixOS</h2>
+<p>When packaging Go software with Nix, it’s easy to lose Go VCS revision stamping:</p>
+<ol>
+<li>Nix fetchers like <code>fetchFromGitHub</code> are implemented by fetching an archive
+(<code>.tar.gz</code>) file from GitHub — the full <code>.git</code> repository is not transferred,
+which is more efficient.</li>
+<li>Even if a <code>.git</code> repository is present, Nix usually intentionally removes it
+for reproducibility: <code>.git</code> directories contain packed objects that change
+across <code>git gc</code> runs (for example), which would break reproducible builds
+(different hash for the same source).</li>
+</ol>
+<p>So the fundamental tension here is between reproducibility and VCS stamping.</p>
+<p>Luckily, there is a solution that works for both: I created the
+<a href="https://github.com/stapelberg/nix"><code>stapelberg/nix/go-vcs-stamping</code> Nix overlay
+module</a> that you can import to get working Go
+VCS revision stamping by default for your <code>buildGoModule</code> Nix expressions!</p>
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-05-lea-vcs-rev-with-nix.svg"><img
+  src="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-05-lea-vcs-rev-with-nix.svg"
+  alt="diagram from Git repo to go build without and with my go-vcs-stamping overlay workaround" title="diagram from Git repo to go build without and with my go-vcs-stamping overlay workaround"
+  style="
+
+border: 1px solid #000;
+
+margin-right: 1rem"
+  
+  loading="lazy"></a>
+
+
+<h3 id="nix-go-build-detail">The Nix Go build situation in detail</h3>
+<p><strong>Tip:</strong> If you are not a Nix user, feel free to skip over this section. I
+included it in this article so that you have a full example of making VCS
+stamping work in the most complicated environments.</p>
+<hr>
+<p>Packaging Go software in Nix is pleasantly straightforward.</p>
+<p>For example, the Go Protobuf generator plugin <code>protoc-gen-go</code> is packaged in Nix
+with &lt;30 lines: <a href="https://github.com/NixOS/nixpkgs/blob/e347ac28905f77edcd1e9855dedcfb61e517f265/pkgs/by-name/pr/protoc-gen-go/package.nix">official nixpkgs <code>protoc-gen-go</code>
+package.nix</a>. You
+call
+<a href="https://nixos.org/manual/nixpkgs/stable/#ssec-language-go"><code>buildGoModule</code></a>,
+supply as <code>src</code> the result from
+<a href="https://nixos.org/manual/nixpkgs/stable/#fetchfromgithub"><code>fetchFromGitHub</code></a>
+and add a few lines of metadata.</p>
+<p>But getting developer builds fully stamped is not straightforward at all!</p>
+<p>When packaging my own software, I want to package individual revisions
+(developer builds), not just released versions. I use the same <code>buildGoModule</code>,
+or <code>buildGoLatestModule</code> if I need the latest Go version. Instead of using
+<code>fetchFromGitHub</code>, I provide my sources using Flakes, usually also from GitHub
+or from another Git repository. For example, I package <code>gokrazy/bull</code> like so:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  pkgs<span style="color:#666">,</span>
+</span></span><span style="display:flex;"><span>  pkgs-unstable<span style="color:#666">,</span>
+</span></span><span style="display:flex;"><span>  bullsrc<span style="color:#666">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#666">...</span>
+</span></span><span style="display:flex;"><span>}:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Use buildGoLatestModule to build with Go 1.26</span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># even before NixOS 26.05 Yarara is released</span>
+</span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># (NixOS 25.11 contains Go 1.25).</span>
+</span></span><span style="display:flex;"><span>pkgs-unstable<span style="color:#666">.</span>buildGoLatestModule {
+</span></span><span style="display:flex;"><span>  pname <span style="color:#666">=</span> <span style="color:#4070a0">&#34;bull&#34;</span>;
+</span></span><span style="display:flex;"><span>  version <span style="color:#666">=</span> <span style="color:#4070a0">&#34;unstable&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  src <span style="color:#666">=</span> bullsrc;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># Needs changing whenever `go mod vendor` changes,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># i.e. whenever go.mod is updated to use different versions.</span>
+</span></span><span style="display:flex;"><span>  vendorHash <span style="color:#666">=</span> <span style="color:#4070a0">&#34;sha256-sU5j2dji5bX2rp+qwwSFccXNpK2LCpWJq4Omz/jmaXU=&#34;</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The <code>bullsrc</code> comes from my <code>flake.nix</code>:</p>
+<details>
+<summary>Click here to expand the full <code>flake.nix</code></summary>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  inputs <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>    nixpkgs<span style="color:#666">.</span>url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:nixos/nixpkgs/nixos-25.11&#34;</span>;
+</span></span><span style="display:flex;"><span>    nixpkgs-unstable<span style="color:#666">.</span>url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:nixos/nixpkgs/nixos-unstable&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    disko <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>      url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:nix-community/disko&#34;</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#60a0b0;font-style:italic"># Use the same version as nixpkgs</span>
+</span></span><span style="display:flex;"><span>      inputs<span style="color:#666">.</span>nixpkgs<span style="color:#666">.</span>follows <span style="color:#666">=</span> <span style="color:#4070a0">&#34;nixpkgs&#34;</span>;
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    stapelbergnix<span style="color:#666">.</span>url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:stapelberg/nix&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    zkjnastools<span style="color:#666">.</span>url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:stapelberg/zkj-nas-tools&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    configfiles <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>      url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:stapelberg/configfiles&#34;</span>;
+</span></span><span style="display:flex;"><span>      flake <span style="color:#666">=</span> <span style="color:#60add5">false</span>; <span style="color:#60a0b0;font-style:italic"># repo is not a flake</span>
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    bullsrc <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>      url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:gokrazy/bull&#34;</span>;
+</span></span><span style="display:flex;"><span>      flake <span style="color:#666">=</span> <span style="color:#60add5">false</span>;
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    sops-nix <span style="color:#666">=</span> {
+</span></span><span style="display:flex;"><span>      url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:Mic92/sops-nix&#34;</span>;
+</span></span><span style="display:flex;"><span>      inputs<span style="color:#666">.</span>nixpkgs<span style="color:#666">.</span>follows <span style="color:#666">=</span> <span style="color:#4070a0">&#34;nixpkgs&#34;</span>;
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  outputs <span style="color:#666">=</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      nixpkgs<span style="color:#666">,</span>
+</span></span><span style="display:flex;"><span>      nixpkgs-unstable<span style="color:#666">,</span>
+</span></span><span style="display:flex;"><span>      disko<span style="color:#666">,</span>
+</span></span><span style="display:flex;"><span>      stapelbergnix<span style="color:#666">,</span>
+</span></span><span style="display:flex;"><span>      zkjnastools<span style="color:#666">,</span>
+</span></span><span style="display:flex;"><span>      bullsrc<span style="color:#666">,</span>
+</span></span><span style="display:flex;"><span>      configfiles<span style="color:#666">,</span>
+</span></span><span style="display:flex;"><span>      sops-nix<span style="color:#666">,</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#666">...</span>
+</span></span><span style="display:flex;"><span>    }:
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">let</span>
+</span></span><span style="display:flex;"><span>      system <span style="color:#666">=</span> <span style="color:#4070a0">&#34;x86_64-linux&#34;</span>;
+</span></span><span style="display:flex;"><span>      pkgs <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">import</span> nixpkgs {
+</span></span><span style="display:flex;"><span>        <span style="color:#007020;font-weight:bold">inherit</span> system;
+</span></span><span style="display:flex;"><span>        config<span style="color:#666">.</span>allowUnfree <span style="color:#666">=</span> <span style="color:#60add5">false</span>;
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>      pkgs-unstable <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">import</span> nixpkgs-unstable {
+</span></span><span style="display:flex;"><span>        <span style="color:#007020;font-weight:bold">inherit</span> system;
+</span></span><span style="display:flex;"><span>        config<span style="color:#666">.</span>allowUnfree <span style="color:#666">=</span> <span style="color:#60add5">false</span>;
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">in</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      nixosConfigurations<span style="color:#666">.</span>keep <span style="color:#666">=</span> nixpkgs<span style="color:#666">.</span>lib<span style="color:#666">.</span>nixosSystem {
+</span></span><span style="display:flex;"><span>        <span style="color:#007020;font-weight:bold">inherit</span> system;
+</span></span><span style="display:flex;"><span>        <span style="color:#007020;font-weight:bold">inherit</span> pkgs;
+</span></span><span style="display:flex;"><span>        specialArgs <span style="color:#666">=</span> { <span style="color:#007020;font-weight:bold">inherit</span> configfiles; };
+</span></span><span style="display:flex;"><span>        modules <span style="color:#666">=</span> [
+</span></span><span style="display:flex;"><span>          disko<span style="color:#666">.</span>nixosModules<span style="color:#666">.</span>disko
+</span></span><span style="display:flex;"><span>          sops-nix<span style="color:#666">.</span>nixosModules<span style="color:#666">.</span>sops
+</span></span><span style="display:flex;"><span>          <span style="color:#235388">./configuration.nix</span>
+</span></span><span style="display:flex;"><span>          stapelbergnix<span style="color:#666">.</span>lib<span style="color:#666">.</span>userSettings
+</span></span><span style="display:flex;"><span>          stapelbergnix<span style="color:#666">.</span>lib<span style="color:#666">.</span>zshConfig
+</span></span><span style="display:flex;"><span>          <span style="color:#60a0b0;font-style:italic"># Use systemd for network configuration</span>
+</span></span><span style="display:flex;"><span>          stapelbergnix<span style="color:#666">.</span>lib<span style="color:#666">.</span>systemdNetwork
+</span></span><span style="display:flex;"><span>          <span style="color:#60a0b0;font-style:italic"># Use systemd-boot as bootloader</span>
+</span></span><span style="display:flex;"><span>          stapelbergnix<span style="color:#666">.</span>lib<span style="color:#666">.</span>systemdBoot
+</span></span><span style="display:flex;"><span>          <span style="color:#60a0b0;font-style:italic"># Run prometheus node exporter in tailnet</span>
+</span></span><span style="display:flex;"><span>          stapelbergnix<span style="color:#666">.</span>lib<span style="color:#666">.</span>prometheusNode
+</span></span><span style="display:flex;"><span>          zkjnastools<span style="color:#666">.</span>nixosModules<span style="color:#666">.</span>zkjbackup
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          {
+</span></span><span style="display:flex;"><span>            nixpkgs<span style="color:#666">.</span>overlays <span style="color:#666">=</span> [
+</span></span><span style="display:flex;"><span>              (final: prev: {
+</span></span><span style="display:flex;"><span>                bull <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">import</span> <span style="color:#235388">./bull-pkg.nix</span> {
+</span></span><span style="display:flex;"><span>                  pkgs <span style="color:#666">=</span> final;
+</span></span><span style="display:flex;"><span>                  pkgs-unstable <span style="color:#666">=</span> pkgs-unstable;
+</span></span><span style="display:flex;"><span>                  <span style="color:#007020;font-weight:bold">inherit</span> bullsrc;
+</span></span><span style="display:flex;"><span>                };
+</span></span><span style="display:flex;"><span>              })
+</span></span><span style="display:flex;"><span>            ];
+</span></span><span style="display:flex;"><span>          }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        ];
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>      formatter<span style="color:#666">.</span><span style="color:#70a0d0">${</span>system<span style="color:#70a0d0">}</span> <span style="color:#666">=</span> pkgs<span style="color:#666">.</span>nixfmt-tree;
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div></details>
+<p>Go stamps all builds, but it does not have much to stamp here:</p>
+<ul>
+<li>We build from a directory, not a Go module, so the module version is <code>(devel)</code>.</li>
+<li>The stamped buildinfo does not contain any <code>vcs</code> information.</li>
+</ul>
+<p>Here’s a full example of gokrazy/bull:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% go version -m \
+</span></span><span style="display:flex;"><span>  /nix/store/z3y90ck0fp1wwd4scljffhwxcrxjhb9j-bull-unstable/bin/bull
+</span></span><span style="display:flex;"><span>/nix/store/z3y90ck0fp1wwd4scljffhwxcrxjhb9j-bull-unstable/bin/bull: go1.26.1
+</span></span><span style="display:flex;"><span>        path    github.com/gokrazy/bull/cmd/bull
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>        mod     github.com/gokrazy/bull (devel) 
+</span></span><span style="display:flex;"><span>        dep     github.com/BurntSushi/toml      v1.4.1-0.20240526193622-a339e1f7089c    
+</span></span><span style="display:flex;"><span>        dep     github.com/fsnotify/fsnotify    v1.8.0  
+</span></span><span style="display:flex;"><span>        dep     github.com/google/renameio/v2   v2.0.2  
+</span></span><span style="display:flex;"><span>        dep     github.com/yuin/goldmark        v1.7.8  
+</span></span><span style="display:flex;"><span>        dep     go.abhg.dev/goldmark/wikilink   v0.5.0  
+</span></span><span style="display:flex;"><span>        dep     golang.org/x/image      v0.23.0 
+</span></span><span style="display:flex;"><span>        dep     golang.org/x/sync       v0.10.0 
+</span></span><span style="display:flex;"><span>        dep     golang.org/x/sys        v0.28.0 
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>        build   -buildmode=exe
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>        build   -compiler=gc
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>        build   -trimpath=true
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>        build   CGO_ENABLED=0
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>        build   GOARCH=amd64
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>        build   GOOS=linux
+</span></span><span style="display:flex; background-color:#d8d8d8"><span>        build   GOAMD64=v1</span></span></code></pre></div>
+<p>To fix VCS stamping, add my <code>goVcsStamping</code> overlay to your <code>nixosSystem.modules</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  nixpkgs<span style="color:#666">.</span>overlays <span style="color:#666">=</span> [
+</span></span><span style="display:flex;"><span>    stapelbergnix<span style="color:#666">.</span>overlays<span style="color:#666">.</span>goVcsStamping
+</span></span><span style="display:flex;"><span>  ];
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>(If you are using <code>nixpkgs-unstable</code>, like I am, you need to apply the overlay in both places.)</p>
+<p>After rebuilding, your Go binaries should newly be stamped with <code>vcs</code> buildinfo:</p>
+<pre tabindex="0"><code>% go version -m /nix/store/z8mgsf10pkc6dgvi8pfnbb7cs23pqfkn-bull-unstable/bin/bull
+[…]
+  build   vcs=git
+  build   vcs.revision=c0134ef21d37e4ca8346bdcb7ce492954516aed5
+  build   vcs.time=2026-03-22T08:32:55Z
+  build   vcs.modified=false
+</code></pre><p>Nice! 🥳 But… how does it work? When does it apply? How do you know how to fix
+your config?</p>
+<p>I’ll show you <strong>the full diagram</strong> first, and then explain how to read it:</p>
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-05-lea-nix-big-picture.svg"><img
+  src="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-05-lea-nix-big-picture.svg"
+  alt="a big diagram showing all the ways from .nix expression to a stamped binary or a binary where VCS info got lost" title="a big diagram showing all the ways from .nix expression to a stamped binary or a binary where VCS info got lost"
+  style="
+
+border: 1px solid #000;
+
+margin-right: 1rem"
+  
+  loading="lazy"></a>
+
+
+<p>There are 3 relevant parts of the Nix stack that you can end up in, depending on
+what you write into your <code>.nix</code> files:</p>
+<ol>
+<li>Fetchers. These are what Flakes use, but also non-Flake use-cases.</li>
+<li>Fixed-output derivations (FOD). This is how <code>pkgs.fetchgit</code> is implemented,
+but the constant hash churn (updating the <code>sha256</code> line) inherent to FODs is
+annoying.</li>
+<li>Copiers. These just copy files into the Nix store and are not git-aware.</li>
+</ol>
+<p>For the purpose of VCS revision stamping, you should:</p>
+<ul>
+<li>Avoid the Copiers! If you use Flakes:
+<ul>
+<li>❌ do not use <code>url = &quot;/home/michael/dcs&quot;</code> as a Flake input</li>
+<li>✅ use <code>url = &quot;git+file:///home/michael/dcs&quot;</code> instead for git awareness</li>
+</ul>
+</li>
+<li>I avoid the fixed-output derivation (FOD) as well.
+<ul>
+<li>Fetching the git repository at build time is slow and inefficient.</li>
+<li>Enabling <code>leaveDotGit</code>, which is needed for VCS revision stamping with this
+approach, is even more inefficient because a new Git repository must be
+constructed deterministically to keep the FOD reproducible.</li>
+</ul>
+</li>
+</ul>
+<p>Hence, we will stick to the left-most column: fetchers.</p>
+<p>Unfortunately, by default, with fetchers, the VCS revision information, which is
+stored in a Nix attrset (in-memory, during the build process), does not make it
+into the Nix store, hence, when the Nix derivation is evaluated and Go compiles
+the source code, Go does not see any VCS revision.</p>
+<p>My <a href="https://github.com/stapelberg/nix"><code>stapelberg/nix/go-vcs-stamping</code> Nix overlay
+module</a> fixes this, and enabling the overlay
+is how you end up in the left-most lane of the above diagram: the happy path,
+where your Go binaries are now stamped!</p>
+<h3 id="nixos-buildinfo-overlay">My workaround: Nix git buildinfo overlay</h3>
+<p>How does the <code>go-vcs-stamping</code> overlay work? It functions as an adapter between
+Nix and Go:</p>
+<ul>
+<li>Nix tracks the VCS revision in the <code>.rev</code> in-memory attrset.</li>
+<li>Go expects to find the VCS revision in a <code>.git</code> repository, accessed via
+<code>.git/HEAD</code> file access and <a href="https://manpages.debian.org/git.1"><code>git(1)</code></a>
+ commands.</li>
+</ul>
+<p>So the overlay implements 3 steps to get Go to stamp the correct info:</p>
+<ol>
+<li>It synthesizes a <code>.git/HEAD</code> file so that Go’s <code>vcs.FromDir()</code> detects a git
+repository.</li>
+<li>It injects a <code>git</code> command into the <code>PATH</code> that implements exactly the two
+commands used by Go and fails loudly on anything else (in case Go updates its
+implementation).</li>
+<li>It sets <code>-buildvcs=true</code> in the <code>GOFLAGS</code> environment variable.</li>
+</ol>
+<p>For the full source, see
+<a href="https://github.com/stapelberg/nix/blob/main/go-vcs-stamping.nix"><code>go-vcs-stamping.nix</code></a>.</p>
+<h3 id="clean-fix">The clean fix</h3>
+<p>See <a href="https://github.com/golang/go/issues/77020">Go issue #77020</a> and <a href="https://github.com/golang/go/issues/64162">Go issue
+#64162</a> for a cleaner approach to
+fixing this gap: allowing package managers to invoke the Go tool with the
+correct VCS information injected.</p>
+<p>This would allow Nix (or also gokrazy) to pass along buildinfo cleanly, without
+the need for <a href="#nixos-buildinfo-overlay">workarounds like my <code>go-vcs-stamping</code>
+adapter</a>.</p>
+<p>At the time of writing, issue #77020 does not seem to have much traction and is
+still open.</p>
+<h2 id="conclusion-stamp-it-plumb-it-report-it">Conclusion: Stamp it! Plumb it! Report it!</h2>
+<p>My argument is simple:</p>
+<p><strong>Stamping the VCS revision is conceptually easy, but very important!</strong></p>
+<p>For example, if the production system from the incident I mentioned had reported
+its version, we would have saved multiple hours of mitigation time!</p>
+<p>Unfortunately, many environments only identify the build output (useful, but
+orthogonal), but do not plumb the VCS revision (much more useful!), or at least
+not by default.</p>
+<p>Your action plan to fix it is just 3 simple steps:</p>
+<ol>
+<li>Stamp it! Include the source VCS revision in your programs.
+<ul>
+<li>This is not a new idea: <a href="https://i3wm.org">i3</a> builds include their <a href="https://manpages.debian.org/git-describe.1"><code>git-describe(1)</code></a>
+ revision since 2012!</li>
+</ul>
+</li>
+<li>Plumb it! When building / packaging, ensure the VCS revision does not get lost.
+<ul>
+<li>My <a href="#vcs-rev-with-nixos">“VCS rev with NixOS”</a> case study section above
+illustrates several reasons why the VCS rev could get lost, which paths
+can work and how to fix the missing plumbing.</li>
+</ul>
+</li>
+<li>Report it! Make your software print its VCS revision on every relevant
+surface, for example:
+<ul>
+<li><strong>Executable programs:</strong> Report the VCS revision when run with <code>--version</code>
+<ul>
+<li>For Go programs, you can always use <code>go version -m</code></li>
+</ul>
+</li>
+<li><strong>Services and batch jobs:</strong> Include the VCS revision in the startup logs.</li>
+<li><strong>Outgoing HTTP requests:</strong> Include the VCS revision in the <code>User-Agent</code></li>
+<li><strong>HTTP responses:</strong> Include the VCS revision in a header (internally)</li>
+<li><strong>Remote Procedure Calls (RPCs):</strong> Include the revision in RPC metadata</li>
+<li><strong>User Interfaces:</strong> Expose the revision somewhere visible for debugging.</li>
+</ul>
+</li>
+</ol>
+<p>Implementing “version observability” throughout your system is a one-day
+high-ROI project.</p>
+<p>With my Nix example, you saw how the VCS revision is available throughout the
+stack, but can get lost in the middle. Hopefully my resources help you quickly
+fix your stack(s), too:</p>
+<ul>
+<li><a href="https://github.com/stapelberg/nix">My <code>stapelberg/nix/go-vcs-stamping</code>
+overlay</a> for Nix / NixOS</li>
+<li><a href="https://github.com/stapelberg/stampit">My <code>stampit</code> repository</a> is a
+community resource to collect examples (as markdown content) and includes a Go
+module with a few helpers to make version reporting trivial.</li>
+</ul>
+<p><em><strong>Now go stamp your programs and data transfers! 🚀</strong></em></p>
+]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[Can I finally start using Wayland in 2026?]]></title>
     <link href="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/"/>
     <id>https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/</id>
@@ -7551,301 +8695,6 @@ API. In case you do encounter any issues after all, please <a href="https://gith
 Go Protobuf issue tracker</a>.</p>
 <p>Reference documentation for Go Protobuf can be found on <a href="https://protobuf.dev/reference/go/">protobuf.dev → Go
 Reference</a>.</p>
-]]></content>
-  </entry>
-  <entry>
-    <title type="html"><![CDATA[Get a solar panel for your balcony now ☀️]]></title>
-    <link href="https://michael.stapelberg.ch/posts/2024-12-10-solar-panel-for-your-balcony/"/>
-    <id>https://michael.stapelberg.ch/posts/2024-12-10-solar-panel-for-your-balcony/</id>
-    <published>2024-12-10T17:13:00+01:00</published>
-    <content type="html"><![CDATA[<p>A year ago, I got a solar panel for my balcony — an easy way to vote with your
-wallet to convert more of the world’s energy usage to solar power. That was a
-great decision and I would recommend everyone get a solar panel (or two)!</p>
-<h2 id="its-called-plug-in-solar-panel-because-you-can-just-plug-it-in">It’s called plug-in solar panel because you can just plug it in</h2>
-<p>In my experience, many people are surprised about the basics of how power works:
-You do not need to connect devices to a battery in order to enjoy solar
-power. You can just plug in the solar panel into your household electricity
-setup. Any of your consumers (like a TV, or electric cooktop) will now use the
-power that your solar panel produces before consuming power from the grid.</p>
-<p>Here’s the panel I have (Weber barbecue for scale). As you can see, the panel is
-not yet mounted at an angle, just hung over the balcony. The black box at the
-back of the panel is the inverter (“Wechselrichter”). You connect the panel on
-one side and get electricity out the other side.</p>
-<p><img src="IMG_2882.jpg" alt=""></p>
-<h2 id="which-solar-panel-to-buy">Which solar panel to buy?</h2>
-<p>There are two big questions to answer when chosing a solar panel: what peak
-capacity should your panel(s) have and which company / seller do you buy from?</p>
-<p>Regarding panel capacity: When I look at my energy usage, I see about 100 watts
-of baseline load. This includes always-on servers and other home automation
-devices. During working hours, running a PC and (power-hungry) monitor adds
-another 100 watts or so. Around noon, there is quite a spike in usage when
-cooking with my induction cooktop.</p>
-<p>Hence, I figured a plug &amp; play solar panel with the smallest size of 385 Wp
-would be well equipped to cover baseline usage, compared to the next bigger unit
-with 780 Wp, which seems oversized for my usage. Note that a peak capacity of
-385 Wp will not necessarily mean that you will measure 380W of output. I did
-repeatedly measure energy production exceeding 300W.</p>
-<p>Regarding the company, the best offer I found in Switzerland was a small company
-called <a href="https://www.erneuer.bar/">erneuer.bar</a>, which means “renewable” in
-German. They ship the panels with barely any packaging in fully electric
-vehicles and their offer is eligible for <a href="https://www.topten.ch/private/page/ewz">the topten bonus program from
-EWZ</a>, meaning you’ll get back 200 CHF if
-you fill in a form.</p>
-<p>The specific model I ordered was called “385 Wp Plug &amp; Play Solar (DE)”. Here’s
-the bill:</p>
-<table>
-  <thead>
-      <tr>
-          <th>Produkt</th>
-          <th>Preis</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>385 Wp Plug &amp; Play Solar (DE)</td>
-          <td>CHF 520.00</td>
-      </tr>
-      <tr>
-          <td>Mounting kit: balcony, 1 panel</td>
-          <td>CHF 75.00</td>
-      </tr>
-      <tr>
-          <td>Pre-mount: mounting kit balcony</td>
-          <td>CHF 60.00</td>
-      </tr>
-      <tr>
-          <td>WiFi measurement myStrom</td>
-          <td>CHF 55.00</td>
-      </tr>
-      <tr>
-          <td>Shipping</td>
-          <td>CHF 68.00</td>
-      </tr>
-      <tr>
-          <td>Total</td>
-          <td>CHF 778.00</td>
-      </tr>
-  </tbody>
-</table>
-<p>Of course, you can save some money in various ways. For example, the measurement
-device and pre-mount option are both not required, but convenient. Similarly,
-you can probably find solar panels for cheaper, but the offer that erneuer.bar
-has put together truly is very convenient and works well, and to me that’s worth
-some money.</p>
-<p>One mistake I made when ordering is selecting a 5m cable. It turned out I needed
-a 10m cable, so I recommend you measure better than I did (or just select the
-longer cable). On the plus side, customer service was excellent: I quickly
-received an email response and could just send back my cable in exchange for a
-new one.</p>
-<h2 id="amortization-who-cares">Amortization? Who cares!</h2>
-<p>Many people seem to consider <strong>only the financial aspect</strong> of buying a solar
-panel and calculate when the solar panel will have paid for itself. I don’t
-care. My goal is to convert more energy usage to green energy, not to save
-money.</p>
-<p>Similarly, some people install batteries so that they can use “their” energy for
-themselves, in case the solar panel produces more than they use at that
-moment. I couldn’t care less who uses the energy I produce — as long as it’s
-green energy, anyone is welcome to consume it.</p>
-<p>(Of course I understand these questions become more important the larger a solar
-installation gets. But we’re talking about one balcony and one solar panel (or
-two) covering someone’s baseline residential household electricity load. Don’t
-overthink it!)</p>
-<h2 id="requirement-balcony-power-socket">Requirement: balcony power socket</h2>
-<p>Aside from having a balcony, there is only one hard requirement: you need a
-power socket.</p>
-<p>This requirement is either trivially fulfilled if you already have an outdoor
-power socket on your balcony (lucky you!), or might turn out to be the most
-involved part of the project. Either way, because an electrician needs to
-install power sockets, all you can do is get permission from your landlord and
-make an appointment with your electrician of choice.</p>
-<p>In terms of cost, you will probably spend a few hundred bucks, depending on your
-area’s cost of living. A good idea that did not occur to me back then: Ask
-around in your house if any neighbors would be interested in getting a balcony
-power socket, too, and do it all in one go (for cheaper).</p>
-<h2 id="bureaucracy">Bureaucracy</h2>
-<p>One can easily find stories online about electricity providers and landlords not
-permitting the installation of solar panels for… rather questionable
-reasons. For example, some claimed that solar panels could overload the house
-electricity infrastructure! A drastic-sounding claim, but nonsense in
-practice. Luckily, law makers are recognizing this and are removing barriers.</p>
-<h3 id="electricity-provider-and-the-law">Electricity provider and the law</h3>
-<p>In Switzerland 🇨🇭, you can connect panels producing up to 600W without an
-electrician, but you need to notify your electricity provider.</p>
-<p>In Germany 🇩🇪, you can connect panels producing up to 800W (as of May 16th 2024)
-without an electrician, but <a href="https://www.adac.de/rund-ums-haus/energie/versorgung/balkonkraftwerk-anmelden/">you need to register with the
-Bundesnetzagentur</a>.</p>
-<p>Be sure to check your country’s laws and your electricity provider’s rules and
-processes.</p>
-<h3 id="landlord-and-neighbors">Landlord and neighbors</h3>
-<p>In Switzerland 🇨🇭, you need to <a href="https://www.mieterverband.ch/mv/politik-positionen/news/2024/mustervereinbarung-fuer-bewilligung-von-balkonsolaranlagen.html">ask your landlord for
-permission</a>
-because if your solar panel were to fall down from the balcony, the landlord
-would be liable. Usually, the landlord insists on proper mounting and the tenant
-taking over liability. In my case, the landlord also asked me to ensure the
-neighbors wouldn’t mind. I put up a letter, nobody complained, the landlord
-accepted.</p>
-<p>In Germany 🇩🇪, you do need to ask your landlord for permission, but the landlord
-pretty much has to agree (<a href="https://www.computerbild.de/artikel/cb-News-Energie-Bundeskabinett-Balkonkraftwerk-Wohnung-Privileg-36684829.html">as of October 17th
-2024</a>). The
-question is not “if”, but “how” the landlord wants you to install the solar
-panel.</p>
-<h2 id="optimizing-the-installation-angle">Optimizing the installation angle</h2>
-<p>Earlier I wrote that you can just hang the solar panel onto your balcony and
-plug it in. While this is true, there is one factor that is worth optimizing (as
-time permits): the installation angle.</p>
-<p>If you want more details about the physics background and various considerations
-that go into chasing the optimal angle, check out these (German) articles about
-<a href="https://www.golem.de/news/balkonkraftwerke-was-bringt-der-neigungswinkel-fuer-den-stromertrag-2405-185599-2.html">optimizing the installation angle (at
-Golem)</a>
-or <a href="https://www.heise.de/ratgeber/Photovoltaik-Anlagen-dimensionieren-Wirtschaftlichkeit-berechnen-9688108.html?seite=2">sizing solar installations (at
-Heise)</a>. I’ll
-summarize: the angle is important and can result in twice as much energy
-production! Any angle is usually better than no angle.</p>
-<p>In my case, I first “installed” the solar panel (no angle) at 2023-09-30.</p>
-<p>Then, about a month later, I installed it at an angle at 2023-10-28.</p>
-<p><img src="IMG_2996.jpg" alt=""></p>
-<p>I unfortunately don’t have a great before/after graph because after I installed
-the proper angle mount, there were almost no sunny days.</p>
-<p>Instead, I will show you data from a comparable time range (early October) in
-2023 (before mounting the panel at an angle) and in 2024 (with a properly
-mounted panel). As you can see, the difference is not that huge, but clearly
-visible: without an angle mount, I could never exceed 300 Wh per day. With a
-proper mount, a number of days exceed 300 Wh:</p>
-<table>
-  <thead>
-      <tr>
-          <th></th>
-          <th>1st</th>
-          <th>2nd</th>
-          <th>3rd</th>
-          <th>4th</th>
-          <th>5th</th>
-          <th>6th</th>
-          <th>7th</th>
-          <th>8th</th>
-          <th>9th</th>
-          <th>10th</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>2023 🌞 Wh</td>
-          <td>133</td>
-          <td>268</td>
-          <td>262</td>
-          <td>208</td>
-          <td>271</td>
-          <td>255</td>
-          <td>274</td>
-          <td>277</td>
-          <td>275</td>
-          <td>194</td>
-      </tr>
-      <tr>
-          <td>2024 🌞 Wh</td>
-          <td>529</td>
-          <td>119</td>
-          <td>246</td>
-          <td>205</td>
-          <td>160</td>
-          <td>324</td>
-          <td>265</td>
-          <td>335</td>
-          <td>73</td>
-          <td>444</td>
-      </tr>
-  </tbody>
-</table>
-<h2 id="how-much-electricity-does-my-panel-generate">How much electricity does my panel generate?</h2>
-<p>The exact electricity production numbers depend on how much sun ends up on the
-solar panel. This in turn depends on the weather and how obstructed the solar
-panel is (neighbors, trees, …).</p>
-<p>I like measuring things, so I will share some measurements to give you a rough
-idea. But note that measuring your solar panel is strictly optional.</p>
-<p>On the best recorded day, my panel produced about 1.680 kWh of energy:</p>
-<p><img src="2024-06-05-1680Wh.jpg" alt=""></p>
-<p>The missing parts before 14:00 are caused by the neighbor’s house blocking the sun.</p>
-<p>Now, compare this best case with the worst case, a January day with little sun
-(&lt; 50 Wh):</p>
-<p><img src="2024-12-04-solar-january-14th.jpg" alt=""></p>
-<p>Let’s zoom out a bit and consider an entire year instead.</p>
-<p>In 2024, the panel produced over 177 kWh so far, or, averaged to the daily
-value, ≈0.5 kWh/day:</p>
-<p><img src="2024-12-04-solar-whole-year.jpg" alt=""></p>
-<p>Or, in numeric form (all numbers in kWh):</p>
-<table>
-  <thead>
-      <tr>
-          <th>Jan</th>
-          <th>Feb</th>
-          <th>Mar</th>
-          <th>Apr</th>
-          <th>May</th>
-          <th>Jun</th>
-          <th>Jul</th>
-          <th>Aug</th>
-          <th>Sep</th>
-          <th>Oct</th>
-          <th>Nov</th>
-          <th>Dec</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>2.9</td>
-          <td>6.6</td>
-          <td>10.9</td>
-          <td>18.4</td>
-          <td>29.1</td>
-          <td>27.7</td>
-          <td>37.6</td>
-          <td>22.1</td>
-          <td>12.0</td>
-          <td>6.5</td>
-          <td>3.3</td>
-          <td>n/a</td>
-      </tr>
-  </tbody>
-</table>
-<!--
-
-% for f in *.csv; do head -2 "$f"; (IFS=$'\n'; for measure in $(cut -d, -f2 "$f" |grep Wh); do units -t "$measure" Wh; done | tr '\n' '+'; echo 0) | bc; done 
-
-| Month   | Solar energy (kWh) |
-|---------|--------------------|
-| 2024-01 | 2.901              |
-| 2024-02 | 6.614              |
-| 2024-03 | 10.956             |
-| 2024-04 | 18.451             |
-| 2024-05 | 29.150             |
-| 2024-06 | 27.743             |
-| 2024-07 | 37.683             |
-| 2024-08 | 22.128             |
-| 2024-09 | 12.074             |
-| 2024-10 | 6.521              |
-| 2024-11 | 3.361              |
-
--->
-<h2 id="conclusion">Conclusion</h2>
-<p>A solar panel is a great project to make incremental progress on. It’s just 3 to
-4 simple steps, each of which is valuable on its own:</p>
-<ol>
-<li>Check with your landlord that installing an outdoor power socket and solar panel is okay.
-<ul>
-<li>Even if you personally do not go any further with your project, you can
-share the result with your neighbors, who might…</li>
-</ul>
-</li>
-<li>Order an outdoor power socket from your (or your landlord’s) preferred electrician.
-<ul>
-<li>Power will come in handy for lighting when spending summer evenings on the
-balcony.</li>
-</ul>
-</li>
-<li>Order a solar panel and plug it in.</li>
-<li>Optional, but recommended: Optimize the mounting angle later.</li>
-</ol>
-<p>That’s it! Come on, get started right away 🌞</p>
 ]]></content>
   </entry>
 </feed>

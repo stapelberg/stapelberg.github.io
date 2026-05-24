@@ -8,6 +8,1127 @@
   <id>https://michael.stapelberg.ch/posts/tags/rsync/</id>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
+    <title type="html"><![CDATA[How my minimal, memory-safe Go rsync steers clear of vulnerabilities]]></title>
+    <link href="https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/"/>
+    <id>https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/</id>
+    <published>2026-05-24T16:20:22+02:00</published>
+    <content type="html"><![CDATA[<p>Back in January 2025, multiple different security researchers published a total
+of <a href="https://www.openwall.com/lists/oss-security/2025/01/14/3">6 security vulnerabilities in
+rsync</a>, some of which
+allow arbitrary code execution and file leaks, so naturally I was wondering
+whether/how my <a href="https://github.com/gokrazy/rsync">gokrazy/rsync</a> implementation
+was affected. Did implementing my own (compatible, but minimal) rsync in Go, a
+modern and memory-safe programming language, really rule out entire classes of
+security vulnerabilities?</p>
+<p>This deep dive article was in the making since January 2025, but was delayed
+because we uncovered more unpublished vulnerabilities in the process! The
+“Security Vulnerabilities” section now covers all 12 vulnerabilities from the
+January 2025 batch and the May 2026 batch.</p>
+<p><strong>If you are running (upstream, samba)
+<a href="https://github.com/RsyncProject/rsync">rsync</a> in production, upgrade to version
+3.4.3 or newer.</strong></p>
+<p>If you are running <a href="https://github.com/gokrazy/rsync">gokrazy/rsync</a> in
+production, upgrade to version v0.3.3 or newer.</p>
+<p>Feel free to skip over the nitty-gritty security issue details and jump directly to:</p>
+<ul>
+<li>The <a href="#go-verdict">verdict on whether using Go has helped</a>.</li>
+<li>The <a href="#gokrazy-rsync-verdict">verdict on whether a minimal re-implementation like gokrazy/rsync helps</a>.</li>
+<li>My <a href="#openrsync">comparison with OpenBSD’s <code>openrsync</code></a> (written in C).</li>
+<li><a href="#defenseindepth">Defense in depth mechanisms</a> one can use on Linux.</li>
+<li>The <a href="#conclusion">conclusion</a>.</li>
+</ul>
+<h2 id="context-my-own-rsync">Context: My own rsync</h2>
+<p>For context, I blogged about <a href="/posts/2022-06-18-rsync-overview/">rsync, how I use it, and how it
+works</a> back in June 2022. See also <a href="/posts/tags/rsync/">all posts
+tagged “rsync”</a>.</p>
+<p>The original motivation for writing my own rsync (back then only a server, today
+all directions are supported) was to provide the software packages of <a href="https://distr1.org/">distri,
+my Linux distribution research project for fast package
+management</a>, which I wanted to host on
+<a href="https://router7.org/">router7</a>, my small home Linux+Go internet router, which
+in turn is built on <a href="https://gokrazy.org/">gokrazy</a>, my Go appliance platform.</p>
+<p>I am still running multiple gokrazy/rsync servers for this original purpose, and
+also many others! Having rsync available as a primitive (that you can link into
+your Go programs!) is really nice.</p>
+<h2 id="vulns">Security Vulnerabilities</h2>
+<p>This article covers the following security vulnerabilities:</p>
+<ul>
+<li>CVE-2024-12084 to 12088 <a href="https://github.com/google/security-research/security/advisories/GHSA-p5pg-x43v-mvqj">(original report)</a></li>
+<li>CVE-2024-12747 (discovered separately by Aleksei Gorban &ldquo;loqpa&rdquo;)</li>
+<li>CVE-2026-29518 (discovered by Damien Neil and myself! and independently by <a href="https://nullx3d.com/">Nullx3D</a>)</li>
+<li>CVE-2026-43617 to 43620</li>
+<li>CVE-2026-45232</li>
+</ul>
+<p>The first batch of the vulnerabilities above was announced on the <a href="https://www.openwall.com/lists/oss-security/2025/01/14/3">oss-security
+mailing list</a>, but
+note that the original report has more detail compared to the oss-security
+summaries!</p>
+<p>The later vulnerabilities were announced via <a href="https://github.com/RsyncProject/rsync/security/advisories">GitHub Security Advisories on the
+rsync project</a>.</p>
+<h3 id="jan2025">January 2025 batch</h3>
+<h4 id="cve-2024-12084">CVE-2024-12084: Heap Buffer Overflow (9.8)</h4>
+<p><strong>Summary:</strong></p>
+<ul>
+<li>rsync performed insufficient validation: It read the (attacker-controlled)
+checksum length from the network and compared the length against
+<code>MAX_DIGEST_LEN</code>.</li>
+<li>However, rsync’s data structures always declared a 16 byte buffer: <code>char sum2[SUM_LENGTH]</code>
+<ul>
+<li><code>SUM_LENGTH</code> is always 16 (bytes), which is sufficient to hold an
+<a href="https://en.wikipedia.org/wiki/MD4">MD4</a> or
+<a href="https://en.wikipedia.org/wiki/MD5">MD5</a> checksum.</li>
+<li><code>MAX_DIGEST_LEN</code> used to be 16 (bytes), but can be larger when rsync is
+compiled with SHA256 or SHA512 checksum support.</li>
+</ul>
+</li>
+<li>Hence, the bounds check was ineffective! An attacker could write out of bounds.</li>
+<li>This issue was introduced with <a href="https://github.com/RsyncProject/rsync/commit/ae16850dc58e884eb9f5cb7f772342b2db28f471">commit <code>ae16850</code> in September
+2022</a>,
+which added SHA256/SHA512 checksum support.</li>
+</ul>
+<details>
+<summary>Click to expand the <strong>full description of the improper checksum length validation</strong> (quoting the <a href="https://github.com/google/security-research/security/advisories/GHSA-p5pg-x43v-mvqj">Google Security
+report</a>)</summary>
+<blockquote>
+<p>When the checksums are read by the daemon, two different checksums are read:</p>
+<ol>
+<li>A 32-bit Adler-CRC32 Checksum</li>
+<li>A digest of the file chunk. The digest algorithm is determined at the beginning of the protocol negotiation.
+The corresponding code can be seen below:
+<a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/sender.c#L96-L100">sender.c</a>:</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>s<span style="color:#666">-&gt;</span>sums <span style="color:#666">=</span> <span style="color:#06287e">new_array</span>(<span style="color:#007020;font-weight:bold">struct</span> sum_buf, s<span style="color:#666">-&gt;</span>count);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">for</span> (i <span style="color:#666">=</span> <span style="color:#40a070">0</span>; i <span style="color:#666">&lt;</span> s<span style="color:#666">-&gt;</span>count; i<span style="color:#666">++</span>) {
+</span></span><span style="display:flex;"><span>    s<span style="color:#666">-&gt;</span>sums[i].sum1 <span style="color:#666">=</span> <span style="color:#06287e">read_int</span>(f);
+</span></span><span style="display:flex;"><span>    <span style="color:#06287e">read_buf</span>(f, s<span style="color:#666">-&gt;</span>sums[i].sum2, s<span style="color:#666">-&gt;</span>s2length);
+</span></span></code></pre></div><p>Most importantly, note that <code>sum2</code> field is filled with <code>s-&gt;s2length</code> bytes. <code>sum2</code> always has a size of 16:
+<a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/rsync.h#L955-L962">rsync.h</a></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#define SUM_LENGTH 16
+</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span><span style="color:#60a0b0;font-style:italic">// …
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">struct</span> sum_buf {
+</span></span><span style="display:flex;"><span>    OFF_T offset;           <span style="color:#60a0b0;font-style:italic">/**&lt; offset in file of this chunk */</span>
+</span></span><span style="display:flex;"><span>    int32 len;              <span style="color:#60a0b0;font-style:italic">/**&lt; length of chunk of file */</span>
+</span></span><span style="display:flex;"><span>    uint32 sum1;            <span style="color:#60a0b0;font-style:italic">/**&lt; simple checksum */</span>
+</span></span><span style="display:flex;"><span>    int32 chain;            <span style="color:#60a0b0;font-style:italic">/**&lt; next hash-table collision */</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#902000">short</span> flags;            <span style="color:#60a0b0;font-style:italic">/**&lt; flag bits */</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#902000">char</span> sum2[SUM_LENGTH];  <span style="color:#60a0b0;font-style:italic">/**&lt; checksum  */</span>
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><p><code>s2length</code> is an attacker-controlled value and can have a value up to <code>MAX_DIGEST_LEN</code> bytes, as the next snipper shows:</p>
+<p><a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/io.c#L1979-L1984">io.c</a></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>sum<span style="color:#666">-&gt;</span>s2length <span style="color:#666">=</span> protocol_version <span style="color:#666">&lt;</span> <span style="color:#40a070">27</span> <span style="color:#666">?</span> <span style="color:#002070;font-weight:bold">csum_length</span> : (<span style="color:#902000">int</span>)<span style="color:#06287e">read_int</span>(f);
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (sum<span style="color:#666">-&gt;</span>s2length <span style="color:#666">&lt;</span> <span style="color:#40a070">0</span> <span style="color:#666">||</span> sum<span style="color:#666">-&gt;</span>s2length <span style="color:#666">&gt;</span> MAX_DIGEST_LEN) {
+</span></span><span style="display:flex;"><span>    <span style="color:#06287e">rprintf</span>(FERROR, <span style="color:#4070a0">&#34;Invalid checksum length %d [%s]</span><span style="color:#4070a0;font-weight:bold">\n</span><span style="color:#4070a0">&#34;</span>,
+</span></span><span style="display:flex;"><span>            sum<span style="color:#666">-&gt;</span>s2length, <span style="color:#06287e">who_am_i</span>());
+</span></span><span style="display:flex;"><span>    <span style="color:#06287e">exit_cleanup</span>(RERR_PROTOCOL);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The problem here is that <code>MAX_DIGEST_LEN</code> can be larger than 16 bytes, depending on the digest support the binary was compiled with:</p>
+<p><a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/lib/md-defines.h#L11-L21">md-defines.h</a></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#define MD4_DIGEST_LEN 16
+</span></span></span><span style="display:flex;"><span><span style="color:#007020">#define MD5_DIGEST_LEN 16
+</span></span></span><span style="display:flex;"><span><span style="color:#007020">#if defined SHA512_DIGEST_LENGTH
+</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>  <span style="color:#007020">#define MAX_DIGEST_LEN SHA512_DIGEST_LENGTH
+</span></span></span><span style="display:flex;"><span><span style="color:#007020">#elif defined SHA256_DIGEST_LENGTH
+</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>  <span style="color:#007020">#define MAX_DIGEST_LEN SHA256_DIGEST_LENGTH
+</span></span></span><span style="display:flex;"><span><span style="color:#007020">#elif defined SHA_DIGEST_LENGTH
+</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>  <span style="color:#007020">#define MAX_DIGEST_LEN SHA_DIGEST_LENGTH
+</span></span></span><span style="display:flex;"><span><span style="color:#007020">#else
+</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>  <span style="color:#007020">#define MAX_DIGEST_LEN MD5_DIGEST_LEN </span><span style="color:#60a0b0;font-style:italic">/* 16 bytes */</span><span style="color:#007020">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020">#endif
+</span></span></span></code></pre></div><p><code>SHA256</code> support is common and sets the <code>MAX_DIGEST_LENGTH</code> value to 64. As a
+result, an attacker can write up to 48 bytes past the <code>sum2</code> buffer limit.</p>
+</blockquote>
+</details>
+<p><strong>Upstream fix:</strong></p>
+<p>The <a href="https://github.com/RsyncProject/rsync/commit/0902b52f6687b1f7952422080d50b93108742e53">upstream fix for
+CVE-2024-12084</a>
+changes the <code>sum2</code> field to a dynamically-allocated <code>sum2_array</code> field, which is
+allocated with <code>xfer_sum_len</code> length, and fixes the bounds check to check
+against the <code>xfer_sum_len</code> (checksum length for this transfer’s algorithm).</p>
+<p><strong>Can Go help prevent this?</strong></p>
+<p>Yes: Missing or incorrect bounds checks will not result in a heap buffer
+overflow in Go! Instead, attempting to write out of bounds will result in a
+panic because the Go runtime performs bounds checks.</p>
+<p><strong>How does gokrazy/rsync fare?</strong></p>
+<p>gokrazy/rsync also had insufficient validation! Our issue was different, though:
+It wasn’t size confusion, we just were not doing any validation of the sum
+header at all — oops!</p>
+<p>We can confirm that the Go runtime’s bounds check triggers
+on an attempt to <a href="https://github.com/gokrazy/rsync/blob/3a9d1ec136e049b2bffc9db15230eb70308ac90d/rsyncd/sender.go#L136">write out of
+bounds</a>
+by changing the code like so and running the tests:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/types.go w/types.go
+</span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">index 5601697..899fcb8 100644
+</span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold"></span><span style="color:#a00000">--- i/types.go
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ w/types.go
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -59,7 +59,7 @@ func (sh *SumHead) WriteTo(c *rsyncwire.Conn) error {
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span> 	var buf rsyncwire.Buffer
+</span></span><span style="display:flex;"><span> 	buf.WriteInt32(sh.ChecksumCount)
+</span></span><span style="display:flex;"><span> 	buf.WriteInt32(sh.BlockLength)
+</span></span><span style="display:flex;"><span><span style="color:#a00000">-	buf.WriteInt32(sh.ChecksumLength)
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+	buf.WriteInt32(512 /*sh.ChecksumLength*/)
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 	buf.WriteInt32(sh.RemainderLength)
+</span></span><span style="display:flex;"><span> 	return c.WriteString(buf.String())
+</span></span><span style="display:flex;"><span> }
+</span></span></code></pre></div><p>As expected, the Go runtime panics with the following message:</p>
+<div style="font-size: 80%">
+<pre tabindex="0"><code>panic: runtime error: slice bounds out of range [:512] with length 16
+
+goroutine 277 [running]:
+github.com/gokrazy/rsync/rsyncd.(*sendTransfer).receiveSums(0xc0000d7b68)
+	/home/michael/go/src/github.com/gokrazy/rsync/rsyncd/sender.go:136 +0x339
+github.com/gokrazy/rsync/rsyncd.(*sendTransfer).sendFiles(0xc0000d7b68, 0xc000120820)
+	/home/michael/go/src/github.com/gokrazy/rsync/rsyncd/sender.go:46 +0x134
+github.com/gokrazy/rsync/rsyncd.(*Server).handleConnSender(0xc000476090, {{0x95ed9b, 0x7}, {0xc000426810, 0x2a}, {0x0, 0x0, 0x0}}, {0xa2a120, 0xc0000b2ba0}, ...)
+	/home/michael/go/src/github.com/gokrazy/rsync/rsyncd/rsyncd.go:397 +0x26a
+github.com/gokrazy/rsync/rsyncd.(*Server).HandleConn(0xc000476090, {{0x95ed9b, 0x7}, {0xc000426810, 0x2a}, {0x0, 0x0, 0x0}}, {0xa2a120, 0xc0000b2ba0}, ...)
+	/home/michael/go/src/github.com/gokrazy/rsync/rsyncd/rsyncd.go:351 +0x37a
+github.com/gokrazy/rsync/rsyncd.(*Server).HandleDaemonConn(0xc000476090, {0x94db80?, 0xc00018a040?}, {0x7fd15838b118, 0xc000428028}, {0xa2bd90, 0xc0002303c0})
+	/home/michael/go/src/github.com/gokrazy/rsync/rsyncd/rsyncd.go:307 +0xdbb
+github.com/gokrazy/rsync/rsyncd.(*Server).Serve.func2()
+	/home/michael/go/src/github.com/gokrazy/rsync/rsyncd/rsyncd.go:450 +0xaf
+created by github.com/gokrazy/rsync/rsyncd.(*Server).Serve in goroutine 260
+	/home/michael/go/src/github.com/gokrazy/rsync/rsyncd/rsyncd.go:448 +0xd2
+</code></pre></div>
+<p>Of course, crashing the entire server is not the best failure mode, so I <a href="https://github.com/gokrazy/rsync/commit/178216f10f2e05fd74bf865f2d0725fce4f907cd">added
+the missing bounds checking to turn the panic into an
+error</a>.</p>
+<h4 id="cve-2024-12085">CVE-2024-12085: Stack Info Leak Defeats ASLR (7.5)</h4>
+<p><strong>Summary:</strong></p>
+<p>Because of the same lack of validation as in the previous CVE-2024-12084
+vulnerability, an attacker could select a checksum algorithm with short
+checksums (e.g. <code>xxhash64</code> with 8 byte checksums), but then claim they were
+sending longer checksums (e.g. 9 bytes), making the victim leak one byte of
+uninitialized stack content in the response.</p>
+<p>Leaking one byte of stack content may seem benign, but as the <a
+href="https://github.com/google/security-research/security/advisories/GHSA-p5pg-x43v-mvqj">Google
+Security report</a> puts it:</p>
+<blockquote>
+<p>The first pair of vulnerabilities are a Heap Buffer Overflow and an Info Leak.
+When combined, they allow a client to execute arbitrary code on the machine a
+Rsync server is running on. The client only requires anonymous read-access to
+the server.</p>
+</blockquote>
+<details>
+<summary>Click to expand the <strong>full description of the info leak</strong>
+(quoting the <a
+href="https://github.com/google/security-research/security/advisories/GHSA-p5pg-x43v-mvqj">Google
+Security report</a>)</summary>
+<blockquote>
+<p>The daemon matches checksums of chunks the client sent to the server against
+the local file contents in
+<a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/match.c#L140-L145"><code>hash_search()</code></a>. Part
+of the function prologue is to allocate a buffer on the stack of
+<code>MAX_DIGEST_LEN</code> bytes:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">static</span> <span style="color:#902000">void</span> <span style="color:#06287e">hash_search</span>(<span style="color:#902000">int</span> f, <span style="color:#007020;font-weight:bold">struct</span> sum_struct <span style="color:#666">*</span>s,
+</span></span><span style="display:flex;"><span>                        <span style="color:#007020;font-weight:bold">struct</span> map_struct <span style="color:#666">*</span>buf, OFF_T len)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    OFF_T offset, aligned_offset, end;
+</span></span><span style="display:flex;"><span>    int32 k, want_i, aligned_i, backup;
+</span></span><span style="display:flex;"><span>    <span style="color:#902000">char</span> sum2[MAX_DIGEST_LEN];
+</span></span></code></pre></div><p>The daemon then iterates over the checksums the client sent and generates a
+digest for each of the chunks and compares them to the remote digest:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (<span style="color:#666">!</span>done_csum2) {
+</span></span><span style="display:flex;"><span>    map <span style="color:#666">=</span> (schar <span style="color:#666">*</span>)<span style="color:#06287e">map_ptr</span>(buf, offset, l);
+</span></span><span style="display:flex;"><span>    <span style="color:#06287e">get_checksum2</span>((<span style="color:#902000">char</span> <span style="color:#666">*</span>)map, l, sum2);
+</span></span><span style="display:flex;"><span>    done_csum2 <span style="color:#666">=</span> <span style="color:#40a070">1</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (<span style="color:#06287e">memcmp</span>(sum2, s<span style="color:#666">-&gt;</span>sums[i].sum2, s<span style="color:#666">-&gt;</span>s2length) <span style="color:#666">!=</span> <span style="color:#40a070">0</span>) {
+</span></span><span style="display:flex;"><span>    false_alarms<span style="color:#666">++</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">continue</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Notably, the number of bytes that are compared again are <code>s-&gt;s2length</code>
+bytes. In this case, the comparison does not go out of bounds since
+<code>s-&gt;s2length</code> can be a maximum of <code>MAX_DIGEST_LEN</code>.</p>
+<p>However, the local <code>sum2</code> buffer, not to be confused with the
+attacker-controlled <code>s-&gt;sums[i].sum2</code>, is a buffer on the stack that is not
+cleared and thus contains uninitialized stack contents.</p>
+<p>A malicious client can send a (known) <code>xxhash64</code> checksum for a given chunk of
+a file, which leads to the daemon writing 8 bytes to the stack buffer
+<code>sum2</code>. The attacker can then set <code>s-&gt;s2length</code> to 9 bytes. The result of such
+a setup would be that the first 8 bytes match and an attacker-controlled 9th
+byte is compared with an unknown value of uninitialized stack data.</p>
+<p>An attacker can divide a file into 255 chunks and as a result leak one byte
+per file download. An attacker can incrementally repeat the process, either in
+the same connection or by resetting the connection.</p>
+<p>As a result, they can leak <code>MAX_DIGEST_LEN - 8</code> bytes of uninitialized stack
+data, which can contain pointers to Heap objects, Stack cookies, local
+variables and pointers to global variables and return pointers. With those
+pointers they can defeat ASLR.</p>
+</blockquote>
+</details>
+<p><strong>Upstream fix:</strong></p>
+<p>There are two relevant upstream fixes:</p>
+<ul>
+<li>The <a href="https://github.com/RsyncProject/rsync/commit/0902b52f6687b1f7952422080d50b93108742e53">“Some checksum buffer
+fixes”</a>
+commit prevents this attack because the attacker-controlled <code>s-&gt;s2length</code> can
+no longer be larger than the transfer’s checksum length.</li>
+<li>The <a href="https://github.com/RsyncProject/rsync/commit/589b0691e59f761ccb05ddb8e1124991440db2c7">“prevent information leak off the
+stack”</a>
+commit initializes the <code>sum2</code> memory to zero, thereby making any stack leak
+through <code>sum2</code> impossible.</li>
+</ul>
+<p><strong>Can Go help prevent this?</strong></p>
+<p>Yes: By design, Go initializes all variables to the zero value. Go programmers
+do not need to remember to explicitly initialize variables.</p>
+<p><strong>How does gokrazy/rsync fare?</strong></p>
+<p>gokrazy/rsync is not affected by this vulnerability: Variables are always
+initialized in Go.</p>
+<p>Additionally, selecting checksums other than MD4 was only introduced in protocol
+version 30 (gokrazy/rsync implements protocol version 27).</p>
+<!--
+Go does not do ASLR (https://github.com/golang/go/issues/27583#issuecomment-1002725264).
+Not sure if it makes sense to mention that here.
+-->
+<h4 id="cve-2024-12087">CVE-2024-12087: Path Traversal using Symlinks (7.5)</h4>
+<p><strong>Description:</strong> (quoting the <a href="https://github.com/google/security-research/security/advisories/GHSA-p5pg-x43v-mvqj">Google Security
+report</a>)</p>
+<blockquote>
+<p>When the syncing of symbolic links is enabled, either through the <code>-l</code> or <code>-a</code>
+(<code>--archive</code>) flags, a malicious server can make the client write arbitrary
+files outside of the destination directory.  A malicious server can send the
+client a file list such as:</p>
+<pre tabindex="0"><code>symlink -&gt; /arbitrary/directory
+symlink/poc.txt
+</code></pre><p>Symbolic links, by default, can be absolute or contain characters such as <code>../../</code>.</p>
+<p>In practice, the client validates the file list and when it sees the
+<code>symlink/poc.txt</code> entry, it will look for a directory called <code>symlink</code>,
+otherwise it will error out. If the server sends <code>symlink</code> as [both, a
+directory and a symbolic link], [the client] will only keep the directory
+entry, thus the attack requires some more details to work.</p>
+<p>In <code>inc_recurse</code> mode, which the server can enable for the client, the server
+sends the client multiple file lists. The deduplication of the entries happens
+on a per-file-list basis. As a result, a malicious server can send a client
+multiple file lists, where:</p>
+<pre tabindex="0"><code># file list 1:
+.
+./symlink (directory)
+./symlink/poc.txt (regular file)
+
+# file list 2:
+./symlink -&gt; /arbitrary/path (symlink)
+</code></pre><p>As a result, the <code>symlink</code> directory is created first and <code>symlink/poc.txt</code> is
+considered a valid entry in the file list. Then, the attacker changes the type
+of <code>symlink</code> to a symbolic link.</p>
+<p>When the server then instructs the client to create the <code>symlink/poc.txt</code>
+file, it will follow the symbolic link and thus files can be created outside
+of the destination directory.</p>
+</blockquote>
+<p><strong>Can Go help prevent this?</strong></p>
+<p>No. This vulnerability is caused by a logic error: when multiple file lists are
+used, the merged file list needs to be re-verified.</p>
+<p>But see <a href="#goosroot">Defense in depth: Go’s <code>os.Root</code></a></p>
+<p><strong>Upstream fix:</strong></p>
+<p>The <a href="https://github.com/RsyncProject/rsync/commit/688f5c379a433038bde36897a156d589be373a98">upstream fix for
+CVE-2024-12087</a>
+adds the missing validation.</p>
+<p><strong>How does gokrazy/rsync fare?</strong></p>
+<p>gokrazy/rsync is not affected by this vulnerability: gokrazy/rsync does not
+implement the incremental recursion mode (<code>--inc-recursive</code>).</p>
+<p>The trade-off here is implementation complexity vs. resource usage: the
+incremental recursion mode allows working with the file set in a “windowed” way,
+as opposed to having to scan the entire file set before any transfer can
+begin. See also my <a href="/posts/2022-07-02-rsync-how-does-it-work/">How does rsync
+work?</a> blog post.</p>
+<h4 id="cve-2024-12088">CVE-2024-12088: Bypass for <code>--safe-links</code> (7.5)</h4>
+<p><strong>Description:</strong> (quoting the <a href="https://github.com/google/security-research/security/advisories/GHSA-p5pg-x43v-mvqj">Google Security
+report</a>)</p>
+<blockquote>
+<p>The <code>--safe-links</code> CLI flag makes the client validate any symbolic links it
+receives from the server. The desired behavior is that symbolic links target
+can only be 1) relative to the destination directory and 2) never point
+outside of the destination directory.</p>
+<p>The <code>unsafe_symlink()</code> function is responsible for validating these symbolic
+links. The function calculates the traversal depth of a symbolic link target,
+relative to its position within the destination directory.</p>
+<p>As an example, the following symbolic link is considered unsafe:</p>
+<p><code>{DESTINATION}/foo -&gt; ../../</code></p>
+<p>As it points outside the destination directory. On the other hand, the
+following symbolic link is considered safe as it still points within the
+destination directory:</p>
+<p><code>{DESTINATION}/foo -&gt; a/b/c/d/e/f/../../</code></p>
+<p>This function can be bypassed as it does not consider if the destination of a
+symbolic link contains other symbolic links in the path. For example, take the
+following two symbolic links:</p>
+<p><code>{DESTINATION}/a -&gt; .</code>
+<code>{DESTINATION}/foo -&gt; a/a/a/a/a/a/../../</code></p>
+<p>In this case, foo would actually point outside the destination
+directory. However, the <code>unsafe_symlink()</code> function assumes that <code>a/</code> is a
+directory and that the symbolic link is safe.</p>
+</blockquote>
+<p><strong>Upstream fix:</strong></p>
+<p>The <a href="https://github.com/RsyncProject/rsync/commit/407c71c7ce562137230e8ba19149c81ccc47c387">upstream fix for
+CVE-2024-12088</a>
+makes <code>unsafe_symlink()</code> stricter by not allowing <code>../</code> anywhere within the
+path, except at the very beginning.</p>
+<p><strong>Can Go help prevent this?</strong></p>
+<p>No. This vulnerability is caused by a logic error: the validation function was
+incorrect. We could have implemented that same bug.</p>
+<p>But see <a href="#goosroot">Defense in depth: Go’s <code>os.Root</code></a></p>
+<p><strong>How does gokrazy/rsync fare?</strong></p>
+<p>gokrazy/rsync is not vulnerable: The <code>--safe-links</code> feature is not yet
+implemented in gokrazy/rsync.</p>
+<h4 id="cve-2024-12086">CVE-2024-12086: Arbitrary File Leak (6.8)</h4>
+<p><strong>Summary:</strong></p>
+<p>The rsync receiver (in client mode) did not sanitize file names provided by the
+rsync sender, or otherwise prevent opening files outside the destination tree. A
+malicious sender could instruct a receiver to compare checksums of arbitrary
+files outside the destination tree. By observing the receiver’s reaction to a
+provided one-byte checksum, a malicious sender can leak arbitrary files.</p>
+<details>
+<summary>Click to expand the <strong>full description of the file leak</strong>
+(quoting the <a
+href="https://github.com/google/security-research/security/advisories/GHSA-p5pg-x43v-mvqj">Google
+Security report</a>)</summary>
+<blockquote>
+<p>When a client connects to a malicious server the server is able to leak the
+contents of an arbitrary file on the client’s machine.  In
+<a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/rsync.c#L322C5-L322C23"><code>read_ndx_and_attrs()</code></a>
+the client will read <code>fnamecmp</code> type as well as the <code>xname</code> from the server if
+the server sets the appropriate flags. The flag <code>sanitize_paths</code> will not be
+set for the client.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (iflags <span style="color:#666">&amp;</span> ITEM_BASIS_TYPE_FOLLOWS)
+</span></span><span style="display:flex;"><span>    fnamecmp_type <span style="color:#666">=</span> <span style="color:#06287e">read_byte</span>(f_in);
+</span></span><span style="display:flex;"><span><span style="color:#666">*</span>type_ptr <span style="color:#666">=</span> fnamecmp_type;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (iflags <span style="color:#666">&amp;</span> ITEM_XNAME_FOLLOWS) {
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> ((len <span style="color:#666">=</span> <span style="color:#06287e">read_vstring</span>(f_in, xname, MAXPATHLEN)) <span style="color:#666">&lt;</span> <span style="color:#40a070">0</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#06287e">exit_cleanup</span>(RERR_PROTOCOL);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> (sanitize_paths) { <span style="color:#60a0b0;font-style:italic">/* not enabled when client receives */</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#06287e">sanitize_path</span>(xname, xname, <span style="color:#4070a0">&#34;&#34;</span>, <span style="color:#40a070">0</span>, SP_DEFAULT);
+</span></span><span style="display:flex;"><span>        len <span style="color:#666">=</span> <span style="color:#06287e">strlen</span>(buf);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>} <span style="color:#007020;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#666">*</span>buf <span style="color:#666">=</span> <span style="color:#4070a0">&#39;\0&#39;</span>;
+</span></span><span style="display:flex;"><span>    len <span style="color:#666">=</span> <span style="color:#666">-</span><span style="color:#40a070">1</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#666">*</span>len_ptr <span style="color:#666">=</span> len;
+</span></span></code></pre></div><p>The caller
+(<a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/receiver.c#L521"><code>recv_files()</code></a>)
+then uses the server provided values to determine a file to compare the
+incoming data with.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">case</span> <span style="color:#002070;font-weight:bold">FNAMECMP_FUZZY</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> (file<span style="color:#666">-&gt;</span>dirname) {
+</span></span><span style="display:flex;"><span>        <span style="color:#06287e">pathjoin</span>(fnamecmpbuf, <span style="color:#007020;font-weight:bold">sizeof</span> fnamecmpbuf, file<span style="color:#666">-&gt;</span>dirname, xname);
+</span></span><span style="display:flex;"><span>        fnamecmp <span style="color:#666">=</span> fnamecmpbuf;
+</span></span><span style="display:flex;"><span>    } <span style="color:#007020;font-weight:bold">else</span>
+</span></span><span style="display:flex;"><span>        fnamecmp <span style="color:#666">=</span> xname;
+</span></span><span style="display:flex;"><span>        <span style="color:#007020;font-weight:bold">break</span>;
+</span></span><span style="display:flex;"><span><span style="">…</span>
+</span></span><span style="display:flex;"><span>fd1 <span style="color:#666">=</span> <span style="color:#06287e">do_open</span>(fnamecmp, O_RDONLY, <span style="color:#40a070">0</span>);
+</span></span></code></pre></div><p>In
+<a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/receiver.c#L368"><code>receive_data()</code></a>
+the contents of the file specified by <code>xname</code> are copied into the destination
+file. This can be achieved by the server sending a negative token.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">while</span> ((i <span style="color:#666">=</span> <span style="color:#06287e">recv_token</span>(f_in, <span style="color:#666">&amp;</span>data)) <span style="color:#666">!=</span> <span style="color:#40a070">0</span>) {
+</span></span><span style="display:flex;"><span>..snip..
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> (i <span style="color:#666">&gt;</span> <span style="color:#40a070">0</span>) {
+</span></span><span style="display:flex;"><span>..snip..
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>..snip..
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> (fd <span style="color:#666">!=</span> <span style="color:#666">-</span><span style="color:#40a070">1</span> <span style="color:#666">&amp;&amp;</span> map <span style="color:#666">&amp;&amp;</span> <span style="color:#06287e">write_file</span>(fd, <span style="color:#40a070">0</span>, offset, map, len) <span style="color:#666">!=</span> (<span style="color:#902000">int</span>)len)
+</span></span></code></pre></div><p>The server sends a checksum to compare. If they don&rsquo;t match, a 0 is returned.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (fd <span style="color:#666">!=</span> <span style="color:#666">-</span><span style="color:#40a070">1</span> <span style="color:#666">&amp;&amp;</span> <span style="color:#06287e">memcmp</span>(file_sum1, sender_file_sum, xfer_sum_len) <span style="color:#666">!=</span> <span style="color:#40a070">0</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">return</span> <span style="color:#40a070">0</span>;
+</span></span></code></pre></div><p>When the return value is 0 the receiver will then send a <code>MSG_REDO</code> to the
+generator. The generator will then write a message to the server.</p>
+<p>The server can use this as a signal to determine if the checksum they sent was
+correct. By starting off with a <code>blength</code> of 1 a malicious server is able to
+determine the contents of the target file byte by byte.</p>
+</blockquote>
+</details>
+<p><strong>Upstream fix:</strong></p>
+<p>The <a href="https://github.com/RsyncProject/rsync/commit/c35e28331f10ba6eba370611abd78bde32d54da7">upstream fix for
+CVE-2024-12086</a>
+prevents opening files outside the destination tree by verifying the
+sender-provided path.</p>
+<p><strong>Can Go help prevent this?</strong></p>
+<p>Yes, Go offers an API to prevent this, see <a href="#goosroot">Defense in depth: Go’s
+<code>os.Root</code></a>.</p>
+<p><strong>How does gokrazy/rsync fare?</strong></p>
+<p>gokrazy/rsync is not vulnerable: the fuzzy matching feature was introduced with
+rsync protocol version 29, but gokrazy/rsync implements protocol version 27.</p>
+<h4 id="cve-2024-12747">CVE-2024-12747: Symlink Race Condition (5.6)</h4>
+<p><strong>Description:</strong> (quoting the <a href="https://access.redhat.com/security/cve/CVE-2024-12747">Red Hat Security
+Advisory</a>)</p>
+<blockquote>
+<p>A flaw was found in rsync. This vulnerability arises from a race condition
+during rsync&rsquo;s handling of symbolic links. Rsync&rsquo;s default behavior when
+encountering symbolic links is to skip them. If an attacker replaced a regular
+file with a symbolic link at the right time, it was possible to bypass the
+default behavior and traverse symbolic links. Depending on the privileges of
+the rsync process, an attacker could leak sensitive information, potentially
+leading to privilege escalation.</p>
+</blockquote>
+<p><strong>Upstream fix:</strong></p>
+<p>The <a href="https://github.com/RsyncProject/rsync/commit/0590b09d9a34ae72741b91ec0708a820650198b0">upstream fix for
+CVE-2024-12747</a>
+changes <code>open()</code> calls in the rsync sender to use the <code>O_NOFOLLOW</code> option. The
+paths are not expected to be symlinks at that point in the algorithm (symlinks
+would be handled with <a href="https://manpages.debian.org/readlink.2"><code>readlink(2)</code></a>
+).</p>
+<p><strong>Can Go help prevent this?</strong></p>
+<p>Yes, Go offers an API to prevent this, see <a href="#goosroot">Defense in depth: Go’s
+<code>os.Root</code></a>.</p>
+<p><strong>How does gokrazy/rsync fare?</strong></p>
+<p>gokrazy/rsync was vulnerable before <a href="https://github.com/gokrazy/rsync/commit/1b1fbf65b8ed696db464bf53445e8f9b97a37210">commit
+<code>1b1fbf6</code></a>,
+which introduces the same <code>O_NOFOLLOW</code> mitigation that upstream rsync uses.</p>
+<details>
+<summary>Click to expand the <strong>reproduction steps</strong> to trigger the
+issue in <code>gokrazy/rsync</code></summary>
+<p>To reproduce the issue, use the following steps:</p>
+<ol>
+<li>
+<p>Check out gokrazy/rsync v0.2.7:</p>
+<pre tabindex="0"><code>git clone https://github.com/gokrazy/rsync
+cd rsync
+git checkout v0.2.7
+</code></pre></li>
+<li>
+<p>Patch the code as follows to undo the fix and execute the attack:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/internal/nofollow/nofollow_unix.go w/internal/nofollow/nofollow_unix.go
+</span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold"></span><span style="color:#a00000">--- i/internal/nofollow/nofollow_unix.go
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ w/internal/nofollow/nofollow_unix.go
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -2,8 +2,6 @@
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>
+</span></span><span style="display:flex;"><span> package nofollow
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a00000">-import &#34;golang.org/x/sys/unix&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">-
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span> // Maybe resolves to unix.O_NOFOLLOW on unix systems,
+</span></span><span style="display:flex;"><span> // 0 on other platforms.
+</span></span><span style="display:flex;"><span><span style="color:#a00000">-const Maybe = unix.O_NOFOLLOW
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+const Maybe = 0 // unix.O_NOFOLLOW
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>
+</span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/internal/sender/do.go w/internal/sender/do.go
+</span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold"></span><span style="color:#a00000">--- i/internal/sender/do.go
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ w/internal/sender/do.go
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -2,6 +2,8 @@ package sender
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>
+</span></span><span style="display:flex;"><span> import (
+</span></span><span style="display:flex;"><span> 	&#34;fmt&#34;
+</span></span><span style="display:flex;"><span><span style="color:#00a000">+	&#34;os&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	&#34;path/filepath&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 	&#34;sort&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> 	&#34;github.com/gokrazy/rsync/internal/log&#34;
+</span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -55,6 +57,15 @@ func (st *Transfer) Do(crd *rsyncwire.CountingReader, cwr *rsyncwire.CountingWri
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span> 		st.Logger.Printf(&#34;file list sent&#34;)
+</span></span><span style="display:flex;"><span> 	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#00a000">+	// HACK: swap out the passwd file with a symlink to /etc/passwd
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	if err := os.Remove(filepath.Join(modPath, &#34;passwd&#34;)); err != nil {
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+		return nil, err
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	}
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	if err := os.Symlink(&#34;../passwd&#34;, filepath.Join(modPath, &#34;passwd&#34;)); err != nil {
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+		return nil, err
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	}
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	st.Logger.Printf(&#34;HACK: swapped passwd file for symlink&#34;)
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 	// Sort the file list. The client sorts, so we need to sort, too (in the
+</span></span><span style="display:flex;"><span> 	// same way!), otherwise our indices do not match what the client will
+</span></span><span style="display:flex;"><span> 	// request.
+</span></span></code></pre></div></li>
+</ol>
+<p>Running the <code>TestReceiverSymlinkTraversal</code> test now shows that the server
+traversed the symlink:</p>
+<pre tabindex="0"><code>    receiver_test.go:371: unexpected file contents: diff (-want +got):
+          bytes.Join({
+        - 	&#34;benign&#34;,
+        + 	&#34;secret&#34;,
+          }, &#34;&#34;)
+</code></pre></details>
+<p><strong>A surprising discovery</strong></p>
+<p>When I shared a draft of this article with Damien Neil, member of the Go
+Security Team and the author of <a href="#goosroot">the traversal-resistant <code>os.Root</code>
+API</a>, he pointed out:</p>
+<blockquote>
+<p>I believe the <a href="https://github.com/gokrazy/rsync/commit/1b1fbf65b8ed696db464bf53445e8f9b97a37210">gokrazy fix for
+CVE-2024-12747</a>
+is insufficient. You&rsquo;re calling <code>os.Open</code> with <code>O_NOFOLLOW</code>, but <code>O_NOFOLLOW</code>
+only prevents symlink traversal in the last path component.</p>
+<p>This is probably still vulnerable to replacing an earlier path component so
+<code>os.Open(&quot;dir/passwd&quot;)</code> can be redirected by symlinking <code>dir</code> to <code>/etc</code>.</p>
+</blockquote>
+<p>We reported this to the rsync security contact address in April 2025. In
+December 2025 I learned that someone else had also independently discovered and
+reported this issue.</p>
+<p>Ultimately, this resulted in CVE-2026-29518, published on 2026-05-20.</p>
+<h3 id="may2026">May 2026 batch</h3>
+<h4 id="cve-2026-29518">CVE-2026-29518: Symlink Race Condition (7.0)</h4>
+<p><strong>Description:</strong> (quoting the <a href="https://github.com/RsyncProject/rsync/pull/895/changes/8471fdd1561049ef5f58df44a1811a50bd9a531d">rsync 3.4.3 NEWS entry</a>)</p>
+<blockquote>
+<p>TOCTOU symlink race condition allowing local privilege escalation in
+daemon mode without chroot.</p>
+<p>An rsync daemon configured with <code>use chroot = no</code> is exposed
+to a time-of-check / time-of-use race on parent path components. A local
+attacker with write access to a module can replace a parent directory
+component with a symlink between the receiver&rsquo;s check and its open(),
+redirecting reads (basis-file disclosure) and writes (file overwrite)
+outside the module. Under elevated daemon privilege this allows privilege
+escalation.</p>
+<p>Default <code>use chroot = yes</code> is not exposed.</p>
+<p>Reach: local attacker on the daemon host, write access to a module path,
+daemon configured with <code>use chroot = no</code>.</p>
+</blockquote>
+<p><strong>Upstream fix:</strong></p>
+<p>The <a href="https://github.com/RsyncProject/rsync/commit/859d44fa4f1420775e4ba050337ef32092f2894c">upstream fix for
+CVE-2026-29518</a>
+uses <code>secure_relative_open()</code>, which is similar to Go’s <code>os.Root</code> API.</p>
+<p><strong>Can Go help prevent this?</strong></p>
+<p>Yes, Go offers an API to prevent this, see <a href="#goosroot">Defense in depth: Go’s
+<code>os.Root</code></a>.</p>
+<p><strong>How does gokrazy/rsync fare?</strong></p>
+<p>gokrazy/rsync was vulnerable until I switched <a href="https://github.com/gokrazy/rsync/commit/b6d50e5e9fd1fdf196f09947a6bc796b1ac48f46">the
+sender</a>
+and <a href="https://github.com/gokrazy/rsync/commit/cc42e03cad132ba19e0905f149c7c34dab45cd3a">the
+receiver</a>
+to <a href="#goosroot">the traversal-resistant <code>os.Root</code> API</a>.</p>
+<h4 id="cve-2026-43618">CVE-2026-43618: Integer overflow leaks remote memory (8.1)</h4>
+<p><strong>Description:</strong> (quoting the <a href="https://github.com/RsyncProject/rsync/security/advisories/GHSA-g37v-g3gj-pmwq">GitHub Security Advisory</a>)</p>
+<blockquote>
+<p>Description: The receiver&rsquo;s compressed-token decoder accumulated a 32-bit
+signed counter without overflow checking. A malicious sender can trigger an
+overflow that, with careful manipulation, leaks process memory contents to
+the attacker &ndash; environment variables, passwords, heap and library pointers
+&ndash; significantly weakening ASLR and facilitating further exploitation.</p>
+<p>Reach: authenticated daemon connection with compression enabled (the
+default for protocols &gt;= 30 when both peers advertise it). Disabling
+compression on the daemon (&ldquo;refuse options = compress&rdquo; in rsyncd.conf) is
+the available workaround.</p>
+</blockquote>
+<p><strong>Upstream fix:</strong></p>
+<p>The <a href="https://github.com/RsyncProject/rsync/commit/c44c90e9460c666c965446a8c0957f0b9fa4c66a">upstream fix for
+CVE-2026-43618</a>
+introduces the missing checks.</p>
+<p><strong>How does gokrazy/rsync fare?</strong></p>
+<p>gokrazy/rsync is not vulnerable because it does not implement compression. See
+<a href="https://github.com/gokrazy/rsync/issues/35#issuecomment-2988582190">gokrazy/rsync issue
+#35</a> for
+details on why compression support sounds simple, but is non-trivial.</p>
+<h4 id="cve-2026-43620">CVE-2026-43620: DOS after Out-of-bounds read (6.5)</h4>
+<p><strong>Description:</strong> (quoting the <a href="https://github.com/RsyncProject/rsync/security/advisories/GHSA-28pw-r563-rxvm">GitHub Security Advisory</a>)</p>
+<blockquote>
+<p>The 2025 fix that added a <code>parent_ndx&lt;0</code> guard in <code>send_files()</code>
+was not applied to the visually-identical block in <code>recv_files()</code>. A
+malicious rsync server can drive any connecting client into a deterministic
+<code>SIGSEGV</code> by setting <code>CF_INC_RECURSE</code> in the compatibility flags, sending a
+flist whose first sorted entry is not a leading &ldquo;.&rdquo; directory (which causes
+<code>recv_file_list()</code> to set <code>parent_ndx = -1</code>), then sending a transfer record
+with <code>ndx=0</code> and a non-<code>ITEM_TRANSFER</code> iflag word. The receiver reads
+<code>dir_flist-&gt;files[-1]</code> and dereferences the result. On glibc x86-64 the
+dereferenced pointer is mmap chunk metadata that lands at an unmapped
+address, hence a clean <code>SEGV_MAPERR</code>; non-glibc allocators have not been
+audited.</p>
+<p>Reach: any rsync client doing a normal pull from an attacker-controlled
+URL. Works for both rsync:// URLs and remote-shell pulls. <code>inc_recurse</code> is the
+protocol-30+ default; no special options are required on the victim.</p>
+<p>Workaround: <code>--no-inc-recursive</code> on the client.</p>
+</blockquote>
+<p><strong>Upstream fix:</strong></p>
+<p>The <a href="https://github.com/RsyncProject/rsync/commit/0cf200ecbb8baaf58070d825c4fbd892b4a63b69">upstream fix for
+CVE-2026-43620</a>
+adds the <code>parent_ndx&lt;0</code> guard to <code>recv_files()</code> as well.</p>
+<p><strong>How does gokrazy/rsync fare?</strong></p>
+<p>Just like for <a href="#cve-2024-12087">CVE-2024-12087</a>, gokrazy/rsync is not affected
+by this vulnerability: gokrazy/rsync does not implement the incremental
+recursion mode (<code>--inc-recursive</code>).</p>
+<h4 id="cve-2026-43619">CVE-2026-43619: More symlink races (6.3)</h4>
+<p><strong>Description:</strong> (quoting the <a href="https://github.com/RsyncProject/rsync/security/advisories/GHSA-4h9m-w5ff-j735">GitHub Security
+Advisory</a>)</p>
+<blockquote>
+<p>Description: Earlier fixes for symlink races on the receiver&rsquo;s open() call
+(CVE-2026-29518) missed the same race class on every other path-based
+system call: chmod, lchown, utimes, rename, unlink, mkdir, symlink, mknod,
+link, rmdir, lstat. On rsync daemons with &ldquo;use chroot = no&rdquo; a local
+attacker with filesystem access on the daemon host can swap a symlink into
+a parent directory component between the receiver&rsquo;s check and one of these
+syscalls, redirecting it outside the exported module. The fix routes each
+affected path-based syscall through a parent dirfd opened under
+RESOLVE_BENEATH-equivalent kernel-enforced confinement (openat2 on Linux
+5.6+, O_RESOLVE_BENEATH on FreeBSD 13+ and macOS 15+, per-component
+O_NOFOLLOW walk elsewhere). Default &ldquo;use chroot = yes&rdquo; is not exposed.</p>
+<p>Reach: local attacker on the daemon host, write access to a module path,
+daemon configured with use chroot = no.</p>
+</blockquote>
+<p><strong>Upstream fix:</strong></p>
+<p>The <a href="https://github.com/RsyncProject/rsync/commit/30656c5e358b1c6033f4caf24f3e11b29d25c9f4">upstream fix for
+CVE-2026-43619</a>
+uses the <code>*at</code> family of syscalls, just like Go’s <code>os.Root</code>.</p>
+<p><strong>Can Go help prevent this?</strong></p>
+<p>Yes, Go offers an API to prevent this, see <a href="#goosroot">Defense in depth: Go’s
+<code>os.Root</code></a>.</p>
+<p><strong>How does gokrazy/rsync fare?</strong></p>
+<p>gokrazy/rsync is not affected, because it uses Go’s <code>os.Root</code> API throughout.</p>
+<h4 id="cve-2026-43617">CVE-2026-43617: Hostname/ACL bypass (4.8)</h4>
+<p><strong>Description:</strong> (quoting the <a href="https://github.com/RsyncProject/rsync/security/advisories/GHSA-rjfm-3w2m-jf4f">GitHub Security
+Advisory</a>)</p>
+<blockquote>
+<p>On an rsync daemon configured with the global <code>daemon chroot = /X</code> rsyncd.conf
+setting, the reverse-DNS lookup of the connecting client was performed <em>after</em>
+the daemon had chrooted into <code>/X</code>. If <code>/X</code> did not contain the files glibc
+needs for resolution (<code>/etc/resolv.conf</code>, <code>/etc/nsswitch.conf</code>, <code>/etc/hosts</code>,
+NSS service modules), the lookup failed and the connecting hostname was set to
+&ldquo;UNKNOWN&rdquo;. Hostname-based deny rules (&ldquo;hosts deny = *.evil.example&rdquo;) therefore
+could not match, and an attacker controlling their PTR record could connect
+from a hostname the administrator had intended to deny. IP-based ACLs are
+unaffected. The per-module <code>use chroot</code> setting is unrelated to this issue.</p>
+<p>Reach: rsync daemon configured with <code>daemon chroot = /X</code> AND hostname-based
+ACLs AND <code>/X</code> does not include the libc resolver fixtures.</p>
+</blockquote>
+<p><strong>Upstream fix:</strong></p>
+<p>The <a href="https://github.com/RsyncProject/rsync/commit/c38f20c5ffabacd0c0c483786ab224a36e14bf43">upstream fix for
+CVE-2026-43617</a>
+moves the DNS lookup to an earlier point in the protocol.</p>
+<p><strong>How does gokrazy/rsync fare?</strong></p>
+<p>gokrazy/rsync is not vulnerable because we only implement IP-based allow/deny
+lists, not hostname-based allow/deny lists.</p>
+<h4 id="cve-2026-45232">CVE-2026-45232: stack out-of-bounds write (3.1)</h4>
+<p><strong>Description:</strong> (quoting the <a href="https://github.com/RsyncProject/rsync/security/advisories/GHSA-8f85-j2cv-59m8">GitHub Security Advisory</a>)</p>
+<blockquote>
+<p>The rsync client&rsquo;s HTTP <code>CONNECT</code> proxy support contains an off-by-one
+out-of-bounds stack write in <code>establish_proxy_connection()</code> (<code>socket.c</code>). After
+issuing the <code>CONNECT</code> request, rsync reads the proxy&rsquo;s first response line one
+byte at a time into a 1024-byte stack buffer with the bound <code>cp &lt; &amp;buffer[sizeof buffer - 1]</code>, so the loop only ever writes <code>buffer[0..sizeof-2]</code>. If the proxy
+(or a man-in-the-middle in front of it) returns 1023+ bytes on the first
+response line without a <code>'\n'</code> terminator, the loop exits with <code>cp == &amp;buffer[sizeof buffer - 1]</code> — a slot the loop never wrote, so <code>*cp</code> holds stale
+stack bytes left there by the earlier <code>snprintf()</code> that formatted the outgoing
+<code>CONNECT</code> request. The post-loop code then does:</p>
+<pre tabindex="0"><code>if (*cp != &#39;\n&#39;)   /* (*cp is uninitialised stack data) */
+    cp++;          /* cp now &amp;buffer[sizeof]: one past end */
+*cp-- = &#39;\0&#39;;      /* one-byte OOB write on the stack */
+</code></pre><p>The <code>'\0'</code> lands one byte past the end of the on-stack <code>buffer[1024]</code>,
+corrupting whatever lives in the adjacent stack slot. AddressSanitizer reports
+<code>stack-buffer-overflow</code> at <code>socket.c:95</code> in the <code>establish_proxy_connection</code>
+frame.</p>
+</blockquote>
+<p><strong>Upstream fix:</strong></p>
+<p>The <a href="https://github.com/RsyncProject/rsync/commit/a5fc5ebe7a8ef1aa72f6e344599f97fd4427ecba">upstream fix for
+CVE-2026-45232</a>
+validates the attacker-supplied data.</p>
+<p><strong>How does gokrazy/rsync fare?</strong></p>
+<p>gokrazy/rsync does not implement such proxy support, so it is not vulnerable.</p>
+<h3 id="go-verdict">Go verdict</h3>
+<p>Let’s summarize how Go fares:</p>
+<ul>
+<li>The Go runtime’s bounds checks turn more serious security issues into a panic.
+<ul>
+<li>A panic is still a denial-of-service risk, but that’s much preferable.</li>
+</ul>
+</li>
+<li>Go initializes memory to zero, making info leaks like CVE-2024-12085 impossible.</li>
+<li>Go’s <code>os.Root</code> API prevents most of the remaining vulnerabilities.</li>
+<li>Only one out of twelve vulnerabilities (CVE-2026-43617) is a proper bug in
+the application logic that using Go could not have prevented.</li>
+</ul>
+<table>
+  <thead>
+      <tr>
+          <th>CVE number</th>
+          <th>Cause</th>
+          <th>Risk (C)</th>
+          <th>Does Go help?</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2024-12084</td>
+          <td>insufficient validation</td>
+          <td>Heap Buffer Overflow</td>
+          <td>✅ bounds check (panics!)</td>
+      </tr>
+      <tr>
+          <td>2024-12085</td>
+          <td>insufficient validation</td>
+          <td>Info Leak</td>
+          <td>✅ zero init</td>
+      </tr>
+      <tr>
+          <td>2024-12086</td>
+          <td>missing validation</td>
+          <td>Arbitrary File Leak</td>
+          <td>✅ <code>os.Root</code></td>
+      </tr>
+      <tr>
+          <td>2024-12087</td>
+          <td>insufficient validation</td>
+          <td>Write Arbitrary Files</td>
+          <td>✅ <code>os.Root</code></td>
+      </tr>
+      <tr>
+          <td>2024-12088</td>
+          <td>insufficient validation</td>
+          <td>Create Arbitrary Symlinks</td>
+          <td>✅ <code>os.Root</code></td>
+      </tr>
+      <tr>
+          <td>2024-12747</td>
+          <td>TOCTOU</td>
+          <td>Leak Privileged Files</td>
+          <td>✅ <code>os.Root</code></td>
+      </tr>
+      <tr>
+          <td>2026-29518</td>
+          <td>TOCTOU</td>
+          <td>Leak Privileged Files</td>
+          <td>✅ <code>os.Root</code></td>
+      </tr>
+      <tr>
+          <td>2026-43617</td>
+          <td>missing validation</td>
+          <td>Deny List Ineffective</td>
+          <td>❌ logic bug</td>
+      </tr>
+      <tr>
+          <td>2026-43618</td>
+          <td>insufficient validation</td>
+          <td>Info Leak</td>
+          <td>✅ bounds check (panics!)</td>
+      </tr>
+      <tr>
+          <td>2026-43619</td>
+          <td>TOCTOU</td>
+          <td>Leak Privileged Files</td>
+          <td>✅ <code>os.Root</code></td>
+      </tr>
+      <tr>
+          <td>2026-43620</td>
+          <td>insufficient validation</td>
+          <td>crash (DOS)</td>
+          <td>✅ bounds check (panics!)</td>
+      </tr>
+      <tr>
+          <td>2026-45232</td>
+          <td>missing validation</td>
+          <td>Memory Write</td>
+          <td>✅ bounds check (panics!)</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="gokrazy-rsync-verdict">gokrazy/rsync verdict</h3>
+<p>Aside from being written in Go, another key difference between gokrazy/rsync and
+the official upstream rsync is that the gokrazy implementation is <strong>minimal</strong>:</p>
+<ul>
+<li>gokrazy/rsync is unaffected by many vulnerabilities because it does not
+implement the feature in question, for example <code>--inc-recursive</code>.</li>
+<li>Like all other wire protocol-compatible rsync implementations, gokrazy/rsync
+targets protocol version 27, because later protocol versions introduce
+significant complexity.</li>
+<li>In some cases, features that would be good to implement come with significant
+blockers, e.g. compression is tricky, see <a href="https://github.com/gokrazy/rsync/issues/35#issuecomment-2988582190">gokrazy/rsync issue
+#35</a> for
+details.</li>
+</ul>
+<p>Let’s have a look at whether gokrazy/rsync was affected by each CVE at the time
+of publishing:</p>
+<table>
+  <thead>
+      <tr>
+          <th>CVE number</th>
+          <th>Cause</th>
+          <th>gokrazy/rsync impl?</th>
+          <th>gokrazy/rsync affected?</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2024-12084</td>
+          <td>insufficient validation</td>
+          <td>yes</td>
+          <td>⚠️ panic</td>
+      </tr>
+      <tr>
+          <td>2024-12085</td>
+          <td>insufficient validation</td>
+          <td>no (proto 30)</td>
+          <td>✅ not vuln</td>
+      </tr>
+      <tr>
+          <td>2024-12086</td>
+          <td>missing validation</td>
+          <td>no (proto 29)</td>
+          <td>✅ not vuln</td>
+      </tr>
+      <tr>
+          <td>2024-12087</td>
+          <td>insufficient validation</td>
+          <td>no (<code>inc-rec</code>)</td>
+          <td>✅ not vuln</td>
+      </tr>
+      <tr>
+          <td>2024-12088</td>
+          <td>insufficient validation</td>
+          <td>no (<code>safe-links</code>)</td>
+          <td>✅ not vuln</td>
+      </tr>
+      <tr>
+          <td>2024-12747</td>
+          <td>TOCTOU</td>
+          <td>yes</td>
+          <td>❌ vuln</td>
+      </tr>
+      <tr>
+          <td>2026-29518</td>
+          <td>TOCTOU</td>
+          <td>yes</td>
+          <td>⚠️ patched</td>
+      </tr>
+      <tr>
+          <td>2026-43617</td>
+          <td>missing validation</td>
+          <td>no (host deny lists)</td>
+          <td>✅ not vuln</td>
+      </tr>
+      <tr>
+          <td>2026-43618</td>
+          <td>insufficient validation</td>
+          <td>no (compression)</td>
+          <td>✅ not vuln</td>
+      </tr>
+      <tr>
+          <td>2026-43619</td>
+          <td>TOCTOU</td>
+          <td>yes</td>
+          <td>⚠️ patched</td>
+      </tr>
+      <tr>
+          <td>2026-43620</td>
+          <td>insufficient validation</td>
+          <td>no (<code>inc-rec</code>)</td>
+          <td>✅ not vuln</td>
+      </tr>
+      <tr>
+          <td>2026-45232</td>
+          <td>missing validation</td>
+          <td>no (proxy)</td>
+          <td>✅ not vuln</td>
+      </tr>
+  </tbody>
+</table>
+<p>To be clear: all known vulnerabilities are fixed in gokrazy/rsync! The table
+above documents what the state was at the time when each CVE was published. In
+other words:</p>
+<p>When the January 2025 vulnerabilities were published, gokrazy/rsync panicked
+(CVE-2024-12084) and was vulnerable to a TOCTOU race (CVE-2024-12747). In the
+process of fixing the TOCTOU issue, we discovered CVE-2026-29518, which was
+fixed in gokrazy/rsync before the CVE was published. CVE-2026-43619 was
+discovered even later, but was also already fixed in gokrazy/rsync with the same
+fix: using Go’s <code>os.Root</code> everywhere.</p>
+<h3 id="terminology">Imprecise terminology</h3>
+<p>As I was reading the vulnerability reports, I noticed that the reports were
+slightly misleading by their choice of words: most reports just spoke of
+“server” and “client”. However, in an rsync transfer, both sides, the rsync
+client and the rsync server can assume either role: sender (upload files) or
+receiver (download files)!</p>
+<p>Some setups come with further restrictions that make certain attacks harder or
+impossible to pull off. For example, when running in daemon mode, file system
+access can be restricted to the pre-configured module paths (but not in command
+mode!).</p>
+<p>Here is a diagram to give you an overview of the 4 different setups and
+role/protocol layering:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations.png"><img
+  srcset="https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations_hu_b83596d5e1578bab.png 2x,https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations_hu_80c1da434b4b343b.png 3x"
+  src="https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations_hu_b1c2c5d30df87dad.png"
+  alt="diagram showing 4 different rsync setups: (1) rsync --daemon (2) rsync -e ssh; rsync://server/module/dir (3) rsync server:/some/path (4) rsync /src" title="diagram showing 4 different rsync setups: (1) rsync --daemon (2) rsync -e ssh; rsync://server/module/dir (3) rsync server:/some/path (4) rsync /src"
+  width="600"
+  height="547"
+  style="
+
+border: 1px solid #000;
+
+"
+  
+  loading="lazy"></a>
+
+
+
+<p>In the context of our vulnerability reports, I would say that the Arbitrary File
+Leak vulnerability (CVE-2024-12086)’s original title “Server leaks arbitrary
+client files” can easily be misunderstood.</p>
+<p>Instead, I would say: The <strong>rsync receiver</strong> will leak arbitrary files to a
+<strong>malicious sender</strong>.</p>
+<p>I have verified that a malicious client sender can make an unpatched remote
+rsync open files outside the destination tree (e.g. the <code>/etc/shadow</code> system
+password database) when running in command mode, for example over SSH. (But,
+when running in daemon mode, the server enables additional path sanitization,
+which prevents this attack.)</p>
+<p>Similarly, the Symlink Path Traversal vulnerability (CVE-2024-12087) speaks
+about a “malicious server”, but again, it should be “malicious sender”, which
+can be either the client or the server.</p>
+<h2 id="openrsync">Comparison with OpenBSD’s openrsync (C)</h2>
+<p>The OpenBSD project is known for its security focus, so how does openrsync
+compare?</p>
+<p>openrsync is not affected by the Heap Buffer Overflow (CVE-2024-12084) and Stack
+Info Leak (CVE-2024-12085) vulnerabilities because it validates the checksum
+length and only supports one checksum size/algorithm (MD4).</p>
+<p>openrsync is not affected by CVE-2024-12086, CVE-2024-12087 and CVE-2024-12088
+because it does not implement the relevant features (like gokrazy/rsync). Even
+if it was vulnerable, openrsync’s defense-in-depth measures like using
+<a href="https://man.openbsd.org/unveil.2">OpenBSD’s <code>unveil(2)</code></a> and
+<a href="https://man.openbsd.org/pledge.2"><code>pledge(2)</code></a> to restrict file system access
+would have prevented successful exploitation — at least when running on OpenBSD.</p>
+<p>openrsync is not affected by CVE-2024-12747 because it <a href="https://github.com/kristapsdz/openrsync/commit/8f1927c35021cd1fbf31cb8c5a6393cc37ba4de8">used <code>O_NOFOLLOW</code> from
+the very moment they implemented symlink
+support</a>. But,
+because <code>O_NOFOLLOW</code> is not a sufficient fix for this issue, openrsync <strong>is</strong>
+affected by CVE-2026-29518!</p>
+<p>The above covers the January 2025 batch of vulnerabilities; the May 2026 batch
+is similar in that most features just are not implemented.</p>
+<p>Overall, I say: Well done, Kristaps and contributors! By diligently implementing
+validation, restricting the attack surface and employing defense-in-depth
+measures, openrsync manages to not be affected by almost all of the reported
+vulnerabilities.</p>
+<h2 id="defenseindepth">Defense in depth</h2>
+<p>Which APIs and environments can we use on Linux for defense-in-depth measures?</p>
+<p>I’ll go through the ones <code>gokrazy/rsync</code> supports, ordered by traditional to
+modern.</p>
+<h3 id="mountnamespaces">Linux mount namespaces</h3>
+<p>Within a few weeks after starting the <code>gokrazy/rsync</code> project, I <a href="https://github.com/gokrazy/rsync/commit/d63aaed3be4f69ac98581c4b0ac2646c37f1f8c0">added support
+for dropping privileges and using mount/pid namespaces on
+Linux</a>
+to restrict the file system objects that my rsync server could work with.</p>
+<p>This approach works very well to mitigate path traversal attacks, but requires
+privileges, meaning we need to run as <code>root</code> or <a href="https://github.com/gokrazy/rsync/commit/da9802e33c89af947d4958ec31e51b14f43ebfb2">in a Linux user
+namespace</a>
+(if enabled on your distribution / system).</p>
+<p>That limitation makes mount namespaces well-suited for server setups, but
+usually unavailable for interactive one-off transfers that are typically running
+under a human’s user account.</p>
+<h3 id="systemdhardening">systemd hardening</h3>
+<p>In the same commit that introduced Linux mount/pid namespace support, I also
+included a systemd service file that restricted file system access to home
+directories and encouraged folks in the README to further restrict file system
+access, depending on what their use-case allows.</p>
+<p>These file system restrictions, if set up correctly, mitigate the File Leak
+(CVE-2024-12086) and Path Traversal (CVE-2024-12087) vulnerabilities.</p>
+<p>The Symlink Race Condition (CVE-2024-12747) relies on privilege escalation
+through the rsync process, but thanks to the
+<a href="https://0pointer.net/blog/dynamic-users-with-systemd.html">DynamicUser</a>
+feature, our process has fewer privileges than other users.</p>
+<p>Similarly to mount namespaces, these measures are great for server setups, but
+too cumbersome to set up for interactive one-off usages.</p>
+<h3 id="landlock">Linux Landlock</h3>
+<p>I stumbled upon Justine’s blog post <a href="https://justine.lol/pledge/#paths">Porting OpenBSD pledge() to Linux
+(2022)</a> and was reminded that Linux offers
+the <a href="https://docs.kernel.org/userspace-api/landlock.html">Landlock API</a> for
+unprivileged, per-process access control, similar to OpenBSD’s
+<a href="https://man.openbsd.org/unveil"><code>unveil(2)</code></a> system call, which openrsync
+uses. The basic idea is that once your program knows the directory it works
+with, it makes a call like <code>unveil(&quot;/home/michael/backups&quot;, &quot;rw&quot;);</code> and no
+longer has access to other file system locations.</p>
+<p>I had previously heard of Landlock at a Go Meetup, so I knew there was Go
+support for Landlock. Back in 2022, I enabled Landlock support in the gokrazy
+kernel images.</p>
+<p>So I gave it a shot in March 2025 and <a href="https://github.com/gokrazy/rsync/commit/f84d1e39ec6613599cd9610974e89be5ca183a6d">implemented Landlock support to restrict
+file system
+access</a>. It
+took me a few hours, which seems a little longer than one might expect at
+first. Making Landlock work (and/or skipping it) in our test environment ran
+into a couple of road blocks: Our tests had defined many functions that get run
+in the same process, but when repeatedly adding rulesets, we would exceed the
+limit of 16 (!) policy layers per process.</p>
+<p>Once I had it set up just right, it is a beautiful solution. Now we can restrict
+rsync transfers to their sources (read-only) or destination directories
+(read-write), even for unprivileged invocations of <code>gokrazy/rsync</code>! 🎉</p>
+<hr>
+<p>The downside to Landlock is that Landlock operates at the process level. This
+means that Landlock policies must include the files that your program needs,
+e.g. <code>gokrazy/rsync</code> needs to be able to read <code>/etc/passwd</code> for user id lookup,
+so if the attacker is after the <code>/etc/passwd</code> file, Landlock does not help.</p>
+<h3 id="goosroot">Go’s os.Root</h3>
+<p>In February 2025, the Go 1.24 release introduced the
+<a href="https://pkg.go.dev/os#Root"><code>os.Root</code></a> API, which is resistant against path
+traversal, see <a href="https://go.dev/blog/osroot">The Go Blog: Traversal-resistant file
+APIs</a> (by Damien Neil, March 2025). This API allows
+more fine-grained control (per file system operation) compared to Landlock.</p>
+<p>Go 1.25 (released in August 2025) added more methods to <code>os.Root</code>, making it a
+convenient choice for most file system usage.</p>
+<p>I have converted all of <code>gokrazy/rsync</code>’s file system usage to use <code>os.Root</code>,
+which is a great fit: users configure input/output directories, but the
+filenames received over the network are untrusted. That’s exactly what <code>os.Root</code>
+was designed for!</p>
+<hr>
+<p>When I first looked into using <code>os.Root</code>, I thought that some system calls could
+inherently not be made with this API, like for example <a href="https://manpages.debian.org/mknod.2"><code>mknod(2)</code></a>
+ to create device node files. Damien explained:</p>
+<blockquote>
+<p>It won&rsquo;t support mknod, though.</p>
+<p>However, you should be able to use it to enable a safe mknod:</p>
+<ul>
+<li>os.Root.OpenFile the parent directory of the target,</li>
+<li>File.Fd to get the file descriptor for that directory,</li>
+<li><a href="https://pkg.go.dev/golang.org/x/sys/unix#Mknodat">https://pkg.go.dev/golang.org/x/sys/unix#Mknodat</a> to create the file.</li>
+</ul>
+</blockquote>
+<p>If you’re curious how that looks in practice, check out <code>gokrazy/rsync</code>’s usage
+in <a href="https://github.com/gokrazy/rsync/blob/45444634288e753178af56c61e064ffb08636695/internal/receiver/generatormknod_linux.go#L15-L29"><code>internal/receiver/generatormknod_linux.go</code>, line
+15-29</a>.</p>
+<p>Another stumbling block was when I realized that unlike with <a href="https://manpages.debian.org/mknodat.2"><code>mknodat(2)</code></a>
+, Linux only implements <a href="https://manpages.debian.org/bind.2"><code>bind(2)</code></a>
+, but no <code>bindat</code> (as of Linux 7.0)!</p>
+<p>Luckily, <a href="https://mastodon.social/@pid_eins/115869484548013992">Lennart Poettering pointed
+out</a> that there’s a trick
+to skip path resolution without <code>bindat</code>:</p>
+<blockquote>
+<p>you can probably bind to <code>/proc/self/&lt;fd&gt;/foobar</code> in the meantime&hellip;</p>
+</blockquote>
+<p>And indeed, this works! Path resolution is skipped because we only specify a
+basename (last component of a path) after the known-safe <code>/proc/self/&lt;fd&gt;</code>, not
+a path (see <a href="https://github.com/gokrazy/rsync/blob/45444634288e753178af56c61e064ffb08636695/internal/receiver/generatormknod_linux.go#L49-L56">line
+49-56</a>).</p>
+<p>With these two tips, <code>gokrazy/rsync</code> v0.3.1 and newer are fully using <code>os.Root</code>,
+meaning all file system access is traversal-safe! 🥳</p>
+<h2 id="conclusion">Conclusion</h2>
+<p><strong>Lacking validation causes vulnerabilities</strong></p>
+<p>It is interesting to note that aside from the TOCTOU vulnerabilities
+(CVE-2024-12747, CVE-2026-29518 and CVE-2026-43619), all other vulnerabilities
+were caused by missing or incorrect input validation. In three cases, there was
+just no validation to begin with. In another case (CVE-2024-12088), the subject
+matter of file system path resolution is tricky enough that the existing
+validation did not cover all edge cases.</p>
+<p>As the <a href="#go-verdict">Go verdict</a> section explains in more detail, the most
+valuable structural fixes are to provide bounds checking (= always-on
+validation) and safe-by-default APIs like Go’s <code>os.Root</code>.</p>
+<p><strong>Too much complexity</strong></p>
+<p>A few of the vulnerabilities came from evolution of the rsync protocol: The
+code used to correctly perform sufficient validation, but then new features were
+added. For example, when checksum algorithm negotiation was added (protocol
+version 30), the validation was not correctly updated. When incremental
+recursion was added (also protocol version 30), the validation that made sense
+for individual file lists was not updated for the new processing approach of
+merging incremental file lists.</p>
+<p>Avoiding complexity avoids vulnerabilities! Both gokrazy/rsync and also
+openrsync were not vulnerable to 8 out of the 12 security vulnerabilities simply
+because they do not implement the feature with the vulnerability.</p>
+<p>Of course, these features were added to rsync because they were valuable to
+someone at some point, and of course I am not saying that we should just… not
+develop software any further, ever.</p>
+<p>But, I consider it ideal to <strong>use an implementation whose complexity is
+appropriate for and proportional to the complexity of the use-case</strong>. In other
+words: for simple use-cases, reach for a simple implementation. Only reach for
+the fully-featured implementation where needed.</p>
+]]></content>
+  </entry>
+  <entry>
     <title type="html"><![CDATA[Tips to debug hanging Go programs]]></title>
     <link href="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/"/>
     <id>https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/</id>

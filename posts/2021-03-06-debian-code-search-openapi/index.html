@@ -105,7 +105,7 @@ The goal of offering an OpenAPI-based API is to provide developers with automati
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -230,17 +230,17 @@ dashboard, etc.</p>
 </li>
 </ol>
 <h2 id="curl-example">curl example</h2>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>curl <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  -H <span style="color:#4070a0">&#34;x-dcs-apikey: </span><span style="color:#007020;font-weight:bold">$(</span>cat dcs-apikey-stapelberg.txt<span style="color:#007020;font-weight:bold">)</span><span style="color:#4070a0">&#34;</span> <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  -X GET <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  <span style="color:#4070a0">&#34;https://codesearch.debian.net/api/v1/search?query=i3Font&amp;match_mode=regexp&#34;</span> 
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>curl <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>  -H <span style="color:#4070a0">&#34;x-dcs-apikey: </span><span style="color:#007020;font-weight:bold">$(</span>cat dcs-apikey-stapelberg.txt<span style="color:#007020;font-weight:bold">)</span><span style="color:#4070a0">&#34;</span> <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>  -X GET <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>  <span style="color:#4070a0">&#34;https://codesearch.debian.net/api/v1/search?query=i3Font&amp;match_mode=regexp&#34;</span> 
 </span></span></code></pre></div><h2 id="web-browser-example">Web browser example</h2>
 <p>You can try out the API in your web browser in the <a href="https://codesearch.debian.net/apikeys/#openapi-doc-browser">OpenAPI
 documentation</a>.</p>
 <h2 id="code-example-go">Code example (Go)</h2>
 <p>Here’s an example program that demonstrates how to set up an auto-generated Go
 client for the Debian Code Search OpenAPI, run a query, and aggregate the results:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">burndown</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">burndown</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>cfg<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>openapiclient.<span style="color:#06287e">NewConfiguration</span>()<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>cfg.<span style="color:#06287e">AddDefaultHeader</span>(<span style="color:#4070a0">&#34;x-dcs-apikey&#34;</span>,<span style="color:#bbb"> </span>apiKey)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>client<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>openapiclient.<span style="color:#06287e">NewAPIClient</span>(cfg)<span style="color:#bbb">
@@ -281,7 +281,7 @@ client for the Debian Code Search OpenAPI, run a query, and aggregate the result
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>wr.<span style="color:#06287e">Flush</span>()<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>wr.<span style="color:#06287e">Error</span>()<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div><p>The full example can be found under
 <a href="https://github.com/Debian/dcs/blob/3d6a18f010e915f77b4833189286100308c539cb/_example/burndown.go"><code>burndown.go</code></a>.</p>
 <h2 id="feedback">Feedback?</h2>
@@ -291,26 +291,26 @@ client for the Debian Code Search OpenAPI, run a query, and aggregate the result
 <p>I’m aware of the following <a href="https://codesearch.debian.net/thirdparty">third-party projects using Debian Code
 Search</a>:</p>
 <table>
-  <thead>
-      <tr>
-          <th>Tool</th>
-          <th>Migration status</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td><a href="https://salsa.debian.org/debian/codesearch-cli">Debian Code Search CLI tool</a></td>
-          <td><a href="https://salsa.debian.org/debian/codesearch-cli/-/merge_requests/1">Updated to OpenAPI</a></td>
-      </tr>
-      <tr>
-          <td><a href="https://salsa.debian.org/aviau/identify-incomplete-xs-go-import-path">identify-incomplete-xs-go-import-path</a></td>
-          <td><a href="https://salsa.debian.org/aviau/identify-incomplete-xs-go-import-path/-/merge_requests/1">Update pending</a></td>
-      </tr>
-      <tr>
-          <td><a href="https://gitlab.gnome.org/nbenitez/gnome-codesearch">gnome-codesearch</a></td>
-          <td>makes no API queries</td>
-      </tr>
-  </tbody>
+	<thead>
+			<tr>
+					<th>Tool</th>
+					<th>Migration status</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><a href="https://salsa.debian.org/debian/codesearch-cli">Debian Code Search CLI tool</a></td>
+					<td><a href="https://salsa.debian.org/debian/codesearch-cli/-/merge_requests/1">Updated to OpenAPI</a></td>
+			</tr>
+			<tr>
+					<td><a href="https://salsa.debian.org/aviau/identify-incomplete-xs-go-import-path">identify-incomplete-xs-go-import-path</a></td>
+					<td><a href="https://salsa.debian.org/aviau/identify-incomplete-xs-go-import-path/-/merge_requests/1">Update pending</a></td>
+			</tr>
+			<tr>
+					<td><a href="https://gitlab.gnome.org/nbenitez/gnome-codesearch">gnome-codesearch</a></td>
+					<td>makes no API queries</td>
+			</tr>
+	</tbody>
 </table>
 <p>If you find any others, please point them to this post in case they are not
 using Debian Code Search’s OpenAPI yet.</p>

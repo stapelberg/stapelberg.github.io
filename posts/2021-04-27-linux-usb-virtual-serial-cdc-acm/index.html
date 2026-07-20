@@ -14,7 +14,7 @@ This article walks you through diagnosing and working around this issue, in the 
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-mac_hu_680bb3da9972e13a.jpg">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-mac_hu_98131830b3ee92ba.jpg">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -106,7 +106,7 @@ This article walks you through diagnosing and working around this issue, in the 
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -311,7 +311,7 @@ thing?</p>
 (already queued), the standard tty settings are still in effect, because the
 application did not yet have a chance to set its tty configuration up!</p>
 <p>This can be verified by running the following command on a Linux host:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% stty -F /dev/ttyACM0 <span style="color:#40a070">115200</span> -echo -echoe -echok
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% stty -F /dev/ttyACM0 <span style="color:#40a070">115200</span> -echo -echoe -echok
 </span></span></code></pre></div><p>Even though the command’s sole purpose is to configure the tty, its opening of
 the device still causes the banner to print, and echoing to happen, and garbled
 output is the result.</p>
@@ -320,7 +320,7 @@ driver <a href="https://elixir.bootlin.com/linux/v5.11.16/source/drivers/usb/cla
 table</a>,
 in which devices that print a banner select the <code>DISABLE_ECHO</code> quirk, which
 results in the CDC ACM driver turning off the echoing termios flag early:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">static</span> <span style="color:#007020;font-weight:bold">const</span> <span style="color:#007020;font-weight:bold">struct</span> usb_device_id acm_ids[] <span style="color:#666">=</span> {
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">static</span> <span style="color:#007020;font-weight:bold">const</span> <span style="color:#007020;font-weight:bold">struct</span> usb_device_id acm_ids[] <span style="color:#666">=</span> {
 </span></span><span style="display:flex;"><span>	<span style="color:#60a0b0;font-style:italic">/* quirky and broken devices */</span>
 </span></span><span style="display:flex;"><span>	{ <span style="color:#06287e">USB_DEVICE</span>(<span style="color:#40a070">0x0424</span>, <span style="color:#40a070">0x274e</span>), <span style="color:#60a0b0;font-style:italic">/* Microchip Technology, Inc. */</span>
 </span></span><span style="display:flex;"><span>	  .driver_info <span style="color:#666">=</span> DISABLE_ECHO, }, <span style="color:#60a0b0;font-style:italic">/* DISABLE ECHO in termios flag */</span>
@@ -328,7 +328,7 @@ results in the CDC ACM driver turning off the echoing termios flag early:</p>
 </span></span></span></code></pre></div><p>So, a quick solution to turn off echoing early is to change your USB vendor and
 product id (VID/PID) to an ID for which the Linux kernel applies the
 <code>DISABLE_ECHO</code> quirk, e.g.:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#define USB_DEVICE_VID 0x0424
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#define USB_DEVICE_VID 0x0424
 </span></span></span><span style="display:flex;"><span><span style="color:#007020">#define USB_DEVICE_PID 0x274e
 </span></span></span></code></pre></div><h2 id="flushing-in-screen">Flushing in Screen</h2>
 <p>With tty echo disabled, I don’t see garbled output anymore, but still wouldn’t
@@ -416,7 +416,7 @@ application a chance to configure the serial device.</li>
 </ol>
 <p>In our <code>main.c</code> loop, we wait until USB is active, and until we receive the
 first <code>CDC_SET_CONTROL_LINE_STATE</code> request because the serial port was opened:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">while</span> (<span style="color:#007020">true</span>) {
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">while</span> (<span style="color:#007020">true</span>) {
 </span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> (SDU1.config<span style="color:#666">-&gt;</span>usbp<span style="color:#666">-&gt;</span>state <span style="color:#666">==</span> USB_ACTIVE) {
 </span></span><span style="display:flex;"><span>      <span style="color:#06287e">chSemWait</span>(<span style="color:#666">&amp;</span>scls);
 </span></span><span style="display:flex;"><span>      <span style="color:#06287e">chThdSleepMilliseconds</span>(<span style="color:#40a070">100</span>);
@@ -427,7 +427,7 @@ first <code>CDC_SET_CONTROL_LINE_STATE</code> request because the serial port wa
 </span></span><span style="display:flex;"><span>  }
 </span></span></code></pre></div><p>And in our <code>usbcfg.c</code>, when receiving a <code>CDC_SET_CONTROL_LINE_STATE</code> request, we
 will reset the semaphore to non-blockingly wake up all waiters:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">extern</span> <span style="color:#902000">semaphore_t</span> scls;
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">extern</span> <span style="color:#902000">semaphore_t</span> scls;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#902000">bool</span> <span style="color:#06287e">requests_hook</span>(USBDriver <span style="color:#666">*</span>usbp) {
 </span></span><span style="display:flex;"><span>  <span style="color:#007020;font-weight:bold">const</span> <span style="color:#902000">bool</span> result <span style="color:#666">=</span> <span style="color:#06287e">sduRequestsHook</span>(usbp);
@@ -459,8 +459,8 @@ will reset the semaphore to non-blockingly wake up all waiters:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-mac.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-mac_hu_c726f827ca7a6388.jpg 2x,https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-mac_hu_fe28fd7fc1c91b5.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-mac_hu_4fb4a0a2cb46a4fa.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-mac_hu_a528a8645ac73f6c.jpg 2x,https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-mac_hu_10215ef58fe7fc80.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-mac_hu_b36b9ce5b3ce6fb2.jpg"
   alt="USB virtual serial device on macOS" title="USB virtual serial device on macOS"
   width="600"
   height="671"
@@ -491,8 +491,8 @@ border: 1px solid #000;
 
 
 <a href="https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-windows10.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-windows10_hu_4aa23ad6a82f5471.jpg 2x,https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-windows10_hu_6aabe78b39573347.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-windows10_hu_ba0d3db5e7ee1183.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-windows10_hu_137fdeca1e0c928c.jpg 2x,https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-windows10_hu_82fc3b1e5d058ce0.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2021-04-27-linux-usb-virtual-serial-cdc-acm/chibios-acm-windows10_hu_af9256e2cf6fadd3.jpg"
   alt="USB virtual serial device on Windows 10" title="USB virtual serial device on Windows 10"
   width="600"
   height="338"

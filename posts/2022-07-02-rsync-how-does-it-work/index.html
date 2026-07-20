@@ -15,7 +15,7 @@ How does rsync work? When talking about the rsync protocol, we need to distingui
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-logical-view-featured_hu_fd4b08433a4b420a.png">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-logical-view-featured_hu_e3f63608b8abbea3.png">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -108,7 +108,7 @@ How does rsync work? When talking about the rsync protocol, we need to distingui
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -297,8 +297,8 @@ to pin-point any bottlenecks:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hu_1e6cb5c3a0d53421.jpg 2x,https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hu_81f1353f7140ad17.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hu_ab177c5f9e8ee16.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hu_a9d9f70fb5fe8625.jpg 2x,https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hu_28af2a145a98ddb.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hu_d49b3d3aab60f55f.jpg"
   
   width="600"
   height="331"
@@ -417,28 +417,28 @@ implementation (To be published.)</p>
 <h2 id="confirmation-hack">Appendix A: rsync confirmation hack</h2>
 <p>For verifying rsync’s behavior with regards to changing data sets, I checked
 out the following version:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% git clone https://github.com/WayneD/rsync/ rsync-changing-data-sets
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% git clone https://github.com/WayneD/rsync/ rsync-changing-data-sets
 </span></span><span style="display:flex;"><span>% <span style="color:#007020">cd</span> rsync-changing-data-sets
 </span></span><span style="display:flex;"><span>% git checkout v3.2.4
 </span></span><span style="display:flex;"><span>% ./configure
 </span></span><span style="display:flex;"><span>% make
 </span></span></code></pre></div><p>Then, I modified <code>flist.c</code> to add a confirmation step between sending the file
 list and doing the actual file transfers:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/flist.c w/flist.c
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/flist.c w/flist.c
 </span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">index 1ba306bc..98981f34 100644
-</span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold"></span><span style="color:#a00000">--- i/flist.c
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ w/flist.c
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -20,6 +20,8 @@
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>  * with this program; if not, visit the http://fsf.org website.
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">--- i/flist.c
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+++ w/flist.c
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -20,6 +20,8 @@
+</span></span></span><span style="display:flex;"><span>  * with this program; if not, visit the http://fsf.org website.
 </span></span><span style="display:flex;"><span>  */
 </span></span><span style="display:flex;"><span> 
 </span></span><span style="display:flex;"><span><span style="color:#00a000">+#include &lt;stdio.h&gt;
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> #include &#34;rsync.h&#34;
+</span></span></span><span style="display:flex;"><span> #include &#34;rsync.h&#34;
 </span></span><span style="display:flex;"><span> #include &#34;ifuncs.h&#34;
 </span></span><span style="display:flex;"><span> #include &#34;rounding.h&#34;
 </span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -2516,6 +2518,17 @@ struct file_list *send_file_list(int f, int argc, char *argv[])
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span> 	if (DEBUG_GTE(FLIST, 2))
+</span></span></span><span style="display:flex;"><span> 	if (DEBUG_GTE(FLIST, 2))
 </span></span><span style="display:flex;"><span> 		rprintf(FINFO, &#34;send_file_list done\n&#34;);
 </span></span><span style="display:flex;"><span> 
 </span></span><span style="display:flex;"><span><span style="color:#00a000">+	char *line = NULL;
@@ -452,11 +452,11 @@ list and doing the actual file transfers:</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	  printf(&#34;enter &#39;yes&#39; to continue: &#34;);
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	}
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 	if (inc_recurse) {
+</span></span></span><span style="display:flex;"><span> 	if (inc_recurse) {
 </span></span><span style="display:flex;"><span> 		send_dir_depth = 1;
 </span></span><span style="display:flex;"><span> 		add_dirs_to_tree(-1, flist, stats.num_dirs);
 </span></span></code></pre></div><p>My rsync invocation is:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>./rsync -av --debug<span style="color:#666">=</span>all4 --protocol<span style="color:#666">=</span><span style="color:#40a070">27</span> ~/i3/src /tmp/DEST/
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>./rsync -av --debug<span style="color:#666">=</span>all4 --protocol<span style="color:#666">=</span><span style="color:#40a070">27</span> ~/i3/src /tmp/DEST/
 </span></span></code></pre></div><p>It’s necessary to use an older protocol version to make rsync generate a full
 file list before starting the transfer. Later protocol versions interleave these
 parts of the protocol.</p>

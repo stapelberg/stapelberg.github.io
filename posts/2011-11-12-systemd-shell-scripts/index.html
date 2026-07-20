@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,11 +179,11 @@
 <h1 class="ms_title">systemd ist lange überfällig… (2011)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2011-11-12, last modified 2018-03-23</div>
+  <div id="ms_date">published 2011-11-12, last modified 2026-07-20</div>
   
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2011-11-12-systemd-shell-scripts.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2011-11-12-systemd-shell-scripts.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -194,7 +194,6 @@
 scripts in einen ordentlich wartbaren Dienst sind mit sysvinit einfach viel zu
 groß. 
 </p>
-
 <p>
 Vor ziemlich langer Zeit habe ich den RaumZeitMPD geschrieben, einen IRC-Bot,
 welcher bei !stream anzeigt, welches Lied gerade gespielt wird und bei !stream
@@ -203,7 +202,6 @@ die <a href="http://www.youtube.com/watch?v=JoGhlOhAuno">Rundumleuchte für 5
 Sekunden aufleuchten zu lassen</a>, damit einer der Anwesenden seine
 Aufmerksamkeit auf das IRC richtet.
 </p>
-
 <p>
 Dieser Bot lief bislang in einer screen-Session auf der Blackbox. Dieses Setup
 ist natürlich nicht ideal, denn sofern die Blackbox neugestartet wird, muss
@@ -212,7 +210,6 @@ unzuverlässig und erfordert, dass permanent mindestens eine Person das Wissen
 haben muss, wie man den RaumZeitMPD startet. Eine bessere Lösung ist es, ihn
 bei Systemstart zu starten und als Daemon laufen zu lassen.
 </p>
-
 <p>
 Das kriegt man natürlich mit sysvinit hin. Ein Initscript, welches anhand des
 minimale Debian-Beispiels angefertigt wurde, ist allerdings 140 Zeilen lang.
@@ -220,13 +217,11 @@ Zum Vergleich: Der (Perl-)Code für RaumZeitMPD ist 173 Zeilen, inklusive 30
 Zeilen Dokumentation! Mein Projekt hat sich also gerade um fast 100%
 aufgeblasen, nur damit ich es bei Systemstart starten lassen kann.
 </p>
-
 <p>
 Doch das ist nicht das eigentliche Problem, daran hat man sich ja gewöhnt. Die
 richtigen Schmerzen spürt man, wenn man sich um das daemonizing kümmert. Hierzu
 gibt es zwei Möglichkeiten:
 </p>
-
 <ol>
 <li>
   Man benutzt <code>--background</code> und <code>--make-pidfile</code> beim
@@ -249,7 +244,6 @@ gibt es zwei Möglichkeiten:
   dem eigentlichen Zweck dient.
 </li>
 </ol>
-
 <p>
 Nun kann man natürlich einen Kompromiss wählen und
 <code>start-stop-daemon</code> zum daemonizing benutzen, aber via
@@ -263,7 +257,6 @@ schlecht ist – logs helfen enorm beim Verstehen/Analysieren von Problemen. Die
 Lösung dafür ist also, <code>rsyslogd</code> so zu konfigurieren, dass er die
 Ausgabe für den RaumZeitMPD in eine eigene Datei schreibt:
 </p>
-
 <pre>
 $ cat /etc/rsyslog.d/raumzeitmpd.conf
 # Log all lines from RaumZeitMPD to /var/log/raumzeitmpd.log (without syncing)
@@ -271,7 +264,6 @@ $ cat /etc/rsyslog.d/raumzeitmpd.conf
 :programname, isequal, "RaumZeitMPD"  -/var/log/raumzeitmpd.log
 :programname, isequal, "RaumZeitMPD" ~
 </pre>
-
 <p>
 Doch damit ist aus dem Script auf einmal ein vollwertiger Daemon geworden, den
 ein Gelegenheitshacker nicht mehr interaktiv "mal eben" erweitern kann – nach
@@ -280,7 +272,6 @@ nun auch noch seinen syslog-daemon umkonfigurieren, neustarten und permanent
 <code>tail -f /var/log/raumzeitmpd.log</code> in einem anderen Fenster laufen
 lassen.
 </p>
-
 <p>
 Wie hilft hier nun systemd? Es nimmt mir die ganze Arbeit ab. Ich muss mich
 nicht darum kümmern, beim starten zu daemonizen (oder im Vordergrund zu
@@ -291,7 +282,6 @@ syslog geloggt wird – interaktive Aufrufe schreiben dennoch nach stdout. Ich
 brauche keine Optionen einführen. Mein Script bleibt hübsch und konzentriert
 sich auf das Wesentliche.
 </p>
-
 <p>
 Sobald systemd etwas verbreiteter ist, können wir uns endlich von daemonizing,
 logging und anderem obsoleten Unsinn trennen und ohne viel Aufwand einfache

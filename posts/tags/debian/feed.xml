@@ -6,6 +6,9 @@
 
 
   <id>https://michael.stapelberg.ch/posts/tags/debian/</id>
+  <author>
+    <name>Michael Stapelberg</name>
+  </author>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
     <title type="html"><![CDATA[Debian Code Search: OpenAPI now available]]></title>
@@ -39,17 +42,17 @@ dashboard, etc.</p>
 </li>
 </ol>
 <h2 id="curl-example">curl example</h2>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>curl <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  -H <span style="color:#4070a0">&#34;x-dcs-apikey: </span><span style="color:#007020;font-weight:bold">$(</span>cat dcs-apikey-stapelberg.txt<span style="color:#007020;font-weight:bold">)</span><span style="color:#4070a0">&#34;</span> <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  -X GET <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  <span style="color:#4070a0">&#34;https://codesearch.debian.net/api/v1/search?query=i3Font&amp;match_mode=regexp&#34;</span> 
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>curl <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>  -H <span style="color:#4070a0">&#34;x-dcs-apikey: </span><span style="color:#007020;font-weight:bold">$(</span>cat dcs-apikey-stapelberg.txt<span style="color:#007020;font-weight:bold">)</span><span style="color:#4070a0">&#34;</span> <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>  -X GET <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>  <span style="color:#4070a0">&#34;https://codesearch.debian.net/api/v1/search?query=i3Font&amp;match_mode=regexp&#34;</span> 
 </span></span></code></pre></div><h2 id="web-browser-example">Web browser example</h2>
 <p>You can try out the API in your web browser in the <a href="https://codesearch.debian.net/apikeys/#openapi-doc-browser">OpenAPI
 documentation</a>.</p>
 <h2 id="code-example-go">Code example (Go)</h2>
 <p>Here’s an example program that demonstrates how to set up an auto-generated Go
 client for the Debian Code Search OpenAPI, run a query, and aggregate the results:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">burndown</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">burndown</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>cfg<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>openapiclient.<span style="color:#06287e">NewConfiguration</span>()<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>cfg.<span style="color:#06287e">AddDefaultHeader</span>(<span style="color:#4070a0">&#34;x-dcs-apikey&#34;</span>,<span style="color:#bbb"> </span>apiKey)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>client<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>openapiclient.<span style="color:#06287e">NewAPIClient</span>(cfg)<span style="color:#bbb">
@@ -90,7 +93,7 @@ client for the Debian Code Search OpenAPI, run a query, and aggregate the result
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>wr.<span style="color:#06287e">Flush</span>()<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>wr.<span style="color:#06287e">Error</span>()<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div><p>The full example can be found under
 <a href="https://github.com/Debian/dcs/blob/3d6a18f010e915f77b4833189286100308c539cb/_example/burndown.go"><code>burndown.go</code></a>.</p>
 <h2 id="feedback">Feedback?</h2>
@@ -100,26 +103,26 @@ client for the Debian Code Search OpenAPI, run a query, and aggregate the result
 <p>I’m aware of the following <a href="https://codesearch.debian.net/thirdparty">third-party projects using Debian Code
 Search</a>:</p>
 <table>
-  <thead>
-      <tr>
-          <th>Tool</th>
-          <th>Migration status</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td><a href="https://salsa.debian.org/debian/codesearch-cli">Debian Code Search CLI tool</a></td>
-          <td><a href="https://salsa.debian.org/debian/codesearch-cli/-/merge_requests/1">Updated to OpenAPI</a></td>
-      </tr>
-      <tr>
-          <td><a href="https://salsa.debian.org/aviau/identify-incomplete-xs-go-import-path">identify-incomplete-xs-go-import-path</a></td>
-          <td><a href="https://salsa.debian.org/aviau/identify-incomplete-xs-go-import-path/-/merge_requests/1">Update pending</a></td>
-      </tr>
-      <tr>
-          <td><a href="https://gitlab.gnome.org/nbenitez/gnome-codesearch">gnome-codesearch</a></td>
-          <td>makes no API queries</td>
-      </tr>
-  </tbody>
+	<thead>
+			<tr>
+					<th>Tool</th>
+					<th>Migration status</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><a href="https://salsa.debian.org/debian/codesearch-cli">Debian Code Search CLI tool</a></td>
+					<td><a href="https://salsa.debian.org/debian/codesearch-cli/-/merge_requests/1">Updated to OpenAPI</a></td>
+			</tr>
+			<tr>
+					<td><a href="https://salsa.debian.org/aviau/identify-incomplete-xs-go-import-path">identify-incomplete-xs-go-import-path</a></td>
+					<td><a href="https://salsa.debian.org/aviau/identify-incomplete-xs-go-import-path/-/merge_requests/1">Update pending</a></td>
+			</tr>
+			<tr>
+					<td><a href="https://gitlab.gnome.org/nbenitez/gnome-codesearch">gnome-codesearch</a></td>
+					<td>makes no API queries</td>
+			</tr>
+	</tbody>
 </table>
 <p>If you find any others, please point them to this post in case they are not
 using Debian Code Search’s OpenAPI yet.</p>
@@ -330,30 +333,30 @@ them. Here is a table summarizing how affected programs might try to arrange for
 re-execution, whether the technique results in a wrapper bypass, and what we do
 about it in distri:</p>
 <table>
-  <thead>
-      <tr>
-          <th>technique to execute itself</th>
-          <th>uses wrapper</th>
-          <th>mitigation</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>run-time: find own basename in <code>PATH</code></td>
-          <td>yes</td>
-          <td>wrapper program</td>
-      </tr>
-      <tr>
-          <td>compile-time: embed expected path</td>
-          <td>no; bypass!</td>
-          <td>configure or patch</td>
-      </tr>
-      <tr>
-          <td>run-time: <code>argv[0]</code> or <code>/proc/self/exe</code></td>
-          <td>no; bypass!</td>
-          <td><a href="https://github.com/distr1/distri/commit/f45ee9ac1121da284f2943c80e2c30afa24ca80d">patch</a></td>
-      </tr>
-  </tbody>
+	<thead>
+			<tr>
+					<th>technique to execute itself</th>
+					<th>uses wrapper</th>
+					<th>mitigation</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>run-time: find own basename in <code>PATH</code></td>
+					<td>yes</td>
+					<td>wrapper program</td>
+			</tr>
+			<tr>
+					<td>compile-time: embed expected path</td>
+					<td>no; bypass!</td>
+					<td>configure or patch</td>
+			</tr>
+			<tr>
+					<td>run-time: <code>argv[0]</code> or <code>/proc/self/exe</code></td>
+					<td>no; bypass!</td>
+					<td><a href="https://github.com/distr1/distri/commit/f45ee9ac1121da284f2943c80e2c30afa24ca80d">patch</a></td>
+			</tr>
+	</tbody>
 </table>
 <p>One might think that setting <code>argv[0]</code> to the wrapper location seems like a way
 to side-step this problem. We tried doing this in distri, but <a href="https://github.com/distr1/distri/commit/b517cb33ed827d358b00737434c7a09dd75583b7">had to
@@ -1373,101 +1376,101 @@ outputs.</p>
 actual performance, but your experience may vary.</p>
 <h4 id="ack-small-perl-program">ack (small Perl program)</h4>
 <table>
-  <thead>
-      <tr>
-          <th>distribution</th>
-          <th>package manager</th>
-          <th>data</th>
-          <th>wall-clock time</th>
-          <th>rate</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>Fedora</td>
-          <td>dnf</td>
-          <td>84 MB</td>
-          <td>25s</td>
-          <td>3.4 MB/s</td>
-      </tr>
-      <tr>
-          <td>NixOS</td>
-          <td>Nix</td>
-          <td>15 MB</td>
-          <td>7s</td>
-          <td>2.3 MB/s</td>
-      </tr>
-      <tr>
-          <td>Debian</td>
-          <td>apt</td>
-          <td>16 MB</td>
-          <td>3s</td>
-          <td>4.9 MB/s</td>
-      </tr>
-      <tr>
-          <td>Arch Linux</td>
-          <td>pacman</td>
-          <td>25 MB</td>
-          <td>1s</td>
-          <td>18.4 MB/s</td>
-      </tr>
-      <tr>
-          <td>Alpine</td>
-          <td>apk</td>
-          <td>10 MB</td>
-          <td>1s</td>
-          <td>11.9 MB/s</td>
-      </tr>
-  </tbody>
+	<thead>
+			<tr>
+					<th>distribution</th>
+					<th>package manager</th>
+					<th>data</th>
+					<th>wall-clock time</th>
+					<th>rate</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>Fedora</td>
+					<td>dnf</td>
+					<td>84 MB</td>
+					<td>25s</td>
+					<td>3.4 MB/s</td>
+			</tr>
+			<tr>
+					<td>NixOS</td>
+					<td>Nix</td>
+					<td>15 MB</td>
+					<td>7s</td>
+					<td>2.3 MB/s</td>
+			</tr>
+			<tr>
+					<td>Debian</td>
+					<td>apt</td>
+					<td>16 MB</td>
+					<td>3s</td>
+					<td>4.9 MB/s</td>
+			</tr>
+			<tr>
+					<td>Arch Linux</td>
+					<td>pacman</td>
+					<td>25 MB</td>
+					<td>1s</td>
+					<td>18.4 MB/s</td>
+			</tr>
+			<tr>
+					<td>Alpine</td>
+					<td>apk</td>
+					<td>10 MB</td>
+					<td>1s</td>
+					<td>11.9 MB/s</td>
+			</tr>
+	</tbody>
 </table>
 <h4 id="qemu-large-c-program">qemu (large C program)</h4>
 <table>
-  <thead>
-      <tr>
-          <th>distribution</th>
-          <th>package manager</th>
-          <th>data</th>
-          <th>wall-clock time</th>
-          <th>rate</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>Fedora</td>
-          <td>dnf</td>
-          <td>350 MB</td>
-          <td>56s</td>
-          <td>6.25 MB/s</td>
-      </tr>
-      <tr>
-          <td>Debian</td>
-          <td>apt</td>
-          <td>256 MB</td>
-          <td>39s</td>
-          <td>6.5 MB/s</td>
-      </tr>
-      <tr>
-          <td>NixOS</td>
-          <td>Nix</td>
-          <td>251 MB</td>
-          <td>36s</td>
-          <td>6.8 MB/s</td>
-      </tr>
-      <tr>
-          <td>Arch Linux</td>
-          <td>pacman</td>
-          <td>128 MB</td>
-          <td>10s</td>
-          <td>12.1 MB/s</td>
-      </tr>
-      <tr>
-          <td>Alpine</td>
-          <td>apk</td>
-          <td>34 MB</td>
-          <td>1.8s</td>
-          <td>18.6 MB/s</td>
-      </tr>
-  </tbody>
+	<thead>
+			<tr>
+					<th>distribution</th>
+					<th>package manager</th>
+					<th>data</th>
+					<th>wall-clock time</th>
+					<th>rate</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>Fedora</td>
+					<td>dnf</td>
+					<td>350 MB</td>
+					<td>56s</td>
+					<td>6.25 MB/s</td>
+			</tr>
+			<tr>
+					<td>Debian</td>
+					<td>apt</td>
+					<td>256 MB</td>
+					<td>39s</td>
+					<td>6.5 MB/s</td>
+			</tr>
+			<tr>
+					<td>NixOS</td>
+					<td>Nix</td>
+					<td>251 MB</td>
+					<td>36s</td>
+					<td>6.8 MB/s</td>
+			</tr>
+			<tr>
+					<td>Arch Linux</td>
+					<td>pacman</td>
+					<td>128 MB</td>
+					<td>10s</td>
+					<td>12.1 MB/s</td>
+			</tr>
+			<tr>
+					<td>Alpine</td>
+					<td>apk</td>
+					<td>34 MB</td>
+					<td>1.8s</td>
+					<td>18.6 MB/s</td>
+			</tr>
+	</tbody>
 </table>
 <p>(Looking for older measurements? See <a href="#appendix-b">Appendix B (2019)</a> or <a href="#appendix-c">Appendix C (2020)</a>).</p>
 <p>The difference between the slowest and fastest package managers is 30x!</p>
@@ -1515,88 +1518,88 @@ manager could likely beat <code>apk</code>’s performance. It could, for exampl
 systems</a>
 fare:</p>
 <table>
-  <thead>
-      <tr>
-          <th>name</th>
-          <th>scope</th>
-          <th>package file format</th>
-          <th>hooks/triggers</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>AppImage</td>
-          <td>apps</td>
-          <td>image: ISO9660, SquashFS</td>
-          <td>no</td>
-      </tr>
-      <tr>
-          <td><a href="https://snapcraft.io/">snappy</a></td>
-          <td>apps</td>
-          <td>image: SquashFS</td>
-          <td>yes: <a href="https://docs.snapcraft.io/build-snaps/hooks">hooks</a></td>
-      </tr>
-      <tr>
-          <td>FlatPak</td>
-          <td>apps</td>
-          <td>archive: <a href="https://ostree.readthedocs.io/en/latest/">OSTree</a></td>
-          <td>no</td>
-      </tr>
-      <tr>
-          <td>0install</td>
-          <td>apps</td>
-          <td>archive: tar.bz2</td>
-          <td>no</td>
-      </tr>
-      <tr>
-          <td>nix, guix</td>
-          <td>distro</td>
-          <td>archive: nar.{bz2,xz}</td>
-          <td><a href="https://github.com/NixOS/nixos/blob/master/modules/system/activation/activation-script.nix">activation script</a></td>
-      </tr>
-      <tr>
-          <td>dpkg</td>
-          <td>distro</td>
-          <td>archive: tar.{gz,xz,bz2} in ar(1)</td>
-          <td>yes</td>
-      </tr>
-      <tr>
-          <td>rpm</td>
-          <td>distro</td>
-          <td>archive: cpio.{bz2,lz,xz}</td>
-          <td><a href="https://fedoraproject.org/wiki/Packaging:Scriptlets">scriptlets</a></td>
-      </tr>
-      <tr>
-          <td>pacman</td>
-          <td>distro</td>
-          <td>archive: tar.xz</td>
-          <td><a href="https://wiki.archlinux.org/index.php/PKGBUILD#install">install</a></td>
-      </tr>
-      <tr>
-          <td>slackware</td>
-          <td>distro</td>
-          <td>archive: tar.{gz,xz}</td>
-          <td>yes: doinst.sh</td>
-      </tr>
-      <tr>
-          <td>apk</td>
-          <td>distro</td>
-          <td>archive: tar.gz</td>
-          <td>yes: .post-install</td>
-      </tr>
-      <tr>
-          <td>Entropy</td>
-          <td>distro</td>
-          <td>archive: tar.bz2</td>
-          <td>yes</td>
-      </tr>
-      <tr>
-          <td>ipkg, opkg</td>
-          <td>distro</td>
-          <td>archive: tar{,.gz}</td>
-          <td>yes</td>
-      </tr>
-  </tbody>
+	<thead>
+			<tr>
+					<th>name</th>
+					<th>scope</th>
+					<th>package file format</th>
+					<th>hooks/triggers</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>AppImage</td>
+					<td>apps</td>
+					<td>image: ISO9660, SquashFS</td>
+					<td>no</td>
+			</tr>
+			<tr>
+					<td><a href="https://snapcraft.io/">snappy</a></td>
+					<td>apps</td>
+					<td>image: SquashFS</td>
+					<td>yes: <a href="https://docs.snapcraft.io/build-snaps/hooks">hooks</a></td>
+			</tr>
+			<tr>
+					<td>FlatPak</td>
+					<td>apps</td>
+					<td>archive: <a href="https://ostree.readthedocs.io/en/latest/">OSTree</a></td>
+					<td>no</td>
+			</tr>
+			<tr>
+					<td>0install</td>
+					<td>apps</td>
+					<td>archive: tar.bz2</td>
+					<td>no</td>
+			</tr>
+			<tr>
+					<td>nix, guix</td>
+					<td>distro</td>
+					<td>archive: nar.{bz2,xz}</td>
+					<td><a href="https://github.com/NixOS/nixos/blob/master/modules/system/activation/activation-script.nix">activation script</a></td>
+			</tr>
+			<tr>
+					<td>dpkg</td>
+					<td>distro</td>
+					<td>archive: tar.{gz,xz,bz2} in ar(1)</td>
+					<td>yes</td>
+			</tr>
+			<tr>
+					<td>rpm</td>
+					<td>distro</td>
+					<td>archive: cpio.{bz2,lz,xz}</td>
+					<td><a href="https://fedoraproject.org/wiki/Packaging:Scriptlets">scriptlets</a></td>
+			</tr>
+			<tr>
+					<td>pacman</td>
+					<td>distro</td>
+					<td>archive: tar.xz</td>
+					<td><a href="https://wiki.archlinux.org/index.php/PKGBUILD#install">install</a></td>
+			</tr>
+			<tr>
+					<td>slackware</td>
+					<td>distro</td>
+					<td>archive: tar.{gz,xz}</td>
+					<td>yes: doinst.sh</td>
+			</tr>
+			<tr>
+					<td>apk</td>
+					<td>distro</td>
+					<td>archive: tar.gz</td>
+					<td>yes: .post-install</td>
+			</tr>
+			<tr>
+					<td>Entropy</td>
+					<td>distro</td>
+					<td>archive: tar.bz2</td>
+					<td>yes</td>
+			</tr>
+			<tr>
+					<td>ipkg, opkg</td>
+					<td>distro</td>
+					<td>archive: tar{,.gz}</td>
+					<td>yes</td>
+			</tr>
+	</tbody>
 </table>
 <h3 id="conclusion">Conclusion</h3>
 <p>As per the <a href="#current-landscape">current landscape</a>, there is no
@@ -3027,35 +3030,27 @@ what you’re currently using.</p>
     <content type="html"><![CDATA[<p>
   <strong>This is taken care of: Gunnar Wolf has taken on maintenance of the Raspberry Pi image. Thank you!</strong>
 </p>
-
 <p>
   (Cross-posting this message I sent to pkg-raspi-maintainers for broader visibility.)
 </p>
-
 <p>
   I started building Raspberry Pi images because I thought there should be an easy, official way to install Debian on the Raspberry Pi.
 </p>
-
 <p>
   I still believe that, but I’m not actually using Debian on any of my Raspberry Pis anymore¹, so my personal motivation to do any work on the images is gone.
 </p>
-
 <p>
   On top of that, I realize that my commitments exceed my spare time capacity, so I need to get rid of responsibilities.
 </p>
-
 <p>
   Therefore, <strong>I’m looking for someone to take up maintainership of the Raspberry Pi images</strong>. Numerous people have reached out to me with thank you notes and questions, so I think the user interest is there. Also, I’ll be happy to answer any questions that you might have and that I can easily answer. Please reply here (or in private) if you’re interested.
 </p>
-
 <p>
   If I can’t find someone within the next 7 days, I’ll put up an announcement message in the raspi3-image-spec README, wiki page, and my blog posts, stating that the image is unmaintained and looking for a new maintainer.
 </p>
-
 <p>
   Thanks for your understanding,
 </p>
-
 <p>
   ① just in case you’re curious, I’m now running cross-compiled Go programs directly under a Linux kernel and minimal userland, see <a href="https://gokrazy.org/">https://gokrazy.org/</a>
 </p>
@@ -3070,12 +3065,10 @@ what you’re currently using.</p>
   I have heard a number of times that sbuild is too hard to get started with,
   and hence people don’t use it.
 </p>
-
 <p>
   To reduce hurdles from using/contributing to Debian, I wanted to make sbuild
   easier to set up.
 </p>
-
 <p>
   sbuild ≥ 0.74.0 provides a Debian package
   called <a href="https://packages.debian.org/sid/sbuild-debian-developer-setup">sbuild-debian-developer-setup</a>. Once
@@ -3083,12 +3076,10 @@ what you’re currently using.</p>
   the <a href="https://manpages.debian.org/unstable/sbuild/sbuild-debian-developer-setup.1">sbuild-debian-developer-setup(1)</a>
   command to create a chroot suitable for building packages for Debian unstable.
 </p>
-
 <p>
   On a system without any sbuild/schroot bits installed, a transcript of the
   full setup looks like this:
 </p>
-
 <pre>
 % sudo apt install -t unstable sbuild-debian-developer-setup
 Reading package lists... Done
@@ -3169,7 +3160,6 @@ Build Architecture: amd64
 Build Type: binary
 […]
 </pre>
-
 <p>
   I hope you’ll find this useful.
 </p>
@@ -3183,7 +3173,6 @@ Build Type: binary
     <content type="html"><![CDATA[<p>
   dput-ng ≥ 1.16 contains two usability changes which make uploading easier:
 </p>
-
 <ol>
   <li>
     When no arguments are specified, dput-ng auto-selects the most recent .changes file (with confirmation).
@@ -3192,7 +3181,6 @@ Build Type: binary
     Instead of erroring out when detecting an unsigned .changes file, <a href="https://manpages.debian.org/stretch/devscripts/debsign.1">debsign(1)</a> is invoked to sign the .changes file before proceeding.
   </li>
 </ol>
-
 <p>
   With these changes, after building a package, you just need to
   type <code>dput</code> (in the correct directory of course) to sign and upload

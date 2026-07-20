@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,11 +179,11 @@
 <h1 class="ms_title"> Android ist IPv6-enabled stan… (2010)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2010-10-20, last modified 2018-03-23</div>
+  <div id="ms_date">published 2010-10-20, last modified 2026-07-20</div>
   
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2010-10-20-Android-ist-IPv6-enabled-stan.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2010-10-20-Android-ist-IPv6-enabled-stan.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -194,11 +194,9 @@ und eventuell die Einstellungen zu ändern, ist Busybox:
 <a href="http://zedomax.com/android/busybox.zip">http://zedomax.com/android/busybox.zip</a>
 (von <a href="http://zedomax.com/blog/2010/07/07/android-hack-how-to-install-busybox-on-your-android/">diesem Blogpost</a>)
 </p>
-
 <p>
 Die Installation ging bei mir einfacher als im mitgelieferten Script:
 </p>
-
 <pre>
 x200 $ unzip busybox.zip
 x200 $ adb push busybox /sdcard/busybox
@@ -211,17 +209,14 @@ $ su
 # ./busybox --install -s /system/xbin
 # mount -o remount,ro /dev/block/mtdblock6 /system
 </pre>
-
 <p>
 Vermutlich arbeitet das Script vergleichsweise umständlich, weil ältere
 Android-Versionen kein <code>cp</code> hatten. Zu beachten ist, dass die Nummer
 des MTD-devices je nach Firmware unterschiedlich sein kann.
 </p>
-
 <p>
 Nun kann man verifizieren, dass man eine IPv6-Adresse hat:
 </p>
-
 <pre>
 # ip -6 a
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 16436 
@@ -233,7 +228,6 @@ Nun kann man verifizieren, dass man eine IPv6-Adresse hat:
     inet6 fe80::a6ed:4eff:fef8:f2dd/64 scope link 
        valid_lft forever preferred_lft forever
 </pre>
-
 <div id="bmc">
   <p>
     Did you like this

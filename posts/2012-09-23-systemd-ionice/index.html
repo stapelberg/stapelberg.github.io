@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,11 +179,11 @@
 <h1 class="ms_title">systemd: modify IO scheduling (2012)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2012-09-23, last modified 2020-12-31</div>
+  <div id="ms_date">published 2012-09-23, last modified 2026-07-20</div>
   
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2012-09-23-systemd-ionice.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2012-09-23-systemd-ionice.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -194,30 +194,24 @@ IO scheduling class/priority in a very simple way. I have recently configured
 <code>bacula-fd</code> on my server in such a way that it will not put a lot of
 load on the machine:
 </p>
-
 <p>
 To override the service unit, in this case <code>bacula-fd.service</code>, run:
 </p>
-
 <pre>
 $ sudo systemctl edit bacula-fd.service
 </pre>
-
 <p>
 And add these lines:
 </p>
-
 <pre>
 [Service]
 Nice=10
 IOSchedulingClass=best-effort
 IOSchedulingPriority=7
 </pre>
-
 <p>
 To verify the current unit configuration you can use <code>systemctl cat</code>:
 </p>
-
 <pre>
 $ sudo systemctl cat bacula-fd.service
 <strong># /lib/systemd/system/bacula-fd.service</strong>
@@ -230,21 +224,17 @@ Nice=10
 IOSchedulingClass=best-effort
 IOSchedulingPriority=7</strong>
 </pre>
-
 <p>
 Note that this created a separate file to avoid touching the original one.<br>
 Now you can enable and start the unit as you usually would:
 </p>
-
 <pre>
 $ sudo systemctl enable --now bacula-fd.service
 </pre>
-
 <p>
 And that’s it. See <code>nice(1)</code> and <code>ionice(1)</code> for the
 possible values. Of course, these attributes are passed on to child processs:
 </p>
-
 <pre>
 USER       PID PRI  NI %CPU %MEM COMMAND
 root      3522  30  10  0.0  0.0 /usr/sbin/bacula-fd -u root -g root -c /etc/bacula/bacula-fd.conf
@@ -252,7 +242,6 @@ root     23380  30  10  0.0  0.0  \_ /bin/sh /root/bin/xen-lvm-snapshot/foreach-
 root     23607  30  10  0.0  0.0      \_ /bin/sh /root/bin/xen-lvm-snapshot/mount-snapshot.sh plana/domu-web
 root     23665  30  10  0.0  0.0          \_ /sbin/fsck.ext3 -y /dev/loop3
 </pre>
-
 <p>
 PS: If you wanted, you can revert the the changes with:
 </p>

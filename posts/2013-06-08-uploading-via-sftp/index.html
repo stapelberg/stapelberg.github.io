@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,7 +179,7 @@
 <h1 class="ms_title">Uploading packages via SFTP (2013)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2013-06-08, last modified 2019-02-04</div>
+  <div id="ms_date">published 2013-06-08, last modified 2026-07-20</div>
   
   
   <div id="ms_tags">
@@ -192,7 +192,7 @@
   </div>
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2013-06-08-uploading-via-sftp.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2013-06-08-uploading-via-sftp.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -205,7 +205,6 @@ let’s give that a try. With <a
 href="http://people.debian.org/~paultag/dput-ng/">dput-ng</a>, the following
 configuration leads to using sftp by default:
 </p>
-
 <pre>
 mkdir -p ~/.dput.d/profiles/
 cat &gt; ~/.dput.d/profiles/ftp-master.json &lt;&lt;EOT
@@ -216,7 +215,6 @@ cat &gt; ~/.dput.d/profiles/ftp-master.json &lt;&lt;EOT
 }
 EOT
 </pre>
-
 <p>
 Note that uploading via SFTP will lead to <a
 href="http://ftp-master.debian.org/git/dak.git/">debianqueued</a> uploading the

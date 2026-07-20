@@ -12,7 +12,7 @@
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations_hu_c5889f1baf713a4.png">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations_hu_6e54c5ead19ddf3b.png">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -103,7 +103,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -327,16 +327,16 @@ report</a>)</summary>
 The corresponding code can be seen below:
 <a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/sender.c#L96-L100">sender.c</a>:</li>
 </ol>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>s<span style="color:#666">-&gt;</span>sums <span style="color:#666">=</span> <span style="color:#06287e">new_array</span>(<span style="color:#007020;font-weight:bold">struct</span> sum_buf, s<span style="color:#666">-&gt;</span>count);
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>s<span style="color:#666">-&gt;</span>sums <span style="color:#666">=</span> <span style="color:#06287e">new_array</span>(<span style="color:#007020;font-weight:bold">struct</span> sum_buf, s<span style="color:#666">-&gt;</span>count);
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">for</span> (i <span style="color:#666">=</span> <span style="color:#40a070">0</span>; i <span style="color:#666">&lt;</span> s<span style="color:#666">-&gt;</span>count; i<span style="color:#666">++</span>) {
 </span></span><span style="display:flex;"><span>    s<span style="color:#666">-&gt;</span>sums[i].sum1 <span style="color:#666">=</span> <span style="color:#06287e">read_int</span>(f);
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">read_buf</span>(f, s<span style="color:#666">-&gt;</span>sums[i].sum2, s<span style="color:#666">-&gt;</span>s2length);
 </span></span></code></pre></div><p>Most importantly, note that <code>sum2</code> field is filled with <code>s-&gt;s2length</code> bytes. <code>sum2</code> always has a size of 16:
 <a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/rsync.h#L955-L962">rsync.h</a></p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#define SUM_LENGTH 16
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span><span style="color:#60a0b0;font-style:italic">// …
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">struct</span> sum_buf {
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#define SUM_LENGTH 16
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// …
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">struct</span> sum_buf {
 </span></span><span style="display:flex;"><span>    OFF_T offset;           <span style="color:#60a0b0;font-style:italic">/**&lt; offset in file of this chunk */</span>
 </span></span><span style="display:flex;"><span>    int32 len;              <span style="color:#60a0b0;font-style:italic">/**&lt; length of chunk of file */</span>
 </span></span><span style="display:flex;"><span>    uint32 sum1;            <span style="color:#60a0b0;font-style:italic">/**&lt; simple checksum */</span>
@@ -346,7 +346,7 @@ The corresponding code can be seen below:
 </span></span><span style="display:flex;"><span>};
 </span></span></code></pre></div><p><code>s2length</code> is an attacker-controlled value and can have a value up to <code>MAX_DIGEST_LEN</code> bytes, as the next snipper shows:</p>
 <p><a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/io.c#L1979-L1984">io.c</a></p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>sum<span style="color:#666">-&gt;</span>s2length <span style="color:#666">=</span> protocol_version <span style="color:#666">&lt;</span> <span style="color:#40a070">27</span> <span style="color:#666">?</span> <span style="color:#002070;font-weight:bold">csum_length</span> : (<span style="color:#902000">int</span>)<span style="color:#06287e">read_int</span>(f);
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>sum<span style="color:#666">-&gt;</span>s2length <span style="color:#666">=</span> protocol_version <span style="color:#666">&lt;</span> <span style="color:#40a070">27</span> <span style="color:#666">?</span> <span style="color:#002070;font-weight:bold">csum_length</span> : (<span style="color:#902000">int</span>)<span style="color:#06287e">read_int</span>(f);
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (sum<span style="color:#666">-&gt;</span>s2length <span style="color:#666">&lt;</span> <span style="color:#40a070">0</span> <span style="color:#666">||</span> sum<span style="color:#666">-&gt;</span>s2length <span style="color:#666">&gt;</span> MAX_DIGEST_LEN) {
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">rprintf</span>(FERROR, <span style="color:#4070a0">&#34;Invalid checksum length %d [%s]</span><span style="color:#4070a0;font-weight:bold">\n</span><span style="color:#4070a0">&#34;</span>,
 </span></span><span style="display:flex;"><span>            sum<span style="color:#666">-&gt;</span>s2length, <span style="color:#06287e">who_am_i</span>());
@@ -354,16 +354,16 @@ The corresponding code can be seen below:
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>The problem here is that <code>MAX_DIGEST_LEN</code> can be larger than 16 bytes, depending on the digest support the binary was compiled with:</p>
 <p><a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/lib/md-defines.h#L11-L21">md-defines.h</a></p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#define MD4_DIGEST_LEN 16
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#define MD4_DIGEST_LEN 16
 </span></span></span><span style="display:flex;"><span><span style="color:#007020">#define MD5_DIGEST_LEN 16
 </span></span></span><span style="display:flex;"><span><span style="color:#007020">#if defined SHA512_DIGEST_LENGTH
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>  <span style="color:#007020">#define MAX_DIGEST_LEN SHA512_DIGEST_LENGTH
+</span></span></span><span style="display:flex;"><span>  <span style="color:#007020">#define MAX_DIGEST_LEN SHA512_DIGEST_LENGTH
 </span></span></span><span style="display:flex;"><span><span style="color:#007020">#elif defined SHA256_DIGEST_LENGTH
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>  <span style="color:#007020">#define MAX_DIGEST_LEN SHA256_DIGEST_LENGTH
+</span></span></span><span style="display:flex;"><span>  <span style="color:#007020">#define MAX_DIGEST_LEN SHA256_DIGEST_LENGTH
 </span></span></span><span style="display:flex;"><span><span style="color:#007020">#elif defined SHA_DIGEST_LENGTH
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>  <span style="color:#007020">#define MAX_DIGEST_LEN SHA_DIGEST_LENGTH
+</span></span></span><span style="display:flex;"><span>  <span style="color:#007020">#define MAX_DIGEST_LEN SHA_DIGEST_LENGTH
 </span></span></span><span style="display:flex;"><span><span style="color:#007020">#else
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>  <span style="color:#007020">#define MAX_DIGEST_LEN MD5_DIGEST_LEN </span><span style="color:#60a0b0;font-style:italic">/* 16 bytes */</span><span style="color:#007020">
+</span></span></span><span style="display:flex;"><span>  <span style="color:#007020">#define MAX_DIGEST_LEN MD5_DIGEST_LEN </span><span style="color:#60a0b0;font-style:italic">/* 16 bytes */</span><span style="color:#007020">
 </span></span></span><span style="display:flex;"><span><span style="color:#007020">#endif
 </span></span></span></code></pre></div><p><code>SHA256</code> support is common and sets the <code>MAX_DIGEST_LENGTH</code> value to 64. As a
 result, an attacker can write up to 48 bytes past the <code>sum2</code> buffer limit.</p>
@@ -387,17 +387,17 @@ header at all — oops!</p>
 on an attempt to <a href="https://github.com/gokrazy/rsync/blob/3a9d1ec136e049b2bffc9db15230eb70308ac90d/rsyncd/sender.go#L136">write out of
 bounds</a>
 by changing the code like so and running the tests:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/types.go w/types.go
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/types.go w/types.go
 </span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">index 5601697..899fcb8 100644
-</span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold"></span><span style="color:#a00000">--- i/types.go
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ w/types.go
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -59,7 +59,7 @@ func (sh *SumHead) WriteTo(c *rsyncwire.Conn) error {
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span> 	var buf rsyncwire.Buffer
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">--- i/types.go
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+++ w/types.go
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -59,7 +59,7 @@ func (sh *SumHead) WriteTo(c *rsyncwire.Conn) error {
+</span></span></span><span style="display:flex;"><span> 	var buf rsyncwire.Buffer
 </span></span><span style="display:flex;"><span> 	buf.WriteInt32(sh.ChecksumCount)
 </span></span><span style="display:flex;"><span> 	buf.WriteInt32(sh.BlockLength)
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-	buf.WriteInt32(sh.ChecksumLength)
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+	buf.WriteInt32(512 /*sh.ChecksumLength*/)
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 	buf.WriteInt32(sh.RemainderLength)
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	buf.WriteInt32(512 /*sh.ChecksumLength*/)
+</span></span></span><span style="display:flex;"><span> 	buf.WriteInt32(sh.RemainderLength)
 </span></span><span style="display:flex;"><span> 	return c.WriteString(buf.String())
 </span></span><span style="display:flex;"><span> }
 </span></span></code></pre></div><p>As expected, the Go runtime panics with the following message:</p>
@@ -450,7 +450,7 @@ the local file contents in
 <a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/match.c#L140-L145"><code>hash_search()</code></a>. Part
 of the function prologue is to allocate a buffer on the stack of
 <code>MAX_DIGEST_LEN</code> bytes:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">static</span> <span style="color:#902000">void</span> <span style="color:#06287e">hash_search</span>(<span style="color:#902000">int</span> f, <span style="color:#007020;font-weight:bold">struct</span> sum_struct <span style="color:#666">*</span>s,
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">static</span> <span style="color:#902000">void</span> <span style="color:#06287e">hash_search</span>(<span style="color:#902000">int</span> f, <span style="color:#007020;font-weight:bold">struct</span> sum_struct <span style="color:#666">*</span>s,
 </span></span><span style="display:flex;"><span>                        <span style="color:#007020;font-weight:bold">struct</span> map_struct <span style="color:#666">*</span>buf, OFF_T len)
 </span></span><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>    OFF_T offset, aligned_offset, end;
@@ -458,7 +458,7 @@ of the function prologue is to allocate a buffer on the stack of
 </span></span><span style="display:flex;"><span>    <span style="color:#902000">char</span> sum2[MAX_DIGEST_LEN];
 </span></span></code></pre></div><p>The daemon then iterates over the checksums the client sent and generates a
 digest for each of the chunks and compares them to the remote digest:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (<span style="color:#666">!</span>done_csum2) {
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (<span style="color:#666">!</span>done_csum2) {
 </span></span><span style="display:flex;"><span>    map <span style="color:#666">=</span> (schar <span style="color:#666">*</span>)<span style="color:#06287e">map_ptr</span>(buf, offset, l);
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">get_checksum2</span>((<span style="color:#902000">char</span> <span style="color:#666">*</span>)map, l, sum2);
 </span></span><span style="display:flex;"><span>    done_csum2 <span style="color:#666">=</span> <span style="color:#40a070">1</span>;
@@ -619,7 +619,7 @@ contents of an arbitrary file on the client’s machine.  In
 the client will read <code>fnamecmp</code> type as well as the <code>xname</code> from the server if
 the server sets the appropriate flags. The flag <code>sanitize_paths</code> will not be
 set for the client.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (iflags <span style="color:#666">&amp;</span> ITEM_BASIS_TYPE_FOLLOWS)
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (iflags <span style="color:#666">&amp;</span> ITEM_BASIS_TYPE_FOLLOWS)
 </span></span><span style="display:flex;"><span>    fnamecmp_type <span style="color:#666">=</span> <span style="color:#06287e">read_byte</span>(f_in);
 </span></span><span style="display:flex;"><span><span style="color:#666">*</span>type_ptr <span style="color:#666">=</span> fnamecmp_type;
 </span></span><span style="display:flex;"><span>
@@ -640,7 +640,7 @@ set for the client.</p>
 (<a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/receiver.c#L521"><code>recv_files()</code></a>)
 then uses the server provided values to determine a file to compare the
 incoming data with.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">case</span> <span style="color:#002070;font-weight:bold">FNAMECMP_FUZZY</span>:
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">case</span> <span style="color:#002070;font-weight:bold">FNAMECMP_FUZZY</span>:
 </span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> (file<span style="color:#666">-&gt;</span>dirname) {
 </span></span><span style="display:flex;"><span>        <span style="color:#06287e">pathjoin</span>(fnamecmpbuf, <span style="color:#007020;font-weight:bold">sizeof</span> fnamecmpbuf, file<span style="color:#666">-&gt;</span>dirname, xname);
 </span></span><span style="display:flex;"><span>        fnamecmp <span style="color:#666">=</span> fnamecmpbuf;
@@ -653,7 +653,7 @@ incoming data with.</p>
 <a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/receiver.c#L368"><code>receive_data()</code></a>
 the contents of the file specified by <code>xname</code> are copied into the destination
 file. This can be achieved by the server sending a negative token.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">while</span> ((i <span style="color:#666">=</span> <span style="color:#06287e">recv_token</span>(f_in, <span style="color:#666">&amp;</span>data)) <span style="color:#666">!=</span> <span style="color:#40a070">0</span>) {
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">while</span> ((i <span style="color:#666">=</span> <span style="color:#06287e">recv_token</span>(f_in, <span style="color:#666">&amp;</span>data)) <span style="color:#666">!=</span> <span style="color:#40a070">0</span>) {
 </span></span><span style="display:flex;"><span>..snip..
 </span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> (i <span style="color:#666">&gt;</span> <span style="color:#40a070">0</span>) {
 </span></span><span style="display:flex;"><span>..snip..
@@ -661,7 +661,7 @@ file. This can be achieved by the server sending a negative token.</p>
 </span></span><span style="display:flex;"><span>..snip..
 </span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> (fd <span style="color:#666">!=</span> <span style="color:#666">-</span><span style="color:#40a070">1</span> <span style="color:#666">&amp;&amp;</span> map <span style="color:#666">&amp;&amp;</span> <span style="color:#06287e">write_file</span>(fd, <span style="color:#40a070">0</span>, offset, map, len) <span style="color:#666">!=</span> (<span style="color:#902000">int</span>)len)
 </span></span></code></pre></div><p>The server sends a checksum to compare. If they don&rsquo;t match, a 0 is returned.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (fd <span style="color:#666">!=</span> <span style="color:#666">-</span><span style="color:#40a070">1</span> <span style="color:#666">&amp;&amp;</span> <span style="color:#06287e">memcmp</span>(file_sum1, sender_file_sum, xfer_sum_len) <span style="color:#666">!=</span> <span style="color:#40a070">0</span>)
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (fd <span style="color:#666">!=</span> <span style="color:#666">-</span><span style="color:#40a070">1</span> <span style="color:#666">&amp;&amp;</span> <span style="color:#06287e">memcmp</span>(file_sum1, sender_file_sum, xfer_sum_len) <span style="color:#666">!=</span> <span style="color:#40a070">0</span>)
 </span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">return</span> <span style="color:#40a070">0</span>;
 </span></span></code></pre></div><p>When the return value is 0 the receiver will then send a <code>MSG_REDO</code> to the
 generator. The generator will then write a message to the server.</p>
@@ -720,34 +720,34 @@ git checkout v0.2.7
 </code></pre></li>
 <li>
 <p>Patch the code as follows to undo the fix and execute the attack:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/internal/nofollow/nofollow_unix.go w/internal/nofollow/nofollow_unix.go
-</span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold"></span><span style="color:#a00000">--- i/internal/nofollow/nofollow_unix.go
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ w/internal/nofollow/nofollow_unix.go
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -2,8 +2,6 @@
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/internal/nofollow/nofollow_unix.go w/internal/nofollow/nofollow_unix.go
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">--- i/internal/nofollow/nofollow_unix.go
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+++ w/internal/nofollow/nofollow_unix.go
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -2,8 +2,6 @@
+</span></span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span> package nofollow
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-import &#34;golang.org/x/sys/unix&#34;
 </span></span></span><span style="display:flex;"><span><span style="color:#a00000">-
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span> // Maybe resolves to unix.O_NOFOLLOW on unix systems,
+</span></span></span><span style="display:flex;"><span> // Maybe resolves to unix.O_NOFOLLOW on unix systems,
 </span></span><span style="display:flex;"><span> // 0 on other platforms.
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-const Maybe = unix.O_NOFOLLOW
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+const Maybe = 0 // unix.O_NOFOLLOW
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+const Maybe = 0 // unix.O_NOFOLLOW
+</span></span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/internal/sender/do.go w/internal/sender/do.go
-</span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold"></span><span style="color:#a00000">--- i/internal/sender/do.go
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ w/internal/sender/do.go
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -2,6 +2,8 @@ package sender
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">--- i/internal/sender/do.go
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+++ w/internal/sender/do.go
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -2,6 +2,8 @@ package sender
+</span></span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span> import (
 </span></span><span style="display:flex;"><span> 	&#34;fmt&#34;
 </span></span><span style="display:flex;"><span><span style="color:#00a000">+	&#34;os&#34;
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	&#34;path/filepath&#34;
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 	&#34;sort&#34;
+</span></span></span><span style="display:flex;"><span> 	&#34;sort&#34;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span> 	&#34;github.com/gokrazy/rsync/internal/log&#34;
 </span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -55,6 +57,15 @@ func (st *Transfer) Do(crd *rsyncwire.CountingReader, cwr *rsyncwire.CountingWri
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span> 		st.Logger.Printf(&#34;file list sent&#34;)
+</span></span></span><span style="display:flex;"><span> 		st.Logger.Printf(&#34;file list sent&#34;)
 </span></span><span style="display:flex;"><span> 	}
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#00a000">+	// HACK: swap out the passwd file with a symlink to /etc/passwd
@@ -759,7 +759,7 @@ git checkout v0.2.7
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	}
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	st.Logger.Printf(&#34;HACK: swapped passwd file for symlink&#34;)
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 	// Sort the file list. The client sorts, so we need to sort, too (in the
+</span></span></span><span style="display:flex;"><span> 	// Sort the file list. The client sorts, so we need to sort, too (in the
 </span></span><span style="display:flex;"><span> 	// same way!), otherwise our indices do not match what the client will
 </span></span><span style="display:flex;"><span> 	// request.
 </span></span></code></pre></div></li>
@@ -956,88 +956,88 @@ validates the attacker-supplied data.</p>
 the application logic that using Go could not have prevented.</li>
 </ul>
 <table>
-  <thead>
-      <tr>
-          <th>CVE number</th>
-          <th>Cause</th>
-          <th>Risk (C)</th>
-          <th>Does Go help?</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>2024-12084</td>
-          <td>insufficient validation</td>
-          <td>Heap Buffer Overflow</td>
-          <td>✅ bounds check (panics!)</td>
-      </tr>
-      <tr>
-          <td>2024-12085</td>
-          <td>insufficient validation</td>
-          <td>Info Leak</td>
-          <td>✅ zero init</td>
-      </tr>
-      <tr>
-          <td>2024-12086</td>
-          <td>missing validation</td>
-          <td>Arbitrary File Leak</td>
-          <td>✅ <code>os.Root</code></td>
-      </tr>
-      <tr>
-          <td>2024-12087</td>
-          <td>insufficient validation</td>
-          <td>Write Arbitrary Files</td>
-          <td>✅ <code>os.Root</code></td>
-      </tr>
-      <tr>
-          <td>2024-12088</td>
-          <td>insufficient validation</td>
-          <td>Create Arbitrary Symlinks</td>
-          <td>✅ <code>os.Root</code></td>
-      </tr>
-      <tr>
-          <td>2024-12747</td>
-          <td>TOCTOU</td>
-          <td>Leak Privileged Files</td>
-          <td>✅ <code>os.Root</code></td>
-      </tr>
-      <tr>
-          <td>2026-29518</td>
-          <td>TOCTOU</td>
-          <td>Leak Privileged Files</td>
-          <td>✅ <code>os.Root</code></td>
-      </tr>
-      <tr>
-          <td>2026-43617</td>
-          <td>missing validation</td>
-          <td>Deny List Ineffective</td>
-          <td>❌ logic bug</td>
-      </tr>
-      <tr>
-          <td>2026-43618</td>
-          <td>insufficient validation</td>
-          <td>Info Leak</td>
-          <td>✅ bounds check (panics!)</td>
-      </tr>
-      <tr>
-          <td>2026-43619</td>
-          <td>TOCTOU</td>
-          <td>Leak Privileged Files</td>
-          <td>✅ <code>os.Root</code></td>
-      </tr>
-      <tr>
-          <td>2026-43620</td>
-          <td>insufficient validation</td>
-          <td>crash (DOS)</td>
-          <td>✅ bounds check (panics!)</td>
-      </tr>
-      <tr>
-          <td>2026-45232</td>
-          <td>missing validation</td>
-          <td>Memory Write</td>
-          <td>✅ bounds check (panics!)</td>
-      </tr>
-  </tbody>
+	<thead>
+			<tr>
+					<th>CVE number</th>
+					<th>Cause</th>
+					<th>Risk (C)</th>
+					<th>Does Go help?</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>2024-12084</td>
+					<td>insufficient validation</td>
+					<td>Heap Buffer Overflow</td>
+					<td>✅ bounds check (panics!)</td>
+			</tr>
+			<tr>
+					<td>2024-12085</td>
+					<td>insufficient validation</td>
+					<td>Info Leak</td>
+					<td>✅ zero init</td>
+			</tr>
+			<tr>
+					<td>2024-12086</td>
+					<td>missing validation</td>
+					<td>Arbitrary File Leak</td>
+					<td>✅ <code>os.Root</code></td>
+			</tr>
+			<tr>
+					<td>2024-12087</td>
+					<td>insufficient validation</td>
+					<td>Write Arbitrary Files</td>
+					<td>✅ <code>os.Root</code></td>
+			</tr>
+			<tr>
+					<td>2024-12088</td>
+					<td>insufficient validation</td>
+					<td>Create Arbitrary Symlinks</td>
+					<td>✅ <code>os.Root</code></td>
+			</tr>
+			<tr>
+					<td>2024-12747</td>
+					<td>TOCTOU</td>
+					<td>Leak Privileged Files</td>
+					<td>✅ <code>os.Root</code></td>
+			</tr>
+			<tr>
+					<td>2026-29518</td>
+					<td>TOCTOU</td>
+					<td>Leak Privileged Files</td>
+					<td>✅ <code>os.Root</code></td>
+			</tr>
+			<tr>
+					<td>2026-43617</td>
+					<td>missing validation</td>
+					<td>Deny List Ineffective</td>
+					<td>❌ logic bug</td>
+			</tr>
+			<tr>
+					<td>2026-43618</td>
+					<td>insufficient validation</td>
+					<td>Info Leak</td>
+					<td>✅ bounds check (panics!)</td>
+			</tr>
+			<tr>
+					<td>2026-43619</td>
+					<td>TOCTOU</td>
+					<td>Leak Privileged Files</td>
+					<td>✅ <code>os.Root</code></td>
+			</tr>
+			<tr>
+					<td>2026-43620</td>
+					<td>insufficient validation</td>
+					<td>crash (DOS)</td>
+					<td>✅ bounds check (panics!)</td>
+			</tr>
+			<tr>
+					<td>2026-45232</td>
+					<td>missing validation</td>
+					<td>Memory Write</td>
+					<td>✅ bounds check (panics!)</td>
+			</tr>
+	</tbody>
 </table>
 <h3 id="gokrazy-rsync-verdict">gokrazy/rsync verdict</h3>
 <p>Aside from being written in Go, another key difference between gokrazy/rsync and
@@ -1056,88 +1056,88 @@ details.</li>
 <p>Let’s have a look at whether gokrazy/rsync was affected by each CVE at the time
 of publishing:</p>
 <table>
-  <thead>
-      <tr>
-          <th>CVE number</th>
-          <th>Cause</th>
-          <th>gokrazy/rsync impl?</th>
-          <th>gokrazy/rsync affected?</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>2024-12084</td>
-          <td>insufficient validation</td>
-          <td>yes</td>
-          <td>⚠️ panic</td>
-      </tr>
-      <tr>
-          <td>2024-12085</td>
-          <td>insufficient validation</td>
-          <td>no (proto 30)</td>
-          <td>✅ not vuln</td>
-      </tr>
-      <tr>
-          <td>2024-12086</td>
-          <td>missing validation</td>
-          <td>no (proto 29)</td>
-          <td>✅ not vuln</td>
-      </tr>
-      <tr>
-          <td>2024-12087</td>
-          <td>insufficient validation</td>
-          <td>no (<code>inc-rec</code>)</td>
-          <td>✅ not vuln</td>
-      </tr>
-      <tr>
-          <td>2024-12088</td>
-          <td>insufficient validation</td>
-          <td>no (<code>safe-links</code>)</td>
-          <td>✅ not vuln</td>
-      </tr>
-      <tr>
-          <td>2024-12747</td>
-          <td>TOCTOU</td>
-          <td>yes</td>
-          <td>❌ vuln</td>
-      </tr>
-      <tr>
-          <td>2026-29518</td>
-          <td>TOCTOU</td>
-          <td>yes</td>
-          <td>⚠️ patched</td>
-      </tr>
-      <tr>
-          <td>2026-43617</td>
-          <td>missing validation</td>
-          <td>no (host deny lists)</td>
-          <td>✅ not vuln</td>
-      </tr>
-      <tr>
-          <td>2026-43618</td>
-          <td>insufficient validation</td>
-          <td>no (compression)</td>
-          <td>✅ not vuln</td>
-      </tr>
-      <tr>
-          <td>2026-43619</td>
-          <td>TOCTOU</td>
-          <td>yes</td>
-          <td>⚠️ patched</td>
-      </tr>
-      <tr>
-          <td>2026-43620</td>
-          <td>insufficient validation</td>
-          <td>no (<code>inc-rec</code>)</td>
-          <td>✅ not vuln</td>
-      </tr>
-      <tr>
-          <td>2026-45232</td>
-          <td>missing validation</td>
-          <td>no (proxy)</td>
-          <td>✅ not vuln</td>
-      </tr>
-  </tbody>
+	<thead>
+			<tr>
+					<th>CVE number</th>
+					<th>Cause</th>
+					<th>gokrazy/rsync impl?</th>
+					<th>gokrazy/rsync affected?</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>2024-12084</td>
+					<td>insufficient validation</td>
+					<td>yes</td>
+					<td>⚠️ panic</td>
+			</tr>
+			<tr>
+					<td>2024-12085</td>
+					<td>insufficient validation</td>
+					<td>no (proto 30)</td>
+					<td>✅ not vuln</td>
+			</tr>
+			<tr>
+					<td>2024-12086</td>
+					<td>missing validation</td>
+					<td>no (proto 29)</td>
+					<td>✅ not vuln</td>
+			</tr>
+			<tr>
+					<td>2024-12087</td>
+					<td>insufficient validation</td>
+					<td>no (<code>inc-rec</code>)</td>
+					<td>✅ not vuln</td>
+			</tr>
+			<tr>
+					<td>2024-12088</td>
+					<td>insufficient validation</td>
+					<td>no (<code>safe-links</code>)</td>
+					<td>✅ not vuln</td>
+			</tr>
+			<tr>
+					<td>2024-12747</td>
+					<td>TOCTOU</td>
+					<td>yes</td>
+					<td>❌ vuln</td>
+			</tr>
+			<tr>
+					<td>2026-29518</td>
+					<td>TOCTOU</td>
+					<td>yes</td>
+					<td>⚠️ patched</td>
+			</tr>
+			<tr>
+					<td>2026-43617</td>
+					<td>missing validation</td>
+					<td>no (host deny lists)</td>
+					<td>✅ not vuln</td>
+			</tr>
+			<tr>
+					<td>2026-43618</td>
+					<td>insufficient validation</td>
+					<td>no (compression)</td>
+					<td>✅ not vuln</td>
+			</tr>
+			<tr>
+					<td>2026-43619</td>
+					<td>TOCTOU</td>
+					<td>yes</td>
+					<td>⚠️ patched</td>
+			</tr>
+			<tr>
+					<td>2026-43620</td>
+					<td>insufficient validation</td>
+					<td>no (<code>inc-rec</code>)</td>
+					<td>✅ not vuln</td>
+			</tr>
+			<tr>
+					<td>2026-45232</td>
+					<td>missing validation</td>
+					<td>no (proxy)</td>
+					<td>✅ not vuln</td>
+			</tr>
+	</tbody>
 </table>
 <p>To be clear: all known vulnerabilities are fixed in gokrazy/rsync! The table
 above documents what the state was at the time when each CVE was published. In
@@ -1176,8 +1176,8 @@ role/protocol layering:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations.png"><img
-  srcset="https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations_hu_b83596d5e1578bab.png 2x,https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations_hu_80c1da434b4b343b.png 3x"
-  src="https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations_hu_b1c2c5d30df87dad.png"
+  srcset="https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations_hu_fe6c47e615c529cc.png 2x,https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations_hu_2af07d046b10779e.png 3x"
+  src="https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations_hu_676301528b69c19f.png"
   alt="diagram showing 4 different rsync setups: (1) rsync --daemon (2) rsync -e ssh; rsync://server/module/dir (3) rsync server:/some/path (4) rsync /src" title="diagram showing 4 different rsync setups: (1) rsync --daemon (2) rsync -e ssh; rsync://server/module/dir (3) rsync server:/some/path (4) rsync /src"
   width="600"
   height="547"

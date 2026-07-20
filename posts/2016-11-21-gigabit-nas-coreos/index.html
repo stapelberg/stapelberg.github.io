@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -588,27 +588,27 @@ picked up either manually when time-critical, or automatically by virtue of
 CoreOS rebooting to update itself.
 </p>
 <p>rrsync:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">FROM</span><span style="color:#bbb"> </span><span style="color:#4070a0">debian:jessie</span><span style="">
-</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">RUN</span> apt-get update <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  <span style="color:#666">&amp;&amp;</span> apt-get install -y rsync <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  <span style="color:#666">&amp;&amp;</span> gunzip -c /usr/share/doc/rsync/scripts/rrsync.gz &gt; /usr/bin/rrsync <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  <span style="color:#666">&amp;&amp;</span> chmod +x /usr/bin/rrsync<span style="">
-</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">ENTRYPOINT</span> [<span style="color:#4070a0">&#34;/usr/bin/rrsync&#34;</span>]<span style="">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">FROM</span><span style="color:#bbb"> </span><span style="color:#4070a0">debian:jessie</span><span style="">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">RUN</span> apt-get update <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>  <span style="color:#666">&amp;&amp;</span> apt-get install -y rsync <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>  <span style="color:#666">&amp;&amp;</span> gunzip -c /usr/share/doc/rsync/scripts/rrsync.gz &gt; /usr/bin/rrsync <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>  <span style="color:#666">&amp;&amp;</span> chmod +x /usr/bin/rrsync<span style="">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">ENTRYPOINT</span> [<span style="color:#4070a0">&#34;/usr/bin/rrsync&#34;</span>]<span style="">
 </span></span></span></code></pre></div><p>samba:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">FROM</span><span style="color:#bbb"> </span><span style="color:#4070a0">debian:jessie</span><span style="">
-</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">RUN</span> apt-get update <span style="color:#666">&amp;&amp;</span> apt-get install -y samba<span style="">
-</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">ADD</span> smb.conf /etc/samba/smb.conf<span style="">
-</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">EXPOSE</span><span style="color:#bbb"> </span><span style="color:#4070a0">137</span> <span style="color:#40a070">138</span> <span style="color:#40a070">139</span> <span style="color:#40a070">445</span><span style="">
-</span></span></span><span style="display:flex;"><span><span style=""></span><span style="color:#007020;font-weight:bold">CMD</span> [<span style="color:#4070a0">&#34;/usr/sbin/smbd&#34;</span>, <span style="color:#4070a0">&#34;-FS&#34;</span>]<span style="">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">FROM</span><span style="color:#bbb"> </span><span style="color:#4070a0">debian:jessie</span><span style="">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">RUN</span> apt-get update <span style="color:#666">&amp;&amp;</span> apt-get install -y samba<span style="">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">ADD</span> smb.conf /etc/samba/smb.conf<span style="">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">EXPOSE</span><span style="color:#bbb"> </span><span style="color:#4070a0">137</span> <span style="color:#40a070">138</span> <span style="color:#40a070">139</span> <span style="color:#40a070">445</span><span style="">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">CMD</span> [<span style="color:#4070a0">&#34;/usr/sbin/smbd&#34;</span>, <span style="color:#4070a0">&#34;-FS&#34;</span>]<span style="">
 </span></span></span></code></pre></div><h3 id="appendix-a-cloud-config">Appendix A: cloud-config</h3>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">#cloud-config</span><span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">#cloud-config</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">hostname</span>:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;storage&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">hostname</span>:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;storage&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">ssh_authorized_keys</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">ssh_authorized_keys</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- ssh-rsa AAAAB… michael@midna<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">write_files</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">write_files</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">path</span>:<span style="color:#bbb"> </span>/etc/ssl/certs/r.zekjur.net.crt<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">content</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      -----BEGIN CERTIFICATE-----
@@ -638,7 +638,7 @@ CoreOS rebooting to update itself.
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      command=&#34;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/scan2drive:/srv/backup/scan2drive stapelberg/rsync /srv/backup/scan2drive&#34; ssh-rsa AAAAB… root@scan2drive
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">      command=&#34;/bin/docker run -i -e SSH_ORIGINAL_COMMAND -v /srv/backup/alp.zekjur.net:/srv/backup/alp.zekjur.net stapelberg/rsync /srv/backup/alp.zekjur.net&#34; ssh-rsa AAAAB… root@alp</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">coreos</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">coreos</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">update</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">reboot-strategy</span>:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;reboot&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">locksmith</span>:<span style="color:#bbb">

@@ -13,7 +13,7 @@
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2025-08-24-secret-management-with-sops-nix/nix-snowflake-unlock-featured_hu_163e5f7e79ba6ffa.png">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2025-08-24-secret-management-with-sops-nix/nix-snowflake-unlock-featured_hu_e6cec1d7f617e613.png">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -104,7 +104,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -337,11 +337,11 @@ i.e. <a href="https://manpages.debian.org/tree.1"><code>tree(1)</code></a>
 …
 </code></pre><p>In the root of the git repository (next to the <code>batchn</code> directory), I create
 <code>.sops.yaml</code> like so:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">keys</span>:<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">keys</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#007020">&amp;admin_michael</span><span style="color:#bbb"> </span>age10e9tt2qwq90y5hvl35dau0sm5cm4qvegtw2a70v7sz5fy99de42s9d5nkf<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#007020">&amp;server_batchn</span><span style="color:#bbb"> </span>age1wnwfnrqhewjh39pmtyc8zhqw606znskt4h5p9s3pve4apd67gapqj6tr0k<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#60a0b0;font-style:italic"># …more server keys go here…</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">creation_rules</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># …more server keys go here…</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">creation_rules</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">path_regex</span>:<span style="color:#bbb"> </span>batchn/secrets/[^/]+\.(yaml|json|env|ini)$<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">key_groups</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- <span style="color:#062873;font-weight:bold">age</span>:<span style="color:#bbb">
@@ -358,7 +358,7 @@ someone on just one aspect of the system.</p>
 <code>secrets/example.yaml</code> in our configured editor by running:</p>
 <pre tabindex="0"><code>midna ~/nix-configs/batchn % nix run nixpkgs#sops secrets/example.yaml
 </code></pre><p>The simplest key file contains just one key, for example:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">api-key</span>:<span style="color:#bbb"> </span>hello world :)<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">api-key</span>:<span style="color:#bbb"> </span>hello world :)<span style="color:#bbb">
 </span></span></span></code></pre></div><p>After saving and exiting your editor, sops will update the encrypted
 secrets/example.yaml.</p>
 <h3 id="step-6-configure-sops-in-nixos">Step 6. Configure sops in NixOS</h3>
@@ -367,10 +367,10 @@ integration to make the decrypted secrets available on the system.</p>
 <p>In <code>flake.nix</code>, I added <code>sops-nix</code> to the <code>inputs</code> section and added the NixOS
 module. I show the entire diff because the places where the lines go are just as
 important as what the lines say:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#a00000">--- c/batchn/flake.nix
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ i/batchn/flake.nix
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -1,85 +1,93 @@
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span> {
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#a00000">--- c/batchn/flake.nix
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+++ i/batchn/flake.nix
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -1,85 +1,93 @@
+</span></span></span><span style="display:flex;"><span> {
 </span></span><span style="display:flex;"><span>   inputs = {
 </span></span><span style="display:flex;"><span>     nixpkgs.url = &#34;github:nixos/nixpkgs/nixos-25.05&#34;;
 </span></span><span style="display:flex;"><span>
@@ -387,7 +387,7 @@ important as what the lines say:</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+      inputs.nixpkgs.follows = &#34;nixpkgs&#34;;
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+    };
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>   };
+</span></span></span><span style="display:flex;"><span>   };
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>   outputs =
 </span></span><span style="display:flex;"><span>     {
@@ -396,7 +396,7 @@ important as what the lines say:</p>
 </span></span><span style="display:flex;"><span>       stapelbergnix,
 </span></span><span style="display:flex;"><span>       zkjnastools,
 </span></span><span style="display:flex;"><span><span style="color:#00a000">+      sops-nix,
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>       ...
+</span></span></span><span style="display:flex;"><span>       ...
 </span></span><span style="display:flex;"><span>     }:
 </span></span><span style="display:flex;"><span>     let
 </span></span><span style="display:flex;"><span>       system = &#34;x86_64-linux&#34;;
@@ -421,7 +421,7 @@ important as what the lines say:</p>
 </span></span><span style="display:flex;"><span>           stapelbergnix.lib.prometheusNode
 </span></span><span style="display:flex;"><span>           zkjnastools.nixosModules.zkjbackup
 </span></span><span style="display:flex;"><span><span style="color:#00a000">+          sops-nix.nixosModules.sops
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>         ];
+</span></span></span><span style="display:flex;"><span>         ];
 </span></span><span style="display:flex;"><span>       };
 </span></span><span style="display:flex;"><span>       formatter.${system} = pkgs.nixfmt-tree;
 </span></span><span style="display:flex;"><span>     };
@@ -429,7 +429,7 @@ important as what the lines say:</p>
 </span></span></code></pre></div><p>Then, in <code>configuration.nix</code>, we tell <code>sops-nix</code> to use the SSH host key as
 identity, where sops will find our secrets and which secrets <code>sops-nix</code> should
 realize on the remote system:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  sops<span style="color:#666">.</span>age<span style="color:#666">.</span>sshKeyPaths <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;/etc/ssh/ssh_host_ed25519_key&#34;</span> ];
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  sops<span style="color:#666">.</span>age<span style="color:#666">.</span>sshKeyPaths <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;/etc/ssh/ssh_host_ed25519_key&#34;</span> ];
 </span></span><span style="display:flex;"><span>  sops<span style="color:#666">.</span>defaultSopsFile <span style="color:#666">=</span> <span style="color:#235388">./secrets/example.yaml</span>;
 </span></span><span style="display:flex;"><span>  sops<span style="color:#666">.</span>secrets<span style="color:#666">.</span><span style="color:#4070a0">&#34;api-key&#34;</span> <span style="color:#666">=</span> { };
 </span></span></code></pre></div><p>After deploying, we can access the secret on the running system:</p>
@@ -450,7 +450,7 @@ these secrets?</p>
 <p>Let’s assume you have deployed a custom Go server as a systemd service on NixOS
 as follows, and you want to start managing the cleartext secret passed via the
 <code>-securecookie_hash_key</code> and <code>-securecookie_block_key</code> command-line flags:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  users<span style="color:#666">.</span>groups<span style="color:#666">.</span>fortuneserver <span style="color:#666">=</span> { };
 </span></span><span style="display:flex;"><span>  users<span style="color:#666">.</span>users<span style="color:#666">.</span>fortuneserver <span style="color:#666">=</span> {
 </span></span><span style="display:flex;"><span>    isSystemUser <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
@@ -474,7 +474,7 @@ as follows, and you want to start managing the cleartext secret passed via the
 </span></span><span style="display:flex;"><span>  };
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>With the following sops secrets:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">fortuneserver</span>:<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">fortuneserver</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">securecookie_hash_key</span>:<span style="color:#bbb"> </span>some-secret-key<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">securecookie_block_key</span>:<span style="color:#bbb"> </span>a-different-secret-key<span style="color:#bbb">
 </span></span></span></code></pre></div><p>…we need to adjust our NixOS config to read these secret files at
@@ -482,7 +482,7 @@ runtime. Because the <code>ExecStart</code> directive is interpreted by systemd 
 passed through a shell, we use the <a href="https://nixos.org/manual/nixpkgs/stable/#trivial-builder-writeShellScript"><code>writeShellScript</code>
 helper</a>
 and then just <code>cat</code> the files:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;display:grid;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
 </span></span><span style="display:flex; background-color:#d8d8d8"><span>  sops<span style="color:#666">.</span>secrets<span style="color:#666">.</span><span style="color:#4070a0">&#34;fortuneserver/securecookie_hash_key&#34;</span> <span style="color:#666">=</span> {
 </span></span><span style="display:flex; background-color:#d8d8d8"><span>    owner <span style="color:#666">=</span> <span style="color:#4070a0">&#34;fortuneserver&#34;</span>;
 </span></span><span style="display:flex; background-color:#d8d8d8"><span>    restartUnits <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;fortuneserver.service&#34;</span> ];
@@ -518,11 +518,11 @@ and then just <code>cat</code> the files:</p>
 <p>What if the service in question does not use command-line flags, but environment
 variables for configuring secrets? We can put an environment variable file into
 a sops-managed secret:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">translate-fe</span>:<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">translate-fe</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">env</span>:<span style="color:#bbb"> </span>|<span style="color:#4070a0;font-style:italic">
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-style:italic">        DEEPL_AUTH_KEY=my-deepl-key</span><span style="color:#bbb">
 </span></span></span></code></pre></div><p>…and then we make systemd apply these environment variables from the secrets file:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;display:grid;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
 </span></span><span style="display:flex; background-color:#d8d8d8"><span>  sops<span style="color:#666">.</span>secrets<span style="color:#666">.</span><span style="color:#4070a0">&#34;translate-fe/env&#34;</span> <span style="color:#666">=</span> {
 </span></span><span style="display:flex; background-color:#d8d8d8"><span>    owner <span style="color:#666">=</span> <span style="color:#4070a0">&#34;translatefe&#34;</span>;
 </span></span><span style="display:flex; background-color:#d8d8d8"><span>    restartUnits <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;translate-fe.service&#34;</span> ];
@@ -545,7 +545,7 @@ the option might not always be called <code>EnvironmentFile</code>. For example,
 oauth2-proxy service, you would need to configure the
 <a href="https://search.nixos.org/options?channel=25.05&amp;show=services.oauth2-proxy.keyFile&amp;from=0&amp;size=50&amp;sort=relevance&amp;type=packages&amp;query=oauth2-proxy"><code>services.oauth2-proxy.keyFile</code>
 option</a>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  services<span style="color:#666">.</span>oauth2-proxy <span style="color:#666">=</span> {
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>  services<span style="color:#666">.</span>oauth2-proxy <span style="color:#666">=</span> {
 </span></span><span style="display:flex;"><span>    keyFile <span style="color:#666">=</span> config<span style="color:#666">.</span>sops<span style="color:#666">.</span>secrets<span style="color:#666">.</span><span style="color:#4070a0">&#34;oauth2-proxy/env&#34;</span><span style="color:#666">.</span>path;
 </span></span><span style="display:flex;"><span>    enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
 </span></span><span style="display:flex;"><span>    <span style="color:#60a0b0;font-style:italic"># …</span>
@@ -556,7 +556,7 @@ account under which the service is running. But what if there is no such user
 account, because the service use systemd’s <code>DynamicUser</code> feature?</p>
 <p>We can use systemd’s <code>LoadCredential</code> feature! For example, I supply the SMTP
 password to my Prometheus Alertmanager as follows:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;display:grid;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
 </span></span><span style="display:flex; background-color:#d8d8d8"><span>  sops<span style="color:#666">.</span>secrets<span style="color:#666">.</span><span style="color:#4070a0">&#34;alertmanager/smtp_pw&#34;</span> <span style="color:#666">=</span> {
 </span></span><span style="display:flex; background-color:#d8d8d8"><span>    restartUnits <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;alertmanager.service&#34;</span> ];
 </span></span><span style="display:flex; background-color:#d8d8d8"><span>  };

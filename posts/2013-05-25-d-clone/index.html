@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,7 +179,7 @@
 <h1 class="ms_title">Cloning git-buildpackage repositories (2013)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2013-05-25, last modified 2019-02-04</div>
+  <div id="ms_date">published 2013-05-25, last modified 2026-07-20</div>
   
   
   <div id="ms_tags">
@@ -192,7 +192,7 @@
   </div>
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2013-05-25-d-clone.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2013-05-25-d-clone.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -203,33 +203,28 @@ make my changes, then push and upload the Debian package. I don’t keep those
 repositories around in order to avoid cruft and also to have a 100% clean,
 up-to-date setup whenever I start working on something.
 </p>
-
 <p>
 Everytime I clone such a repository, I struggle with the setup. For example, I
 usually forget the --pristine-tar flag for gbp-clone. Also, I usually forget to
 push other branches (working on “debian”, forgetting “upstream”) and, even more
 often, I forget pushing tags.
 </p>
-
 <p>
 I spent some time on this and figured out that one can use the following to
 make --pristine-tar the default:
 </p>
-
 <pre>
 cat &gt;&gt; ~/.gbp.conf &lt;EOF
 [DEFAULT]
 pristine-tar = True
 EOF
 </pre>
-
 <p>
 Avoiding my other pain points is not so easy apparently, so I wrote a little
 shell function (only tested with zsh!) which uses debcheckout to get the git
 URL, gbp-clone to actually clone it and a few git config calls to make me able
 to just “git push” when I am done and not worry about anything:
 </p>
-
 <pre>
 # Clones the git sources of a Debian package
 # needs debcheckout from devscripts and gbp-clone from git-buildpackage
@@ -266,7 +261,6 @@ function d-clone() {
     fi
 }
 </pre>
-
 <p>
 With that function, starting work on a package becomes as easy as
 <code>“d-clone golang-doc”</code>.

@@ -105,7 +105,7 @@ I patched bcrypt to use a window of 256K over the input and output file instead 
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -185,7 +185,7 @@ I patched bcrypt to use a window of 256K over the input and output file instead 
 <h1 class="ms_title">RC bugs (2012)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2012-11-25, last modified 2019-02-04</div>
+  <div id="ms_date">published 2012-11-25, last modified 2026-07-20</div>
   
   
   <div id="ms_tags">
@@ -198,7 +198,7 @@ I patched bcrypt to use a window of 256K over the input and output file instead 
   </div>
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2012-11-25-rc-bugs.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2012-11-25-rc-bugs.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -211,29 +211,24 @@ I recently worked on the following RC bugs:
 I provided some analysis. By rebuilding lftp’s configure script with recent
 autotools, this should be fixed.
 </li>
-
 <li>
 <a href="http://bugs.debian.org/676229">#676229 — gnustep-make: should depend on a chosen version of gobjc, not just "gobjc"</a><br>
 This issue was fixed by an upload, but not marked as closed. I tried to
 reproduce it and failed (as expected), so I closed the bug.
 </li>
-
 <li>
 <a href="http://bugs.debian.org/694091">#694091 — bcrypt: Tries to load whole file into memory regardless of the size</a><br>
 I patched bcrypt to use a window of 256K over the input and output file instead
 of loading it into memory. I also fixed the offset types so that it works with
 files &gt; 2 GiB on 32-bit platforms.
 </li>
-
 </ul>
 </p>
-
 <p>
 I have to say that I find the BTS to be very hard to read from the perspective
 of a newcomer who wants to help squashing RC bugs, both from a technical and a
 social standpoint.
 </p>
-
 <p>
 As an example for the technical side: blocking bugs are very
 easy to miss, so innocent bugreports which seem actionable turn out to just
@@ -242,7 +237,6 @@ interface to the BTS for RC bugs is UDD, so <a
 href="http://richardhartmann.de/blog/posts/2012/11/24-Debian_Release_Critical_Bug_report_for_Week_47/">RichiH’s
 RC report</a> was quite helpful.
 </p>
-
 <p>
 For the social side: Bugreports often are in a state in which it is not clear
 what the next course of action is, e.g. <a
@@ -251,7 +245,6 @@ but still has severity: grave) or <a
 href="http://bugs.debian.org/684633">#684633</a> (dropping from testing
 suggested but not clear whether a removal request has been filed or not).
 </p>
-
 <p>
 I’m aware that this is very vague critic. I suppose what I am missing is a way
 in which we can make the list of RC bugs more actionable. When I am browsing

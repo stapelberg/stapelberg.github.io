@@ -13,7 +13,7 @@
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2024-09-18-a-signal-run-a-day-keeps-the-un-link-away/2024-09-18-signal-screenshot-featured_hu_f96a0daad3147d21.jpg">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2024-09-18-a-signal-run-a-day-keeps-the-un-link-away/2024-09-18-signal-screenshot-featured_hu_9da698ef13eae8b1.jpg">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -104,7 +104,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -265,12 +265,12 @@ stand-in.</p>
 a target website that doesn’t go offline unless I want it to. So let’s just use
 this website! Go’s <code>net/http</code> package that is included in Go’s standard library
 makes this super easy:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">checkConnectivity</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">checkConnectivity</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>_,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>http.<span style="color:#06287e">Get</span>(<span style="color:#4070a0">&#34;https://michael.stapelberg.ch/&#34;</span>)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>err<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div><p>Now we just need to loop around this single connectivity check:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">waitForConnectivity</span>(timeout<span style="color:#bbb"> </span>time.Duration)<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">waitForConnectivity</span>(timeout<span style="color:#bbb"> </span>time.Duration)<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">const</span><span style="color:#bbb"> </span>freq<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span><span style="color:#40a070">1</span><span style="color:#bbb"> </span><span style="color:#666">*</span><span style="color:#bbb"> </span>time.Second<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">for</span><span style="color:#bbb"> </span>start<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>time.<span style="color:#06287e">Now</span>();<span style="color:#bbb"> </span>time.<span style="color:#06287e">Since</span>(start)<span style="color:#bbb"> </span>&lt;<span style="color:#bbb"> </span>timeout;<span style="color:#bbb"> </span>time.<span style="color:#06287e">Sleep</span>(freq)<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#06287e">checkConnectivity</span>();<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
@@ -280,7 +280,7 @@ makes this super easy:</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span><span style="color:#60a0b0;font-style:italic">// connectivity check succeeded</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;no connectivity established within %v&#34;</span>,<span style="color:#bbb"> </span>timeout)<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div><p>We could improve this code to be more generally applicable by adding
 <a href="https://en.wikipedia.org/wiki/Exponential_backoff">Exponential Backoff</a>, but
 for this particular connectivity check, we should be fine even without
@@ -291,19 +291,19 @@ system: we can specify the <code>O_EXCL</code> flag when creating our program’
 make the first creation attempt proceed, but any further creation attempt fail
 because the file already exists. We’ll then redirect the standard library’s
 <code>log</code> package output to the log file:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>logFn<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>filepath.<span style="color:#06287e">Join</span>(home,<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;signal-keepalive&#34;</span>,<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;_logs&#34;</span>,<span style="color:#bbb"> </span>time.<span style="color:#06287e">Now</span>().<span style="color:#06287e">Format</span>(<span style="color:#4070a0">&#34;2006-01-02&#34;</span>)<span style="color:#666">+</span><span style="color:#4070a0">&#34;.txt&#34;</span>)<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>f,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>os.<span style="color:#06287e">OpenFile</span>(logFn,<span style="color:#bbb"> </span>os.O_RDWR|os.O_CREATE|os.O_EXCL,<span style="color:#bbb"> </span><span style="color:#40a070">0666</span>)<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>logFn<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>filepath.<span style="color:#06287e">Join</span>(home,<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;signal-keepalive&#34;</span>,<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;_logs&#34;</span>,<span style="color:#bbb"> </span>time.<span style="color:#06287e">Now</span>().<span style="color:#06287e">Format</span>(<span style="color:#4070a0">&#34;2006-01-02&#34;</span>)<span style="color:#666">+</span><span style="color:#4070a0">&#34;.txt&#34;</span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>f,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>os.<span style="color:#06287e">OpenFile</span>(logFn,<span style="color:#bbb"> </span>os.O_RDWR|os.O_CREATE|os.O_EXCL,<span style="color:#bbb"> </span><span style="color:#40a070">0666</span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>os.<span style="color:#06287e">IsExist</span>(err)<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span><span style="color:#60a0b0;font-style:italic">// nothing to do, already ran today</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>err<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#60a0b0;font-style:italic">// Intentionally not closing this file so that even the log.Fatal()</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#60a0b0;font-style:italic">// call in the calling function will end up in the log file.</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Intentionally not closing this file so that even the log.Fatal()</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// call in the calling function will end up in the log file.</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>log.<span style="color:#06287e">SetOutput</span>(f)<span style="color:#bbb"> </span><span style="color:#60a0b0;font-style:italic">// redirect standard library logging into this file</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;signal-keepalive, waiting for internet connectivity&#34;</span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>log.<span style="color:#06287e">SetOutput</span>(f)<span style="color:#bbb"> </span><span style="color:#60a0b0;font-style:italic">// redirect standard library logging into this file</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;signal-keepalive, waiting for internet connectivity&#34;</span>)<span style="color:#bbb">
 </span></span></span></code></pre></div><p>Not closing the file might seem weird at first, but remember that this is a
 short-lived program and the operating system closes all file handles of a
 process when it exits.</p>
@@ -312,9 +312,9 @@ process when it exits.</p>
 system paths that you might want or need to adjust.</p>
 <details>
 <summary>Click to expand: <code>keepalive.go</code></summary>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span><span style="color:#bbb"> </span>main<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span><span style="color:#bbb"> </span>main<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">import</span><span style="color:#bbb"> </span>(<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span><span style="color:#bbb"> </span>(<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;fmt&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;log&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;net/http&#34;</span><span style="color:#bbb">
@@ -322,14 +322,14 @@ system paths that you might want or need to adjust.</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;os/exec&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;path/filepath&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;time&#34;</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">checkConnectivity</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">checkConnectivity</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>_,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>http.<span style="color:#06287e">Get</span>(<span style="color:#4070a0">&#34;https://michael.stapelberg.ch/&#34;</span>)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>err<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">waitForConnectivity</span>(timeout<span style="color:#bbb"> </span>time.Duration)<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">waitForConnectivity</span>(timeout<span style="color:#bbb"> </span>time.Duration)<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">for</span><span style="color:#bbb"> </span>start<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>time.<span style="color:#06287e">Now</span>();<span style="color:#bbb"> </span>time.<span style="color:#06287e">Since</span>(start)<span style="color:#bbb"> </span>&lt;<span style="color:#bbb"> </span>timeout;<span style="color:#bbb"> </span>time.<span style="color:#06287e">Sleep</span>(<span style="color:#40a070">1</span><span style="color:#bbb"> </span><span style="color:#666">*</span><span style="color:#bbb"> </span>time.Second)<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#06287e">checkConnectivity</span>();<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">			</span>log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;connectivity check failed: %v&#34;</span>,<span style="color:#bbb"> </span>err)<span style="color:#bbb">
@@ -338,9 +338,9 @@ system paths that you might want or need to adjust.</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span><span style="color:#60a0b0;font-style:italic">// connectivity check succeeded</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;no connectivity established within %v&#34;</span>,<span style="color:#bbb"> </span>timeout)<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">keepalive</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">keepalive</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// Limit to one attempt per day by exclusively creating a logfile.</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>home<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>os.<span style="color:#06287e">Getenv</span>(<span style="color:#4070a0">&#34;HOME&#34;</span>)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>home<span style="color:#bbb"> </span><span style="color:#666">==</span><span style="color:#bbb"> </span><span style="color:#4070a0">&#34;&#34;</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
@@ -389,13 +389,13 @@ system paths that you might want or need to adjust.</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;all done&#34;</span>)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>f.<span style="color:#06287e">Sync</span>()<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">main</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">main</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#06287e">keepalive</span>();<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>log.<span style="color:#06287e">Fatal</span>(err)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div></details>
 <p>(Use <code>go build keepalive.go</code> to compile if you’re unfamiliar with <a href="https://go.dev">Go</a>.)</p>
 <h2 id="macos-installation-launchd">macOS installation: launchd</h2>
@@ -411,7 +411,7 @@ and decided to configure my program to run at 08:03 each day:</p>
 <summary>
 Click to expand: <code>net.zekjur.signalkeepalive.plist</code>
 </summary>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#007020">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#007020">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;</span>
 </span></span><span style="display:flex;"><span><span style="color:#007020">&lt;!DOCTYPE plist PUBLIC &#34;-//Apple Computer//DTD PLIST 1.0//EN&#34;
 </span></span></span><span style="display:flex;"><span><span style="color:#007020">&#34;http://www.apple.com/DTDs/PropertyList-1.0.dtd&#34;&gt;</span>
 </span></span><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">&lt;plist</span> <span style="color:#4070a0">version=</span><span style="color:#4070a0">&#34;1.0&#34;</span><span style="color:#062873;font-weight:bold">&gt;</span>

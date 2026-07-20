@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,11 +179,11 @@
 <h1 class="ms_title">Threadsafe Funktionen in Single-Thread-Programmen (2011)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2011-04-27, last modified 2018-03-23</div>
+  <div id="ms_date">published 2011-04-27, last modified 2026-07-20</div>
   
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2011-04-27-threadsafe-funktionen-in-single-thread-programmen.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2011-04-27-threadsafe-funktionen-in-single-thread-programmen.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -200,7 +200,6 @@ href="http://code.stapelberg.de/git/i3status/commit/?id=4fa8a4e0ab52d5e804e3d85c
 wurde dieser Fehler</a> also, indem man die Uhrzeit als allererstes speichert
 und dann später ausgibt.
 </p>
-
 <p>
 Mit der neuen Version zeigte sich allerdings ein neuer Fehler: Die Uhr
 sprang alle paar Sekunden einfach so mal vor, mal zurück. Außerdem ging sie um
@@ -212,7 +211,6 @@ eine statisch allokierte <tt>struct tm</tt> zurückgibt. Der zweite Aufruf
 überschrieb daher die Uhrzeit des ersten Aufrufs, weswegen zweimal der
 Zeitpunkt des leeren Akkus angezeigt wurde.
 </p>
-
 <p>
 <a
 href="http://code.stapelberg.de/git/i3status/commit/?id=28934ef858e094bac998556df85a082bee923a96">Die

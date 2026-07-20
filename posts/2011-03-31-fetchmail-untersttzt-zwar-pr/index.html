@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,11 +179,11 @@
 <h1 class="ms_title"> fetchmail unterstützt zwar pr… (2011)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2011-03-31, last modified 2018-03-23</div>
+  <div id="ms_date">published 2011-03-31, last modified 2026-07-20</div>
   
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2011-03-31-fetchmail-untersttzt-zwar-pr.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2011-03-31-fetchmail-untersttzt-zwar-pr.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -193,11 +193,9 @@ fetchmail unterstützt zwar prinzipiell die IDLE-Funktion von IMAP um bei neuen
 Nachrichten sofort benachrichtigt zu werden (im Vergleich zu periodischem
 Nachfragen), aber nicht wenn man mehrere Accounts konfiguriert hat.
 </p>
-
 <p>
 Abhilfe schafft ein kleines Script und n einzelne fetchmail-Prozesse:
 </p>
-
 <pre>
 #!/bin/sh
 
@@ -206,11 +204,9 @@ do
 	fetchmail -f /home/michael/.fetchmail/$config --pidfile /tmp/fetchmail.$config.pid --idle
 done
 </pre>
-
 <p>
 Anschließend darf man sich über nahezu sofortige E-Mail-Zustellung freuen ;-).
 </p>
-
 <div id="bmc">
   <p>
     Did you like this

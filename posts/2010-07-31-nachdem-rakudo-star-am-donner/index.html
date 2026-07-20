@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,11 +179,11 @@
 <h1 class="ms_title"> Nachdem Rakudo Star am Donner… (2010)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2010-07-31, last modified 2018-03-23</div>
+  <div id="ms_date">published 2010-07-31, last modified 2026-07-20</div>
   
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2010-07-31-Nachdem-Rakudo-Star-am-Donner.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2010-07-31-Nachdem-Rakudo-Star-am-Donner.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -194,7 +194,6 @@ herausgekommen ist, habe ich hier mal schnell ein paar Zeilen zusammengehackt,
 um ein Dokument aus CouchDB zu holen. LWP::Simple und JSON::Tiny kommen bei
 Rakudo direkt mit:
 </p>
-
 <pre>
 #!/usr/bin/env perl6
 use v6;
@@ -207,28 +206,23 @@ my $json = LWP::Simple.new.get("$dburl/b616376f0add14a2feda9ad46b0025f3");
 my $doc = from-json($json);
 say $doc.perl;
 </pre>
-
 <p>
 Das Programm sollte relativ klar sein, mit LWP::Simple kommuniziert man mit
 CouchDB, das Ergebnis decoded man mit from-json und das Analogon zu
 Data::Dumper ist die <code>.perl</code>-Method auf beliebige Datenstrukturen.
 </p>
-
 <p>
 Die Ausgabe sieht dann so aus:
 </p>
-
 <pre>
 $ time /home/michael/rakudo-star/rakudo-star-2010.07/install/bin/perl6 poc.pl
 {"added" => "2010/07/29 14:29:57 +0200", "_id" => "b616376f0add14a2feda9ad46b0025f3", "_rev" => "1-57f31860902c59c53be8c06ee9556ee8", "text" => "fnord", "tags" => ["meh"]}
 perl6 poc.pl  1,47s user 0,15s system 90% cpu 1,794 total
 </pre>
-
 <p>
 Dass es noch ein bisschen langsam ist (zum Vergleich: 0,138s mit Perl 5), wurde
 ja mit angekündigt bei dem Release.
 </p>
-
 <div id="bmc">
   <p>
     Did you like this

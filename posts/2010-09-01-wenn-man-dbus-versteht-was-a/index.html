@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,11 +179,11 @@
 <h1 class="ms_title"> Wenn man DBus versteht (was a… (2010)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2010-09-01, last modified 2018-03-23</div>
+  <div id="ms_date">published 2010-09-01, last modified 2026-07-20</div>
   
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2010-09-01-Wenn-man-DBus-versteht-was-a.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2010-09-01-Wenn-man-DBus-versteht-was-a.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -196,7 +196,6 @@ schnell zu sein und man kann damit recht stabil IPC bauen (auch wenn ich Teile
 der schwarzen Magie in dem ganzen Konstrukt, was heutzutage einen Desktop
 auszumachen scheint, noch nicht verstanden habe).
 </p>
-
 <p>
 Nokia hingegen scheint DBus teilweise noch nicht wirklich verstanden zu haben.
 Man braucht sich dazu nur mal die Internet Connectivity-APIs auf Maemo
@@ -205,7 +204,6 @@ Veränderungen der Konnektivität Anwendungen zu benachrichtigen oder Statistike
 über die derzeitige Verbindung bereitzustellen (per GPRS übertragenes
 Datenvolumen z.B.).
 </p>
-
 <p>
 Dieser IC-API fehlt nun leider die Möglichkeit, auf die derzeit vorhandenen
 WLANs zuzugreifen. Ein Blick ins syslog offenbart allerdings, dass der
@@ -214,7 +212,6 @@ Dieser spricht selbstverständlich via DBus mit dem <code>icd</code> (Internet
 Connectivity Daemon). Also kann ich den <code>wlancond</code> auch von meiner
 eigenen Anwendung aus ansprechen.
 </p>
-
 <p>
 Zunächst fehlt dem <code>wlancond</code> leider die XML-Beschreibung über die
 verfügbaren Pfade, Interfaces, Methoden und Signale. Würde diese Datei
@@ -223,7 +220,6 @@ dann bestimmt auch aufgefallen, was für einen Müll sie eigentlich durch die
 Gegend schicken. Hier mal ein Ausschnitt aus dem Code, den man braucht, um die
 derzeit verfügbaren ESSIDs inklusive Signalstärke auszulesen:
 </p>
-
 <pre>
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
@@ -259,7 +255,6 @@ void app::scan_results(const QDBusMessage &msg) {
     }
 }
 </pre>
-
 <p>
 Für die weniger DBus-Bewanderten: Nachdem man den scan request gesendet hat
 (<code>wlancond.call()</code>), der merkwürdigerweise den DBus-Datentyp string
@@ -273,19 +268,16 @@ Kanal, was das Netz kann und danach geht’s mit dem nächsten Netz weiter. Man
 muss sich das also alles selber zusammenfummeln. Wie hübsch der Code aussieht,
 sieht man ja.
 </p>
-
 <p>
 Sinnvoller wäre gewesen, ein Array zu versenden (dann kann man nämlich auch
 direkt die Signatur des Signals nutzen und Qt kann Typprüfung vornehmen),
 welches pro Netz ein Dictionary enthält (dann muss man sich nicht selbst Stück
 für Stück durch die Argumente wühlen).
 </p>
-
 <p>
 Hoffentlich sieht Nokia in QtMobility eine einfachere Möglichkeit vor, sich die
 verfügbaren Netze anzusehen…
 </p>
-
 <div id="bmc">
   <p>
     Did you like this

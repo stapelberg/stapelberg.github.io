@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,11 +179,11 @@
 <h1 class="ms_title"> Da CouchDBs SSL-Unterstützung… (2010)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2010-09-18, last modified 2021-09-18</div>
+  <div id="ms_date">published 2010-09-18, last modified 2026-07-20</div>
   
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2010-09-18-Da-CouchDBs-SSL-Untersttzung.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2010-09-18-Da-CouchDBs-SSL-Untersttzung.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -195,7 +195,6 @@ nutzlos ist</a> (für das Szenario, dass ich in einem fremden Netz unterwegs bin
 und der Netzbetreiber Man-in-the-middle spielt um meine Daten abzugreifen),
 musste ich mir eine Alternative überlegen.
 </p>
-
 <p>
 Folgende Punkte gilt es zu beachten:
 <ul>
@@ -212,7 +211,6 @@ Folgende Punkte gilt es zu beachten:
   </li>
 </ul>
 </p>
-
 <p>
 Meine Wahl ist ein OpenVPN-Tunnel, über den nicht die Defaultroute läuft,
 sondern eine spezifische Route für alle IPs, auf denen ich später eine CouchDB
@@ -224,14 +222,12 @@ $ cat /etc/openvpn/n900.up.sh
 ip -6 a a 2001::vpn:1/48 dev $1
 ip -6 r a 2001::couch:1/112 via 2001::gw:1 dev $1
 </pre>
-
 <p>
 Damit das OpenVPN einigermaßen performant läuft, sollte man laut <a
 href="http://www.cs.wustl.edu/~jain/cse567-08/ftp/ovpn/index.html">diesem
 Paper</a> die Parameter <code>cipher AES-256-CBC</code> und
 <code>comp-lzo</code> wählen.
 </p>
-
 <p>
 Auf der Gegenseite, also auf <code>2001::couch:1</code> konfiguriert man nun
 die zusätzliche Adresse und grenzt den Zugriff via <code>ip6tables</code> auf
@@ -244,13 +240,11 @@ den VPN-Client ein:
 # ip6tables -A couch -d 2001::couch:1/128 -j REJECT
 # ip6tables -I INPUT 5 -j couch
 </pre>
-
 <p>
 Die Angabe <code>preferred_lft 0</code> bewirkt, dass diese IP nicht als
 Source-IP für ausgehende Verbindungen benutzt wird (sondern nur als zusätzliche
 IP zur Verfügung steht).
 </p>
-
 <p>
 Auf meinem Telefon muss nun sichergestellt sein, dass OpenVPN dauerhaft läuft,
 damit die einzig mögliche Route zu <code>2001::couch:1</code> durch das VPN
@@ -260,7 +254,6 @@ meinem Fall nicht funktioniert, da mein IPv6-Tunnel und das VPN sich im selben
 Netz befinden. Falls das nicht so wäre, müsste man <code>2001::couch:1</code>
 auch in das VPN stecken.
 </p>
-
 <div id="bmc">
   <p>
     Did you like this

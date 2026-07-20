@@ -105,7 +105,7 @@ Motivation Once you have a few IOT devices, an obvious question is how to networ
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -386,9 +386,9 @@ for the NodeMCU (ESP8266-based):</p>
 library</a>. If your
 microcontroller is networked, e.g. an ESP32 with WiFi, you can publish MQTT
 messages from your Arduino sketch:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#include</span> <span style="color:#007020">&lt;WiFi.h&gt;</span><span style="color:#007020">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#include</span> <span style="color:#007020">&lt;WiFi.h&gt;</span><span style="color:#007020">
 </span></span></span><span style="display:flex;"><span><span style="color:#007020">#include</span> <span style="color:#007020">&lt;PubSubClient.h&gt;</span><span style="color:#007020">
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>
+</span></span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>WiFiClient wificlient;
 </span></span><span style="display:flex;"><span>PubSubClient <span style="color:#06287e">client</span>(wificlient);
 </span></span><span style="display:flex;"><span>
@@ -403,7 +403,7 @@ messages from your Arduino sketch:</p>
 </span></span><span style="display:flex;"><span>  
 </span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> (<span style="color:#06287e">strcmp</span>(topic, <span style="color:#4070a0">&#34;doorbell/cmd/unlock&#34;</span>) <span style="color:#666">==</span> <span style="color:#40a070">0</span>) {
 </span></span><span style="display:flex;"><span>  		<span style="color:#60a0b0;font-style:italic">// …
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    }
+</span></span></span><span style="display:flex;"><span>    }
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#902000">void</span> <span style="color:#06287e">taskmqtt</span>(<span style="color:#902000">void</span> <span style="color:#666">*</span>pvParameters) {
@@ -414,19 +414,19 @@ messages from your Arduino sketch:</p>
 </span></span><span style="display:flex;"><span>		}
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// Poll PubSubClient for new messages and invoke the callback.
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// Should be called as infrequent as one is willing to delay
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// reacting to MQTT messages.
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// Should not be called too frequently to avoid strain on
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// the network hardware:
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		<span style="color:#60a0b0;font-style:italic">// https://github.com/knolleary/pubsubclient/issues/756#issuecomment-654335096
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>		client.<span style="color:#06287e">loop</span>();
+</span></span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// Should be called as infrequent as one is willing to delay
+</span></span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// reacting to MQTT messages.
+</span></span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// Should not be called too frequently to avoid strain on
+</span></span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// the network hardware:
+</span></span></span><span style="display:flex;"><span>		<span style="color:#60a0b0;font-style:italic">// https://github.com/knolleary/pubsubclient/issues/756#issuecomment-654335096
+</span></span></span><span style="display:flex;"><span>		client.<span style="color:#06287e">loop</span>();
 </span></span><span style="display:flex;"><span>		<span style="color:#06287e">vTaskDelay</span>(<span style="color:#06287e">pdMS_TO_TICKS</span>(<span style="color:#40a070">100</span>));
 </span></span><span style="display:flex;"><span>	}
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#902000">void</span> <span style="color:#06287e">setup</span>() {
 </span></span><span style="display:flex;"><span>	<span style="color:#06287e">connectToWiFi</span>(); <span style="color:#60a0b0;font-style:italic">// WiFi configuration omitted for brevity
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>
+</span></span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>	client.<span style="color:#06287e">setServer</span>(<span style="color:#4070a0">&#34;dr.lan&#34;</span>, <span style="color:#40a070">1883</span>);
 </span></span><span style="display:flex;"><span>	client.<span style="color:#06287e">setCallback</span>(callback);
 </span></span><span style="display:flex;"><span>
@@ -440,18 +440,18 @@ messages from your Arduino sketch:</p>
 <p>The Nuki Opener doesn’t support MQTT out of the box, but the Nuki Bridge can
 send Webhook requests. In a few lines of Go, you can forward what the Nuki
 Bridge sends to MQTT:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span><span style="color:#bbb"> </span>main<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span><span style="color:#bbb"> </span>main<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">import</span><span style="color:#bbb"> </span>(<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span><span style="color:#bbb"> </span>(<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;fmt&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;io/ioutil&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;log&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;net/http&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>mqtt<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;github.com/eclipse/paho.mqtt.golang&#34;</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">nukiBridge</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">nukiBridge</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>opts<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>mqtt.<span style="color:#06287e">NewClientOptions</span>().<span style="color:#06287e">AddBroker</span>(<span style="color:#4070a0">&#34;tcp://dr.lan:1883&#34;</span>)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>opts.<span style="color:#06287e">SetClientID</span>(<span style="color:#4070a0">&#34;nuki2mqtt&#34;</span>)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>opts.<span style="color:#06287e">SetConnectRetry</span>(<span style="color:#007020;font-weight:bold">true</span>)<span style="color:#bbb">
@@ -477,13 +477,13 @@ Bridge sends to MQTT:</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>})<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>http.<span style="color:#06287e">ListenAndServe</span>(<span style="color:#4070a0">&#34;:8319&#34;</span>,<span style="color:#bbb"> </span>mux)<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">main</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">main</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#06287e">nukiBridge</span>();<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>log.<span style="color:#06287e">Fatal</span>(err)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div><p>See <a href="https://developer.nuki.io/t/bridge-http-api/26">Nuki’s Bridge HTTP-API</a>
 document for details on how to configure your bridge to send webhook callbacks.</p>
 <h2 id="step-3-express-your-logic">Step 3. Express your logic</h2>
@@ -508,39 +508,39 @@ notifications, or to headless Raspberry Pis.</p>
 <h3 id="regelwerk-control-loops-definition">regelwerk: control loops definition</h3>
 <p><code>regelwerk</code> defines a control loop as a stateful function that accepts an event
 (from MQTT) and returns messages to publish to MQTT, if any:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">type</span><span style="color:#bbb"> </span>controlLoop<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">interface</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">type</span><span style="color:#bbb"> </span>controlLoop<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">interface</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>sync.Locker<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#06287e">StatusString</span>()<span style="color:#bbb"> </span><span style="color:#902000">string</span><span style="color:#bbb"> </span><span style="color:#60a0b0;font-style:italic">// for human introspection</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#06287e">ProcessEvent</span>(MQTTEvent)<span style="color:#bbb"> </span>[]MQTTPublish<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#60a0b0;font-style:italic">// Like mqtt.Message, but with timestamp</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">type</span><span style="color:#bbb"> </span>MQTTEvent<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">struct</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Like mqtt.Message, but with timestamp</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">type</span><span style="color:#bbb"> </span>MQTTEvent<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">struct</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>Timestamp<span style="color:#bbb"> </span>time.Time<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>Topic<span style="color:#bbb">     </span><span style="color:#902000">string</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>Payload<span style="color:#bbb">   </span><span style="color:#007020;font-weight:bold">interface</span>{}<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#60a0b0;font-style:italic">// Parameters for mqtt.Client.Publish()</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">type</span><span style="color:#bbb"> </span>MQTTPublish<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">struct</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Parameters for mqtt.Client.Publish()</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">type</span><span style="color:#bbb"> </span>MQTTPublish<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">struct</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>Topic<span style="color:#bbb">    </span><span style="color:#902000">string</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>Qos<span style="color:#bbb">      </span><span style="color:#902000">byte</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>Retained<span style="color:#bbb"> </span><span style="color:#902000">bool</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>Payload<span style="color:#bbb">  </span><span style="color:#007020;font-weight:bold">interface</span>{}<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div><h3 id="regelwerk-mqtt-dispatcher">regelwerk: MQTT dispatcher</h3>
 <p>Our MQTT message handler dispatches each incoming message to all control loops,
 in one goroutine per message and loop. With typical message volumes on a
 personal MQTT bus, this is a simple yet effective design that brings just enough
 isolation.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">type</span><span style="color:#bbb"> </span>mqttMessageHandler<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">struct</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">type</span><span style="color:#bbb"> </span>mqttMessageHandler<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">struct</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>dryRun<span style="color:#bbb"> </span><span style="color:#902000">bool</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>loops<span style="color:#bbb">  </span>[]controlLoop<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span>(h<span style="color:#bbb"> </span><span style="color:#666">*</span>mqttMessageHandler)<span style="color:#bbb"> </span><span style="color:#06287e">handle</span>(client<span style="color:#bbb"> </span>mqtt.Client,<span style="color:#bbb"> </span>m<span style="color:#bbb"> </span>mqtt.Message)<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span>(h<span style="color:#bbb"> </span><span style="color:#666">*</span>mqttMessageHandler)<span style="color:#bbb"> </span><span style="color:#06287e">handle</span>(client<span style="color:#bbb"> </span>mqtt.Client,<span style="color:#bbb"> </span>m<span style="color:#bbb"> </span>mqtt.Message)<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;received message %q on %q&#34;</span>,<span style="color:#bbb"> </span>m.<span style="color:#06287e">Payload</span>(),<span style="color:#bbb"> </span>m.<span style="color:#06287e">Topic</span>())<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>ev<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>MQTTEvent{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>Timestamp:<span style="color:#bbb"> </span>time.<span style="color:#06287e">Now</span>(),<span style="color:#bbb"> </span><span style="color:#60a0b0;font-style:italic">// consistent for all loops</span><span style="color:#bbb">
@@ -569,7 +569,7 @@ isolation.</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">			</span><span style="color:#60a0b0;font-style:italic">// …input/output logging omitted for brevity…</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>}()<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div><h3 id="regelwerk-control-loop-example">regelwerk: control loop example</h3>
 <p>Now that we have the definition and dispatching out of the way, let’s take a
 look at an actual example control loop.</p>
@@ -581,14 +581,14 @@ and
 <a href="https://github.com/rtr7/router7/blob/c30bf38438b3ba00ae13dff914f0ef4f05684250/cmd/dhcp4d/dhcp4d.go#L405-L433">dhcp4d</a>,
 the output goes to a Sonoff S26 Smart Power Plug running
 <a href="https://tasmota.github.io/docs/">Tasmota</a>.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">type</span><span style="color:#bbb"> </span>avrPowerLoop<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">struct</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">type</span><span style="color:#bbb"> </span>avrPowerLoop<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">struct</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>statusLoop<span style="color:#bbb"> </span><span style="color:#60a0b0;font-style:italic">// for l.statusf() debugging</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>midnaUnlocked<span style="color:#bbb">          </span><span style="color:#902000">bool</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>michaelPhoneExpiration<span style="color:#bbb"> </span>time.Time<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span>(l<span style="color:#bbb"> </span><span style="color:#666">*</span>avrPowerLoop)<span style="color:#bbb"> </span><span style="color:#06287e">ProcessEvent</span>(ev<span style="color:#bbb"> </span>MQTTEvent)<span style="color:#bbb"> </span>[]MQTTPublish<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span>(l<span style="color:#bbb"> </span><span style="color:#666">*</span>avrPowerLoop)<span style="color:#bbb"> </span><span style="color:#06287e">ProcessEvent</span>(ev<span style="color:#bbb"> </span>MQTTEvent)<span style="color:#bbb"> </span>[]MQTTPublish<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// Update loop state based on inputs:</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">switch</span><span style="color:#bbb"> </span>ev.Topic<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">case</span><span style="color:#bbb"> </span><span style="color:#4070a0">&#34;runstatus/midna/i3lock&#34;</span>:<span style="color:#bbb">
@@ -633,7 +633,7 @@ the output goes to a Sonoff S26 Smart Power Plug running
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">			</span>Retained:<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">true</span>,<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>},<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div><h2 id="conclusion">Conclusion</h2>
 <p>I like the Pub/Sub pattern for home automation, as it nicely uncouples all
 components.</p>

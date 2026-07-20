@@ -14,7 +14,7 @@ Because the event is located in another country, many hours of travel away, ther
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured_hu_fb4eb0d6ecb08f81.jpg">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured_hu_1b3b25643fcb21d3.jpg">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -106,7 +106,7 @@ Because the event is located in another country, many hours of travel away, ther
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -315,8 +315,8 @@ for a few hours.</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0484.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0484_hu_14535dbad7bfddc6.jpg 2x,https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0484_hu_922e9517419a793d.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0484_hu_5f273a3b631f4096.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0484_hu_6b36f423f4ec27c5.jpg 2x,https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0484_hu_5561a08e157f8196.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0484_hu_a0a27a149bdc34b2.jpg"
   alt="TP-Link M7350 4G/LTE Mobile Wi-Fi router connected to digitec iot" title="TP-Link M7350 4G/LTE Mobile Wi-Fi router connected to digitec iot"
   width="600"
   height="450"
@@ -406,8 +406,8 @@ a comparison):</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured_hu_76069bc2981b9a05.jpg 2x,https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured_hu_6a8a714e14e8207b.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured_hu_d9b9bca89a19aaac.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured_hu_44801e84b26e099d.jpg 2x,https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured_hu_56f4d401383a0916.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-08-27-out-of-band-remote-console/IMG_0767_featured_hu_c86e1d232e853f25.jpg"
   alt="Raspberry Pi Zero 2 W with USB hub, ethernet and serial" title="Raspberry Pi Zero 2 W with USB hub, ethernet and serial"
   width="600"
   height="600"
@@ -458,28 +458,28 @@ network adapter I had lying around, and my USB-to-serial adapter.</p>
 <h3 id="gokrazy-setup">gokrazy setup</h3>
 <p>Just like in the <a href="https://gokrazy.org/quickstart/">gokrazy quickstart</a>, we’re
 going to create a directory for this gokrazy instance:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#bb60d5">INSTANCE</span><span style="color:#666">=</span>gokrazy/consrv
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#bb60d5">INSTANCE</span><span style="color:#666">=</span>gokrazy/consrv
 </span></span><span style="display:flex;"><span>mkdir -p ~/<span style="color:#70a0d0">${</span><span style="color:#bb60d5">INSTANCE</span>?<span style="color:#70a0d0">}</span>
 </span></span><span style="display:flex;"><span><span style="color:#007020">cd</span> ~/<span style="color:#70a0d0">${</span><span style="color:#bb60d5">INSTANCE</span>?<span style="color:#70a0d0">}</span>
 </span></span><span style="display:flex;"><span>go mod init consrv
 </span></span></code></pre></div><p>You could now directly run <code>gokr-packer</code>, but personally, I like putting the
 <code>gokr-packer</code> command into a
 <a href="https://en.wikipedia.org/wiki/Make_(software)#Makefile"><code>Makefile</code></a> right away:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-makefile" data-lang="makefile"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># The consrv hostname resolves to the device’s Tailscale IP address,
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-makefile" data-lang="makefile"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># The consrv hostname resolves to the device’s Tailscale IP address,
 </span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># once Tailscale is set up.
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#bb60d5">PACKER</span> <span style="color:#666">:=</span> gokr-packer -hostname<span style="color:#666">=</span>consrv
+</span></span></span><span style="display:flex;"><span><span style="color:#bb60d5">PACKER</span> <span style="color:#666">:=</span> gokr-packer -hostname<span style="color:#666">=</span>consrv
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#bb60d5">PKGS</span> <span style="color:#666">:=</span> <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/gokrazy/breakglass <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/gokrazy/timestamps <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/gokrazy/serial-busybox <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/gokrazy/stat/cmd/gokr-webstat <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/gokrazy/stat/cmd/gokr-stat <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/gokrazy/mkfs <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/gokrazy/wifi <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	tailscale.com/cmd/tailscaled <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	tailscale.com/cmd/tailscale <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>	github.com/mdlayher/consrv/cmd/consrv
+</span></span></span><span style="display:flex;"><span>	github.com/gokrazy/breakglass <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>	github.com/gokrazy/timestamps <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>	github.com/gokrazy/serial-busybox <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>	github.com/gokrazy/stat/cmd/gokr-webstat <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>	github.com/gokrazy/stat/cmd/gokr-stat <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>	github.com/gokrazy/mkfs <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>	github.com/gokrazy/wifi <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>	tailscale.com/cmd/tailscaled <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>	tailscale.com/cmd/tailscale <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>	github.com/mdlayher/consrv/cmd/consrv
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#06287e">all</span><span style="color:#666">:</span>
 </span></span><span style="display:flex;"><span>
@@ -504,9 +504,9 @@ otherwise it uses the Out Of Band network.</p>
 to include the device in your Tailscale mesh VPN.</p>
 <h3 id="wifi-internet-connection-and-dual-homing">WiFi internet connection and dual homing</h3>
 <p>Setup WiFi:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>mkdir -p extrafiles/github.com/gokrazy/wifi/etc
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>mkdir -p extrafiles/github.com/gokrazy/wifi/etc
 </span></span><span style="display:flex;"><span>cat <span style="color:#4070a0">&#39;{&#34;ssid&#34;: &#34;oob&#34;, &#34;psk&#34;: &#34;secret&#34;}&#39;</span> <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  &gt; extrafiles/github.com/gokrazy/wifi/etc/wifi.json
+</span></span></span><span style="display:flex;"><span>  &gt; extrafiles/github.com/gokrazy/wifi/etc/wifi.json
 </span></span></code></pre></div><p><code>consrv</code> should use the Out Of Band mobile uplink to reach the internet. At the
 same time, it should still be usable from my home network, too, to make gokrazy
 updates go quickly.</p>
@@ -514,9 +514,9 @@ updates go quickly.</p>
 <p>I arranged for the WiFi interface to have higher route priority (5) than the
 ethernet interface (typically 1, but 11 in our setup thanks to the
 <code>-extra_route_priority=10</code> flag):</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>mkdir -p flags/github.com/gokrazy/gokrazy/cmd/dhcp
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>mkdir -p flags/github.com/gokrazy/gokrazy/cmd/dhcp
 </span></span><span style="display:flex;"><span><span style="color:#007020">echo</span> <span style="color:#4070a0">&#39;-extra_route_priority=10&#39;</span> <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  &gt; flags/github.com/gokrazy/gokrazy/cmd/dhcp/flags.txt
+</span></span></span><span style="display:flex;"><span>  &gt; flags/github.com/gokrazy/gokrazy/cmd/dhcp/flags.txt
 </span></span><span style="display:flex;"><span>make update
 </span></span></code></pre></div><p>Now, <code>tailscale netcheck</code> shows an IPv4 address belonging to Sunrise, the mobile
 network provider behind the digitec iot subscription.</p>
@@ -525,15 +525,15 @@ network provider behind the digitec iot subscription.</p>
 written in Go that Matt Layher and I developed. If you’re curious, you can watch
 the two of us creating it in this twitch stream recording:</p>
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-      <iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" loading="eager" referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube-nocookie.com/embed/1g46ei9aBH0?autoplay=0&amp;controls=1&amp;end=0&amp;loop=0&amp;mute=0&amp;start=0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" title="YouTube video"></iframe>
-    </div>
+			<iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" loading="eager" referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube-nocookie.com/embed/1g46ei9aBH0?autoplay=0&amp;controls=1&amp;end=0&amp;loop=0&amp;mute=0&amp;start=0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" title="YouTube video"></iframe>
+		</div>
 
 <p>The installation of <code>consrv</code> consists of two steps.</p>
 <p>Step 1 is done: we already included <code>consrv</code> in the <code>Makefile</code> earlier in
 <a href="#gokrazy-setup">gokrazy setup</a>.</p>
 <p>So, we only need to configure the desired serial ports in <code>consrv.toml</code> (in
 <a href="https://gokrazy.org/userguide/package-config/#extrafiles">gokrazy extrafiles</a>):</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>mkdir -p extrafiles/github.com/mdlayher/consrv/cmd/consrv/etc/consrv
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>mkdir -p extrafiles/github.com/mdlayher/consrv/cmd/consrv/etc/consrv
 </span></span><span style="display:flex;"><span>cat &gt; extrafiles/github.com/mdlayher/consrv/cmd/consrv/etc/consrv/consrv.toml <span style="color:#4070a0">&lt;&lt;&#39;EOT&#39;
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0">[server]
 </span></span></span><span style="display:flex;"><span><span style="color:#4070a0">address = &#34;:2222&#34;
@@ -551,7 +551,7 @@ the two of us creating it in this twitch stream recording:</p>
 </span></span></code></pre></div><p>Run <code>make update</code> to deploy the configuration to your device.</p>
 <p>If everything is set up correctly, we can now start a serial console session via
 SSH:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>midna% ssh -p 2222 router7@consrv.lan
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>midna% ssh -p 2222 router7@consrv.lan
 </span></span><span style="display:flex;"><span>Warning: Permanently added &#39;[consrv.lan]:2222&#39; (ED25519) to the list of known hosts.
 </span></span><span style="display:flex;"><span>consrv&gt; opened serial connection &#34;router7&#34;: path: &#34;/dev/ttyUSB0&#34;, serial: &#34;01716A92&#34;, baud: 115200
 </span></span><span style="display:flex;"><span>2022/06/19 20:50:47 dns.go:175: probe results: [{upstream: [2001:4860:4860::8888]:53, rtt: 999.665µs} {upstream: [2001:4860:4860::8844]:53, rtt: 2.041079ms} {upstream: 8.8.8.8:53, rtt: 2.073279ms} {upstream: 8.8.4.4:53, rtt: 16.200959ms}]

@@ -14,7 +14,7 @@ On servers, this isn’t what I want — in general it’s helpful for automated
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2024-01-17-systemd-indefinite-service-restarts/systemd-light-vertical-color_hu_d32958f560e13be9.png">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2024-01-17-systemd-indefinite-service-restarts/systemd-light-vertical-color_hu_c0ade14bb3c392a.png">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -106,7 +106,7 @@ On servers, this isn’t what I want — in general it’s helpful for automated
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -246,58 +246,58 @@ systemd does not attempt to restart the service anymore.</p>
 <p>It’s easy to see that for a service which takes, say, 100ms to crash, for
 example because it can’t bind on its listening IP address, this means:</p>
 <table>
-  <thead>
-      <tr>
-          <th>time</th>
-          <th>event</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>T+0</td>
-          <td>first start</td>
-      </tr>
-      <tr>
-          <td>T+100ms</td>
-          <td>first crash</td>
-      </tr>
-      <tr>
-          <td>T+200ms</td>
-          <td>second start</td>
-      </tr>
-      <tr>
-          <td>T+300ms</td>
-          <td>second crash</td>
-      </tr>
-      <tr>
-          <td>T+400ms</td>
-          <td>third start</td>
-      </tr>
-      <tr>
-          <td>T+500ms</td>
-          <td>third crash</td>
-      </tr>
-      <tr>
-          <td>T+600ms</td>
-          <td>fourth start</td>
-      </tr>
-      <tr>
-          <td>T+700ms</td>
-          <td>fourth crash</td>
-      </tr>
-      <tr>
-          <td>T+800ms</td>
-          <td>fifth start</td>
-      </tr>
-      <tr>
-          <td>T+900ms</td>
-          <td>fifth crash within 10s</td>
-      </tr>
-      <tr>
-          <td>T+1s</td>
-          <td>systemd gives up</td>
-      </tr>
-  </tbody>
+	<thead>
+			<tr>
+					<th>time</th>
+					<th>event</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>T+0</td>
+					<td>first start</td>
+			</tr>
+			<tr>
+					<td>T+100ms</td>
+					<td>first crash</td>
+			</tr>
+			<tr>
+					<td>T+200ms</td>
+					<td>second start</td>
+			</tr>
+			<tr>
+					<td>T+300ms</td>
+					<td>second crash</td>
+			</tr>
+			<tr>
+					<td>T+400ms</td>
+					<td>third start</td>
+			</tr>
+			<tr>
+					<td>T+500ms</td>
+					<td>third crash</td>
+			</tr>
+			<tr>
+					<td>T+600ms</td>
+					<td>fourth start</td>
+			</tr>
+			<tr>
+					<td>T+700ms</td>
+					<td>fourth crash</td>
+			</tr>
+			<tr>
+					<td>T+800ms</td>
+					<td>fifth start</td>
+			</tr>
+			<tr>
+					<td>T+900ms</td>
+					<td>fifth crash within 10s</td>
+			</tr>
+			<tr>
+					<td>T+1s</td>
+					<td>systemd gives up</td>
+			</tr>
+	</tbody>
 </table>
 <h2 id="why-does-systemd-give-up-by-default">Why does systemd give up by default?</h2>
 <p>I’m not sure. If I had to speculate, I would guess the developers wanted to

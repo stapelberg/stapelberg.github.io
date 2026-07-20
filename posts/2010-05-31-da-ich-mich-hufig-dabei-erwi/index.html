@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,11 +179,11 @@
 <h1 class="ms_title"> Da ich mich häufig dabei erwi… (2010)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2010-05-31, last modified 2018-03-23</div>
+  <div id="ms_date">published 2010-05-31, last modified 2026-07-20</div>
   
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2010-05-31-Da-ich-mich-hufig-dabei-erwi.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2010-05-31-Da-ich-mich-hufig-dabei-erwi.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -196,7 +196,6 @@ Perl suchen den letzten Coredump (dazu muss das Coredump-Pattern mit
 <code>sysctl -w kernel.core_pattern = %e.core.%p</code> sinnvoll definiert
 sein) und starten gdb mit den passenden Optionen:
 </p>
-
 <pre>
 #!/usr/bin/env perl                                      
 # vim:ts=4:sw=4:expandtab:ft=perl
@@ -220,7 +219,6 @@ my ($program, $args) = ($call =~ /([^ ]+) (.+)/);
 say "Running: gdb $program -c $newest_dump --args $program $args";
 system "gdb $program -c $newest_dump --args $program $args";
 </pre>
-
 <div id="bmc">
   <p>
     Did you like this

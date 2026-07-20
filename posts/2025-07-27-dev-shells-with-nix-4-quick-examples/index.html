@@ -14,7 +14,7 @@ This seemed like a good example use-case to demonstrate a couple of Nix commands
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2025-07-27-dev-shells-with-nix-4-quick-examples/2025-07-19-emacs-nix-shell_hu_60f740222093088f.jpg">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2025-07-27-dev-shells-with-nix-4-quick-examples/2025-07-19-emacs-nix-shell_hu_8a46fc4eea8409d8.jpg">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -106,7 +106,7 @@ This seemed like a good example use-case to demonstrate a couple of Nix commands
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -252,13 +252,13 @@ Flakes (see <a href="#setup">setup</a>).</p>
 <p>Before we start looking at Nix, I will show how to get GoCV running on Debian.</p>
 <p>Let’s create a minimal Go program which uses a GoCV function like
 <code>gocv.NewMat()</code>, just to verify that we can compile this program:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span><span style="color:#bbb"> </span>main<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span><span style="color:#bbb"> </span>main<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">import</span><span style="color:#bbb"> </span><span style="color:#4070a0">&#34;gocv.io/x/gocv&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span><span style="color:#bbb"> </span><span style="color:#4070a0">&#34;gocv.io/x/gocv&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">main</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">main</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>gocv.<span style="color:#06287e">NewMat</span>()<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div><p>If we try to build this on a Debian system, we get:</p>
 <pre tabindex="0"><code>debian % mkdir -p /tmp/minimal
 debian % cd /tmp/minimal
@@ -384,7 +384,7 @@ version (outside the dev shell), which cannot find <code>opencv4.pc</code>.</p>
 example, just <code>pkg-config</code> and <code>opencv</code>), we can create a <code>shell.nix</code> (in any
 directory, but usually in the root of a project) which <code>nix-shell</code> (without the
 <code>-p</code> flag) will read:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  pkgs <span style="color:#666">?</span> <span style="color:#007020;font-weight:bold">import</span> <span style="color:#235388">&lt;nixpkgs&gt;</span> { }<span style="color:#666">,</span>
 </span></span><span style="display:flex;"><span>}:
 </span></span><span style="display:flex;"><span>pkgs<span style="color:#666">.</span>mkShell {
@@ -436,8 +436,8 @@ over <code>opencv</code>, I got to <code>opencv/4.x.nix</code> in my local Nix s
 
 
 <a href="https://michael.stapelberg.ch/posts/2025-07-27-dev-shells-with-nix-4-quick-examples/2025-07-19-emacs-nix-shell.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2025-07-27-dev-shells-with-nix-4-quick-examples/2025-07-19-emacs-nix-shell_hu_6ca6f897c44d3994.jpg 2x,https://michael.stapelberg.ch/posts/2025-07-27-dev-shells-with-nix-4-quick-examples/2025-07-19-emacs-nix-shell_hu_ebe840dd6e5fb84c.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2025-07-27-dev-shells-with-nix-4-quick-examples/2025-07-19-emacs-nix-shell_hu_9fd651da07f25ae.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2025-07-27-dev-shells-with-nix-4-quick-examples/2025-07-19-emacs-nix-shell_hu_7584696e56032065.jpg 2x,https://michael.stapelberg.ch/posts/2025-07-27-dev-shells-with-nix-4-quick-examples/2025-07-19-emacs-nix-shell_hu_bcaa5e595e44c610.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2025-07-27-dev-shells-with-nix-4-quick-examples/2025-07-19-emacs-nix-shell_hu_aa914c7ef06d1901.jpg"
   alt="Emacs showing opencv/4.x.nix after jumping to definition of opencv" title="Emacs showing opencv/4.x.nix after jumping to definition of opencv"
   width="600"
   height="374"
@@ -466,7 +466,7 @@ structure around it: The <code>mkShell</code> expression goes into the
 contains <a href="https://nix.dev/manual/nix/2.28/command-ref/new-cli/nix3-flake.html#flake-references">Flake
 references</a>
 that are available to this build:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  inputs<span style="color:#666">.</span>nixpkgs<span style="color:#666">.</span>url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:NixOS/nixpkgs/nixos-25.05&#34;</span>;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>  outputs <span style="color:#666">=</span>
@@ -508,7 +508,7 @@ criticism of Nix Flakes.</p>
 <code>flake.nix</code> to use its
 <a href="https://github.com/numtide/flake-utils?tab=readme-ov-file#eachdefaultsystem--system---attrs"><code>eachDefaultSystem</code></a>
 convenience function:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  inputs <span style="color:#666">=</span> {
 </span></span><span style="display:flex;"><span>    nixpkgs<span style="color:#666">.</span>url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:nixos/nixpkgs/nixos-25.05&#34;</span>;
 </span></span><span style="display:flex;"><span>    flake-utils<span style="color:#666">.</span>url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:numtide/flake-utils&#34;</span>;
@@ -562,40 +562,40 @@ shell with <code>nix-shell</code> or <code>nix develop</code>.</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>How do the four examples above compare? Here’s an overview:</p>
 <table>
-  <thead>
-      <tr>
-          <th>Example</th>
-          <th>Boilerplate</th>
-          <th>Pinned?</th>
-          <th>System-dependent?</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td><a href="#nix-shell">Ex 1</a>: <code>nix-shell -p …</code></td>
-          <td>😊</td>
-          <td>no</td>
-          <td>no</td>
-      </tr>
-      <tr>
-          <td><a href="#shell.nix">Ex 2</a>: <code>shell.nix</code></td>
-          <td>🙂</td>
-          <td>no</td>
-          <td>no</td>
-      </tr>
-      <tr>
-          <td><a href="#nix-flakes">Ex 3</a>: <code>flake.nix</code></td>
-          <td>😲</td>
-          <td>yes</td>
-          <td>yes</td>
-      </tr>
-      <tr>
-          <td><a href="#system-indep-flake">Ex 4</a>: system-independent <code>flake.nix</code></td>
-          <td>🤨</td>
-          <td>yes</td>
-          <td>no</td>
-      </tr>
-  </tbody>
+	<thead>
+			<tr>
+					<th>Example</th>
+					<th>Boilerplate</th>
+					<th>Pinned?</th>
+					<th>System-dependent?</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><a href="#nix-shell">Ex 1</a>: <code>nix-shell -p …</code></td>
+					<td>😊</td>
+					<td>no</td>
+					<td>no</td>
+			</tr>
+			<tr>
+					<td><a href="#shell.nix">Ex 2</a>: <code>shell.nix</code></td>
+					<td>🙂</td>
+					<td>no</td>
+					<td>no</td>
+			</tr>
+			<tr>
+					<td><a href="#nix-flakes">Ex 3</a>: <code>flake.nix</code></td>
+					<td>😲</td>
+					<td>yes</td>
+					<td>yes</td>
+			</tr>
+			<tr>
+					<td><a href="#system-indep-flake">Ex 4</a>: system-independent <code>flake.nix</code></td>
+					<td>🤨</td>
+					<td>yes</td>
+					<td>no</td>
+			</tr>
+	</tbody>
 </table>
 <p>For personal one-off experiments, I use <code>nix-shell</code>.</p>
 <p>Once the experiment works, I typically want to pin the dependencies, so I use a

@@ -107,7 +107,7 @@ in other words: the component which verifies usernames and passwords.
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -222,19 +222,19 @@ guide until I had dex serving the example config.</p>
 <li>Configure GitLab’s redirect URI.</li>
 </ol>
 <p>Here is a diff:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#a00000">--- /proc/self/fd/11	2017-10-21 15:01:49.005587935 +0200
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ /tmp/config-dev.yaml	2017-10-21 15:01:47.121632025 +0200
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -1,7 +1,7 @@
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span> # The base path of dex and the external name of the OpenID Connect service.
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#a00000">--- /proc/self/fd/11	2017-10-21 15:01:49.005587935 +0200
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+++ /tmp/config-dev.yaml	2017-10-21 15:01:47.121632025 +0200
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -1,7 +1,7 @@
+</span></span></span><span style="display:flex;"><span> # The base path of dex and the external name of the OpenID Connect service.
 </span></span><span style="display:flex;"><span> # This is the canonical URL that all clients MUST use to refer to dex. If a
 </span></span><span style="display:flex;"><span> # path is provided, dex&#39;s HTTP service will listen at a non-root URL.
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-issuer: http://127.0.0.1:5556/dex
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+issuer: https://dex.example.net:5554/dex
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+issuer: https://dex.example.net:5554/dex
+</span></span></span><span style="display:flex;"><span> 
 </span></span><span style="display:flex;"><span> # The storage configuration determines where dex stores its state. Supported
 </span></span><span style="display:flex;"><span> # options include SQL flavors and Kubernetes third party resources.
 </span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -14,11 +14,9 @@
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span> 
+</span></span></span><span style="display:flex;"><span> 
 </span></span><span style="display:flex;"><span> # Configuration for the HTTP endpoints.
 </span></span><span style="display:flex;"><span> web:
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-  http: 0.0.0.0:5556
@@ -242,19 +242,19 @@ guide until I had dex serving the example config.</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#a00000">-  # https: 127.0.0.1:5554
 </span></span></span><span style="display:flex;"><span><span style="color:#a00000">-  # tlsCert: /etc/dex/tls.crt
 </span></span></span><span style="display:flex;"><span><span style="color:#a00000">-  # tlsKey: /etc/dex/tls.key
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+  https: dex.example.net:5554
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+  https: dex.example.net:5554
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+  tlsCert: /etc/letsencrypt/live/dex.example.net/fullchain.pem
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+  tlsKey: /etc/letsencrypt/live/dex.example.net/privkey.pem
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 
+</span></span></span><span style="display:flex;"><span> 
 </span></span><span style="display:flex;"><span> # Uncomment this block to enable the gRPC API. This values MUST be different
 </span></span><span style="display:flex;"><span> # from the HTTP endpoints.
 </span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -50,7 +48,7 @@
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span> staticClients:
+</span></span></span><span style="display:flex;"><span> staticClients:
 </span></span><span style="display:flex;"><span> - id: example-app
 </span></span><span style="display:flex;"><span>   redirectURIs:
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-  - &#39;http://127.0.0.1:5555/callback&#39;
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+  - &#39;http://gitlab.example.net/users/auth/mydex/callback&#39;
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>   name: &#39;Example App&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+  - &#39;http://gitlab.example.net/users/auth/mydex/callback&#39;
+</span></span></span><span style="display:flex;"><span>   name: &#39;Example App&#39;
 </span></span><span style="display:flex;"><span>   secret: ZXhhbXBsZS1hcHAtc2VjcmV0
 </span></span></code></pre></div><h3 id="step-2-configure-gitlab">Step 2: configure GitLab</h3>
 <p>First, I followed <a href="https://docs.gitlab.com/omnibus/docker/">GitLab Docker
@@ -314,16 +314,16 @@ gitlab_rails[&#39;omniauth_providers&#39;] = [
 </code></pre><h3 id="step-3-patch-omniauth-openid-connect">Step 3: patch omniauth-openid-connect</h3>
 <p>Until <a href="https://github.com/coreos/dex/issues/376">dex issue #376</a> is fixed, the
 following patch for the omniauth-openid-connect gem is required:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#a00000">--- /opt/gitlab/embedded/lib/ruby/gems/2.3.0/gems/omniauth-openid-connect-0.2.3/lib/omniauth/strategies/openid_connect.rb.orig	2017-10-21 12:31:50.777602847 +0000
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ /opt/gitlab/embedded/lib/ruby/gems/2.3.0/gems/omniauth-openid-connect-0.2.3/lib/omniauth/strategies/openid_connect.rb	2017-10-21 12:34:20.063308560 +0000
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -42,24 +42,13 @@
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>       option :send_nonce, true
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#a00000">--- /opt/gitlab/embedded/lib/ruby/gems/2.3.0/gems/omniauth-openid-connect-0.2.3/lib/omniauth/strategies/openid_connect.rb.orig	2017-10-21 12:31:50.777602847 +0000
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+++ /opt/gitlab/embedded/lib/ruby/gems/2.3.0/gems/omniauth-openid-connect-0.2.3/lib/omniauth/strategies/openid_connect.rb	2017-10-21 12:34:20.063308560 +0000
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -42,24 +42,13 @@
+</span></span></span><span style="display:flex;"><span>       option :send_nonce, true
 </span></span><span style="display:flex;"><span>       option :client_auth_method
 </span></span><span style="display:flex;"><span> 
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-      uid { user_info.sub }
 </span></span></span><span style="display:flex;"><span><span style="color:#a00000">-
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+      uid { @email }
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>       info do
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+      uid { @email }
+</span></span></span><span style="display:flex;"><span>       info do
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-        {
 </span></span></span><span style="display:flex;"><span><span style="color:#a00000">-          name: user_info.name,
 </span></span></span><span style="display:flex;"><span><span style="color:#a00000">-          email: user_info.email,
@@ -335,21 +335,21 @@ following patch for the omniauth-openid-connect gem is required:</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#a00000">-          phone: user_info.phone_number,
 </span></span></span><span style="display:flex;"><span><span style="color:#a00000">-          urls: { website: user_info.website }
 </span></span></span><span style="display:flex;"><span><span style="color:#a00000">-        }
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+        { email: @email }
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>       end
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+        { email: @email }
+</span></span></span><span style="display:flex;"><span>       end
 </span></span><span style="display:flex;"><span> 
 </span></span><span style="display:flex;"><span>       extra do
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-        {raw_info: user_info.raw_attributes}
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+        {raw_info: {}}
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>       end
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+        {raw_info: {}}
+</span></span></span><span style="display:flex;"><span>       end
 </span></span><span style="display:flex;"><span> 
 </span></span><span style="display:flex;"><span>       credentials do
 </span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -165,6 +154,7 @@
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>               client_id: client_options.identifier,
+</span></span></span><span style="display:flex;"><span>               client_id: client_options.identifier,
 </span></span><span style="display:flex;"><span>               nonce: stored_nonce
 </span></span><span style="display:flex;"><span>           )
 </span></span><span style="display:flex;"><span><span style="color:#00a000">+          @email = _id_token.raw_attributes[&#39;email&#39;]
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>           _access_token
+</span></span></span><span style="display:flex;"><span>           _access_token
 </span></span><span style="display:flex;"><span>         }.call()
 </span></span><span style="display:flex;"><span>       end
 </span></span></code></pre></div><div id="bmc">

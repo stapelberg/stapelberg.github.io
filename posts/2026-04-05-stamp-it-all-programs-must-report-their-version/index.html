@@ -12,7 +12,7 @@
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-05-lea-common-case-build-from-git-featured_hu_574969fcd942fcaa.png">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-05-lea-common-case-build-from-git-featured_hu_2c5ac5fe0767919a.png">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -103,7 +103,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -274,8 +274,8 @@ dishwasher:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-04-feuermurmel-dishwasher-versioning.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-04-feuermurmel-dishwasher-versioning_hu_1d046eb0df440b85.jpg 2x,https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-04-feuermurmel-dishwasher-versioning_hu_1a09cac140bcb1d2.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-04-feuermurmel-dishwasher-versioning_hu_9dd1db4e61dd3ec0.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-04-feuermurmel-dishwasher-versioning_hu_b0aacbc1f55d6a32.jpg 2x,https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-04-feuermurmel-dishwasher-versioning_hu_eda51a12209b7f34.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-04-feuermurmel-dishwasher-versioning_hu_c593ca2b227d5973.jpg"
   alt="a dishwasher, with many precise bits of version information" title="a dishwasher, with many precise bits of version information"
   width="600"
   height="450"
@@ -322,7 +322,7 @@ for user support, it is very valuable for programs to clearly identify
 themselves. Let me illustrate with the following case study.</p>
 <h2 id="i3-moreversion">Case Study: i3’s <code>--version</code> and <code>--moreversion</code></h2>
 <p>When running <code>i3 --version</code>, you will see output like this:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% i3 --version
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% i3 --version
 </span></span><span style="display:flex;"><span>i3 version 4.24 (2024-11-06) © 2009 Michael Stapelberg and contributors
 </span></span></code></pre></div><p>Each word was carefully deliberated and placed. Let me dissect:</p>
 <ol>
@@ -403,7 +403,7 @@ your X11 session using <a href="https://i3wm.org/docs/ipc.html">its IPC (interpr
 interface</a> and reports the running i3 process’s
 version, alongside other key details that are helpful to show the user, like
 which configuration file is loaded and when it was last changed:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% i3 --moreversion
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% i3 --moreversion
 </span></span><span style="display:flex;"><span>Binary i3 version:  4.24 (2024-11-06) © 2009 Michael Stapelberg and…
 </span></span><span style="display:flex;"><span>Running i3 version: 4.24 (2024-11-06) (pid 2521)
 </span></span><span style="display:flex;"><span>Loaded i3 config:
@@ -439,18 +439,18 @@ editing the wrong file.</p>
 </ol>
 <p>I use NixOS, BTW, so I automatically get a stable identifier
 (<code>0zn9r4263fjpqah6vdzlalfn0ahp8xc2-i3-4.24</code>) for <em>the specific build</em> of i3.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% ls -l $(which i3)
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% ls -l $(which i3)
 </span></span><span style="display:flex;"><span>lrwxrwxrwx 1 root root 58 1970-01-01 01:00 /run/current-system/sw/bin/i3
 </span></span><span style="display:flex;"><span>-&gt; /nix/store/0zn9r4263fjpqah6vdzlalfn0ahp8xc2-i3-4.24/bin/i3
 </span></span></code></pre></div><p>To see the build recipe (“derivation” in Nix terminology) which produced this
 Nix store output (<code>0zn9r4263…-i3-4.24</code>), I can run <code>nix derivation show</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% nix derivation show /nix/store/0zn9r4263fjpqah6vdzlalfn0ahp8xc2-i3-4.24
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% nix derivation show /nix/store/0zn9r4263fjpqah6vdzlalfn0ahp8xc2-i3-4.24
 </span></span><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  &#34;/nix/store/z7ly4kvgixf29rlz01ji4nywbajfifk4-i3-4.24.drv&#34;: {
 </span></span><span style="display:flex;"><span>[…]
 </span></span></code></pre></div><details>
 <summary>Click here to expand the full <code>nix derivation show</code> output if you are curious</summary>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% nix derivation show /nix/store/0zn9r4263fjpqah6vdzlalfn0ahp8xc2-i3-4.24
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% nix derivation show /nix/store/0zn9r4263fjpqah6vdzlalfn0ahp8xc2-i3-4.24
 </span></span><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  &#34;/nix/store/z7ly4kvgixf29rlz01ji4nywbajfifk4-i3-4.24.drv&#34;: {
 </span></span><span style="display:flex;"><span>    &#34;args&#34;: [
@@ -911,8 +911,8 @@ and no VCS buildinfo, because it currently suffers from the same gap as Nix:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-03-29-gokrazy-scan2drive-rsync.png"><img
-  srcset="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-03-29-gokrazy-scan2drive-rsync_hu_b9f20b08c5492d94.png 2x,https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-03-29-gokrazy-scan2drive-rsync_hu_ec0d408518026341.png 3x"
-  src="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-03-29-gokrazy-scan2drive-rsync_hu_16984c2d1be3db9c.png"
+  srcset="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-03-29-gokrazy-scan2drive-rsync_hu_bdda2b3931bb0cee.png 2x,https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-03-29-gokrazy-scan2drive-rsync_hu_f5be822c1490d069.png 3x"
+  src="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-03-29-gokrazy-scan2drive-rsync_hu_8f704022ad0a233b.png"
   alt="gokrazy scan2drive rsync" title="gokrazy scan2drive rsync"
   width="600"
   height="433"
@@ -937,38 +937,38 @@ extracts the revision from the Go module version of the main module
 <p>What are the other cases? These examples illustrate the scenarios I usually deal
 with:</p>
 <table>
-  <thead>
-      <tr>
-          <th>source (built from)</th>
-          <th>buildinfo (stamped into program)</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>directory (no git)</td>
-          <td>module <code>(devel)</code></td>
-      </tr>
-      <tr>
-          <td>Go module</td>
-          <td>module <code>v0.3.1-0.20260105212325-5347ac5f5bcb</code></td>
-      </tr>
-      <tr>
-          <td>directory (git)</td>
-          <td>module <code>v0.0.0-20260131174001-ccb1d233f2a4+dirty</code></td>
-      </tr>
-      <tr>
-          <td></td>
-          <td><code>vcs.revision=ccb1d233f2a43e9118b9146b3c9a5ded1efb7551</code></td>
-      </tr>
-      <tr>
-          <td></td>
-          <td><code>vcs.time=2026-01-31T17:40:01Z</code></td>
-      </tr>
-      <tr>
-          <td></td>
-          <td><code>vcs.modified=true</code></td>
-      </tr>
-  </tbody>
+	<thead>
+			<tr>
+					<th>source (built from)</th>
+					<th>buildinfo (stamped into program)</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>directory (no git)</td>
+					<td>module <code>(devel)</code></td>
+			</tr>
+			<tr>
+					<td>Go module</td>
+					<td>module <code>v0.3.1-0.20260105212325-5347ac5f5bcb</code></td>
+			</tr>
+			<tr>
+					<td>directory (git)</td>
+					<td>module <code>v0.0.0-20260131174001-ccb1d233f2a4+dirty</code></td>
+			</tr>
+			<tr>
+					<td></td>
+					<td><code>vcs.revision=ccb1d233f2a43e9118b9146b3c9a5ded1efb7551</code></td>
+			</tr>
+			<tr>
+					<td></td>
+					<td><code>vcs.time=2026-01-31T17:40:01Z</code></td>
+			</tr>
+			<tr>
+					<td></td>
+					<td><code>vcs.modified=true</code></td>
+			</tr>
+	</tbody>
 </table>
 
 
@@ -988,14 +988,14 @@ margin-right: 1rem"
 
 <details>
 <summary>Go code to programmatically read the version</summary>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span><span style="color:#bbb"> </span>version<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span><span style="color:#bbb"> </span>version<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">import</span><span style="color:#bbb"> </span>(<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span><span style="color:#bbb"> </span>(<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;runtime/debug&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;strings&#34;</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">readParts</span>()<span style="color:#bbb"> </span>(revision<span style="color:#bbb"> </span><span style="color:#902000">string</span>,<span style="color:#bbb"> </span>modified,<span style="color:#bbb"> </span>ok<span style="color:#bbb"> </span><span style="color:#902000">bool</span>)<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">readParts</span>()<span style="color:#bbb"> </span>(revision<span style="color:#bbb"> </span><span style="color:#902000">string</span>,<span style="color:#bbb"> </span>modified,<span style="color:#bbb"> </span>ok<span style="color:#bbb"> </span><span style="color:#902000">bool</span>)<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>info,<span style="color:#bbb"> </span>ok<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>debug.<span style="color:#06287e">ReadBuildInfo</span>()<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>!ok<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#4070a0">&#34;&#34;</span>,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">false</span>,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">false</span><span style="color:#bbb">
@@ -1015,9 +1015,9 @@ margin-right: 1rem"
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>v[idx<span style="color:#666">+</span><span style="color:#40a070">1</span>:],<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">false</span>,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">true</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#4070a0">&#34;&lt;BUG&gt;&#34;</span>,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">false</span>,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">false</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">Read</span>()<span style="color:#bbb"> </span><span style="color:#902000">string</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">Read</span>()<span style="color:#bbb"> </span><span style="color:#902000">string</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>revision,<span style="color:#bbb"> </span>modified,<span style="color:#bbb"> </span>ok<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#06287e">readParts</span>()<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>!ok<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#4070a0">&#34;&lt;not okay&gt;&#34;</span><span style="color:#bbb">
@@ -1028,7 +1028,7 @@ margin-right: 1rem"
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#4070a0">&#34;https://github.com/gokrazy/tools/commit/&#34;</span><span style="color:#bbb"> </span><span style="color:#666">+</span><span style="color:#bbb"> </span>revision<span style="color:#bbb"> </span><span style="color:#666">+</span><span style="color:#bbb"> </span>modifiedSuffix<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div></details>
 <p>This is what it looks like in practice:</p>
 <pre tabindex="0"><code>% go install github.com/gokrazy/tools/cmd/gok@latest
@@ -1090,7 +1090,7 @@ and add a few lines of metadata.</p>
 or <code>buildGoLatestModule</code> if I need the latest Go version. Instead of using
 <code>fetchFromGitHub</code>, I provide my sources using Flakes, usually also from GitHub
 or from another Git repository. For example, I package <code>gokrazy/bull</code> like so:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  pkgs<span style="color:#666">,</span>
 </span></span><span style="display:flex;"><span>  pkgs-unstable<span style="color:#666">,</span>
 </span></span><span style="display:flex;"><span>  bullsrc<span style="color:#666">,</span>
@@ -1113,7 +1113,7 @@ or from another Git repository. For example, I package <code>gokrazy/bull</code>
 </span></span></code></pre></div><p>The <code>bullsrc</code> comes from my <code>flake.nix</code>:</p>
 <details>
 <summary>Click here to expand the full <code>flake.nix</code></summary>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  inputs <span style="color:#666">=</span> {
 </span></span><span style="display:flex;"><span>    nixpkgs<span style="color:#666">.</span>url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:nixos/nixpkgs/nixos-25.11&#34;</span>;
 </span></span><span style="display:flex;"><span>    nixpkgs-unstable<span style="color:#666">.</span>url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:nixos/nixpkgs/nixos-unstable&#34;</span>;
@@ -1210,7 +1210,7 @@ or from another Git repository. For example, I package <code>gokrazy/bull</code>
 <li>The stamped buildinfo does not contain any <code>vcs</code> information.</li>
 </ul>
 <p>Here’s a full example of gokrazy/bull:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% go version -m \
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;display:grid;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% go version -m \
 </span></span><span style="display:flex;"><span>  /nix/store/z3y90ck0fp1wwd4scljffhwxcrxjhb9j-bull-unstable/bin/bull
 </span></span><span style="display:flex;"><span>/nix/store/z3y90ck0fp1wwd4scljffhwxcrxjhb9j-bull-unstable/bin/bull: go1.26.1
 </span></span><span style="display:flex;"><span>        path    github.com/gokrazy/bull/cmd/bull
@@ -1231,7 +1231,7 @@ or from another Git repository. For example, I package <code>gokrazy/bull</code>
 </span></span><span style="display:flex; background-color:#d8d8d8"><span>        build   GOOS=linux
 </span></span><span style="display:flex; background-color:#d8d8d8"><span>        build   GOAMD64=v1</span></span></code></pre></div>
 <p>To fix VCS stamping, add my <code>goVcsStamping</code> overlay to your <code>nixosSystem.modules</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  nixpkgs<span style="color:#666">.</span>overlays <span style="color:#666">=</span> [
 </span></span><span style="display:flex;"><span>    stapelbergnix<span style="color:#666">.</span>overlays<span style="color:#666">.</span>goVcsStamping
 </span></span><span style="display:flex;"><span>  ];

@@ -6,6 +6,9 @@
 
 
   <id>https://michael.stapelberg.ch/posts/tags/golang/</id>
+  <author>
+    <name>Michael Stapelberg</name>
+  </author>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
     <title type="html"><![CDATA[How my minimal, memory-safe Go rsync steers clear of vulnerabilities]]></title>
@@ -97,16 +100,16 @@ report</a>)</summary>
 The corresponding code can be seen below:
 <a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/sender.c#L96-L100">sender.c</a>:</li>
 </ol>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>s<span style="color:#666">-&gt;</span>sums <span style="color:#666">=</span> <span style="color:#06287e">new_array</span>(<span style="color:#007020;font-weight:bold">struct</span> sum_buf, s<span style="color:#666">-&gt;</span>count);
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>s<span style="color:#666">-&gt;</span>sums <span style="color:#666">=</span> <span style="color:#06287e">new_array</span>(<span style="color:#007020;font-weight:bold">struct</span> sum_buf, s<span style="color:#666">-&gt;</span>count);
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">for</span> (i <span style="color:#666">=</span> <span style="color:#40a070">0</span>; i <span style="color:#666">&lt;</span> s<span style="color:#666">-&gt;</span>count; i<span style="color:#666">++</span>) {
 </span></span><span style="display:flex;"><span>    s<span style="color:#666">-&gt;</span>sums[i].sum1 <span style="color:#666">=</span> <span style="color:#06287e">read_int</span>(f);
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">read_buf</span>(f, s<span style="color:#666">-&gt;</span>sums[i].sum2, s<span style="color:#666">-&gt;</span>s2length);
 </span></span></code></pre></div><p>Most importantly, note that <code>sum2</code> field is filled with <code>s-&gt;s2length</code> bytes. <code>sum2</code> always has a size of 16:
 <a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/rsync.h#L955-L962">rsync.h</a></p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#define SUM_LENGTH 16
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span><span style="color:#60a0b0;font-style:italic">// …
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">struct</span> sum_buf {
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#define SUM_LENGTH 16
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// …
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">struct</span> sum_buf {
 </span></span><span style="display:flex;"><span>    OFF_T offset;           <span style="color:#60a0b0;font-style:italic">/**&lt; offset in file of this chunk */</span>
 </span></span><span style="display:flex;"><span>    int32 len;              <span style="color:#60a0b0;font-style:italic">/**&lt; length of chunk of file */</span>
 </span></span><span style="display:flex;"><span>    uint32 sum1;            <span style="color:#60a0b0;font-style:italic">/**&lt; simple checksum */</span>
@@ -116,7 +119,7 @@ The corresponding code can be seen below:
 </span></span><span style="display:flex;"><span>};
 </span></span></code></pre></div><p><code>s2length</code> is an attacker-controlled value and can have a value up to <code>MAX_DIGEST_LEN</code> bytes, as the next snipper shows:</p>
 <p><a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/io.c#L1979-L1984">io.c</a></p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>sum<span style="color:#666">-&gt;</span>s2length <span style="color:#666">=</span> protocol_version <span style="color:#666">&lt;</span> <span style="color:#40a070">27</span> <span style="color:#666">?</span> <span style="color:#002070;font-weight:bold">csum_length</span> : (<span style="color:#902000">int</span>)<span style="color:#06287e">read_int</span>(f);
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>sum<span style="color:#666">-&gt;</span>s2length <span style="color:#666">=</span> protocol_version <span style="color:#666">&lt;</span> <span style="color:#40a070">27</span> <span style="color:#666">?</span> <span style="color:#002070;font-weight:bold">csum_length</span> : (<span style="color:#902000">int</span>)<span style="color:#06287e">read_int</span>(f);
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (sum<span style="color:#666">-&gt;</span>s2length <span style="color:#666">&lt;</span> <span style="color:#40a070">0</span> <span style="color:#666">||</span> sum<span style="color:#666">-&gt;</span>s2length <span style="color:#666">&gt;</span> MAX_DIGEST_LEN) {
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">rprintf</span>(FERROR, <span style="color:#4070a0">&#34;Invalid checksum length %d [%s]</span><span style="color:#4070a0;font-weight:bold">\n</span><span style="color:#4070a0">&#34;</span>,
 </span></span><span style="display:flex;"><span>            sum<span style="color:#666">-&gt;</span>s2length, <span style="color:#06287e">who_am_i</span>());
@@ -124,16 +127,16 @@ The corresponding code can be seen below:
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>The problem here is that <code>MAX_DIGEST_LEN</code> can be larger than 16 bytes, depending on the digest support the binary was compiled with:</p>
 <p><a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/lib/md-defines.h#L11-L21">md-defines.h</a></p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#define MD4_DIGEST_LEN 16
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#define MD4_DIGEST_LEN 16
 </span></span></span><span style="display:flex;"><span><span style="color:#007020">#define MD5_DIGEST_LEN 16
 </span></span></span><span style="display:flex;"><span><span style="color:#007020">#if defined SHA512_DIGEST_LENGTH
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>  <span style="color:#007020">#define MAX_DIGEST_LEN SHA512_DIGEST_LENGTH
+</span></span></span><span style="display:flex;"><span>  <span style="color:#007020">#define MAX_DIGEST_LEN SHA512_DIGEST_LENGTH
 </span></span></span><span style="display:flex;"><span><span style="color:#007020">#elif defined SHA256_DIGEST_LENGTH
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>  <span style="color:#007020">#define MAX_DIGEST_LEN SHA256_DIGEST_LENGTH
+</span></span></span><span style="display:flex;"><span>  <span style="color:#007020">#define MAX_DIGEST_LEN SHA256_DIGEST_LENGTH
 </span></span></span><span style="display:flex;"><span><span style="color:#007020">#elif defined SHA_DIGEST_LENGTH
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>  <span style="color:#007020">#define MAX_DIGEST_LEN SHA_DIGEST_LENGTH
+</span></span></span><span style="display:flex;"><span>  <span style="color:#007020">#define MAX_DIGEST_LEN SHA_DIGEST_LENGTH
 </span></span></span><span style="display:flex;"><span><span style="color:#007020">#else
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>  <span style="color:#007020">#define MAX_DIGEST_LEN MD5_DIGEST_LEN </span><span style="color:#60a0b0;font-style:italic">/* 16 bytes */</span><span style="color:#007020">
+</span></span></span><span style="display:flex;"><span>  <span style="color:#007020">#define MAX_DIGEST_LEN MD5_DIGEST_LEN </span><span style="color:#60a0b0;font-style:italic">/* 16 bytes */</span><span style="color:#007020">
 </span></span></span><span style="display:flex;"><span><span style="color:#007020">#endif
 </span></span></span></code></pre></div><p><code>SHA256</code> support is common and sets the <code>MAX_DIGEST_LENGTH</code> value to 64. As a
 result, an attacker can write up to 48 bytes past the <code>sum2</code> buffer limit.</p>
@@ -157,17 +160,17 @@ header at all — oops!</p>
 on an attempt to <a href="https://github.com/gokrazy/rsync/blob/3a9d1ec136e049b2bffc9db15230eb70308ac90d/rsyncd/sender.go#L136">write out of
 bounds</a>
 by changing the code like so and running the tests:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/types.go w/types.go
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/types.go w/types.go
 </span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">index 5601697..899fcb8 100644
-</span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold"></span><span style="color:#a00000">--- i/types.go
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ w/types.go
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -59,7 +59,7 @@ func (sh *SumHead) WriteTo(c *rsyncwire.Conn) error {
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span> 	var buf rsyncwire.Buffer
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">--- i/types.go
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+++ w/types.go
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -59,7 +59,7 @@ func (sh *SumHead) WriteTo(c *rsyncwire.Conn) error {
+</span></span></span><span style="display:flex;"><span> 	var buf rsyncwire.Buffer
 </span></span><span style="display:flex;"><span> 	buf.WriteInt32(sh.ChecksumCount)
 </span></span><span style="display:flex;"><span> 	buf.WriteInt32(sh.BlockLength)
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-	buf.WriteInt32(sh.ChecksumLength)
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+	buf.WriteInt32(512 /*sh.ChecksumLength*/)
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 	buf.WriteInt32(sh.RemainderLength)
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	buf.WriteInt32(512 /*sh.ChecksumLength*/)
+</span></span></span><span style="display:flex;"><span> 	buf.WriteInt32(sh.RemainderLength)
 </span></span><span style="display:flex;"><span> 	return c.WriteString(buf.String())
 </span></span><span style="display:flex;"><span> }
 </span></span></code></pre></div><p>As expected, the Go runtime panics with the following message:</p>
@@ -220,7 +223,7 @@ the local file contents in
 <a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/match.c#L140-L145"><code>hash_search()</code></a>. Part
 of the function prologue is to allocate a buffer on the stack of
 <code>MAX_DIGEST_LEN</code> bytes:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">static</span> <span style="color:#902000">void</span> <span style="color:#06287e">hash_search</span>(<span style="color:#902000">int</span> f, <span style="color:#007020;font-weight:bold">struct</span> sum_struct <span style="color:#666">*</span>s,
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">static</span> <span style="color:#902000">void</span> <span style="color:#06287e">hash_search</span>(<span style="color:#902000">int</span> f, <span style="color:#007020;font-weight:bold">struct</span> sum_struct <span style="color:#666">*</span>s,
 </span></span><span style="display:flex;"><span>                        <span style="color:#007020;font-weight:bold">struct</span> map_struct <span style="color:#666">*</span>buf, OFF_T len)
 </span></span><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>    OFF_T offset, aligned_offset, end;
@@ -228,7 +231,7 @@ of the function prologue is to allocate a buffer on the stack of
 </span></span><span style="display:flex;"><span>    <span style="color:#902000">char</span> sum2[MAX_DIGEST_LEN];
 </span></span></code></pre></div><p>The daemon then iterates over the checksums the client sent and generates a
 digest for each of the chunks and compares them to the remote digest:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (<span style="color:#666">!</span>done_csum2) {
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (<span style="color:#666">!</span>done_csum2) {
 </span></span><span style="display:flex;"><span>    map <span style="color:#666">=</span> (schar <span style="color:#666">*</span>)<span style="color:#06287e">map_ptr</span>(buf, offset, l);
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">get_checksum2</span>((<span style="color:#902000">char</span> <span style="color:#666">*</span>)map, l, sum2);
 </span></span><span style="display:flex;"><span>    done_csum2 <span style="color:#666">=</span> <span style="color:#40a070">1</span>;
@@ -389,7 +392,7 @@ contents of an arbitrary file on the client’s machine.  In
 the client will read <code>fnamecmp</code> type as well as the <code>xname</code> from the server if
 the server sets the appropriate flags. The flag <code>sanitize_paths</code> will not be
 set for the client.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (iflags <span style="color:#666">&amp;</span> ITEM_BASIS_TYPE_FOLLOWS)
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (iflags <span style="color:#666">&amp;</span> ITEM_BASIS_TYPE_FOLLOWS)
 </span></span><span style="display:flex;"><span>    fnamecmp_type <span style="color:#666">=</span> <span style="color:#06287e">read_byte</span>(f_in);
 </span></span><span style="display:flex;"><span><span style="color:#666">*</span>type_ptr <span style="color:#666">=</span> fnamecmp_type;
 </span></span><span style="display:flex;"><span>
@@ -410,7 +413,7 @@ set for the client.</p>
 (<a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/receiver.c#L521"><code>recv_files()</code></a>)
 then uses the server provided values to determine a file to compare the
 incoming data with.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">case</span> <span style="color:#002070;font-weight:bold">FNAMECMP_FUZZY</span>:
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">case</span> <span style="color:#002070;font-weight:bold">FNAMECMP_FUZZY</span>:
 </span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> (file<span style="color:#666">-&gt;</span>dirname) {
 </span></span><span style="display:flex;"><span>        <span style="color:#06287e">pathjoin</span>(fnamecmpbuf, <span style="color:#007020;font-weight:bold">sizeof</span> fnamecmpbuf, file<span style="color:#666">-&gt;</span>dirname, xname);
 </span></span><span style="display:flex;"><span>        fnamecmp <span style="color:#666">=</span> fnamecmpbuf;
@@ -423,7 +426,7 @@ incoming data with.</p>
 <a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/receiver.c#L368"><code>receive_data()</code></a>
 the contents of the file specified by <code>xname</code> are copied into the destination
 file. This can be achieved by the server sending a negative token.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">while</span> ((i <span style="color:#666">=</span> <span style="color:#06287e">recv_token</span>(f_in, <span style="color:#666">&amp;</span>data)) <span style="color:#666">!=</span> <span style="color:#40a070">0</span>) {
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">while</span> ((i <span style="color:#666">=</span> <span style="color:#06287e">recv_token</span>(f_in, <span style="color:#666">&amp;</span>data)) <span style="color:#666">!=</span> <span style="color:#40a070">0</span>) {
 </span></span><span style="display:flex;"><span>..snip..
 </span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> (i <span style="color:#666">&gt;</span> <span style="color:#40a070">0</span>) {
 </span></span><span style="display:flex;"><span>..snip..
@@ -431,7 +434,7 @@ file. This can be achieved by the server sending a negative token.</p>
 </span></span><span style="display:flex;"><span>..snip..
 </span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> (fd <span style="color:#666">!=</span> <span style="color:#666">-</span><span style="color:#40a070">1</span> <span style="color:#666">&amp;&amp;</span> map <span style="color:#666">&amp;&amp;</span> <span style="color:#06287e">write_file</span>(fd, <span style="color:#40a070">0</span>, offset, map, len) <span style="color:#666">!=</span> (<span style="color:#902000">int</span>)len)
 </span></span></code></pre></div><p>The server sends a checksum to compare. If they don&rsquo;t match, a 0 is returned.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (fd <span style="color:#666">!=</span> <span style="color:#666">-</span><span style="color:#40a070">1</span> <span style="color:#666">&amp;&amp;</span> <span style="color:#06287e">memcmp</span>(file_sum1, sender_file_sum, xfer_sum_len) <span style="color:#666">!=</span> <span style="color:#40a070">0</span>)
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (fd <span style="color:#666">!=</span> <span style="color:#666">-</span><span style="color:#40a070">1</span> <span style="color:#666">&amp;&amp;</span> <span style="color:#06287e">memcmp</span>(file_sum1, sender_file_sum, xfer_sum_len) <span style="color:#666">!=</span> <span style="color:#40a070">0</span>)
 </span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">return</span> <span style="color:#40a070">0</span>;
 </span></span></code></pre></div><p>When the return value is 0 the receiver will then send a <code>MSG_REDO</code> to the
 generator. The generator will then write a message to the server.</p>
@@ -490,34 +493,34 @@ git checkout v0.2.7
 </code></pre></li>
 <li>
 <p>Patch the code as follows to undo the fix and execute the attack:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/internal/nofollow/nofollow_unix.go w/internal/nofollow/nofollow_unix.go
-</span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold"></span><span style="color:#a00000">--- i/internal/nofollow/nofollow_unix.go
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ w/internal/nofollow/nofollow_unix.go
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -2,8 +2,6 @@
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/internal/nofollow/nofollow_unix.go w/internal/nofollow/nofollow_unix.go
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">--- i/internal/nofollow/nofollow_unix.go
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+++ w/internal/nofollow/nofollow_unix.go
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -2,8 +2,6 @@
+</span></span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span> package nofollow
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-import &#34;golang.org/x/sys/unix&#34;
 </span></span></span><span style="display:flex;"><span><span style="color:#a00000">-
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span> // Maybe resolves to unix.O_NOFOLLOW on unix systems,
+</span></span></span><span style="display:flex;"><span> // Maybe resolves to unix.O_NOFOLLOW on unix systems,
 </span></span><span style="display:flex;"><span> // 0 on other platforms.
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-const Maybe = unix.O_NOFOLLOW
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+const Maybe = 0 // unix.O_NOFOLLOW
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+const Maybe = 0 // unix.O_NOFOLLOW
+</span></span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/internal/sender/do.go w/internal/sender/do.go
-</span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold"></span><span style="color:#a00000">--- i/internal/sender/do.go
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ w/internal/sender/do.go
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -2,6 +2,8 @@ package sender
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">--- i/internal/sender/do.go
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+++ w/internal/sender/do.go
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -2,6 +2,8 @@ package sender
+</span></span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span> import (
 </span></span><span style="display:flex;"><span> 	&#34;fmt&#34;
 </span></span><span style="display:flex;"><span><span style="color:#00a000">+	&#34;os&#34;
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	&#34;path/filepath&#34;
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 	&#34;sort&#34;
+</span></span></span><span style="display:flex;"><span> 	&#34;sort&#34;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span> 	&#34;github.com/gokrazy/rsync/internal/log&#34;
 </span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -55,6 +57,15 @@ func (st *Transfer) Do(crd *rsyncwire.CountingReader, cwr *rsyncwire.CountingWri
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span> 		st.Logger.Printf(&#34;file list sent&#34;)
+</span></span></span><span style="display:flex;"><span> 		st.Logger.Printf(&#34;file list sent&#34;)
 </span></span><span style="display:flex;"><span> 	}
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#00a000">+	// HACK: swap out the passwd file with a symlink to /etc/passwd
@@ -529,7 +532,7 @@ git checkout v0.2.7
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	}
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	st.Logger.Printf(&#34;HACK: swapped passwd file for symlink&#34;)
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 	// Sort the file list. The client sorts, so we need to sort, too (in the
+</span></span></span><span style="display:flex;"><span> 	// Sort the file list. The client sorts, so we need to sort, too (in the
 </span></span><span style="display:flex;"><span> 	// same way!), otherwise our indices do not match what the client will
 </span></span><span style="display:flex;"><span> 	// request.
 </span></span></code></pre></div></li>
@@ -726,88 +729,88 @@ validates the attacker-supplied data.</p>
 the application logic that using Go could not have prevented.</li>
 </ul>
 <table>
-  <thead>
-      <tr>
-          <th>CVE number</th>
-          <th>Cause</th>
-          <th>Risk (C)</th>
-          <th>Does Go help?</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>2024-12084</td>
-          <td>insufficient validation</td>
-          <td>Heap Buffer Overflow</td>
-          <td>✅ bounds check (panics!)</td>
-      </tr>
-      <tr>
-          <td>2024-12085</td>
-          <td>insufficient validation</td>
-          <td>Info Leak</td>
-          <td>✅ zero init</td>
-      </tr>
-      <tr>
-          <td>2024-12086</td>
-          <td>missing validation</td>
-          <td>Arbitrary File Leak</td>
-          <td>✅ <code>os.Root</code></td>
-      </tr>
-      <tr>
-          <td>2024-12087</td>
-          <td>insufficient validation</td>
-          <td>Write Arbitrary Files</td>
-          <td>✅ <code>os.Root</code></td>
-      </tr>
-      <tr>
-          <td>2024-12088</td>
-          <td>insufficient validation</td>
-          <td>Create Arbitrary Symlinks</td>
-          <td>✅ <code>os.Root</code></td>
-      </tr>
-      <tr>
-          <td>2024-12747</td>
-          <td>TOCTOU</td>
-          <td>Leak Privileged Files</td>
-          <td>✅ <code>os.Root</code></td>
-      </tr>
-      <tr>
-          <td>2026-29518</td>
-          <td>TOCTOU</td>
-          <td>Leak Privileged Files</td>
-          <td>✅ <code>os.Root</code></td>
-      </tr>
-      <tr>
-          <td>2026-43617</td>
-          <td>missing validation</td>
-          <td>Deny List Ineffective</td>
-          <td>❌ logic bug</td>
-      </tr>
-      <tr>
-          <td>2026-43618</td>
-          <td>insufficient validation</td>
-          <td>Info Leak</td>
-          <td>✅ bounds check (panics!)</td>
-      </tr>
-      <tr>
-          <td>2026-43619</td>
-          <td>TOCTOU</td>
-          <td>Leak Privileged Files</td>
-          <td>✅ <code>os.Root</code></td>
-      </tr>
-      <tr>
-          <td>2026-43620</td>
-          <td>insufficient validation</td>
-          <td>crash (DOS)</td>
-          <td>✅ bounds check (panics!)</td>
-      </tr>
-      <tr>
-          <td>2026-45232</td>
-          <td>missing validation</td>
-          <td>Memory Write</td>
-          <td>✅ bounds check (panics!)</td>
-      </tr>
-  </tbody>
+	<thead>
+			<tr>
+					<th>CVE number</th>
+					<th>Cause</th>
+					<th>Risk (C)</th>
+					<th>Does Go help?</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>2024-12084</td>
+					<td>insufficient validation</td>
+					<td>Heap Buffer Overflow</td>
+					<td>✅ bounds check (panics!)</td>
+			</tr>
+			<tr>
+					<td>2024-12085</td>
+					<td>insufficient validation</td>
+					<td>Info Leak</td>
+					<td>✅ zero init</td>
+			</tr>
+			<tr>
+					<td>2024-12086</td>
+					<td>missing validation</td>
+					<td>Arbitrary File Leak</td>
+					<td>✅ <code>os.Root</code></td>
+			</tr>
+			<tr>
+					<td>2024-12087</td>
+					<td>insufficient validation</td>
+					<td>Write Arbitrary Files</td>
+					<td>✅ <code>os.Root</code></td>
+			</tr>
+			<tr>
+					<td>2024-12088</td>
+					<td>insufficient validation</td>
+					<td>Create Arbitrary Symlinks</td>
+					<td>✅ <code>os.Root</code></td>
+			</tr>
+			<tr>
+					<td>2024-12747</td>
+					<td>TOCTOU</td>
+					<td>Leak Privileged Files</td>
+					<td>✅ <code>os.Root</code></td>
+			</tr>
+			<tr>
+					<td>2026-29518</td>
+					<td>TOCTOU</td>
+					<td>Leak Privileged Files</td>
+					<td>✅ <code>os.Root</code></td>
+			</tr>
+			<tr>
+					<td>2026-43617</td>
+					<td>missing validation</td>
+					<td>Deny List Ineffective</td>
+					<td>❌ logic bug</td>
+			</tr>
+			<tr>
+					<td>2026-43618</td>
+					<td>insufficient validation</td>
+					<td>Info Leak</td>
+					<td>✅ bounds check (panics!)</td>
+			</tr>
+			<tr>
+					<td>2026-43619</td>
+					<td>TOCTOU</td>
+					<td>Leak Privileged Files</td>
+					<td>✅ <code>os.Root</code></td>
+			</tr>
+			<tr>
+					<td>2026-43620</td>
+					<td>insufficient validation</td>
+					<td>crash (DOS)</td>
+					<td>✅ bounds check (panics!)</td>
+			</tr>
+			<tr>
+					<td>2026-45232</td>
+					<td>missing validation</td>
+					<td>Memory Write</td>
+					<td>✅ bounds check (panics!)</td>
+			</tr>
+	</tbody>
 </table>
 <h3 id="gokrazy-rsync-verdict">gokrazy/rsync verdict</h3>
 <p>Aside from being written in Go, another key difference between gokrazy/rsync and
@@ -826,88 +829,88 @@ details.</li>
 <p>Let’s have a look at whether gokrazy/rsync was affected by each CVE at the time
 of publishing:</p>
 <table>
-  <thead>
-      <tr>
-          <th>CVE number</th>
-          <th>Cause</th>
-          <th>gokrazy/rsync impl?</th>
-          <th>gokrazy/rsync affected?</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>2024-12084</td>
-          <td>insufficient validation</td>
-          <td>yes</td>
-          <td>⚠️ panic</td>
-      </tr>
-      <tr>
-          <td>2024-12085</td>
-          <td>insufficient validation</td>
-          <td>no (proto 30)</td>
-          <td>✅ not vuln</td>
-      </tr>
-      <tr>
-          <td>2024-12086</td>
-          <td>missing validation</td>
-          <td>no (proto 29)</td>
-          <td>✅ not vuln</td>
-      </tr>
-      <tr>
-          <td>2024-12087</td>
-          <td>insufficient validation</td>
-          <td>no (<code>inc-rec</code>)</td>
-          <td>✅ not vuln</td>
-      </tr>
-      <tr>
-          <td>2024-12088</td>
-          <td>insufficient validation</td>
-          <td>no (<code>safe-links</code>)</td>
-          <td>✅ not vuln</td>
-      </tr>
-      <tr>
-          <td>2024-12747</td>
-          <td>TOCTOU</td>
-          <td>yes</td>
-          <td>❌ vuln</td>
-      </tr>
-      <tr>
-          <td>2026-29518</td>
-          <td>TOCTOU</td>
-          <td>yes</td>
-          <td>⚠️ patched</td>
-      </tr>
-      <tr>
-          <td>2026-43617</td>
-          <td>missing validation</td>
-          <td>no (host deny lists)</td>
-          <td>✅ not vuln</td>
-      </tr>
-      <tr>
-          <td>2026-43618</td>
-          <td>insufficient validation</td>
-          <td>no (compression)</td>
-          <td>✅ not vuln</td>
-      </tr>
-      <tr>
-          <td>2026-43619</td>
-          <td>TOCTOU</td>
-          <td>yes</td>
-          <td>⚠️ patched</td>
-      </tr>
-      <tr>
-          <td>2026-43620</td>
-          <td>insufficient validation</td>
-          <td>no (<code>inc-rec</code>)</td>
-          <td>✅ not vuln</td>
-      </tr>
-      <tr>
-          <td>2026-45232</td>
-          <td>missing validation</td>
-          <td>no (proxy)</td>
-          <td>✅ not vuln</td>
-      </tr>
-  </tbody>
+	<thead>
+			<tr>
+					<th>CVE number</th>
+					<th>Cause</th>
+					<th>gokrazy/rsync impl?</th>
+					<th>gokrazy/rsync affected?</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>2024-12084</td>
+					<td>insufficient validation</td>
+					<td>yes</td>
+					<td>⚠️ panic</td>
+			</tr>
+			<tr>
+					<td>2024-12085</td>
+					<td>insufficient validation</td>
+					<td>no (proto 30)</td>
+					<td>✅ not vuln</td>
+			</tr>
+			<tr>
+					<td>2024-12086</td>
+					<td>missing validation</td>
+					<td>no (proto 29)</td>
+					<td>✅ not vuln</td>
+			</tr>
+			<tr>
+					<td>2024-12087</td>
+					<td>insufficient validation</td>
+					<td>no (<code>inc-rec</code>)</td>
+					<td>✅ not vuln</td>
+			</tr>
+			<tr>
+					<td>2024-12088</td>
+					<td>insufficient validation</td>
+					<td>no (<code>safe-links</code>)</td>
+					<td>✅ not vuln</td>
+			</tr>
+			<tr>
+					<td>2024-12747</td>
+					<td>TOCTOU</td>
+					<td>yes</td>
+					<td>❌ vuln</td>
+			</tr>
+			<tr>
+					<td>2026-29518</td>
+					<td>TOCTOU</td>
+					<td>yes</td>
+					<td>⚠️ patched</td>
+			</tr>
+			<tr>
+					<td>2026-43617</td>
+					<td>missing validation</td>
+					<td>no (host deny lists)</td>
+					<td>✅ not vuln</td>
+			</tr>
+			<tr>
+					<td>2026-43618</td>
+					<td>insufficient validation</td>
+					<td>no (compression)</td>
+					<td>✅ not vuln</td>
+			</tr>
+			<tr>
+					<td>2026-43619</td>
+					<td>TOCTOU</td>
+					<td>yes</td>
+					<td>⚠️ patched</td>
+			</tr>
+			<tr>
+					<td>2026-43620</td>
+					<td>insufficient validation</td>
+					<td>no (<code>inc-rec</code>)</td>
+					<td>✅ not vuln</td>
+			</tr>
+			<tr>
+					<td>2026-45232</td>
+					<td>missing validation</td>
+					<td>no (proxy)</td>
+					<td>✅ not vuln</td>
+			</tr>
+	</tbody>
 </table>
 <p>To be clear: all known vulnerabilities are fixed in gokrazy/rsync! The table
 above documents what the state was at the time when each CVE was published. In
@@ -946,8 +949,8 @@ role/protocol layering:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations.png"><img
-  srcset="https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations_hu_b83596d5e1578bab.png 2x,https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations_hu_80c1da434b4b343b.png 3x"
-  src="https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations_hu_b1c2c5d30df87dad.png"
+  srcset="https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations_hu_fe6c47e615c529cc.png 2x,https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations_hu_2af07d046b10779e.png 3x"
+  src="https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations_hu_676301528b69c19f.png"
   alt="diagram showing 4 different rsync setups: (1) rsync --daemon (2) rsync -e ssh; rsync://server/module/dir (3) rsync server:/some/path (4) rsync /src" title="diagram showing 4 different rsync setups: (1) rsync --daemon (2) rsync -e ssh; rsync://server/module/dir (3) rsync server:/some/path (4) rsync /src"
   width="600"
   height="547"
@@ -1164,8 +1167,8 @@ dishwasher:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-04-feuermurmel-dishwasher-versioning.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-04-feuermurmel-dishwasher-versioning_hu_1d046eb0df440b85.jpg 2x,https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-04-feuermurmel-dishwasher-versioning_hu_1a09cac140bcb1d2.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-04-feuermurmel-dishwasher-versioning_hu_9dd1db4e61dd3ec0.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-04-feuermurmel-dishwasher-versioning_hu_b0aacbc1f55d6a32.jpg 2x,https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-04-feuermurmel-dishwasher-versioning_hu_eda51a12209b7f34.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-04-04-feuermurmel-dishwasher-versioning_hu_c593ca2b227d5973.jpg"
   alt="a dishwasher, with many precise bits of version information" title="a dishwasher, with many precise bits of version information"
   width="600"
   height="450"
@@ -1212,7 +1215,7 @@ for user support, it is very valuable for programs to clearly identify
 themselves. Let me illustrate with the following case study.</p>
 <h2 id="i3-moreversion">Case Study: i3’s <code>--version</code> and <code>--moreversion</code></h2>
 <p>When running <code>i3 --version</code>, you will see output like this:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% i3 --version
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% i3 --version
 </span></span><span style="display:flex;"><span>i3 version 4.24 (2024-11-06) © 2009 Michael Stapelberg and contributors
 </span></span></code></pre></div><p>Each word was carefully deliberated and placed. Let me dissect:</p>
 <ol>
@@ -1293,7 +1296,7 @@ your X11 session using <a href="https://i3wm.org/docs/ipc.html">its IPC (interpr
 interface</a> and reports the running i3 process’s
 version, alongside other key details that are helpful to show the user, like
 which configuration file is loaded and when it was last changed:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% i3 --moreversion
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% i3 --moreversion
 </span></span><span style="display:flex;"><span>Binary i3 version:  4.24 (2024-11-06) © 2009 Michael Stapelberg and…
 </span></span><span style="display:flex;"><span>Running i3 version: 4.24 (2024-11-06) (pid 2521)
 </span></span><span style="display:flex;"><span>Loaded i3 config:
@@ -1329,18 +1332,18 @@ editing the wrong file.</p>
 </ol>
 <p>I use NixOS, BTW, so I automatically get a stable identifier
 (<code>0zn9r4263fjpqah6vdzlalfn0ahp8xc2-i3-4.24</code>) for <em>the specific build</em> of i3.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% ls -l $(which i3)
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% ls -l $(which i3)
 </span></span><span style="display:flex;"><span>lrwxrwxrwx 1 root root 58 1970-01-01 01:00 /run/current-system/sw/bin/i3
 </span></span><span style="display:flex;"><span>-&gt; /nix/store/0zn9r4263fjpqah6vdzlalfn0ahp8xc2-i3-4.24/bin/i3
 </span></span></code></pre></div><p>To see the build recipe (“derivation” in Nix terminology) which produced this
 Nix store output (<code>0zn9r4263…-i3-4.24</code>), I can run <code>nix derivation show</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% nix derivation show /nix/store/0zn9r4263fjpqah6vdzlalfn0ahp8xc2-i3-4.24
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% nix derivation show /nix/store/0zn9r4263fjpqah6vdzlalfn0ahp8xc2-i3-4.24
 </span></span><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  &#34;/nix/store/z7ly4kvgixf29rlz01ji4nywbajfifk4-i3-4.24.drv&#34;: {
 </span></span><span style="display:flex;"><span>[…]
 </span></span></code></pre></div><details>
 <summary>Click here to expand the full <code>nix derivation show</code> output if you are curious</summary>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% nix derivation show /nix/store/0zn9r4263fjpqah6vdzlalfn0ahp8xc2-i3-4.24
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% nix derivation show /nix/store/0zn9r4263fjpqah6vdzlalfn0ahp8xc2-i3-4.24
 </span></span><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  &#34;/nix/store/z7ly4kvgixf29rlz01ji4nywbajfifk4-i3-4.24.drv&#34;: {
 </span></span><span style="display:flex;"><span>    &#34;args&#34;: [
@@ -1801,8 +1804,8 @@ and no VCS buildinfo, because it currently suffers from the same gap as Nix:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-03-29-gokrazy-scan2drive-rsync.png"><img
-  srcset="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-03-29-gokrazy-scan2drive-rsync_hu_b9f20b08c5492d94.png 2x,https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-03-29-gokrazy-scan2drive-rsync_hu_ec0d408518026341.png 3x"
-  src="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-03-29-gokrazy-scan2drive-rsync_hu_16984c2d1be3db9c.png"
+  srcset="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-03-29-gokrazy-scan2drive-rsync_hu_bdda2b3931bb0cee.png 2x,https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-03-29-gokrazy-scan2drive-rsync_hu_f5be822c1490d069.png 3x"
+  src="https://michael.stapelberg.ch/posts/2026-04-05-stamp-it-all-programs-must-report-their-version/2026-03-29-gokrazy-scan2drive-rsync_hu_8f704022ad0a233b.png"
   alt="gokrazy scan2drive rsync" title="gokrazy scan2drive rsync"
   width="600"
   height="433"
@@ -1827,38 +1830,38 @@ extracts the revision from the Go module version of the main module
 <p>What are the other cases? These examples illustrate the scenarios I usually deal
 with:</p>
 <table>
-  <thead>
-      <tr>
-          <th>source (built from)</th>
-          <th>buildinfo (stamped into program)</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>directory (no git)</td>
-          <td>module <code>(devel)</code></td>
-      </tr>
-      <tr>
-          <td>Go module</td>
-          <td>module <code>v0.3.1-0.20260105212325-5347ac5f5bcb</code></td>
-      </tr>
-      <tr>
-          <td>directory (git)</td>
-          <td>module <code>v0.0.0-20260131174001-ccb1d233f2a4+dirty</code></td>
-      </tr>
-      <tr>
-          <td></td>
-          <td><code>vcs.revision=ccb1d233f2a43e9118b9146b3c9a5ded1efb7551</code></td>
-      </tr>
-      <tr>
-          <td></td>
-          <td><code>vcs.time=2026-01-31T17:40:01Z</code></td>
-      </tr>
-      <tr>
-          <td></td>
-          <td><code>vcs.modified=true</code></td>
-      </tr>
-  </tbody>
+	<thead>
+			<tr>
+					<th>source (built from)</th>
+					<th>buildinfo (stamped into program)</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>directory (no git)</td>
+					<td>module <code>(devel)</code></td>
+			</tr>
+			<tr>
+					<td>Go module</td>
+					<td>module <code>v0.3.1-0.20260105212325-5347ac5f5bcb</code></td>
+			</tr>
+			<tr>
+					<td>directory (git)</td>
+					<td>module <code>v0.0.0-20260131174001-ccb1d233f2a4+dirty</code></td>
+			</tr>
+			<tr>
+					<td></td>
+					<td><code>vcs.revision=ccb1d233f2a43e9118b9146b3c9a5ded1efb7551</code></td>
+			</tr>
+			<tr>
+					<td></td>
+					<td><code>vcs.time=2026-01-31T17:40:01Z</code></td>
+			</tr>
+			<tr>
+					<td></td>
+					<td><code>vcs.modified=true</code></td>
+			</tr>
+	</tbody>
 </table>
 
 
@@ -1878,14 +1881,14 @@ margin-right: 1rem"
 
 <details>
 <summary>Go code to programmatically read the version</summary>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span><span style="color:#bbb"> </span>version<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span><span style="color:#bbb"> </span>version<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">import</span><span style="color:#bbb"> </span>(<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span><span style="color:#bbb"> </span>(<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;runtime/debug&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;strings&#34;</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">readParts</span>()<span style="color:#bbb"> </span>(revision<span style="color:#bbb"> </span><span style="color:#902000">string</span>,<span style="color:#bbb"> </span>modified,<span style="color:#bbb"> </span>ok<span style="color:#bbb"> </span><span style="color:#902000">bool</span>)<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">readParts</span>()<span style="color:#bbb"> </span>(revision<span style="color:#bbb"> </span><span style="color:#902000">string</span>,<span style="color:#bbb"> </span>modified,<span style="color:#bbb"> </span>ok<span style="color:#bbb"> </span><span style="color:#902000">bool</span>)<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>info,<span style="color:#bbb"> </span>ok<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>debug.<span style="color:#06287e">ReadBuildInfo</span>()<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>!ok<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#4070a0">&#34;&#34;</span>,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">false</span>,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">false</span><span style="color:#bbb">
@@ -1905,9 +1908,9 @@ margin-right: 1rem"
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>v[idx<span style="color:#666">+</span><span style="color:#40a070">1</span>:],<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">false</span>,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">true</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#4070a0">&#34;&lt;BUG&gt;&#34;</span>,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">false</span>,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">false</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">Read</span>()<span style="color:#bbb"> </span><span style="color:#902000">string</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">Read</span>()<span style="color:#bbb"> </span><span style="color:#902000">string</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>revision,<span style="color:#bbb"> </span>modified,<span style="color:#bbb"> </span>ok<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#06287e">readParts</span>()<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>!ok<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#4070a0">&#34;&lt;not okay&gt;&#34;</span><span style="color:#bbb">
@@ -1918,7 +1921,7 @@ margin-right: 1rem"
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#4070a0">&#34;https://github.com/gokrazy/tools/commit/&#34;</span><span style="color:#bbb"> </span><span style="color:#666">+</span><span style="color:#bbb"> </span>revision<span style="color:#bbb"> </span><span style="color:#666">+</span><span style="color:#bbb"> </span>modifiedSuffix<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div></details>
 <p>This is what it looks like in practice:</p>
 <pre tabindex="0"><code>% go install github.com/gokrazy/tools/cmd/gok@latest
@@ -1980,7 +1983,7 @@ and add a few lines of metadata.</p>
 or <code>buildGoLatestModule</code> if I need the latest Go version. Instead of using
 <code>fetchFromGitHub</code>, I provide my sources using Flakes, usually also from GitHub
 or from another Git repository. For example, I package <code>gokrazy/bull</code> like so:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  pkgs<span style="color:#666">,</span>
 </span></span><span style="display:flex;"><span>  pkgs-unstable<span style="color:#666">,</span>
 </span></span><span style="display:flex;"><span>  bullsrc<span style="color:#666">,</span>
@@ -2003,7 +2006,7 @@ or from another Git repository. For example, I package <code>gokrazy/bull</code>
 </span></span></code></pre></div><p>The <code>bullsrc</code> comes from my <code>flake.nix</code>:</p>
 <details>
 <summary>Click here to expand the full <code>flake.nix</code></summary>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  inputs <span style="color:#666">=</span> {
 </span></span><span style="display:flex;"><span>    nixpkgs<span style="color:#666">.</span>url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:nixos/nixpkgs/nixos-25.11&#34;</span>;
 </span></span><span style="display:flex;"><span>    nixpkgs-unstable<span style="color:#666">.</span>url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:nixos/nixpkgs/nixos-unstable&#34;</span>;
@@ -2100,7 +2103,7 @@ or from another Git repository. For example, I package <code>gokrazy/bull</code>
 <li>The stamped buildinfo does not contain any <code>vcs</code> information.</li>
 </ul>
 <p>Here’s a full example of gokrazy/bull:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% go version -m \
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;display:grid;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% go version -m \
 </span></span><span style="display:flex;"><span>  /nix/store/z3y90ck0fp1wwd4scljffhwxcrxjhb9j-bull-unstable/bin/bull
 </span></span><span style="display:flex;"><span>/nix/store/z3y90ck0fp1wwd4scljffhwxcrxjhb9j-bull-unstable/bin/bull: go1.26.1
 </span></span><span style="display:flex;"><span>        path    github.com/gokrazy/bull/cmd/bull
@@ -2121,7 +2124,7 @@ or from another Git repository. For example, I package <code>gokrazy/bull</code>
 </span></span><span style="display:flex; background-color:#d8d8d8"><span>        build   GOOS=linux
 </span></span><span style="display:flex; background-color:#d8d8d8"><span>        build   GOAMD64=v1</span></span></code></pre></div>
 <p>To fix VCS stamping, add my <code>goVcsStamping</code> overlay to your <code>nixosSystem.modules</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  nixpkgs<span style="color:#666">.</span>overlays <span style="color:#666">=</span> [
 </span></span><span style="display:flex;"><span>    stapelbergnix<span style="color:#666">.</span>overlays<span style="color:#666">.</span>goVcsStamping
 </span></span><span style="display:flex;"><span>  ];
@@ -2299,7 +2302,7 @@ the monitor would show a signal:</p>
 </code></pre><h2 id="automatic-monitor-configuration-with-grobi">Automatic monitor configuration with grobi</h2>
 <p>I have now completely solved this problem by creating the following
 <code>~/.config/grobi.conf</code> file:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">rules</span>:<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">rules</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>UP3218K<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">outputs_connected</span>:<span style="color:#bbb"> </span>[DP-2, DP-4]<span style="color:#bbb">
@@ -2353,9 +2356,9 @@ jobs have some time to run before I start using the computer.</p>
  and <code>systemctl suspend</code> that integrates with the
 myStrom switch smart plug to turn off power to the monitor entirely. This is
 worthwhile because the monitor draws 30W even in standby!</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span><span style="color:#bbb"> </span>main<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span><span style="color:#bbb"> </span>main<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">import</span><span style="color:#bbb"> </span>(<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span><span style="color:#bbb"> </span>(<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;context&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;flag&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;fmt&#34;</span><span style="color:#bbb">
@@ -2365,9 +2368,9 @@ worthwhile because the monitor draws 30W even in standby!</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;os&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;os/exec&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;time&#34;</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">var</span><span style="color:#bbb"> </span>(<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">var</span><span style="color:#bbb"> </span>(<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>resume<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>flag.<span style="color:#06287e">Bool</span>(<span style="color:#4070a0">&#34;resume&#34;</span>,<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">false</span>,<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#4070a0">&#34;run resume behavior only (turn on monitor via smart plug)&#34;</span>)<span style="color:#bbb">
@@ -2375,9 +2378,9 @@ worthwhile because the monitor draws 30W even in standby!</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>noMonitor<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>flag.<span style="color:#06287e">Bool</span>(<span style="color:#4070a0">&#34;no_monitor&#34;</span>,<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">false</span>,<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#4070a0">&#34;disable turning off/on monitor&#34;</span>)<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">monitorPower</span>(ctx<span style="color:#bbb"> </span>context.Context,<span style="color:#bbb"> </span>method,<span style="color:#bbb"> </span>cmnd<span style="color:#bbb"> </span><span style="color:#902000">string</span>)<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">monitorPower</span>(ctx<span style="color:#bbb"> </span>context.Context,<span style="color:#bbb"> </span>method,<span style="color:#bbb"> </span>cmnd<span style="color:#bbb"> </span><span style="color:#902000">string</span>)<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span><span style="color:#666">*</span>noMonitor<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;[monitor power] skipping because -no_monitor flag is set&#34;</span>)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb">
@@ -2412,9 +2415,9 @@ worthwhile because the monitor draws 30W even in standby!</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>log.<span style="color:#06287e">Printf</span>(<span style="color:#4070a0">&#34;[monitor power] request succeeded&#34;</span>)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">nextWakeup</span>(now<span style="color:#bbb"> </span>time.Time)<span style="color:#bbb"> </span>time.Time<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">nextWakeup</span>(now<span style="color:#bbb"> </span>time.Time)<span style="color:#bbb"> </span>time.Time<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>midnight<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>time.<span style="color:#06287e">Date</span>(now.<span style="color:#06287e">Year</span>(),<span style="color:#bbb"> </span>now.<span style="color:#06287e">Month</span>(),<span style="color:#bbb"> </span>now.<span style="color:#06287e">Day</span>(),<span style="color:#bbb"> </span><span style="color:#40a070">0</span>,<span style="color:#bbb"> </span><span style="color:#40a070">0</span>,<span style="color:#bbb"> </span><span style="color:#40a070">0</span>,<span style="color:#bbb"> </span><span style="color:#40a070">0</span>,<span style="color:#bbb"> </span>time.Local)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>now.<span style="color:#06287e">Hour</span>()<span style="color:#bbb"> </span>&lt;<span style="color:#bbb"> </span><span style="color:#40a070">6</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#60a0b0;font-style:italic">// wake up today</span><span style="color:#bbb">
@@ -2423,9 +2426,9 @@ worthwhile because the monitor draws 30W even in standby!</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// wake up tomorrow</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>midnight.<span style="color:#06287e">Add</span>(<span style="color:#40a070">24</span><span style="color:#bbb"> </span><span style="color:#666">*</span><span style="color:#bbb"> </span>time.Hour).<span style="color:#06287e">Add</span>(<span style="color:#40a070">6</span><span style="color:#666">*</span>time.Hour<span style="color:#bbb"> </span><span style="color:#666">+</span><span style="color:#bbb"> </span><span style="color:#40a070">50</span><span style="color:#666">*</span>time.Minute)<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">runResume</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">runResume</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// Retry for up to one minute to give the network some time to come up</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>ctx,<span style="color:#bbb"> </span>canc<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>context.<span style="color:#06287e">WithTimeout</span>(context.<span style="color:#06287e">Background</span>(),<span style="color:#bbb"> </span><span style="color:#40a070">1</span><span style="color:#666">*</span>time.Minute)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">defer</span><span style="color:#bbb"> </span><span style="color:#06287e">canc</span>()<span style="color:#bbb">
@@ -2433,9 +2436,9 @@ worthwhile because the monitor draws 30W even in standby!</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>log.<span style="color:#06287e">Print</span>(err)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">zleep</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">zleep</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>ctx<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>context.<span style="color:#06287e">Background</span>()<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>now<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>time.<span style="color:#06287e">Now</span>().<span style="color:#06287e">Truncate</span>(<span style="color:#40a070">1</span><span style="color:#bbb"> </span><span style="color:#666">*</span><span style="color:#bbb"> </span>time.Second)<span style="color:#bbb">
@@ -2464,9 +2467,9 @@ worthwhile because the monitor draws 30W even in standby!</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">main</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">main</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>flag.<span style="color:#06287e">Parse</span>()<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span><span style="color:#666">*</span>resume<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#06287e">runResume</span>();<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
@@ -2477,11 +2480,11 @@ worthwhile because the monitor draws 30W even in standby!</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">			</span>log.<span style="color:#06287e">Fatal</span>(err)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div><p>To turn power to the monitor on after resuming, I placed the following shell
 script in <code>/lib/systemd/system-sleep/zleep.sh</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#007020">#!/bin/sh
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#007020">#!/bin/sh
+</span></span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">case</span> <span style="color:#4070a0">&#34;</span><span style="color:#bb60d5">$1</span><span style="color:#4070a0">&#34;</span> in
 </span></span><span style="display:flex;"><span>	pre<span style="color:#666">)</span>	<span style="color:#007020">exit</span> <span style="color:#40a070">0</span>
 </span></span><span style="display:flex;"><span>		;;
@@ -2669,8 +2672,8 @@ stack trace in a more colorful and much shorter version:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_c04249176648ab38.jpg 2x,https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_8da191a897747329.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_e61da31f617a2260.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_4c5f7b3d7df4ad22.jpg 2x,https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_ad1e8c2d9905e0.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_a426e16585061786.jpg"
   
   width="600"
   height="394"
@@ -3359,9 +3362,9 @@ work well in the scenarios this article explains.</p>
 <p>To start an ephemeral PostgreSQL instance before your test functions run, you
 would <a href="https://pkg.go.dev/testing#hdr-Main">declare a custom <code>TestMain</code>
 function</a>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">var</span><span style="color:#bbb"> </span>pgt<span style="color:#bbb"> </span><span style="color:#666">*</span>postgrestest.Server<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">var</span><span style="color:#bbb"> </span>pgt<span style="color:#bbb"> </span><span style="color:#666">*</span>postgrestest.Server<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">TestMain</span>(m<span style="color:#bbb"> </span><span style="color:#666">*</span>testing.M)<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">TestMain</span>(m<span style="color:#bbb"> </span><span style="color:#666">*</span>testing.M)<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">var</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>pgt,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>postgrestest.<span style="color:#06287e">Start</span>(context.<span style="color:#06287e">Background</span>())<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
@@ -3370,7 +3373,7 @@ function</a>:</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">defer</span><span style="color:#bbb"> </span>pgt.<span style="color:#06287e">Cleanup</span>()<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>m.<span style="color:#06287e">Run</span>()<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div><p>Starting a PostgreSQL instance takes about:</p>
 <ul>
 <li>300ms on my <a href="/posts/2022-01-15-high-end-linux-pc/">Intel Core i9 12900K CPU</a> (from 2022)</li>
@@ -3378,13 +3381,13 @@ function</a>:</p>
 </ul>
 <p>Then, you can create a separate database for each test on this ephemeral
 Postgres instance:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">TestSignupForm</span>(t<span style="color:#bbb"> </span><span style="color:#666">*</span>testing.T)<span style="color:#bbb"> </span>{<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">TestSignupForm</span>(t<span style="color:#bbb"> </span><span style="color:#666">*</span>testing.T)<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>pgurl,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>pgt.<span style="color:#06287e">CreateDatabase</span>(context.<span style="color:#06287e">Background</span>())<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>t.<span style="color:#06287e">Fatal</span>(err)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// test goes here…</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div><p>Each CreateDatabase call takes about:</p>
 <ul>
 <li>5-10ms on my <a href="/posts/2022-01-15-high-end-linux-pc/">Intel Core i9 12900K CPU</a> (from 2022)</li>
@@ -3457,13 +3460,13 @@ run in parallel (in batches of size <code>-parallel</code>).</li>
 […]
 </code></pre><p>To print <code>GOMAXPROCS</code> on a given machine, we can run a test program like this
 <code>gomaxprocs.go</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span><span style="color:#bbb"> </span>main<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span><span style="color:#bbb"> </span>main<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">import</span><span style="color:#bbb"> </span><span style="color:#4070a0">&#34;runtime&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span><span style="color:#bbb"> </span><span style="color:#4070a0">&#34;runtime&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">main</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">main</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020">print</span>(runtime.<span style="color:#06287e">GOMAXPROCS</span>(<span style="color:#40a070">0</span>))<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div><p>For me, <code>GOMAXPROCS</code> defaults to the <a href="https://ark.intel.com/content/www/us/en/ark/products/134597/intel-core-i9-12900-processor-30m-cache-up-to-5-10-ghz.html">24 <em>threads</em> of my Intel Core i9 12900K
 CPU</a>,
 which has 16 <em>cores</em> (8 Performance, 8 Efficiency; only the Performance cores
@@ -3486,9 +3489,9 @@ to using a
 <a href="https://pkg.go.dev/github.com/stapelberg/postgrestest#DBCreator"><code>DBCreator</code></a>
 for a database identified by a URL. The old code still needs to remain so that
 you can run a single test without bothering with <code>PGURL</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">var</span><span style="color:#bbb"> </span>dbc<span style="color:#bbb"> </span><span style="color:#666">*</span>postgrestest.DBCreator<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;display:grid;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">var</span><span style="color:#bbb"> </span>dbc<span style="color:#bbb"> </span><span style="color:#666">*</span>postgrestest.DBCreator<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">TestMain</span>(m<span style="color:#bbb"> </span><span style="color:#666">*</span>testing.M)<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">TestMain</span>(m<span style="color:#bbb"> </span><span style="color:#666">*</span>testing.M)<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// It is best to specify the PGURL environment variable so that only</span><span style="color:#bbb">
 </span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// one PostgreSQL instance is used for all tests.</span><span style="color:#bbb">
 </span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">	</span>pgurl<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>os.<span style="color:#06287e">Getenv</span>(<span style="color:#4070a0">&#34;PGURL&#34;</span>)<span style="color:#bbb">
@@ -3509,24 +3512,24 @@ you can run a single test without bothering with <code>PGURL</code>:</p>
 </span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>m.<span style="color:#06287e">Run</span>()<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}</span></span></code></pre></div>
+</span></span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
 <p>Inside the test function(s), we only need to update the <code>CreateDatabase</code>
 receiver name:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">TestSignupForm</span>(t<span style="color:#bbb"> </span><span style="color:#666">*</span>testing.T)<span style="color:#bbb"> </span>{<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;display:grid;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">TestSignupForm</span>(t<span style="color:#bbb"> </span><span style="color:#666">*</span>testing.T)<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">	</span>pgurl,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>dbc.<span style="color:#06287e">CreateDatabase</span>(context.<span style="color:#06287e">Background</span>())<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>t.<span style="color:#06287e">Fatal</span>(err)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// test goes here…</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}</span></span></code></pre></div>
+</span></span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
 <p>Then, we create a new wrapper program (e.g. <code>internal/cmd/initpg/initpg.go</code>)
 which calls <code>postgrestest.Start</code> and passes the <code>PGURL</code> environment variable to
 the process(es) it starts:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// initpg is a small test helper command which starts a Postgres</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#60a0b0;font-style:italic">// instance and makes it available to the wrapped &#39;go test&#39; command.</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">package</span><span style="color:#bbb"> </span>main<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// initpg is a small test helper command which starts a Postgres</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// instance and makes it available to the wrapped &#39;go test&#39; command.</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">package</span><span style="color:#bbb"> </span>main<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">import</span><span style="color:#bbb"> </span>(<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">import</span><span style="color:#bbb"> </span>(<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;context&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;fmt&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#4070a0">&#34;log&#34;</span><span style="color:#bbb">
@@ -3537,9 +3540,9 @@ the process(es) it starts:</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// Use the same database driver as in the rest of your project.</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>_<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;github.com/lib/pq&#34;</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">runWrappedCommand</span>(pgurl<span style="color:#bbb"> </span><span style="color:#902000">string</span>)<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">runWrappedCommand</span>(pgurl<span style="color:#bbb"> </span><span style="color:#902000">string</span>)<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// os.Args[0] is initpg</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// os.Args[1] is --</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// os.Args[2] is go</span><span style="color:#bbb">
@@ -3554,9 +3557,9 @@ the process(es) it starts:</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;%v: %v&#34;</span>,<span style="color:#bbb"> </span>wrapped.Args,<span style="color:#bbb"> </span>err)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">initpg</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">initpg</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>pgt,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>postgrestest.<span style="color:#06287e">Start</span>(context.<span style="color:#06287e">Background</span>())<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// NOTE: keep reading the article, do not submit as-is</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
@@ -3566,13 +3569,13 @@ the process(es) it starts:</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// Run the wrapped command (&#39;go test&#39;, typically)</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#06287e">runWrappedCommand</span>(pgt.<span style="color:#06287e">DefaultDatabase</span>())<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">main</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">main</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#06287e">initpg</span>();<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>log.<span style="color:#06287e">Fatal</span>(err)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div><h3 id="running-the-initpg-wrapper-program">Running the initpg wrapper program</h3>
 <p>While we could use <code>go run ./internal/cmd/initpg</code> to compile and run this
 wrapper program, it is a bit wasteful to recompile this program over and over
@@ -3599,7 +3602,7 @@ install, not helper programs that are only necessary to run tests.</li>
 are consistently named, e.g. <code>make test</code>, <code>make push</code>, etc. Given that I already
 use <code>make</code>, I like to set up my <code>Makefile</code> to build initpg in the <code>_bin</code>
 directory:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Makefile" data-lang="Makefile"><span style="display:flex;"><span><span style="color:#06287e">.PHONY</span><span style="color:#666">:</span> test
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-Makefile" data-lang="Makefile"><span style="display:flex;"><span><span style="color:#06287e">.PHONY</span><span style="color:#666">:</span> test
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#06287e">_bin/initpg</span><span style="color:#666">:</span> internal/cmd/initpg/initpg.go
 </span></span><span style="display:flex;"><span>	mkdir -p _bin
@@ -3641,7 +3644,7 @@ temporary directory that the <code>postgrestest</code> package uses for its ephe
 database instance changes on each run.</p>
 <p>The documentation on the <code>go test</code> caching behavior explains this in the last
 paragraph:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% go help test
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;display:grid;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>% go help test
 </span></span><span style="display:flex;"><span>[…]
 </span></span><span style="display:flex;"><span>In package list mode only, go test caches successful package test
 </span></span><span style="display:flex;"><span>results to avoid unnecessary repeated running of tests. When the
@@ -3671,7 +3674,7 @@ means we cannot use a randomly generated name for the Postgres data directory,
 but instead need to use a fixed name.</p>
 <p>My <code>postgrestest</code> package offers convenient support for specifying the desired
 directory:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">initpg</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;display:grid;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">initpg</span>()<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">	</span>cacheDir,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>os.<span style="color:#06287e">UserCacheDir</span>()<span style="color:#bbb">
 </span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex; background-color:#d8d8d8"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>err<span style="color:#bbb">
@@ -3685,7 +3688,7 @@ directory:</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#60a0b0;font-style:italic">// Run the wrapped command (&#39;go test&#39;, typically)</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#06287e">runWrappedCommand</span>(pgt.<span style="color:#06287e">DefaultDatabase</span>())<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}</span></span></code></pre></div>
+</span></span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
 <p>When running the tests now, starting with the second run (without any changes),
 you should see a “ (cached)” suffix printed behind tests that were successfully
 cached, and the test runtime should be much shorter — under a second in my
@@ -3855,8 +3858,8 @@ use core dump debugging!</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_a8173ece4c3f11e6.jpg 2x,https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_beea9b0751b668d7.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_604c37f3566e3ffa.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_8e666702f0357e4d.jpg 2x,https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_a1e1faf114299629.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_e4c52f9dcb473cf9.jpg"
   alt="Core memory" title="Core memory"
   width="600"
   height="516"
@@ -4013,7 +4016,7 @@ the commit is part of a released version, you can install the latest dlv
 directly from git:</p>
 <pre tabindex="0"><code>% go install github.com/go-delve/delve/cmd/dlv@master
 </code></pre><p>Save the following Starlark code to a file, for example <code>~/dlv_writebytestofile.star</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Syntax: writebytestofile &lt;byte slice var&gt; &lt;output file path&gt;</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Syntax: writebytestofile &lt;byte slice var&gt; &lt;output file path&gt;</span>
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">def</span> <span style="color:#06287e">command_writebytestofile</span>(args):
 </span></span><span style="display:flex;"><span>	var_name, filename <span style="color:#666">=</span> args<span style="color:#666">.</span>split(<span style="color:#4070a0">&#34; &#34;</span>)
 </span></span><span style="display:flex;"><span>	s <span style="color:#666">=</span> <span style="color:#007020">eval</span>(<span style="color:#007020;font-weight:bold">None</span>, var_name)<span style="color:#666">.</span>Variable
@@ -4034,14 +4037,14 @@ slice contents of <code>in.Name</code> to <code>/tmp/name.raw</code>:</p>
 (instead of a gRPC server, as above), you will notice that panics in your HTTP
 handlers do not actually result in a core dump! This code in
 <code>go/src/net/http/server.go</code> recovers panics and logs a stack trace:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">defer</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">func</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">defer</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">func</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#007020">recover</span>();<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span><span style="color:#666">&amp;&amp;</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span>ErrAbortHandler<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span><span style="color:#007020;font-weight:bold">const</span><span style="color:#bbb"> </span>size<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span><span style="color:#40a070">64</span><span style="color:#bbb"> </span><span style="color:#666">&lt;&lt;</span><span style="color:#bbb"> </span><span style="color:#40a070">10</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>buf<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#007020">make</span>([]<span style="color:#902000">byte</span>,<span style="color:#bbb"> </span>size)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>buf<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>buf[:runtime.<span style="color:#06287e">Stack</span>(buf,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">false</span>)]<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>c.server.<span style="color:#06287e">logf</span>(<span style="color:#4070a0">&#34;http: panic serving %v: %v\n%s&#34;</span>,<span style="color:#bbb"> </span>c.remoteAddr,<span style="color:#bbb"> </span>err,<span style="color:#bbb"> </span>buf)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>}<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}()<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}()<span style="color:#bbb">
 </span></span></span></code></pre></div><p>Or, in other words: the <code>GOTRACEBACK=crash</code> environment variable configures what
 happens for unhandled signals, but this signal is handled with the <code>recover()</code>
 call, so no core is dumped.</p>
@@ -4057,15 +4060,15 @@ called), but then how do we produce a core dump from our own handler?</p>
 <code>signal_unix.go</code> and <a href="https://cs.opensource.google/go/go/+/refs/tags/go1.23.2:src/runtime/signal_unix.go;l=938">sends signal <code>SIGABRT</code> with the <code>dieFromSignal</code>
 function</a>
 to the current thread:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020">//go:nosplit</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">crash</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020">//go:nosplit</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">crash</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span><span style="color:#06287e">dieFromSignal</span>(_SIGABRT)<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div><p>The default action for <code>SIGABRT</code> is to “terminate the process and dump core”,
 see <a href="https://manpages.debian.org/signal.7"><code>signal(7)</code></a>
 .</p>
 <p>We can follow the same strategy and send <code>SIGABRT</code> to our process:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">main</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">main</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>http.<span style="color:#06287e">HandleFunc</span>(<span style="color:#4070a0">&#34;/&#34;</span>,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">func</span>(w<span style="color:#bbb"> </span>http.ResponseWriter,<span style="color:#bbb"> </span>r<span style="color:#bbb"> </span><span style="color:#666">*</span>http.Request)<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">defer</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">func</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">			</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#007020">recover</span>();<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
@@ -4082,7 +4085,7 @@ see <a href="https://manpages.debian.org/signal.7"><code>signal(7)</code></a>
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020">panic</span>(<span style="color:#4070a0">&#34;this should result in a core dump&#34;</span>)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>})<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>log.<span style="color:#06287e">Fatal</span>(http.<span style="color:#06287e">ListenAndServe</span>(<span style="color:#4070a0">&#34;:8080&#34;</span>,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span>))<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div><p>There is one caveat: If you have any non-Go threads running in your program,
 e.g. by using cgo, they might pick up the signal, so ensure they do not install
 a <code>SIGABRT</code> handler (see also: <a href="https://pkg.go.dev/os/signal#hdr-Go_programs_that_use_cgo_or_SWIG">cgo-related documentation in
@@ -4168,7 +4171,7 @@ as <code>~/src/evcc</code>. evcc is an electric vehicle charge controller with P
 integration, written in Go.</p>
 <p>Now I want to run <code>evcc</code> on my Raspberry Pi using gokrazy. First, I create a new
 instance:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>% gok -i evcc new
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>% gok -i evcc new
 </span></span><span style="display:flex;"><span>gokrazy instance configuration created in /home/michael/gokrazy/evcc/config.json
 </span></span><span style="display:flex;"><span><span style="color:#666">(</span>Use <span style="color:#4070a0">&#39;gok -i evcc edit&#39;</span> to edit the configuration interactively.<span style="color:#666">)</span>
 </span></span><span style="display:flex;"><span>
@@ -4176,7 +4179,7 @@ instance:</p>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>To deploy this gokrazy instance, see <span style="color:#4070a0">&#39;gok help overwrite&#39;</span>
 </span></span></code></pre></div><p>Now let’s add our working copy of <code>evcc</code> to the instance:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>% gok -i evcc add .
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>% gok -i evcc add .
 </span></span><span style="display:flex;"><span>2023/01/15 18:55:39 Adding the following package to gokrazy instance <span style="color:#4070a0">&#34;evcc&#34;</span>:
 </span></span><span style="display:flex;"><span>  Go package  : github.com/evcc-io/evcc
 </span></span><span style="display:flex;"><span>  in Go module: github.com/evcc-io/evcc
@@ -4188,7 +4191,7 @@ instance:</p>
 </span></span><span style="display:flex;"><span>2023/01/15 18:55:39 All <span style="color:#007020;font-weight:bold">done</span>! Next, use <span style="color:#4070a0">&#39;gok overwrite&#39;</span> <span style="color:#666">(</span>first deployment<span style="color:#666">)</span>, <span style="color:#4070a0">&#39;gok update&#39;</span> <span style="color:#666">(</span>following deployments<span style="color:#666">)</span> or <span style="color:#4070a0">&#39;gok run&#39;</span> <span style="color:#666">(</span>run on running instance temporarily<span style="color:#666">)</span>
 </span></span></code></pre></div><p>We might want to monitor this Raspberry Pi’s stats later, so let’s add the
 Prometheus node exporter to our gokrazy instance, too:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>% gok -i evcc add github.com/prometheus/node_exporter
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>% gok -i evcc add github.com/prometheus/node_exporter
 </span></span><span style="display:flex;"><span>2023/01/15 19:04:05 Adding github.com/prometheus/node_exporter as a <span style="color:#666">(</span>non-local<span style="color:#666">)</span> package to gokrazy instance evcc
 </span></span><span style="display:flex;"><span>2023/01/15 19:04:05 Creating gokrazy builddir <span style="color:#007020;font-weight:bold">for</span> package github.com/prometheus/node_exporter
 </span></span><span style="display:flex;"><span>2023/01/15 19:04:05 Creating go.mod before calling go get
@@ -4199,7 +4202,7 @@ Prometheus node exporter to our gokrazy instance, too:</p>
 </span></span><span style="display:flex;"><span>2023/01/15 19:04:07 Adding package to gokrazy config
 </span></span></code></pre></div><p>It’s time to insert an SD card (<code>/dev/sdx</code>), which we will overwrite with a
 gokrazy build:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>% gok -i evcc overwrite --full /dev/sdx
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>% gok -i evcc overwrite --full /dev/sdx
 </span></span></code></pre></div><p>See <a href="https://gokrazy.org/quickstart/">gokrazy quickstart</a> for more detailed instructions.</p>
 <h2 id="automation">Automation</h2>
 <p>The new <code>gok</code> subcommands (<code>add</code>, <code>update</code>, etc.) are much easier to manage than
@@ -4270,68 +4273,68 @@ before closing the pipe, so that the parent program knows where to connect to.</
 <h4 id="parent-program">Parent Program</h4>
 <p>So, how do we go about readiness notifications in Go? We create a new pipe and
 specify the write end in the <code>ExtraFiles</code> field of <code>(os/exec).Cmd</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>r,<span style="color:#bbb"> </span>w,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>os.<span style="color:#06287e">Pipe</span>()<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>r,<span style="color:#bbb"> </span>w,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>os.<span style="color:#06287e">Pipe</span>()<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>err<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>child<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>exec.<span style="color:#06287e">Command</span>(<span style="color:#4070a0">&#34;child&#34;</span>)<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>child.Stderr<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>os.Stderr<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>child.ExtraFiles<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>[]<span style="color:#666">*</span>os.File{w}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>child<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>exec.<span style="color:#06287e">Command</span>(<span style="color:#4070a0">&#34;child&#34;</span>)<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>child.Stderr<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>os.Stderr<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>child.ExtraFiles<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>[]<span style="color:#666">*</span>os.File{w}<span style="color:#bbb">
 </span></span></span></code></pre></div><p>It is good practice to explicitly specify the file descriptor number that we
 passed via some sort of signaling, so that the child program does not need to be
 modified when we add new file descriptors in the parent, and also because this
 behavior is usually opt-in.</p>
 <p>In this case, we’ll do that via an environment variable and start the child
 program:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Go dup2()’s ExtraFiles to file descriptor 3 and counting.</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#60a0b0;font-style:italic">// File descriptors 0, 1, 2 are stdin, stdout and stderr.</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>child.Env<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span><span style="color:#007020">append</span>(os.<span style="color:#06287e">Environ</span>(),<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;CHILD_READY_FD=3&#34;</span>)<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Go dup2()’s ExtraFiles to file descriptor 3 and counting.</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// File descriptors 0, 1, 2 are stdin, stdout and stderr.</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>child.Env<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span><span style="color:#007020">append</span>(os.<span style="color:#06287e">Environ</span>(),<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;CHILD_READY_FD=3&#34;</span>)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#60a0b0;font-style:italic">// Note child.Start(), not child.Run():</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>child.<span style="color:#06287e">Start</span>();<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Note child.Start(), not child.Run():</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>child.<span style="color:#06287e">Start</span>();<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;%v: %v&#34;</span>,<span style="color:#bbb"> </span>child.Args,<span style="color:#bbb"> </span>err)<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div><p>At this point, both the parent and the child process have a file descriptor
 referencing the write end of the pipe. Since the pipe will only be closed once
 <em>all</em> processes have closed the write end, we need to close the write end in the
 parent program:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Close the write end of the pipe in the parent:</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>w.<span style="color:#06287e">Close</span>()<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Close the write end of the pipe in the parent:</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>w.<span style="color:#06287e">Close</span>()<span style="color:#bbb">
 </span></span></span></code></pre></div><p>Now, we can blockingly read from the pipe, and know that once the read call
 returns, the child program is ready to receive requests:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Avoid hanging forever in case the child program never becomes ready;</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#60a0b0;font-style:italic">// this is easier to diagnose than an unspecified CI/CD test timeout.</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#60a0b0;font-style:italic">// This timeout should be much much longer than initialization takes.</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>r.<span style="color:#06287e">SetReadDeadline</span>(time.<span style="color:#06287e">Now</span>().<span style="color:#06287e">Add</span>(<span style="color:#40a070">1</span><span style="color:#bbb"> </span><span style="color:#666">*</span><span style="color:#bbb"> </span>time.Minute))<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>_,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>ioutil.<span style="color:#06287e">ReadAll</span>(r);<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// Avoid hanging forever in case the child program never becomes ready;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// this is easier to diagnose than an unspecified CI/CD test timeout.</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// This timeout should be much much longer than initialization takes.</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>r.<span style="color:#06287e">SetReadDeadline</span>(time.<span style="color:#06287e">Now</span>().<span style="color:#06287e">Add</span>(<span style="color:#40a070">1</span><span style="color:#bbb"> </span><span style="color:#666">*</span><span style="color:#bbb"> </span>time.Minute))<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>_,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>ioutil.<span style="color:#06287e">ReadAll</span>(r);<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span>fmt.<span style="color:#06287e">Errorf</span>(<span style="color:#4070a0">&#34;awaiting readiness: %v&#34;</span>,<span style="color:#bbb"> </span>err)<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#60a0b0;font-style:italic">// …send requests…</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// …send requests…</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#60a0b0;font-style:italic">// …tear down child program…</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// …tear down child program…</span><span style="color:#bbb">
 </span></span></span></code></pre></div><h4 id="child-program">Child Program</h4>
 <p>In the child program, we need to recognize that the parent program requests a
 readiness notification, and ensure our signaling doesn’t leak to child programs
 of the child program:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">var</span><span style="color:#bbb"> </span>readyFile<span style="color:#bbb"> </span><span style="color:#666">*</span>os.File<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">var</span><span style="color:#bbb"> </span>readyFile<span style="color:#bbb"> </span><span style="color:#666">*</span>os.File<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">init</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">init</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>fd,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>strconv.<span style="color:#06287e">Atoi</span>(os.<span style="color:#06287e">Getenv</span>(<span style="color:#4070a0">&#34;CHILD_READY_FD&#34;</span>));<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">==</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>readyFile<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>os.<span style="color:#06287e">NewFile</span>(<span style="color:#007020">uintptr</span>(fd),<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;readyfd&#34;</span>)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>os.<span style="color:#06287e">Unsetenv</span>(<span style="color:#4070a0">&#34;CHILD_READY_FD&#34;</span>)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>}<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">main</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">main</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#60a0b0;font-style:italic">// …initialize…</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>readyFile<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>readyFile.<span style="color:#06287e">Close</span>()<span style="color:#bbb"> </span><span style="color:#60a0b0;font-style:italic">// signal readiness</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>readyFile<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb">   </span><span style="color:#60a0b0;font-style:italic">// just to be prudent</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>}<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div><h3 id="conclusion">Conclusion</h3>
 <p>Depending on what you’re communicating from the child to the parent, and how
 your system is architected, it might be a good idea to use <a href="http://0pointer.de/blog/projects/socket-activation.html">systemd socket
@@ -5235,69 +5238,56 @@ list</a> so that everyone can participate!</p>
   In the pkg-go team, we are currently discussing which workflows we should
   standardize on.
 </p>
-
 <p>
   One of the considerations is what goes into the “upstream” Git branch of our
   repositories: should it track the upstream Git repository, or should it
   contain orig tarball imports?
 </p>
-
 <p>
   Now, tracking the upstream Git repository only works if upstream actually uses
   Git. The go tool, which is widely used within the Go community for managing Go
   packages, supports Git, Mercurial, Bazaar and Subversion. But which of these
   are actually used in practice?
 </p>
-
 <p>
   Let’s find out!
 </p>
-
 <h3>Option 1: If you have the sources lists of all suites locally anyway</h3>
-
 <pre>
 /usr/lib/apt/apt-helper cat-file \
   $(apt-get indextargets --format '$(FILENAME)' 'ShortDesc: Sources' 'Origin: Debian') \
   | sed -n 's,Go-Import-Path: ,,gp' \
   | sort -u
 </pre>
-
 <h3>Option 2: If you prefer to use a relational database over textfiles</h3>
-
 <p>
   This is the harder option, but also the more complete one.
 </p>
-
 <p>
   First, we’ll need the Go package import paths of all Go packages which are in
   Debian. We can get them from
   the <a href="https://wiki.debian.org/ProjectB">ProjectB</a> database, Debian’s
   main PostgreSQL database containing all of the state about the Debian archive.
 </p>
-
 <p>
   Unfortunately, only Debian Developers have SSH access to a mirror of ProjectB
   at the moment. I contacted DSA to ask about providing public ProjectB access.
 </p>
-
 <pre>
   ssh mirror.ftp-master.debian.org "echo \"SELECT value FROM source_metadata \
   LEFT JOIN metadata_keys ON (source_metadata.key_id = metadata_keys.key_id) \
   WHERE metadata_keys.key = 'Go-Import-Path' GROUP BY value\" | \
     psql -A -t service=projectb" > go_import_path.txt
 </pre>
-
 <p>
   I
   uploaded <a href="https://people.debian.org/~stapelberg/2017-10-22-go_import_path.txt">a
   copy of resulting <code>go_import_path.txt</code></a>, if you’re curious.
 </p>
-
 <p>
   Now, let’s come up with a little bit of Go to print the VCS responsible for
   each specified Go import path:
 </p>
-
 <pre>
 go get -u golang.org/x/tools/go/vcs
 cat >vcs4.go <<'EOT'
@@ -5330,13 +5320,11 @@ func main() {
 }
 EOT
 </pre>
-
 <p>
   Lastly, run it in combination
   with <a href="https://manpages.debian.org/stretch/coreutils/uniq.1"><code>uniq(1)</code></a>
   to discover…
 </p>
-
 <pre>
 go run vcs4.go $(tr '\n' ' ' < go_import_path.txt) | sort | uniq -c
     760 Git

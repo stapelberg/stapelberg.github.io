@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,11 +179,11 @@
 <h1 class="ms_title"> Nachdem ich letztens ein WebD… (2010)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2010-07-27, last modified 2021-09-18</div>
+  <div id="ms_date">published 2010-07-27, last modified 2026-07-20</div>
   
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2010-07-27-Nachdem-ich-letztens-ein-WebD.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2010-07-27-Nachdem-ich-letztens-ein-WebD.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -197,7 +197,6 @@ Upload-Rechte für das extras-devel-Repository.  Nachdem man diese Rechte bekomm
 lädt man seinen SSH-Public-Key hoch und kann danach Pakete in den Autobuilder
 laden.
 </p>
-
 <p>
 Wer von Debian kommt, würde jetzt sein Paket bauen und signiert hochladen.
 Allerdings wies der Autobuilder mein signiertes Paket zurück mit der Meldung,
@@ -213,7 +212,6 @@ verwendet, als diejenige, mit denen man dann die Pakete veröffentlicht. Die
 Lösung aus demselben Thread lautet dann: Pakete muss man eigentlich garnicht
 signieren, die kann man auch einfach so hochladen. Na dann.
 </p>
-
 <p>
 Während man die fehlende Authentifizierung durch Signaturen noch verschmerzen
 kann (immerhin dürfen nur Nutzer mit Upload-Rechten hochladen, was durch
@@ -226,7 +224,6 @@ Problem zu lösen, gibt es den Parameter <code>--ignore-missing-info</code> für
 nicht verfügbar. Nun könnte man also das Paket entweder auf dem Autobuilder
 bauen oder im SDK. Ich will aber natürlich beides.
 </p>
-
 <p>
 Wie löst man das Problem nun? Mit folgendem hässlichen Hack in
 <code>debian/rules</code>:
@@ -234,7 +231,6 @@ Wie löst man das Problem nun? Mit folgendem hässlichen Hack in
 <pre>
 	dh_shlibdeps -- --ignore-missing-info || dh_shlibdeps
 </pre>
-
 <div id="bmc">
   <p>
     Did you like this

@@ -13,7 +13,7 @@
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2025-06-01-nixos-installation-declarative/nix-snowflake-rainbow-featured_hu_2c3edabdd6900fed.png">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2025-06-01-nixos-installation-declarative/nix-snowflake-rainbow-featured_hu_248dae90e659a6fd.png">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -104,7 +104,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -346,7 +346,7 @@ system: same configuration, same build tool. The procedure is documented in the
 <p>I copied the customizations I would typically put into <code>configuration.nix</code>,
 imported the <code>installation-cd-minimal.nix</code> module from <code>nixpkgs</code> and put the
 result in the <code>iso.nix</code> file:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:grid;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{ config<span style="color:#666">,</span> pkgs<span style="color:#666">,</span> <span style="color:#666">...</span> }:
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;display:grid;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{ config<span style="color:#666">,</span> pkgs<span style="color:#666">,</span> <span style="color:#666">...</span> }:
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  imports <span style="color:#666">=</span> [
@@ -449,8 +449,8 @@ machines as in VMs:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2025-06-01-nixos-installation-declarative/2025-05-17-proxmox-frigaten.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2025-06-01-nixos-installation-declarative/2025-05-17-proxmox-frigaten_hu_6bf4477cb712a89f.jpg 2x,https://michael.stapelberg.ch/posts/2025-06-01-nixos-installation-declarative/2025-05-17-proxmox-frigaten_hu_4c049a51d6ef646f.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2025-06-01-nixos-installation-declarative/2025-05-17-proxmox-frigaten_hu_ad95b7d92750e4a1.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2025-06-01-nixos-installation-declarative/2025-05-17-proxmox-frigaten_hu_28842937008a089a.jpg 2x,https://michael.stapelberg.ch/posts/2025-06-01-nixos-installation-declarative/2025-05-17-proxmox-frigaten_hu_82488a6c79f743c9.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2025-06-01-nixos-installation-declarative/2025-05-17-proxmox-frigaten_hu_531b3ee20d663fa3.jpg"
   alt="proxmox VM creation dialog screenshot" title="proxmox VM creation dialog screenshot"
   width="600"
   height="455"
@@ -469,7 +469,7 @@ disable Secure Boot. Note that Proxmox enables Secure Boot by default, for
 example.</p>
 <p>Then, boot the custom installer ISO on the target system, and ensure <code>ssh michael@nixos.lan</code> works without prompting for a password.</p>
 <p>Declare a <code>flake.nix</code> with the following content:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  inputs <span style="color:#666">=</span> {
 </span></span><span style="display:flex;"><span>    nixpkgs<span style="color:#666">.</span>url <span style="color:#666">=</span> <span style="color:#4070a0">&#34;github:nixos/nixpkgs/nixos-25.05&#34;</span>;
 </span></span><span style="display:flex;"><span>
@@ -506,7 +506,7 @@ example.</p>
 </span></span></code></pre></div><p>Declare your disk config in <code>disk-config.nix</code>:</p>
 <details>
 <summary>disk-config.nix</summary>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{ lib<span style="color:#666">,</span> <span style="color:#666">...</span> }:
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{ lib<span style="color:#666">,</span> <span style="color:#666">...</span> }:
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  disko<span style="color:#666">.</span>devices <span style="color:#666">=</span> {
@@ -543,7 +543,7 @@ example.</p>
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div></details>
 <p>Declare your desired NixOS config in <code>configuration.nix</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{ modulesPath<span style="color:#666">,</span> lib<span style="color:#666">,</span> pkgs<span style="color:#666">,</span> <span style="color:#666">...</span> }:
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{ modulesPath<span style="color:#666">,</span> lib<span style="color:#666">,</span> pkgs<span style="color:#666">,</span> <span style="color:#666">...</span> }:
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  imports <span style="color:#666">=</span>

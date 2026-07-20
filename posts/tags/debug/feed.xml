@@ -6,6 +6,9 @@
 
 
   <id>https://michael.stapelberg.ch/posts/tags/debug/</id>
+  <author>
+    <name>Michael Stapelberg</name>
+  </author>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
     <title type="html"><![CDATA[Tips to debug hanging Go programs]]></title>
@@ -166,8 +169,8 @@ stack trace in a more colorful and much shorter version:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_c04249176648ab38.jpg 2x,https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_8da191a897747329.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_e61da31f617a2260.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_4c5f7b3d7df4ad22.jpg 2x,https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_ad1e8c2d9905e0.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_a426e16585061786.jpg"
   
   width="600"
   height="394"
@@ -544,8 +547,8 @@ use core dump debugging!</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_a8173ece4c3f11e6.jpg 2x,https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_beea9b0751b668d7.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_604c37f3566e3ffa.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_8e666702f0357e4d.jpg 2x,https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_a1e1faf114299629.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2024-10-22-debug-go-core-dumps-delve-export-bytes/core-memory-featured_hu_e4c52f9dcb473cf9.jpg"
   alt="Core memory" title="Core memory"
   width="600"
   height="516"
@@ -702,7 +705,7 @@ the commit is part of a released version, you can install the latest dlv
 directly from git:</p>
 <pre tabindex="0"><code>% go install github.com/go-delve/delve/cmd/dlv@master
 </code></pre><p>Save the following Starlark code to a file, for example <code>~/dlv_writebytestofile.star</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Syntax: writebytestofile &lt;byte slice var&gt; &lt;output file path&gt;</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Syntax: writebytestofile &lt;byte slice var&gt; &lt;output file path&gt;</span>
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">def</span> <span style="color:#06287e">command_writebytestofile</span>(args):
 </span></span><span style="display:flex;"><span>	var_name, filename <span style="color:#666">=</span> args<span style="color:#666">.</span>split(<span style="color:#4070a0">&#34; &#34;</span>)
 </span></span><span style="display:flex;"><span>	s <span style="color:#666">=</span> <span style="color:#007020">eval</span>(<span style="color:#007020;font-weight:bold">None</span>, var_name)<span style="color:#666">.</span>Variable
@@ -723,14 +726,14 @@ slice contents of <code>in.Name</code> to <code>/tmp/name.raw</code>:</p>
 (instead of a gRPC server, as above), you will notice that panics in your HTTP
 handlers do not actually result in a core dump! This code in
 <code>go/src/net/http/server.go</code> recovers panics and logs a stack trace:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">defer</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">func</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">defer</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">func</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#007020">recover</span>();<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span><span style="color:#666">&amp;&amp;</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span>ErrAbortHandler<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span><span style="color:#007020;font-weight:bold">const</span><span style="color:#bbb"> </span>size<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span><span style="color:#40a070">64</span><span style="color:#bbb"> </span><span style="color:#666">&lt;&lt;</span><span style="color:#bbb"> </span><span style="color:#40a070">10</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>buf<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#007020">make</span>([]<span style="color:#902000">byte</span>,<span style="color:#bbb"> </span>size)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>buf<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>buf[:runtime.<span style="color:#06287e">Stack</span>(buf,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">false</span>)]<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>c.server.<span style="color:#06287e">logf</span>(<span style="color:#4070a0">&#34;http: panic serving %v: %v\n%s&#34;</span>,<span style="color:#bbb"> </span>c.remoteAddr,<span style="color:#bbb"> </span>err,<span style="color:#bbb"> </span>buf)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>}<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}()<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}()<span style="color:#bbb">
 </span></span></span></code></pre></div><p>Or, in other words: the <code>GOTRACEBACK=crash</code> environment variable configures what
 happens for unhandled signals, but this signal is handled with the <code>recover()</code>
 call, so no core is dumped.</p>
@@ -746,15 +749,15 @@ called), but then how do we produce a core dump from our own handler?</p>
 <code>signal_unix.go</code> and <a href="https://cs.opensource.google/go/go/+/refs/tags/go1.23.2:src/runtime/signal_unix.go;l=938">sends signal <code>SIGABRT</code> with the <code>dieFromSignal</code>
 function</a>
 to the current thread:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020">//go:nosplit</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">crash</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020">//go:nosplit</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">crash</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">        </span><span style="color:#06287e">dieFromSignal</span>(_SIGABRT)<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div><p>The default action for <code>SIGABRT</code> is to “terminate the process and dump core”,
 see <a href="https://manpages.debian.org/signal.7"><code>signal(7)</code></a>
 .</p>
 <p>We can follow the same strategy and send <code>SIGABRT</code> to our process:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">main</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">main</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>http.<span style="color:#06287e">HandleFunc</span>(<span style="color:#4070a0">&#34;/&#34;</span>,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">func</span>(w<span style="color:#bbb"> </span>http.ResponseWriter,<span style="color:#bbb"> </span>r<span style="color:#bbb"> </span><span style="color:#666">*</span>http.Request)<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020;font-weight:bold">defer</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">func</span>()<span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">			</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span><span style="color:#007020">recover</span>();<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">!=</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
@@ -771,7 +774,7 @@ see <a href="https://manpages.debian.org/signal.7"><code>signal(7)</code></a>
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span><span style="color:#007020">panic</span>(<span style="color:#4070a0">&#34;this should result in a core dump&#34;</span>)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>})<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>log.<span style="color:#06287e">Fatal</span>(http.<span style="color:#06287e">ListenAndServe</span>(<span style="color:#4070a0">&#34;:8080&#34;</span>,<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span>))<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div><p>There is one caveat: If you have any non-Go threads running in your program,
 e.g. by using cgo, they might pick up the signal, so ensure they do not install
 a <code>SIGABRT</code> handler (see also: <a href="https://pkg.go.dev/os/signal#hdr-Go_programs_that_use_cgo_or_SWIG">cgo-related documentation in
@@ -1262,8 +1265,8 @@ memory.</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-text.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-text_hu_e53e841704bbad8e.jpg 2x,https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-text_hu_12be45f01fbce110.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-text_hu_566cfd8106263dff.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-text_hu_e53a2969f5c19e04.jpg 2x,https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-text_hu_2fb34e51b47a1dd0.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-text_hu_39d58761b874ede1.jpg"
   
   width="600"
   height="589"
@@ -1320,8 +1323,8 @@ back using <code>layout regs</code>. I’m not sure if there’s an easier way.<
 
 
 <a href="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured_hu_47f2f78d59fa5cf1.jpg 2x,https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured_hu_2b9035be25bb5308.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured_hu_6b635090913012bc.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured_hu_4c759760368c88b2.jpg 2x,https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured_hu_19dbd949043056bf.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-featured_hu_6031eaaf2529d77a.jpg"
   
   width="600"
   height="583"
@@ -1362,8 +1365,8 @@ enabled</a>:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-emacs.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-emacs_hu_d89d1ec45f8765a6.jpg 2x,https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-emacs_hu_b44b68175d66edb5.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-emacs_hu_85dbec5c64f962eb.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-emacs_hu_fbff1f8dcc4b21b3.jpg 2x,https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-emacs_hu_12e9758b9b201bba.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2024-02-11-minimal-linux-bootloader-debugging-story/2024-01-21-gdb-emacs_hu_9da89fd86d8600f9.jpg"
   
   width="600"
   height="584"
@@ -1380,34 +1383,34 @@ border: 0;
 <h2 id="debugging-the-failing-loop">Debugging the failing loop</h2>
 <p>Let’s take a look at the loop that we know the bootloader is entering, but not
 leaving (neither <code>read_protected_mode_kernel_2</code> nor <code>run_kernel</code> are ever called):</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-asm" data-lang="asm"><span style="display:flex;"><span><span style="color:#002070;font-weight:bold">read_protected_mode_kernel:</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-asm" data-lang="asm"><span style="display:flex;"><span><span style="color:#002070;font-weight:bold">read_protected_mode_kernel:</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">mov</span>  <span style="color:#60add5">edx</span>, [<span style="color:#60add5">es</span>:<span style="color:#40a070">0x1f4</span>]              <span style="color:#60a0b0;font-style:italic">; edx stores the number of bytes to load
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    <span style="color:#06287e">shl</span>  <span style="color:#60add5">edx</span>, <span style="color:#40a070">4</span>
+</span></span></span><span style="display:flex;"><span>    <span style="color:#06287e">shl</span>  <span style="color:#60add5">edx</span>, <span style="color:#40a070">4</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#002070;font-weight:bold">.loop:</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">cmp</span>  <span style="color:#60add5">edx</span>, <span style="color:#40a070">0</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">je</span>   <span style="color:#60add5">run_kernel</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">cmp</span>  <span style="color:#60add5">edx</span>, <span style="color:#40a070">0xfe00</span>                  <span style="color:#60a0b0;font-style:italic">; less than 127*512 bytes remaining?
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    <span style="color:#06287e">jb</span>   <span style="color:#60add5">read_protected_mode_kernel_2</span>
+</span></span></span><span style="display:flex;"><span>    <span style="color:#06287e">jb</span>   <span style="color:#60add5">read_protected_mode_kernel_2</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">mov</span>  <span style="color:#60add5">eax</span>, <span style="color:#40a070">0x7f</span>                    <span style="color:#60a0b0;font-style:italic">; load 127 sectors (maximum)
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    <span style="color:#06287e">xor</span>  <span style="color:#60add5">bx</span>, <span style="color:#60add5">bx</span>                       <span style="color:#60a0b0;font-style:italic">; no offset
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    <span style="color:#06287e">mov</span>  <span style="color:#60add5">cx</span>, <span style="color:#40a070">0x2000</span>                   <span style="color:#60a0b0;font-style:italic">; load temporary to 0x20000
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    <span style="color:#06287e">mov</span>  <span style="color:#60add5">esi</span>, <span style="color:#60add5">current_lba</span>
+</span></span></span><span style="display:flex;"><span>    <span style="color:#06287e">xor</span>  <span style="color:#60add5">bx</span>, <span style="color:#60add5">bx</span>                       <span style="color:#60a0b0;font-style:italic">; no offset
+</span></span></span><span style="display:flex;"><span>    <span style="color:#06287e">mov</span>  <span style="color:#60add5">cx</span>, <span style="color:#40a070">0x2000</span>                   <span style="color:#60a0b0;font-style:italic">; load temporary to 0x20000
+</span></span></span><span style="display:flex;"><span>    <span style="color:#06287e">mov</span>  <span style="color:#60add5">esi</span>, <span style="color:#60add5">current_lba</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">call</span> <span style="color:#60add5">read_from_hdd</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">mov</span>  <span style="color:#60add5">cx</span>, <span style="color:#40a070">0x7f00</span>                   <span style="color:#60a0b0;font-style:italic">; move 65024 bytes (127*512 byte)
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    <span style="color:#06287e">call</span> <span style="color:#60add5">do_move</span>
+</span></span></span><span style="display:flex;"><span>    <span style="color:#06287e">call</span> <span style="color:#60add5">do_move</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">sub</span>  <span style="color:#60add5">edx</span>, <span style="color:#40a070">0xfe00</span>                  <span style="color:#60a0b0;font-style:italic">; update the number of bytes to load
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    <span style="color:#06287e">add</span>  <span style="color:#60add5">word</span> [<span style="color:#60add5">gdt.dest</span>], <span style="color:#40a070">0xfe00</span>
+</span></span></span><span style="display:flex;"><span>    <span style="color:#06287e">add</span>  <span style="color:#60add5">word</span> [<span style="color:#60add5">gdt.dest</span>], <span style="color:#40a070">0xfe00</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">adc</span>  <span style="color:#60add5">byte</span> [<span style="color:#60add5">gdt.dest</span><span style="">+</span><span style="color:#40a070">2</span>], <span style="color:#40a070">0</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">jmp</span>  <span style="color:#60add5">short</span> <span style="color:#60add5">read_protected_mode_kernel.loop</span>
 </span></span></code></pre></div><p>The comments explain that the code loads chunks of FE00h == 65024 (127*512)
 bytes at a time.</p>
 <p>Loading means calling <code>read_from_hdd</code>, then <code>do_move</code>. Let’s take a look at <code>do_move</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-asm" data-lang="asm"><span style="display:flex;"><span><span style="color:#002070;font-weight:bold">do_move:</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-asm" data-lang="asm"><span style="display:flex;"><span><span style="color:#002070;font-weight:bold">do_move:</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">push</span> <span style="color:#60add5">edx</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">push</span> <span style="color:#60add5">es</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">xor</span>  <span style="color:#60add5">ax</span>, <span style="color:#60add5">ax</span>
@@ -1415,7 +1418,7 @@ bytes at a time.</p>
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">mov</span>  <span style="color:#60add5">ah</span>, <span style="color:#40a070">0x87</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">mov</span>  <span style="color:#60add5">si</span>, <span style="color:#60add5">gdt</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">int</span>  <span style="color:#40a070">0x15</span>     <span style="color:#60a0b0;font-style:italic">; line 182
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span>    <span style="color:#06287e">jc</span>   <span style="color:#60add5">error</span>
+</span></span></span><span style="display:flex;"><span>    <span style="color:#06287e">jc</span>   <span style="color:#60add5">error</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">pop</span>  <span style="color:#60add5">es</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">pop</span>  <span style="color:#60add5">edx</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">ret</span>
@@ -1539,14 +1542,14 @@ an idea of the amount of code needed.</p>
 out</a>
 that the following code change should fix the truncation and result in a GDT
 with all address bits in the right place:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#a00000">--- i/mbr/bootloader.asm
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ w/mbr/bootloader.asm
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -119,6 +119,7 @@ read_protected_mode_kernel:
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span> 	sub	edx, 0xfe00			; update the number of bytes to load
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#a00000">--- i/mbr/bootloader.asm
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+++ w/mbr/bootloader.asm
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -119,6 +119,7 @@ read_protected_mode_kernel:
+</span></span></span><span style="display:flex;"><span> 	sub	edx, 0xfe00			; update the number of bytes to load
 </span></span><span style="display:flex;"><span> 	add	word [gdt.dest], 0xfe00
 </span></span><span style="display:flex;"><span> 	adc	byte [gdt.dest+2], 0
 </span></span><span style="display:flex;"><span><span style="color:#00a000">+	adc	byte [gdt.dest+5], 0
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 	jmp	short read_protected_mode_kernel.loop
+</span></span></span><span style="display:flex;"><span> 	jmp	short read_protected_mode_kernel.loop
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span> read_protected_mode_kernel_2:
 </span></span></code></pre></div><p>…and indeed, in my first test this seems to fix the problem! It’ll take me a
@@ -1559,7 +1562,7 @@ a better understanding of how Move Memory Block works.</p>
 DOS emulator. Its <a href="https://sourceforge.net/p/dosbox/code-0/HEAD/tree/dosbox/branches/0_74_3/src/ints/bios.cpp#l663">Move Memory Block
 implementation</a>
 does seem to support 32 bit addresses:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>PhysPt dest	<span style="color:#666">=</span> (<span style="color:#06287e">mem_readd</span>(data<span style="color:#666">+</span><span style="color:#40a070">0x1A</span>) <span style="color:#666">&amp;</span> <span style="color:#40a070">0x00FFFFFF</span>) <span style="color:#666">+</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>PhysPt dest	<span style="color:#666">=</span> (<span style="color:#06287e">mem_readd</span>(data<span style="color:#666">+</span><span style="color:#40a070">0x1A</span>) <span style="color:#666">&amp;</span> <span style="color:#40a070">0x00FFFFFF</span>) <span style="color:#666">+</span>
 </span></span><span style="display:flex;"><span>              (<span style="color:#06287e">mem_readb</span>(data<span style="color:#666">+</span><span style="color:#40a070">0x1E</span>)<span style="color:#666">&lt;&lt;</span><span style="color:#40a070">24</span>);
 </span></span></code></pre></div><p>Another implementation is <a href="https://www.seabios.org/SeaBIOS">SeaBIOS</a>. Contrary
 to DOSBox, SeaBIOS is not just used in emulation: The PC Engines apu uses

@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,11 +179,11 @@
 <h1 class="ms_title"> Heute in „Warum ich die GNU a… (2010)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2010-04-18, last modified 2018-03-23</div>
+  <div id="ms_date">published 2010-04-18, last modified 2026-07-20</div>
   
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2010-04-18-Heute-in-Warum-ich-die-GNU-a.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2010-04-18-Heute-in-Warum-ich-die-GNU-a.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -198,7 +198,6 @@ System in hinreichend aktueller Version verfügbar sind und sie stellen mit
 libtool ein Script bereit, mit dem man systemunabhängig shared libraries
 erstellen kann.
 </p>
-
 <p>
 Das Problem bei PHP5 ist nun, dass die Länge des Befehls zum Linken aufgrund
 der vielen .o-Dateien so lang ist, dass libtool glaubt, den Befehl in
@@ -209,7 +208,6 @@ LT_CMD_MAX_LEN <a
 href="http://git.savannah.gnu.org/cgit/libtool.git/tree/libltdl/m4/libtool.m4#n1457">gerne
 mal ansehen</a>. Ansonsten hier der Patch, mit dem das Problem gelöst wird:
 </p>
-
 <pre>
 --- a/libltdl/m4/libtool.m4
 +++ b/libltdl/m4/libtool.m4
@@ -225,20 +223,17 @@ mal ansehen</a>. Ansonsten hier der Patch, mit dem das Problem gelöst wird:
      # On DJGPP, this test can blow up pretty badly due to problems in libc
      # (any single argument exceeding 2000 bytes causes a buffer overrun
 </pre>
-
 <p>
 <code>getconf</code> ist übrigens in POSIX.2, also 1992 (!) spezifiziert. Es
 ist mir ein Rätsel, warum man das nicht in erster Linie verwendet. Verwendet
 jemand ernsthaft noch 20 Jahre alte Systeme und denkt, er könne sich
 beschweren, wenn aktuelle Software nicht mehr läuft?
 </p>
-
 <p>
 Übrigens: Wenn du dein System (für ein paar Minuten?) aufhängen möchtest,
 kannst du mal den Teil des LT_CMD_MAX_LEN-Makros ausführen, der für unbekannte
 Systeme verwendet wird…
 </p>
-
 <div id="bmc">
   <p>
     Did you like this

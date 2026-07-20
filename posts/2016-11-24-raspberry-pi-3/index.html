@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,7 +179,7 @@
 <h1 class="ms_title">Debian stretch on the Raspberry Pi 3 (2016)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2016-11-24, last modified 2019-02-04</div>
+  <div id="ms_date">published 2016-11-24, last modified 2026-07-20</div>
   
   
   <div id="ms_tags">
@@ -192,7 +192,7 @@
   </div>
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2016-11-24-raspberry-pi-3.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2016-11-24-raspberry-pi-3.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -201,7 +201,6 @@
 The last couple of days, I worked on getting Debian to run on the Raspberry Pi
 3.
 </p>
-
 <p>
 Thanks to the work of many talented people, the Linux kernel in version 4.8 is
 _almost_ ready to run on the Raspberry Pi 3. The only missing thing is the
@@ -210,7 +209,6 @@ card. I’ve asked our maintainers to <a
 href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=845422">include the
 patch</a> for the time being.
 </p>
-
 <p>
 Aside from the kernel, one also needs a working bootloader, hence I used
 Ubuntu’s linux-firmware-raspi2 package and uploaded the <a
@@ -218,7 +216,6 @@ href="https://anonscm.debian.org/cgit/pkg-raspi/linux-firmware-raspi3.git/">linu
 package</a> to Debian. The package is currently in the NEW queue and needs to
 be accepted by ftp-master before entering Debian.
 </p>
-
 <p>
 The most popular method of providing a Linux distribution for the Raspberry Pi
 is to provide an image that can be written to an SD card. I made two little
@@ -227,14 +224,12 @@ href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=845439">#845439</a>, <a
 href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=845526">#845526</a>)
 which make it easier to create such an image.
 </p>
-
 <p>
 The Debian wiki page <a
 href="https://wiki.debian.org/RaspberryPi3">https://wiki.debian.org/RaspberryPi3</a>
 describes the current state of affairs and should be updated, as this blog post
 will not be updated.
 </p>
-
 <p>
 As a <strong>preview version</strong> (i.e. unofficial, unsupported, etc.)
 until all the necessary bits and pieces are in place to build images in a
@@ -243,12 +238,10 @@ href="https://people.debian.org/~stapelberg/raspberrypi3/">https://people.debian
 To install the image, insert the SD card into your computer (I’m assuming it’s
 available as <code>/dev/sdb</code>) and copy the image onto it:
 </p>
-
 <pre>
 $ wget https://people.debian.org/~stapelberg/raspberrypi3/2016-11-24-raspberry-pi-3-stretch-PREVIEW.img
 $ sudo dd if=2016-11-24-raspberry-pi-3-stretch-PREVIEW.img of=/dev/sdb bs=5M
 </pre>
-
 <p>
 I hope this initial work on getting Debian booted will motivate other people to
 contribute little improvements here and there. A list of current limitations

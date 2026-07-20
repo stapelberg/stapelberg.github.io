@@ -14,7 +14,7 @@ While a commercial solution like IPMI offers many more features like remote seri
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2022-10-09-remote-power-button/IMG_1085_featured_hu_c28594675526ce90.jpg">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2022-10-09-remote-power-button/IMG_1085_featured_hu_baf2045bc687bf2c.jpg">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -106,7 +106,7 @@ While a commercial solution like IPMI offers many more features like remote seri
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -226,8 +226,8 @@ has great price performance if all you need is power management.</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2022-10-09-remote-power-button/IMG_1085_featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-10-09-remote-power-button/IMG_1085_featured_hu_cfa0af0c0a30ea77.jpg 2x,https://michael.stapelberg.ch/posts/2022-10-09-remote-power-button/IMG_1085_featured_hu_c9ece9d621cf9445.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2022-10-09-remote-power-button/IMG_1085_featured_hu_1943ebaca229c7a0.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2022-10-09-remote-power-button/IMG_1085_featured_hu_7f67b658cdddb334.jpg 2x,https://michael.stapelberg.ch/posts/2022-10-09-remote-power-button/IMG_1085_featured_hu_7b1a6c65f8b67cd0.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-10-09-remote-power-button/IMG_1085_featured_hu_eea6cc77cf617702.jpg"
   alt="The inside of a PC case, where an ESP32 micro controller on an Adafruit Perma-Proto bread board is mounted inside the case and wired up to the mainboard with jumper wires for remote power control" title="The inside of a PC case, where an ESP32 micro controller on an Adafruit Perma-Proto bread board is mounted inside the case and wired up to the mainboard with jumper wires for remote power control"
   width="600"
   height="450"
@@ -314,7 +314,7 @@ easily implement the functionality I wanted :)</p>
 lines to make the GPIO pin available through MQTT, and make it a momentary
 switch instead of a toggle switch, so that it briefly presses the power button
 and doesn’t hold the power button:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">switch</span>:<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">switch</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">platform</span>:<span style="color:#bbb"> </span>gpio<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">pin</span>:<span style="color:#bbb"> </span><span style="color:#40a070">25</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">id</span>:<span style="color:#bbb"> </span>powerbtn<span style="color:#bbb">
@@ -326,24 +326,24 @@ and doesn’t hold the power button:</p>
 </span></span></span></code></pre></div><p>I have elided the full configuration for brevity, but you can click here to see it:</p>
 <details>
 <summary>full ESPHome YAML configuration</summary>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">esphome</span>:<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">esphome</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>poweresp<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">esp32</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">esp32</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">board</span>:<span style="color:#bbb"> </span>pico32<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">framework</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">type</span>:<span style="color:#bbb"> </span>arduino<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#60a0b0;font-style:italic"># Enable logging</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">logger</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Enable logging</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">logger</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">mqtt</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">mqtt</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">broker</span>:<span style="color:#bbb"> </span><span style="color:#40a070">10.0.0.54</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">ota</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">ota</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">password</span>:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">wifi</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">wifi</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">ssid</span>:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;essid&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">password</span>:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;secret&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
@@ -352,9 +352,9 @@ and doesn’t hold the power button:</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">ssid</span>:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;Poweresp Fallback Hotspot&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">password</span>:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;secret2&#34;</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">captive_portal</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">captive_portal</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">switch</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">switch</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">platform</span>:<span style="color:#bbb"> </span>gpio<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">pin</span>:<span style="color:#bbb"> </span><span style="color:#40a070">25</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">id</span>:<span style="color:#bbb"> </span>powerbtn<span style="color:#bbb">
@@ -390,7 +390,7 @@ few pointers:</p>
 </ul>
 <h2 id="integration-into-automation">Integration into automation</h2>
 <p>To push the power button remotely from Go, I’m using the following code:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">pushMainboardPower</span>(mqttBroker,<span style="color:#bbb"> </span>clientID<span style="color:#bbb"> </span><span style="color:#902000">string</span>)<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">func</span><span style="color:#bbb"> </span><span style="color:#06287e">pushMainboardPower</span>(mqttBroker,<span style="color:#bbb"> </span>clientID<span style="color:#bbb"> </span><span style="color:#902000">string</span>)<span style="color:#bbb"> </span><span style="color:#902000">error</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>opts<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>mqtt.<span style="color:#06287e">NewClientOptions</span>().<span style="color:#06287e">AddBroker</span>(mqttBroker)<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">if</span><span style="color:#bbb"> </span>hostname,<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">:=</span><span style="color:#bbb"> </span>os.<span style="color:#06287e">Hostname</span>();<span style="color:#bbb"> </span>err<span style="color:#bbb"> </span><span style="color:#666">==</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb"> </span>{<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">		</span>clientID<span style="color:#bbb"> </span><span style="color:#666">+=</span><span style="color:#bbb"> </span><span style="color:#4070a0">&#34;@&#34;</span><span style="color:#bbb"> </span><span style="color:#666">+</span><span style="color:#bbb"> </span>hostname<span style="color:#bbb">
@@ -411,7 +411,7 @@ few pointers:</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span>}<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">	</span><span style="color:#007020;font-weight:bold">return</span><span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">nil</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>}<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>}<span style="color:#bbb">
 </span></span></span></code></pre></div><h2 id="conclusion">Conclusion</h2>
 <p>I hope this small project write-up is useful to others in a similar situation!</p>
 <p>If you need more features than that, check out the next step on the feature and

@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,7 +179,7 @@
 <h1 class="ms_title">mergebot: easily merging contributions (2016)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2016-07-17, last modified 2019-02-04</div>
+  <div id="ms_date">published 2016-07-17, last modified 2026-07-20</div>
   
   
   <div id="ms_tags">
@@ -192,7 +192,7 @@
   </div>
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2016-07-17-mergebot.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2016-07-17-mergebot.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -200,15 +200,12 @@
   <p>
 Recently, I was wondering why I was pushing off accepting contributions in Debian for longer than in other projects. It occurred to me that the effort to accept a contribution in Debian is way higher than in other FOSS projects. My remaining FOSS projects are on GitHub, where I can just click the “Merge” button after deciding a contribution looks good. In Debian, merging is actually a lot of work: I need to clone the repository, configure it, merge the patch, update the changelog, build and upload.
 </p>
-
 <p>
 I wondered how close we can bring Debian to a model where accepting a contribution is just a single click as well. In principle, I think it can be done.
 </p>
-
 <p>
 To demonstrate the feasibility and collect some feedback, I wrote a program called <code>mergebot</code>. The first stage is done: <code>mergebot</code> can be used on your local machine as a command-line tool. You provide it with the source package and bug number which contains the patch in question, and it will do the rest:
 </p>
-
 <pre style="background-color: black; color: white; padding: 0.1em; overflow-x: auto">
 <span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">~</span> $ mergebot -source_package=wit -bug=#831331
 2016/07/17 12:06:06 will work on package "wit", bug "831331"
@@ -261,11 +258,9 @@ Uploading wit_2.31a-3.debian.tar.xz
 Uploading wit_2.31a-3_amd64.deb
 Uploading wit_2.31a-3_amd64.changes
 </pre>
-
 <p>
 Of course, this is not quite as convenient as clicking a “Merge” button yet. I have <a href="https://github.com/Debian/mergebot#future-ideas">some ideas</a> on how to make that happen, but I need to know whether people are interested before I spend more time on this.
 </p>
-
 <p>
 Please see <a href="https://github.com/Debian/mergebot">github.com/Debian/mergebot</a> for more details, and please get in touch if you think this is worthwhile or would even like to help. Feedback is accepted in the GitHub issue tracker for mergebot or <a href="https://lists.alioth.debian.org/cgi-bin/mailman/listinfo/mergebot-discuss">the project mailing list mergebot-discuss</a>. Thanks!
 </p>

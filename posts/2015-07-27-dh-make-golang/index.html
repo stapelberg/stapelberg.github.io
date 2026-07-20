@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,7 +179,7 @@
 <h1 class="ms_title">dh-make-golang: creating Debian packages from Go packages (2015)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2015-07-27, last modified 2019-02-04</div>
+  <div id="ms_date">published 2015-07-27, last modified 2026-07-20</div>
   
   
   <div id="ms_tags">
@@ -192,7 +192,7 @@
   </div>
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2015-07-27-dh-make-golang.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2015-07-27-dh-make-golang.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -212,7 +212,7 @@
   </style>
   <details class="ms_toc_details">
     <summary>Table of contents</summary>
-    
+    <nav class="TableOfContents"></nav>
   </details>
   <p>
 Recently, the <a href="https://pkg-go.alioth.debian.org/">pkg-go team</a> has
@@ -222,7 +222,6 @@ user-space file system for interacting with Google Cloud Storage) and <a
 href="https://influxdb.com/">InfluxDB</a> (an open-source distributed time
 series database).
 </p>
-
 <p>
 Packaging Go library packages (!) is a fairly repetitive process, so before
 starting my work on the dependencies for gcsfuse, I started writing a tool
@@ -230,17 +229,14 @@ called <a href="https://github.com/Debian/dh-make-golang">dh-make-golang</a>.
 Just like dh-make itself, the goal is to automatically create (almost) an
 entire Debian package.
 </p>
-
 <p>
 As I worked my way through the dependencies of gcsfuse, I refined how the tool
 works, and now I believe it’s good enough for a first release.
 </p>
-
 <p>
 To demonstrate how the tool works, let’s assume we want to package the Go
 library <a href="https://github.com/jacobsa/ratelimit">github.com/jacobsa/ratelimit</a>:
 </p>
-
 <pre style="background-color: black; color: white; padding: 0.1em; overflow-x: scroll">
 <span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">/tmp</span> $ dh-make-golang github.com/jacobsa/ratelimit
 2015/07/25 18:25:39 Downloading "github.com/jacobsa/ratelimit/..."
@@ -267,7 +263,6 @@ library <a href="https://github.com/jacobsa/ratelimit">github.com/jacobsa/rateli
 2015/07/25 18:25:55     git remote set-url origin git@salsa.debian.org:go-team/packages/golang-github-jacobsa-ratelimit.git
 2015/07/25 18:25:55     gbp push
 </pre>
-
 <p>
 The ITP is often the most labor-intensive part of the packaging process,
 because any number of auto-detected values might be wrong: the repository owner
@@ -275,7 +270,6 @@ might not be the “Upstream Author”, the repository might not have a short
 description, the long description might need some adjustments or the license
 might not be auto-detected.
 </p>
-
 <pre style="background-color: black; color: white; padding: 0.1em">
 <span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">/tmp</span> $ cat itp-golang-github-jacobsa-ratelimit.txt
 From: "Michael Stapelberg" &lt;stapelberg AT debian.org&gt;
@@ -304,12 +298,10 @@ Owner: Michael Stapelberg &lt;stapelberg AT debian.org&gt;
 TODO: perhaps reasoning
 <span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">/tmp</span> $
 </pre>
-
 <p>
 After filling in all the TODOs in the file, let’s mail it out and get a sense
 of what else still needs to be done:
 </p>
-
 <pre style="background-color: black; color: white; padding: 0.1em">
 <span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">/tmp</span> $ sendmail -t -f &lt; itp-golang-github-jacobsa-ratelimit.txt
 <span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">/tmp</span> $ cd golang-github-jacobsa-ratelimit
@@ -317,12 +309,10 @@ of what else still needs to be done:
 debian/changelog:  * Initial release (Closes: TODO) 
 <span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">/tmp/golang-github-jacobsa-ratelimit</span> <span style="color: #04B5B8">master</span> $
 </pre>
-
 <p>
 After filling in these TODOs as well, let’s have a final look at what we’re
 about to build:
 </p>
-
 <pre style="background-color: black; color: white; padding: 0.1em; overflow-x: scroll">
 <span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">/tmp/golang-github-jacobsa-ratelimit</span> <span style="color: #04B5B8">master</span> $ head -100 debian/**/*
 ==&gt; debian/changelog &lt;==                            
@@ -418,11 +408,9 @@ head: error reading ‘debian/source’: Is a directory
 3.0 (quilt)
 <span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">/tmp/golang-github-jacobsa-ratelimit</span> <span style="color: #04B5B8">master</span> $
 </pre>
-
 <p>
 Okay, then. Let’s give it a shot and see if it builds:
 </p>
-
 <pre style="background-color: black; color: white; padding: 0.1em; overflow-x: scroll">
 <span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">/tmp/golang-github-jacobsa-ratelimit</span> <span style="color: #04B5B8">master</span> $ git add debian &amp;&amp; git commit -a -m 'Initial packaging'
 [master 48f4c25] Initial packaging                                                      
@@ -442,11 +430,9 @@ P: golang-github-jacobsa-ratelimit-dev: no-upstream-changelog
 I: golang-github-jacobsa-ratelimit-dev: extended-description-is-probably-too-short
 <span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">/tmp/golang-github-jacobsa-ratelimit</span> <span style="color: #04B5B8">master</span> $
 </pre>
-
 <p>
 This package just built (as it should!), but occasionally one might need to disable a test and file an upstream bug about it. So, let’s push this package to pkg-go and upload it:
 </p>
-
 <pre style="background-color: black; color: white; padding: 0.1em; overflow-x: scroll">
 <span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">/tmp/golang-github-jacobsa-ratelimit</span> <span style="color: #04B5B8">master</span> $ ssh git.debian.org "/git/pkg-go/setup-repository golang-github-jacobsa-ratelimit 'Packaging for golang-github-jacobsa-ratelimit'"
 Initialized empty shared Git repository in /srv/git.debian.org/git/pkg-go/packages/golang-github-jacobsa-ratelimit.git/
@@ -485,7 +471,6 @@ To git+ssh://git.debian.org/git/pkg-go/packages/golang-github-jacobsa-ratelimit.
  * [new tag]         debian/0.0_git20150723.0.2ca5e0c-1 -&gt; debian/0.0_git20150723.0.2ca5e0c-1
 <span style="background-color: #04B5B8; color: black">midna</span> <span style="color: #8AE234">/tmp/golang-github-jacobsa-ratelimit</span> <span style="color: #04B5B8">master</span> $
 </pre>
-
 <p>
 Thanks for reading this far, and I hope dh-make-golang makes your life a tiny
 bit easier. As <a
@@ -517,7 +502,7 @@ dh-make-golang</code>. If you have any feedback, I’m eager to hear it.
   <div>
     <strong>Table Of Contents</strong>
 
-    
+    <nav class="TableOfContents"></nav>
   </div>
 </div>
 

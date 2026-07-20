@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,11 +179,11 @@
 <h1 class="ms_title"> Auf meinem Server nutze ich X… (2010)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2010-03-21, last modified 2018-03-23</div>
+  <div id="ms_date">published 2010-03-21, last modified 2026-07-20</div>
   
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2010-03-21-Auf-meinem-Server-nutze-ich-X.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2010-03-21-Auf-meinem-Server-nutze-ich-X.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -198,7 +198,6 @@ einen Snapshot der LVs mountet, der dann gesichert wird:
 <a href="http://code.stapelberg.de/git/xen-lvm-snapshot/">
 http://code.stapelberg.de/git/xen-lvm-snapshot/</a>.
 </p>
-
 <p>
 Da ich den Snapshot zu einem beliebigen Zeitpunkt (dann, wenn das Backup eben
 läuft) anfertige, ist das Dateisystem des Gastsystems natürlich nicht
@@ -207,7 +206,6 @@ ein Journaling Filesystem ist, kann man den Snapshot nicht einfach mounten).
 Deswegen nutze ich <code>fsck</code> um das Journal abspielen zu lassen und
 somit einen sauberen Zustand des Dateisystems für die Sicherung zu erlangen.
 </p>
-
 <p>
 Das funktionierte auch bis gestern einwandfrei. Dann allerdings meinte
 <code>fsck</code>, dass 183 Tage ohne Überprüfung des Dateisystems zu lange
@@ -218,14 +216,12 @@ wiederum veranlasst die Shell, das Script abzubrechen (durch <code>set -e
 </code>), bevor der Snapshot gemountet wird, was wiederum <code>bacula</code>
 stört (immerhin wurde der Fehler bis hin zu mir durchgereicht).
 </p>
-
 <p>
 Die <a href="http://code.stapelberg.de/git/xen-lvm-snapshot/commit/?id=c89ef0d0687cf3dd65d5c7ac409c2d46548fe6b2">
 Lösung des Problems</a> ist trivial, gleichzeitig sieht man hier aber schön,
 wie selbst vermeintlich simple Programme monatelang funktionieren können, bevor
 ein Fehler bemerkt wird.
 </p>
-
 <div id="bmc">
   <p>
     Did you like this

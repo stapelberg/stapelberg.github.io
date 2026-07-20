@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,11 +179,11 @@
 <h1 class="ms_title"> Ich habe gerade auf Arbeit ei… (2010)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2010-05-04, last modified 2018-03-23</div>
+  <div id="ms_date">published 2010-05-04, last modified 2026-07-20</div>
   
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2010-05-04-Ich-habe-gerade-auf-Arbeit-ei.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2010-05-04-Ich-habe-gerade-auf-Arbeit-ei.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -195,7 +195,6 @@ des Buffers auf der Karte einfach hing. Als ich mir das Problem auf meiner
 Testmaschine anschaute, hing der Transfer nicht nur, sondern gelegentlich
 startete auch die Maschine neu (manchmal mit Kernel Panic).
 </p>
-
 <p>
 Für Leute mit ein bisschen Kenntnis von Kerneltreibern ist nun eigentlich
 die erste Vermutung, dass mit dem DMA-Transfer etwas nicht stimmt. Kurz
@@ -207,14 +206,12 @@ Fall bedeutet, dass sie garnicht erst angefangen hat, im schlimmsten Fall
 hat sie nie aufgehört und schreibt dann natürlich einfach den gesamten Speicher
 mit irgendwelchen Werten voll :-).
 </p>
-
 <p>
 Leider ist auf dieser Karte der DMA-Teil nicht innerhalb des FPGAs, ansonsten
 hätte man die Möglichkeit gehabt, sich genau anzuschauen, was vom Rechner
 kommt und wo dabei das Problem ist. Stattdessen erledigt ein externer
 Chip den DMA-Transfer, der sich allerdings über die Jahre bewährt hat.
 </p>
-
 <p>
 Das eigentliche Problem war nun, dass tatsächlich einfach das Stop-Bit im
 letzten DMA-descriptor fehlte. Daher trat das Problem nur bei DMA-Transfers
@@ -225,19 +222,16 @@ Pagesize sein und der Speicher musste aligned sein (was von der Anwendung nicht
 gefordert wurde, da es nicht notwendig ist in diesem Fall). Der Bugfix sieht
 dann so aus:
 </p>
-
 <pre> 
 -    if (restOfTransferSize < pagesize) {
 +    if (restOfTransferSize <= pagesize) {
 </pre>
-
 <p>
 …und ja, natürlich hab ich mir den Spaß nicht nehmen lassen, ein paar mal
 den Speicher mit Müll vollzuschreiben und zu schauen, wo es kracht :-). Und
 im Gegensatz zu der letzten DMA debugging session hat es mir dabei nicht das
 Dateisystem zerschossen, sondern nur (wiederholt) .zsh_history und .viminfo.
 </p>
-
 <div id="bmc">
   <p>
     Did you like this

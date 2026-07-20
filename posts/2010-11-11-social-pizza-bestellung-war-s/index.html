@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,11 +179,11 @@
 <h1 class="ms_title"> Social Pizza-Bestellung war s… (2010)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2010-11-11, last modified 2018-03-23</div>
+  <div id="ms_date">published 2010-11-11, last modified 2026-07-20</div>
   
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2010-11-11-Social-Pizza-Bestellung-war-s.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2010-11-11-Social-Pizza-Bestellung-war-s.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -196,7 +196,6 @@ Aufgrund mangelnder Computerfähigkeiten der Jungs bei (bzw. hinter) Hallo
 Pizza (Bestellungen gehen per Fax ein und werden dann abgetippt!), kommt dieses
 Feature natürlich nicht.
 </p>
-
 <p>
 Daher sind wir das mal selbst angegangen. Unsere Lösung besteht aus einem
 Proxy-Server auf unserem Router, der Requests an hallopizza.de weiterleitet und
@@ -204,7 +203,6 @@ dabei das Cookie ersetzt. Wir haben dazu zwei vhosts: Einer mit hübschem
 DNS-Namen, der dann auf den anderen mit korrekter URL weiterleitet (damit man
 nicht auf der Eingangsseite landet).
 </p>
-
 <pre>
 &lt;VirtualHost 172.22.37.2:80&gt;
         DocumentRoot /var/www
@@ -217,7 +215,6 @@ nicht auf der Eingangsseite landet).
         RewriteRule / http://172.22.37.1/bestellen/ [L]
 &lt;/VirtualHost&gt;
 </pre>
-
 <p>
 Der andere vhost ist dann Proxy-Server für hallopizza.de. Dabei gilt es zu
 beachten, dass Antworten von hallopizza.de üblicherweise komprimiert sind
@@ -225,7 +222,6 @@ beachten, dass Antworten von hallopizza.de üblicherweise komprimiert sind
 ersetzen wir die URL http://hallopizza.de/ durch http://172.22.37.1/ und fügen
 ein Cookie hinzu (das holt man sich vorher von hallopizza.de, z.B. via wget):
 </p>
-
 <pre>
 &lt;VirtualHost 172.22.37.1:80&gt;
         DocumentRoot /var/www
@@ -244,13 +240,11 @@ ein Cookie hinzu (das holt man sich vorher von hallopizza.de, z.B. via wget):
         RequestHeader set Cookie "hallopizza=blargh"
 &lt;/VirtualHost&gt;
 </pre>
-
 <p>
 Man sollte darauf achten, dass man nicht gleichzeitig im Warenkorb rumklickt,
 hallopizza.de verträgt das nicht so gut. Wenn man das aber nacheinander macht,
 funktioniert es einwandfrei.
 </p>
-
 <div id="bmc">
   <p>
     Did you like this

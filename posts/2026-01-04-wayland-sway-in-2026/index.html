@@ -12,7 +12,7 @@
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-select1-featured_hu_e6c8d9344a09ba58.png">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-select1-featured_hu_ace81dd3b9a74e19.png">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -103,7 +103,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -351,7 +351,7 @@ declarative approach is really nice for doing such tests, because you can
 reliably restore your system to an earlier version.</p>
 <p>To make a Wayland/sway session available on my NixOS 25.11 installation, I added
 the following lines to my NixOS configuration file (<code>configuration.nix</code>):</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># GDM display manager (can launch both X11/i3 and Wayland/Sway sessions)</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># GDM display manager (can launch both X11/i3 and Wayland/Sway sessions)</span>
 </span></span><span style="display:flex;"><span>services<span style="color:#666">.</span>displayManager<span style="color:#666">.</span>gdm<span style="color:#666">.</span>enable <span style="color:#666">=</span> <span style="color:#60add5">true</span>;
 </span></span><span style="display:flex;"><span>services<span style="color:#666">.</span>displayManager<span style="color:#666">.</span>gdm<span style="color:#666">.</span>autoSuspend <span style="color:#666">=</span> <span style="color:#60add5">false</span>;
 </span></span><span style="display:flex;"><span>
@@ -364,7 +364,7 @@ the following lines to my NixOS configuration file (<code>configuration.nix</cod
 </span></span><span style="display:flex;"><span>  extraOptions <span style="color:#666">=</span> [ <span style="color:#4070a0">&#34;--unsupported-gpu&#34;</span> ];
 </span></span><span style="display:flex;"><span>};
 </span></span></code></pre></div><p>I also added the following Wayland-specific programs to <code>environment.systemPackages</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>environment<span style="color:#666">.</span>systemPackages <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">with</span> pkgs; [
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>environment<span style="color:#666">.</span>systemPackages <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">with</span> pkgs; [
 </span></span><span style="display:flex;"><span>  <span style="color:#60a0b0;font-style:italic"># …</span>
 </span></span><span style="display:flex;"><span>  foot          <span style="color:#60a0b0;font-style:italic"># terminal emulator</span>
 </span></span><span style="display:flex;"><span>  wtype         <span style="color:#60a0b0;font-style:italic"># replacement for xdotool type</span>
@@ -399,25 +399,25 @@ use, and configuring <code>input</code>/<code>output</code> blocks that I former
 file</a>:</p>
 <details>
 <summary>my changes to the default Sway config</summary>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#a00000">--- /home/michael/src/sway/config.in	2025-09-24 19:08:38.876573260 +0200
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ /home/michael/.config/sway/config	2025-12-31 15:50:38.616697542 +0100
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -9,19 +9,76 @@
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span> # Logo key. Use Mod1 for Alt.
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#a00000">--- /home/michael/src/sway/config.in	2025-09-24 19:08:38.876573260 +0200
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+++ /home/michael/.config/sway/config	2025-12-31 15:50:38.616697542 +0100
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -9,19 +9,76 @@
+</span></span></span><span style="display:flex;"><span> # Logo key. Use Mod1 for Alt.
 </span></span><span style="display:flex;"><span> set $mod Mod4
 </span></span><span style="display:flex;"><span> # Home row direction keys, like vim
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-set $left h
 </span></span></span><span style="display:flex;"><span><span style="color:#a00000">-set $down j
 </span></span></span><span style="display:flex;"><span><span style="color:#a00000">-set $up k
 </span></span></span><span style="display:flex;"><span><span style="color:#a00000">-set $right l
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+set $left n
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+set $left n
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+set $down r
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+set $up t
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+set $right d
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> # Your preferred terminal emulator
+</span></span></span><span style="display:flex;"><span> # Your preferred terminal emulator
 </span></span><span style="display:flex;"><span> set $term foot
 </span></span><span style="display:flex;"><span> # Your preferred application launcher
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-set $menu wmenu-run
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+set $menu fuzzel
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+set $menu fuzzel
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+font pango:Bitstream Vera Sans Mono 8
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+
@@ -445,28 +445,28 @@ file</a>:</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	accel_profile adaptive
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	pointer_accel 0.2
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+}
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 
+</span></span></span><span style="display:flex;"><span> 
 </span></span><span style="display:flex;"><span> ### Output configuration
 </span></span><span style="display:flex;"><span> #
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-# Default wallpaper (more resolutions are available in @datadir@/backgrounds/sway/)
 </span></span></span><span style="display:flex;"><span><span style="color:#a00000">-output * bg @datadir@/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+output * bg /dev/null fill #333333
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+output * bg /dev/null fill #333333
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+output * scale 3
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> #
+</span></span></span><span style="display:flex;"><span> #
 </span></span><span style="display:flex;"><span> # Example configuration:
 </span></span><span style="display:flex;"><span> #
 </span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -33,14 +90,41 @@
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span> #
+</span></span></span><span style="display:flex;"><span> #
 </span></span><span style="display:flex;"><span> # Example configuration:
 </span></span><span style="display:flex;"><span> #
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-# exec swayidle -w \
 </span></span></span><span style="display:flex;"><span><span style="color:#a00000">-#          timeout 300 &#39;swaylock -f -c 000000&#39; \
 </span></span></span><span style="display:flex;"><span><span style="color:#a00000">-#          timeout 600 &#39;swaymsg &#34;output * power off&#34;&#39; resume &#39;swaymsg &#34;output * power on&#34;&#39; \
 </span></span></span><span style="display:flex;"><span><span style="color:#a00000">-#          before-sleep &#39;swaylock -f -c 000000&#39;
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+exec swayidle -w \
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+exec swayidle -w \
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+         before-sleep &#39;~/swaylock.sh&#39; \
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+         lock &#39;~/swaylock.sh&#39;
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> #
+</span></span></span><span style="display:flex;"><span> #
 </span></span><span style="display:flex;"><span> # This will lock your screen after 300 seconds of inactivity, then turn off
 </span></span><span style="display:flex;"><span> # your displays after another 300 seconds, and turn your screens back on when
 </span></span><span style="display:flex;"><span> # resumed. It will also lock your screen before your computer goes to sleep.
@@ -474,66 +474,66 @@ file</a>:</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+  # Notifications
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+  bindsym $mod+period exec dunstctl close
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 
+</span></span></span><span style="display:flex;"><span> 
 </span></span><span style="display:flex;"><span> ### Input configuration
 </span></span><span style="display:flex;"><span> #
 </span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -63,11 +147,13 @@
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>     # Start a terminal
+</span></span></span><span style="display:flex;"><span>     # Start a terminal
 </span></span><span style="display:flex;"><span>     bindsym $mod+Return exec $term
 </span></span><span style="display:flex;"><span> 
 </span></span><span style="display:flex;"><span>     # Kill focused window
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-    bindsym $mod+Shift+q kill
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+    bindsym $mod+Shift+x kill
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+    bindsym $mod+Shift+x kill
+</span></span></span><span style="display:flex;"><span> 
 </span></span><span style="display:flex;"><span>     # Start your launcher
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-    bindsym $mod+d exec $menu
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+    bindsym $mod+a exec $menu
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+    bindsym $mod+a exec $menu
+</span></span></span><span style="display:flex;"><span> 
 </span></span><span style="display:flex;"><span>     # Drag floating windows by holding down $mod and left mouse button.
 </span></span><span style="display:flex;"><span>     # Resize them with right mouse button + $mod.
 </span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -142,12 +228,11 @@
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>     bindsym $mod+v splitv
+</span></span></span><span style="display:flex;"><span>     bindsym $mod+v splitv
 </span></span><span style="display:flex;"><span> 
 </span></span><span style="display:flex;"><span>     # Switch the current container between different layout styles
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-    bindsym $mod+s layout stacking
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+    bindsym $mod+i layout stacking
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>     bindsym $mod+w layout tabbed
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+    bindsym $mod+i layout stacking
+</span></span></span><span style="display:flex;"><span>     bindsym $mod+w layout tabbed
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-    bindsym $mod+e layout toggle split
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span> 
+</span></span></span><span style="display:flex;"><span> 
 </span></span><span style="display:flex;"><span>     # Make the current focus fullscreen
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-    bindsym $mod+f fullscreen
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+    bindsym $mod+e fullscreen
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+    bindsym $mod+e fullscreen
+</span></span></span><span style="display:flex;"><span> 
 </span></span><span style="display:flex;"><span>     # Toggle the current focus between tiling and floating mode
 </span></span><span style="display:flex;"><span>     bindsym $mod+Shift+space floating toggle
 </span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -156,7 +241,7 @@
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>     bindsym $mod+space focus mode_toggle
+</span></span></span><span style="display:flex;"><span>     bindsym $mod+space focus mode_toggle
 </span></span><span style="display:flex;"><span> 
 </span></span><span style="display:flex;"><span>     # Move focus to the parent container
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-    bindsym $mod+a focus parent
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+    bindsym $mod+u focus parent
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> #
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+    bindsym $mod+u focus parent
+</span></span></span><span style="display:flex;"><span> #
 </span></span><span style="display:flex;"><span> # Scratchpad:
 </span></span><span style="display:flex;"><span> #
 </span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -192,37 +277,25 @@
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>     bindsym Return mode &#34;default&#34;
+</span></span></span><span style="display:flex;"><span>     bindsym Return mode &#34;default&#34;
 </span></span><span style="display:flex;"><span>     bindsym Escape mode &#34;default&#34;
 </span></span><span style="display:flex;"><span> }
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-bindsym $mod+r mode &#34;resize&#34;
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+#bindsym $mod+r mode &#34;resize&#34;
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+#bindsym $mod+r mode &#34;resize&#34;
+</span></span></span><span style="display:flex;"><span> 
 </span></span><span style="display:flex;"><span> #
 </span></span><span style="display:flex;"><span> # Status Bar:
 </span></span><span style="display:flex;"><span> #
 </span></span><span style="display:flex;"><span> # Read `man 5 sway-bar` for more information about this section.
 </span></span><span style="display:flex;"><span> bar {
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-    position top
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span> 
+</span></span></span><span style="display:flex;"><span> 
 </span></span><span style="display:flex;"><span>     # When the status_command prints a new line to stdout, swaybar updates.
 </span></span><span style="display:flex;"><span>     # The default just shows the current date and time.
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-    status_command while date +&#39;%Y-%m-%d %X&#39;; do sleep 1; done
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+    status_command i3status
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> }
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+    status_command i3status
+</span></span></span><span style="display:flex;"><span> }
 </span></span><span style="display:flex;"><span> 
 </span></span></code></pre></div></details>
 <p>I encountered the following issues with Sway:</p>
@@ -605,8 +605,8 @@ difference is visible in Chrome browser tab titles and the URL bar, for example:
 
 
 <a href="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/2026-01-03-chrome-wayland-x11.png"><img
-  srcset="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/2026-01-03-chrome-wayland-x11_hu_9fc3abb5389d56fe.png 2x,https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/2026-01-03-chrome-wayland-x11_hu_e67075ba45299853.png 3x"
-  src="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/2026-01-03-chrome-wayland-x11_hu_8822a57b2d4633df.png"
+  srcset="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/2026-01-03-chrome-wayland-x11_hu_891f1aeb4efb99c0.png 2x,https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/2026-01-03-chrome-wayland-x11_hu_e79fb94d42b3555a.png 3x"
+  src="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/2026-01-03-chrome-wayland-x11_hu_625173356adcf636.png"
   
   width="600"
   height="219"
@@ -659,8 +659,8 @@ such that their normal content is fully hidden.&rdquo;</p>
 instead of just cancelling <code>swaylock</code> with Ctrl+C. And hope it never crashes.</p>
 <p>I used to start <code>i3lock</code> via a wrapper script, which turns off the monitor
 (input wakes it up):</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#007020">#!/bin/sh
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span><span style="color:#60a0b0;font-style:italic"># Turns on DPMS, mutes all output, locks the screen.</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#007020">#!/bin/sh
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Turns on DPMS, mutes all output, locks the screen.</span>
 </span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Reverts all settings on unlock, or when killed.</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>revert<span style="color:#666">()</span> <span style="color:#666">{</span>
@@ -674,13 +674,13 @@ instead of just cancelling <code>swaylock</code> with Ctrl+C. And hope it never 
 </span></span><span style="display:flex;"><span>i3lock --raw 3840x2160:rgb --image ~/i3lock-wallpaper-3840x2160.rgb -n 
 </span></span><span style="display:flex;"><span>revert
 </span></span></code></pre></div><p>With Wayland, the DPMS behavior has to be implemented differently, with <code>swayidle</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#007020">#!/bin/sh
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span><span style="color:#60a0b0;font-style:italic"># Turns on DPMS, mutes all output, locks the screen.</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#007020">#!/bin/sh
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Turns on DPMS, mutes all output, locks the screen.</span>
 </span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Reverts all settings on unlock, or when killed.</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>swayidle -w <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  timeout <span style="color:#40a070">5</span> <span style="color:#4070a0">&#39;swaymsg &#34;output * dpms off&#34;&#39;</span> <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  resume <span style="color:#4070a0">&#39;swaymsg &#34;output * dpms on&#34;&#39;</span> &amp;
+</span></span></span><span style="display:flex;"><span>  timeout <span style="color:#40a070">5</span> <span style="color:#4070a0">&#39;swaymsg &#34;output * dpms off&#34;&#39;</span> <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>  resume <span style="color:#4070a0">&#39;swaymsg &#34;output * dpms on&#34;&#39;</span> &amp;
 </span></span><span style="display:flex;"><span><span style="color:#bb60d5">swayidle</span><span style="color:#666">=</span><span style="color:#bb60d5">$!</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>revert<span style="color:#666">()</span> <span style="color:#666">{</span>
@@ -805,8 +805,8 @@ an option to change it.</p>
   
   
   <a href="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/foot-triple-long.png"><img
-    srcset="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/foot-triple-long_hu_7510c893c9d05252.png 2x,https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/foot-triple-long_hu_ff181a615a3b5243.png 3x"
-    src="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/foot-triple-long_hu_ac615569c350b15a.png"
+    srcset="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/foot-triple-long_hu_cb277911e8e126ec.png 2x,https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/foot-triple-long_hu_3085dda7310232fb.png 3x"
+    src="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/foot-triple-long_hu_179809caf1f2c8e9.png"
     alt="triple-click in foot on a top(1) output line highlights the whole line" title="triple-click in foot on a top(1) output line highlights the whole line"
     width="600"
     height="188"
@@ -838,8 +838,8 @@ the whole line:</p>
   
   
   <a href="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/foot-triple-short.png"><img
-    srcset="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/foot-triple-short_hu_48f0e7085e53631f.png 2x,https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/foot-triple-short_hu_200619f664efe8fd.png 3x"
-    src="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/foot-triple-short_hu_d228c42ae1be0723.png"
+    srcset="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/foot-triple-short_hu_859746d384866e9.png 2x,https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/foot-triple-short_hu_b82f04dee9918b98.png 3x"
+    src="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/foot-triple-short_hu_168b00ee195c5793.png"
     alt="triple-click in foot on an echo output line highlights only the contents, not the whole line" title="triple-click in foot on an echo output line highlights only the contents, not the whole line"
     width="600"
     height="188"
@@ -876,8 +876,8 @@ window):</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/emacs-blurry.png"><img
-  srcset="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/emacs-blurry_hu_7d0c5381426a6840.png 2x,https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/emacs-blurry_hu_451ca8625cf37945.png 3x"
-  src="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/emacs-blurry_hu_1f4eb4e05ba1b280.png"
+  srcset="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/emacs-blurry_hu_419d7ffb37323374.png 2x,https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/emacs-blurry_hu_fd3a48c054025377.png 3x"
+  src="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/emacs-blurry_hu_d982f01f452b08.png"
   alt="Emacs being blurry in Xwayland" title="Emacs being blurry in Xwayland"
   width="600"
   height="178"
@@ -914,8 +914,8 @@ rendering! The line height and letter spacing seems different:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/2026-01-01-emacs-pgtk-text.png"><img
-  srcset="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/2026-01-01-emacs-pgtk-text_hu_7e85de1866cbc649.png 2x,https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/2026-01-01-emacs-pgtk-text_hu_a6e6e5e89fa8ab95.png 3x"
-  src="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/2026-01-01-emacs-pgtk-text_hu_3f7d94e78f26ace1.png"
+  srcset="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/2026-01-01-emacs-pgtk-text_hu_197839d5cf749bba.png 2x,https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/2026-01-01-emacs-pgtk-text_hu_cb3d30187722b5e0.png 3x"
+  src="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/2026-01-01-emacs-pgtk-text_hu_1f1a8cef794ae57e.png"
   alt="Different text rendering in Emacs (pgtk vs. X11)" title="Different text rendering in Emacs (pgtk vs. X11)"
   width="600"
   height="217"
@@ -962,8 +962,8 @@ good:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/chrome-gpu-wayland.png"><img
-  srcset="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/chrome-gpu-wayland_hu_c5d62f89e8e4bd7.png 2x,https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/chrome-gpu-wayland_hu_ffe2cb2ff688e13c.png 3x"
-  src="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/chrome-gpu-wayland_hu_546fe7df2c265248.png"
+  srcset="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/chrome-gpu-wayland_hu_eed5b252df2bbbe0.png 2x,https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/chrome-gpu-wayland_hu_817cce14c4e12d8a.png 3x"
+  src="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/chrome-gpu-wayland_hu_fa565bed54198301.png"
   alt="chrome://gpu on Sway" title="chrome://gpu on Sway"
   width="600"
   height="619"
@@ -1029,8 +1029,8 @@ contents get shared:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-x11.png"><img
-  srcset="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-x11_hu_128aa894a5a9f6a0.png 2x,https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-x11_hu_b26a1a182eda0744.png 3x"
-  src="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-x11_hu_5eadab053d491b69.png"
+  srcset="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-x11_hu_65a5d9ff5616f454.png 2x,https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-x11_hu_57391eeecebe7731.png 3x"
+  src="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-x11_hu_c1ccc63f7cce02e.png"
   alt="screensharing behavior in Chrome (X11)" title="screensharing behavior in Chrome (X11)"
   width="600"
   height="338"
@@ -1076,8 +1076,8 @@ a window:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-select1-featured.png"><img
-  srcset="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-select1-featured_hu_6528a3bb6276452b.png 2x,https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-select1-featured_hu_df6e12cd6d0a51ab.png 3x"
-  src="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-select1-featured_hu_4b360882013550cc.png"
+  srcset="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-select1-featured_hu_96dbc7d1abf0c2fc.png 2x,https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-select1-featured_hu_a33f6459b506904d.png 3x"
+  src="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-select1-featured_hu_688a423fe44d9e0d.png"
   alt="screensharing behavior in Sway" title="screensharing behavior in Sway"
   width="600"
   height="338"
@@ -1109,8 +1109,8 @@ Chrome:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-select2.png"><img
-  srcset="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-select2_hu_319a311d3fbd9aac.png 2x,https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-select2_hu_683c5a6911153f97.png 3x"
-  src="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-select2_hu_a0d8fb229067ea48.png"
+  srcset="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-select2_hu_cd3e64e6a8e53eb4.png 2x,https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-select2_hu_d15a83bf61355646.png 3x"
+  src="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-select2_hu_4350eb00e73d3fa2.png"
   alt="screensharing behavior in Sway" title="screensharing behavior in Sway"
   width="600"
   height="338"
@@ -1144,8 +1144,8 @@ will be shared:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-select3.png"><img
-  srcset="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-select3_hu_481526ad70aa37a6.png 2x,https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-select3_hu_f4e29500e188ce3f.png 3x"
-  src="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-select3_hu_de76f21970bd6130.png"
+  srcset="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-select3_hu_48f45f51a1e8139.png 2x,https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-select3_hu_a5bb7fbe18bfd003.png 3x"
+  src="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/screenshare-select3_hu_9ee36870b4b5a411.png"
   alt="screensharing behavior in Sway" title="screensharing behavior in Sway"
   width="600"
   height="338"
@@ -1197,8 +1197,8 @@ few pixels, shortly after switching focus to this window:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/foot-move.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/foot-move_hu_a4fdc817f2e959e3.jpg 2x,https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/foot-move_hu_4017ffc8ad6950e4.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/foot-move_hu_ba49c2e51c18f85f.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/foot-move_hu_7945acf8cfa9635.jpg 2x,https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/foot-move_hu_9af525a3b4f0ec4a.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2026-01-04-wayland-sway-in-2026/foot-move_hu_231243ff40d950f2.jpg"
   alt="foot content moving around" title="foot content moving around"
   width="600"
   height="338"

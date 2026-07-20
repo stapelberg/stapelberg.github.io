@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,11 +179,11 @@
 <h1 class="ms_title">Mein aktuelles E-Mail-Setup (2012)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2012-07-22, last modified 2018-03-23</div>
+  <div id="ms_date">published 2012-07-22, last modified 2026-07-20</div>
   
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2012-07-22-email.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2012-07-22-email.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -196,7 +196,6 @@ Mail-Index ohne Frontend ist, hat man die Wahl zwischen verschiedenen
 Frontends. Mit notmuch mitgeliefert wird das emacs-frontend, was mir aber nicht
 besonders gut gefällt.
 </p>
-
 <p>
 Ehemalige Nutzer von sup werden sich in dem notmuch-Frontend <a
 href="https://github.com/pazz/alot">alot</a> schnell heimisch fühlen. alot kann
@@ -205,7 +204,6 @@ GPG Encryption/Decryption oder Folding), aber ist für mich derzeit benutzbar
 genug. Der Entwickler pazz ist ziemlich responsiv was Patches angeht, daher
 prophezeie ich dem Projekt eine deutlich bessere Zukunft als sup.
 </p>
-
 <p>
 Da notmuch mit Maildirs umgehen kann benutze ich offlineimap in Kombination mit
 einem eigenen IMAP-Server. Es ist abzusehen, dass ich nie wieder auf das
@@ -218,7 +216,6 @@ Diese sorgt dafür, dass nur das INBOX-Folder synchronisiert wird, was einen
 offlineimap-Lauf (insbesondere mit dem <code>-q</code>-Parameter) erheblich
 beschleunigt.
 </p>
-
 <p>
 Zusätzlich hilft es natürlich, die Datenmenge relativ klein zu halten, weswegen
 ich mein INBOX-Folder auf dem IMAP-Server regelmäßig aufräumen möchte. Dazu
@@ -226,27 +223,22 @@ nutze ich das Script <a
 href="http://www.dovecot.org/list/dovecot/2010-December/055835.html">archivemail.sh
 von David Woodhouse</a>.
 </p>
-
 <p>
 Damit eingehende Mails ordentlich gefiltert werden und gekillte Threads auch
 gekillt bleiben benutze ich <a
 href="https://github.com/teythoon/afew/">afew</a>. Eine minimal Config dafür
 sieht so aus:
 </p>
-
 <pre>
 [global]
 [KillThreadsFilter]
 </pre>
-
 <p>
 Beim Abholen von Mails nutzt man dann:
 </p>
-
 <pre>
 offlineimap -q &amp;&amp; notmuch new &amp;&amp; afew -n -t
 </pre>
-
 <p>
 Als Anti-Spam-Lösung benutze ich <a
 href="http://dspam.nuclearelephant.com/">DSPAM</a>. Mein Filter für afew sieht
@@ -256,33 +248,28 @@ folgendermaßen aus:
 # coding=utf-8
 # vim:ts=4:sw=4:expandtab
 from __future__ import print_function, absolute_import, unicode_literals
-
-from ..Filter import Filter, register_filter
-
-@register_filter
+<p>from ..Filter import Filter, register_filter</p>
+<p>@register_filter
 class DSPAMFilter(Filter):
-    message = 'Tagging messages according to their DSPAM-header'
+message = &lsquo;Tagging messages according to their DSPAM-header&rsquo;</p>
+<pre><code>def __init__(self, spam_tag='is-spam'):
+    super(DSPAMFilter, self).__init__()
+    self.spam_tag = spam_tag
 
-    def __init__(self, spam_tag='is-spam'):
-        super(DSPAMFilter, self).__init__()
-        self.spam_tag = spam_tag
-
-    def handle_message(self, message):
-        if (message.get_header('X-DSPAM-Result') == 'Spam' and
-            float(message.get_header('X-DSPAM-Probability')) &gt; 0.5):
-            self.add_tags(message, self.spam_tag)
-</pre>
-
+def handle_message(self, message):
+    if (message.get_header('X-DSPAM-Result') == 'Spam' and
+        float(message.get_header('X-DSPAM-Probability')) &amp;gt; 0.5):
+        self.add_tags(message, self.spam_tag)
+</code></pre>
+<p></pre></p>
 <p>
 (Man steckt den Filter in <code>afew/afew/filters/DSPAMFilter.py</code> und
 fügt <code>[DSPAMFilter]</code> in der Config hinzu).
 </p>
-
 <p>
 Ich setze dann für alle Threads den <code>is-spam</code>-Tag entsprechend und
 trainiere DSPAM mit folgendem Script periodisch:
 </p>
-
 <pre>
 #!/bin/zsh
 # script to prepare the DSPAM training based on the current notmuch tags.

@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,7 +179,7 @@
 <h1 class="ms_title">Replying to Debian BTS messages in notmuch (2013)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2013-03-08, last modified 2019-02-04</div>
+  <div id="ms_date">published 2013-03-08, last modified 2026-07-20</div>
   
   
   <div id="ms_tags">
@@ -192,7 +192,7 @@
   </div>
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2013-03-08-bts-notmuch-reply.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2013-03-08-bts-notmuch-reply.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -203,14 +203,12 @@ packages was very uncomfortable: I first downloaded the mbox archive from the
 BTS, then imported that in claws-mail, hit reply all, remove submit@, add
 bugnumber@, then send the email.
 </p>
-
 <p>
 Therefore, I decided to hack up a little elisp function to automate this
 process for notmuch. It first downloads the message from the BTS, adds it to
 the notmuch database, then calls notmuch-mua-reply on the message and fixes the
 To: header:
 </p>
-
 <pre>
 ;; Removes submit@bugs.debian.org from the recipients of a reply-all message.
 (defun debian-remove-submit (recipients)
@@ -269,17 +267,14 @@ To: header:
       ;; Our modifications don’t count as modifications.
       (set-buffer-modified-p nil))))
 </pre>
-
 <p>
 In case you want to get updates, you can find the latest version of this code in <a href="http://code.stapelberg.de/git/configfiles/tree/emacs-zkj-notmuch.el">my configfiles git repository</a>.
 </p>
-
 <p>
 To add a single message to the notmuch database and get its message ID, I have
 written this simple python script (using python-notmuch), located in
 <code>~/.local/bin/python-import.py</code>:
 </p>
-
 <pre>
 #!/usr/bin/env python
 # vim:ts=4:sw=4:et
@@ -295,7 +290,6 @@ db = notmuch.Database(mode=notmuch.Database.MODE.READ_WRITE)
 (msg, status) = db.add_message(sys.argv[1])
 print msg.get_message_id()
 </pre>
-
 <p>
 If you have any improvements, I’d love to hear about it. If it’s useful for
 you, enjoy.

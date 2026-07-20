@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,7 +179,7 @@
 <h1 class="ms_title">rc bug #694670: kscd does not play any CD (2012)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2012-12-01, last modified 2019-02-04</div>
+  <div id="ms_date">published 2012-12-01, last modified 2026-07-20</div>
   
   
   <div id="ms_tags">
@@ -192,7 +192,7 @@
   </div>
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2012-12-01-kscd-rc.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2012-12-01-kscd-rc.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -200,7 +200,6 @@
   <p>
 Dear Lazyweb,
 </p>
-
 <p>
 I recently investigated <a
 href="http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=694670">#694670 - kscd
@@ -209,14 +208,12 @@ applications such as kscd won’t play Audio CDs when your CD drive is not calle
 <code>/dev/cdrom</code>, but e.g. <code>/dev/cdrom5</code> because I have had
 multiple CD drives connected to my machine.
 </p>
-
 <p>
 Now, I am not very deeply involved into KDE or phonon in particular. Therefore,
 I am asking: Is there anyone who could have a look into this issue? It should
 be easy to reproduce, you can simply append "5" to "cdrom" in
 <code>/etc/udev/rules.d/70-persistent-cd.rules</code> and reboot afterwards.
 </p>
-
 <p>
 As an outsider, I am somewhat baffled by the complexity of C++, phonon,
 gstreamer, etc. All these layers of abstraction are not that easy to debug, at

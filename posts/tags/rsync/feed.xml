@@ -6,6 +6,9 @@
 
 
   <id>https://michael.stapelberg.ch/posts/tags/rsync/</id>
+  <author>
+    <name>Michael Stapelberg</name>
+  </author>
   <generator>Hugo -- gohugo.io</generator>
   <entry>
     <title type="html"><![CDATA[How my minimal, memory-safe Go rsync steers clear of vulnerabilities]]></title>
@@ -97,16 +100,16 @@ report</a>)</summary>
 The corresponding code can be seen below:
 <a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/sender.c#L96-L100">sender.c</a>:</li>
 </ol>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>s<span style="color:#666">-&gt;</span>sums <span style="color:#666">=</span> <span style="color:#06287e">new_array</span>(<span style="color:#007020;font-weight:bold">struct</span> sum_buf, s<span style="color:#666">-&gt;</span>count);
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>s<span style="color:#666">-&gt;</span>sums <span style="color:#666">=</span> <span style="color:#06287e">new_array</span>(<span style="color:#007020;font-weight:bold">struct</span> sum_buf, s<span style="color:#666">-&gt;</span>count);
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">for</span> (i <span style="color:#666">=</span> <span style="color:#40a070">0</span>; i <span style="color:#666">&lt;</span> s<span style="color:#666">-&gt;</span>count; i<span style="color:#666">++</span>) {
 </span></span><span style="display:flex;"><span>    s<span style="color:#666">-&gt;</span>sums[i].sum1 <span style="color:#666">=</span> <span style="color:#06287e">read_int</span>(f);
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">read_buf</span>(f, s<span style="color:#666">-&gt;</span>sums[i].sum2, s<span style="color:#666">-&gt;</span>s2length);
 </span></span></code></pre></div><p>Most importantly, note that <code>sum2</code> field is filled with <code>s-&gt;s2length</code> bytes. <code>sum2</code> always has a size of 16:
 <a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/rsync.h#L955-L962">rsync.h</a></p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#define SUM_LENGTH 16
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span><span style="color:#60a0b0;font-style:italic">// …
-</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"></span><span style="color:#007020;font-weight:bold">struct</span> sum_buf {
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#define SUM_LENGTH 16
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">// …
+</span></span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">struct</span> sum_buf {
 </span></span><span style="display:flex;"><span>    OFF_T offset;           <span style="color:#60a0b0;font-style:italic">/**&lt; offset in file of this chunk */</span>
 </span></span><span style="display:flex;"><span>    int32 len;              <span style="color:#60a0b0;font-style:italic">/**&lt; length of chunk of file */</span>
 </span></span><span style="display:flex;"><span>    uint32 sum1;            <span style="color:#60a0b0;font-style:italic">/**&lt; simple checksum */</span>
@@ -116,7 +119,7 @@ The corresponding code can be seen below:
 </span></span><span style="display:flex;"><span>};
 </span></span></code></pre></div><p><code>s2length</code> is an attacker-controlled value and can have a value up to <code>MAX_DIGEST_LEN</code> bytes, as the next snipper shows:</p>
 <p><a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/io.c#L1979-L1984">io.c</a></p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>sum<span style="color:#666">-&gt;</span>s2length <span style="color:#666">=</span> protocol_version <span style="color:#666">&lt;</span> <span style="color:#40a070">27</span> <span style="color:#666">?</span> <span style="color:#002070;font-weight:bold">csum_length</span> : (<span style="color:#902000">int</span>)<span style="color:#06287e">read_int</span>(f);
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>sum<span style="color:#666">-&gt;</span>s2length <span style="color:#666">=</span> protocol_version <span style="color:#666">&lt;</span> <span style="color:#40a070">27</span> <span style="color:#666">?</span> <span style="color:#002070;font-weight:bold">csum_length</span> : (<span style="color:#902000">int</span>)<span style="color:#06287e">read_int</span>(f);
 </span></span><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (sum<span style="color:#666">-&gt;</span>s2length <span style="color:#666">&lt;</span> <span style="color:#40a070">0</span> <span style="color:#666">||</span> sum<span style="color:#666">-&gt;</span>s2length <span style="color:#666">&gt;</span> MAX_DIGEST_LEN) {
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">rprintf</span>(FERROR, <span style="color:#4070a0">&#34;Invalid checksum length %d [%s]</span><span style="color:#4070a0;font-weight:bold">\n</span><span style="color:#4070a0">&#34;</span>,
 </span></span><span style="display:flex;"><span>            sum<span style="color:#666">-&gt;</span>s2length, <span style="color:#06287e">who_am_i</span>());
@@ -124,16 +127,16 @@ The corresponding code can be seen below:
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>The problem here is that <code>MAX_DIGEST_LEN</code> can be larger than 16 bytes, depending on the digest support the binary was compiled with:</p>
 <p><a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/lib/md-defines.h#L11-L21">md-defines.h</a></p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#define MD4_DIGEST_LEN 16
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020">#define MD4_DIGEST_LEN 16
 </span></span></span><span style="display:flex;"><span><span style="color:#007020">#define MD5_DIGEST_LEN 16
 </span></span></span><span style="display:flex;"><span><span style="color:#007020">#if defined SHA512_DIGEST_LENGTH
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>  <span style="color:#007020">#define MAX_DIGEST_LEN SHA512_DIGEST_LENGTH
+</span></span></span><span style="display:flex;"><span>  <span style="color:#007020">#define MAX_DIGEST_LEN SHA512_DIGEST_LENGTH
 </span></span></span><span style="display:flex;"><span><span style="color:#007020">#elif defined SHA256_DIGEST_LENGTH
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>  <span style="color:#007020">#define MAX_DIGEST_LEN SHA256_DIGEST_LENGTH
+</span></span></span><span style="display:flex;"><span>  <span style="color:#007020">#define MAX_DIGEST_LEN SHA256_DIGEST_LENGTH
 </span></span></span><span style="display:flex;"><span><span style="color:#007020">#elif defined SHA_DIGEST_LENGTH
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>  <span style="color:#007020">#define MAX_DIGEST_LEN SHA_DIGEST_LENGTH
+</span></span></span><span style="display:flex;"><span>  <span style="color:#007020">#define MAX_DIGEST_LEN SHA_DIGEST_LENGTH
 </span></span></span><span style="display:flex;"><span><span style="color:#007020">#else
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span>  <span style="color:#007020">#define MAX_DIGEST_LEN MD5_DIGEST_LEN </span><span style="color:#60a0b0;font-style:italic">/* 16 bytes */</span><span style="color:#007020">
+</span></span></span><span style="display:flex;"><span>  <span style="color:#007020">#define MAX_DIGEST_LEN MD5_DIGEST_LEN </span><span style="color:#60a0b0;font-style:italic">/* 16 bytes */</span><span style="color:#007020">
 </span></span></span><span style="display:flex;"><span><span style="color:#007020">#endif
 </span></span></span></code></pre></div><p><code>SHA256</code> support is common and sets the <code>MAX_DIGEST_LENGTH</code> value to 64. As a
 result, an attacker can write up to 48 bytes past the <code>sum2</code> buffer limit.</p>
@@ -157,17 +160,17 @@ header at all — oops!</p>
 on an attempt to <a href="https://github.com/gokrazy/rsync/blob/3a9d1ec136e049b2bffc9db15230eb70308ac90d/rsyncd/sender.go#L136">write out of
 bounds</a>
 by changing the code like so and running the tests:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/types.go w/types.go
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/types.go w/types.go
 </span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">index 5601697..899fcb8 100644
-</span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold"></span><span style="color:#a00000">--- i/types.go
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ w/types.go
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -59,7 +59,7 @@ func (sh *SumHead) WriteTo(c *rsyncwire.Conn) error {
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span> 	var buf rsyncwire.Buffer
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">--- i/types.go
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+++ w/types.go
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -59,7 +59,7 @@ func (sh *SumHead) WriteTo(c *rsyncwire.Conn) error {
+</span></span></span><span style="display:flex;"><span> 	var buf rsyncwire.Buffer
 </span></span><span style="display:flex;"><span> 	buf.WriteInt32(sh.ChecksumCount)
 </span></span><span style="display:flex;"><span> 	buf.WriteInt32(sh.BlockLength)
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-	buf.WriteInt32(sh.ChecksumLength)
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+	buf.WriteInt32(512 /*sh.ChecksumLength*/)
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 	buf.WriteInt32(sh.RemainderLength)
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	buf.WriteInt32(512 /*sh.ChecksumLength*/)
+</span></span></span><span style="display:flex;"><span> 	buf.WriteInt32(sh.RemainderLength)
 </span></span><span style="display:flex;"><span> 	return c.WriteString(buf.String())
 </span></span><span style="display:flex;"><span> }
 </span></span></code></pre></div><p>As expected, the Go runtime panics with the following message:</p>
@@ -220,7 +223,7 @@ the local file contents in
 <a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/match.c#L140-L145"><code>hash_search()</code></a>. Part
 of the function prologue is to allocate a buffer on the stack of
 <code>MAX_DIGEST_LEN</code> bytes:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">static</span> <span style="color:#902000">void</span> <span style="color:#06287e">hash_search</span>(<span style="color:#902000">int</span> f, <span style="color:#007020;font-weight:bold">struct</span> sum_struct <span style="color:#666">*</span>s,
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">static</span> <span style="color:#902000">void</span> <span style="color:#06287e">hash_search</span>(<span style="color:#902000">int</span> f, <span style="color:#007020;font-weight:bold">struct</span> sum_struct <span style="color:#666">*</span>s,
 </span></span><span style="display:flex;"><span>                        <span style="color:#007020;font-weight:bold">struct</span> map_struct <span style="color:#666">*</span>buf, OFF_T len)
 </span></span><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>    OFF_T offset, aligned_offset, end;
@@ -228,7 +231,7 @@ of the function prologue is to allocate a buffer on the stack of
 </span></span><span style="display:flex;"><span>    <span style="color:#902000">char</span> sum2[MAX_DIGEST_LEN];
 </span></span></code></pre></div><p>The daemon then iterates over the checksums the client sent and generates a
 digest for each of the chunks and compares them to the remote digest:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (<span style="color:#666">!</span>done_csum2) {
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (<span style="color:#666">!</span>done_csum2) {
 </span></span><span style="display:flex;"><span>    map <span style="color:#666">=</span> (schar <span style="color:#666">*</span>)<span style="color:#06287e">map_ptr</span>(buf, offset, l);
 </span></span><span style="display:flex;"><span>    <span style="color:#06287e">get_checksum2</span>((<span style="color:#902000">char</span> <span style="color:#666">*</span>)map, l, sum2);
 </span></span><span style="display:flex;"><span>    done_csum2 <span style="color:#666">=</span> <span style="color:#40a070">1</span>;
@@ -389,7 +392,7 @@ contents of an arbitrary file on the client’s machine.  In
 the client will read <code>fnamecmp</code> type as well as the <code>xname</code> from the server if
 the server sets the appropriate flags. The flag <code>sanitize_paths</code> will not be
 set for the client.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (iflags <span style="color:#666">&amp;</span> ITEM_BASIS_TYPE_FOLLOWS)
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (iflags <span style="color:#666">&amp;</span> ITEM_BASIS_TYPE_FOLLOWS)
 </span></span><span style="display:flex;"><span>    fnamecmp_type <span style="color:#666">=</span> <span style="color:#06287e">read_byte</span>(f_in);
 </span></span><span style="display:flex;"><span><span style="color:#666">*</span>type_ptr <span style="color:#666">=</span> fnamecmp_type;
 </span></span><span style="display:flex;"><span>
@@ -410,7 +413,7 @@ set for the client.</p>
 (<a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/receiver.c#L521"><code>recv_files()</code></a>)
 then uses the server provided values to determine a file to compare the
 incoming data with.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">case</span> <span style="color:#002070;font-weight:bold">FNAMECMP_FUZZY</span>:
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">case</span> <span style="color:#002070;font-weight:bold">FNAMECMP_FUZZY</span>:
 </span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> (file<span style="color:#666">-&gt;</span>dirname) {
 </span></span><span style="display:flex;"><span>        <span style="color:#06287e">pathjoin</span>(fnamecmpbuf, <span style="color:#007020;font-weight:bold">sizeof</span> fnamecmpbuf, file<span style="color:#666">-&gt;</span>dirname, xname);
 </span></span><span style="display:flex;"><span>        fnamecmp <span style="color:#666">=</span> fnamecmpbuf;
@@ -423,7 +426,7 @@ incoming data with.</p>
 <a href="https://github.com/RsyncProject/rsync/blob/9615a2492bbf96bc145e738ebff55bbb91e0bbee/receiver.c#L368"><code>receive_data()</code></a>
 the contents of the file specified by <code>xname</code> are copied into the destination
 file. This can be achieved by the server sending a negative token.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">while</span> ((i <span style="color:#666">=</span> <span style="color:#06287e">recv_token</span>(f_in, <span style="color:#666">&amp;</span>data)) <span style="color:#666">!=</span> <span style="color:#40a070">0</span>) {
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">while</span> ((i <span style="color:#666">=</span> <span style="color:#06287e">recv_token</span>(f_in, <span style="color:#666">&amp;</span>data)) <span style="color:#666">!=</span> <span style="color:#40a070">0</span>) {
 </span></span><span style="display:flex;"><span>..snip..
 </span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> (i <span style="color:#666">&gt;</span> <span style="color:#40a070">0</span>) {
 </span></span><span style="display:flex;"><span>..snip..
@@ -431,7 +434,7 @@ file. This can be achieved by the server sending a negative token.</p>
 </span></span><span style="display:flex;"><span>..snip..
 </span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">if</span> (fd <span style="color:#666">!=</span> <span style="color:#666">-</span><span style="color:#40a070">1</span> <span style="color:#666">&amp;&amp;</span> map <span style="color:#666">&amp;&amp;</span> <span style="color:#06287e">write_file</span>(fd, <span style="color:#40a070">0</span>, offset, map, len) <span style="color:#666">!=</span> (<span style="color:#902000">int</span>)len)
 </span></span></code></pre></div><p>The server sends a checksum to compare. If they don&rsquo;t match, a 0 is returned.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (fd <span style="color:#666">!=</span> <span style="color:#666">-</span><span style="color:#40a070">1</span> <span style="color:#666">&amp;&amp;</span> <span style="color:#06287e">memcmp</span>(file_sum1, sender_file_sum, xfer_sum_len) <span style="color:#666">!=</span> <span style="color:#40a070">0</span>)
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#007020;font-weight:bold">if</span> (fd <span style="color:#666">!=</span> <span style="color:#666">-</span><span style="color:#40a070">1</span> <span style="color:#666">&amp;&amp;</span> <span style="color:#06287e">memcmp</span>(file_sum1, sender_file_sum, xfer_sum_len) <span style="color:#666">!=</span> <span style="color:#40a070">0</span>)
 </span></span><span style="display:flex;"><span>    <span style="color:#007020;font-weight:bold">return</span> <span style="color:#40a070">0</span>;
 </span></span></code></pre></div><p>When the return value is 0 the receiver will then send a <code>MSG_REDO</code> to the
 generator. The generator will then write a message to the server.</p>
@@ -490,34 +493,34 @@ git checkout v0.2.7
 </code></pre></li>
 <li>
 <p>Patch the code as follows to undo the fix and execute the attack:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/internal/nofollow/nofollow_unix.go w/internal/nofollow/nofollow_unix.go
-</span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold"></span><span style="color:#a00000">--- i/internal/nofollow/nofollow_unix.go
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ w/internal/nofollow/nofollow_unix.go
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -2,8 +2,6 @@
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/internal/nofollow/nofollow_unix.go w/internal/nofollow/nofollow_unix.go
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">--- i/internal/nofollow/nofollow_unix.go
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+++ w/internal/nofollow/nofollow_unix.go
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -2,8 +2,6 @@
+</span></span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span> package nofollow
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-import &#34;golang.org/x/sys/unix&#34;
 </span></span></span><span style="display:flex;"><span><span style="color:#a00000">-
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span> // Maybe resolves to unix.O_NOFOLLOW on unix systems,
+</span></span></span><span style="display:flex;"><span> // Maybe resolves to unix.O_NOFOLLOW on unix systems,
 </span></span><span style="display:flex;"><span> // 0 on other platforms.
 </span></span><span style="display:flex;"><span><span style="color:#a00000">-const Maybe = unix.O_NOFOLLOW
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+const Maybe = 0 // unix.O_NOFOLLOW
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span>
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+const Maybe = 0 // unix.O_NOFOLLOW
+</span></span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/internal/sender/do.go w/internal/sender/do.go
-</span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold"></span><span style="color:#a00000">--- i/internal/sender/do.go
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ w/internal/sender/do.go
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -2,6 +2,8 @@ package sender
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">--- i/internal/sender/do.go
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+++ w/internal/sender/do.go
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -2,6 +2,8 @@ package sender
+</span></span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span> import (
 </span></span><span style="display:flex;"><span> 	&#34;fmt&#34;
 </span></span><span style="display:flex;"><span><span style="color:#00a000">+	&#34;os&#34;
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	&#34;path/filepath&#34;
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 	&#34;sort&#34;
+</span></span></span><span style="display:flex;"><span> 	&#34;sort&#34;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span> 	&#34;github.com/gokrazy/rsync/internal/log&#34;
 </span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -55,6 +57,15 @@ func (st *Transfer) Do(crd *rsyncwire.CountingReader, cwr *rsyncwire.CountingWri
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span> 		st.Logger.Printf(&#34;file list sent&#34;)
+</span></span></span><span style="display:flex;"><span> 		st.Logger.Printf(&#34;file list sent&#34;)
 </span></span><span style="display:flex;"><span> 	}
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#00a000">+	// HACK: swap out the passwd file with a symlink to /etc/passwd
@@ -529,7 +532,7 @@ git checkout v0.2.7
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	}
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	st.Logger.Printf(&#34;HACK: swapped passwd file for symlink&#34;)
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 	// Sort the file list. The client sorts, so we need to sort, too (in the
+</span></span></span><span style="display:flex;"><span> 	// Sort the file list. The client sorts, so we need to sort, too (in the
 </span></span><span style="display:flex;"><span> 	// same way!), otherwise our indices do not match what the client will
 </span></span><span style="display:flex;"><span> 	// request.
 </span></span></code></pre></div></li>
@@ -726,88 +729,88 @@ validates the attacker-supplied data.</p>
 the application logic that using Go could not have prevented.</li>
 </ul>
 <table>
-  <thead>
-      <tr>
-          <th>CVE number</th>
-          <th>Cause</th>
-          <th>Risk (C)</th>
-          <th>Does Go help?</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>2024-12084</td>
-          <td>insufficient validation</td>
-          <td>Heap Buffer Overflow</td>
-          <td>✅ bounds check (panics!)</td>
-      </tr>
-      <tr>
-          <td>2024-12085</td>
-          <td>insufficient validation</td>
-          <td>Info Leak</td>
-          <td>✅ zero init</td>
-      </tr>
-      <tr>
-          <td>2024-12086</td>
-          <td>missing validation</td>
-          <td>Arbitrary File Leak</td>
-          <td>✅ <code>os.Root</code></td>
-      </tr>
-      <tr>
-          <td>2024-12087</td>
-          <td>insufficient validation</td>
-          <td>Write Arbitrary Files</td>
-          <td>✅ <code>os.Root</code></td>
-      </tr>
-      <tr>
-          <td>2024-12088</td>
-          <td>insufficient validation</td>
-          <td>Create Arbitrary Symlinks</td>
-          <td>✅ <code>os.Root</code></td>
-      </tr>
-      <tr>
-          <td>2024-12747</td>
-          <td>TOCTOU</td>
-          <td>Leak Privileged Files</td>
-          <td>✅ <code>os.Root</code></td>
-      </tr>
-      <tr>
-          <td>2026-29518</td>
-          <td>TOCTOU</td>
-          <td>Leak Privileged Files</td>
-          <td>✅ <code>os.Root</code></td>
-      </tr>
-      <tr>
-          <td>2026-43617</td>
-          <td>missing validation</td>
-          <td>Deny List Ineffective</td>
-          <td>❌ logic bug</td>
-      </tr>
-      <tr>
-          <td>2026-43618</td>
-          <td>insufficient validation</td>
-          <td>Info Leak</td>
-          <td>✅ bounds check (panics!)</td>
-      </tr>
-      <tr>
-          <td>2026-43619</td>
-          <td>TOCTOU</td>
-          <td>Leak Privileged Files</td>
-          <td>✅ <code>os.Root</code></td>
-      </tr>
-      <tr>
-          <td>2026-43620</td>
-          <td>insufficient validation</td>
-          <td>crash (DOS)</td>
-          <td>✅ bounds check (panics!)</td>
-      </tr>
-      <tr>
-          <td>2026-45232</td>
-          <td>missing validation</td>
-          <td>Memory Write</td>
-          <td>✅ bounds check (panics!)</td>
-      </tr>
-  </tbody>
+	<thead>
+			<tr>
+					<th>CVE number</th>
+					<th>Cause</th>
+					<th>Risk (C)</th>
+					<th>Does Go help?</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>2024-12084</td>
+					<td>insufficient validation</td>
+					<td>Heap Buffer Overflow</td>
+					<td>✅ bounds check (panics!)</td>
+			</tr>
+			<tr>
+					<td>2024-12085</td>
+					<td>insufficient validation</td>
+					<td>Info Leak</td>
+					<td>✅ zero init</td>
+			</tr>
+			<tr>
+					<td>2024-12086</td>
+					<td>missing validation</td>
+					<td>Arbitrary File Leak</td>
+					<td>✅ <code>os.Root</code></td>
+			</tr>
+			<tr>
+					<td>2024-12087</td>
+					<td>insufficient validation</td>
+					<td>Write Arbitrary Files</td>
+					<td>✅ <code>os.Root</code></td>
+			</tr>
+			<tr>
+					<td>2024-12088</td>
+					<td>insufficient validation</td>
+					<td>Create Arbitrary Symlinks</td>
+					<td>✅ <code>os.Root</code></td>
+			</tr>
+			<tr>
+					<td>2024-12747</td>
+					<td>TOCTOU</td>
+					<td>Leak Privileged Files</td>
+					<td>✅ <code>os.Root</code></td>
+			</tr>
+			<tr>
+					<td>2026-29518</td>
+					<td>TOCTOU</td>
+					<td>Leak Privileged Files</td>
+					<td>✅ <code>os.Root</code></td>
+			</tr>
+			<tr>
+					<td>2026-43617</td>
+					<td>missing validation</td>
+					<td>Deny List Ineffective</td>
+					<td>❌ logic bug</td>
+			</tr>
+			<tr>
+					<td>2026-43618</td>
+					<td>insufficient validation</td>
+					<td>Info Leak</td>
+					<td>✅ bounds check (panics!)</td>
+			</tr>
+			<tr>
+					<td>2026-43619</td>
+					<td>TOCTOU</td>
+					<td>Leak Privileged Files</td>
+					<td>✅ <code>os.Root</code></td>
+			</tr>
+			<tr>
+					<td>2026-43620</td>
+					<td>insufficient validation</td>
+					<td>crash (DOS)</td>
+					<td>✅ bounds check (panics!)</td>
+			</tr>
+			<tr>
+					<td>2026-45232</td>
+					<td>missing validation</td>
+					<td>Memory Write</td>
+					<td>✅ bounds check (panics!)</td>
+			</tr>
+	</tbody>
 </table>
 <h3 id="gokrazy-rsync-verdict">gokrazy/rsync verdict</h3>
 <p>Aside from being written in Go, another key difference between gokrazy/rsync and
@@ -826,88 +829,88 @@ details.</li>
 <p>Let’s have a look at whether gokrazy/rsync was affected by each CVE at the time
 of publishing:</p>
 <table>
-  <thead>
-      <tr>
-          <th>CVE number</th>
-          <th>Cause</th>
-          <th>gokrazy/rsync impl?</th>
-          <th>gokrazy/rsync affected?</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>2024-12084</td>
-          <td>insufficient validation</td>
-          <td>yes</td>
-          <td>⚠️ panic</td>
-      </tr>
-      <tr>
-          <td>2024-12085</td>
-          <td>insufficient validation</td>
-          <td>no (proto 30)</td>
-          <td>✅ not vuln</td>
-      </tr>
-      <tr>
-          <td>2024-12086</td>
-          <td>missing validation</td>
-          <td>no (proto 29)</td>
-          <td>✅ not vuln</td>
-      </tr>
-      <tr>
-          <td>2024-12087</td>
-          <td>insufficient validation</td>
-          <td>no (<code>inc-rec</code>)</td>
-          <td>✅ not vuln</td>
-      </tr>
-      <tr>
-          <td>2024-12088</td>
-          <td>insufficient validation</td>
-          <td>no (<code>safe-links</code>)</td>
-          <td>✅ not vuln</td>
-      </tr>
-      <tr>
-          <td>2024-12747</td>
-          <td>TOCTOU</td>
-          <td>yes</td>
-          <td>❌ vuln</td>
-      </tr>
-      <tr>
-          <td>2026-29518</td>
-          <td>TOCTOU</td>
-          <td>yes</td>
-          <td>⚠️ patched</td>
-      </tr>
-      <tr>
-          <td>2026-43617</td>
-          <td>missing validation</td>
-          <td>no (host deny lists)</td>
-          <td>✅ not vuln</td>
-      </tr>
-      <tr>
-          <td>2026-43618</td>
-          <td>insufficient validation</td>
-          <td>no (compression)</td>
-          <td>✅ not vuln</td>
-      </tr>
-      <tr>
-          <td>2026-43619</td>
-          <td>TOCTOU</td>
-          <td>yes</td>
-          <td>⚠️ patched</td>
-      </tr>
-      <tr>
-          <td>2026-43620</td>
-          <td>insufficient validation</td>
-          <td>no (<code>inc-rec</code>)</td>
-          <td>✅ not vuln</td>
-      </tr>
-      <tr>
-          <td>2026-45232</td>
-          <td>missing validation</td>
-          <td>no (proxy)</td>
-          <td>✅ not vuln</td>
-      </tr>
-  </tbody>
+	<thead>
+			<tr>
+					<th>CVE number</th>
+					<th>Cause</th>
+					<th>gokrazy/rsync impl?</th>
+					<th>gokrazy/rsync affected?</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>2024-12084</td>
+					<td>insufficient validation</td>
+					<td>yes</td>
+					<td>⚠️ panic</td>
+			</tr>
+			<tr>
+					<td>2024-12085</td>
+					<td>insufficient validation</td>
+					<td>no (proto 30)</td>
+					<td>✅ not vuln</td>
+			</tr>
+			<tr>
+					<td>2024-12086</td>
+					<td>missing validation</td>
+					<td>no (proto 29)</td>
+					<td>✅ not vuln</td>
+			</tr>
+			<tr>
+					<td>2024-12087</td>
+					<td>insufficient validation</td>
+					<td>no (<code>inc-rec</code>)</td>
+					<td>✅ not vuln</td>
+			</tr>
+			<tr>
+					<td>2024-12088</td>
+					<td>insufficient validation</td>
+					<td>no (<code>safe-links</code>)</td>
+					<td>✅ not vuln</td>
+			</tr>
+			<tr>
+					<td>2024-12747</td>
+					<td>TOCTOU</td>
+					<td>yes</td>
+					<td>❌ vuln</td>
+			</tr>
+			<tr>
+					<td>2026-29518</td>
+					<td>TOCTOU</td>
+					<td>yes</td>
+					<td>⚠️ patched</td>
+			</tr>
+			<tr>
+					<td>2026-43617</td>
+					<td>missing validation</td>
+					<td>no (host deny lists)</td>
+					<td>✅ not vuln</td>
+			</tr>
+			<tr>
+					<td>2026-43618</td>
+					<td>insufficient validation</td>
+					<td>no (compression)</td>
+					<td>✅ not vuln</td>
+			</tr>
+			<tr>
+					<td>2026-43619</td>
+					<td>TOCTOU</td>
+					<td>yes</td>
+					<td>⚠️ patched</td>
+			</tr>
+			<tr>
+					<td>2026-43620</td>
+					<td>insufficient validation</td>
+					<td>no (<code>inc-rec</code>)</td>
+					<td>✅ not vuln</td>
+			</tr>
+			<tr>
+					<td>2026-45232</td>
+					<td>missing validation</td>
+					<td>no (proxy)</td>
+					<td>✅ not vuln</td>
+			</tr>
+	</tbody>
 </table>
 <p>To be clear: all known vulnerabilities are fixed in gokrazy/rsync! The table
 above documents what the state was at the time when each CVE was published. In
@@ -946,8 +949,8 @@ role/protocol layering:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations.png"><img
-  srcset="https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations_hu_b83596d5e1578bab.png 2x,https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations_hu_80c1da434b4b343b.png 3x"
-  src="https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations_hu_b1c2c5d30df87dad.png"
+  srcset="https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations_hu_fe6c47e615c529cc.png 2x,https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations_hu_2af07d046b10779e.png 3x"
+  src="https://michael.stapelberg.ch/posts/2026-05-24-minimal-memory-safe-go-rsync-vulns/rsync-combinations_hu_676301528b69c19f.png"
   alt="diagram showing 4 different rsync setups: (1) rsync --daemon (2) rsync -e ssh; rsync://server/module/dir (3) rsync server:/some/path (4) rsync /src" title="diagram showing 4 different rsync setups: (1) rsync --daemon (2) rsync -e ssh; rsync://server/module/dir (3) rsync server:/some/path (4) rsync /src"
   width="600"
   height="547"
@@ -1287,8 +1290,8 @@ stack trace in a more colorful and much shorter version:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_c04249176648ab38.jpg 2x,https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_8da191a897747329.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_e61da31f617a2260.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_4c5f7b3d7df4ad22.jpg 2x,https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_ad1e8c2d9905e0.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2025-02-27-debug-hanging-go-programs/2025-02-08-panicparse_hu_a426e16585061786.jpg"
   
   width="600"
   height="394"
@@ -1638,8 +1641,8 @@ to pin-point any bottlenecks:</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hu_1e6cb5c3a0d53421.jpg 2x,https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hu_81f1353f7140ad17.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hu_ab177c5f9e8ee16.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hu_a9d9f70fb5fe8625.jpg 2x,https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hu_28af2a145a98ddb.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-07-02-rsync-how-does-it-work/2022-05-29-rsync-exo1-backup_hu_d49b3d3aab60f55f.jpg"
   
   width="600"
   height="331"
@@ -1758,28 +1761,28 @@ implementation (To be published.)</p>
 <h2 id="confirmation-hack">Appendix A: rsync confirmation hack</h2>
 <p>For verifying rsync’s behavior with regards to changing data sets, I checked
 out the following version:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% git clone https://github.com/WayneD/rsync/ rsync-changing-data-sets
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>% git clone https://github.com/WayneD/rsync/ rsync-changing-data-sets
 </span></span><span style="display:flex;"><span>% <span style="color:#007020">cd</span> rsync-changing-data-sets
 </span></span><span style="display:flex;"><span>% git checkout v3.2.4
 </span></span><span style="display:flex;"><span>% ./configure
 </span></span><span style="display:flex;"><span>% make
 </span></span></code></pre></div><p>Then, I modified <code>flist.c</code> to add a confirmation step between sending the file
 list and doing the actual file transfers:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/flist.c w/flist.c
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">diff --git i/flist.c w/flist.c
 </span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold">index 1ba306bc..98981f34 100644
-</span></span></span><span style="display:flex;"><span><span style="color:#000080;font-weight:bold"></span><span style="color:#a00000">--- i/flist.c
-</span></span></span><span style="display:flex;"><span><span style="color:#a00000"></span><span style="color:#00a000">+++ w/flist.c
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span><span style="color:#800080;font-weight:bold">@@ -20,6 +20,8 @@
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span>  * with this program; if not, visit the http://fsf.org website.
+</span></span></span><span style="display:flex;"><span><span style="color:#a00000">--- i/flist.c
+</span></span></span><span style="display:flex;"><span><span style="color:#00a000">+++ w/flist.c
+</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -20,6 +20,8 @@
+</span></span></span><span style="display:flex;"><span>  * with this program; if not, visit the http://fsf.org website.
 </span></span><span style="display:flex;"><span>  */
 </span></span><span style="display:flex;"><span> 
 </span></span><span style="display:flex;"><span><span style="color:#00a000">+#include &lt;stdio.h&gt;
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> #include &#34;rsync.h&#34;
+</span></span></span><span style="display:flex;"><span> #include &#34;rsync.h&#34;
 </span></span><span style="display:flex;"><span> #include &#34;ifuncs.h&#34;
 </span></span><span style="display:flex;"><span> #include &#34;rounding.h&#34;
 </span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold">@@ -2516,6 +2518,17 @@ struct file_list *send_file_list(int f, int argc, char *argv[])
-</span></span></span><span style="display:flex;"><span><span style="color:#800080;font-weight:bold"></span> 	if (DEBUG_GTE(FLIST, 2))
+</span></span></span><span style="display:flex;"><span> 	if (DEBUG_GTE(FLIST, 2))
 </span></span><span style="display:flex;"><span> 		rprintf(FINFO, &#34;send_file_list done\n&#34;);
 </span></span><span style="display:flex;"><span> 
 </span></span><span style="display:flex;"><span><span style="color:#00a000">+	char *line = NULL;
@@ -1793,11 +1796,11 @@ list and doing the actual file transfers:</p>
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	  printf(&#34;enter &#39;yes&#39; to continue: &#34;);
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+	}
 </span></span></span><span style="display:flex;"><span><span style="color:#00a000">+
-</span></span></span><span style="display:flex;"><span><span style="color:#00a000"></span> 	if (inc_recurse) {
+</span></span></span><span style="display:flex;"><span> 	if (inc_recurse) {
 </span></span><span style="display:flex;"><span> 		send_dir_depth = 1;
 </span></span><span style="display:flex;"><span> 		add_dirs_to_tree(-1, flist, stats.num_dirs);
 </span></span></code></pre></div><p>My rsync invocation is:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>./rsync -av --debug<span style="color:#666">=</span>all4 --protocol<span style="color:#666">=</span><span style="color:#40a070">27</span> ~/i3/src /tmp/DEST/
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>./rsync -av --debug<span style="color:#666">=</span>all4 --protocol<span style="color:#666">=</span><span style="color:#40a070">27</span> ~/i3/src /tmp/DEST/
 </span></span></code></pre></div><p>It’s necessary to use an older protocol version to make rsync generate a full
 file list before starting the transfer. Later protocol versions interleave these
 parts of the protocol.</p>
@@ -1831,22 +1834,22 @@ to your Pushgateway.</p>
 server.</p>
 <p>Then, in my <code>prometheus.conf</code> file, I instruct Prometheus to pull data from my
 Pushgateway:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># prometheus.conf</span><span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># prometheus.conf</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">rule_files</span>:<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>- backups.rules.yml<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">rule_files</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>- backups.rules.yml<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">scrape_configs</span>:<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#60a0b0;font-style:italic"># […]</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>- <span style="color:#062873;font-weight:bold">job_name</span>:<span style="color:#bbb"> </span>pushgateway<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">scrape_configs</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># […]</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>- <span style="color:#062873;font-weight:bold">job_name</span>:<span style="color:#bbb"> </span>pushgateway<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">honor_labels</span>:<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">true</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">static_configs</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">targets</span>:<span style="color:#bbb"> </span>[<span style="color:#4070a0">&#39;pushgateway:9091&#39;</span>]<span style="color:#bbb">
 </span></span></span></code></pre></div><p>Finally, in <code>backups.rules.yml</code>, I configure an alert on the time series <code>rsync_exit_code</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># backups.rules.yml</span><span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># backups.rules.yml</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">groups</span>:<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>backups.rules<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">groups</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>backups.rules<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">rules</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">alert</span>:<span style="color:#bbb"> </span>RsyncFailing<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">expr</span>:<span style="color:#bbb"> </span>rsync_exit_code{job=&#34;rsync&#34;} &gt; 0<span style="color:#bbb">
@@ -1861,7 +1864,7 @@ a non-zero exit code.</p>
 <h3 id="rsync-client-side-setup">rsync client-side setup</h3>
 <p>On each machine that runs <code>rsync</code> jobs I want to monitor, I first install
 <code>rsyncprom</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>go install github.com/stapelberg/rsyncprom/cmd/rsync-prom@latest
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>go install github.com/stapelberg/rsyncprom/cmd/rsync-prom@latest
 </span></span></code></pre></div><p>Then, I just wrap <code>rsync</code> transfers where it’s most convenient, for example in
 my <a href="https://manpages.debian.org/crontab.5"><code>crontab(5)</code></a>
 :</p>
@@ -1897,8 +1900,8 @@ running on a (different) server at an ISP.</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu_f49f29f3abecbb80.jpg 2x,https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu_2f7d6622da1f2afd.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu_f9be59dd23c35f90.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu_2db3563c2595b8dc.jpg 2x,https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu_109d709c8651f78a.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu_8dfdde166eaab1ad.jpg"
   alt="rsync grafana dashboard" title="rsync grafana dashboard"
   width="600"
   height="469"
@@ -1933,45 +1936,45 @@ and OpenBSD comes with a BSD-licensed implementation called
 <p>On Windows, you can use the <a href="https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux">Windows Subsystem for
 Linux</a>.</p>
 <table>
-  <thead>
-      <tr>
-          <th>Operating System</th>
-          <th>Implementation</th>
-          <th>Version</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>FreeBSD 13.1 (ports)</td>
-          <td>tridge</td>
-          <td><a href="https://www.freebsd.org/cgi/man.cgi?query=rsync&amp;manpath=FreeBSD+13.1-RELEASE+and+Ports">3.2.3</a></td>
-      </tr>
-      <tr>
-          <td>OpenBSD 7.1</td>
-          <td>openrsync</td>
-          <td>(7.1)</td>
-      </tr>
-      <tr>
-          <td>OpenBSD 7.1 (ports)</td>
-          <td>tridge</td>
-          <td><a href="https://openports.se/net/rsync">3.2.4</a></td>
-      </tr>
-      <tr>
-          <td>NetBSD 9.2 (pkgsrc)</td>
-          <td>tridge</td>
-          <td><a href="https://ftp.netbsd.org/pub/pkgsrc/current/pkgsrc/net/rsync/index.html">3.2.4</a></td>
-      </tr>
-      <tr>
-          <td>Linux</td>
-          <td>tridge</td>
-          <td><a href="https://repology.org/project/rsync/versions">repology</a></td>
-      </tr>
-      <tr>
-          <td>macOS</td>
-          <td>tridge</td>
-          <td><a href="https://www.unix.com/man-page/osx/1/rsync/">2.6.9</a></td>
-      </tr>
-  </tbody>
+	<thead>
+			<tr>
+					<th>Operating System</th>
+					<th>Implementation</th>
+					<th>Version</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>FreeBSD 13.1 (ports)</td>
+					<td>tridge</td>
+					<td><a href="https://www.freebsd.org/cgi/man.cgi?query=rsync&amp;manpath=FreeBSD+13.1-RELEASE+and+Ports">3.2.3</a></td>
+			</tr>
+			<tr>
+					<td>OpenBSD 7.1</td>
+					<td>openrsync</td>
+					<td>(7.1)</td>
+			</tr>
+			<tr>
+					<td>OpenBSD 7.1 (ports)</td>
+					<td>tridge</td>
+					<td><a href="https://openports.se/net/rsync">3.2.4</a></td>
+			</tr>
+			<tr>
+					<td>NetBSD 9.2 (pkgsrc)</td>
+					<td>tridge</td>
+					<td><a href="https://ftp.netbsd.org/pub/pkgsrc/current/pkgsrc/net/rsync/index.html">3.2.4</a></td>
+			</tr>
+			<tr>
+					<td>Linux</td>
+					<td>tridge</td>
+					<td><a href="https://repology.org/project/rsync/versions">repology</a></td>
+			</tr>
+			<tr>
+					<td>macOS</td>
+					<td>tridge</td>
+					<td><a href="https://www.unix.com/man-page/osx/1/rsync/">2.6.9</a></td>
+			</tr>
+	</tbody>
 </table>
 <h2 id="next-up">Next Up</h2>
 <p>The third article in this series is <a href="../2022-07-02-rsync-how-does-it-work/">rsync, article 3: How does rsync
@@ -2017,8 +2020,8 @@ doesn’t mind if the binary file it’s uploading is currently running (contrar
 , for example).</p>
 <p>To illustrate how such a script could look like, here’s my push script for
 <a href="https://codesearch.debian.net/">Debian Code Search</a>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#007020">#!/bin/zsh
-</span></span></span><span style="display:flex;"><span><span style="color:#007020"></span><span style="color:#007020">set</span> -ex
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#007020">#!/bin/zsh
+</span></span></span><span style="display:flex;"><span><span style="color:#007020">set</span> -ex
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Asynchronously transfer assets while compiling:</span>
 </span></span><span style="display:flex;"><span><span style="color:#666">(</span>
@@ -2034,16 +2037,16 @@ doesn’t mind if the binary file it’s uploading is currently running (contrar
 </span></span><span style="display:flex;"><span><span style="color:#bb60d5">tmp</span><span style="color:#666">=</span><span style="color:#007020;font-weight:bold">$(</span>mktemp -d<span style="color:#007020;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>mkdir <span style="color:#bb60d5">$tmp</span>/bin
 </span></span><span style="display:flex;"><span><span style="color:#bb60d5">GOBIN</span><span style="color:#666">=</span><span style="color:#bb60d5">$tmp</span>/bin <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span><span style="color:#bb60d5">GOAMD64</span><span style="color:#666">=</span>v3 <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  go install <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  -ldflags <span style="color:#4070a0">&#39;-X github.com/Debian/dcs/cmd/dcs-web/common.Version=$version&#39;</span> <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  github.com/Debian/dcs/cmd/...
+</span></span></span><span style="display:flex;"><span><span style="color:#bb60d5">GOAMD64</span><span style="color:#666">=</span>v3 <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>  go install <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>  -ldflags <span style="color:#4070a0">&#39;-X github.com/Debian/dcs/cmd/dcs-web/common.Version=$version&#39;</span> <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>  github.com/Debian/dcs/cmd/...
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Transfer the Debian Code Search binaries:</span>
 </span></span><span style="display:flex;"><span>rsync <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  <span style="color:#bb60d5">$tmp</span>/bin/dcs-<span style="color:#666">{</span>web,source-backend,package-importer,compute-ranking,feeder<span style="color:#666">}</span> <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  <span style="color:#bb60d5">$tmp</span>/bin/dcs <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  root@dcs:/srv/dcs/bin/
+</span></span></span><span style="display:flex;"><span>  <span style="color:#bb60d5">$tmp</span>/bin/dcs-<span style="color:#666">{</span>web,source-backend,package-importer,compute-ranking,feeder<span style="color:#666">}</span> <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>  <span style="color:#bb60d5">$tmp</span>/bin/dcs <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>  root@dcs:/srv/dcs/bin/
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Wait for the asynchronous asset transfer to complete:</span>
 </span></span><span style="display:flex;"><span><span style="color:#007020">wait</span>
@@ -2051,10 +2054,10 @@ doesn’t mind if the binary file it’s uploading is currently running (contrar
 </span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># Restart Debian Code Search on the server:</span>
 </span></span><span style="display:flex;"><span><span style="color:#bb60d5">UNITS</span><span style="color:#666">=(</span>dcs-package-importer.service dcs-source-backend.service dcs-compute-ranking.timer dcs-web.service<span style="color:#666">)</span>
 </span></span><span style="display:flex;"><span>ssh root@dcs systemctl daemon-reload <span style="color:#4070a0;font-weight:bold">\&amp;\&amp;</span> <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  systemctl <span style="color:#007020">enable</span> <span style="color:#70a0d0">${</span><span style="color:#bb60d5">UNITS</span><span style="color:#70a0d0">}</span> <span style="color:#4070a0;font-weight:bold">\;</span> <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  systemctl reset-failed <span style="color:#70a0d0">${</span><span style="color:#bb60d5">UNITS</span><span style="color:#70a0d0">}</span> <span style="color:#4070a0;font-weight:bold">\;</span> <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  systemctl restart <span style="color:#70a0d0">${</span><span style="color:#bb60d5">UNITS</span><span style="color:#70a0d0">}</span> <span style="color:#4070a0;font-weight:bold">\;</span> <span style="color:#4070a0;font-weight:bold">\
-</span></span></span><span style="display:flex;"><span><span style="color:#4070a0;font-weight:bold"></span>  systemctl reload nginx
+</span></span></span><span style="display:flex;"><span>  systemctl <span style="color:#007020">enable</span> <span style="color:#70a0d0">${</span><span style="color:#bb60d5">UNITS</span><span style="color:#70a0d0">}</span> <span style="color:#4070a0;font-weight:bold">\;</span> <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>  systemctl reset-failed <span style="color:#70a0d0">${</span><span style="color:#bb60d5">UNITS</span><span style="color:#70a0d0">}</span> <span style="color:#4070a0;font-weight:bold">\;</span> <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>  systemctl restart <span style="color:#70a0d0">${</span><span style="color:#bb60d5">UNITS</span><span style="color:#70a0d0">}</span> <span style="color:#4070a0;font-weight:bold">\;</span> <span style="color:#4070a0;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span>  systemctl reload nginx
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>rm -rf <span style="color:#4070a0">&#34;</span><span style="color:#70a0d0">${</span><span style="color:#bb60d5">tmp</span>?<span style="color:#70a0d0">}</span><span style="color:#4070a0">&#34;</span>
 </span></span></code></pre></div><h2 id="backups-using-rsync">Scenario: Backups using rsync</h2>

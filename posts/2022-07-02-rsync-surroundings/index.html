@@ -14,7 +14,7 @@ Now that we know what to use rsync for, how can we best integrate rsync into mon
   
   
   
-  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu_e7ef9bb4e85b2e5b.jpg">
+  <meta property="og:image" content="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu_c7c0566a096bca3.jpg">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -106,7 +106,7 @@ Now that we know what to use rsync for, how can we best integrate rsync into mon
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -227,22 +227,22 @@ to your Pushgateway.</p>
 server.</p>
 <p>Then, in my <code>prometheus.conf</code> file, I instruct Prometheus to pull data from my
 Pushgateway:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># prometheus.conf</span><span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># prometheus.conf</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">rule_files</span>:<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>- backups.rules.yml<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">rule_files</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>- backups.rules.yml<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">scrape_configs</span>:<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#60a0b0;font-style:italic"># […]</span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>- <span style="color:#062873;font-weight:bold">job_name</span>:<span style="color:#bbb"> </span>pushgateway<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">scrape_configs</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># […]</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>- <span style="color:#062873;font-weight:bold">job_name</span>:<span style="color:#bbb"> </span>pushgateway<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">honor_labels</span>:<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">true</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">static_configs</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">targets</span>:<span style="color:#bbb"> </span>[<span style="color:#4070a0">&#39;pushgateway:9091&#39;</span>]<span style="color:#bbb">
 </span></span></span></code></pre></div><p>Finally, in <code>backups.rules.yml</code>, I configure an alert on the time series <code>rsync_exit_code</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># backups.rules.yml</span><span style="color:#bbb">
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic"># backups.rules.yml</span><span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#062873;font-weight:bold">groups</span>:<span style="color:#bbb">
-</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>backups.rules<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#062873;font-weight:bold">groups</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span>- <span style="color:#062873;font-weight:bold">name</span>:<span style="color:#bbb"> </span>backups.rules<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#062873;font-weight:bold">rules</span>:<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>- <span style="color:#062873;font-weight:bold">alert</span>:<span style="color:#bbb"> </span>RsyncFailing<span style="color:#bbb">
 </span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span><span style="color:#062873;font-weight:bold">expr</span>:<span style="color:#bbb"> </span>rsync_exit_code{job=&#34;rsync&#34;} &gt; 0<span style="color:#bbb">
@@ -257,7 +257,7 @@ a non-zero exit code.</p>
 <h3 id="rsync-client-side-setup">rsync client-side setup</h3>
 <p>On each machine that runs <code>rsync</code> jobs I want to monitor, I first install
 <code>rsyncprom</code>:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>go install github.com/stapelberg/rsyncprom/cmd/rsync-prom@latest
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>go install github.com/stapelberg/rsyncprom/cmd/rsync-prom@latest
 </span></span></code></pre></div><p>Then, I just wrap <code>rsync</code> transfers where it’s most convenient, for example in
 my <a href="https://manpages.debian.org/crontab.5"><code>crontab(5)</code></a>
 :</p>
@@ -293,8 +293,8 @@ running on a (different) server at an ISP.</p>
 
 
 <a href="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured.jpg"><img
-  srcset="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu_f49f29f3abecbb80.jpg 2x,https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu_2f7d6622da1f2afd.jpg 3x"
-  src="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu_f9be59dd23c35f90.jpg"
+  srcset="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu_2db3563c2595b8dc.jpg 2x,https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu_109d709c8651f78a.jpg 3x"
+  src="https://michael.stapelberg.ch/posts/2022-07-02-rsync-surroundings/2022-06-12-rsync-grafana-featured_hu_8dfdde166eaab1ad.jpg"
   alt="rsync grafana dashboard" title="rsync grafana dashboard"
   width="600"
   height="469"
@@ -329,45 +329,45 @@ and OpenBSD comes with a BSD-licensed implementation called
 <p>On Windows, you can use the <a href="https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux">Windows Subsystem for
 Linux</a>.</p>
 <table>
-  <thead>
-      <tr>
-          <th>Operating System</th>
-          <th>Implementation</th>
-          <th>Version</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>FreeBSD 13.1 (ports)</td>
-          <td>tridge</td>
-          <td><a href="https://www.freebsd.org/cgi/man.cgi?query=rsync&amp;manpath=FreeBSD+13.1-RELEASE+and+Ports">3.2.3</a></td>
-      </tr>
-      <tr>
-          <td>OpenBSD 7.1</td>
-          <td>openrsync</td>
-          <td>(7.1)</td>
-      </tr>
-      <tr>
-          <td>OpenBSD 7.1 (ports)</td>
-          <td>tridge</td>
-          <td><a href="https://openports.se/net/rsync">3.2.4</a></td>
-      </tr>
-      <tr>
-          <td>NetBSD 9.2 (pkgsrc)</td>
-          <td>tridge</td>
-          <td><a href="https://ftp.netbsd.org/pub/pkgsrc/current/pkgsrc/net/rsync/index.html">3.2.4</a></td>
-      </tr>
-      <tr>
-          <td>Linux</td>
-          <td>tridge</td>
-          <td><a href="https://repology.org/project/rsync/versions">repology</a></td>
-      </tr>
-      <tr>
-          <td>macOS</td>
-          <td>tridge</td>
-          <td><a href="https://www.unix.com/man-page/osx/1/rsync/">2.6.9</a></td>
-      </tr>
-  </tbody>
+	<thead>
+			<tr>
+					<th>Operating System</th>
+					<th>Implementation</th>
+					<th>Version</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>FreeBSD 13.1 (ports)</td>
+					<td>tridge</td>
+					<td><a href="https://www.freebsd.org/cgi/man.cgi?query=rsync&amp;manpath=FreeBSD+13.1-RELEASE+and+Ports">3.2.3</a></td>
+			</tr>
+			<tr>
+					<td>OpenBSD 7.1</td>
+					<td>openrsync</td>
+					<td>(7.1)</td>
+			</tr>
+			<tr>
+					<td>OpenBSD 7.1 (ports)</td>
+					<td>tridge</td>
+					<td><a href="https://openports.se/net/rsync">3.2.4</a></td>
+			</tr>
+			<tr>
+					<td>NetBSD 9.2 (pkgsrc)</td>
+					<td>tridge</td>
+					<td><a href="https://ftp.netbsd.org/pub/pkgsrc/current/pkgsrc/net/rsync/index.html">3.2.4</a></td>
+			</tr>
+			<tr>
+					<td>Linux</td>
+					<td>tridge</td>
+					<td><a href="https://repology.org/project/rsync/versions">repology</a></td>
+			</tr>
+			<tr>
+					<td>macOS</td>
+					<td>tridge</td>
+					<td><a href="https://www.unix.com/man-page/osx/1/rsync/">2.6.9</a></td>
+			</tr>
+	</tbody>
 </table>
 <h2 id="next-up">Next Up</h2>
 <p>The third article in this series is <a href="../2022-07-02-rsync-how-does-it-work/">rsync, article 3: How does rsync

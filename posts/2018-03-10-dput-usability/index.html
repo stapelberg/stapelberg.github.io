@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,7 +179,7 @@
 <h1 class="ms_title">dput usability changes (2018)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2018-03-10, last modified 2019-02-04</div>
+  <div id="ms_date">published 2018-03-10, last modified 2026-07-20</div>
   
   
   <div id="ms_tags">
@@ -192,7 +192,7 @@
   </div>
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2018-03-10-dput-usability.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2018-03-10-dput-usability.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -200,7 +200,6 @@
   <p>
   dput-ng ≥ 1.16 contains two usability changes which make uploading easier:
 </p>
-
 <ol>
   <li>
     When no arguments are specified, dput-ng auto-selects the most recent .changes file (with confirmation).
@@ -209,7 +208,6 @@
     Instead of erroring out when detecting an unsigned .changes file, <a href="https://manpages.debian.org/stretch/devscripts/debsign.1">debsign(1)</a> is invoked to sign the .changes file before proceeding.
   </li>
 </ol>
-
 <p>
   With these changes, after building a package, you just need to
   type <code>dput</code> (in the correct directory of course) to sign and upload

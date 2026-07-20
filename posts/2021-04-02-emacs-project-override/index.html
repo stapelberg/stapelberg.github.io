@@ -103,7 +103,7 @@ In practice, a project is recognized by looking for Git repositories, which is a
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -204,7 +204,7 @@ project-based commands in a parent directory that contains multiple Git
 repositories.</p>
 <p>Luckily, we can provide our own entry to the <code>project-find-functions</code> hook, and
 look for a <code>.project.el</code> file in the parent directories:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-elisp" data-lang="elisp"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">;; Returns the parent directory containing a .project.el file, if any,</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-elisp" data-lang="elisp"><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">;; Returns the parent directory containing a .project.el file, if any,</span>
 </span></span><span style="display:flex;"><span><span style="color:#60a0b0;font-style:italic">;; to override the standard project.el detection logic when needed.</span>
 </span></span><span style="display:flex;"><span>(<span style="color:#007020">defun</span> <span style="color:#bb60d5">zkj-project-override</span> (<span style="color:#bb60d5">dir</span>)
 </span></span><span style="display:flex;"><span>  (<span style="color:#007020">let</span> ((<span style="color:#bb60d5">override</span> (<span style="color:#bb60d5">locate-dominating-file</span> <span style="color:#bb60d5">dir</span> <span style="color:#4070a0">&#34;.project.el&#34;</span>)))

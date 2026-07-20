@@ -105,7 +105,7 @@ input latency (keyboard) processing latency (computer) output latency (monitor) 
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -253,30 +253,30 @@ measure Emacs’s processing latency.</p>
 <h3 id="end-to-end-latency">End-to-end latency</h3>
 <p>With the kinX keyboard controller, we can achieve the following end-to-end latency:</p>
 <table>
-  <thead>
-      <tr>
-          <th>contributor</th>
-          <th>latency</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>Matrix scan</td>
-          <td>≈ 208 μs</td>
-      </tr>
-      <tr>
-          <td>USB poll</td>
-          <td>≈ 125 μs</td>
-      </tr>
-      <tr>
-          <td>Linux</td>
-          <td>≈ 152 μs</td>
-      </tr>
-      <tr>
-          <td>Emacs</td>
-          <td>≈ 278 μs</td>
-      </tr>
-  </tbody>
+	<thead>
+			<tr>
+					<th>contributor</th>
+					<th>latency</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>Matrix scan</td>
+					<td>≈ 208 μs</td>
+			</tr>
+			<tr>
+					<td>USB poll</td>
+					<td>≈ 125 μs</td>
+			</tr>
+			<tr>
+					<td>Linux</td>
+					<td>≈ 152 μs</td>
+			</tr>
+			<tr>
+					<td>Emacs</td>
+					<td>≈ 278 μs</td>
+			</tr>
+	</tbody>
 </table>
 <p><br>This sums up to ≈ 763 μs on average. On top of that, we have output latency
 within [0, 16ms] due to the 60 Hz refresh rate of our monitors.</p>

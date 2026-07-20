@@ -99,7 +99,7 @@
   
 
   
-  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-%2fYWwNmSwU0AVUEYIthYX38%2bRwG48BGBQNeu5vLf5c8D24kuUrCGYa2Frxc5Y0zO6mJRYk8Dxp8FK7WEPc9ZhXg%3d%3d" type="text/css">
+  <link rel="stylesheet" href="/1.min.css?cachebust=sha512-BbEIU%2fDBvvC8mj28p80mYaDZgOhwAve2cEDD7ZUNfrhEJbisLK5nkNzKVuIzto7gTx0Aq6HjTZ5WUk8AqsHoMA%3d%3d" type="text/css">
   <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="ATOM feed">
 </head>
 <body>
@@ -179,11 +179,11 @@
 <h1 class="ms_title">SSD kaputt (2011)</h1>
 
 <div class="ms_meta">
-  <div id="ms_date">published 2011-10-15, last modified 2018-03-23</div>
+  <div id="ms_date">published 2011-10-15, last modified 2026-07-20</div>
   
   
   <div>
-    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2011-10-15-ssd-broken.html"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
+    <a href="https://github.com/stapelberg/hugo/edit/master/content/posts/2011-10-15-ssd-broken.markdown"><img src="/Bilder/pen-square-solid.svg" width="18" height="20" alt="Edit Icon" title="Suggest a change to this article"></a>
   </div>
   
 </div>
@@ -194,7 +194,6 @@ gegeben hat (nach einem power cycle war sie aber wieder benutzbar), ist sie
 gestern so ausgefallen, dass ich mich nicht mehr an meinem System anmelden
 konnte und das Symptom auch über einen Neustart bestehen blieb.
 </p>
-
 <p>
 Da ich ja schon vorher Anzeichen hatte, hatte ich mir rechtzeitig Ersatz
 bestellt und so beschränkte sich die Reparatur auf Austauschen der Platte und
@@ -203,14 +202,12 @@ Sicherungszeitpunkt ein paar kleine Änderungen an zwei Dateien gemacht hatte,
 habe ich ein grml gebootet und die SSD mit einem alternativen Superblock
 gemountet – dadurch konnte ich dann auf die Dateien zugreifen.
 </p>
-
 <p>
 Bei der neuen SSD (eine OCZ Vertex 2, die hat derzeit das beste
 Preis-/Leistungsverhältnis) habe ich diesmal die Partitionen so angelegt, dass
 sie auf eine 512 KiB großen Erase Block Size ausgelegt sind. Mehr als
 Dokumentation für mich denn als Anleitung hier die nötigen Schritte:
 </p>
-
 <pre>
 $ fdisk -S 32 -H 32 /dev/sda
 $ fdisk -l /dev/sda
@@ -226,7 +223,6 @@ $ mkfs.ext4 -b 1024 -E stride=512,stripe-width=512 -O ^has_journal /dev/sda1
 $ cryptsetup luksOpen /dev/sda2 sda2_crypt
 $ mkfs.ext4 -b 4096 -E stride=128,stripe-width=128 /dev/mapper/sda2_crypt
 </pre>
-
 <p>
 Für die „told you so“-Leute (oder Datenpunkt-Sammler, welche SSDs wann
 ausfallen): Die alte SSD war von SuperTalent und hielt gute 1,5 Jahre. Ich habe
@@ -235,7 +231,6 @@ wäre, die Platte leer zu machen, TRIM zu nutzen und schauen ob sie die defekten
 Sektoren dann ordentlich wegsortiert. Ich hab aber derzeit nicht die Motivation
 / Mittel dazu.
 </p>
-
 <p>
 Die Moral von der Geschichte ist natürlich, wie toll tägliche Backups sind. ♥
 </p>
